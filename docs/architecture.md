@@ -116,7 +116,7 @@ graph TB
 | Container | Responsibility | Tech |
 |-----------|----------------|------|
 | React SPA | All UI; static build served by ingress/CDN | React + TypeScript + MUI |
-| Laravel API | Stateless HTTP API, request auth, module orchestration | PHP 8.3 / Laravel 11 |
+| Laravel API | Stateless HTTP API, request auth, module orchestration | PHP 8.4 / Laravel 12 ([ADR-0006](./adr/0006-runtime-baseline-laravel-12-php-84.md)) |
 | Queue Workers | Background jobs: email, malware scan, PDF, GPA recalc, SLA/reminder actions | Laravel Horizon |
 | Scheduler | Time-driven work: SLA aging, Incomplete→FW conversion, reminders | Laravel scheduler |
 | Reverb | Real-time push for the notification bell | Laravel Reverb (WebSockets) |

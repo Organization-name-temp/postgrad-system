@@ -28,6 +28,34 @@ _Avoid_: supervisor, mentor, tutor.
 The faculty member (role R04) who teaches a Course and enters/signs its grades.
 _Avoid_: doctor, teacher, professor, lecturer (all appear in the SRS; "Instructor" is canonical).
 
+## Identity & access
+
+**User**:
+The authenticable account for one person — an email, a password, a preferred locale, and
+one or more Roles. A User is distinct from the Roles it holds: the same person is one
+User throughout, whether their current Role is Applicant or Student. The People above are
+Roles a User holds, not separate accounts.
+_Avoid_: account (informal for User); "login" (that is the *act*, not the User).
+
+**Role**:
+One of the ten fixed positions defined by the bylaws (R01–R10 — see People for each). The
+role set is fixed in code; a User may hold several, and only the *assignment* of Roles to
+Users is editable at runtime, and only by System/Super Administrator.
+_Avoid_: group, profile, persona.
+
+**Permission**:
+A single authorised action (e.g. "Approve Course Registration"), drawn from the SRS §3.2
+matrix. Each Role grants a fixed set; a User's effective Permissions are the union across
+their Roles. Enforced on the API and mirrored on the SPA for display only — the client is
+never the authority.
+_Avoid_: privilege, right, capability ("Permission" is canonical).
+
+**Audit Log**:
+The append-only record of security- and data-sensitive events (authentication events now;
+sensitive-data CRUD later), retained long-term. Entries are never updated or deleted and
+are written only through the audit writer, never edited directly.
+_Avoid_: activity log, history, event log (the domain-event stream is a separate thing).
+
 ## Admissions
 
 **Application**:

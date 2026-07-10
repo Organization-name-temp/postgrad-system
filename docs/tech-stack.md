@@ -117,7 +117,7 @@ Frontend   React + TypeScript · Vite · MUI · TanStack Query · Zustand
            React Hook Form + Zod · React Router · react-i18next
            OpenAPI-generated client · Vitest + Playwright
 
-Backend    PHP 8.3 · Laravel 11 · REST /api/v1 (OpenAPI 3.0)
+Backend    PHP 8.4 · Laravel 12 · REST /api/v1 (OpenAPI 3.0)
            Sanctum + Socialite/SAML/LDAP + TOTP MFA
            deptrac · PHPStan/Larastan · Pest · Horizon · Reverb
 

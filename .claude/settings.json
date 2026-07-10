@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "PowerShell(Write-Output \"--- node ---\"; try { node --version } catch { Write-Output \"node NOT found\" }; Write-Output \"--- npm ---\"; try { npm --version } catch { Write-Output \"npm NOT found\" }; Write-Output \"--- claude ---\"; try { \\(Get-Command claude -ErrorAction Stop\\).Source } catch { Write-Output \"claude CLI NOT found on PATH\" })",
-      "PowerShell($paths = @\\(\"$env:USERPROFILE\\\\.local\\\\bin\\\\claude.exe\",\"$env:USERPROFILE\\\\.local\\\\bin\\\\claude\",\"$env:APPDATA\\\\npm\\\\claude.cmd\",\"$env:USERPROFILE\\\\.npm-global\\\\bin\\\\claude.cmd\"\\); foreach\\($p in $paths\\){ if\\(Test-Path $p\\){ Write-Output \"FOUND: $p\" } }; Write-Output \"--- npm global bin ---\"; npm bin -g 2>$null; Write-Output \"--- npm root -g ---\"; npm root -g)"
+      "PowerShell($paths = @\\(\"$env:USERPROFILE\\\\.local\\\\bin\\\\claude.exe\",\"$env:USERPROFILE\\\\.local\\\\bin\\\\claude\",\"$env:APPDATA\\\\npm\\\\claude.cmd\",\"$env:USERPROFILE\\\\.npm-global\\\\bin\\\\claude.cmd\"\\); foreach\\($p in $paths\\){ if\\(Test-Path $p\\){ Write-Output \"FOUND: $p\" } }; Write-Output \"--- npm global bin ---\"; npm bin -g 2>$null; Write-Output \"--- npm root -g ---\"; npm root -g)",
+      "Bash(git -C \"c:/Users/Mohamed/Desktop/Postgrad System\" log --oneline -10)",
+      "Bash(gh auth *)",
+      "PowerShell($gh = Get-Command gh -ErrorAction SilentlyContinue; if \\($gh\\) { \"gh FOUND: $\\($gh.Source\\)\"; gh --version | Select-Object -First 1 } else { \"gh NOT FOUND on PATH\" }; \"--- docs/agents ---\"; if \\(Test-Path \"docs/agents\"\\) { Get-ChildItem docs/agents -Name } else { \"no docs/agents dir\" }; \"--- root agent files ---\"; Get-ChildItem -Name CLAUDE.md, AGENTS.md, .scratch -ErrorAction SilentlyContinue)"
     ]
   }
 }

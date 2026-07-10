@@ -71,17 +71,40 @@ deptrac + PHPStan/Larastan + eslint-boundaries + Pint are green (see §4). Build
 strict; do not start a phase before the previous one's review gate passes.
 
 ### Phase 0 — Walking skeleton & foundations
-The thinnest end-to-end slice that proves the whole stack.
-- Monorepo: `backend/` (Laravel 11) + `frontend/` (React + TS + Vite + MUI).
-- Module scaffold under `backend/modules/<Name>/{Public,Internal}` + **deptrac** rules;
+The thinnest end-to-end slice that proves the whole stack. Runtime is **Laravel 12 /
+PHP 8.4** ([ADR-0006](./adr/0006-runtime-baseline-laravel-12-php-84.md)). The decisions
+below were sharpened in a `/grill-with-docs` session; `/to-prd` turns them into the phase PRD.
+
+- **Monorepo:** `backend/` (Laravel 12) + `frontend/` (React + TS + Vite + MUI), beside `docs/`.
+- **Modules:** hand-rolled PSR-4 (`Modules\` → `backend/modules/`) with one thin
+  auto-discovered `ModuleServiceProvider` per module
+  ([ADR-0007](./adr/0007-hand-rolled-psr4-modules.md)). **deptrac** governs the
+  `Public`/`Internal` seam generically; only **Identity** is scaffolded now (later modules
+  join the ruleset as born — first cross-module boundary test in Phase 1).
   `eslint-plugin-boundaries` for the frontend feature seams.
-- **Identity & Access:** Sanctum SPA cookie auth (login/logout), seeded users, the
-  R01–R10 role model + permission matrix (SRS §3.2), API policy middleware + SPA
-  route guards. Audit-log table stub (append-only), written by later events.
-- **OpenAPI → typed client** pipeline (Scribe → openapi-typescript/Orval + Axios).
-- **i18n scaffold:** `react-i18next`, EN+AR resource files, MUI RTL/LTR theme toggle.
-- Test harness: Pest, Vitest + RTL, one Playwright smoke; CI-runnable gate scripts.
-- **Demo:** log in as any seeded role → land on a guarded, language-switchable dashboard.
+- **Identity & Access:** Sanctum SPA cookie auth (`login`/`logout`); seeded users (one per
+  role R01–R10 + one deliberately multi-role); the R01–R10 role model + §3.2 permission
+  matrix as **PHP enums + a static matrix** ([ADR-0008](./adr/0008-rbac-enums-static-matrix.md)),
+  with `Gate`s registered from the matrix, API policy middleware + SPA route guards.
+  `GET /api/v1/me` returns user + roles + effective permissions (the server is the sole
+  authority; the SPA mirrors for UX only). Append-only **audit-log** table behind an
+  `AuditLogger` (Identity/Public) that writes login/logout/failed-login now (account
+  lockout stays deferred — a failed-login audit row is not lockout).
+- **API conventions:** `/api/v1`; `{data, meta}` success via API Resources; native
+  `{message, errors}` errors; standard status codes (422/401/403/404/409).
+- **OpenAPI → typed client:** Scribe → OpenAPI 3.0 → **Orval** (TanStack Query hooks +
+  Axios + Zod). `openapi.json` and the generated client are committed; both gates fail on drift.
+- **i18n (full loop):** `react-i18next`, EN+AR per-feature namespaces + a shared `common`,
+  MUI RTL/LTR flip; language persisted to `users.preferred_locale` via `PATCH /api/v1/me`;
+  an `Accept-Language` middleware sets the Laravel locale so server messages localize too.
+- **Dev environment:** Vite dev proxy (`/api` + `/sanctum` → Laravel, same-origin);
+  **docker-compose runs Postgres only** (orchestration stays deferred per ADR-0005).
+- **Gates:** `composer gate` (Pint, PHPStan/Larastan, deptrac, Pest) + `npm run gate`
+  (ESLint + boundaries, Prettier, `tsc`, Vitest + RTL, one Playwright smoke) + a thin
+  `.github/workflows/ci.yml` that calls both.
+- **Demo:** log in as any seeded role → land on one guarded dashboard showing your
+  identity, roles, and effective permissions, with a permission-gated widget and a live
+  EN↔AR / RTL toggle.
 
 ### Phase 1 — Catalog (SRS §4.3)
 - **Catalog module:** Faculties, Departments, Programs, Courses, Course Categories

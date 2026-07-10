@@ -1,0 +1,10 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    # Tech-stack targets PHPStan "max"; we start at a solid level and raise it as
+    # the domain grows (a documented later hardening step, per tech-stack.md).
+    level: 6
+    paths:
+        - app
+        - modules

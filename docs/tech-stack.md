@@ -16,8 +16,8 @@ Each choice below is tied to the requirement that drove it. The core shape — *
 
 | Concern | Choice | Why |
 |---------|--------|-----|
-| Language / runtime | **PHP 8.3** | Typed properties, enums, readonly — leveraged for domain modeling |
-| Framework | **Laravel 11** | Mature ecosystem for every SRS need (auth, queues, scheduler, broadcasting, localization) |
+| Language / runtime | **PHP 8.4** | Typed properties, enums, readonly, property hooks, asymmetric visibility — leveraged for domain modeling ([ADR-0006](./adr/0006-runtime-baseline-laravel-12-php-84.md)) |
+| Framework | **Laravel 12** | Mature ecosystem for every SRS need (auth, queues, scheduler, broadcasting, localization); Laravel 11 is EOL ([ADR-0006](./adr/0006-runtime-baseline-laravel-12-php-84.md)) |
 | API style | **REST, versioned `/api/v1`** | SRS §6.2 mandates RESTful + URL-path versioning |
 | API docs | **Scribe** (or L5-Swagger) → **OpenAPI 3.0** | SRS §6.2.3; the spec also generates the frontend's typed client |
 | Module boundaries | **deptrac** | Enforces the modular-monolith seams ([ADR-0002](./adr/0002-modular-monolith-seams.md)) |

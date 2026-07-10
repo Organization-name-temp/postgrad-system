@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Write-Output \"--- node ---\"; try { node --version } catch { Write-Output \"node NOT found\" }; Write-Output \"--- npm ---\"; try { npm --version } catch { Write-Output \"npm NOT found\" }; Write-Output \"--- claude ---\"; try { \\(Get-Command claude -ErrorAction Stop\\).Source } catch { Write-Output \"claude CLI NOT found on PATH\" })",
+      "PowerShell($paths = @\\(\"$env:USERPROFILE\\\\.local\\\\bin\\\\claude.exe\",\"$env:USERPROFILE\\\\.local\\\\bin\\\\claude\",\"$env:APPDATA\\\\npm\\\\claude.cmd\",\"$env:USERPROFILE\\\\.npm-global\\\\bin\\\\claude.cmd\"\\); foreach\\($p in $paths\\){ if\\(Test-Path $p\\){ Write-Output \"FOUND: $p\" } }; Write-Output \"--- npm global bin ---\"; npm bin -g 2>$null; Write-Output \"--- npm root -g ---\"; npm root -g)"
+    ]
+  }
+}

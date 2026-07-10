@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  title: 'PRS API Documentation'
+  description: ''
+  version: 1.0.0
+servers:
+  - url: 'http://localhost'
+tags:
+  - name: Endpoints
+    description: ''
+paths:
+  /api/v1/health:
+    get:
+      summary: 'Service health check.'
+      operationId: serviceHealthCheck
+      description: "A public, unauthenticated liveness probe used by the SPA to confirm the\nAPI is reachable."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    status: ok
+                    app: PRS
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: ok
+                      app:
+                        type: string
+                        example: PRS
+      tags:
+        - Endpoints
+      security: []
+  /api/v1/login:
+    post:
+      summary: 'Log in.'
+      operationId: logIn
+      description: "Authenticates via Sanctum's SPA cookie session (Q10)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    name: 'Student Affairs'
+                    email: r05@ejust.test
+                    preferred_locale: en
+                    roles:
+                      -
+                        code: R05
+                        name: 'Student Affairs Staff'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: 'Student Affairs'
+                      email:
+                        type: string
+                        example: r05@ejust.test
+                      preferred_locale:
+                        type: string
+                        example: en
+                      roles:
+                        type: array
+                        example:
+                          - code: R05
+                            name: 'Student Affairs Staff'
+                        items:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              example: R05
+                            name:
+                              type: string
+                              example: 'Student Affairs Staff'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'These credentials do not match our records.'
+                  errors:
+                    email:
+                      - 'These credentials do not match our records.'
+                properties:
+                  message:
+                    type: string
+                    example: 'These credentials do not match our records.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'These credentials do not match our records.'
+                        items:
+                          type: string
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Must be a valid email address.'
+                  example: gbailey@example.net
+                password:
+                  type: string
+                  description: ''
+                  example: '|]|{+-'
+              required:
+                - email
+                - password
+      security: []
+  /api/v1/logout:
+    post:
+      summary: 'Log out.'
+      operationId: logOut
+      description: 'Ends the session.'
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+                properties: {}
+      tags:
+        - Endpoints
+      security: []
+  /api/v1/me:
+    get:
+      summary: 'Current user.'
+      operationId: currentUser
+      description: "The authenticated user + roles (and, from ticket 05, effective\npermissions); the SPA's authority source for route guards."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    name: 'Student Affairs'
+                    email: r05@ejust.test
+                    preferred_locale: en
+                    roles:
+                      -
+                        code: R05
+                        name: 'Student Affairs Staff'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: 'Student Affairs'
+                      email:
+                        type: string
+                        example: r05@ejust.test
+                      preferred_locale:
+                        type: string
+                        example: en
+                      roles:
+                        type: array
+                        example:
+                          - code: R05
+                            name: 'Student Affairs Staff'
+                        items:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              example: R05
+                            name:
+                              type: string
+                              example: 'Student Affairs Staff'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []

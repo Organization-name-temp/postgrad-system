@@ -1,0 +1,4 @@
+# Keep generated API artifacts LF-normalized so the drift checks in the gate are
+# stable across operating systems (Windows CRLF would otherwise show false drift).
+backend/openapi.yaml text eol=lf
+frontend/src/shared/api/generated/** text eol=lf

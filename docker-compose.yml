@@ -1,0 +1,29 @@
+# Local dev database for the Postgraduate Registration System (PRS).
+#
+# Postgres ONLY. The application itself is deliberately NOT containerized —
+# ADR-0005 defers app/orchestration containerization for this localhost learning
+# build; this compose file is a dev-database convenience (Q11), version-pinned and
+# disposable. Run `docker compose up -d` from the repo root.
+services:
+  db:
+    image: postgres:17
+    container_name: prs-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: prs
+      POSTGRES_USER: prs
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - prs-pgdata:/var/lib/postgresql/data
+      # Runs once on first cluster init to create the separate test database.
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prs -d prs"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  prs-pgdata:

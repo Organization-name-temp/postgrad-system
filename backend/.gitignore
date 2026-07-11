@@ -7,14 +7,27 @@
 /storage/*.key
 /storage/pail
 /vendor
+/.deptrac.cache
 .env
 .env.backup
 .env.production
 .phpactor.json
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
 /auth.json
 /.fleet
 /.idea
 /.nova
 /.vscode
 /.zed
-/.scribe/endpoints.cache
+
+# Scribe generates HTML docs + assets on every run; only backend/openapi.yaml
+# (copied out by `composer api:spec`) is the committed contract.
+/.scribe
+/resources/views/scribe
+/public/vendor/scribe
+/public/docs
+/storage/app/private/scribe

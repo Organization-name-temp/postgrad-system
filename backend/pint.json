@@ -1,0 +1,10 @@
+{
+    "preset": "laravel",
+    "exclude": [
+        "bootstrap/cache",
+        "storage",
+        "resources/views/scribe",
+        "public/vendor/scribe",
+        "public/docs"
+    ]
+}

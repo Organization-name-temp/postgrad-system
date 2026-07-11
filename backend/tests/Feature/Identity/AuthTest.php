@@ -5,9 +5,6 @@ use Laravel\Sanctum\Sanctum;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 
-use function Pest\Laravel\getJson;
-use function Pest\Laravel\postJson;
-
 uses(RefreshDatabase::class);
 
 it('logs in with valid credentials and records a login audit entry', function () {
@@ -17,7 +14,7 @@ it('logs in with valid credentials and records a login audit entry', function ()
     ]);
     $user->assignRole(Role::StudentAffairs);
 
-    postJson('/api/v1/login',
+    $this->postJson('/api/v1/login',
         ['email' => 'r05@ejust.test', 'password' => 'password'],
         ['Origin' => 'http://localhost'],
     )
@@ -37,7 +34,7 @@ it('rejects invalid credentials and records a failed-login audit entry', functio
         'password' => 'password',
     ]);
 
-    postJson('/api/v1/login',
+    $this->postJson('/api/v1/login',
         ['email' => 'r05@ejust.test', 'password' => 'wrong-password'],
         ['Origin' => 'http://localhost'],
     )->assertStatus(422);
@@ -50,14 +47,14 @@ it('returns the authenticated user and their roles from /me', function () {
     $user->assignRole(Role::Advisor);
     Sanctum::actingAs($user);
 
-    getJson('/api/v1/me')
+    $this->getJson('/api/v1/me')
         ->assertOk()
         ->assertJsonPath('data.id', $user->id)
         ->assertJsonPath('data.roles.0.code', 'R03');
 });
 
 it('rejects /me when unauthenticated', function () {
-    getJson('/api/v1/me')->assertUnauthorized();
+    $this->getJson('/api/v1/me')->assertUnauthorized();
 });
 
 it('logs out an authenticated session and records a logout audit entry', function () {
@@ -66,12 +63,12 @@ it('logs out an authenticated session and records a logout audit entry', functio
         'password' => 'password',
     ]);
 
-    postJson('/api/v1/login',
+    $this->postJson('/api/v1/login',
         ['email' => 'r05@ejust.test', 'password' => 'password'],
         ['Origin' => 'http://localhost'],
     )->assertOk();
 
-    postJson('/api/v1/logout', [], ['Origin' => 'http://localhost'])
+    $this->postJson('/api/v1/logout', [], ['Origin' => 'http://localhost'])
         ->assertNoContent();
 
     $this->assertDatabaseHas('audit_log', [

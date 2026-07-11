@@ -13,6 +13,14 @@ use Modules\Identity\Internal\Models\User;
 class UserFactory extends Factory
 {
     /**
+     * The relocated User model (Modules\Identity\Internal\Models\User). Set
+     * explicitly because the default resolver would guess App\Models\User.
+     *
+     * @var class-string<User>
+     */
+    protected $model = User::class;
+
+    /**
      * The current password being used by the factory.
      */
     protected static ?string $password;

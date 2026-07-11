@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Laravel\Sanctum\HasApiTokens;
+use Modules\Identity\Public\Enums\Permission;
 use Modules\Identity\Public\Enums\Role;
 
 /**
@@ -17,7 +19,7 @@ use Modules\Identity\Public\Enums\Role;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /** @var list<string> */
     protected $fillable = [
@@ -72,5 +74,22 @@ class User extends Authenticatable
     public function hasRole(Role $role): bool
     {
         return $this->roles()->contains($role);
+    }
+
+    /**
+     * The user's effective permissions: the union across their roles, per the
+     * SRS §3.2 matrix (ADR-0008). The server is the sole authority — this is
+     * what the API enforces and what `/me` mirrors to the SPA.
+     *
+     * @return list<Permission>
+     */
+    public function permissions(): array
+    {
+        return Permission::forRoles($this->roles()->all());
+    }
+
+    public function hasPermission(Permission $permission): bool
+    {
+        return in_array($permission, $this->permissions(), true);
     }
 }

@@ -62,6 +62,21 @@ paths:
                       -
                         code: R05
                         name: 'Student Affairs Staff'
+                    permissions:
+                      - documents.upload
+                      - application.view_status
+                      - application.screen
+                      - interview.schedule
+                      - courses.register_for_student
+                      - registration.approve
+                      - catalog.view
+                      - grades.enter
+                      - grades.view_student
+                      - transcript.view_unofficial
+                      - transcript.issue_official
+                      - transcript.export
+                      - standing.monitor
+                      - calendar.manage
                 properties:
                   data:
                     type: object
@@ -92,6 +107,25 @@ paths:
                             name:
                               type: string
                               example: 'Student Affairs Staff'
+                      permissions:
+                        type: array
+                        example:
+                          - documents.upload
+                          - application.view_status
+                          - application.screen
+                          - interview.schedule
+                          - courses.register_for_student
+                          - registration.approve
+                          - catalog.view
+                          - grades.enter
+                          - grades.view_student
+                          - transcript.view_unofficial
+                          - transcript.issue_official
+                          - transcript.export
+                          - standing.monitor
+                          - calendar.manage
+                        items:
+                          type: string
         422:
           description: ''
           content:
@@ -178,6 +212,21 @@ paths:
                       -
                         code: R05
                         name: 'Student Affairs Staff'
+                    permissions:
+                      - documents.upload
+                      - application.view_status
+                      - application.screen
+                      - interview.schedule
+                      - courses.register_for_student
+                      - registration.approve
+                      - catalog.view
+                      - grades.enter
+                      - grades.view_student
+                      - transcript.view_unofficial
+                      - transcript.issue_official
+                      - transcript.export
+                      - standing.monitor
+                      - calendar.manage
                 properties:
                   data:
                     type: object
@@ -208,6 +257,25 @@ paths:
                             name:
                               type: string
                               example: 'Student Affairs Staff'
+                      permissions:
+                        type: array
+                        example:
+                          - documents.upload
+                          - application.view_status
+                          - application.screen
+                          - interview.schedule
+                          - courses.register_for_student
+                          - registration.approve
+                          - catalog.view
+                          - grades.enter
+                          - grades.view_student
+                          - transcript.view_unofficial
+                          - transcript.issue_official
+                          - transcript.export
+                          - standing.monitor
+                          - calendar.manage
+                        items:
+                          type: string
         401:
           description: ''
           content:
@@ -220,6 +288,144 @@ paths:
                   message:
                     type: string
                     example: Unauthenticated.
+      tags:
+        - Endpoints
+      security: []
+    patch:
+      summary: 'Update current user.'
+      operationId: updateCurrentUser
+      description: "Persists the user's preferred UI language so the next session opens in it."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    name: 'Student Affairs'
+                    email: r05@ejust.test
+                    preferred_locale: ar
+                    roles:
+                      -
+                        code: R05
+                        name: 'Student Affairs Staff'
+                    permissions:
+                      - catalog.view
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: 'Student Affairs'
+                      email:
+                        type: string
+                        example: r05@ejust.test
+                      preferred_locale:
+                        type: string
+                        example: ar
+                      roles:
+                        type: array
+                        example:
+                          - code: R05
+                            name: 'Student Affairs Staff'
+                        items:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              example: R05
+                            name:
+                              type: string
+                              example: 'Student Affairs Staff'
+                      permissions:
+                        type: array
+                        example:
+                          - catalog.view
+                        items:
+                          type: string
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The selected preferred locale is invalid.'
+                  errors:
+                    preferred_locale:
+                      - 'The selected preferred locale is invalid.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The selected preferred locale is invalid.'
+                  errors:
+                    type: object
+                    properties:
+                      preferred_locale:
+                        type: array
+                        example:
+                          - 'The selected preferred locale is invalid.'
+                        items:
+                          type: string
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preferred_locale:
+                  type: string
+                  description: 'The UI language (en or ar).'
+                  example: ar
+              required:
+                - preferred_locale
+      security: []
+  /api/v1/demo/catalog-management:
+    get:
+      summary: 'Catalog management demo.'
+      operationId: catalogManagementDemo
+      description: "A permission-gated sample endpoint (the Phase 0 RBAC tracer): reachable\nonly by users whose effective permissions include `catalog.manage`\n(R06/R07 and admins). It proves API-side enforcement; later phases replace\nit with the real Catalog module."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    message: 'You can manage programs and courses.'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: 'You can manage programs and courses.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
       tags:
         - Endpoints
       security: []

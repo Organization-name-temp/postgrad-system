@@ -50,6 +50,7 @@ export type LogIn200Data = {
   email?: string;
   preferred_locale?: string;
   roles?: LogIn200DataRolesItem[];
+  permissions?: string[];
 };
 
 export type LogIn200 = {
@@ -78,6 +79,7 @@ export type CurrentUser200Data = {
   email?: string;
   preferred_locale?: string;
   roles?: CurrentUser200DataRolesItem[];
+  permissions?: string[];
 };
 
 export type CurrentUser200 = {
@@ -85,6 +87,50 @@ export type CurrentUser200 = {
 };
 
 export type CurrentUser401 = {
+  message?: string;
+};
+
+export type UpdateCurrentUserBody = {
+  /** The UI language (en or ar). */
+  preferred_locale: string;
+};
+
+export type UpdateCurrentUser200DataRolesItem = {
+  code?: string;
+  name?: string;
+};
+
+export type UpdateCurrentUser200Data = {
+  id?: number;
+  name?: string;
+  email?: string;
+  preferred_locale?: string;
+  roles?: UpdateCurrentUser200DataRolesItem[];
+  permissions?: string[];
+};
+
+export type UpdateCurrentUser200 = {
+  data?: UpdateCurrentUser200Data;
+};
+
+export type UpdateCurrentUser422Errors = {
+  preferred_locale?: string[];
+};
+
+export type UpdateCurrentUser422 = {
+  message?: string;
+  errors?: UpdateCurrentUser422Errors;
+};
+
+export type CatalogManagementDemo200Data = {
+  message?: string;
+};
+
+export type CatalogManagementDemo200 = {
+  data?: CatalogManagementDemo200Data;
+};
+
+export type CatalogManagementDemo403 = {
   message?: string;
 };
 
@@ -411,6 +457,169 @@ export function useCurrentUser<TData = Awaited<ReturnType<typeof currentUser>>, 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCurrentUserQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Persists the user's preferred UI language so the next session opens in it.
+ * @summary Update current user.
+ */
+export const updateCurrentUser = (
+    updateCurrentUserBody: UpdateCurrentUserBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateCurrentUser200>(
+      {url: `/api/v1/me`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateCurrentUserBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateCurrentUserMutationOptions = <TError = UpdateCurrentUser422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateCurrentUserBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateCurrentUserBody}, TContext> => {
+
+const mutationKey = ['updateCurrentUser'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUser>>, {data: UpdateCurrentUserBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateCurrentUser(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateCurrentUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateCurrentUser>>>
+    export type UpdateCurrentUserMutationBody = UpdateCurrentUserBody
+    export type UpdateCurrentUserMutationError = UpdateCurrentUser422
+
+    /**
+ * @summary Update current user.
+ */
+export const useUpdateCurrentUser = <TError = UpdateCurrentUser422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError,{data: UpdateCurrentUserBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateCurrentUser>>,
+        TError,
+        {data: UpdateCurrentUserBody},
+        TContext
+      > => {
+      return useMutation(getUpdateCurrentUserMutationOptions(options), queryClient);
+    }
+
+/**
+ * A permission-gated sample endpoint (the Phase 0 RBAC tracer): reachable
+ * only by users whose effective permissions include `catalog.manage`
+ * (R06/R07 and admins). It proves API-side enforcement; later phases replace
+ * it with the real Catalog module.
+ * @summary Catalog management demo.
+ */
+export const catalogManagementDemo = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CatalogManagementDemo200>(
+      {url: `/api/v1/demo/catalog-management`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getCatalogManagementDemoQueryKey = () => {
+    return [
+    `/api/v1/demo/catalog-management`
+    ] as const;
+    }
+
+
+export const getCatalogManagementDemoQueryOptions = <TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCatalogManagementDemoQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof catalogManagementDemo>>> = ({ signal }) => catalogManagementDemo(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CatalogManagementDemoQueryResult = NonNullable<Awaited<ReturnType<typeof catalogManagementDemo>>>
+export type CatalogManagementDemoQueryError = CatalogManagementDemo403
+
+
+export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogManagementDemo>>,
+          TError,
+          Awaited<ReturnType<typeof catalogManagementDemo>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogManagementDemo>>,
+          TError,
+          Awaited<ReturnType<typeof catalogManagementDemo>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Catalog management demo.
+ */
+
+export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCatalogManagementDemoQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

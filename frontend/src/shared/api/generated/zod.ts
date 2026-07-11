@@ -37,7 +37,8 @@ export const LogInResponse = zod.object({
   "roles": zod.array(zod.object({
   "code": zod.string().optional(),
   "name": zod.string().optional()
-})).optional()
+})).optional(),
+  "permissions": zod.array(zod.string()).optional()
 }).optional()
 })
 
@@ -65,6 +66,44 @@ export const CurrentUserResponse = zod.object({
   "roles": zod.array(zod.object({
   "code": zod.string().optional(),
   "name": zod.string().optional()
-})).optional()
+})).optional(),
+  "permissions": zod.array(zod.string()).optional()
+}).optional()
+})
+
+
+/**
+ * Persists the user's preferred UI language so the next session opens in it.
+ * @summary Update current user.
+ */
+export const UpdateCurrentUserBody = zod.object({
+  "preferred_locale": zod.string().describe('The UI language (en or ar).')
+})
+
+export const UpdateCurrentUserResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional(),
+  "preferred_locale": zod.string().optional(),
+  "roles": zod.array(zod.object({
+  "code": zod.string().optional(),
+  "name": zod.string().optional()
+})).optional(),
+  "permissions": zod.array(zod.string()).optional()
+}).optional()
+})
+
+
+/**
+ * A permission-gated sample endpoint (the Phase 0 RBAC tracer): reachable
+ * only by users whose effective permissions include `catalog.manage`
+ * (R06/R07 and admins). It proves API-side enforcement; later phases replace
+ * it with the real Catalog module.
+ * @summary Catalog management demo.
+ */
+export const CatalogManagementDemoResponse = zod.object({
+  "data": zod.object({
+  "message": zod.string().optional()
 }).optional()
 })

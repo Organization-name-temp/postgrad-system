@@ -17,6 +17,15 @@ export const en = {
       dark: 'Dark',
       system: 'System',
     },
+    nav: {
+      label: 'Main navigation',
+      open: 'Open navigation menu',
+      skipToContent: 'Skip to main content',
+      dashboard: 'Dashboard',
+    },
+    menu: {
+      account: 'Account menu',
+    },
   },
   auth: {
     login: {

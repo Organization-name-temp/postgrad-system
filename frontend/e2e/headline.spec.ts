@@ -48,6 +48,8 @@ test('headline: sign in, see identity/roles/permissions, flip to RTL, sign out',
   await page.getByRole('button', { name: 'English' }).click()
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
 
-  await page.getByRole('button', { name: 'Log out' }).click()
+  // Log out lives in the app-bar account menu now (Phase 0.5 shell).
+  await page.getByRole('button', { name: 'Account menu' }).click()
+  await page.getByRole('menuitem', { name: 'Log out' }).click()
   await expect(page).toHaveURL(/\/login$/)
 })

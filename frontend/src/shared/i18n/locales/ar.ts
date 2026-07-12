@@ -16,6 +16,15 @@ export const ar = {
       dark: 'داكن',
       system: 'النظام',
     },
+    nav: {
+      label: 'التنقل الرئيسي',
+      open: 'فتح قائمة التنقل',
+      skipToContent: 'تخطّي إلى المحتوى الرئيسي',
+      dashboard: 'لوحة التحكم',
+    },
+    menu: {
+      account: 'قائمة الحساب',
+    },
   },
   auth: {
     login: {

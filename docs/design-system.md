@@ -93,10 +93,13 @@ The E-JUST brand colour. **`500` is the canonical brand red.**
 | 800 | `#8A0019` | |
 | 900 | `#5E0011` | |
 
-> **Contrast rule (load-bearing):** vivid `#E4002B` on white is ≈ 4:1 — it **fails** WCAG
-> AA (4.5:1) for normal text. Use `500` only for fills, accents, and large text (≥ 3:1);
-> use **`700` (`#B00020`)** for any red body text or links on light surfaces. On dark
-> surfaces, use `300 (#FF8296)` for red text/links.
+> **Contrast rule (load-bearing):** vivid `#E4002B` on white is ≈ **4.85:1** — it *technically*
+> clears WCAG AA (4.5) for normal text, but only just, and it drops below on tinted/off-white
+> surfaces. So treat `500` as a **fills / accents / large-text** colour (its comfortable
+> ≥ 3:1 zone), and use **`700` (`#B00020`, ≈ 7.3:1)** for any red body text or links on light
+> surfaces where you want real headroom. On dark surfaces, use `300 (#FF8296)` for red
+> text/links. *(These ratios are enforced by the Phase 0.5 token-contrast gate — a Vitest
+> test over `tokens.ts` using a WebAIM-verified contrast util; measured, not assumed.)*
 
 ### Ink / neutral — cool-tinted greys toward the logo black
 Carries the bulk of the UI (surfaces, borders, text) — the "neutral-led" strategy.
@@ -487,9 +490,14 @@ statuses (don't affect CGPA) render **outlined/muted**; negative-counting render
 - **Language:** `<html lang>` tracks the active locale so screen readers switch voice.
 
 **How the gate is made real (Phase 0.5):** two mechanisms, both cross-OS-deterministic.
-1. **Token-contrast unit test (Vitest)** — a pure ratio function asserts every critical
-   semantic pair (light + dark) meets AA (≥ 4.5 body / ≥ 3 large & UI). This is what encodes
-   the §2 rule that `#E4002B` **fails** as body text (≈ 4:1) and forces `#B00020`.
+1. **Token-contrast unit test (Vitest)** — a WebAIM-verified ratio function asserts every
+   readable semantic pair (light + dark) meets AA (≥ 4.5 body / ≥ 3 large & UI), and encodes
+   the §2 brand-red rule: the text token `#B00020` (≈ 7.3:1) clears AA with real headroom —
+   more than the vivid `#E4002B` (≈ 4.85:1), which is why `500` stays a fills/large colour and
+   `700` carries red text. **Scope:** it gates text and essential UI indicators (focus ring,
+   status fills); **disabled text** (WCAG 1.4.3) and the **decorative elevation dividers** (§6
+   — never the sole cue for a boundary) are intentionally exempt, while **interactive/input
+   border** contrast (SC 1.4.11) is verified at the component level as those components land.
 2. **`@axe-core/playwright`** on the `/style` gallery + the re-skinned login/dashboard
    across all four combos, failing on serious/critical violations (axe reads computed CSS
    colours, not pixels, so it does not suffer the cross-OS flakiness of screenshots).

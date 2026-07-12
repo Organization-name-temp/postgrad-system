@@ -6,7 +6,7 @@
 |---|---|
 | **Status** | Agreed plan, v1.0 (from a `/grill-with-docs` alignment session) |
 | **Scope decision** | [adr/0005-localhost-learning-build.md](./adr/0005-localhost-learning-build.md) |
-| **Source of truth** | [SRS.md](./SRS.md) · [business-requirements.md](./business-requirements.md) · [architecture.md](./architecture.md) · [tech-stack.md](./tech-stack.md) |
+| **Source of truth** | [SRS.md](./SRS.md) · [business-requirements.md](./business-requirements.md) · [architecture.md](./architecture.md) · [tech-stack.md](./tech-stack.md) · [design-system.md](./design-system.md) |
 | **Ubiquitous language** | [../CONTEXT.md](../CONTEXT.md) |
 
 This roadmap turns the SRS/architecture into a **phased build plan**. It records the
@@ -56,6 +56,7 @@ email/SMS, cron scheduler, sync replica, and all scale/HA NFRs. See ADR-0005.
 | Events / notifications | In-process events kept; user-facing = in-app table + polled bell | Q4 |
 | Derived models | Computed on-demand (no cache) | derived |
 | i18n | **Fully bilingual EN+AR + RTL from Phase 0** (`react-i18next` + MUI direction) | Q6 |
+| UI / design system | **MUI retained** (Ant/shadcn rejected); neutral-led palette, E-JUST red as accent, light+dark, token-driven; built in **Phase 0.5** | [ADR-0009](./adr/0009-mui-ui-foundation-design-system.md) · [design-system.md](./design-system.md) |
 | Sequencing | **Student-lifecycle order** | Q5 |
 | Testing / DoD | Domain-TDD (Pest) + API feature tests + 1 Playwright smoke/phase + static-analysis gates | Q9 |
 | Execution | ROADMAP now; per phase `/to-prd → /to-issues → /tdd → review`; **one phase at a time** | Q10 |
@@ -105,6 +106,39 @@ below were sharpened in a `/grill-with-docs` session; `/to-prd` turns them into 
 - **Demo:** log in as any seeded role → land on one guarded dashboard showing your
   identity, roles, and effective permissions, with a permission-gated widget and a live
   EN↔AR / RTL toggle.
+
+### Phase 0.5 — Design System & Theming
+A **frontend-weighted foundation slice** that turns the agreed design language into a themed,
+tokenised MUI setup every later phase consumes. It sits **after Phase 0's review gate and
+before Phase 1** because Phase 1's catalog TreeView is the first thing built on it. The full
+spec is [design-system.md](./design-system.md); the reasoning + rejected alternatives (Ant
+Design, shadcn/ui, brand-forward palette, Style Dictionary) are in
+[ADR-0009](./adr/0009-mui-ui-foundation-design-system.md).
+
+- **Tokens:** a three-tier `frontend/src/app/theme/tokens.ts` (primitive → semantic →
+  component) feeding `createTheme({ cssVariables: true, colorSchemes: { light, dark } })`.
+- **Palette:** neutral-led; **E-JUST red `#E4002B`** (50–900 ramp) as a disciplined accent
+  with the accessible `#B00020` for red text; slate-blue secondary; semantic
+  success/warning/error/info kept distinct from brand red. **Light + dark both ship.**
+- **Typography:** **IBM Plex Sans + IBM Plex Sans Arabic** self-hosted via `@fontsource`,
+  family switched by language (extends [AppThemeProvider](../frontend/src/app/AppThemeProvider.tsx)),
+  Arabic leading bump, `textTransform: none` on buttons, tabular figures for data.
+- **Shape/spacing:** 8px spacing scale, 8px default radius, **flat/border-led elevation**.
+- **Theme toggle:** client-side light/dark switch (localStorage); server persistence via
+  `PATCH /api/v1/me` (mirroring locale) **deferred**.
+- **Re-skin:** existing Phase 0 screens (login, dashboard, layout, language switcher) moved
+  onto tokens — no raw hex/spacing left.
+- **`<StatusChip>`:** one reusable component encoding the domain status-colour map
+  (Application / Course Status / Academic Standing / Grade — design-system.md §10), ready
+  for later phases; colour is never the only signal (icon/label always present).
+- **`/style` gallery:** a dev-only route showing palette, type scale, and key components
+  across light/dark × EN/AR — living reference and the target of one Playwright **visual**
+  smoke.
+- **DoD:** **no new backend domain logic** (the one legitimately frontend-only slice — no
+  Pest domain tests). Gates green (ESLint + boundaries, Prettier, `tsc`, Vitest + RTL, the
+  Playwright smoke); WCAG AA contrast holds across the full light/dark × LTR/RTL matrix.
+- **Demo:** toggle light↔dark and EN↔AR on the re-skinned dashboard; open `/style` and see
+  the whole system render correctly in all four combinations.
 
 ### Phase 1 — Catalog (SRS §4.3)
 - **Catalog module:** Faculties, Departments, Programs, Courses, Course Categories

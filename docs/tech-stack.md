@@ -63,7 +63,7 @@ Each choice below is tied to the requirement that drove it. The core shape — *
 |---------|--------|-----|
 | Language | **TypeScript** | Type safety end-to-end with the generated API client |
 | Build tool | **Vite** | Fast builds, modern DX, static output served by ingress/CDN |
-| UI library | **MUI (Material UI)** | TreeView (catalog), Stepper (application wizard), DataGrid (reports); best-documented RTL + WCAG support |
+| UI library | **MUI (Material UI)** | TreeView (catalog), Stepper (application wizard), DataGrid (reports); best-documented RTL + WCAG support. Retained over Ant Design/shadcn, and themed via a token-driven E-JUST design system ([ADR-0009](./adr/0009-mui-ui-foundation-design-system.md), [design-system.md](./design-system.md)) |
 | Server state | **TanStack Query** | Caching, background refetch, request dedup against the REST API |
 | API client | **Generated from OpenAPI** (openapi-typescript / Orval) + **Axios** | No hand-written types; contract stays in sync ([ADR-0001]) |
 | Local/UI state | **Zustand** | Lightweight; avoids Redux boilerplate for UI-only state |

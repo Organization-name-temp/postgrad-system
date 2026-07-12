@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
 import { DashboardPage } from '../features/auth/DashboardPage'
+import { FacultiesPage } from '../features/catalog/faculties/FacultiesPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 
@@ -37,6 +38,7 @@ export function App() {
             <Route element={<RequireAuth />}>
               <Route element={<AuthenticatedLayout />}>
                 <Route path="/" element={<DashboardPage />} />
+                <Route path="/catalog/faculties" element={<FacultiesPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -7,6 +7,7 @@ import {
   getCurrentUserQueryKey,
 } from '../../shared/api/generated/endpoints'
 import type { CurrentUser200Data } from '../../shared/api/generated/endpoints'
+import { usePermissions } from '../../shared/access/usePermissions'
 import { fetchCsrfCookie } from './csrf'
 
 export interface UseAuth {
@@ -62,14 +63,16 @@ export function useAuth(): UseAuth {
     await queryClient.invalidateQueries({ queryKey: getCurrentUserQueryKey() })
   }
 
-  const permissions = me.data?.data?.permissions ?? []
+  // Permission reading is cross-cutting, so it lives in shared/access; useAuth
+  // delegates rather than keeping its own copy (one source of the rule).
+  const { permissions, hasPermission } = usePermissions()
 
   return {
     user: me.data?.data,
     isPending: me.isPending,
     isAuthenticated,
     permissions,
-    hasPermission: (permission: string) => permissions.includes(permission),
+    hasPermission,
     isLoggingIn: loginMutation.isPending,
     loginError: loginMutation.error,
     login,

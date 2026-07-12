@@ -1,8 +1,8 @@
 import { Chip, Paper, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from './useAuth'
-import { PermissionGate } from './PermissionGate'
-import { PERMISSION } from './permissions'
+import { PermissionGate } from '../../shared/access/PermissionGate'
+import { PERMISSION } from '../../shared/access/permissions'
 import { CatalogManagementWidget } from './CatalogManagementWidget'
 
 /**

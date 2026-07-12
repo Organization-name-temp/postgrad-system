@@ -7,6 +7,120 @@
 import * as zod from 'zod';
 
 /**
+ * @summary List Faculties.
+ */
+export const ListFacultiesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create a Faculty.
+ */
+export const CreateAFacultyBody = zod.object({
+  "code": zod.string().describe('Unique short code for the Faculty.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const CreateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Faculty.
+ */
+export const ShowAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const ShowAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update a Faculty.
+ */
+export const UpdateAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const UpdateAFacultyBody = zod.object({
+  "code": zod.string().describe('Unique short code for the Faculty.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const UpdateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Faculty.
+ */
+export const ActivateAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const ActivateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Faculty without deleting it — enrolled students and
+ * historical records are unaffected (BR-18).
+ * @summary Deactivate a Faculty.
+ */
+export const DeactivateAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const DeactivateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
  * API is reachable.
  * @summary Service health check.

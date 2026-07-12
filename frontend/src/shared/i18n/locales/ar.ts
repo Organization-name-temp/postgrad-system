@@ -21,6 +21,7 @@ export const ar = {
       open: 'فتح قائمة التنقل',
       skipToContent: 'تخطّي إلى المحتوى الرئيسي',
       dashboard: 'لوحة التحكم',
+      catalog: 'الكتالوج',
     },
     menu: {
       account: 'قائمة الحساب',
@@ -43,6 +44,29 @@ export const ar = {
     catalog: {
       title: 'إدارة المقررات',
       error: 'تعذّر تحميل المورد المحمي.',
+    },
+  },
+  catalog: {
+    status: { active: 'مُفعَّلة', inactive: 'مُعطَّلة' },
+    faculties: {
+      title: 'الكليات',
+      new: 'كلية جديدة',
+      edit: 'تعديل الكلية',
+      editAction: 'تعديل',
+      empty: 'لا توجد كليات بعد.',
+      loading: 'جارٍ تحميل الكليات',
+      loadError: 'تعذّر تحميل الكليات.',
+      saveError: 'تعذّر حفظ الكلية. تأكّد من أن الرمز فريد ومن إدخال الاسمين.',
+      code: 'الرمز',
+      name: 'الاسم',
+      nameEn: 'الاسم (بالإنجليزية)',
+      nameAr: 'الاسم (بالعربية)',
+      statusHeader: 'الحالة',
+      actions: 'الإجراءات',
+      activate: 'تفعيل',
+      deactivate: 'تعطيل',
+      save: 'حفظ',
+      cancel: 'إلغاء',
     },
   },
 } as const

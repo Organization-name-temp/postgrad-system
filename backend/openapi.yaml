@@ -6,9 +6,367 @@ info:
 servers:
   - url: 'http://localhost'
 tags:
+  - name: Catalog
+    description: "\nManage Faculties — the top-level academic divisions (FoE, BAS, CSIT) at the\nroot of the catalog tree. Reading requires the catalog.view permission;\ncreating/editing/activating requires catalog.manage (Department Head, Dean, or\nan administrator). Faculties are deactivated, never deleted (ADR-0010)."
   - name: Endpoints
     description: ''
 paths:
+  /api/v1/faculties:
+    get:
+      summary: 'List Faculties.'
+      operationId: listFaculties
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      code: FoE
+                      name_en: 'Faculty of Engineering'
+                      name_ar: 'كلية الهندسة'
+                      is_active: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        code: FoE
+                        name_en: 'Faculty of Engineering'
+                        name_ar: 'كلية الهندسة'
+                        is_active: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        code:
+                          type: string
+                          example: FoE
+                        name_en:
+                          type: string
+                          example: 'Faculty of Engineering'
+                        name_ar:
+                          type: string
+                          example: 'كلية الهندسة'
+                        is_active:
+                          type: boolean
+                          example: true
+      tags:
+        - Catalog
+      security: []
+    post:
+      summary: 'Create a Faculty.'
+      operationId: createAFaculty
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    code: FoE
+                    name_en: 'Faculty of Engineering'
+                    name_ar: 'كلية الهندسة'
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: FoE
+                      name_en:
+                        type: string
+                        example: 'Faculty of Engineering'
+                      name_ar:
+                        type: string
+                        example: 'كلية الهندسة'
+                      is_active:
+                        type: boolean
+                        example: true
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The code has already been taken.'
+                  errors:
+                    code:
+                      - 'The code has already been taken.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The code has already been taken.'
+                  errors:
+                    type: object
+                    properties:
+                      code:
+                        type: array
+                        example:
+                          - 'The code has already been taken.'
+                        items:
+                          type: string
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Unique short code for the Faculty.'
+                  example: FoE
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'Faculty of Engineering'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'كلية الهندسة'
+              required:
+                - code
+                - name_en
+                - name_ar
+      security: []
+  '/api/v1/faculties/{faculty_id}':
+    get:
+      summary: 'Show a Faculty.'
+      operationId: showAFaculty
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    code: FoE
+                    name_en: 'Faculty of Engineering'
+                    name_ar: 'كلية الهندسة'
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: FoE
+                      name_en:
+                        type: string
+                        example: 'Faculty of Engineering'
+                      name_ar:
+                        type: string
+                        example: 'كلية الهندسة'
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      security: []
+    patch:
+      summary: 'Update a Faculty.'
+      operationId: updateAFaculty
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    code: FoE
+                    name_en: 'Faculty of Engineering'
+                    name_ar: 'كلية الهندسة'
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: FoE
+                      name_en:
+                        type: string
+                        example: 'Faculty of Engineering'
+                      name_ar:
+                        type: string
+                        example: 'كلية الهندسة'
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: 'Unique short code for the Faculty.'
+                  example: FoE
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'Faculty of Engineering'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'كلية الهندسة'
+              required:
+                - code
+                - name_en
+                - name_ar
+      security: []
+    parameters:
+      -
+        in: path
+        name: faculty_id
+        description: 'The ID of the faculty.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/v1/faculties/{faculty_id}/activate':
+    post:
+      summary: 'Activate a Faculty.'
+      operationId: activateAFaculty
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    code: FoE
+                    name_en: 'Faculty of Engineering'
+                    name_ar: 'كلية الهندسة'
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: FoE
+                      name_en:
+                        type: string
+                        example: 'Faculty of Engineering'
+                      name_ar:
+                        type: string
+                        example: 'كلية الهندسة'
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: faculty_id
+        description: 'The ID of the faculty.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/v1/faculties/{faculty_id}/deactivate':
+    post:
+      summary: 'Deactivate a Faculty.'
+      operationId: deactivateAFaculty
+      description: "Deactivating retires a Faculty without deleting it — enrolled students and\nhistorical records are unaffected (BR-18)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    code: FoE
+                    name_en: 'Faculty of Engineering'
+                    name_ar: 'كلية الهندسة'
+                    is_active: false
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: FoE
+                      name_en:
+                        type: string
+                        example: 'Faculty of Engineering'
+                      name_ar:
+                        type: string
+                        example: 'كلية الهندسة'
+                      is_active:
+                        type: boolean
+                        example: false
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: faculty_id
+        description: 'The ID of the faculty.'
+        example: 16
+        required: true
+        schema:
+          type: integer
   /api/v1/health:
     get:
       summary: 'Service health check.'

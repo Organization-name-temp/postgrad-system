@@ -5,6 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>frontend</title>
+    <!--
+      Pre-paint colour-scheme init: set data-mui-color-scheme before the bundle
+      loads so there's no flash of the wrong theme. Mirrors MUI's defaults
+      (localStorage key `mui-mode`, attribute `data-mui-color-scheme`); a first
+      visit follows the OS. Kept in sync with AppThemeProvider (defaultMode="system").
+    -->
+    <script>
+      ;(function () {
+        try {
+          var mode = localStorage.getItem('mui-mode') || 'system'
+          var dark =
+            mode === 'dark' ||
+            (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          document.documentElement.setAttribute('data-mui-color-scheme', dark ? 'dark' : 'light')
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

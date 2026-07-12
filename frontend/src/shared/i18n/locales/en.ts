@@ -11,6 +11,12 @@ export const en = {
       en: 'English',
       ar: 'العربية',
     },
+    theme: {
+      toggle: 'Toggle light and dark theme',
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System',
+    },
   },
   auth: {
     login: {

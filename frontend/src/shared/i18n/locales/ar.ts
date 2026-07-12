@@ -10,6 +10,12 @@ export const ar = {
       en: 'English',
       ar: 'العربية',
     },
+    theme: {
+      toggle: 'تبديل السمة الفاتحة والداكنة',
+      light: 'فاتح',
+      dark: 'داكن',
+      system: 'النظام',
+    },
   },
   auth: {
     login: {

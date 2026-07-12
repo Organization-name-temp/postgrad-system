@@ -4,6 +4,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../features/auth/useAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeModeToggle } from './ThemeModeToggle'
 
 /**
  * The authenticated app shell: a top bar with the language switcher and log-out
@@ -36,6 +37,7 @@ export function AuthenticatedLayout() {
           </Typography>
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
             <LanguageSwitcher />
+            <ThemeModeToggle />
             <Button color="inherit" onClick={handleLogout}>
               {t('logOut')}
             </Button>

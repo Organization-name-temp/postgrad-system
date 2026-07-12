@@ -30,30 +30,40 @@ const TONE_PALETTE = {
 const iconInherits = { '& .MuiChip-icon': { color: 'inherit' } }
 
 /**
- * filled-soft = a tinted fill + readable text, built to hold WCAG AA contrast in
- * *both* colour schemes. The fill is an alpha tint of the tone (via the channel
- * var, so it flips per scheme); the text is the dark shade in light mode and the
- * light shade in dark mode (theme.applyStyles). Neutral has no palette colour, so
- * it uses the scheme-aware action/text roles.
+ * Per-variant styling that keeps every chip WCAG AA in both schemes. The tone's
+ * `.main` is a fill colour, not a text colour, so soft/outlined labels use the
+ * accessible shade: `.dark` in light mode, `.light` in dark mode (via
+ * theme.applyStyles).
+ *  - `filled`      → MUI's fill + auto contrast text (the theme's 4.5
+ *                    contrastThreshold picks readable text). No override.
+ *  - `filled-soft` → an alpha tint of the tone (channel var, flips per scheme) +
+ *                    accessible text.
+ *  - `outlined`    → MUI's `.main` border, label text overridden to accessible.
+ * `neutral` has no palette colour, so soft uses the action/text roles and
+ * filled/outlined fall back to MUI's already-accessible default.
  */
-function filledSoftSx(tone: StatusTone): SxProps<Theme> {
+function chipSx(tone: StatusTone, variant: StatusChipVariant): SxProps<Theme> | undefined {
+  if (variant === 'filled') return undefined
+
   if (tone === 'neutral') {
+    if (variant === 'outlined') return undefined
     return (theme) => ({
       backgroundColor: theme.vars.palette.action.hover,
       color: theme.vars.palette.text.secondary,
       ...iconInherits,
     })
   }
+
   const c = TONE_PALETTE[tone]
-  // Array form is required to combine a base with theme.applyStyles (MUI docs).
-  return [
-    (theme) => ({
-      backgroundColor: `rgba(${theme.vars.palette[c].mainChannel} / 0.16)`,
-      color: theme.vars.palette[c].dark,
-      ...iconInherits,
-    }),
-    (theme) => theme.applyStyles('dark', { color: theme.vars.palette[c].light }),
-  ]
+  const base =
+    variant === 'filled-soft'
+      ? (theme: Theme) => ({
+          backgroundColor: `rgba(${theme.vars.palette[c].mainChannel} / 0.16)`,
+          color: theme.vars.palette[c].dark,
+          ...iconInherits,
+        })
+      : (theme: Theme) => ({ color: theme.vars.palette[c].dark, ...iconInherits })
+  return [base, (theme) => theme.applyStyles('dark', { color: theme.vars.palette[c].light })]
 }
 
 /**
@@ -76,7 +86,7 @@ export function StatusChip({ tone, variant, label, icon }: StatusChipProps) {
       // Observable, public hooks for tests / e2e / QA — not MUI's internal classes.
       data-tone={tone}
       data-variant={variant}
-      sx={variant === 'filled-soft' ? filledSoftSx(tone) : undefined}
+      sx={chipSx(tone, variant)}
     />
   )
 }

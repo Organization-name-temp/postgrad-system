@@ -1,4 +1,4 @@
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import type { ReactElement } from 'react'
 import { Link as RouterLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -25,32 +25,35 @@ export function SideNav({ items, onNavigate }: { items: NavItem[]; onNavigate?: 
   const { pathname } = useLocation()
   const visible = items.filter((item) => !item.permission || hasPermission(item.permission))
 
-  // The `nav` landmark lives here so it travels with the list into the mobile
-  // drawer's portal. The permanent + temporary copies are never both in the a11y
-  // tree — the hidden drawer is display:none — so there's no duplicate landmark.
+  // The `nav` landmark wraps the list (not the List itself — `List component="nav"`
+  // renders <nav><li>, which is invalid). It travels with SideNav into the mobile
+  // drawer's portal; the permanent + temporary copies are never both in the a11y
+  // tree (the hidden drawer is display:none), so there's no duplicate landmark.
   return (
-    <List component="nav" aria-label={t('nav.label')}>
-      {visible.map((item) => {
-        const selected = pathname === item.to
-        return (
-          <ListItem key={item.key} disablePadding>
-            <ListItemButton
-              component={RouterLink}
-              to={item.to}
-              selected={selected}
-              aria-current={selected ? 'page' : undefined}
-              onClick={onNavigate}
-              sx={{
-                borderInlineStart: '3px solid transparent',
-                '&.Mui-selected': { borderInlineStartColor: 'primary.main' },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={t(`nav.${item.key}`)} />
-            </ListItemButton>
-          </ListItem>
-        )
-      })}
-    </List>
+    <Box component="nav" aria-label={t('nav.label')}>
+      <List>
+        {visible.map((item) => {
+          const selected = pathname === item.to
+          return (
+            <ListItem key={item.key} disablePadding>
+              <ListItemButton
+                component={RouterLink}
+                to={item.to}
+                selected={selected}
+                aria-current={selected ? 'page' : undefined}
+                onClick={onNavigate}
+                sx={{
+                  borderInlineStart: '3px solid transparent',
+                  '&.Mui-selected': { borderInlineStartColor: 'primary.main' },
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={t(`nav.${item.key}`)} />
+              </ListItemButton>
+            </ListItem>
+          )
+        })}
+      </List>
+    </Box>
   )
 }

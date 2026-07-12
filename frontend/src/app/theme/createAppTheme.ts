@@ -27,6 +27,10 @@ function toPalette(
 ): PaletteOptions {
   return {
     mode,
+    // Pick contrast text at the WCAG AA text bar (4.5), not MUI's default 3 — so
+    // filled chips/buttons on mid-tone status colours (success/warning) get
+    // readable text automatically.
+    contrastThreshold: 4.5,
     primary: { main: s.primary.main, dark: s.primary.dark, contrastText: s.primary.contrastText },
     secondary: { main: s.secondary.main },
     error: s.error,

@@ -12,6 +12,7 @@ import {
 import type { ListFaculties200DataItem } from '../../../shared/api/generated/endpoints'
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { activeStatusChip } from '../statusChips'
+import { pickLocaleName } from '../localeName'
 
 interface FacultyRowProps {
   faculty: ListFaculties200DataItem
@@ -32,7 +33,7 @@ export function FacultyRow({ faculty, canManage, onEdit }: FacultyRowProps) {
   const busy = activate.isPending || deactivate.isPending
 
   const isActive = faculty.is_active ?? false
-  const name = (i18n.language === 'ar' ? faculty.name_ar : faculty.name_en) ?? ''
+  const name = pickLocaleName(faculty, i18n.language)
   const chip = activeStatusChip(isActive, {
     active: t('status.active'),
     inactive: t('status.inactive'),

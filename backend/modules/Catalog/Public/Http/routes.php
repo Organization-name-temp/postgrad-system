@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Catalog\Internal\Http\Controllers\DepartmentController;
 use Modules\Catalog\Internal\Http\Controllers\FacultyController;
 
 /*
@@ -11,11 +12,19 @@ use Modules\Catalog\Internal\Http\Controllers\FacultyController;
 */
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Faculties
     Route::get('/faculties', [FacultyController::class, 'index'])->middleware('can:catalog.view');
     Route::get('/faculties/{faculty}', [FacultyController::class, 'show'])->middleware('can:catalog.view');
-
     Route::post('/faculties', [FacultyController::class, 'store'])->middleware('can:catalog.manage');
     Route::patch('/faculties/{faculty}', [FacultyController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/faculties/{faculty}/activate', [FacultyController::class, 'activate'])->middleware('can:catalog.manage');
     Route::post('/faculties/{faculty}/deactivate', [FacultyController::class, 'deactivate'])->middleware('can:catalog.manage');
+
+    // Departments
+    Route::get('/departments', [DepartmentController::class, 'index'])->middleware('can:catalog.view');
+    Route::get('/departments/{department}', [DepartmentController::class, 'show'])->middleware('can:catalog.view');
+    Route::post('/departments', [DepartmentController::class, 'store'])->middleware('can:catalog.manage');
+    Route::patch('/departments/{department}', [DepartmentController::class, 'update'])->middleware('can:catalog.manage');
+    Route::post('/departments/{department}/activate', [DepartmentController::class, 'activate'])->middleware('can:catalog.manage');
+    Route::post('/departments/{department}/deactivate', [DepartmentController::class, 'deactivate'])->middleware('can:catalog.manage');
 });

@@ -1,26 +1,14 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 use Modules\Catalog\Internal\Models\Faculty;
-use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 
 uses(RefreshDatabase::class);
 
-/** Sign in as a fresh user holding the given role. */
-function actingAsCatalogRole(Role $role): User
-{
-    $user = User::factory()->create();
-    $user->assignRole($role);
-    Sanctum::actingAs($user);
-
-    return $user;
-}
-
 it('lets a viewer list faculties', function () {
     Faculty::factory()->count(2)->create();
-    actingAsCatalogRole(Role::Applicant); // holds catalog.view, not catalog.manage
+    actingAsRole(Role::Applicant); // holds catalog.view, not catalog.manage
 
     $this->getJson('/api/v1/faculties')
         ->assertOk()
@@ -30,7 +18,7 @@ it('lets a viewer list faculties', function () {
 
 it('lets a viewer read a single faculty with both language names', function () {
     $faculty = Faculty::factory()->create(['name_en' => 'Faculty of Engineering', 'name_ar' => 'كلية الهندسة']);
-    actingAsCatalogRole(Role::Student);
+    actingAsRole(Role::Student);
 
     $this->getJson("/api/v1/faculties/{$faculty->id}")
         ->assertOk()
@@ -39,7 +27,7 @@ it('lets a viewer read a single faculty with both language names', function () {
 });
 
 it('lets a manager create a faculty, active by default', function () {
-    actingAsCatalogRole(Role::DepartmentHead); // holds catalog.manage
+    actingAsRole(Role::DepartmentHead); // holds catalog.manage
 
     $this->postJson('/api/v1/faculties', [
         'code' => 'FoE',
@@ -54,7 +42,7 @@ it('lets a manager create a faculty, active by default', function () {
 });
 
 it('requires both language names', function () {
-    actingAsCatalogRole(Role::DepartmentHead);
+    actingAsRole(Role::DepartmentHead);
 
     $this->postJson('/api/v1/faculties', ['code' => 'FoE', 'name_en' => 'Faculty of Engineering'])
         ->assertStatus(422)
@@ -63,7 +51,7 @@ it('requires both language names', function () {
 
 it('rejects a duplicate faculty code', function () {
     Faculty::factory()->create(['code' => 'FoE']);
-    actingAsCatalogRole(Role::DepartmentHead);
+    actingAsRole(Role::DepartmentHead);
 
     $this->postJson('/api/v1/faculties', [
         'code' => 'FoE',
@@ -76,7 +64,7 @@ it('rejects a duplicate faculty code', function () {
 
 it('lets a manager rename a faculty', function () {
     $faculty = Faculty::factory()->create(['code' => 'FoE', 'name_en' => 'Old']);
-    actingAsCatalogRole(Role::Dean); // also holds catalog.manage
+    actingAsRole(Role::Dean); // also holds catalog.manage
 
     $this->patchJson("/api/v1/faculties/{$faculty->id}", [
         'code' => 'FoE',
@@ -91,7 +79,7 @@ it('lets a manager rename a faculty', function () {
 
 it('lets a manager deactivate then reactivate a faculty', function () {
     $faculty = Faculty::factory()->create(['is_active' => true]);
-    actingAsCatalogRole(Role::DepartmentHead);
+    actingAsRole(Role::DepartmentHead);
 
     $this->postJson("/api/v1/faculties/{$faculty->id}/deactivate")
         ->assertOk()
@@ -105,7 +93,7 @@ it('lets a manager deactivate then reactivate a faculty', function () {
 
 it('forbids mutations for a viewer without catalog.manage', function () {
     $faculty = Faculty::factory()->create();
-    actingAsCatalogRole(Role::Applicant); // catalog.view only
+    actingAsRole(Role::Applicant); // catalog.view only
 
     $this->postJson('/api/v1/faculties', ['code' => 'X', 'name_en' => 'x', 'name_ar' => 'س'])
         ->assertForbidden();
@@ -117,7 +105,7 @@ it('forbids mutations for a viewer without catalog.manage', function () {
 
 it('does not allow hard-deleting a faculty', function () {
     $faculty = Faculty::factory()->create();
-    actingAsCatalogRole(Role::DepartmentHead);
+    actingAsRole(Role::DepartmentHead);
 
     // Only GET/PATCH exist on this URI; DELETE is deactivate-only by design.
     $this->deleteJson("/api/v1/faculties/{$faculty->id}")->assertStatus(405);

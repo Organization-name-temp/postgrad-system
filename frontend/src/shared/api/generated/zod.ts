@@ -121,6 +121,128 @@ export const DeactivateAFacultyResponse = zod.object({
 
 
 /**
+ * @summary List Departments.
+ */
+export const ListDepartmentsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create a Department.
+ */
+export const CreateADepartmentBody = zod.object({
+  "faculty_id": zod.number().describe('The owning Faculty id.'),
+  "code": zod.string().describe('Unique short code for the Department.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const CreateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Department.
+ */
+export const ShowADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const ShowADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update a Department.
+ */
+export const UpdateADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const UpdateADepartmentBody = zod.object({
+  "faculty_id": zod.number().describe('The owning Faculty id.'),
+  "code": zod.string().describe('Unique short code for the Department.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const UpdateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Department.
+ */
+export const ActivateADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const ActivateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Department without deleting it — enrolled students and
+ * historical records are unaffected (BR-18).
+ * @summary Deactivate a Department.
+ */
+export const DeactivateADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const DeactivateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
  * API is reachable.
  * @summary Service health check.

@@ -1,5 +1,8 @@
 <?php
 
+use Laravel\Sanctum\Sanctum;
+use Modules\Identity\Internal\Models\User;
+use Modules\Identity\Public\Enums\Role;
 use Tests\TestCase;
 
 /*
@@ -10,3 +13,16 @@ use Tests\TestCase;
 */
 
 uses(TestCase::class)->in('Feature');
+
+/**
+ * Sign in as a fresh user holding the given role. Shared across feature tests
+ * (the API is the sole RBAC authority — ADR-0008).
+ */
+function actingAsRole(Role $role): User
+{
+    $user = User::factory()->create();
+    $user->assignRole($role);
+    Sanctum::actingAs($user);
+
+    return $user;
+}

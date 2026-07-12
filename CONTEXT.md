@@ -74,21 +74,37 @@ Waitlisted, or Rejected.
 A top-level academic division (FoE, BAS, CSIT). Contains Departments.
 
 **Department**:
-An academic unit within a Faculty. Owns Programs.
+An academic unit within a Faculty. Owns Programs and Courses.
 
 **Program**:
-A named course of study leading to a degree (MSc or PhD) within a Department, with a
-total required credit-hour count (default 21). An Applicant applies to a Program; a
-Student is enrolled in one.
+A named course of study leading to a degree (MSc or PhD) within a Department. Carries a
+required credit-hour count per Category (default Preparatory 6 / Program Core 6 /
+Research Elective 9, total 21). An Applicant applies to a Program; a Student is enrolled
+in one.
 _Avoid_: track, major, course (a Program is not a Course).
 
 **Course**:
-A single teachable unit with a code, credit hours, and a level. Belongs to one of three
-categories. Distinct from an Enrollment (a Student taking that Course).
+A single teachable unit with a code, a credit-hour breakdown (Lecture + Tutorial + Lab =
+Total), and a level. Owned by a Department, or university-wide (the shared Preparatory
+language/culture courses belong to no Department). A Course carries no Category of its
+own — its Category is assigned per Program by a Curriculum Entry. Distinct from an
+Enrollment (a Student taking that Course).
+
+**Curriculum**:
+A Program's set of Curriculum Entries — the Courses it comprises, grouped by Category.
+Editing a Program's Curriculum is a versioned Program change.
+
+**Curriculum Entry**:
+The placement of one Course into one Program under one Category (e.g. "CSE511 is Program
+Core in the MSc in Computer Engineering"). The same Course may have Entries in several
+Programs under different Categories — one Program's Core Course is available to another
+Program as an (external) Research Elective.
+_Avoid_: program course, offering (an offering is a scheduled section — Enrollment's term).
 
 **Course Category**:
-One of exactly three buckets a Course counts toward for a Program:
-Preparatory (6 × 1 CH), Program Core (2 × 3 CH), Research Elective (3 × 3 CH).
+The role a Course plays within a Program, assigned by a Curriculum Entry — one of exactly
+three: Preparatory (6 × 1 CH), Program Core (2 × 3 CH), Research Elective (3 × 3 CH). A
+Category is per-Program, never an intrinsic property of the Course.
 
 ## Enrollment & credit
 

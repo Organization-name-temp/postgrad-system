@@ -115,28 +115,53 @@ spec is [design-system.md](./design-system.md); the reasoning + rejected alterna
 Design, shadcn/ui, brand-forward palette, Style Dictionary) are in
 [ADR-0009](./adr/0009-mui-ui-foundation-design-system.md).
 
-- **Tokens:** a three-tier `frontend/src/app/theme/tokens.ts` (primitive → semantic →
-  component) feeding `createTheme({ cssVariables: true, colorSchemes: { light, dark } })`.
+The implementation decisions below were sharpened in a `/grill-with-docs` session; the
+theming architecture and reconciled wording live in [design-system.md](./design-system.md).
+
+- **Tokens:** `frontend/src/app/theme/tokens.ts` holds **all** design values (colour ramps +
+  semantic roles, type scale, spacing, radius, shadow, motion) as **MUI-agnostic typed
+  data**; a thin `createAppTheme(direction, lang)` **adapter** maps them into
+  `createTheme({ cssVariables: true, colorSchemes: { light, dark } })`.
+- **Theming architecture (two axes):** light/dark flips the `data-mui-color-scheme`
+  attribute via `useColorScheme` (`defaultMode: 'system'`, localStorage) — a **CSS-variable
+  flip, no theme recreation**; `InitColorSchemeScript` in `index.html` prevents the
+  first-paint flash. Direction + font **recreate the theme + swap the Emotion cache**
+  (Phase-0 mechanism), memoised on **language only**. See design-system.md §3.5.
 - **Palette:** neutral-led; **E-JUST red `#E4002B`** (50–900 ramp) as a disciplined accent
   with the accessible `#B00020` for red text; slate-blue secondary; semantic
   success/warning/error/info kept distinct from brand red. **Light + dark both ship.**
-- **Typography:** **IBM Plex Sans + IBM Plex Sans Arabic** self-hosted via `@fontsource`,
-  family switched by language (extends [AppThemeProvider](../frontend/src/app/AppThemeProvider.tsx)),
-  Arabic leading bump, `textTransform: none` on buttons, tabular figures for data.
+- **Typography:** **IBM Plex Sans + IBM Plex Sans Arabic** self-hosted via `@fontsource`
+  (per-subset: latin / arabic), weights 400/500/600/700, `font-display: swap`, **preload**
+  the two hot weights of the active language; family switched by language (extends
+  [AppThemeProvider](../frontend/src/app/AppThemeProvider.tsx)), Arabic leading bump,
+  `textTransform: none` on buttons, tabular figures for data.
 - **Shape/spacing:** 8px spacing scale, 8px default radius, **flat/border-led elevation**.
-- **Theme toggle:** client-side light/dark switch (localStorage); server persistence via
-  `PATCH /api/v1/me` (mirroring locale) **deferred**.
+- **App-shell chrome:** build the reusable **app-bar + role-aware side nav** now, wired from
+  `GET /me` (brand, page title, language switcher, theme toggle, user menu, permission-
+  filtered nav). **Global search + the notifications bell are deferred** to the phases that
+  add their endpoints (they need data that doesn't exist; DoD forbids new backend logic).
 - **Re-skin:** existing Phase 0 screens (login, dashboard, layout, language switcher) moved
-  onto tokens — no raw hex/spacing left.
-- **`<StatusChip>`:** one reusable component encoding the domain status-colour map
-  (Application / Course Status / Academic Standing / Grade — design-system.md §10), ready
-  for later phases; colour is never the only signal (icon/label always present).
-- **`/style` gallery:** a dev-only route showing palette, type scale, and key components
-  across light/dark × EN/AR — living reference and the target of one Playwright **visual**
-  smoke.
+  onto tokens — no raw hex left, **enforced by an ESLint `no-restricted-syntax` hex rule**
+  (raw spacing/radius stay review discipline).
+- **`<StatusChip>`:** a **presentational** `shared/ui` component (`tone`/`variant`/`icon`/
+  `label`) encoding the design *rules* but **no status names**; each later phase colocates
+  its own `statusToChip` map. The `/style` gallery renders the full §10 catalogue as demo
+  data. Colour is never the only signal (icon/label always present).
+- **Logo on dark:** white-chip approach, **no new assets** (no transparent/vector logo
+  exists yet); `favicon.svg`/`icons.svg` placeholders + a transparent-logo swap are flagged
+  as non-blocking cleanups (design-system.md §1).
+- **`/style` gallery:** a **dev-only** route (`import.meta.env.DEV`-gated) showing palette,
+  type scale, and key components across light/dark × EN/AR — living reference and the target
+  of the Phase 0.5 Playwright smoke.
+- **New deps:** `@mui/icons-material`, `@fontsource/ibm-plex-sans`,
+  `@fontsource/ibm-plex-sans-arabic`, `@axe-core/playwright`. *(Not* `@mui/x-tree-view` /
+  `@mui/x-data-grid` — those arrive with Phase 1 / Phase 7.)*
 - **DoD:** **no new backend domain logic** (the one legitimately frontend-only slice — no
-  Pest domain tests). Gates green (ESLint + boundaries, Prettier, `tsc`, Vitest + RTL, the
-  Playwright smoke); WCAG AA contrast holds across the full light/dark × LTR/RTL matrix.
+  Pest domain tests). Gates green (ESLint + boundaries + **hex rule**, Prettier, `tsc`,
+  **Vitest + RTL incl. a token-contrast unit test**, and a **hybrid Playwright smoke** —
+  functional assertions across all four combos as the gate + per-combo screenshots uploaded
+  as CI artifacts, not pixel-asserted). WCAG AA is a **real gate**: the contrast unit test +
+  **`@axe-core/playwright`** on `/style` and the re-skinned screens.
 - **Demo:** toggle light↔dark and EN↔AR on the re-skinned dashboard; open `/style` and see
   the whole system render correctly in all four combinations.
 

@@ -11,6 +11,21 @@ export const en = {
       en: 'English',
       ar: 'العربية',
     },
+    theme: {
+      toggle: 'Toggle light and dark theme',
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System',
+    },
+    nav: {
+      label: 'Main navigation',
+      open: 'Open navigation menu',
+      skipToContent: 'Skip to main content',
+      dashboard: 'Dashboard',
+    },
+    menu: {
+      account: 'Account menu',
+    },
   },
   auth: {
     login: {

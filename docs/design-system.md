@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Status** | Baseline design system, v1.0 (from a `/grill-with-docs` alignment session) |
+| **Status** | Design system v1.1 — baseline (v1.0) + Phase 0.5 implementation decisions (both from `/grill-with-docs` sessions) |
 | **Decision record** | [adr/0009-mui-ui-foundation-design-system.md](./adr/0009-mui-ui-foundation-design-system.md) |
 | **Companions** | [tech-stack.md](./tech-stack.md) · [architecture.md](./architecture.md) · [ROADMAP.md](./ROADMAP.md) |
 | **Ubiquitous language** | [../CONTEXT.md](../CONTEXT.md) (status names below are canonical from here) |
@@ -52,11 +52,23 @@ directly in `createTheme`.
 - **Minimum size:** mark ≥ 24px; lockup ≥ 140px wide (below that the tagline is illegible —
   switch to the mark).
 - **Placement:** on light surfaces use the asset as-is; on dark surfaces (dark mode app
-  bar, dark hero) place the logo on a neutral/white chip or use a white-knockout variant —
-  the black form must never sit on a dark background.
+  bar, dark hero) place the logo on a **neutral/white chip** (`bgcolor: common.white`,
+  `radius-md`, small padding) — the black form must never sit on a dark background. The chip
+  is the **Phase 0.5 approach** because no transparent/white-knockout logo asset exists yet
+  (see cleanups below); a knockout SVG variant is the better long-term option once brand
+  vector art is available.
 - **Don'ts:** don't recolour the mark, don't stretch/skew, don't add shadows/outlines,
   don't rotate, don't reconstruct it from the brand-red token (the asset is authoritative).
 - The logo is **not** mirrored in RTL (see §11).
+
+### Asset cleanups (flagged in Phase 0.5, not blocking it)
+- `frontend/public/favicon.svg` is currently a **purple placeholder unrelated to the
+  brand** — replace with the real E-JUST mark.
+- `frontend/public/icons.svg` is a **leftover social-icon sprite** — remove (iconography is
+  `@mui/icons-material`, §7).
+- `logo.jpg` is opaque and `name.png` is indexed-palette; replacing them with a
+  **transparent SVG/PNG** removes the need for the white chip on dark and any non-white
+  surface. A good later win when brand vector art appears.
 
 ---
 
@@ -81,10 +93,13 @@ The E-JUST brand colour. **`500` is the canonical brand red.**
 | 800 | `#8A0019` | |
 | 900 | `#5E0011` | |
 
-> **Contrast rule (load-bearing):** vivid `#E4002B` on white is ≈ 4:1 — it **fails** WCAG
-> AA (4.5:1) for normal text. Use `500` only for fills, accents, and large text (≥ 3:1);
-> use **`700` (`#B00020`)** for any red body text or links on light surfaces. On dark
-> surfaces, use `300 (#FF8296)` for red text/links.
+> **Contrast rule (load-bearing):** vivid `#E4002B` on white is ≈ **4.85:1** — it *technically*
+> clears WCAG AA (4.5) for normal text, but only just, and it drops below on tinted/off-white
+> surfaces. So treat `500` as a **fills / accents / large-text** colour (its comfortable
+> ≥ 3:1 zone), and use **`700` (`#B00020`, ≈ 7.3:1)** for any red body text or links on light
+> surfaces where you want real headroom. On dark surfaces, use `300 (#FF8296)` for red
+> text/links. *(These ratios are enforced by the Phase 0.5 token-contrast gate — a Vitest
+> test over `tokens.ts` using a WebAIM-verified contrast util; measured, not assumed.)*
 
 ### Ink / neutral — cool-tinted greys toward the logo black
 Carries the bulk of the UI (surfaces, borders, text) — the "neutral-led" strategy.
@@ -169,6 +184,29 @@ with no reload. **Both schemes ship in v1.**
 
 ---
 
+## 3.5 Theming architecture — the two axes
+
+The UI varies along **two independent axes** that use *different* mechanisms and compose
+without interfering (settled in the Phase 0.5 planning grill):
+
+- **Colour scheme (light ⇄ dark)** — driven by `cssVariables: true` + `colorSchemes`
+  (§3). Toggling flips the `data-mui-color-scheme` attribute on `<html>`; MUI swaps the
+  emitted CSS variables with **no theme recreation and no React re-render**. Managed by
+  MUI's `useColorScheme` (localStorage-backed, `defaultMode: 'system'` so a first visit
+  follows the OS). An `InitColorSchemeScript` in `index.html` sets the attribute before
+  first paint, so there is **no flash** of the wrong scheme.
+- **Direction + font (EN/LTR ⇄ AR/RTL)** — driven by **recreating the theme** and
+  **swapping the Emotion cache** (the Phase-0 mechanism in §11). Neither can be a variable
+  flip: `stylis-plugin-rtl` rewrites CSS at injection time, and `fontFamily` is a theme
+  value. So the single factory `createAppTheme(direction, lang)` is memoised on
+  **language only** and always bakes in *both* colour schemes.
+
+The dark selection **survives a language switch** because it lives in the DOM attribute +
+localStorage, not in the theme object. Use `<CssBaseline enableColorScheme />` so native
+form controls and scrollbars track the scheme.
+
+---
+
 ## 4. Typography
 
 **Families (self-hosted via `@fontsource`, no CDN):**
@@ -176,6 +214,10 @@ with no reload. **Both schemes ship in v1.**
 - **Arabic (AR):** `IBM Plex Sans Arabic` — `@fontsource/ibm-plex-sans-arabic`
 - Same type system across scripts → harmonised weights/metrics. Weights shipped: 400, 500,
   600, 700.
+- **Loading (Phase 0.5):** import **only the used subsets** — `ibm-plex-sans` → *latin*,
+  `ibm-plex-sans-arabic` → *arabic* — at those four weights (per-subset `@fontsource` CSS,
+  not the whole package). `font-display: swap` (fallback shows immediately, no invisible
+  text). **Preload** the two hot weights (400 body + 600 heading) of the active language.
 
 **Family switching:** set `theme.typography.fontFamily` by language inside
 [frontend/src/app/AppThemeProvider.tsx](../frontend/src/app/AppThemeProvider.tsx) (it
@@ -231,13 +273,20 @@ already keys on `i18n.language`). Fallback stacks:
 **Breakpoints (MUI defaults):** `xs 0 · sm 600 · md 900 · lg 1200 · xl 1536`.
 **Content max-width:** `1280px`, centred, with `space-5`(24) gutters (`space-4`(16) on `xs`).
 
-**App shell** (built in Phase 0.5, consumed by every phase):
+**App shell.** Phase 0.5 builds the reusable **shell chrome** — everything backed by data
+that already exists via `GET /me`. Two app-bar features that need endpoints not yet built —
+**global search** and the **notifications bell** — are **deferred to the phases that
+introduce their data** (the bell to the phase that adds notifications; search later). The
+shell chrome is consumed by every subsequent phase.
+
 - **Top app bar** (`surface`, 1px bottom border, height 64): logo lockup (start), page
-  title/breadcrumbs, then (end) global search, notifications bell (polled, §9), language
-  switcher, theme toggle, user menu.
+  title/breadcrumbs, then (end) language switcher, theme toggle, user menu. *(Global search
+  and the notifications bell, §9, slot in here later — deferred, not built in 0.5.)*
 - **Side navigation** (permanent on `lg+`, drawer on smaller): **role-aware** — items
   filtered by the user's effective Permissions (mirrors the API authority, display-only).
-  Active item uses the `primary` accent (left border in LTR / right border in RTL).
+  Active item uses the `primary` accent (left border in LTR / right border in RTL). Built
+  in 0.5 with the destinations that exist (dashboard, dev-only `/style`); each later phase
+  registers its own items.
 - **Content region:** page header (title + primary action) → body. Max-width as above.
 
 ---
@@ -326,6 +375,8 @@ Each maps to an MUI component with PRS usage rules. Theme-level overrides live i
   (flips in RTL), auto-dismiss 4–6s, never for critical errors (use inline/dialog).
 - **Notifications (bell)** — polled in-app list (per ROADMAP; no websockets). Unread count
   badge on the app-bar bell; panel lists localised notifications with relative timestamps.
+  **Deferred past Phase 0.5** — built with the phase that introduces notification data; the
+  0.5 shell leaves its app-bar slot empty (§5).
 - **Tabs / breadcrumbs** — breadcrumb separators are directional (mirror in RTL).
 - **Status chips** — see §10; the single reusable `<StatusChip>` component.
 - **States (every data view must define all three):**
@@ -342,6 +393,16 @@ The PRS is dense with domain statuses (see [../CONTEXT.md](../CONTEXT.md)). Each
 by the **single `<StatusChip>` component** with a fixed colour + **always** a text label,
 and an icon where it aids scanning. **Colour never stands alone** (WCAG 1.4.1). Non-counting
 statuses (don't affect CGPA) render **outlined/muted**; negative-counting render **filled**.
+
+> **Ownership (Phase 0.5).** `<StatusChip>` is **presentational** and lives in
+> `shared/ui`: its props are `tone` (success/warning/error/info/neutral/secondary),
+> `variant` (filled / filled-soft / outlined), `icon`, and `label`. It encodes the *rules*
+> below (non-counting → outlined, negative → filled) but **knows no status names** — that
+> would put domain vocabulary in `shared/` ahead of the domains that own it (frontend seam,
+> architecture.md §7). Each later phase colocates its own `statusToChip` map (a `feature` →
+> `shared` import). The tables below are the **design catalogue**; in Phase 0.5 the `/style`
+> gallery renders them as **static demo data** to prove the design — it ships no
+> authoritative domain map.
 
 ### Application status  (Draft → … → Accepted/Rejected)
 | Status | Token | Style |
@@ -427,6 +488,21 @@ statuses (don't affect CGPA) render **outlined/muted**; negative-counting render
   trap + Esc), menus.
 - **Reduced motion:** honour `prefers-reduced-motion` (§8).
 - **Language:** `<html lang>` tracks the active locale so screen readers switch voice.
+
+**How the gate is made real (Phase 0.5):** two mechanisms, both cross-OS-deterministic.
+1. **Token-contrast unit test (Vitest)** — a WebAIM-verified ratio function asserts every
+   readable semantic pair (light + dark) meets AA (≥ 4.5 body / ≥ 3 large & UI), and encodes
+   the §2 brand-red rule: the text token `#B00020` (≈ 7.3:1) clears AA with real headroom —
+   more than the vivid `#E4002B` (≈ 4.85:1), which is why `500` stays a fills/large colour and
+   `700` carries red text. **Scope:** it gates text and essential UI indicators (focus ring,
+   status fills); **disabled text** (WCAG 1.4.3) and the **decorative elevation dividers** (§6
+   — never the sole cue for a boundary) are intentionally exempt, while **interactive/input
+   border** contrast (SC 1.4.11) is verified at the component level as those components land.
+2. **`@axe-core/playwright`** on the `/style` gallery + the re-skinned login/dashboard
+   across all four combos, failing on serious/critical violations (axe reads computed CSS
+   colours, not pixels, so it does not suffer the cross-OS flakiness of screenshots).
+Also enforced: an **ESLint `no-restricted-syntax`** rule bans raw hex-colour literals
+outside `tokens.ts` (§0's "never hard-code a colour").
 
 ---
 

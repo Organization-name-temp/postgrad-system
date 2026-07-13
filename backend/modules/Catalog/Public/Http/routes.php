@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Catalog\Internal\Http\Controllers\CourseController;
+use Modules\Catalog\Internal\Http\Controllers\CurriculumController;
 use Modules\Catalog\Internal\Http\Controllers\DepartmentController;
 use Modules\Catalog\Internal\Http\Controllers\FacultyController;
 use Modules\Catalog\Internal\Http\Controllers\ProgramController;
@@ -37,6 +38,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/programs/{program}', [ProgramController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/programs/{program}/activate', [ProgramController::class, 'activate'])->middleware('can:catalog.manage');
     Route::post('/programs/{program}/deactivate', [ProgramController::class, 'deactivate'])->middleware('can:catalog.manage');
+
+    // Curriculum (a Program's Curriculum Entries — Courses placed into Categories)
+    Route::get('/programs/{program}/curriculum', [CurriculumController::class, 'index'])->middleware('can:catalog.view');
+    Route::post('/programs/{program}/curriculum', [CurriculumController::class, 'store'])->middleware('can:catalog.manage');
+    Route::delete('/programs/{program}/curriculum/{curriculum_entry}', [CurriculumController::class, 'destroy'])->middleware('can:catalog.manage');
 
     // Courses
     Route::get('/courses', [CourseController::class, 'index'])->middleware('can:catalog.view');

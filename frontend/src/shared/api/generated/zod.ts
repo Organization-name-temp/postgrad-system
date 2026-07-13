@@ -408,6 +408,94 @@ export const DeactivateAProgramResponse = zod.object({
 
 
 /**
+ * Returns the Program's Curriculum Entries — each with its Category and the
+ * embedded Course — ordered by ordinal (the manager's insertion order within a
+ * Category, with Course code as a stable tiebreak). The front end groups them
+ * into the three Category sections.
+ * @summary List a Program's Curriculum.
+ */
+export const ListAProgramsCurriculumParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ListAProgramsCurriculumResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "program_id": zod.number().optional(),
+  "category": zod.string().optional(),
+  "ordinal": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Creates a Curriculum Entry placing the Course into the given Category. The
+ * ordinal is assigned automatically (appended within the Category). A Course
+ * sits at most once per Program+Category (a duplicate is a 422).
+ * @summary Add a Course to a Program's Curriculum.
+ */
+export const AddACourseToAProgramsCurriculumParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const AddACourseToAProgramsCurriculumBody = zod.object({
+  "course_id": zod.number().describe('The Course to place.'),
+  "category": zod.string().describe('One of Preparatory, ProgramCore, ResearchElective.')
+})
+
+export const AddACourseToAProgramsCurriculumResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "program_id": zod.number().optional(),
+  "category": zod.string().optional(),
+  "ordinal": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Removing an entry takes the Course out of the Program's Curriculum; the Course
+ * itself is untouched (it may still sit in other Programs). The change is
+ * captured in the Program's version history (ADR-0011).
+ * @summary Remove a Curriculum Entry from a Program.
+ */
+export const RemoveACurriculumEntryFromAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.'),
+  "curriculum_entry_id": zod.number().describe('The ID of the curriculum entry.')
+})
+
+export const RemoveACurriculumEntryFromAProgramResponse = zod.looseObject({
+
+})
+
+
+/**
  * @summary List Courses.
  */
 export const ListCoursesResponse = zod.object({

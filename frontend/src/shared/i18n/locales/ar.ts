@@ -97,6 +97,7 @@ export const ar = {
       new: 'برنامج جديد',
       edit: 'تعديل البرنامج',
       editAction: 'تعديل',
+      editDetails: 'تعديل التفاصيل',
       empty: 'لا توجد برامج بعد.',
       loading: 'جارٍ تحميل البرامج',
       loadError: 'تعذّر تحميل البرامج.',
@@ -155,6 +156,23 @@ export const ar = {
       deactivate: 'تعطيل',
       save: 'حفظ',
       cancel: 'إلغاء',
+    },
+    curriculum: {
+      title: 'الخطة الدراسية',
+      loading: 'جارٍ تحميل الخطة الدراسية',
+      loadError: 'تعذّر تحميل الخطة الدراسية.',
+      saveError:
+        'تعذّر تحديث الخطة الدراسية. قد يكون المقرر مُدرجًا بالفعل ضمن هذه الفئة لهذا البرنامج.',
+      categories: {
+        Preparatory: 'تمهيدية',
+        ProgramCore: 'أساسية للبرنامج',
+        ResearchElective: 'اختيارية بحثية',
+      },
+      emptyCategory: 'لا توجد مقررات في هذه الفئة بعد.',
+      addCourse: 'إضافة مقرر',
+      add: 'إضافة',
+      remove: 'إزالة {{code}}',
+      level: 'المستوى {{level}}',
     },
   },
 } as const

@@ -387,6 +387,76 @@ export type DeactivateAProgram200 = {
   data?: DeactivateAProgram200Data;
 };
 
+export type ListAProgramsCurriculum200DataItemCourse = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type ListAProgramsCurriculum200DataItem = {
+  id?: number;
+  program_id?: number;
+  category?: string;
+  ordinal?: number;
+  course?: ListAProgramsCurriculum200DataItemCourse;
+};
+
+export type ListAProgramsCurriculum200 = {
+  data?: ListAProgramsCurriculum200DataItem[];
+};
+
+export type AddACourseToAProgramsCurriculumBody = {
+  /** The Course to place. */
+  course_id: number;
+  /** One of Preparatory, ProgramCore, ResearchElective. */
+  category: string;
+};
+
+export type AddACourseToAProgramsCurriculum201DataCourse = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type AddACourseToAProgramsCurriculum201Data = {
+  id?: number;
+  program_id?: number;
+  category?: string;
+  ordinal?: number;
+  course?: AddACourseToAProgramsCurriculum201DataCourse;
+};
+
+export type AddACourseToAProgramsCurriculum201 = {
+  data?: AddACourseToAProgramsCurriculum201Data;
+};
+
+export type AddACourseToAProgramsCurriculum422Errors = {
+  course_id?: string[];
+};
+
+export type AddACourseToAProgramsCurriculum422 = {
+  message?: string;
+  errors?: AddACourseToAProgramsCurriculum422Errors;
+};
+
+export type RemoveACurriculumEntryFromAProgram204 = { [key: string]: unknown };
+
 export type ListCourses200DataItem = {
   id?: number;
   department_id?: number;
@@ -2009,6 +2079,239 @@ export const useDeactivateAProgram = <TError = unknown,
         TContext
       > => {
       return useMutation(getDeactivateAProgramMutationOptions(options), queryClient);
+    }
+
+/**
+ * Returns the Program's Curriculum Entries — each with its Category and the
+ * embedded Course — ordered by ordinal (the manager's insertion order within a
+ * Category, with Course code as a stable tiebreak). The front end groups them
+ * into the three Category sections.
+ * @summary List a Program's Curriculum.
+ */
+export const listAProgramsCurriculum = (
+    programId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAProgramsCurriculum200>(
+      {url: `/api/v1/programs/${programId}/curriculum`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAProgramsCurriculumQueryKey = (programId: number,) => {
+    return [
+    `/api/v1/programs/${programId}/curriculum`
+    ] as const;
+    }
+
+
+export const getListAProgramsCurriculumQueryOptions = <TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAProgramsCurriculumQueryKey(programId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAProgramsCurriculum>>> = ({ signal }) => listAProgramsCurriculum(programId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: programId !== null && programId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAProgramsCurriculumQueryResult = NonNullable<Awaited<ReturnType<typeof listAProgramsCurriculum>>>
+export type ListAProgramsCurriculumQueryError = unknown
+
+
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Program's Curriculum.
+ */
+
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAProgramsCurriculumQueryOptions(programId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Creates a Curriculum Entry placing the Course into the given Category. The
+ * ordinal is assigned automatically (appended within the Category). A Course
+ * sits at most once per Program+Category (a duplicate is a 422).
+ * @summary Add a Course to a Program's Curriculum.
+ */
+export const addACourseToAProgramsCurriculum = (
+    programId: number,
+    addACourseToAProgramsCurriculumBody: AddACourseToAProgramsCurriculumBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AddACourseToAProgramsCurriculum201>(
+      {url: `/api/v1/programs/${programId}/curriculum`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: addACourseToAProgramsCurriculumBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAddACourseToAProgramsCurriculumMutationOptions = <TError = AddACourseToAProgramsCurriculum422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, TError,{programId: number;data: AddACourseToAProgramsCurriculumBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, TError,{programId: number;data: AddACourseToAProgramsCurriculumBody}, TContext> => {
+
+const mutationKey = ['addACourseToAProgramsCurriculum'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, {programId: number;data: AddACourseToAProgramsCurriculumBody}> = (props) => {
+          const {programId,data} = props ?? {};
+
+          return  addACourseToAProgramsCurriculum(programId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddACourseToAProgramsCurriculumMutationResult = NonNullable<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>>
+    export type AddACourseToAProgramsCurriculumMutationBody = AddACourseToAProgramsCurriculumBody
+    export type AddACourseToAProgramsCurriculumMutationError = AddACourseToAProgramsCurriculum422
+
+    /**
+ * @summary Add a Course to a Program's Curriculum.
+ */
+export const useAddACourseToAProgramsCurriculum = <TError = AddACourseToAProgramsCurriculum422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, TError,{programId: number;data: AddACourseToAProgramsCurriculumBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>,
+        TError,
+        {programId: number;data: AddACourseToAProgramsCurriculumBody},
+        TContext
+      > => {
+      return useMutation(getAddACourseToAProgramsCurriculumMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removing an entry takes the Course out of the Program's Curriculum; the Course
+ * itself is untouched (it may still sit in other Programs). The change is
+ * captured in the Program's version history (ADR-0011).
+ * @summary Remove a Curriculum Entry from a Program.
+ */
+export const removeACurriculumEntryFromAProgram = (
+    programId: number,
+    curriculumEntryId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RemoveACurriculumEntryFromAProgram204>(
+      {url: `/api/v1/programs/${programId}/curriculum/${curriculumEntryId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getRemoveACurriculumEntryFromAProgramMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, TError,{programId: number;curriculumEntryId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, TError,{programId: number;curriculumEntryId: number}, TContext> => {
+
+const mutationKey = ['removeACurriculumEntryFromAProgram'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, {programId: number;curriculumEntryId: number}> = (props) => {
+          const {programId,curriculumEntryId} = props ?? {};
+
+          return  removeACurriculumEntryFromAProgram(programId,curriculumEntryId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveACurriculumEntryFromAProgramMutationResult = NonNullable<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>>
+
+    export type RemoveACurriculumEntryFromAProgramMutationError = unknown
+
+    /**
+ * @summary Remove a Curriculum Entry from a Program.
+ */
+export const useRemoveACurriculumEntryFromAProgram = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, TError,{programId: number;curriculumEntryId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>,
+        TError,
+        {programId: number;curriculumEntryId: number},
+        TContext
+      > => {
+      return useMutation(getRemoveACurriculumEntryFromAProgramMutationOptions(options), queryClient);
     }
 
 /**

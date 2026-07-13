@@ -15,7 +15,6 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
 import { useListDepartments, useListPrograms } from '../../../shared/api/generated/endpoints'
-import type { ListPrograms200DataItem } from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
 import { PERMISSION } from '../../../shared/access/permissions'
 import { pickLocaleName } from '../localeName'
@@ -27,7 +26,7 @@ import { ProgramFormDialog } from './ProgramFormDialog'
  * owning Department, degree level, per-Category credit split, status); only
  * catalog.manage holders see the New / edit / activate / deactivate controls — the
  * API enforces the same split (ADR-0008). Departments are fetched alongside to
- * resolve each Program's Department name and to populate the create/edit picker.
+ * resolve each Program's Department name and to populate the create dialog's picker.
  */
 export function ProgramsPage() {
   const { t, i18n } = useTranslation('catalog')
@@ -44,17 +43,9 @@ export function ProgramsPage() {
     return department ? pickLocaleName(department, i18n.language, department.code ?? '') : ''
   }
 
+  // The list creates Programs; editing a Program's attributes and Curriculum happens
+  // on its own edit page (each row's edit action links there).
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<ListPrograms200DataItem | undefined>(undefined)
-
-  const openCreate = () => {
-    setEditing(undefined)
-    setDialogOpen(true)
-  }
-  const openEdit = (program: ListPrograms200DataItem) => {
-    setEditing(program)
-    setDialogOpen(true)
-  }
 
   return (
     <>
@@ -66,7 +57,7 @@ export function ProgramsPage() {
           {t('programs.title')}
         </Typography>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
             {t('programs.new')}
           </Button>
         )}
@@ -100,7 +91,6 @@ export function ProgramsPage() {
                   program={program}
                   departmentName={departmentName(program.department_id)}
                   canManage={canManage}
-                  onEdit={openEdit}
                 />
               ))}
             </TableBody>
@@ -108,7 +98,7 @@ export function ProgramsPage() {
         </TableContainer>
       )}
 
-      <ProgramFormDialog open={dialogOpen} onClose={() => setDialogOpen(false)} program={editing} />
+      <ProgramFormDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </>
   )
 }

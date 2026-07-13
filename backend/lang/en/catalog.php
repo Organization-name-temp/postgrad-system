@@ -6,4 +6,5 @@
 // domain messages the Catalog controllers raise.
 return [
     'credit_hours_unbalanced' => 'The lecture, tutorial and lab hours must add up to the total.',
+    'curriculum_duplicate' => 'This course is already in that category for this program.',
 ];

@@ -1308,6 +1308,284 @@ paths:
         required: true
         schema:
           type: integer
+  '/api/v1/programs/{program_id}/curriculum':
+    get:
+      summary: "List a Program's Curriculum."
+      operationId: listAProgramsCurriculum
+      description: "Returns the Program's Curriculum Entries — each with its Category and the\nembedded Course — ordered by ordinal (the manager's insertion order within a\nCategory, with Course code as a stable tiebreak). The front end groups them\ninto the three Category sections."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      program_id: 1
+                      category: ProgramCore
+                      ordinal: 0
+                      course:
+                        id: 1
+                        department_id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        lecture_ch: 3
+                        tutorial_ch: 0
+                        lab_ch: 0
+                        total_ch: 3
+                        is_active: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        program_id: 1
+                        category: ProgramCore
+                        ordinal: 0
+                        course:
+                          id: 1
+                          department_id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          lecture_ch: 3
+                          tutorial_ch: 0
+                          lab_ch: 0
+                          total_ch: 3
+                          is_active: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        program_id:
+                          type: integer
+                          example: 1
+                        category:
+                          type: string
+                          example: ProgramCore
+                        ordinal:
+                          type: integer
+                          example: 0
+                        course:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            department_id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: DEP501
+                            name_en:
+                              type: string
+                              example: 'Advanced Algorithms'
+                            name_ar:
+                              type: string
+                              example: 'خوارزميات متقدمة'
+                            level:
+                              type: integer
+                              example: 500
+                            lecture_ch:
+                              type: integer
+                              example: 3
+                            tutorial_ch:
+                              type: integer
+                              example: 0
+                            lab_ch:
+                              type: integer
+                              example: 0
+                            total_ch:
+                              type: integer
+                              example: 3
+                            is_active:
+                              type: boolean
+                              example: true
+      tags:
+        - Catalog
+      security: []
+    post:
+      summary: "Add a Course to a Program's Curriculum."
+      operationId: addACourseToAProgramsCurriculum
+      description: "Creates a Curriculum Entry placing the Course into the given Category. The\nordinal is assigned automatically (appended within the Category). A Course\nsits at most once per Program+Category (a duplicate is a 422)."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    program_id: 1
+                    category: ProgramCore
+                    ordinal: 0
+                    course:
+                      id: 1
+                      department_id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      lecture_ch: 3
+                      tutorial_ch: 0
+                      lab_ch: 0
+                      total_ch: 3
+                      is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      program_id:
+                        type: integer
+                        example: 1
+                      category:
+                        type: string
+                        example: ProgramCore
+                      ordinal:
+                        type: integer
+                        example: 0
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          department_id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          lecture_ch:
+                            type: integer
+                            example: 3
+                          tutorial_ch:
+                            type: integer
+                            example: 0
+                          lab_ch:
+                            type: integer
+                            example: 0
+                          total_ch:
+                            type: integer
+                            example: 3
+                          is_active:
+                            type: boolean
+                            example: true
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This course is already in that category for this program.'
+                  errors:
+                    course_id:
+                      - 'This course is already in that category for this program.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This course is already in that category for this program.'
+                  errors:
+                    type: object
+                    properties:
+                      course_id:
+                        type: array
+                        example:
+                          - 'This course is already in that category for this program.'
+                        items:
+                          type: string
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course_id:
+                  type: integer
+                  description: 'The Course to place.'
+                  example: 1
+                category:
+                  type: string
+                  description: 'One of Preparatory, ProgramCore, ResearchElective.'
+                  example: ProgramCore
+              required:
+                - course_id
+                - category
+      security: []
+    parameters:
+      -
+        in: path
+        name: program_id
+        description: 'The ID of the program.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/programs/{program_id}/curriculum/{curriculum_entry_id}':
+    delete:
+      summary: 'Remove a Curriculum Entry from a Program.'
+      operationId: removeACurriculumEntryFromAProgram
+      description: "Removing an entry takes the Course out of the Program's Curriculum; the Course\nitself is untouched (it may still sit in other Programs). The change is\ncaptured in the Program's version history (ADR-0011)."
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+                properties: {}
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: program_id
+        description: 'The ID of the program.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: curriculum_entry_id
+        description: 'The ID of the curriculum entry.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/courses:
     get:
       summary: 'List Courses.'

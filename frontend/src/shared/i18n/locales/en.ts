@@ -100,6 +100,7 @@ export const en = {
       new: 'New program',
       edit: 'Edit program',
       editAction: 'Edit',
+      editDetails: 'Edit details',
       empty: 'No programs yet.',
       loading: 'Loading programs',
       loadError: 'Could not load programs.',
@@ -158,6 +159,23 @@ export const en = {
       deactivate: 'Deactivate',
       save: 'Save',
       cancel: 'Cancel',
+    },
+    curriculum: {
+      title: 'Curriculum',
+      loading: 'Loading curriculum',
+      loadError: 'Could not load the curriculum.',
+      saveError:
+        'Could not update the curriculum. The course may already be in that category for this program.',
+      categories: {
+        Preparatory: 'Preparatory',
+        ProgramCore: 'Program Core',
+        ResearchElective: 'Research Elective',
+      },
+      emptyCategory: 'No courses in this category yet.',
+      addCourse: 'Add a course',
+      add: 'Add',
+      remove: 'Remove {{code}}',
+      level: 'Level {{level}}',
     },
   },
 } as const

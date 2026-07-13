@@ -2,6 +2,7 @@ import { IconButton, Stack, TableCell, TableRow, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+import { Link as RouterLink } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
@@ -19,16 +20,16 @@ interface ProgramRowProps {
   /** The owning Department's name in the active locale (resolved by the page). */
   departmentName: string
   canManage: boolean
-  onEdit: (program: ListPrograms200DataItem) => void
 }
 
 /**
  * One Program row: code, locale-picked name, owning Department, degree level, the
  * per-Category credit split (prep / core / elective · total), and an
- * active/inactive StatusChip. Managers additionally get edit + activate/deactivate
- * actions (deactivate is the only "delete" — never hard-deleted, BR-18).
+ * active/inactive StatusChip. The edit action opens the Program edit page (where
+ * attributes and Curriculum are managed together); managers also get
+ * activate/deactivate (deactivate is the only "delete" — never hard-deleted, BR-18).
  */
-export function ProgramRow({ program, departmentName, canManage, onEdit }: ProgramRowProps) {
+export function ProgramRow({ program, departmentName, canManage }: ProgramRowProps) {
   const { t, i18n } = useTranslation('catalog')
   const queryClient = useQueryClient()
   const activate = useActivateAProgram()
@@ -80,7 +81,8 @@ export function ProgramRow({ program, departmentName, canManage, onEdit }: Progr
             <Tooltip title={t('programs.editAction')}>
               <IconButton
                 size="small"
-                onClick={() => onEdit(program)}
+                component={RouterLink}
+                to={`/catalog/programs/${program.id}`}
                 aria-label={t('programs.editAction')}
               >
                 <EditIcon fontSize="small" />

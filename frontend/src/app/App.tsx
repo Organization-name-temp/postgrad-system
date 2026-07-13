@@ -7,6 +7,7 @@ import { DashboardPage } from '../features/auth/DashboardPage'
 import { FacultiesPage } from '../features/catalog/faculties/FacultiesPage'
 import { DepartmentsPage } from '../features/catalog/departments/DepartmentsPage'
 import { ProgramsPage } from '../features/catalog/programs/ProgramsPage'
+import { ProgramEditPage } from '../features/catalog/programs/ProgramEditPage'
 import { CoursesPage } from '../features/catalog/courses/CoursesPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
@@ -44,6 +45,7 @@ export function App() {
                 <Route path="/catalog/faculties" element={<FacultiesPage />} />
                 <Route path="/catalog/departments" element={<DepartmentsPage />} />
                 <Route path="/catalog/programs" element={<ProgramsPage />} />
+                <Route path="/catalog/programs/:programId" element={<ProgramEditPage />} />
                 <Route path="/catalog/courses" element={<CoursesPage />} />
               </Route>
             </Route>

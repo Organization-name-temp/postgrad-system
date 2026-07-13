@@ -15,6 +15,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   getListProgramsQueryKey,
+  getShowAProgramQueryKey,
   useCreateAProgram,
   useListDepartments,
   useUpdateAProgram,
@@ -86,6 +87,11 @@ export function ProgramFormDialog({ open, onClose, program }: ProgramFormDialogP
 
   const onSaved = () => {
     void queryClient.invalidateQueries({ queryKey: getListProgramsQueryKey() })
+    // Also refresh the single-Program view (the edit page header reads it) after an
+    // edit, so the change shows without a reload.
+    if (isEdit && program?.id !== undefined) {
+      void queryClient.invalidateQueries({ queryKey: getShowAProgramQueryKey(program.id) })
+    }
     onClose()
   }
 

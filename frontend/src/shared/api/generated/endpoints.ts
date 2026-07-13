@@ -387,6 +387,165 @@ export type DeactivateAProgram200 = {
   data?: DeactivateAProgram200Data;
 };
 
+export type ListCourses200DataItem = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type ListCourses200 = {
+  data?: ListCourses200DataItem[];
+};
+
+export type CreateACourseBody = {
+  /** The owning Department id; omit for a university-wide Course. */
+  department_id?: number;
+  /** Unique short code for the Course. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** One of 400, 500, 600, 700. */
+  level: number;
+  /** Lecture credit hours. */
+  lecture_ch: number;
+  /** Tutorial credit hours. */
+  tutorial_ch: number;
+  /** Lab credit hours. */
+  lab_ch: number;
+  /** Total credit hours; must equal lecture + tutorial + lab. */
+  total_ch: number;
+};
+
+export type CreateACourse201Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type CreateACourse201 = {
+  data?: CreateACourse201Data;
+};
+
+export type CreateACourse422Errors = {
+  total_ch?: string[];
+};
+
+export type CreateACourse422 = {
+  message?: string;
+  errors?: CreateACourse422Errors;
+};
+
+export type ShowACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type ShowACourse200 = {
+  data?: ShowACourse200Data;
+};
+
+export type UpdateACourseBody = {
+  /** The owning Department id; omit for a university-wide Course. */
+  department_id?: number;
+  /** Unique short code for the Course. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** One of 400, 500, 600, 700. */
+  level: number;
+  /** Lecture credit hours. */
+  lecture_ch: number;
+  /** Tutorial credit hours. */
+  tutorial_ch: number;
+  /** Lab credit hours. */
+  lab_ch: number;
+  /** Total credit hours; must equal lecture + tutorial + lab. */
+  total_ch: number;
+};
+
+export type UpdateACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type UpdateACourse200 = {
+  data?: UpdateACourse200Data;
+};
+
+export type ActivateACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type ActivateACourse200 = {
+  data?: ActivateACourse200Data;
+};
+
+export type DeactivateACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type DeactivateACourse200 = {
+  data?: DeactivateACourse200Data;
+};
+
 export type ServiceHealthCheck200Data = {
   status?: string;
   app?: string;
@@ -1850,6 +2009,453 @@ export const useDeactivateAProgram = <TError = unknown,
         TContext
       > => {
       return useMutation(getDeactivateAProgramMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary List Courses.
+ */
+export const listCourses = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListCourses200>(
+      {url: `/api/v1/courses`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListCoursesQueryKey = () => {
+    return [
+    `/api/v1/courses`
+    ] as const;
+    }
+
+
+export const getListCoursesQueryOptions = <TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCoursesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCourses>>> = ({ signal }) => listCourses(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCoursesQueryResult = NonNullable<Awaited<ReturnType<typeof listCourses>>>
+export type ListCoursesQueryError = unknown
+
+
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCourses>>,
+          TError,
+          Awaited<ReturnType<typeof listCourses>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCourses>>,
+          TError,
+          Awaited<ReturnType<typeof listCourses>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Courses.
+ */
+
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCoursesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Omit `department_id` (or send null) to mark the Course university-wide — the
+ * shape used for the shared Preparatory language/culture courses.
+ * @summary Create a Course.
+ */
+export const createACourse = (
+    createACourseBody: CreateACourseBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateACourse201>(
+      {url: `/api/v1/courses`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createACourseBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateACourseMutationOptions = <TError = CreateACourse422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourse>>, TError,{data: CreateACourseBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createACourse>>, TError,{data: CreateACourseBody}, TContext> => {
+
+const mutationKey = ['createACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createACourse>>, {data: CreateACourseBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createACourse(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof createACourse>>>
+    export type CreateACourseMutationBody = CreateACourseBody
+    export type CreateACourseMutationError = CreateACourse422
+
+    /**
+ * @summary Create a Course.
+ */
+export const useCreateACourse = <TError = CreateACourse422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourse>>, TError,{data: CreateACourseBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createACourse>>,
+        TError,
+        {data: CreateACourseBody},
+        TContext
+      > => {
+      return useMutation(getCreateACourseMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Course.
+ */
+export const showACourse = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowACourse200>(
+      {url: `/api/v1/courses/${courseId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowACourseQueryKey = (courseId: number,) => {
+    return [
+    `/api/v1/courses/${courseId}`
+    ] as const;
+    }
+
+
+export const getShowACourseQueryOptions = <TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowACourseQueryKey(courseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showACourse>>> = ({ signal }) => showACourse(courseId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowACourseQueryResult = NonNullable<Awaited<ReturnType<typeof showACourse>>>
+export type ShowACourseQueryError = unknown
+
+
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourse>>,
+          TError,
+          Awaited<ReturnType<typeof showACourse>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourse>>,
+          TError,
+          Awaited<ReturnType<typeof showACourse>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Course.
+ */
+
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowACourseQueryOptions(courseId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Update a Course.
+ */
+export const updateACourse = (
+    courseId: number,
+    updateACourseBody: UpdateACourseBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateACourse200>(
+      {url: `/api/v1/courses/${courseId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateACourseBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateACourseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourse>>, TError,{courseId: number;data: UpdateACourseBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateACourse>>, TError,{courseId: number;data: UpdateACourseBody}, TContext> => {
+
+const mutationKey = ['updateACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateACourse>>, {courseId: number;data: UpdateACourseBody}> = (props) => {
+          const {courseId,data} = props ?? {};
+
+          return  updateACourse(courseId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof updateACourse>>>
+    export type UpdateACourseMutationBody = UpdateACourseBody
+    export type UpdateACourseMutationError = unknown
+
+    /**
+ * @summary Update a Course.
+ */
+export const useUpdateACourse = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourse>>, TError,{courseId: number;data: UpdateACourseBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateACourse>>,
+        TError,
+        {courseId: number;data: UpdateACourseBody},
+        TContext
+      > => {
+      return useMutation(getUpdateACourseMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Activate a Course.
+ */
+export const activateACourse = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ActivateACourse200>(
+      {url: `/api/v1/courses/${courseId}/activate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getActivateACourseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateACourse>>, TError,{courseId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof activateACourse>>, TError,{courseId: number}, TContext> => {
+
+const mutationKey = ['activateACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activateACourse>>, {courseId: number}> = (props) => {
+          const {courseId} = props ?? {};
+
+          return  activateACourse(courseId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof activateACourse>>>
+
+    export type ActivateACourseMutationError = unknown
+
+    /**
+ * @summary Activate a Course.
+ */
+export const useActivateACourse = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateACourse>>, TError,{courseId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof activateACourse>>,
+        TError,
+        {courseId: number},
+        TContext
+      > => {
+      return useMutation(getActivateACourseMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deactivating retires a Course without deleting it — it stays readable and its
+ * historical academic records are unaffected (BR-18, FR-PCM-003.3).
+ * @summary Deactivate a Course.
+ */
+export const deactivateACourse = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeactivateACourse200>(
+      {url: `/api/v1/courses/${courseId}/deactivate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeactivateACourseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateACourse>>, TError,{courseId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deactivateACourse>>, TError,{courseId: number}, TContext> => {
+
+const mutationKey = ['deactivateACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deactivateACourse>>, {courseId: number}> = (props) => {
+          const {courseId} = props ?? {};
+
+          return  deactivateACourse(courseId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeactivateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof deactivateACourse>>>
+
+    export type DeactivateACourseMutationError = unknown
+
+    /**
+ * @summary Deactivate a Course.
+ */
+export const useDeactivateACourse = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateACourse>>, TError,{courseId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deactivateACourse>>,
+        TError,
+        {courseId: number},
+        TContext
+      > => {
+      return useMutation(getDeactivateACourseMutationOptions(options), queryClient);
     }
 
 /**

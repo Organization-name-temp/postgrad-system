@@ -1308,6 +1308,570 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/courses:
+    get:
+      summary: 'List Courses.'
+      operationId: listCourses
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      department_id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      lecture_ch: 3
+                      tutorial_ch: 0
+                      lab_ch: 0
+                      total_ch: 3
+                      is_active: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        department_id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        lecture_ch: 3
+                        tutorial_ch: 0
+                        lab_ch: 0
+                        total_ch: 3
+                        is_active: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        department_id:
+                          type: integer
+                          example: 1
+                        code:
+                          type: string
+                          example: DEP501
+                        name_en:
+                          type: string
+                          example: 'Advanced Algorithms'
+                        name_ar:
+                          type: string
+                          example: 'خوارزميات متقدمة'
+                        level:
+                          type: integer
+                          example: 500
+                        lecture_ch:
+                          type: integer
+                          example: 3
+                        tutorial_ch:
+                          type: integer
+                          example: 0
+                        lab_ch:
+                          type: integer
+                          example: 0
+                        total_ch:
+                          type: integer
+                          example: 3
+                        is_active:
+                          type: boolean
+                          example: true
+      tags:
+        - Catalog
+      security: []
+    post:
+      summary: 'Create a Course.'
+      operationId: createACourse
+      description: "Omit `department_id` (or send null) to mark the Course university-wide — the\nshape used for the shared Preparatory language/culture courses."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: DEP501
+                    name_en: 'Advanced Algorithms'
+                    name_ar: 'خوارزميات متقدمة'
+                    level: 500
+                    lecture_ch: 3
+                    tutorial_ch: 0
+                    lab_ch: 0
+                    total_ch: 3
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: DEP501
+                      name_en:
+                        type: string
+                        example: 'Advanced Algorithms'
+                      name_ar:
+                        type: string
+                        example: 'خوارزميات متقدمة'
+                      level:
+                        type: integer
+                        example: 500
+                      lecture_ch:
+                        type: integer
+                        example: 3
+                      tutorial_ch:
+                        type: integer
+                        example: 0
+                      lab_ch:
+                        type: integer
+                        example: 0
+                      total_ch:
+                        type: integer
+                        example: 3
+                      is_active:
+                        type: boolean
+                        example: true
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The lecture, tutorial and lab hours must add up to the total.'
+                  errors:
+                    total_ch:
+                      - 'The lecture, tutorial and lab hours must add up to the total.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The lecture, tutorial and lab hours must add up to the total.'
+                  errors:
+                    type: object
+                    properties:
+                      total_ch:
+                        type: array
+                        example:
+                          - 'The lecture, tutorial and lab hours must add up to the total.'
+                        items:
+                          type: string
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                department_id:
+                  type: integer
+                  description: 'The owning Department id; omit for a university-wide Course.'
+                  example: 1
+                code:
+                  type: string
+                  description: 'Unique short code for the Course.'
+                  example: DEP501
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'Advanced Algorithms'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'خوارزميات متقدمة'
+                level:
+                  type: integer
+                  description: 'One of 400, 500, 600, 700.'
+                  example: 500
+                lecture_ch:
+                  type: integer
+                  description: 'Lecture credit hours.'
+                  example: 3
+                tutorial_ch:
+                  type: integer
+                  description: 'Tutorial credit hours.'
+                  example: 0
+                lab_ch:
+                  type: integer
+                  description: 'Lab credit hours.'
+                  example: 0
+                total_ch:
+                  type: integer
+                  description: 'Total credit hours; must equal lecture + tutorial + lab.'
+                  example: 3
+              required:
+                - code
+                - name_en
+                - name_ar
+                - level
+                - lecture_ch
+                - tutorial_ch
+                - lab_ch
+                - total_ch
+      security: []
+  '/api/v1/courses/{course_id}':
+    get:
+      summary: 'Show a Course.'
+      operationId: showACourse
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: DEP501
+                    name_en: 'Advanced Algorithms'
+                    name_ar: 'خوارزميات متقدمة'
+                    level: 500
+                    lecture_ch: 3
+                    tutorial_ch: 0
+                    lab_ch: 0
+                    total_ch: 3
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: DEP501
+                      name_en:
+                        type: string
+                        example: 'Advanced Algorithms'
+                      name_ar:
+                        type: string
+                        example: 'خوارزميات متقدمة'
+                      level:
+                        type: integer
+                        example: 500
+                      lecture_ch:
+                        type: integer
+                        example: 3
+                      tutorial_ch:
+                        type: integer
+                        example: 0
+                      lab_ch:
+                        type: integer
+                        example: 0
+                      total_ch:
+                        type: integer
+                        example: 3
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      security: []
+    patch:
+      summary: 'Update a Course.'
+      operationId: updateACourse
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: DEP501
+                    name_en: 'Advanced Algorithms'
+                    name_ar: 'خوارزميات متقدمة'
+                    level: 500
+                    lecture_ch: 3
+                    tutorial_ch: 0
+                    lab_ch: 0
+                    total_ch: 3
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: DEP501
+                      name_en:
+                        type: string
+                        example: 'Advanced Algorithms'
+                      name_ar:
+                        type: string
+                        example: 'خوارزميات متقدمة'
+                      level:
+                        type: integer
+                        example: 500
+                      lecture_ch:
+                        type: integer
+                        example: 3
+                      tutorial_ch:
+                        type: integer
+                        example: 0
+                      lab_ch:
+                        type: integer
+                        example: 0
+                      total_ch:
+                        type: integer
+                        example: 3
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                department_id:
+                  type: integer
+                  description: 'The owning Department id; omit for a university-wide Course.'
+                  example: 1
+                code:
+                  type: string
+                  description: 'Unique short code for the Course.'
+                  example: DEP501
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'Advanced Algorithms'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'خوارزميات متقدمة'
+                level:
+                  type: integer
+                  description: 'One of 400, 500, 600, 700.'
+                  example: 500
+                lecture_ch:
+                  type: integer
+                  description: 'Lecture credit hours.'
+                  example: 3
+                tutorial_ch:
+                  type: integer
+                  description: 'Tutorial credit hours.'
+                  example: 0
+                lab_ch:
+                  type: integer
+                  description: 'Lab credit hours.'
+                  example: 0
+                total_ch:
+                  type: integer
+                  description: 'Total credit hours; must equal lecture + tutorial + lab.'
+                  example: 3
+              required:
+                - code
+                - name_en
+                - name_ar
+                - level
+                - lecture_ch
+                - tutorial_ch
+                - lab_ch
+                - total_ch
+      security: []
+    parameters:
+      -
+        in: path
+        name: course_id
+        description: 'The ID of the course.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/courses/{course_id}/activate':
+    post:
+      summary: 'Activate a Course.'
+      operationId: activateACourse
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: DEP501
+                    name_en: 'Advanced Algorithms'
+                    name_ar: 'خوارزميات متقدمة'
+                    level: 500
+                    lecture_ch: 3
+                    tutorial_ch: 0
+                    lab_ch: 0
+                    total_ch: 3
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: DEP501
+                      name_en:
+                        type: string
+                        example: 'Advanced Algorithms'
+                      name_ar:
+                        type: string
+                        example: 'خوارزميات متقدمة'
+                      level:
+                        type: integer
+                        example: 500
+                      lecture_ch:
+                        type: integer
+                        example: 3
+                      tutorial_ch:
+                        type: integer
+                        example: 0
+                      lab_ch:
+                        type: integer
+                        example: 0
+                      total_ch:
+                        type: integer
+                        example: 3
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: course_id
+        description: 'The ID of the course.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/courses/{course_id}/deactivate':
+    post:
+      summary: 'Deactivate a Course.'
+      operationId: deactivateACourse
+      description: "Deactivating retires a Course without deleting it — it stays readable and its\nhistorical academic records are unaffected (BR-18, FR-PCM-003.3)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: DEP501
+                    name_en: 'Advanced Algorithms'
+                    name_ar: 'خوارزميات متقدمة'
+                    level: 500
+                    lecture_ch: 3
+                    tutorial_ch: 0
+                    lab_ch: 0
+                    total_ch: 3
+                    is_active: false
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: DEP501
+                      name_en:
+                        type: string
+                        example: 'Advanced Algorithms'
+                      name_ar:
+                        type: string
+                        example: 'خوارزميات متقدمة'
+                      level:
+                        type: integer
+                        example: 500
+                      lecture_ch:
+                        type: integer
+                        example: 3
+                      tutorial_ch:
+                        type: integer
+                        example: 0
+                      lab_ch:
+                        type: integer
+                        example: 0
+                      total_ch:
+                        type: integer
+                        example: 3
+                      is_active:
+                        type: boolean
+                        example: false
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: course_id
+        description: 'The ID of the course.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/health:
     get:
       summary: 'Service health check.'

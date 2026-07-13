@@ -408,6 +408,170 @@ export const DeactivateAProgramResponse = zod.object({
 
 
 /**
+ * @summary List Courses.
+ */
+export const ListCoursesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * Omit `department_id` (or send null) to mark the Course university-wide — the
+ * shape used for the shared Preparatory language/culture courses.
+ * @summary Create a Course.
+ */
+export const CreateACourseBody = zod.object({
+  "department_id": zod.number().optional().describe('The owning Department id; omit for a university-wide Course.'),
+  "code": zod.string().describe('Unique short code for the Course.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "level": zod.number().describe('One of 400, 500, 600, 700.'),
+  "lecture_ch": zod.number().describe('Lecture credit hours.'),
+  "tutorial_ch": zod.number().describe('Tutorial credit hours.'),
+  "lab_ch": zod.number().describe('Lab credit hours.'),
+  "total_ch": zod.number().describe('Total credit hours; must equal lecture + tutorial + lab.')
+})
+
+export const CreateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Course.
+ */
+export const ShowACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const ShowACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update a Course.
+ */
+export const UpdateACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const UpdateACourseBody = zod.object({
+  "department_id": zod.number().optional().describe('The owning Department id; omit for a university-wide Course.'),
+  "code": zod.string().describe('Unique short code for the Course.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "level": zod.number().describe('One of 400, 500, 600, 700.'),
+  "lecture_ch": zod.number().describe('Lecture credit hours.'),
+  "tutorial_ch": zod.number().describe('Tutorial credit hours.'),
+  "lab_ch": zod.number().describe('Lab credit hours.'),
+  "total_ch": zod.number().describe('Total credit hours; must equal lecture + tutorial + lab.')
+})
+
+export const UpdateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Course.
+ */
+export const ActivateACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const ActivateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Course without deleting it — it stays readable and its
+ * historical academic records are unaffected (BR-18, FR-PCM-003.3).
+ * @summary Deactivate a Course.
+ */
+export const DeactivateACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const DeactivateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
  * API is reachable.
  * @summary Service health check.

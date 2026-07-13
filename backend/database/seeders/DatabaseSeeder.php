@@ -28,5 +28,9 @@ class DatabaseSeeder extends Seeder
         );
         $multi->assignRole(Role::Advisor);
         $multi->assignRole(Role::Instructor);
+
+        // The realistic E-JUST academic catalog the browse tree and later phases run
+        // against (Phase 1). Idempotent, so re-seeding the dev DB is safe.
+        $this->call(CatalogSeeder::class);
     }
 }

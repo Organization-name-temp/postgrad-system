@@ -9,6 +9,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    // Fail loudly if 5173 is taken instead of silently drifting to 5174+, whose
+    // origin isn't in SANCTUM_STATEFUL_DOMAINS — that mismatch makes Sanctum skip
+    // the session and login 500s with "Session store not set on request" (Q10).
+    strictPort: true,
     proxy: {
       '/api': { target: 'http://127.0.0.1:8000', changeOrigin: true },
       '/sanctum': { target: 'http://127.0.0.1:8000', changeOrigin: true },

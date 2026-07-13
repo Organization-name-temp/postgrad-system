@@ -1,15 +1,12 @@
 import { Chip, Paper, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from './useAuth'
-import { PermissionGate } from './PermissionGate'
-import { PERMISSION } from './permissions'
-import { CatalogManagementWidget } from './CatalogManagementWidget'
 
 /**
  * The authenticated landing. Shows the signed-in identity, the roles the user
- * holds, and their effective permissions, plus a permission-gated widget that
- * appears only for users who can manage the catalog. Ticket 06 localizes the
- * strings.
+ * holds, and their effective permissions. (Phase 0's permission-gated demo widget
+ * was retired when the real Catalog module landed — its "Browse catalog" nav item
+ * is now the permission-gated surface.)
  */
 export function DashboardPage() {
   const { t } = useTranslation('auth')
@@ -50,10 +47,6 @@ export function DashboardPage() {
           ))}
         </Stack>
       </Paper>
-
-      <PermissionGate permission={PERMISSION.manageCatalog}>
-        <CatalogManagementWidget />
-      </PermissionGate>
     </>
   )
 }

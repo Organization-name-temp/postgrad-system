@@ -1,9 +1,10 @@
 # Enforces the modular-monolith seam (ADR-0002/0007): a module's Internal is
 # private to that module; only its Public may be referenced from outside.
 #
-# Each module contributes a Public and an Internal layer. Phase 0 has only
-# Identity; later modules add their own layers here as they are born (the first
-# real cross-module boundary test lands in Phase 1).
+# Each module contributes a Public and an Internal layer. Catalog (Phase 1) is
+# the first real cross-module edge: it may reach Identity through Identity\Public
+# (the Permission/Role enums + Gates), but never Identity\Internal, and its own
+# Internal is sealed from everyone else.
 deptrac:
   paths:
     - ./app
@@ -21,13 +22,29 @@ deptrac:
       collectors:
         - type: classLike
           value: '^Modules\\Identity\\Internal\\.*'
+    - name: Catalog_Public
+      collectors:
+        - type: classLike
+          value: '^Modules\\Catalog\\Public\\.*'
+    - name: Catalog_Internal
+      collectors:
+        - type: classLike
+          value: '^Modules\\Catalog\\Internal\\.*'
   ruleset:
     # The app may orchestrate modules only through their Public facades.
     App:
       - Identity_Public
+      - Catalog_Public
     # A module's own Public facade may use its own Internal, and vice versa.
     Identity_Public:
       - Identity_Internal
     Identity_Internal:
       - Identity_Public
-    # No rule grants anyone else access to *_Internal — that is the seam.
+    # Catalog may reach Identity only through Identity\Public (never Internal).
+    Catalog_Public:
+      - Catalog_Internal
+      - Identity_Public
+    Catalog_Internal:
+      - Catalog_Public
+      - Identity_Public
+    # No rule grants anyone access to another module's *_Internal — that is the seam.

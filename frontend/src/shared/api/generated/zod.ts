@@ -7,6 +7,771 @@
 import * as zod from 'zod';
 
 /**
+ * Faculties are ordered by code; within each Program the three Categories are
+ * always present in bylaw order (Preparatory, Program Core, Research Elective)
+ * with their required credit hours, and Courses within a Category follow the
+ * curriculum ordinal (Course code as a stable tiebreak).
+ * @summary The catalog browse tree.
+ */
+export const TheCatalogBrowseTreeResponse = zod.object({
+  "data": zod.object({
+  "faculties": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "departments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "programs": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "categories": zod.array(zod.object({
+  "category": zod.string().optional(),
+  "required_ch": zod.number().optional(),
+  "courses": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})).optional()
+})).optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary List Faculties.
+ */
+export const ListFacultiesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create a Faculty.
+ */
+export const CreateAFacultyBody = zod.object({
+  "code": zod.string().describe('Unique short code for the Faculty.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const CreateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Faculty.
+ */
+export const ShowAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const ShowAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update a Faculty.
+ */
+export const UpdateAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const UpdateAFacultyBody = zod.object({
+  "code": zod.string().describe('Unique short code for the Faculty.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const UpdateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Faculty.
+ */
+export const ActivateAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const ActivateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Faculty without deleting it — enrolled students and
+ * historical records are unaffected (BR-18).
+ * @summary Deactivate a Faculty.
+ */
+export const DeactivateAFacultyParams = zod.object({
+  "faculty_id": zod.number().describe('The ID of the faculty.')
+})
+
+export const DeactivateAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary List Departments.
+ */
+export const ListDepartmentsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create a Department.
+ */
+export const CreateADepartmentBody = zod.object({
+  "faculty_id": zod.number().describe('The owning Faculty id.'),
+  "code": zod.string().describe('Unique short code for the Department.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const CreateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Department.
+ */
+export const ShowADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const ShowADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update a Department.
+ */
+export const UpdateADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const UpdateADepartmentBody = zod.object({
+  "faculty_id": zod.number().describe('The owning Faculty id.'),
+  "code": zod.string().describe('Unique short code for the Department.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.')
+})
+
+export const UpdateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Department.
+ */
+export const ActivateADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const ActivateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Department without deleting it — enrolled students and
+ * historical records are unaffected (BR-18).
+ * @summary Deactivate a Department.
+ */
+export const DeactivateADepartmentParams = zod.object({
+  "department_id": zod.number().describe('The ID of the department.')
+})
+
+export const DeactivateADepartmentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary List Programs.
+ */
+export const ListProgramsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * The per-Category credit hours are optional; each omitted one falls back to
+ * the bylaw default (Preparatory 6 / Program Core 6 / Research Elective 9).
+ * @summary Create a Program.
+ */
+export const CreateAProgramBody = zod.object({
+  "department_id": zod.number().describe('The owning Department id.'),
+  "code": zod.string().describe('Unique short code for the Program.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "degree_level": zod.string().describe('One of MSc, PhD.'),
+  "prep_required_ch": zod.number().optional().describe('Required Preparatory credit hours (default 6).'),
+  "core_required_ch": zod.number().optional().describe('Required Program Core credit hours (default 6).'),
+  "elective_required_ch": zod.number().optional().describe('Required Research Elective credit hours (default 9).')
+})
+
+export const CreateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Program.
+ */
+export const ShowAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ShowAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Any omitted per-Category credit hour keeps its current value (unlike create,
+ * which fills in the bylaw default).
+ * @summary Update a Program.
+ */
+export const UpdateAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const UpdateAProgramBody = zod.object({
+  "department_id": zod.number().describe('The owning Department id.'),
+  "code": zod.string().describe('Unique short code for the Program.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "degree_level": zod.string().describe('One of MSc, PhD.'),
+  "prep_required_ch": zod.number().optional().describe('Required Preparatory credit hours.'),
+  "core_required_ch": zod.number().optional().describe('Required Program Core credit hours.'),
+  "elective_required_ch": zod.number().optional().describe('Required Research Elective credit hours.')
+})
+
+export const UpdateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Program.
+ */
+export const ActivateAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ActivateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Program without deleting it and with no cascading
+ * effect — students already enrolled and historical records are unaffected
+ * (BR-18).
+ * @summary Deactivate a Program.
+ */
+export const DeactivateAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const DeactivateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Returns the Program's Curriculum Entries — each with its Category and the
+ * embedded Course — ordered by ordinal (the manager's insertion order within a
+ * Category, with Course code as a stable tiebreak). The front end groups them
+ * into the three Category sections.
+ * @summary List a Program's Curriculum.
+ */
+export const ListAProgramsCurriculumParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ListAProgramsCurriculumResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "program_id": zod.number().optional(),
+  "category": zod.string().optional(),
+  "ordinal": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Creates a Curriculum Entry placing the Course into the given Category. The
+ * ordinal is assigned automatically (appended within the Category). A Course
+ * sits at most once per Program+Category (a duplicate is a 422).
+ * @summary Add a Course to a Program's Curriculum.
+ */
+export const AddACourseToAProgramsCurriculumParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const AddACourseToAProgramsCurriculumBody = zod.object({
+  "course_id": zod.number().describe('The Course to place.'),
+  "category": zod.string().describe('One of Preparatory, ProgramCore, ResearchElective.')
+})
+
+export const AddACourseToAProgramsCurriculumResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "program_id": zod.number().optional(),
+  "category": zod.string().optional(),
+  "ordinal": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Removing an entry takes the Course out of the Program's Curriculum; the Course
+ * itself is untouched (it may still sit in other Programs). The change is
+ * captured in the Program's version history (ADR-0011).
+ * @summary Remove a Curriculum Entry from a Program.
+ */
+export const RemoveACurriculumEntryFromAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.'),
+  "curriculum_entry_id": zod.number().describe('The ID of the curriculum entry.')
+})
+
+export const RemoveACurriculumEntryFromAProgramResponse = zod.looseObject({
+
+})
+
+
+/**
+ * Returns every version of the Program, oldest first, each with its snapshot of
+ * the full aggregate (fields + Curriculum) at that point.
+ * @summary List a Program's version history.
+ */
+export const ListAProgramsVersionHistoryParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ListAProgramsVersionHistoryResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "version_no": zod.number().optional(),
+  "change_note": zod.string().optional(),
+  "changed_by": zod.number().optional(),
+  "changed_at": zod.string().optional(),
+  "snapshot": zod.object({
+  "code": zod.string().optional(),
+  "curriculum": zod.array(zod.object({
+  "course_id": zod.number().optional(),
+  "course_code": zod.string().optional(),
+  "category": zod.string().optional(),
+  "ordinal": zod.number().optional()
+})).optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Returns every version of the Course, oldest first, each with its snapshot of
+ * the Course's fields at that point.
+ * @summary List a Course's version history.
+ */
+export const ListACoursesVersionHistoryParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const ListACoursesVersionHistoryResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "version_no": zod.number().optional(),
+  "change_note": zod.string().optional(),
+  "changed_by": zod.number().optional(),
+  "changed_at": zod.string().optional(),
+  "snapshot": zod.object({
+  "code": zod.string().optional(),
+  "total_ch": zod.number().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * @summary List Courses.
+ */
+export const ListCoursesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * Omit `department_id` (or send null) to mark the Course university-wide — the
+ * shape used for the shared Preparatory language/culture courses.
+ * @summary Create a Course.
+ */
+export const CreateACourseBody = zod.object({
+  "department_id": zod.number().optional().describe('The owning Department id; omit for a university-wide Course.'),
+  "code": zod.string().describe('Unique short code for the Course.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "level": zod.number().describe('One of 400, 500, 600, 700.'),
+  "lecture_ch": zod.number().describe('Lecture credit hours.'),
+  "tutorial_ch": zod.number().describe('Tutorial credit hours.'),
+  "lab_ch": zod.number().describe('Lab credit hours.'),
+  "total_ch": zod.number().describe('Total credit hours; must equal lecture + tutorial + lab.')
+})
+
+export const CreateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Returns the Course's full detail plus its `placements` — which Programs and
+ * Categories it appears in (via its Curriculum Entries) — for the detail view's
+ * "appears in" section (FR-PCM-002). Version history is a separate endpoint.
+ * @summary Show a Course.
+ */
+export const ShowACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const ShowACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional(),
+  "placements": zod.array(zod.object({
+  "category": zod.string().optional(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update a Course.
+ */
+export const UpdateACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const UpdateACourseBody = zod.object({
+  "department_id": zod.number().optional().describe('The owning Department id; omit for a university-wide Course.'),
+  "code": zod.string().describe('Unique short code for the Course.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "level": zod.number().describe('One of 400, 500, 600, 700.'),
+  "lecture_ch": zod.number().describe('Lecture credit hours.'),
+  "tutorial_ch": zod.number().describe('Tutorial credit hours.'),
+  "lab_ch": zod.number().describe('Lab credit hours.'),
+  "total_ch": zod.number().describe('Total credit hours; must equal lecture + tutorial + lab.')
+})
+
+export const UpdateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Course.
+ */
+export const ActivateACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const ActivateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Course without deleting it — it stays readable and its
+ * historical academic records are unaffected (BR-18, FR-PCM-003.3).
+ * @summary Deactivate a Course.
+ */
+export const DeactivateACourseParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const DeactivateACourseResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
  * API is reachable.
  * @summary Service health check.
@@ -91,19 +856,5 @@ export const UpdateCurrentUserResponse = zod.object({
   "name": zod.string().optional()
 })).optional(),
   "permissions": zod.array(zod.string()).optional()
-}).optional()
-})
-
-
-/**
- * A permission-gated sample endpoint (the Phase 0 RBAC tracer): reachable
- * only by users whose effective permissions include `catalog.manage`
- * (R06/R07 and admins). It proves API-side enforcement; later phases replace
- * it with the real Catalog module.
- * @summary Catalog management demo.
- */
-export const CatalogManagementDemoResponse = zod.object({
-  "data": zod.object({
-  "message": zod.string().optional()
 }).optional()
 })

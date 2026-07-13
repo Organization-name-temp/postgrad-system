@@ -24,6 +24,705 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  is_active?: boolean;
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItem = {
+  category?: string;
+  required_ch?: number;
+  courses?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem[];
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  is_active?: boolean;
+  categories?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItem[];
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+  programs?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItem[];
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+  departments?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItem[];
+};
+
+export type TheCatalogBrowseTree200Data = {
+  faculties?: TheCatalogBrowseTree200DataFacultiesItem[];
+};
+
+export type TheCatalogBrowseTree200 = {
+  data?: TheCatalogBrowseTree200Data;
+};
+
+export type ListFaculties200DataItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type ListFaculties200 = {
+  data?: ListFaculties200DataItem[];
+};
+
+export type CreateAFacultyBody = {
+  /** Unique short code for the Faculty. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+};
+
+export type CreateAFaculty201Data = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type CreateAFaculty201 = {
+  data?: CreateAFaculty201Data;
+};
+
+export type CreateAFaculty422Errors = {
+  code?: string[];
+};
+
+export type CreateAFaculty422 = {
+  message?: string;
+  errors?: CreateAFaculty422Errors;
+};
+
+export type ShowAFaculty200Data = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type ShowAFaculty200 = {
+  data?: ShowAFaculty200Data;
+};
+
+export type UpdateAFacultyBody = {
+  /** Unique short code for the Faculty. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+};
+
+export type UpdateAFaculty200Data = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type UpdateAFaculty200 = {
+  data?: UpdateAFaculty200Data;
+};
+
+export type ActivateAFaculty200Data = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type ActivateAFaculty200 = {
+  data?: ActivateAFaculty200Data;
+};
+
+export type DeactivateAFaculty200Data = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type DeactivateAFaculty200 = {
+  data?: DeactivateAFaculty200Data;
+};
+
+export type ListDepartments200DataItem = {
+  id?: number;
+  faculty_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type ListDepartments200 = {
+  data?: ListDepartments200DataItem[];
+};
+
+export type CreateADepartmentBody = {
+  /** The owning Faculty id. */
+  faculty_id: number;
+  /** Unique short code for the Department. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+};
+
+export type CreateADepartment201Data = {
+  id?: number;
+  faculty_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type CreateADepartment201 = {
+  data?: CreateADepartment201Data;
+};
+
+export type CreateADepartment422Errors = {
+  code?: string[];
+};
+
+export type CreateADepartment422 = {
+  message?: string;
+  errors?: CreateADepartment422Errors;
+};
+
+export type ShowADepartment200Data = {
+  id?: number;
+  faculty_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type ShowADepartment200 = {
+  data?: ShowADepartment200Data;
+};
+
+export type UpdateADepartmentBody = {
+  /** The owning Faculty id. */
+  faculty_id: number;
+  /** Unique short code for the Department. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+};
+
+export type UpdateADepartment200Data = {
+  id?: number;
+  faculty_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type UpdateADepartment200 = {
+  data?: UpdateADepartment200Data;
+};
+
+export type ActivateADepartment200Data = {
+  id?: number;
+  faculty_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type ActivateADepartment200 = {
+  data?: ActivateADepartment200Data;
+};
+
+export type DeactivateADepartment200Data = {
+  id?: number;
+  faculty_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+};
+
+export type DeactivateADepartment200 = {
+  data?: DeactivateADepartment200Data;
+};
+
+export type ListPrograms200DataItem = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  prep_required_ch?: number;
+  core_required_ch?: number;
+  elective_required_ch?: number;
+  total_required_ch?: number;
+  is_active?: boolean;
+};
+
+export type ListPrograms200 = {
+  data?: ListPrograms200DataItem[];
+};
+
+export type CreateAProgramBody = {
+  /** The owning Department id. */
+  department_id: number;
+  /** Unique short code for the Program. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** One of MSc, PhD. */
+  degree_level: string;
+  /** Required Preparatory credit hours (default 6). */
+  prep_required_ch?: number;
+  /** Required Program Core credit hours (default 6). */
+  core_required_ch?: number;
+  /** Required Research Elective credit hours (default 9). */
+  elective_required_ch?: number;
+};
+
+export type CreateAProgram201Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  prep_required_ch?: number;
+  core_required_ch?: number;
+  elective_required_ch?: number;
+  total_required_ch?: number;
+  is_active?: boolean;
+};
+
+export type CreateAProgram201 = {
+  data?: CreateAProgram201Data;
+};
+
+export type CreateAProgram422Errors = {
+  code?: string[];
+};
+
+export type CreateAProgram422 = {
+  message?: string;
+  errors?: CreateAProgram422Errors;
+};
+
+export type ShowAProgram200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  prep_required_ch?: number;
+  core_required_ch?: number;
+  elective_required_ch?: number;
+  total_required_ch?: number;
+  is_active?: boolean;
+};
+
+export type ShowAProgram200 = {
+  data?: ShowAProgram200Data;
+};
+
+export type UpdateAProgramBody = {
+  /** The owning Department id. */
+  department_id: number;
+  /** Unique short code for the Program. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** One of MSc, PhD. */
+  degree_level: string;
+  /** Required Preparatory credit hours. */
+  prep_required_ch?: number;
+  /** Required Program Core credit hours. */
+  core_required_ch?: number;
+  /** Required Research Elective credit hours. */
+  elective_required_ch?: number;
+};
+
+export type UpdateAProgram200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  prep_required_ch?: number;
+  core_required_ch?: number;
+  elective_required_ch?: number;
+  total_required_ch?: number;
+  is_active?: boolean;
+};
+
+export type UpdateAProgram200 = {
+  data?: UpdateAProgram200Data;
+};
+
+export type ActivateAProgram200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  prep_required_ch?: number;
+  core_required_ch?: number;
+  elective_required_ch?: number;
+  total_required_ch?: number;
+  is_active?: boolean;
+};
+
+export type ActivateAProgram200 = {
+  data?: ActivateAProgram200Data;
+};
+
+export type DeactivateAProgram200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  prep_required_ch?: number;
+  core_required_ch?: number;
+  elective_required_ch?: number;
+  total_required_ch?: number;
+  is_active?: boolean;
+};
+
+export type DeactivateAProgram200 = {
+  data?: DeactivateAProgram200Data;
+};
+
+export type ListAProgramsCurriculum200DataItemCourse = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type ListAProgramsCurriculum200DataItem = {
+  id?: number;
+  program_id?: number;
+  category?: string;
+  ordinal?: number;
+  course?: ListAProgramsCurriculum200DataItemCourse;
+};
+
+export type ListAProgramsCurriculum200 = {
+  data?: ListAProgramsCurriculum200DataItem[];
+};
+
+export type AddACourseToAProgramsCurriculumBody = {
+  /** The Course to place. */
+  course_id: number;
+  /** One of Preparatory, ProgramCore, ResearchElective. */
+  category: string;
+};
+
+export type AddACourseToAProgramsCurriculum201DataCourse = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type AddACourseToAProgramsCurriculum201Data = {
+  id?: number;
+  program_id?: number;
+  category?: string;
+  ordinal?: number;
+  course?: AddACourseToAProgramsCurriculum201DataCourse;
+};
+
+export type AddACourseToAProgramsCurriculum201 = {
+  data?: AddACourseToAProgramsCurriculum201Data;
+};
+
+export type AddACourseToAProgramsCurriculum422Errors = {
+  course_id?: string[];
+};
+
+export type AddACourseToAProgramsCurriculum422 = {
+  message?: string;
+  errors?: AddACourseToAProgramsCurriculum422Errors;
+};
+
+export type RemoveACurriculumEntryFromAProgram204 = { [key: string]: unknown };
+
+export type ListAProgramsVersionHistory200DataItemSnapshotCurriculumItem = {
+  course_id?: number;
+  course_code?: string;
+  category?: string;
+  ordinal?: number;
+};
+
+export type ListAProgramsVersionHistory200DataItemSnapshot = {
+  code?: string;
+  curriculum?: ListAProgramsVersionHistory200DataItemSnapshotCurriculumItem[];
+};
+
+export type ListAProgramsVersionHistory200DataItem = {
+  id?: number;
+  version_no?: number;
+  change_note?: string;
+  changed_by?: number;
+  changed_at?: string;
+  snapshot?: ListAProgramsVersionHistory200DataItemSnapshot;
+};
+
+export type ListAProgramsVersionHistory200 = {
+  data?: ListAProgramsVersionHistory200DataItem[];
+};
+
+export type ListACoursesVersionHistory200DataItemSnapshot = {
+  code?: string;
+  total_ch?: number;
+};
+
+export type ListACoursesVersionHistory200DataItem = {
+  id?: number;
+  version_no?: number;
+  change_note?: string;
+  changed_by?: number;
+  changed_at?: string;
+  snapshot?: ListACoursesVersionHistory200DataItemSnapshot;
+};
+
+export type ListACoursesVersionHistory200 = {
+  data?: ListACoursesVersionHistory200DataItem[];
+};
+
+export type ListCourses200DataItem = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type ListCourses200 = {
+  data?: ListCourses200DataItem[];
+};
+
+export type CreateACourseBody = {
+  /** The owning Department id; omit for a university-wide Course. */
+  department_id?: number;
+  /** Unique short code for the Course. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** One of 400, 500, 600, 700. */
+  level: number;
+  /** Lecture credit hours. */
+  lecture_ch: number;
+  /** Tutorial credit hours. */
+  tutorial_ch: number;
+  /** Lab credit hours. */
+  lab_ch: number;
+  /** Total credit hours; must equal lecture + tutorial + lab. */
+  total_ch: number;
+};
+
+export type CreateACourse201Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type CreateACourse201 = {
+  data?: CreateACourse201Data;
+};
+
+export type CreateACourse422Errors = {
+  total_ch?: string[];
+};
+
+export type CreateACourse422 = {
+  message?: string;
+  errors?: CreateACourse422Errors;
+};
+
+export type ShowACourse200DataPlacementsItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type ShowACourse200DataPlacementsItem = {
+  category?: string;
+  program?: ShowACourse200DataPlacementsItemProgram;
+};
+
+export type ShowACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+  placements?: ShowACourse200DataPlacementsItem[];
+};
+
+export type ShowACourse200 = {
+  data?: ShowACourse200Data;
+};
+
+export type UpdateACourseBody = {
+  /** The owning Department id; omit for a university-wide Course. */
+  department_id?: number;
+  /** Unique short code for the Course. */
+  code: string;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** One of 400, 500, 600, 700. */
+  level: number;
+  /** Lecture credit hours. */
+  lecture_ch: number;
+  /** Tutorial credit hours. */
+  tutorial_ch: number;
+  /** Lab credit hours. */
+  lab_ch: number;
+  /** Total credit hours; must equal lecture + tutorial + lab. */
+  total_ch: number;
+};
+
+export type UpdateACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type UpdateACourse200 = {
+  data?: UpdateACourse200Data;
+};
+
+export type ActivateACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type ActivateACourse200 = {
+  data?: ActivateACourse200Data;
+};
+
+export type DeactivateACourse200Data = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type DeactivateACourse200 = {
+  data?: DeactivateACourse200Data;
+};
+
 export type ServiceHealthCheck200Data = {
   status?: string;
   app?: string;
@@ -122,18 +821,6 @@ export type UpdateCurrentUser422 = {
   errors?: UpdateCurrentUser422Errors;
 };
 
-export type CatalogManagementDemo200Data = {
-  message?: string;
-};
-
-export type CatalogManagementDemo200 = {
-  data?: CatalogManagementDemo200Data;
-};
-
-export type CatalogManagementDemo403 = {
-  message?: string;
-};
-
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
@@ -148,6 +835,2316 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * Faculties are ordered by code; within each Program the three Categories are
+ * always present in bylaw order (Preparatory, Program Core, Research Elective)
+ * with their required credit hours, and Courses within a Category follow the
+ * curriculum ordinal (Course code as a stable tiebreak).
+ * @summary The catalog browse tree.
+ */
+export const theCatalogBrowseTree = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheCatalogBrowseTree200>(
+      {url: `/api/v1/catalog/tree`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheCatalogBrowseTreeQueryKey = () => {
+    return [
+    `/api/v1/catalog/tree`
+    ] as const;
+    }
+
+
+export const getTheCatalogBrowseTreeQueryOptions = <TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheCatalogBrowseTreeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theCatalogBrowseTree>>> = ({ signal }) => theCatalogBrowseTree(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheCatalogBrowseTreeQueryResult = NonNullable<Awaited<ReturnType<typeof theCatalogBrowseTree>>>
+export type TheCatalogBrowseTreeQueryError = unknown
+
+
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>,
+          TError,
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>,
+          TError,
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The catalog browse tree.
+ */
+
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheCatalogBrowseTreeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary List Faculties.
+ */
+export const listFaculties = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListFaculties200>(
+      {url: `/api/v1/faculties`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListFacultiesQueryKey = () => {
+    return [
+    `/api/v1/faculties`
+    ] as const;
+    }
+
+
+export const getListFacultiesQueryOptions = <TData = Awaited<ReturnType<typeof listFaculties>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFaculties>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFacultiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFaculties>>> = ({ signal }) => listFaculties(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFaculties>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListFacultiesQueryResult = NonNullable<Awaited<ReturnType<typeof listFaculties>>>
+export type ListFacultiesQueryError = unknown
+
+
+export function useListFaculties<TData = Awaited<ReturnType<typeof listFaculties>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFaculties>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFaculties>>,
+          TError,
+          Awaited<ReturnType<typeof listFaculties>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListFaculties<TData = Awaited<ReturnType<typeof listFaculties>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFaculties>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listFaculties>>,
+          TError,
+          Awaited<ReturnType<typeof listFaculties>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListFaculties<TData = Awaited<ReturnType<typeof listFaculties>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFaculties>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Faculties.
+ */
+
+export function useListFaculties<TData = Awaited<ReturnType<typeof listFaculties>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listFaculties>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListFacultiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create a Faculty.
+ */
+export const createAFaculty = (
+    createAFacultyBody: CreateAFacultyBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAFaculty201>(
+      {url: `/api/v1/faculties`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAFacultyBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAFacultyMutationOptions = <TError = CreateAFaculty422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAFaculty>>, TError,{data: CreateAFacultyBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAFaculty>>, TError,{data: CreateAFacultyBody}, TContext> => {
+
+const mutationKey = ['createAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAFaculty>>, {data: CreateAFacultyBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAFaculty(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof createAFaculty>>>
+    export type CreateAFacultyMutationBody = CreateAFacultyBody
+    export type CreateAFacultyMutationError = CreateAFaculty422
+
+    /**
+ * @summary Create a Faculty.
+ */
+export const useCreateAFaculty = <TError = CreateAFaculty422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAFaculty>>, TError,{data: CreateAFacultyBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAFaculty>>,
+        TError,
+        {data: CreateAFacultyBody},
+        TContext
+      > => {
+      return useMutation(getCreateAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Faculty.
+ */
+export const showAFaculty = (
+    facultyId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowAFaculty200>(
+      {url: `/api/v1/faculties/${facultyId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowAFacultyQueryKey = (facultyId: number,) => {
+    return [
+    `/api/v1/faculties/${facultyId}`
+    ] as const;
+    }
+
+
+export const getShowAFacultyQueryOptions = <TData = Awaited<ReturnType<typeof showAFaculty>>, TError = unknown>(facultyId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAFaculty>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowAFacultyQueryKey(facultyId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showAFaculty>>> = ({ signal }) => showAFaculty(facultyId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: facultyId !== null && facultyId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showAFaculty>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowAFacultyQueryResult = NonNullable<Awaited<ReturnType<typeof showAFaculty>>>
+export type ShowAFacultyQueryError = unknown
+
+
+export function useShowAFaculty<TData = Awaited<ReturnType<typeof showAFaculty>>, TError = unknown>(
+ facultyId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAFaculty>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAFaculty>>,
+          TError,
+          Awaited<ReturnType<typeof showAFaculty>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAFaculty<TData = Awaited<ReturnType<typeof showAFaculty>>, TError = unknown>(
+ facultyId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAFaculty>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAFaculty>>,
+          TError,
+          Awaited<ReturnType<typeof showAFaculty>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAFaculty<TData = Awaited<ReturnType<typeof showAFaculty>>, TError = unknown>(
+ facultyId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAFaculty>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Faculty.
+ */
+
+export function useShowAFaculty<TData = Awaited<ReturnType<typeof showAFaculty>>, TError = unknown>(
+ facultyId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAFaculty>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowAFacultyQueryOptions(facultyId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Update a Faculty.
+ */
+export const updateAFaculty = (
+    facultyId: number,
+    updateAFacultyBody: UpdateAFacultyBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateAFaculty200>(
+      {url: `/api/v1/faculties/${facultyId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAFacultyBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateAFacultyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAFaculty>>, TError,{facultyId: number;data: UpdateAFacultyBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateAFaculty>>, TError,{facultyId: number;data: UpdateAFacultyBody}, TContext> => {
+
+const mutationKey = ['updateAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAFaculty>>, {facultyId: number;data: UpdateAFacultyBody}> = (props) => {
+          const {facultyId,data} = props ?? {};
+
+          return  updateAFaculty(facultyId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof updateAFaculty>>>
+    export type UpdateAFacultyMutationBody = UpdateAFacultyBody
+    export type UpdateAFacultyMutationError = unknown
+
+    /**
+ * @summary Update a Faculty.
+ */
+export const useUpdateAFaculty = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAFaculty>>, TError,{facultyId: number;data: UpdateAFacultyBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAFaculty>>,
+        TError,
+        {facultyId: number;data: UpdateAFacultyBody},
+        TContext
+      > => {
+      return useMutation(getUpdateAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Activate a Faculty.
+ */
+export const activateAFaculty = (
+    facultyId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ActivateAFaculty200>(
+      {url: `/api/v1/faculties/${facultyId}/activate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getActivateAFacultyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAFaculty>>, TError,{facultyId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof activateAFaculty>>, TError,{facultyId: number}, TContext> => {
+
+const mutationKey = ['activateAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activateAFaculty>>, {facultyId: number}> = (props) => {
+          const {facultyId} = props ?? {};
+
+          return  activateAFaculty(facultyId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivateAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof activateAFaculty>>>
+
+    export type ActivateAFacultyMutationError = unknown
+
+    /**
+ * @summary Activate a Faculty.
+ */
+export const useActivateAFaculty = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAFaculty>>, TError,{facultyId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof activateAFaculty>>,
+        TError,
+        {facultyId: number},
+        TContext
+      > => {
+      return useMutation(getActivateAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deactivating retires a Faculty without deleting it — enrolled students and
+ * historical records are unaffected (BR-18).
+ * @summary Deactivate a Faculty.
+ */
+export const deactivateAFaculty = (
+    facultyId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeactivateAFaculty200>(
+      {url: `/api/v1/faculties/${facultyId}/deactivate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeactivateAFacultyMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAFaculty>>, TError,{facultyId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deactivateAFaculty>>, TError,{facultyId: number}, TContext> => {
+
+const mutationKey = ['deactivateAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deactivateAFaculty>>, {facultyId: number}> = (props) => {
+          const {facultyId} = props ?? {};
+
+          return  deactivateAFaculty(facultyId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeactivateAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof deactivateAFaculty>>>
+
+    export type DeactivateAFacultyMutationError = unknown
+
+    /**
+ * @summary Deactivate a Faculty.
+ */
+export const useDeactivateAFaculty = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAFaculty>>, TError,{facultyId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deactivateAFaculty>>,
+        TError,
+        {facultyId: number},
+        TContext
+      > => {
+      return useMutation(getDeactivateAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary List Departments.
+ */
+export const listDepartments = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListDepartments200>(
+      {url: `/api/v1/departments`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListDepartmentsQueryKey = () => {
+    return [
+    `/api/v1/departments`
+    ] as const;
+    }
+
+
+export const getListDepartmentsQueryOptions = <TData = Awaited<ReturnType<typeof listDepartments>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartments>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDepartmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDepartments>>> = ({ signal }) => listDepartments(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDepartments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListDepartmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listDepartments>>>
+export type ListDepartmentsQueryError = unknown
+
+
+export function useListDepartments<TData = Awaited<ReturnType<typeof listDepartments>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDepartments>>,
+          TError,
+          Awaited<ReturnType<typeof listDepartments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDepartments<TData = Awaited<ReturnType<typeof listDepartments>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDepartments>>,
+          TError,
+          Awaited<ReturnType<typeof listDepartments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDepartments<TData = Awaited<ReturnType<typeof listDepartments>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Departments.
+ */
+
+export function useListDepartments<TData = Awaited<ReturnType<typeof listDepartments>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListDepartmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create a Department.
+ */
+export const createADepartment = (
+    createADepartmentBody: CreateADepartmentBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateADepartment201>(
+      {url: `/api/v1/departments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createADepartmentBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateADepartmentMutationOptions = <TError = CreateADepartment422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createADepartment>>, TError,{data: CreateADepartmentBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createADepartment>>, TError,{data: CreateADepartmentBody}, TContext> => {
+
+const mutationKey = ['createADepartment'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createADepartment>>, {data: CreateADepartmentBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createADepartment(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateADepartmentMutationResult = NonNullable<Awaited<ReturnType<typeof createADepartment>>>
+    export type CreateADepartmentMutationBody = CreateADepartmentBody
+    export type CreateADepartmentMutationError = CreateADepartment422
+
+    /**
+ * @summary Create a Department.
+ */
+export const useCreateADepartment = <TError = CreateADepartment422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createADepartment>>, TError,{data: CreateADepartmentBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createADepartment>>,
+        TError,
+        {data: CreateADepartmentBody},
+        TContext
+      > => {
+      return useMutation(getCreateADepartmentMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Department.
+ */
+export const showADepartment = (
+    departmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowADepartment200>(
+      {url: `/api/v1/departments/${departmentId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowADepartmentQueryKey = (departmentId: number,) => {
+    return [
+    `/api/v1/departments/${departmentId}`
+    ] as const;
+    }
+
+
+export const getShowADepartmentQueryOptions = <TData = Awaited<ReturnType<typeof showADepartment>>, TError = unknown>(departmentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showADepartment>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowADepartmentQueryKey(departmentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showADepartment>>> = ({ signal }) => showADepartment(departmentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: departmentId !== null && departmentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showADepartment>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowADepartmentQueryResult = NonNullable<Awaited<ReturnType<typeof showADepartment>>>
+export type ShowADepartmentQueryError = unknown
+
+
+export function useShowADepartment<TData = Awaited<ReturnType<typeof showADepartment>>, TError = unknown>(
+ departmentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showADepartment>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showADepartment>>,
+          TError,
+          Awaited<ReturnType<typeof showADepartment>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowADepartment<TData = Awaited<ReturnType<typeof showADepartment>>, TError = unknown>(
+ departmentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showADepartment>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showADepartment>>,
+          TError,
+          Awaited<ReturnType<typeof showADepartment>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowADepartment<TData = Awaited<ReturnType<typeof showADepartment>>, TError = unknown>(
+ departmentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showADepartment>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Department.
+ */
+
+export function useShowADepartment<TData = Awaited<ReturnType<typeof showADepartment>>, TError = unknown>(
+ departmentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showADepartment>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowADepartmentQueryOptions(departmentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Update a Department.
+ */
+export const updateADepartment = (
+    departmentId: number,
+    updateADepartmentBody: UpdateADepartmentBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateADepartment200>(
+      {url: `/api/v1/departments/${departmentId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateADepartmentBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateADepartmentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateADepartment>>, TError,{departmentId: number;data: UpdateADepartmentBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateADepartment>>, TError,{departmentId: number;data: UpdateADepartmentBody}, TContext> => {
+
+const mutationKey = ['updateADepartment'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateADepartment>>, {departmentId: number;data: UpdateADepartmentBody}> = (props) => {
+          const {departmentId,data} = props ?? {};
+
+          return  updateADepartment(departmentId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateADepartmentMutationResult = NonNullable<Awaited<ReturnType<typeof updateADepartment>>>
+    export type UpdateADepartmentMutationBody = UpdateADepartmentBody
+    export type UpdateADepartmentMutationError = unknown
+
+    /**
+ * @summary Update a Department.
+ */
+export const useUpdateADepartment = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateADepartment>>, TError,{departmentId: number;data: UpdateADepartmentBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateADepartment>>,
+        TError,
+        {departmentId: number;data: UpdateADepartmentBody},
+        TContext
+      > => {
+      return useMutation(getUpdateADepartmentMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Activate a Department.
+ */
+export const activateADepartment = (
+    departmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ActivateADepartment200>(
+      {url: `/api/v1/departments/${departmentId}/activate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getActivateADepartmentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateADepartment>>, TError,{departmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof activateADepartment>>, TError,{departmentId: number}, TContext> => {
+
+const mutationKey = ['activateADepartment'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activateADepartment>>, {departmentId: number}> = (props) => {
+          const {departmentId} = props ?? {};
+
+          return  activateADepartment(departmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivateADepartmentMutationResult = NonNullable<Awaited<ReturnType<typeof activateADepartment>>>
+
+    export type ActivateADepartmentMutationError = unknown
+
+    /**
+ * @summary Activate a Department.
+ */
+export const useActivateADepartment = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateADepartment>>, TError,{departmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof activateADepartment>>,
+        TError,
+        {departmentId: number},
+        TContext
+      > => {
+      return useMutation(getActivateADepartmentMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deactivating retires a Department without deleting it — enrolled students and
+ * historical records are unaffected (BR-18).
+ * @summary Deactivate a Department.
+ */
+export const deactivateADepartment = (
+    departmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeactivateADepartment200>(
+      {url: `/api/v1/departments/${departmentId}/deactivate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeactivateADepartmentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateADepartment>>, TError,{departmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deactivateADepartment>>, TError,{departmentId: number}, TContext> => {
+
+const mutationKey = ['deactivateADepartment'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deactivateADepartment>>, {departmentId: number}> = (props) => {
+          const {departmentId} = props ?? {};
+
+          return  deactivateADepartment(departmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeactivateADepartmentMutationResult = NonNullable<Awaited<ReturnType<typeof deactivateADepartment>>>
+
+    export type DeactivateADepartmentMutationError = unknown
+
+    /**
+ * @summary Deactivate a Department.
+ */
+export const useDeactivateADepartment = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateADepartment>>, TError,{departmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deactivateADepartment>>,
+        TError,
+        {departmentId: number},
+        TContext
+      > => {
+      return useMutation(getDeactivateADepartmentMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary List Programs.
+ */
+export const listPrograms = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListPrograms200>(
+      {url: `/api/v1/programs`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListProgramsQueryKey = () => {
+    return [
+    `/api/v1/programs`
+    ] as const;
+    }
+
+
+export const getListProgramsQueryOptions = <TData = Awaited<ReturnType<typeof listPrograms>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPrograms>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListProgramsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPrograms>>> = ({ signal }) => listPrograms(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPrograms>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListProgramsQueryResult = NonNullable<Awaited<ReturnType<typeof listPrograms>>>
+export type ListProgramsQueryError = unknown
+
+
+export function useListPrograms<TData = Awaited<ReturnType<typeof listPrograms>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPrograms>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPrograms>>,
+          TError,
+          Awaited<ReturnType<typeof listPrograms>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPrograms<TData = Awaited<ReturnType<typeof listPrograms>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPrograms>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPrograms>>,
+          TError,
+          Awaited<ReturnType<typeof listPrograms>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListPrograms<TData = Awaited<ReturnType<typeof listPrograms>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPrograms>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Programs.
+ */
+
+export function useListPrograms<TData = Awaited<ReturnType<typeof listPrograms>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listPrograms>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListProgramsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The per-Category credit hours are optional; each omitted one falls back to
+ * the bylaw default (Preparatory 6 / Program Core 6 / Research Elective 9).
+ * @summary Create a Program.
+ */
+export const createAProgram = (
+    createAProgramBody: CreateAProgramBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAProgram201>(
+      {url: `/api/v1/programs`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAProgramBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAProgramMutationOptions = <TError = CreateAProgram422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAProgram>>, TError,{data: CreateAProgramBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAProgram>>, TError,{data: CreateAProgramBody}, TContext> => {
+
+const mutationKey = ['createAProgram'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAProgram>>, {data: CreateAProgramBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAProgram(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAProgramMutationResult = NonNullable<Awaited<ReturnType<typeof createAProgram>>>
+    export type CreateAProgramMutationBody = CreateAProgramBody
+    export type CreateAProgramMutationError = CreateAProgram422
+
+    /**
+ * @summary Create a Program.
+ */
+export const useCreateAProgram = <TError = CreateAProgram422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAProgram>>, TError,{data: CreateAProgramBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAProgram>>,
+        TError,
+        {data: CreateAProgramBody},
+        TContext
+      > => {
+      return useMutation(getCreateAProgramMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Program.
+ */
+export const showAProgram = (
+    programId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowAProgram200>(
+      {url: `/api/v1/programs/${programId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowAProgramQueryKey = (programId: number,) => {
+    return [
+    `/api/v1/programs/${programId}`
+    ] as const;
+    }
+
+
+export const getShowAProgramQueryOptions = <TData = Awaited<ReturnType<typeof showAProgram>>, TError = unknown>(programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAProgram>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowAProgramQueryKey(programId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showAProgram>>> = ({ signal }) => showAProgram(programId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: programId !== null && programId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showAProgram>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowAProgramQueryResult = NonNullable<Awaited<ReturnType<typeof showAProgram>>>
+export type ShowAProgramQueryError = unknown
+
+
+export function useShowAProgram<TData = Awaited<ReturnType<typeof showAProgram>>, TError = unknown>(
+ programId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAProgram>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAProgram>>,
+          TError,
+          Awaited<ReturnType<typeof showAProgram>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAProgram<TData = Awaited<ReturnType<typeof showAProgram>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAProgram>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAProgram>>,
+          TError,
+          Awaited<ReturnType<typeof showAProgram>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAProgram<TData = Awaited<ReturnType<typeof showAProgram>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAProgram>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Program.
+ */
+
+export function useShowAProgram<TData = Awaited<ReturnType<typeof showAProgram>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAProgram>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowAProgramQueryOptions(programId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Any omitted per-Category credit hour keeps its current value (unlike create,
+ * which fills in the bylaw default).
+ * @summary Update a Program.
+ */
+export const updateAProgram = (
+    programId: number,
+    updateAProgramBody: UpdateAProgramBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateAProgram200>(
+      {url: `/api/v1/programs/${programId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAProgramBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateAProgramMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAProgram>>, TError,{programId: number;data: UpdateAProgramBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateAProgram>>, TError,{programId: number;data: UpdateAProgramBody}, TContext> => {
+
+const mutationKey = ['updateAProgram'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAProgram>>, {programId: number;data: UpdateAProgramBody}> = (props) => {
+          const {programId,data} = props ?? {};
+
+          return  updateAProgram(programId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAProgramMutationResult = NonNullable<Awaited<ReturnType<typeof updateAProgram>>>
+    export type UpdateAProgramMutationBody = UpdateAProgramBody
+    export type UpdateAProgramMutationError = unknown
+
+    /**
+ * @summary Update a Program.
+ */
+export const useUpdateAProgram = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAProgram>>, TError,{programId: number;data: UpdateAProgramBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAProgram>>,
+        TError,
+        {programId: number;data: UpdateAProgramBody},
+        TContext
+      > => {
+      return useMutation(getUpdateAProgramMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Activate a Program.
+ */
+export const activateAProgram = (
+    programId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ActivateAProgram200>(
+      {url: `/api/v1/programs/${programId}/activate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getActivateAProgramMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAProgram>>, TError,{programId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof activateAProgram>>, TError,{programId: number}, TContext> => {
+
+const mutationKey = ['activateAProgram'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activateAProgram>>, {programId: number}> = (props) => {
+          const {programId} = props ?? {};
+
+          return  activateAProgram(programId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivateAProgramMutationResult = NonNullable<Awaited<ReturnType<typeof activateAProgram>>>
+
+    export type ActivateAProgramMutationError = unknown
+
+    /**
+ * @summary Activate a Program.
+ */
+export const useActivateAProgram = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAProgram>>, TError,{programId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof activateAProgram>>,
+        TError,
+        {programId: number},
+        TContext
+      > => {
+      return useMutation(getActivateAProgramMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deactivating retires a Program without deleting it and with no cascading
+ * effect — students already enrolled and historical records are unaffected
+ * (BR-18).
+ * @summary Deactivate a Program.
+ */
+export const deactivateAProgram = (
+    programId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeactivateAProgram200>(
+      {url: `/api/v1/programs/${programId}/deactivate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeactivateAProgramMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAProgram>>, TError,{programId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deactivateAProgram>>, TError,{programId: number}, TContext> => {
+
+const mutationKey = ['deactivateAProgram'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deactivateAProgram>>, {programId: number}> = (props) => {
+          const {programId} = props ?? {};
+
+          return  deactivateAProgram(programId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeactivateAProgramMutationResult = NonNullable<Awaited<ReturnType<typeof deactivateAProgram>>>
+
+    export type DeactivateAProgramMutationError = unknown
+
+    /**
+ * @summary Deactivate a Program.
+ */
+export const useDeactivateAProgram = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAProgram>>, TError,{programId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deactivateAProgram>>,
+        TError,
+        {programId: number},
+        TContext
+      > => {
+      return useMutation(getDeactivateAProgramMutationOptions(options), queryClient);
+    }
+
+/**
+ * Returns the Program's Curriculum Entries — each with its Category and the
+ * embedded Course — ordered by ordinal (the manager's insertion order within a
+ * Category, with Course code as a stable tiebreak). The front end groups them
+ * into the three Category sections.
+ * @summary List a Program's Curriculum.
+ */
+export const listAProgramsCurriculum = (
+    programId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAProgramsCurriculum200>(
+      {url: `/api/v1/programs/${programId}/curriculum`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAProgramsCurriculumQueryKey = (programId: number,) => {
+    return [
+    `/api/v1/programs/${programId}/curriculum`
+    ] as const;
+    }
+
+
+export const getListAProgramsCurriculumQueryOptions = <TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAProgramsCurriculumQueryKey(programId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAProgramsCurriculum>>> = ({ signal }) => listAProgramsCurriculum(programId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: programId !== null && programId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAProgramsCurriculumQueryResult = NonNullable<Awaited<ReturnType<typeof listAProgramsCurriculum>>>
+export type ListAProgramsCurriculumQueryError = unknown
+
+
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsCurriculum>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Program's Curriculum.
+ */
+
+export function useListAProgramsCurriculum<TData = Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsCurriculum>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAProgramsCurriculumQueryOptions(programId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Creates a Curriculum Entry placing the Course into the given Category. The
+ * ordinal is assigned automatically (appended within the Category). A Course
+ * sits at most once per Program+Category (a duplicate is a 422).
+ * @summary Add a Course to a Program's Curriculum.
+ */
+export const addACourseToAProgramsCurriculum = (
+    programId: number,
+    addACourseToAProgramsCurriculumBody: AddACourseToAProgramsCurriculumBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AddACourseToAProgramsCurriculum201>(
+      {url: `/api/v1/programs/${programId}/curriculum`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: addACourseToAProgramsCurriculumBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAddACourseToAProgramsCurriculumMutationOptions = <TError = AddACourseToAProgramsCurriculum422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, TError,{programId: number;data: AddACourseToAProgramsCurriculumBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, TError,{programId: number;data: AddACourseToAProgramsCurriculumBody}, TContext> => {
+
+const mutationKey = ['addACourseToAProgramsCurriculum'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, {programId: number;data: AddACourseToAProgramsCurriculumBody}> = (props) => {
+          const {programId,data} = props ?? {};
+
+          return  addACourseToAProgramsCurriculum(programId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddACourseToAProgramsCurriculumMutationResult = NonNullable<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>>
+    export type AddACourseToAProgramsCurriculumMutationBody = AddACourseToAProgramsCurriculumBody
+    export type AddACourseToAProgramsCurriculumMutationError = AddACourseToAProgramsCurriculum422
+
+    /**
+ * @summary Add a Course to a Program's Curriculum.
+ */
+export const useAddACourseToAProgramsCurriculum = <TError = AddACourseToAProgramsCurriculum422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>, TError,{programId: number;data: AddACourseToAProgramsCurriculumBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addACourseToAProgramsCurriculum>>,
+        TError,
+        {programId: number;data: AddACourseToAProgramsCurriculumBody},
+        TContext
+      > => {
+      return useMutation(getAddACourseToAProgramsCurriculumMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removing an entry takes the Course out of the Program's Curriculum; the Course
+ * itself is untouched (it may still sit in other Programs). The change is
+ * captured in the Program's version history (ADR-0011).
+ * @summary Remove a Curriculum Entry from a Program.
+ */
+export const removeACurriculumEntryFromAProgram = (
+    programId: number,
+    curriculumEntryId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RemoveACurriculumEntryFromAProgram204>(
+      {url: `/api/v1/programs/${programId}/curriculum/${curriculumEntryId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getRemoveACurriculumEntryFromAProgramMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, TError,{programId: number;curriculumEntryId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, TError,{programId: number;curriculumEntryId: number}, TContext> => {
+
+const mutationKey = ['removeACurriculumEntryFromAProgram'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, {programId: number;curriculumEntryId: number}> = (props) => {
+          const {programId,curriculumEntryId} = props ?? {};
+
+          return  removeACurriculumEntryFromAProgram(programId,curriculumEntryId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveACurriculumEntryFromAProgramMutationResult = NonNullable<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>>
+
+    export type RemoveACurriculumEntryFromAProgramMutationError = unknown
+
+    /**
+ * @summary Remove a Curriculum Entry from a Program.
+ */
+export const useRemoveACurriculumEntryFromAProgram = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>, TError,{programId: number;curriculumEntryId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeACurriculumEntryFromAProgram>>,
+        TError,
+        {programId: number;curriculumEntryId: number},
+        TContext
+      > => {
+      return useMutation(getRemoveACurriculumEntryFromAProgramMutationOptions(options), queryClient);
+    }
+
+/**
+ * Returns every version of the Program, oldest first, each with its snapshot of
+ * the full aggregate (fields + Curriculum) at that point.
+ * @summary List a Program's version history.
+ */
+export const listAProgramsVersionHistory = (
+    programId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAProgramsVersionHistory200>(
+      {url: `/api/v1/programs/${programId}/versions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAProgramsVersionHistoryQueryKey = (programId: number,) => {
+    return [
+    `/api/v1/programs/${programId}/versions`
+    ] as const;
+    }
+
+
+export const getListAProgramsVersionHistoryQueryOptions = <TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAProgramsVersionHistoryQueryKey(programId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAProgramsVersionHistory>>> = ({ signal }) => listAProgramsVersionHistory(programId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: programId !== null && programId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAProgramsVersionHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof listAProgramsVersionHistory>>>
+export type ListAProgramsVersionHistoryQueryError = unknown
+
+
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Program's version history.
+ */
+
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAProgramsVersionHistoryQueryOptions(programId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Returns every version of the Course, oldest first, each with its snapshot of
+ * the Course's fields at that point.
+ * @summary List a Course's version history.
+ */
+export const listACoursesVersionHistory = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListACoursesVersionHistory200>(
+      {url: `/api/v1/courses/${courseId}/versions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListACoursesVersionHistoryQueryKey = (courseId: number,) => {
+    return [
+    `/api/v1/courses/${courseId}/versions`
+    ] as const;
+    }
+
+
+export const getListACoursesVersionHistoryQueryOptions = <TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListACoursesVersionHistoryQueryKey(courseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listACoursesVersionHistory>>> = ({ signal }) => listACoursesVersionHistory(courseId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListACoursesVersionHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof listACoursesVersionHistory>>>
+export type ListACoursesVersionHistoryQueryError = unknown
+
+
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Course's version history.
+ */
+
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListACoursesVersionHistoryQueryOptions(courseId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary List Courses.
+ */
+export const listCourses = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListCourses200>(
+      {url: `/api/v1/courses`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListCoursesQueryKey = () => {
+    return [
+    `/api/v1/courses`
+    ] as const;
+    }
+
+
+export const getListCoursesQueryOptions = <TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCoursesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCourses>>> = ({ signal }) => listCourses(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCoursesQueryResult = NonNullable<Awaited<ReturnType<typeof listCourses>>>
+export type ListCoursesQueryError = unknown
+
+
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCourses>>,
+          TError,
+          Awaited<ReturnType<typeof listCourses>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCourses>>,
+          TError,
+          Awaited<ReturnType<typeof listCourses>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Courses.
+ */
+
+export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCoursesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Omit `department_id` (or send null) to mark the Course university-wide — the
+ * shape used for the shared Preparatory language/culture courses.
+ * @summary Create a Course.
+ */
+export const createACourse = (
+    createACourseBody: CreateACourseBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateACourse201>(
+      {url: `/api/v1/courses`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createACourseBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateACourseMutationOptions = <TError = CreateACourse422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourse>>, TError,{data: CreateACourseBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createACourse>>, TError,{data: CreateACourseBody}, TContext> => {
+
+const mutationKey = ['createACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createACourse>>, {data: CreateACourseBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createACourse(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof createACourse>>>
+    export type CreateACourseMutationBody = CreateACourseBody
+    export type CreateACourseMutationError = CreateACourse422
+
+    /**
+ * @summary Create a Course.
+ */
+export const useCreateACourse = <TError = CreateACourse422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourse>>, TError,{data: CreateACourseBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createACourse>>,
+        TError,
+        {data: CreateACourseBody},
+        TContext
+      > => {
+      return useMutation(getCreateACourseMutationOptions(options), queryClient);
+    }
+
+/**
+ * Returns the Course's full detail plus its `placements` — which Programs and
+ * Categories it appears in (via its Curriculum Entries) — for the detail view's
+ * "appears in" section (FR-PCM-002). Version history is a separate endpoint.
+ * @summary Show a Course.
+ */
+export const showACourse = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowACourse200>(
+      {url: `/api/v1/courses/${courseId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowACourseQueryKey = (courseId: number,) => {
+    return [
+    `/api/v1/courses/${courseId}`
+    ] as const;
+    }
+
+
+export const getShowACourseQueryOptions = <TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowACourseQueryKey(courseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showACourse>>> = ({ signal }) => showACourse(courseId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowACourseQueryResult = NonNullable<Awaited<ReturnType<typeof showACourse>>>
+export type ShowACourseQueryError = unknown
+
+
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourse>>,
+          TError,
+          Awaited<ReturnType<typeof showACourse>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourse>>,
+          TError,
+          Awaited<ReturnType<typeof showACourse>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Course.
+ */
+
+export function useShowACourse<TData = Awaited<ReturnType<typeof showACourse>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourse>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowACourseQueryOptions(courseId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Update a Course.
+ */
+export const updateACourse = (
+    courseId: number,
+    updateACourseBody: UpdateACourseBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateACourse200>(
+      {url: `/api/v1/courses/${courseId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateACourseBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateACourseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourse>>, TError,{courseId: number;data: UpdateACourseBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateACourse>>, TError,{courseId: number;data: UpdateACourseBody}, TContext> => {
+
+const mutationKey = ['updateACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateACourse>>, {courseId: number;data: UpdateACourseBody}> = (props) => {
+          const {courseId,data} = props ?? {};
+
+          return  updateACourse(courseId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof updateACourse>>>
+    export type UpdateACourseMutationBody = UpdateACourseBody
+    export type UpdateACourseMutationError = unknown
+
+    /**
+ * @summary Update a Course.
+ */
+export const useUpdateACourse = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourse>>, TError,{courseId: number;data: UpdateACourseBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateACourse>>,
+        TError,
+        {courseId: number;data: UpdateACourseBody},
+        TContext
+      > => {
+      return useMutation(getUpdateACourseMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Activate a Course.
+ */
+export const activateACourse = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ActivateACourse200>(
+      {url: `/api/v1/courses/${courseId}/activate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getActivateACourseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateACourse>>, TError,{courseId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof activateACourse>>, TError,{courseId: number}, TContext> => {
+
+const mutationKey = ['activateACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activateACourse>>, {courseId: number}> = (props) => {
+          const {courseId} = props ?? {};
+
+          return  activateACourse(courseId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof activateACourse>>>
+
+    export type ActivateACourseMutationError = unknown
+
+    /**
+ * @summary Activate a Course.
+ */
+export const useActivateACourse = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateACourse>>, TError,{courseId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof activateACourse>>,
+        TError,
+        {courseId: number},
+        TContext
+      > => {
+      return useMutation(getActivateACourseMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deactivating retires a Course without deleting it — it stays readable and its
+ * historical academic records are unaffected (BR-18, FR-PCM-003.3).
+ * @summary Deactivate a Course.
+ */
+export const deactivateACourse = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeactivateACourse200>(
+      {url: `/api/v1/courses/${courseId}/deactivate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeactivateACourseMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateACourse>>, TError,{courseId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deactivateACourse>>, TError,{courseId: number}, TContext> => {
+
+const mutationKey = ['deactivateACourse'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deactivateACourse>>, {courseId: number}> = (props) => {
+          const {courseId} = props ?? {};
+
+          return  deactivateACourse(courseId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeactivateACourseMutationResult = NonNullable<Awaited<ReturnType<typeof deactivateACourse>>>
+
+    export type DeactivateACourseMutationError = unknown
+
+    /**
+ * @summary Deactivate a Course.
+ */
+export const useDeactivateACourse = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateACourse>>, TError,{courseId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deactivateACourse>>,
+        TError,
+        {courseId: number},
+        TContext
+      > => {
+      return useMutation(getDeactivateACourseMutationOptions(options), queryClient);
+    }
 
 /**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
@@ -534,94 +3531,3 @@ export const useUpdateCurrentUser = <TError = UpdateCurrentUser422,
       > => {
       return useMutation(getUpdateCurrentUserMutationOptions(options), queryClient);
     }
-
-/**
- * A permission-gated sample endpoint (the Phase 0 RBAC tracer): reachable
- * only by users whose effective permissions include `catalog.manage`
- * (R06/R07 and admins). It proves API-side enforcement; later phases replace
- * it with the real Catalog module.
- * @summary Catalog management demo.
- */
-export const catalogManagementDemo = (
-
- signal?: AbortSignal
-) => {
-
-
-      return customInstance<CatalogManagementDemo200>(
-      {url: `/api/v1/demo/catalog-management`, method: 'GET', signal
-    },
-      );
-    }
-
-
-
-
-export const getCatalogManagementDemoQueryKey = () => {
-    return [
-    `/api/v1/demo/catalog-management`
-    ] as const;
-    }
-
-
-export const getCatalogManagementDemoQueryOptions = <TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getCatalogManagementDemoQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof catalogManagementDemo>>> = ({ signal }) => catalogManagementDemo(signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CatalogManagementDemoQueryResult = NonNullable<Awaited<ReturnType<typeof catalogManagementDemo>>>
-export type CatalogManagementDemoQueryError = CatalogManagementDemo403
-
-
-export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof catalogManagementDemo>>,
-          TError,
-          Awaited<ReturnType<typeof catalogManagementDemo>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof catalogManagementDemo>>,
-          TError,
-          Awaited<ReturnType<typeof catalogManagementDemo>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Catalog management demo.
- */
-
-export function useCatalogManagementDemo<TData = Awaited<ReturnType<typeof catalogManagementDemo>>, TError = CatalogManagementDemo403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof catalogManagementDemo>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getCatalogManagementDemoQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}

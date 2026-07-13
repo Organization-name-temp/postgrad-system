@@ -166,11 +166,35 @@ theming architecture and reconciled wording live in [design-system.md](./design-
   the whole system render correctly in all four combinations.
 
 ### Phase 1 — Catalog (SRS §4.3)
-- **Catalog module:** Faculties, Departments, Programs, Courses, Course Categories
-  (Preparatory 6×1 / Program Core 2×3 / Research Elective 3×3), with EN+AR names.
-- Program/course CRUD + version history; `Lecture+Tutorial+Lab CH = Total` validation.
-- **Interactive program tree view** (FR-PCM-002), expandable, searchable; course detail.
-- Realistic **E-JUST seeder** built from the FR-PCM-002 example tree.
+The design below was sharpened in a `/grill-with-docs` session; the resolved glossary
+lives in [CONTEXT.md](../CONTEXT.md) and the two hard-to-reverse choices in
+[ADR-0010](./adr/0010-catalog-curriculum-model.md) (data model) and
+[ADR-0011](./adr/0011-catalog-version-snapshots.md) (version history).
+
+- **New `Catalog` module** (`Public` routes + Resources / `Internal` everything). First
+  real **cross-module deptrac edge**: `Catalog → Identity\Public` (permissions/Gates)
+  allowed, `Internal` private. The cross-module `CatalogService` facade is deferred to
+  Phase 3 (built against Enrollment, its first consumer).
+- **Model** (ADR-0010): Faculty → Department → Program; **Course** standalone with a
+  **nullable** `department_id` (NULL = the shared university Preparatory courses);
+  **Category lives on the Curriculum Entry** (`program_courses`), never on the Course, so
+  a Course can be Core in its Program and an external elective for another. Program stores
+  **required CH per Category** (default prep 6 / core 6 / elective 9 = 21). Bilingual
+  EN+AR as **paired columns**, both required. `Lecture+Tutorial+Lab = Total` invariant;
+  `DegreeLevel`/`CourseLevel` enums (BR-26); deactivate-only (no hard delete, BR-18).
+- **Version history** (ADR-0011): append-only `catalog_versions` snapshots of the full
+  aggregate on every manage action; read-only history API; distinct from the Audit Log.
+- **CRUD + admin UI:** full backend CRUD/activate test-first, plus routed `features/catalog`
+  admin pages; Curriculum edited on the **Program edit page** (three Category sections +
+  course-picker). Permissions already fixed: `catalog.view` / `catalog.manage`.
+- **Interactive program tree view** (FR-PCM-002): one `GET /catalog/tree` read-model
+  endpoint (`@mui/x-tree-view`), **client-side** search/filter, course-status `<StatusChip>`;
+  clicking a course opens detail + version history.
+- Realistic **E-JUST seeder** — FoE → Computer Engineering → MSc & PhD fully populated from
+  the FR-PCM-002 example (shared PRE401–404 linked into every Program), other faculties
+  shallow.
+- **Deferred:** CSV/Excel import (FR-PCM-003.5); `research_type` PBL/Seminar (Phase 3);
+  course equivalencies (Phase 5).
 - **Demo:** browse the University→Faculty→Dept→Program→Course tree; open course details.
 
 ### Phase 2 — Admissions (SRS §4.2)

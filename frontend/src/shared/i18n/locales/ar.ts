@@ -21,6 +21,7 @@ export const ar = {
       open: 'فتح قائمة التنقل',
       skipToContent: 'تخطّي إلى المحتوى الرئيسي',
       dashboard: 'لوحة التحكم',
+      browse: 'استعراض الدليل',
       faculties: 'الكليات',
       departments: 'الأقسام',
       programs: 'البرامج',
@@ -51,6 +52,15 @@ export const ar = {
   },
   catalog: {
     status: { active: 'مُفعَّلة', inactive: 'مُعطَّلة' },
+    tree: {
+      title: 'استعراض الدليل',
+      search: 'ابحث في البرامج والمقررات',
+      university: 'الجامعة المصرية اليابانية للعلوم والتكنولوجيا',
+      requiredCh: 'المطلوب {{ch}} ساعة',
+      loading: 'جارٍ تحميل الدليل',
+      loadError: 'تعذّر تحميل الدليل.',
+      noResults: 'لا توجد برامج أو مقررات تطابق «{{query}}».',
+    },
     faculties: {
       title: 'الكليات',
       new: 'كلية جديدة',
@@ -137,6 +147,8 @@ export const ar = {
         'تعذّر حفظ المقرر. تأكّد من أن الرمز فريد، ومن إدخال الاسمين، وأن مجموع ساعات المحاضرات والتمارين والمعمل يساوي الإجمالي.',
       department: 'القسم',
       universityWide: 'على مستوى الجامعة',
+      appearsIn: 'يظهر في',
+      appearsInEmpty: 'ليس ضمن أي برنامج بعد.',
       level: 'المستوى',
       code: 'الرمز',
       name: 'الاسم',

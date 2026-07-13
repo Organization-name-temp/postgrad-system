@@ -7,6 +7,53 @@
 import * as zod from 'zod';
 
 /**
+ * Faculties are ordered by code; within each Program the three Categories are
+ * always present in bylaw order (Preparatory, Program Core, Research Elective)
+ * with their required credit hours, and Courses within a Category follow the
+ * curriculum ordinal (Course code as a stable tiebreak).
+ * @summary The catalog browse tree.
+ */
+export const TheCatalogBrowseTreeResponse = zod.object({
+  "data": zod.object({
+  "faculties": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "departments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "programs": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "categories": zod.array(zod.object({
+  "category": zod.string().optional(),
+  "required_ch": zod.number().optional(),
+  "courses": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})).optional()
+})).optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
  * @summary List Faculties.
  */
 export const ListFacultiesResponse = zod.object({
@@ -603,6 +650,9 @@ export const CreateACourseResponse = zod.object({
 
 
 /**
+ * Returns the Course's full detail plus its `placements` — which Programs and
+ * Categories it appears in (via its Curriculum Entries) — for the detail view's
+ * "appears in" section (FR-PCM-002). Version history is a separate endpoint.
  * @summary Show a Course.
  */
 export const ShowACourseParams = zod.object({
@@ -621,7 +671,16 @@ export const ShowACourseResponse = zod.object({
   "tutorial_ch": zod.number().optional(),
   "lab_ch": zod.number().optional(),
   "total_ch": zod.number().optional(),
-  "is_active": zod.boolean().optional()
+  "is_active": zod.boolean().optional(),
+  "placements": zod.array(zod.object({
+  "category": zod.string().optional(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional()
+})).optional()
 }).optional()
 })
 

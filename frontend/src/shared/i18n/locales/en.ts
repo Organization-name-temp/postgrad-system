@@ -22,6 +22,7 @@ export const en = {
       open: 'Open navigation menu',
       skipToContent: 'Skip to main content',
       dashboard: 'Dashboard',
+      browse: 'Browse catalog',
       faculties: 'Faculties',
       departments: 'Departments',
       programs: 'Programs',
@@ -52,6 +53,15 @@ export const en = {
   },
   catalog: {
     status: { active: 'Active', inactive: 'Inactive' },
+    tree: {
+      title: 'Browse catalog',
+      search: 'Search programs and courses',
+      university: 'Egypt-Japan University of Science and Technology',
+      requiredCh: '{{ch}} CH required',
+      loading: 'Loading catalog',
+      loadError: 'Could not load the catalog.',
+      noResults: 'No programs or courses match “{{query}}”.',
+    },
     faculties: {
       title: 'Faculties',
       new: 'New faculty',
@@ -140,6 +150,8 @@ export const en = {
         'Could not save the course. Check that the code is unique, both names are filled in, and the lecture, tutorial and lab hours add up to the total.',
       department: 'Department',
       universityWide: 'University-wide',
+      appearsIn: 'Appears in',
+      appearsInEmpty: 'Not part of any program yet.',
       level: 'Level',
       code: 'Code',
       name: 'Name',

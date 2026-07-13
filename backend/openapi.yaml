@@ -7,10 +7,147 @@ servers:
   - url: 'http://localhost'
 tags:
   - name: Catalog
-    description: "\nManage Faculties — the top-level academic divisions (FoE, BAS, CSIT) at the\nroot of the catalog tree. Reading requires the catalog.view permission;\ncreating/editing/activating requires catalog.manage (Department Head, Dean, or\nan administrator). Faculties are deactivated, never deleted (ADR-0010)."
+    description: "\nThe catalog browse tree — the whole academic hierarchy (Faculty → Department →\nProgram → Category → Course) in a single read-model payload so the front end can\nrender and search it client-side without chatty per-node requests (FR-PCM-002,\nspec §API). Every node carries both language names; Course nodes carry their\nactive status so retired courses read accessibly. Reading requires catalog.view —\nthe catalog is universally browsable (ADR-0008). \"University\" is a synthetic root\nthe SPA prepends; it is not an entity, so it is not in this payload."
   - name: Endpoints
     description: ''
 paths:
+  /api/v1/catalog/tree:
+    get:
+      summary: 'The catalog browse tree.'
+      operationId: theCatalogBrowseTree
+      description: "Faculties are ordered by code; within each Program the three Categories are\nalways present in bylaw order (Preparatory, Program Core, Research Elective)\nwith their required credit hours, and Courses within a Category follow the\ncurriculum ordinal (Course code as a stable tiebreak)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    faculties:
+                      -
+                        id: 1
+                        code: FoE
+                        name_en: 'Faculty of Engineering'
+                        name_ar: 'كلية الهندسة'
+                        is_active: true
+                        departments:
+                          -
+                            id: 1
+                            code: CE
+                            name_en: 'Computer Engineering'
+                            name_ar: 'هندسة الحاسوب'
+                            is_active: true
+                            programs:
+                              -
+                                id: 1
+                                code: MSC-CE
+                                name_en: 'MSc in Computer Engineering'
+                                name_ar: 'ماجستير في هندسة الحاسوب'
+                                degree_level: MSc
+                                is_active: true
+                                categories:
+                                  -
+                                    category: Preparatory
+                                    required_ch: 6
+                                    courses:
+                                      - { id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      faculties:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            code: FoE
+                            name_en: 'Faculty of Engineering'
+                            name_ar: 'كلية الهندسة'
+                            is_active: true
+                            departments:
+                              -
+                                id: 1
+                                code: CE
+                                name_en: 'Computer Engineering'
+                                name_ar: 'هندسة الحاسوب'
+                                is_active: true
+                                programs:
+                                  -
+                                    id: 1
+                                    code: MSC-CE
+                                    name_en: 'MSc in Computer Engineering'
+                                    name_ar: 'ماجستير في هندسة الحاسوب'
+                                    degree_level: MSc
+                                    is_active: true
+                                    categories:
+                                      - { category: Preparatory, required_ch: 6, courses: [{ id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }] }
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: FoE
+                            name_en:
+                              type: string
+                              example: 'Faculty of Engineering'
+                            name_ar:
+                              type: string
+                              example: 'كلية الهندسة'
+                            is_active:
+                              type: boolean
+                              example: true
+                            departments:
+                              type: array
+                              example:
+                                -
+                                  id: 1
+                                  code: CE
+                                  name_en: 'Computer Engineering'
+                                  name_ar: 'هندسة الحاسوب'
+                                  is_active: true
+                                  programs:
+                                    -
+                                      id: 1
+                                      code: MSC-CE
+                                      name_en: 'MSc in Computer Engineering'
+                                      name_ar: 'ماجستير في هندسة الحاسوب'
+                                      degree_level: MSc
+                                      is_active: true
+                                      categories: [{ category: Preparatory, required_ch: 6, courses: [{ id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }] }]
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 1
+                                  code:
+                                    type: string
+                                    example: CE
+                                  name_en:
+                                    type: string
+                                    example: 'Computer Engineering'
+                                  name_ar:
+                                    type: string
+                                    example: 'هندسة الحاسوب'
+                                  is_active:
+                                    type: boolean
+                                    example: true
+                                  programs:
+                                    type: array
+                                    example:
+                                      - { id: 1, code: MSC-CE, name_en: 'MSc in Computer Engineering', name_ar: 'ماجستير في هندسة الحاسوب', degree_level: MSc, is_active: true, categories: [{ category: Preparatory, required_ch: 6, courses: [{ id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }] }] }
+                                    items:
+                                      type: object
+                                      properties: { id: { type: integer, example: 1 }, code: { type: string, example: MSC-CE }, name_en: { type: string, example: 'MSc in Computer Engineering' }, name_ar: { type: string, example: 'ماجستير في هندسة الحاسوب' }, degree_level: { type: string, example: MSc }, is_active: { type: boolean, example: true }, categories: { type: array, example: [{ category: Preparatory, required_ch: 6, courses: [{ id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }] }], items: { type: object, properties: { category: { type: string, example: Preparatory }, required_ch: { type: integer, example: 6 }, courses: { type: array, example: [{ id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }], items: { type: object, properties: { id: { type: integer, example: 10 }, code: { type: string, example: PRE401 }, name_en: { type: string, example: 'English for Academic Purposes' }, name_ar: { type: string, example: 'الإنجليزية للأغراض الأكاديمية' }, level: { type: integer, example: 400 }, is_active: { type: boolean, example: true } } } } } } } }
+      tags:
+        - Catalog
+      security: []
   /api/v1/faculties:
     get:
       summary: 'List Faculties.'
@@ -1992,7 +2129,7 @@ paths:
     get:
       summary: 'Show a Course.'
       operationId: showACourse
-      description: ''
+      description: "Returns the Course's full detail plus its `placements` — which Programs and\nCategories it appears in (via its Curriculum Entries) — for the detail view's\n\"appears in\" section (FR-PCM-002). Version history is a separate endpoint."
       parameters: []
       responses:
         200:
@@ -2014,6 +2151,14 @@ paths:
                     lab_ch: 0
                     total_ch: 3
                     is_active: true
+                    placements:
+                      -
+                        category: ProgramCore
+                        program:
+                          id: 1
+                          code: MSC-CE
+                          name_en: 'MSc in Computer Engineering'
+                          name_ar: 'ماجستير في هندسة الحاسوب'
                 properties:
                   data:
                     type: object
@@ -2051,6 +2196,37 @@ paths:
                       is_active:
                         type: boolean
                         example: true
+                      placements:
+                        type: array
+                        example:
+                          -
+                            category: ProgramCore
+                            program:
+                              id: 1
+                              code: MSC-CE
+                              name_en: 'MSc in Computer Engineering'
+                              name_ar: 'ماجستير في هندسة الحاسوب'
+                        items:
+                          type: object
+                          properties:
+                            category:
+                              type: string
+                              example: ProgramCore
+                            program:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                code:
+                                  type: string
+                                  example: MSC-CE
+                                name_en:
+                                  type: string
+                                  example: 'MSc in Computer Engineering'
+                                name_ar:
+                                  type: string
+                                  example: 'ماجستير في هندسة الحاسوب'
       tags:
         - Catalog
       security: []

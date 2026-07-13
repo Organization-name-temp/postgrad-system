@@ -5,6 +5,7 @@ namespace Modules\Catalog\Internal\Models;
 use Database\Factories\FacultyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * A Faculty — a top-level academic division (FoE, BAS, CSIT) at the root of the
@@ -51,5 +52,15 @@ class Faculty extends Model
     protected static function newFactory(): FacultyFactory
     {
         return FacultyFactory::new();
+    }
+
+    /**
+     * The Faculty's Departments — the next level down the catalog tree.
+     *
+     * @return HasMany<Department, $this>
+     */
+    public function departments(): HasMany
+    {
+        return $this->hasMany(Department::class);
     }
 }

@@ -2,7 +2,9 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Catalog\Internal\Models\Course;
+use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
+use Modules\Catalog\Internal\Models\Program;
 use Modules\Identity\Public\Enums\Role;
 
 uses(RefreshDatabase::class);
@@ -41,6 +43,34 @@ it('lets a viewer read a single course with both names, level and credit split',
         ->assertJsonPath('data.tutorial_ch', 0)
         ->assertJsonPath('data.lab_ch', 0)
         ->assertJsonPath('data.total_ch', 3);
+});
+
+it('shows which programs and categories a course is placed in', function () {
+    $course = Course::factory()->create(['code' => 'PRE401']);
+    $msc = Program::factory()->create(['code' => 'MSC-CE', 'name_en' => 'MSc in Computer Engineering', 'name_ar' => 'ماجستير']);
+    $phd = Program::factory()->create(['code' => 'PHD-CE', 'name_en' => 'PhD in Computer Engineering', 'name_ar' => 'دكتوراه']);
+    CurriculumEntry::factory()->create(['program_id' => $msc->id, 'course_id' => $course->id, 'category' => 'Preparatory']);
+    CurriculumEntry::factory()->create(['program_id' => $phd->id, 'course_id' => $course->id, 'category' => 'Preparatory']);
+    actingAsRole(Role::Applicant);
+
+    $this->getJson("/api/v1/courses/{$course->id}")
+        ->assertOk()
+        ->assertJsonStructure(['data' => ['placements' => [['category', 'program' => ['id', 'code', 'name_en', 'name_ar']]]]])
+        ->assertJsonCount(2, 'data.placements')
+        // Ordered by program code (MSC before PHD would be alphabetical: MSC-CE, PHD-CE).
+        ->assertJsonPath('data.placements.0.program.code', 'MSC-CE')
+        ->assertJsonPath('data.placements.0.category', 'Preparatory')
+        ->assertJsonPath('data.placements.0.program.name_en', 'MSc in Computer Engineering')
+        ->assertJsonPath('data.placements.1.program.code', 'PHD-CE');
+});
+
+it('shows an empty placements list for a course in no program', function () {
+    $course = Course::factory()->create();
+    actingAsRole(Role::Applicant);
+
+    $this->getJson("/api/v1/courses/{$course->id}")
+        ->assertOk()
+        ->assertJsonPath('data.placements', []);
 });
 
 it('lets a manager create a department-owned course, active by default', function () {

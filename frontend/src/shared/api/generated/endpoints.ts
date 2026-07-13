@@ -24,6 +24,57 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  is_active?: boolean;
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItem = {
+  category?: string;
+  required_ch?: number;
+  courses?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem[];
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  is_active?: boolean;
+  categories?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItem[];
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+  programs?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItem[];
+};
+
+export type TheCatalogBrowseTree200DataFacultiesItem = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  is_active?: boolean;
+  departments?: TheCatalogBrowseTree200DataFacultiesItemDepartmentsItem[];
+};
+
+export type TheCatalogBrowseTree200Data = {
+  faculties?: TheCatalogBrowseTree200DataFacultiesItem[];
+};
+
+export type TheCatalogBrowseTree200 = {
+  data?: TheCatalogBrowseTree200Data;
+};
+
 export type ListFaculties200DataItem = {
   id?: number;
   code?: string;
@@ -566,6 +617,18 @@ export type CreateACourse422 = {
   errors?: CreateACourse422Errors;
 };
 
+export type ShowACourse200DataPlacementsItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type ShowACourse200DataPlacementsItem = {
+  category?: string;
+  program?: ShowACourse200DataPlacementsItemProgram;
+};
+
 export type ShowACourse200Data = {
   id?: number;
   department_id?: number;
@@ -578,6 +641,7 @@ export type ShowACourse200Data = {
   lab_ch?: number;
   total_ch?: number;
   is_active?: boolean;
+  placements?: ShowACourse200DataPlacementsItem[];
 };
 
 export type ShowACourse200 = {
@@ -783,6 +847,103 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * Faculties are ordered by code; within each Program the three Categories are
+ * always present in bylaw order (Preparatory, Program Core, Research Elective)
+ * with their required credit hours, and Courses within a Category follow the
+ * curriculum ordinal (Course code as a stable tiebreak).
+ * @summary The catalog browse tree.
+ */
+export const theCatalogBrowseTree = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheCatalogBrowseTree200>(
+      {url: `/api/v1/catalog/tree`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheCatalogBrowseTreeQueryKey = () => {
+    return [
+    `/api/v1/catalog/tree`
+    ] as const;
+    }
+
+
+export const getTheCatalogBrowseTreeQueryOptions = <TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheCatalogBrowseTreeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theCatalogBrowseTree>>> = ({ signal }) => theCatalogBrowseTree(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheCatalogBrowseTreeQueryResult = NonNullable<Awaited<ReturnType<typeof theCatalogBrowseTree>>>
+export type TheCatalogBrowseTreeQueryError = unknown
+
+
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>,
+          TError,
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>,
+          TError,
+          Awaited<ReturnType<typeof theCatalogBrowseTree>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The catalog browse tree.
+ */
+
+export function useTheCatalogBrowseTree<TData = Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theCatalogBrowseTree>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheCatalogBrowseTreeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * @summary List Faculties.
@@ -2708,6 +2869,9 @@ export const useCreateACourse = <TError = CreateACourse422,
     }
 
 /**
+ * Returns the Course's full detail plus its `placements` — which Programs and
+ * Categories it appears in (via its Curriculum Entries) — for the detail view's
+ * "appears in" section (FR-PCM-002). Version history is a separate endpoint.
  * @summary Show a Course.
  */
 export const showACourse = (

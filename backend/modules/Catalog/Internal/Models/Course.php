@@ -6,6 +6,7 @@ use Database\Factories\CourseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Catalog\Internal\Enums\CourseLevel;
 
 /**
@@ -83,5 +84,17 @@ class Course extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
+    }
+
+    /**
+     * The Curriculum Entries placing this Course into Programs — the source of the
+     * Course's "appears in" placements (which Programs and Categories it belongs to).
+     * A Course may sit in several Programs under different Categories (ADR-0010).
+     *
+     * @return HasMany<CurriculumEntry, $this>
+     */
+    public function curriculumEntries(): HasMany
+    {
+        return $this->hasMany(CurriculumEntry::class);
     }
 }

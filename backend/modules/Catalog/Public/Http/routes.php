@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Catalog\Internal\Http\Controllers\CatalogTreeController;
 use Modules\Catalog\Internal\Http\Controllers\CatalogVersionController;
 use Modules\Catalog\Internal\Http\Controllers\CourseController;
 use Modules\Catalog\Internal\Http\Controllers\CurriculumController;
@@ -16,6 +17,10 @@ use Modules\Catalog\Internal\Http\Controllers\ProgramController;
 */
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Browse tree — the whole hierarchy in one read-model payload; search/filter
+    // runs client-side over it (FR-PCM-002). A catalog read like any other.
+    Route::get('/catalog/tree', [CatalogTreeController::class, 'index'])->middleware('can:catalog.view');
+
     // Faculties
     Route::get('/faculties', [FacultyController::class, 'index'])->middleware('can:catalog.view');
     Route::get('/faculties/{faculty}', [FacultyController::class, 'show'])->middleware('can:catalog.view');

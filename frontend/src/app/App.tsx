@@ -10,6 +10,7 @@ import { ProgramsPage } from '../features/catalog/programs/ProgramsPage'
 import { ProgramEditPage } from '../features/catalog/programs/ProgramEditPage'
 import { CoursesPage } from '../features/catalog/courses/CoursesPage'
 import { CourseEditPage } from '../features/catalog/courses/CourseEditPage'
+import { CatalogTreePage } from '../features/catalog/tree/CatalogTreePage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 
@@ -43,6 +44,7 @@ export function App() {
             <Route element={<RequireAuth />}>
               <Route element={<AuthenticatedLayout />}>
                 <Route path="/" element={<DashboardPage />} />
+                <Route path="/catalog" element={<CatalogTreePage />} />
                 <Route path="/catalog/faculties" element={<FacultiesPage />} />
                 <Route path="/catalog/departments" element={<DepartmentsPage />} />
                 <Route path="/catalog/programs" element={<ProgramsPage />} />

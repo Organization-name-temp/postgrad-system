@@ -73,12 +73,20 @@ class CourseController
     /**
      * Show a Course.
      *
+     * Returns the Course's full detail plus its `placements` — which Programs and
+     * Categories it appears in (via its Curriculum Entries) — for the detail view's
+     * "appears in" section (FR-PCM-002). Version history is a separate endpoint.
+     *
      * @urlParam course_id integer required The ID of the course. Example: 1
      *
-     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}
+     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true, "placements": [{"category": "ProgramCore", "program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير في هندسة الحاسوب"}}]}}
      */
     public function show(Course $course): CourseResource
     {
+        // Eager-load the placements' Programs so CourseResource can emit `placements`
+        // (an empty array when the Course sits in no Program).
+        $course->load('curriculumEntries.program');
+
         return new CourseResource($course);
     }
 

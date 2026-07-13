@@ -243,6 +243,171 @@ export const DeactivateADepartmentResponse = zod.object({
 
 
 /**
+ * @summary List Programs.
+ */
+export const ListProgramsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * The per-Category credit hours are optional; each omitted one falls back to
+ * the bylaw default (Preparatory 6 / Program Core 6 / Research Elective 9).
+ * @summary Create a Program.
+ */
+export const CreateAProgramBody = zod.object({
+  "department_id": zod.number().describe('The owning Department id.'),
+  "code": zod.string().describe('Unique short code for the Program.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "degree_level": zod.string().describe('One of MSc, PhD.'),
+  "prep_required_ch": zod.number().optional().describe('Required Preparatory credit hours (default 6).'),
+  "core_required_ch": zod.number().optional().describe('Required Program Core credit hours (default 6).'),
+  "elective_required_ch": zod.number().optional().describe('Required Research Elective credit hours (default 9).')
+})
+
+export const CreateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Program.
+ */
+export const ShowAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ShowAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Any omitted per-Category credit hour keeps its current value (unlike create,
+ * which fills in the bylaw default).
+ * @summary Update a Program.
+ */
+export const UpdateAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const UpdateAProgramBody = zod.object({
+  "department_id": zod.number().describe('The owning Department id.'),
+  "code": zod.string().describe('Unique short code for the Program.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "degree_level": zod.string().describe('One of MSc, PhD.'),
+  "prep_required_ch": zod.number().optional().describe('Required Preparatory credit hours.'),
+  "core_required_ch": zod.number().optional().describe('Required Program Core credit hours.'),
+  "elective_required_ch": zod.number().optional().describe('Required Research Elective credit hours.')
+})
+
+export const UpdateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate a Program.
+ */
+export const ActivateAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ActivateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating retires a Program without deleting it and with no cascading
+ * effect — students already enrolled and historical records are unaffected
+ * (BR-18).
+ * @summary Deactivate a Program.
+ */
+export const DeactivateAProgramParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const DeactivateAProgramResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "prep_required_ch": zod.number().optional(),
+  "core_required_ch": zod.number().optional(),
+  "elective_required_ch": zod.number().optional(),
+  "total_required_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
  * API is reachable.
  * @summary Service health check.

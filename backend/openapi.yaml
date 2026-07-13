@@ -644,7 +644,7 @@ paths:
         in: path
         name: department_id
         description: 'The ID of the department.'
-        example: 16
+        example: 1
         required: true
         schema:
           type: integer
@@ -699,7 +699,7 @@ paths:
         in: path
         name: department_id
         description: 'The ID of the department.'
-        example: 16
+        example: 1
         required: true
         schema:
           type: integer
@@ -754,6 +754,556 @@ paths:
         in: path
         name: department_id
         description: 'The ID of the department.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/programs:
+    get:
+      summary: 'List Programs.'
+      operationId: listPrograms
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      department_id: 1
+                      code: MSC-CE
+                      name_en: 'MSc in Computer Engineering'
+                      name_ar: 'ماجستير في هندسة الحاسبات'
+                      degree_level: MSc
+                      prep_required_ch: 6
+                      core_required_ch: 6
+                      elective_required_ch: 9
+                      total_required_ch: 21
+                      is_active: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        department_id: 1
+                        code: MSC-CE
+                        name_en: 'MSc in Computer Engineering'
+                        name_ar: 'ماجستير في هندسة الحاسبات'
+                        degree_level: MSc
+                        prep_required_ch: 6
+                        core_required_ch: 6
+                        elective_required_ch: 9
+                        total_required_ch: 21
+                        is_active: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        department_id:
+                          type: integer
+                          example: 1
+                        code:
+                          type: string
+                          example: MSC-CE
+                        name_en:
+                          type: string
+                          example: 'MSc in Computer Engineering'
+                        name_ar:
+                          type: string
+                          example: 'ماجستير في هندسة الحاسبات'
+                        degree_level:
+                          type: string
+                          example: MSc
+                        prep_required_ch:
+                          type: integer
+                          example: 6
+                        core_required_ch:
+                          type: integer
+                          example: 6
+                        elective_required_ch:
+                          type: integer
+                          example: 9
+                        total_required_ch:
+                          type: integer
+                          example: 21
+                        is_active:
+                          type: boolean
+                          example: true
+      tags:
+        - Catalog
+      security: []
+    post:
+      summary: 'Create a Program.'
+      operationId: createAProgram
+      description: "The per-Category credit hours are optional; each omitted one falls back to\nthe bylaw default (Preparatory 6 / Program Core 6 / Research Elective 9)."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: MSC-CE
+                    name_en: 'MSc in Computer Engineering'
+                    name_ar: 'ماجستير في هندسة الحاسبات'
+                    degree_level: MSc
+                    prep_required_ch: 6
+                    core_required_ch: 6
+                    elective_required_ch: 9
+                    total_required_ch: 21
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: MSC-CE
+                      name_en:
+                        type: string
+                        example: 'MSc in Computer Engineering'
+                      name_ar:
+                        type: string
+                        example: 'ماجستير في هندسة الحاسبات'
+                      degree_level:
+                        type: string
+                        example: MSc
+                      prep_required_ch:
+                        type: integer
+                        example: 6
+                      core_required_ch:
+                        type: integer
+                        example: 6
+                      elective_required_ch:
+                        type: integer
+                        example: 9
+                      total_required_ch:
+                        type: integer
+                        example: 21
+                      is_active:
+                        type: boolean
+                        example: true
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The code has already been taken.'
+                  errors:
+                    code:
+                      - 'The code has already been taken.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The code has already been taken.'
+                  errors:
+                    type: object
+                    properties:
+                      code:
+                        type: array
+                        example:
+                          - 'The code has already been taken.'
+                        items:
+                          type: string
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                department_id:
+                  type: integer
+                  description: 'The owning Department id.'
+                  example: 1
+                code:
+                  type: string
+                  description: 'Unique short code for the Program.'
+                  example: MSC-CE
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'MSc in Computer Engineering'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'ماجستير في هندسة الحاسبات'
+                degree_level:
+                  type: string
+                  description: 'One of MSc, PhD.'
+                  example: MSc
+                prep_required_ch:
+                  type: integer
+                  description: 'Required Preparatory credit hours (default 6).'
+                  example: 6
+                core_required_ch:
+                  type: integer
+                  description: 'Required Program Core credit hours (default 6).'
+                  example: 6
+                elective_required_ch:
+                  type: integer
+                  description: 'Required Research Elective credit hours (default 9).'
+                  example: 9
+              required:
+                - department_id
+                - code
+                - name_en
+                - name_ar
+                - degree_level
+      security: []
+  '/api/v1/programs/{program_id}':
+    get:
+      summary: 'Show a Program.'
+      operationId: showAProgram
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: MSC-CE
+                    name_en: 'MSc in Computer Engineering'
+                    name_ar: 'ماجستير في هندسة الحاسبات'
+                    degree_level: MSc
+                    prep_required_ch: 6
+                    core_required_ch: 6
+                    elective_required_ch: 9
+                    total_required_ch: 21
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: MSC-CE
+                      name_en:
+                        type: string
+                        example: 'MSc in Computer Engineering'
+                      name_ar:
+                        type: string
+                        example: 'ماجستير في هندسة الحاسبات'
+                      degree_level:
+                        type: string
+                        example: MSc
+                      prep_required_ch:
+                        type: integer
+                        example: 6
+                      core_required_ch:
+                        type: integer
+                        example: 6
+                      elective_required_ch:
+                        type: integer
+                        example: 9
+                      total_required_ch:
+                        type: integer
+                        example: 21
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      security: []
+    patch:
+      summary: 'Update a Program.'
+      operationId: updateAProgram
+      description: "Any omitted per-Category credit hour keeps its current value (unlike create,\nwhich fills in the bylaw default)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: MSC-CE
+                    name_en: 'MSc in Computer Engineering'
+                    name_ar: 'ماجستير في هندسة الحاسبات'
+                    degree_level: MSc
+                    prep_required_ch: 6
+                    core_required_ch: 6
+                    elective_required_ch: 9
+                    total_required_ch: 21
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: MSC-CE
+                      name_en:
+                        type: string
+                        example: 'MSc in Computer Engineering'
+                      name_ar:
+                        type: string
+                        example: 'ماجستير في هندسة الحاسبات'
+                      degree_level:
+                        type: string
+                        example: MSc
+                      prep_required_ch:
+                        type: integer
+                        example: 6
+                      core_required_ch:
+                        type: integer
+                        example: 6
+                      elective_required_ch:
+                        type: integer
+                        example: 9
+                      total_required_ch:
+                        type: integer
+                        example: 21
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                department_id:
+                  type: integer
+                  description: 'The owning Department id.'
+                  example: 1
+                code:
+                  type: string
+                  description: 'Unique short code for the Program.'
+                  example: MSC-CE
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'MSc in Computer Engineering'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'ماجستير في هندسة الحاسبات'
+                degree_level:
+                  type: string
+                  description: 'One of MSc, PhD.'
+                  example: MSc
+                prep_required_ch:
+                  type: integer
+                  description: 'Required Preparatory credit hours.'
+                  example: 6
+                core_required_ch:
+                  type: integer
+                  description: 'Required Program Core credit hours.'
+                  example: 6
+                elective_required_ch:
+                  type: integer
+                  description: 'Required Research Elective credit hours.'
+                  example: 9
+              required:
+                - department_id
+                - code
+                - name_en
+                - name_ar
+                - degree_level
+      security: []
+    parameters:
+      -
+        in: path
+        name: program_id
+        description: 'The ID of the program.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/v1/programs/{program_id}/activate':
+    post:
+      summary: 'Activate a Program.'
+      operationId: activateAProgram
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: MSC-CE
+                    name_en: 'MSc in Computer Engineering'
+                    name_ar: 'ماجستير في هندسة الحاسبات'
+                    degree_level: MSc
+                    prep_required_ch: 6
+                    core_required_ch: 6
+                    elective_required_ch: 9
+                    total_required_ch: 21
+                    is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: MSC-CE
+                      name_en:
+                        type: string
+                        example: 'MSc in Computer Engineering'
+                      name_ar:
+                        type: string
+                        example: 'ماجستير في هندسة الحاسبات'
+                      degree_level:
+                        type: string
+                        example: MSc
+                      prep_required_ch:
+                        type: integer
+                        example: 6
+                      core_required_ch:
+                        type: integer
+                        example: 6
+                      elective_required_ch:
+                        type: integer
+                        example: 9
+                      total_required_ch:
+                        type: integer
+                        example: 21
+                      is_active:
+                        type: boolean
+                        example: true
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: program_id
+        description: 'The ID of the program.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/v1/programs/{program_id}/deactivate':
+    post:
+      summary: 'Deactivate a Program.'
+      operationId: deactivateAProgram
+      description: "Deactivating retires a Program without deleting it and with no cascading\neffect — students already enrolled and historical records are unaffected\n(BR-18)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    department_id: 1
+                    code: MSC-CE
+                    name_en: 'MSc in Computer Engineering'
+                    name_ar: 'ماجستير في هندسة الحاسبات'
+                    degree_level: MSc
+                    prep_required_ch: 6
+                    core_required_ch: 6
+                    elective_required_ch: 9
+                    total_required_ch: 21
+                    is_active: false
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      department_id:
+                        type: integer
+                        example: 1
+                      code:
+                        type: string
+                        example: MSC-CE
+                      name_en:
+                        type: string
+                        example: 'MSc in Computer Engineering'
+                      name_ar:
+                        type: string
+                        example: 'ماجستير في هندسة الحاسبات'
+                      degree_level:
+                        type: string
+                        example: MSc
+                      prep_required_ch:
+                        type: integer
+                        example: 6
+                      core_required_ch:
+                        type: integer
+                        example: 6
+                      elective_required_ch:
+                        type: integer
+                        example: 9
+                      total_required_ch:
+                        type: integer
+                        example: 21
+                      is_active:
+                        type: boolean
+                        example: false
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: program_id
+        description: 'The ID of the program.'
         example: 16
         required: true
         schema:

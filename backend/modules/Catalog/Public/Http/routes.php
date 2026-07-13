@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Catalog\Internal\Http\Controllers\DepartmentController;
 use Modules\Catalog\Internal\Http\Controllers\FacultyController;
+use Modules\Catalog\Internal\Http\Controllers\ProgramController;
 
 /*
 | Catalog routes, mounted under /api/v1 by CatalogServiceProvider. Reading
@@ -27,4 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/departments/{department}', [DepartmentController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/departments/{department}/activate', [DepartmentController::class, 'activate'])->middleware('can:catalog.manage');
     Route::post('/departments/{department}/deactivate', [DepartmentController::class, 'deactivate'])->middleware('can:catalog.manage');
+
+    // Programs
+    Route::get('/programs', [ProgramController::class, 'index'])->middleware('can:catalog.view');
+    Route::get('/programs/{program}', [ProgramController::class, 'show'])->middleware('can:catalog.view');
+    Route::post('/programs', [ProgramController::class, 'store'])->middleware('can:catalog.manage');
+    Route::patch('/programs/{program}', [ProgramController::class, 'update'])->middleware('can:catalog.manage');
+    Route::post('/programs/{program}/activate', [ProgramController::class, 'activate'])->middleware('can:catalog.manage');
+    Route::post('/programs/{program}/deactivate', [ProgramController::class, 'deactivate'])->middleware('can:catalog.manage');
 });

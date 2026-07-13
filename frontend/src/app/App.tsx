@@ -6,6 +6,7 @@ import { RequireAuth } from '../features/auth/RequireAuth'
 import { DashboardPage } from '../features/auth/DashboardPage'
 import { FacultiesPage } from '../features/catalog/faculties/FacultiesPage'
 import { DepartmentsPage } from '../features/catalog/departments/DepartmentsPage'
+import { ProgramsPage } from '../features/catalog/programs/ProgramsPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 
@@ -41,6 +42,7 @@ export function App() {
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/catalog/faculties" element={<FacultiesPage />} />
                 <Route path="/catalog/departments" element={<DepartmentsPage />} />
+                <Route path="/catalog/programs" element={<ProgramsPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

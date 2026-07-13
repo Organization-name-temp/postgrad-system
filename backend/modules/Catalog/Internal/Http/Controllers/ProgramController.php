@@ -63,6 +63,8 @@ class ProgramController
     /**
      * Show a Program.
      *
+     * @urlParam program_id integer required The ID of the program. Example: 1
+     *
      * @response 200 {"data": {"id": 1, "department_id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير في هندسة الحاسبات", "degree_level": "MSc", "prep_required_ch": 6, "core_required_ch": 6, "elective_required_ch": 9, "total_required_ch": 21, "is_active": true}}
      */
     public function show(Program $program): ProgramResource
@@ -75,6 +77,8 @@ class ProgramController
      *
      * Any omitted per-Category credit hour keeps its current value (unlike create,
      * which fills in the bylaw default).
+     *
+     * @urlParam program_id integer required The ID of the program. Example: 1
      *
      * @bodyParam department_id integer required The owning Department id. Example: 1
      * @bodyParam code string required Unique short code for the Program. Example: MSC-CE
@@ -99,6 +103,8 @@ class ProgramController
     /**
      * Activate a Program.
      *
+     * @urlParam program_id integer required The ID of the program. Example: 1
+     *
      * @response 200 {"data": {"id": 1, "department_id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير في هندسة الحاسبات", "degree_level": "MSc", "prep_required_ch": 6, "core_required_ch": 6, "elective_required_ch": 9, "total_required_ch": 21, "is_active": true}}
      */
     public function activate(Program $program): ProgramResource
@@ -114,6 +120,8 @@ class ProgramController
      * Deactivating retires a Program without deleting it and with no cascading
      * effect — students already enrolled and historical records are unaffected
      * (BR-18).
+     *
+     * @urlParam program_id integer required The ID of the program. Example: 1
      *
      * @response 200 {"data": {"id": 1, "department_id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير في هندسة الحاسبات", "degree_level": "MSc", "prep_required_ch": 6, "core_required_ch": 6, "elective_required_ch": 9, "total_required_ch": 21, "is_active": false}}
      */

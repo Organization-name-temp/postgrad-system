@@ -51,6 +51,8 @@ class FacultyController
     /**
      * Show a Faculty.
      *
+     * @urlParam faculty_id integer required The ID of the faculty. Example: 1
+     *
      * @response 200 {"data": {"id": 1, "code": "FoE", "name_en": "Faculty of Engineering", "name_ar": "كلية الهندسة", "is_active": true}}
      */
     public function show(Faculty $faculty): FacultyResource
@@ -60,6 +62,8 @@ class FacultyController
 
     /**
      * Update a Faculty.
+     *
+     * @urlParam faculty_id integer required The ID of the faculty. Example: 1
      *
      * @bodyParam code string required Unique short code for the Faculty. Example: FoE
      * @bodyParam name_en string required English name. Example: Faculty of Engineering
@@ -79,6 +83,8 @@ class FacultyController
     /**
      * Activate a Faculty.
      *
+     * @urlParam faculty_id integer required The ID of the faculty. Example: 1
+     *
      * @response 200 {"data": {"id": 1, "code": "FoE", "name_en": "Faculty of Engineering", "name_ar": "كلية الهندسة", "is_active": true}}
      */
     public function activate(Faculty $faculty): FacultyResource
@@ -93,6 +99,8 @@ class FacultyController
      *
      * Deactivating retires a Faculty without deleting it — enrolled students and
      * historical records are unaffected (BR-18).
+     *
+     * @urlParam faculty_id integer required The ID of the faculty. Example: 1
      *
      * @response 200 {"data": {"id": 1, "code": "FoE", "name_en": "Faculty of Engineering", "name_ar": "كلية الهندسة", "is_active": false}}
      */

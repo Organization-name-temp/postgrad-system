@@ -52,6 +52,8 @@ class DepartmentController
     /**
      * Show a Department.
      *
+     * @urlParam department_id integer required The ID of the department. Example: 1
+     *
      * @response 200 {"data": {"id": 1, "faculty_id": 1, "code": "CE", "name_en": "Computer Engineering", "name_ar": "هندسة الحاسبات", "is_active": true}}
      */
     public function show(Department $department): DepartmentResource
@@ -61,6 +63,8 @@ class DepartmentController
 
     /**
      * Update a Department.
+     *
+     * @urlParam department_id integer required The ID of the department. Example: 1
      *
      * @bodyParam faculty_id integer required The owning Faculty id. Example: 1
      * @bodyParam code string required Unique short code for the Department. Example: CE
@@ -81,6 +85,8 @@ class DepartmentController
     /**
      * Activate a Department.
      *
+     * @urlParam department_id integer required The ID of the department. Example: 1
+     *
      * @response 200 {"data": {"id": 1, "faculty_id": 1, "code": "CE", "name_en": "Computer Engineering", "name_ar": "هندسة الحاسبات", "is_active": true}}
      */
     public function activate(Department $department): DepartmentResource
@@ -95,6 +101,8 @@ class DepartmentController
      *
      * Deactivating retires a Department without deleting it — enrolled students and
      * historical records are unaffected (BR-18).
+     *
+     * @urlParam department_id integer required The ID of the department. Example: 1
      *
      * @response 200 {"data": {"id": 1, "faculty_id": 1, "code": "CE", "name_en": "Computer Engineering", "name_ar": "هندسة الحاسبات", "is_active": false}}
      */

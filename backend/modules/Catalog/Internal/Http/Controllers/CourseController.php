@@ -12,6 +12,7 @@ use Modules\Catalog\Internal\Enums\CourseLevel;
 use Modules\Catalog\Internal\Http\Resources\CourseResource;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Support\CreditHours;
+use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
 
 /**
  * @group Catalog
@@ -28,6 +29,8 @@ use Modules\Catalog\Internal\Support\CreditHours;
  */
 class CourseController
 {
+    public function __construct(private readonly CatalogVersionRecorder $versions) {}
+
     /**
      * List Courses.
      *
@@ -62,6 +65,7 @@ class CourseController
         $validated = $this->validated($request);
 
         $course = Course::create($validated);
+        $this->versions->recordCourse($course, 'created');
 
         return (new CourseResource($course))->response()->setStatusCode(201);
     }
@@ -100,6 +104,7 @@ class CourseController
         $validated = $this->validated($request, $course);
 
         $course->update($validated);
+        $this->versions->recordCourse($course, 'updated');
 
         return new CourseResource($course);
     }
@@ -114,6 +119,7 @@ class CourseController
     public function activate(Course $course): CourseResource
     {
         $course->update(['is_active' => true]);
+        $this->versions->recordCourse($course, 'activated');
 
         return new CourseResource($course);
     }
@@ -131,6 +137,7 @@ class CourseController
     public function deactivate(Course $course): CourseResource
     {
         $course->update(['is_active' => false]);
+        $this->versions->recordCourse($course, 'deactivated');
 
         return new CourseResource($course);
     }

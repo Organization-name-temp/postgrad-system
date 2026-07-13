@@ -129,6 +129,7 @@ export const ar = {
       new: 'مقرر جديد',
       edit: 'تعديل المقرر',
       editAction: 'تعديل',
+      editDetails: 'تعديل التفاصيل',
       empty: 'لا توجد مقررات بعد.',
       loading: 'جارٍ تحميل المقررات',
       loadError: 'تعذّر تحميل المقررات.',
@@ -173,6 +174,20 @@ export const ar = {
       add: 'إضافة',
       remove: 'إزالة {{code}}',
       level: 'المستوى {{level}}',
+    },
+    versions: {
+      title: 'سجل الإصدارات',
+      loading: 'جارٍ تحميل سجل الإصدارات',
+      loadError: 'تعذّر تحميل سجل الإصدارات.',
+      empty: 'لا توجد إصدارات بعد.',
+      versionLabel: 'الإصدار {{number}} · {{change}}',
+      changeNotes: {
+        created: 'أُنشئ',
+        updated: 'عُدّل',
+        activated: 'فُعّل',
+        deactivated: 'عُطّل',
+        curriculum_updated: 'تحديث الخطة الدراسية',
+      },
     },
   },
 } as const

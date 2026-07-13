@@ -13,10 +13,14 @@ import {
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
-import { useShowAProgram } from '../../../shared/api/generated/endpoints'
+import {
+  useListAProgramsVersionHistory,
+  useShowAProgram,
+} from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
 import { PERMISSION } from '../../../shared/access/permissions'
 import { CurriculumPanel } from '../curriculum/CurriculumPanel'
+import { VersionHistoryPanel } from '../versions/VersionHistoryPanel'
 import { pickLocaleName } from '../localeName'
 import { ProgramFormDialog } from './ProgramFormDialog'
 
@@ -37,6 +41,10 @@ export function ProgramEditPage() {
 
   const { data, isPending, isError } = useShowAProgram(programId)
   const program = data?.data
+
+  // History is a catalog.view read (story 35), so everyone who can reach the page
+  // can see it — no manage gate.
+  const versions = useListAProgramsVersionHistory(programId)
 
   const [detailsOpen, setDetailsOpen] = useState(false)
 
@@ -87,6 +95,13 @@ export function ProgramEditPage() {
       <Divider sx={{ my: 3 }} />
 
       <CurriculumPanel programId={programId} canManage={canManage} />
+
+      <Divider sx={{ my: 3 }} />
+      <VersionHistoryPanel
+        versions={versions.data?.data ?? []}
+        isPending={versions.isPending}
+        isError={versions.isError}
+      />
 
       <ProgramFormDialog
         open={detailsOpen}

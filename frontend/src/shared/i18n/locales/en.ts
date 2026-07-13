@@ -132,6 +132,7 @@ export const en = {
       new: 'New course',
       edit: 'Edit course',
       editAction: 'Edit',
+      editDetails: 'Edit details',
       empty: 'No courses yet.',
       loading: 'Loading courses',
       loadError: 'Could not load courses.',
@@ -176,6 +177,20 @@ export const en = {
       add: 'Add',
       remove: 'Remove {{code}}',
       level: 'Level {{level}}',
+    },
+    versions: {
+      title: 'Version history',
+      loading: 'Loading version history',
+      loadError: 'Could not load the version history.',
+      empty: 'No versions yet.',
+      versionLabel: 'v{{number}} · {{change}}',
+      changeNotes: {
+        created: 'Created',
+        updated: 'Edited',
+        activated: 'Activated',
+        deactivated: 'Deactivated',
+        curriculum_updated: 'Curriculum updated',
+      },
     },
   },
 } as const

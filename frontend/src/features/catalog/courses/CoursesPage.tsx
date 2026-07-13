@@ -15,7 +15,6 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
 import { useListCourses, useListDepartments } from '../../../shared/api/generated/endpoints'
-import type { ListCourses200DataItem } from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
 import { PERMISSION } from '../../../shared/access/permissions'
 import { pickLocaleName } from '../localeName'
@@ -45,17 +44,9 @@ export function CoursesPage() {
     return department ? pickLocaleName(department, i18n.language, department.code ?? '') : undefined
   }
 
+  // The list creates Courses; editing a Course's attributes and viewing its version
+  // history happen on its own edit page (each row's edit action links there).
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<ListCourses200DataItem | undefined>(undefined)
-
-  const openCreate = () => {
-    setEditing(undefined)
-    setDialogOpen(true)
-  }
-  const openEdit = (course: ListCourses200DataItem) => {
-    setEditing(course)
-    setDialogOpen(true)
-  }
 
   return (
     <>
@@ -67,7 +58,7 @@ export function CoursesPage() {
           {t('courses.title')}
         </Typography>
         {canManage && (
-          <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setDialogOpen(true)}>
             {t('courses.new')}
           </Button>
         )}
@@ -101,7 +92,6 @@ export function CoursesPage() {
                   course={course}
                   departmentName={departmentName(course.department_id)}
                   canManage={canManage}
-                  onEdit={openEdit}
                 />
               ))}
             </TableBody>
@@ -109,7 +99,7 @@ export function CoursesPage() {
         </TableContainer>
       )}
 
-      <CourseFormDialog open={dialogOpen} onClose={() => setDialogOpen(false)} course={editing} />
+      <CourseFormDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </>
   )
 }

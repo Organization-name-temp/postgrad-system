@@ -1586,6 +1586,186 @@ paths:
         required: true
         schema:
           type: integer
+  '/api/v1/programs/{program_id}/versions':
+    get:
+      summary: "List a Program's version history."
+      operationId: listAProgramsVersionHistory
+      description: "Returns every version of the Program, oldest first, each with its snapshot of\nthe full aggregate (fields + Curriculum) at that point."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      version_no: 1
+                      change_note: created
+                      changed_by: 1
+                      changed_at: '2026-07-12T10:00:00+00:00'
+                      snapshot:
+                        code: MSC-CE
+                        curriculum:
+                          -
+                            course_id: 1
+                            course_code: PRE401
+                            category: Preparatory
+                            ordinal: 0
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        version_no: 1
+                        change_note: created
+                        changed_by: 1
+                        changed_at: '2026-07-12T10:00:00+00:00'
+                        snapshot:
+                          code: MSC-CE
+                          curriculum:
+                            - course_id: 1
+                              course_code: PRE401
+                              category: Preparatory
+                              ordinal: 0
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        version_no:
+                          type: integer
+                          example: 1
+                        change_note:
+                          type: string
+                          example: created
+                        changed_by:
+                          type: integer
+                          example: 1
+                        changed_at:
+                          type: string
+                          example: '2026-07-12T10:00:00+00:00'
+                        snapshot:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              example: MSC-CE
+                            curriculum:
+                              type: array
+                              example:
+                                - course_id: 1
+                                  course_code: PRE401
+                                  category: Preparatory
+                                  ordinal: 0
+                              items:
+                                type: object
+                                properties:
+                                  course_id:
+                                    type: integer
+                                    example: 1
+                                  course_code:
+                                    type: string
+                                    example: PRE401
+                                  category:
+                                    type: string
+                                    example: Preparatory
+                                  ordinal:
+                                    type: integer
+                                    example: 0
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: program_id
+        description: 'The ID of the program.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/courses/{course_id}/versions':
+    get:
+      summary: "List a Course's version history."
+      operationId: listACoursesVersionHistory
+      description: "Returns every version of the Course, oldest first, each with its snapshot of\nthe Course's fields at that point."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      version_no: 1
+                      change_note: created
+                      changed_by: 1
+                      changed_at: '2026-07-12T10:00:00+00:00'
+                      snapshot:
+                        code: DEP501
+                        total_ch: 3
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        version_no: 1
+                        change_note: created
+                        changed_by: 1
+                        changed_at: '2026-07-12T10:00:00+00:00'
+                        snapshot:
+                          code: DEP501
+                          total_ch: 3
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        version_no:
+                          type: integer
+                          example: 1
+                        change_note:
+                          type: string
+                          example: created
+                        changed_by:
+                          type: integer
+                          example: 1
+                        changed_at:
+                          type: string
+                          example: '2026-07-12T10:00:00+00:00'
+                        snapshot:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              example: DEP501
+                            total_ch:
+                              type: integer
+                              example: 3
+      tags:
+        - Catalog
+      security: []
+    parameters:
+      -
+        in: path
+        name: course_id
+        description: 'The ID of the course.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/courses:
     get:
       summary: 'List Courses.'

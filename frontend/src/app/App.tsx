@@ -9,6 +9,7 @@ import { DepartmentsPage } from '../features/catalog/departments/DepartmentsPage
 import { ProgramsPage } from '../features/catalog/programs/ProgramsPage'
 import { ProgramEditPage } from '../features/catalog/programs/ProgramEditPage'
 import { CoursesPage } from '../features/catalog/courses/CoursesPage'
+import { CourseEditPage } from '../features/catalog/courses/CourseEditPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 
@@ -47,6 +48,7 @@ export function App() {
                 <Route path="/catalog/programs" element={<ProgramsPage />} />
                 <Route path="/catalog/programs/:programId" element={<ProgramEditPage />} />
                 <Route path="/catalog/courses" element={<CoursesPage />} />
+                <Route path="/catalog/courses/:courseId" element={<CourseEditPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

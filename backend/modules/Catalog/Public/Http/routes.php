@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Catalog\Internal\Http\Controllers\CatalogVersionController;
 use Modules\Catalog\Internal\Http\Controllers\CourseController;
 use Modules\Catalog\Internal\Http\Controllers\CurriculumController;
 use Modules\Catalog\Internal\Http\Controllers\DepartmentController;
@@ -43,6 +44,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/programs/{program}/curriculum', [CurriculumController::class, 'index'])->middleware('can:catalog.view');
     Route::post('/programs/{program}/curriculum', [CurriculumController::class, 'store'])->middleware('can:catalog.manage');
     Route::delete('/programs/{program}/curriculum/{curriculum_entry}', [CurriculumController::class, 'destroy'])->middleware('can:catalog.manage');
+
+    // Version history (read-only; appended on every Program/Course mutation — ADR-0011).
+    // A read like any other catalog read → catalog.view (spec §API "all reads require
+    // catalog.view" + user story 35 "everyone with catalog.view … [reads] history views").
+    Route::get('/programs/{program}/versions', [CatalogVersionController::class, 'forProgram'])->middleware('can:catalog.view');
+    Route::get('/courses/{course}/versions', [CatalogVersionController::class, 'forCourse'])->middleware('can:catalog.view');
 
     // Courses
     Route::get('/courses', [CourseController::class, 'index'])->middleware('can:catalog.view');

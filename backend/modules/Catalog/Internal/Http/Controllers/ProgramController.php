@@ -10,6 +10,7 @@ use Modules\Catalog\Internal\Enums\CourseCategory;
 use Modules\Catalog\Internal\Enums\DegreeLevel;
 use Modules\Catalog\Internal\Http\Resources\ProgramResource;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
 
 /**
  * @group Catalog
@@ -23,6 +24,8 @@ use Modules\Catalog\Internal\Models\Program;
  */
 class ProgramController
 {
+    public function __construct(private readonly CatalogVersionRecorder $versions) {}
+
     /**
      * List Programs.
      *
@@ -56,6 +59,7 @@ class ProgramController
         $validated = array_merge($this->defaultCreditHours(), $request->validate($this->rules()));
 
         $program = Program::create($validated);
+        $this->versions->recordProgram($program, 'created');
 
         return (new ProgramResource($program))->response()->setStatusCode(201);
     }
@@ -96,6 +100,7 @@ class ProgramController
         $validated = $request->validate($this->rules($program));
 
         $program->update($validated);
+        $this->versions->recordProgram($program, 'updated');
 
         return new ProgramResource($program);
     }
@@ -110,6 +115,7 @@ class ProgramController
     public function activate(Program $program): ProgramResource
     {
         $program->update(['is_active' => true]);
+        $this->versions->recordProgram($program, 'activated');
 
         return new ProgramResource($program);
     }
@@ -128,6 +134,7 @@ class ProgramController
     public function deactivate(Program $program): ProgramResource
     {
         $program->update(['is_active' => false]);
+        $this->versions->recordProgram($program, 'deactivated');
 
         return new ProgramResource($program);
     }

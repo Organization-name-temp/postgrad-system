@@ -18,6 +18,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   getListAProgramsCurriculumQueryKey,
+  getListAProgramsVersionHistoryQueryKey,
   useAddACourseToAProgramsCurriculum,
   useListAProgramsCurriculum,
   useListCourses,
@@ -58,8 +59,14 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
   const remove = useRemoveACurriculumEntryFromAProgram()
   const busy = add.isPending || remove.isPending
 
-  const refetch = () =>
+  const refetch = () => {
     void queryClient.invalidateQueries({ queryKey: getListAProgramsCurriculumQueryKey(programId) })
+    // A curriculum edit is a versioned Program change (ADR-0011) — refresh the
+    // version-history panel on the same page too.
+    void queryClient.invalidateQueries({
+      queryKey: getListAProgramsVersionHistoryQueryKey(programId),
+    })
+  }
 
   const addCourse = (courseId: number, category: CourseCategory) =>
     add.mutate({ programId, data: { course_id: courseId, category } }, { onSuccess: refetch })

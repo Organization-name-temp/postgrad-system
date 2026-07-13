@@ -11,6 +11,7 @@ use Modules\Catalog\Internal\Enums\CourseCategory;
 use Modules\Catalog\Internal\Http\Resources\CurriculumEntryResource;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
 
 /**
  * @group Catalog
@@ -23,6 +24,8 @@ use Modules\Catalog\Internal\Models\Program;
  */
 class CurriculumController
 {
+    public function __construct(private readonly CatalogVersionRecorder $versions) {}
+
     /**
      * List a Program's Curriculum.
      *
@@ -90,6 +93,9 @@ class CurriculumController
             'ordinal' => $maxOrdinal === null ? 0 : $maxOrdinal + 1,
         ]);
 
+        // Editing a Program's Curriculum is a versioned Program change (ADR-0011).
+        $this->versions->recordProgram($program, 'curriculum_updated');
+
         return (new CurriculumEntryResource($entry->load('course')))->response()->setStatusCode(201);
     }
 
@@ -112,6 +118,10 @@ class CurriculumController
         abort_unless($curriculumEntry->program_id === $program->getKey(), 404);
 
         $curriculumEntry->delete();
+
+        // Removing an entry changes the Program's Curriculum — record a version
+        // whose snapshot reflects the now-smaller Curriculum (ADR-0011).
+        $this->versions->recordProgram($program, 'curriculum_updated');
 
         return response()->noContent();
     }

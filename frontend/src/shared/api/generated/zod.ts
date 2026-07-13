@@ -496,6 +496,59 @@ export const RemoveACurriculumEntryFromAProgramResponse = zod.looseObject({
 
 
 /**
+ * Returns every version of the Program, oldest first, each with its snapshot of
+ * the full aggregate (fields + Curriculum) at that point.
+ * @summary List a Program's version history.
+ */
+export const ListAProgramsVersionHistoryParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.')
+})
+
+export const ListAProgramsVersionHistoryResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "version_no": zod.number().optional(),
+  "change_note": zod.string().optional(),
+  "changed_by": zod.number().optional(),
+  "changed_at": zod.string().optional(),
+  "snapshot": zod.object({
+  "code": zod.string().optional(),
+  "curriculum": zod.array(zod.object({
+  "course_id": zod.number().optional(),
+  "course_code": zod.string().optional(),
+  "category": zod.string().optional(),
+  "ordinal": zod.number().optional()
+})).optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Returns every version of the Course, oldest first, each with its snapshot of
+ * the Course's fields at that point.
+ * @summary List a Course's version history.
+ */
+export const ListACoursesVersionHistoryParams = zod.object({
+  "course_id": zod.number().describe('The ID of the course.')
+})
+
+export const ListACoursesVersionHistoryResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "version_no": zod.number().optional(),
+  "change_note": zod.string().optional(),
+  "changed_by": zod.number().optional(),
+  "changed_at": zod.string().optional(),
+  "snapshot": zod.object({
+  "code": zod.string().optional(),
+  "total_ch": zod.number().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
  * @summary List Courses.
  */
 export const ListCoursesResponse = zod.object({

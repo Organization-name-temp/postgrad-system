@@ -2,6 +2,7 @@ import { IconButton, Stack, TableCell, TableRow, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import ToggleOnIcon from '@mui/icons-material/ToggleOn'
 import ToggleOffIcon from '@mui/icons-material/ToggleOff'
+import { Link as RouterLink } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
@@ -22,17 +23,16 @@ interface CourseRowProps {
    */
   departmentName?: string
   canManage: boolean
-  onEdit: (course: ListCourses200DataItem) => void
 }
 
 /**
  * One Course row: code, locale-picked name, owning Department (or "university-wide"
  * when it has none), level, the Lecture/Tutorial/Lab · Total credit-hour split, and
- * an active/inactive StatusChip. Managers additionally get edit +
- * activate/deactivate actions (deactivate is the only "delete" — never
- * hard-deleted, BR-18 / FR-PCM-003.3).
+ * an active/inactive StatusChip. The edit action opens the Course edit page (where
+ * attributes and version history live); managers also get activate/deactivate
+ * (deactivate is the only "delete" — never hard-deleted, BR-18 / FR-PCM-003.3).
  */
-export function CourseRow({ course, departmentName, canManage, onEdit }: CourseRowProps) {
+export function CourseRow({ course, departmentName, canManage }: CourseRowProps) {
   const { t, i18n } = useTranslation('catalog')
   const queryClient = useQueryClient()
   const activate = useActivateACourse()
@@ -84,7 +84,8 @@ export function CourseRow({ course, departmentName, canManage, onEdit }: CourseR
             <Tooltip title={t('courses.editAction')}>
               <IconButton
                 size="small"
-                onClick={() => onEdit(course)}
+                component={RouterLink}
+                to={`/catalog/courses/${course.id}`}
                 aria-label={t('courses.editAction')}
               >
                 <EditIcon fontSize="small" />

@@ -457,6 +457,49 @@ export type AddACourseToAProgramsCurriculum422 = {
 
 export type RemoveACurriculumEntryFromAProgram204 = { [key: string]: unknown };
 
+export type ListAProgramsVersionHistory200DataItemSnapshotCurriculumItem = {
+  course_id?: number;
+  course_code?: string;
+  category?: string;
+  ordinal?: number;
+};
+
+export type ListAProgramsVersionHistory200DataItemSnapshot = {
+  code?: string;
+  curriculum?: ListAProgramsVersionHistory200DataItemSnapshotCurriculumItem[];
+};
+
+export type ListAProgramsVersionHistory200DataItem = {
+  id?: number;
+  version_no?: number;
+  change_note?: string;
+  changed_by?: number;
+  changed_at?: string;
+  snapshot?: ListAProgramsVersionHistory200DataItemSnapshot;
+};
+
+export type ListAProgramsVersionHistory200 = {
+  data?: ListAProgramsVersionHistory200DataItem[];
+};
+
+export type ListACoursesVersionHistory200DataItemSnapshot = {
+  code?: string;
+  total_ch?: number;
+};
+
+export type ListACoursesVersionHistory200DataItem = {
+  id?: number;
+  version_no?: number;
+  change_note?: string;
+  changed_by?: number;
+  changed_at?: string;
+  snapshot?: ListACoursesVersionHistory200DataItemSnapshot;
+};
+
+export type ListACoursesVersionHistory200 = {
+  data?: ListACoursesVersionHistory200DataItem[];
+};
+
 export type ListCourses200DataItem = {
   id?: number;
   department_id?: number;
@@ -2313,6 +2356,196 @@ export const useRemoveACurriculumEntryFromAProgram = <TError = unknown,
       > => {
       return useMutation(getRemoveACurriculumEntryFromAProgramMutationOptions(options), queryClient);
     }
+
+/**
+ * Returns every version of the Program, oldest first, each with its snapshot of
+ * the full aggregate (fields + Curriculum) at that point.
+ * @summary List a Program's version history.
+ */
+export const listAProgramsVersionHistory = (
+    programId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAProgramsVersionHistory200>(
+      {url: `/api/v1/programs/${programId}/versions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAProgramsVersionHistoryQueryKey = (programId: number,) => {
+    return [
+    `/api/v1/programs/${programId}/versions`
+    ] as const;
+    }
+
+
+export const getListAProgramsVersionHistoryQueryOptions = <TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAProgramsVersionHistoryQueryKey(programId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAProgramsVersionHistory>>> = ({ signal }) => listAProgramsVersionHistory(programId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: programId !== null && programId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAProgramsVersionHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof listAProgramsVersionHistory>>>
+export type ListAProgramsVersionHistoryQueryError = unknown
+
+
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listAProgramsVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Program's version history.
+ */
+
+export function useListAProgramsVersionHistory<TData = Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError = unknown>(
+ programId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAProgramsVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAProgramsVersionHistoryQueryOptions(programId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Returns every version of the Course, oldest first, each with its snapshot of
+ * the Course's fields at that point.
+ * @summary List a Course's version history.
+ */
+export const listACoursesVersionHistory = (
+    courseId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListACoursesVersionHistory200>(
+      {url: `/api/v1/courses/${courseId}/versions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListACoursesVersionHistoryQueryKey = (courseId: number,) => {
+    return [
+    `/api/v1/courses/${courseId}/versions`
+    ] as const;
+    }
+
+
+export const getListACoursesVersionHistoryQueryOptions = <TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListACoursesVersionHistoryQueryKey(courseId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listACoursesVersionHistory>>> = ({ signal }) => listACoursesVersionHistory(courseId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: courseId !== null && courseId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListACoursesVersionHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof listACoursesVersionHistory>>>
+export type ListACoursesVersionHistoryQueryError = unknown
+
+
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>,
+          TError,
+          Awaited<ReturnType<typeof listACoursesVersionHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Course's version history.
+ */
+
+export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError = unknown>(
+ courseId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listACoursesVersionHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListACoursesVersionHistoryQueryOptions(courseId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * @summary List Courses.

@@ -14,7 +14,9 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
+  getListACoursesVersionHistoryQueryKey,
   getListCoursesQueryKey,
+  getShowACourseQueryKey,
   useCreateACourse,
   useListDepartments,
   useUpdateACourse,
@@ -88,6 +90,15 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
 
   const onSaved = () => {
     void queryClient.invalidateQueries({ queryKey: getListCoursesQueryKey() })
+    // Also refresh the single-Course view and its version history (the edit page
+    // reads both) after an edit, so the change and the new version show without a
+    // reload.
+    if (isEdit && course?.id !== undefined) {
+      void queryClient.invalidateQueries({ queryKey: getShowACourseQueryKey(course.id) })
+      void queryClient.invalidateQueries({
+        queryKey: getListACoursesVersionHistoryQueryKey(course.id),
+      })
+    }
     onClose()
   }
 

@@ -45,10 +45,6 @@ export const ar = {
       roles: 'الأدوار',
       permissions: 'الصلاحيات',
     },
-    catalog: {
-      title: 'إدارة المقررات',
-      error: 'تعذّر تحميل المورد المحمي.',
-    },
   },
   catalog: {
     status: { active: 'مُفعَّلة', inactive: 'مُعطَّلة' },

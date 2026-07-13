@@ -46,10 +46,6 @@ export const en = {
       roles: 'Roles',
       permissions: 'Permissions',
     },
-    catalog: {
-      title: 'Catalog management',
-      error: 'Could not load the gated resource.',
-    },
   },
   catalog: {
     status: { active: 'Active', inactive: 'Inactive' },

@@ -2,10 +2,16 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Modules\Catalog\Internal\Models\Course;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 
 uses(RefreshDatabase::class);
+
+// The RBAC gate is exercised end-to-end against a real permission-gated endpoint —
+// activating a Course, which requires catalog.manage. (Phase 0 used a throwaway
+// /demo/catalog-management endpoint for this; Phase 1's real Catalog module
+// superseded it, so the proof now rides a real consumer.)
 
 it('exposes the effective permissions for the signed-in user from /me', function () {
     $user = User::factory()->create();
@@ -22,28 +28,29 @@ it('exposes the effective permissions for the signed-in user from /me', function
         ->not->toContain('application.submit'); // R06 does not
 });
 
-it('returns 200 from the gated endpoint for a role that holds the permission', function () {
+it('returns 200 from a gated endpoint for a role that holds the permission', function () {
+    $course = Course::factory()->create();
     $user = User::factory()->create();
     $user->assignRole(Role::DepartmentHead); // holds catalog.manage
     Sanctum::actingAs($user);
 
-    $this->getJson('/api/v1/demo/catalog-management')
-        ->assertOk()
-        ->assertJsonPath('data.message', 'You can manage programs and courses.');
+    $this->postJson("/api/v1/courses/{$course->id}/activate")->assertOk();
 });
 
-it('returns 403 from the gated endpoint for a role that lacks the permission', function () {
+it('returns 403 from a gated endpoint for a role that lacks the permission', function () {
+    $course = Course::factory()->create();
     $user = User::factory()->create();
-    $user->assignRole(Role::Applicant); // does not hold catalog.manage
+    $user->assignRole(Role::Applicant); // holds catalog.view, not catalog.manage
     Sanctum::actingAs($user);
 
-    $this->getJson('/api/v1/demo/catalog-management')->assertForbidden();
+    $this->postJson("/api/v1/courses/{$course->id}/activate")->assertForbidden();
 });
 
 it('lets an administrator through the gate via the blanket permission', function () {
+    $course = Course::factory()->create();
     $user = User::factory()->create();
     $user->assignRole(Role::SystemAdmin); // R09 holds every permission
     Sanctum::actingAs($user);
 
-    $this->getJson('/api/v1/demo/catalog-management')->assertOk();
+    $this->postJson("/api/v1/courses/{$course->id}/activate")->assertOk();
 });

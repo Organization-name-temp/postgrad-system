@@ -858,17 +858,3 @@ export const UpdateCurrentUserResponse = zod.object({
   "permissions": zod.array(zod.string()).optional()
 }).optional()
 })
-
-
-/**
- * A permission-gated sample endpoint (the Phase 0 RBAC tracer): reachable
- * only by users whose effective permissions include `catalog.manage`
- * (R06/R07 and admins). It proves API-side enforcement; later phases replace
- * it with the real Catalog module.
- * @summary Catalog management demo.
- */
-export const CatalogManagementDemoResponse = zod.object({
-  "data": zod.object({
-  "message": zod.string().optional()
-}).optional()
-})

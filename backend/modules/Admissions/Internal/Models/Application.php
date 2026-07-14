@@ -6,6 +6,7 @@ use Database\Factories\ApplicationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Enums\EnglishTest;
@@ -142,6 +143,12 @@ class Application extends Model
         return $this->belongsTo(AdmissionCycle::class);
     }
 
+    /** @return HasMany<ApplicationDocument, $this> */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ApplicationDocument::class);
+    }
+
     /**
      * Whether the applicant may still edit the snapshot. Editing is open while the
      * Application has not yet left the applicant's hands — Draft here in ticket 04,
@@ -151,6 +158,22 @@ class Application extends Model
     public function isApplicantEditable(): bool
     {
         return $this->status === ApplicationStatus::Draft;
+    }
+
+    /**
+     * Whether the applicant may still add or remove documents (ticket 05). Documents
+     * stay editable a little longer than the Step-1 snapshot: through submission and
+     * email verification, and again whenever the application is returned for revision
+     * — but they lock the moment it enters review (UnderSAReview onward).
+     */
+    public function areDocumentsEditable(): bool
+    {
+        return in_array($this->status, [
+            ApplicationStatus::Draft,
+            ApplicationStatus::Submitted,
+            ApplicationStatus::EmailVerified,
+            ApplicationStatus::ReturnedForRevision,
+        ], true);
     }
 
     /**

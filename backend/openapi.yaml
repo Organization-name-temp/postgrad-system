@@ -281,6 +281,15 @@ paths:
                     english_score: '7.50'
                     native_arabic_speaker: true
                     submitted_at: '2026-07-14T10:00:00+00:00'
+                    documents:
+                      -
+                        id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                        document_type: graduation_certificate
+                        original_filename: certificate.pdf
+                        mime: application/pdf
+                        size_bytes: 24576
+                        uploaded_at: '2026-07-14T10:00:00+00:00'
+                        download_url: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
                 properties:
                   data:
                     type: object
@@ -366,6 +375,40 @@ paths:
                       submitted_at:
                         type: string
                         example: '2026-07-14T10:00:00+00:00'
+                      documents:
+                        type: array
+                        example:
+                          - id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                            document_type: graduation_certificate
+                            original_filename: certificate.pdf
+                            mime: application/pdf
+                            size_bytes: 24576
+                            uploaded_at: '2026-07-14T10:00:00+00:00'
+                            download_url: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                            document_type:
+                              type: string
+                              example: graduation_certificate
+                            original_filename:
+                              type: string
+                              example: certificate.pdf
+                            mime:
+                              type: string
+                              example: application/pdf
+                            size_bytes:
+                              type: integer
+                              example: 24576
+                            uploaded_at:
+                              type: string
+                              example: '2026-07-14T10:00:00+00:00'
+                            download_url:
+                              type: string
+                              example: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
         401:
           description: ''
           content:
@@ -864,6 +907,215 @@ paths:
       tags:
         - Admissions
       security: []
+  /api/v1/application/documents:
+    post:
+      summary: 'Upload a document.'
+      operationId: uploadADocument
+      description: "Validates the file against the chosen {@see DocumentType}'s rules — allowed\nformats, size ceiling, and how many of that type the application may hold —\nstores it on the private disk under a fresh ULID, and returns the created\ndocument. A bad type, wrong format, oversize file, or one copy too many is a\n422; uploading once the application has left the applicant's hands is a 409."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                    document_type: graduation_certificate
+                    original_filename: certificate.pdf
+                    mime: application/pdf
+                    size_bytes: 24576
+                    uploaded_at: '2026-07-14T10:00:00+00:00'
+                    download_url: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                      document_type:
+                        type: string
+                        example: graduation_certificate
+                      original_filename:
+                        type: string
+                        example: certificate.pdf
+                      mime:
+                        type: string
+                        example: application/pdf
+                      size_bytes:
+                        type: integer
+                        example: 24576
+                      uploaded_at:
+                        type: string
+                        example: '2026-07-14T10:00:00+00:00'
+                      download_url:
+                        type: string
+                        example: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
+        409:
+          description: 'documents locked'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Documents can no longer be changed for this application.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Documents can no longer be changed for this application.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'over the cap'
+                    type: object
+                    example:
+                      message: 'You can upload at most 1 document of this type.'
+                      errors:
+                        document_type:
+                          - 'You can upload at most 1 document of this type.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'You can upload at most 1 document of this type.'
+                      errors:
+                        type: object
+                        properties:
+                          document_type:
+                            type: array
+                            example:
+                              - 'You can upload at most 1 document of this type.'
+                            items:
+                              type: string
+                  -
+                    description: 'bad file'
+                    type: object
+                    example:
+                      message: 'The file must be a file of type: application/pdf, image/jpeg, image/png.'
+                      errors:
+                        file:
+                          - 'The file must be a file of type: application/pdf, image/jpeg, image/png.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'The file must be a file of type: application/pdf, image/jpeg, image/png.'
+                      errors:
+                        type: object
+                        properties:
+                          file:
+                            type: array
+                            example:
+                              - 'The file must be a file of type: application/pdf, image/jpeg, image/png.'
+                            items:
+                              type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                document_type:
+                  type: string
+                  description: 'The kind of document. One of graduation_certificate, transcript, national_id, photo, english_certificate, msc_thesis, cv, recommendation_letter, additional_certificate.'
+                  example: graduation_certificate
+                file:
+                  type: string
+                  format: binary
+                  description: "The file to upload (PDF or image, within the type's size limit)."
+              required:
+                - document_type
+                - file
+      security: []
+  '/api/v1/application/documents/{document_ulid}':
+    delete:
+      summary: 'Remove a document.'
+      operationId: removeADocument
+      description: "Deletes the file (bytes and metadata) from the signed-in applicant's own\napplication, freeing its slot so a replacement can be uploaded. Allowed only\nwhile the application is still applicant-editable; a document that is not the\ncurrent applicant's is a 404, and a locked application is a 409."
+      parameters: []
+      responses:
+        204:
+          description: removed
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ''
+        404:
+          description: 'not the applicant’s document'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Not found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Not found.'
+        409:
+          description: 'documents locked'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Documents can no longer be changed for this application.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Documents can no longer be changed for this application.'
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: document_ulid
+        description: 'The ULID of the document to remove.'
+        example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+        required: true
+        schema:
+          type: string
+  '/api/v1/documents/{document_ulid}':
+    get:
+      summary: 'Stream a document.'
+      operationId: streamADocument
+      description: "Serves the stored file inline to the owning applicant or to a reviewer holding\n`application.screen`; anyone else is refused with a 403. The ULID in the path\nis the only handle — the storage path and row id are never exposed."
+      parameters: []
+      responses:
+        403:
+          description: 'not owner or reviewer'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: document_ulid
+        description: 'The ULID of the document to stream.'
+        example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+        required: true
+        schema:
+          type: string
   /api/v1/admission-cycles:
     get:
       summary: 'List Admission Cycles.'

@@ -104,7 +104,16 @@ export const MyApplicationResponse = zod.object({
   "english_test": zod.string().optional(),
   "english_score": zod.string().optional(),
   "native_arabic_speaker": zod.boolean().optional(),
-  "submitted_at": zod.string().optional()
+  "submitted_at": zod.string().optional(),
+  "documents": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "document_type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "mime": zod.string().optional(),
+  "size_bytes": zod.number().optional(),
+  "uploaded_at": zod.string().optional(),
+  "download_url": zod.string().optional()
+})).optional()
 }).optional()
 })
 
@@ -222,6 +231,59 @@ export const ResendTheVerificationLinkResponse = zod.object({
 }).optional(),
   "verification_url": zod.string().optional()
 })
+
+
+/**
+ * Validates the file against the chosen {@see DocumentType}'s rules — allowed
+ * formats, size ceiling, and how many of that type the application may hold —
+ * stores it on the private disk under a fresh ULID, and returns the created
+ * document. A bad type, wrong format, oversize file, or one copy too many is a
+ * 422; uploading once the application has left the applicant's hands is a 409.
+ * @summary Upload a document.
+ */
+export const UploadADocumentBody = zod.object({
+  "document_type": zod.string().describe('The kind of document. One of graduation_certificate, transcript, national_id, photo, english_certificate, msc_thesis, cv, recommendation_letter, additional_certificate.'),
+  "file": zod.instanceof(File)
+})
+
+export const UploadADocumentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.string().optional(),
+  "document_type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "mime": zod.string().optional(),
+  "size_bytes": zod.number().optional(),
+  "uploaded_at": zod.string().optional(),
+  "download_url": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Deletes the file (bytes and metadata) from the signed-in applicant's own
+ * application, freeing its slot so a replacement can be uploaded. Allowed only
+ * while the application is still applicant-editable; a document that is not the
+ * current applicant's is a 404, and a locked application is a 409.
+ * @summary Remove a document.
+ */
+export const RemoveADocumentParams = zod.object({
+  "document_ulid": zod.string().describe('The ULID of the document to remove.')
+})
+
+export const RemoveADocumentResponse = zod.string()
+
+
+/**
+ * Serves the stored file inline to the owning applicant or to a reviewer holding
+ * `application.screen`; anyone else is refused with a 403. The ULID in the path
+ * is the only handle — the storage path and row id are never exposed.
+ * @summary Stream a document.
+ */
+export const StreamADocumentParams = zod.object({
+  "document_ulid": zod.string().describe('The ULID of the document to stream.')
+})
+
+export const StreamADocumentResponse = zod.void()
 
 
 /**

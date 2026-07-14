@@ -89,6 +89,16 @@ export type VerifyEmailsignedLink403 = {
   message?: string;
 };
 
+export type MyApplication200DataDocumentsItem = {
+  id?: string;
+  document_type?: string;
+  original_filename?: string;
+  mime?: string;
+  size_bytes?: number;
+  uploaded_at?: string;
+  download_url?: string;
+};
+
 export type MyApplication200Data = {
   id?: number;
   status?: string;
@@ -117,6 +127,7 @@ export type MyApplication200Data = {
   english_score?: string;
   native_arabic_speaker?: boolean;
   submitted_at?: string;
+  documents?: MyApplication200DataDocumentsItem[];
 };
 
 export type MyApplication200 = {
@@ -302,6 +313,55 @@ export type ResendTheVerificationLink409 = {
 };
 
 export type ResendTheVerificationLink429 = {
+  message?: string;
+};
+
+export type UploadADocumentBody = {
+  /** The kind of document. One of graduation_certificate, transcript, national_id, photo, english_certificate, msc_thesis, cv, recommendation_letter, additional_certificate. */
+  document_type: string;
+  /** The file to upload (PDF or image, within the type's size limit). */
+  file: Blob;
+};
+
+export type UploadADocument201Data = {
+  id?: string;
+  document_type?: string;
+  original_filename?: string;
+  mime?: string;
+  size_bytes?: number;
+  uploaded_at?: string;
+  download_url?: string;
+};
+
+export type UploadADocument201 = {
+  data?: UploadADocument201Data;
+};
+
+export type UploadADocument409 = {
+  message?: string;
+};
+
+export type UploadADocument422 = {
+  message?: string;
+  errors?: {
+  document_type?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  file?: string[];
+};
+};
+
+export type RemoveADocument404 = {
+  message?: string;
+};
+
+export type RemoveADocument409 = {
+  message?: string;
+};
+
+export type StreamADocument403 = {
   message?: string;
 };
 
@@ -1870,6 +1930,242 @@ export const useResendTheVerificationLink = <TError = ResendTheVerificationLink4
       > => {
       return useMutation(getResendTheVerificationLinkMutationOptions(options), queryClient);
     }
+
+/**
+ * Validates the file against the chosen {@see DocumentType}'s rules — allowed
+ * formats, size ceiling, and how many of that type the application may hold —
+ * stores it on the private disk under a fresh ULID, and returns the created
+ * document. A bad type, wrong format, oversize file, or one copy too many is a
+ * 422; uploading once the application has left the applicant's hands is a 409.
+ * @summary Upload a document.
+ */
+export const uploadADocument = (
+    uploadADocumentBody: UploadADocumentBody,
+ signal?: AbortSignal
+) => {
+
+      const formData = new FormData();
+formData.append(`document_type`, uploadADocumentBody.document_type);
+formData.append(`file`, uploadADocumentBody.file);
+
+      return customInstance<UploadADocument201>(
+      {url: `/api/v1/application/documents`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
+    },
+      );
+    }
+
+
+
+
+export const getUploadADocumentMutationOptions = <TError = UploadADocument409 | UploadADocument422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadADocument>>, TError,{data: UploadADocumentBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof uploadADocument>>, TError,{data: UploadADocumentBody}, TContext> => {
+
+const mutationKey = ['uploadADocument'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadADocument>>, {data: UploadADocumentBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  uploadADocument(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadADocumentMutationResult = NonNullable<Awaited<ReturnType<typeof uploadADocument>>>
+    export type UploadADocumentMutationBody = UploadADocumentBody
+    export type UploadADocumentMutationError = UploadADocument409 | UploadADocument422
+
+    /**
+ * @summary Upload a document.
+ */
+export const useUploadADocument = <TError = UploadADocument409 | UploadADocument422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadADocument>>, TError,{data: UploadADocumentBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadADocument>>,
+        TError,
+        {data: UploadADocumentBody},
+        TContext
+      > => {
+      return useMutation(getUploadADocumentMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deletes the file (bytes and metadata) from the signed-in applicant's own
+ * application, freeing its slot so a replacement can be uploaded. Allowed only
+ * while the application is still applicant-editable; a document that is not the
+ * current applicant's is a 404, and a locked application is a 409.
+ * @summary Remove a document.
+ */
+export const removeADocument = (
+    documentUlid: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<string>(
+      {url: `/api/v1/application/documents/${documentUlid}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getRemoveADocumentMutationOptions = <TError = RemoveADocument404 | RemoveADocument409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeADocument>>, TError,{documentUlid: string}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof removeADocument>>, TError,{documentUlid: string}, TContext> => {
+
+const mutationKey = ['removeADocument'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeADocument>>, {documentUlid: string}> = (props) => {
+          const {documentUlid} = props ?? {};
+
+          return  removeADocument(documentUlid,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveADocumentMutationResult = NonNullable<Awaited<ReturnType<typeof removeADocument>>>
+
+    export type RemoveADocumentMutationError = RemoveADocument404 | RemoveADocument409
+
+    /**
+ * @summary Remove a document.
+ */
+export const useRemoveADocument = <TError = RemoveADocument404 | RemoveADocument409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeADocument>>, TError,{documentUlid: string}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeADocument>>,
+        TError,
+        {documentUlid: string},
+        TContext
+      > => {
+      return useMutation(getRemoveADocumentMutationOptions(options), queryClient);
+    }
+
+/**
+ * Serves the stored file inline to the owning applicant or to a reviewer holding
+ * `application.screen`; anyone else is refused with a 403. The ULID in the path
+ * is the only handle — the storage path and row id are never exposed.
+ * @summary Stream a document.
+ */
+export const streamADocument = (
+    documentUlid: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<unknown>(
+      {url: `/api/v1/documents/${documentUlid}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getStreamADocumentQueryKey = (documentUlid: string,) => {
+    return [
+    `/api/v1/documents/${documentUlid}`
+    ] as const;
+    }
+
+
+export const getStreamADocumentQueryOptions = <TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStreamADocumentQueryKey(documentUlid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof streamADocument>>> = ({ signal }) => streamADocument(documentUlid, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: documentUlid !== null && documentUlid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StreamADocumentQueryResult = NonNullable<Awaited<ReturnType<typeof streamADocument>>>
+export type StreamADocumentQueryError = StreamADocument403
+
+
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof streamADocument>>,
+          TError,
+          Awaited<ReturnType<typeof streamADocument>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof streamADocument>>,
+          TError,
+          Awaited<ReturnType<typeof streamADocument>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Stream a document.
+ */
+
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStreamADocumentQueryOptions(documentUlid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Newest intake first. Requires calendar.manage — this is the management

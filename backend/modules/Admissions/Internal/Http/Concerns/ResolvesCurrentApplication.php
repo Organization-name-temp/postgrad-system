@@ -17,6 +17,7 @@ trait ResolvesCurrentApplication
     protected function currentApplication(Request $request): Application
     {
         return Application::query()
+            ->with('documents')
             ->where('user_id', $request->user()?->getAuthIdentifier())
             ->latest('id')
             ->firstOrFail();

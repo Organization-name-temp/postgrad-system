@@ -10,8 +10,8 @@ use Modules\Admissions\Internal\Models\Application;
  * An Application in the { data: ... } envelope. Carries the Application's identity
  * (id/status/cycle) plus the Step-1 personal-info snapshot filled so far — nulls
  * where the applicant has not yet provided a field — so the SPA can render and
- * resume the wizard. Program selection, documents, and the status timeline are
- * added to this resource by the tickets that introduce them.
+ * resume the wizard. The documents uploaded so far are included (ticket 05);
+ * program selection and the status timeline are added by later tickets.
  *
  * The verification link is *not* part of this payload: it is returned only by the
  * submit and resend endpoints (which add `verification_url` alongside `data`), so
@@ -57,6 +57,9 @@ class ApplicationResource extends JsonResource
             'english_score' => $application->english_score,
             'native_arabic_speaker' => $application->native_arabic_speaker,
             'submitted_at' => $application->submitted_at?->toIso8601String(),
+
+            // Documents uploaded so far (ticket 05).
+            'documents' => ApplicationDocumentResource::collection($application->documents),
         ];
     }
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
+use Modules\Admissions\Internal\Http\Controllers\DocumentController;
 use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
 use Modules\Admissions\Internal\Http\Controllers\RegistrationController;
 
@@ -46,7 +47,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // `verify-resend` limiter is defined in AdmissionsServiceProvider.
     Route::post('/application/resend-verification', [EmailVerificationController::class, 'resend'])
         ->middleware('throttle:verify-resend');
+
+    // Documents (ticket 05). Upload and remove act on the signed-in applicant's own
+    // Application; removal is bound to a document by its ULID (never a row id) and
+    // 404s a document that is not theirs.
+    Route::post('/application/documents', [DocumentController::class, 'store']);
+    Route::delete('/application/documents/{document}', [DocumentController::class, 'destroy'])->whereUlid('document');
 });
+
+// Streaming download (ticket 05). Sanctum-authed but not applicant-scoped: served
+// to the owning applicant *or* a reviewer holding `application.screen` (checked in
+// the controller), anyone else → 403. The ULID is the only handle in the URL.
+Route::middleware('auth:sanctum')
+    ->get('/documents/{document}', [DocumentController::class, 'download'])
+    ->whereUlid('document')
+    ->name('admissions.documents.download');
 
 Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
     Route::get('/admission-cycles', [AdmissionCycleController::class, 'index']);

@@ -13,6 +13,10 @@ return [
         'not_editable' => 'This application can no longer be edited.',
         'already_submitted' => 'Step 1 has already been submitted for this application.',
     ],
+    'documents' => [
+        'locked' => 'Documents can no longer be changed for this application.',
+        'too_many' => 'You can upload at most :max document(s) of this type.',
+    ],
     'verification' => [
         'not_pending' => 'This application is not awaiting email verification.',
     ],

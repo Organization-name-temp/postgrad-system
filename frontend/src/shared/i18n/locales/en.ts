@@ -319,6 +319,36 @@ export const en = {
       resending: 'Resending…',
       resendError: 'Could not resend the link right now. Please try again later.',
     },
+    documents: {
+      title: 'Documents',
+      intro:
+        'Upload your certificates and supporting files. Each has its own accepted formats and size limit; you can preview, replace, or remove any of them until you submit.',
+      hint: 'Accepted: {{formats}} · up to {{size}} MB',
+      upToCount: 'up to {{count}} files',
+      requirements: {
+        required: 'Required',
+        conditional: 'If applicable',
+        optional: 'Optional',
+      },
+      types: {
+        graduation_certificate: 'Graduation certificate',
+        transcript: 'Academic transcript',
+        national_id: 'National ID / passport',
+        photo: 'Personal photo',
+        english_certificate: 'English proficiency certificate',
+        msc_thesis: 'MSc thesis',
+        cv: 'CV',
+        recommendation_letter: 'Recommendation letters',
+        additional_certificate: 'Additional certificates',
+      },
+      upload: 'Upload',
+      addAnother: 'Add another',
+      uploading: 'Uploading…',
+      uploadError: 'Could not upload the file. Please check its format and size and try again.',
+      preview: 'Preview',
+      remove: 'Remove',
+      nextStep: 'Next you will choose your program. That step is coming soon.',
+    },
   },
   admin: {
     cycles: {

@@ -310,6 +310,36 @@ export const ar = {
       resending: 'جارٍ إعادة الإرسال…',
       resendError: 'تعذّر إعادة إرسال الرابط الآن. يرجى المحاولة لاحقًا.',
     },
+    documents: {
+      title: 'المستندات',
+      intro:
+        'ارفع شهاداتك وملفاتك الداعمة. لكل نوع صيغه المقبولة وحدّ لحجمه؛ يمكنك المعاينة أو الاستبدال أو الحذف حتى إتمام الإرسال.',
+      hint: 'المقبول: {{formats}} · حتى {{size}} ميجابايت',
+      upToCount: 'حتى {{count}} ملفات',
+      requirements: {
+        required: 'مطلوب',
+        conditional: 'إن وُجد',
+        optional: 'اختياري',
+      },
+      types: {
+        graduation_certificate: 'شهادة التخرج',
+        transcript: 'كشف الدرجات',
+        national_id: 'الرقم القومي / جواز السفر',
+        photo: 'صورة شخصية',
+        english_certificate: 'شهادة إتقان اللغة الإنجليزية',
+        msc_thesis: 'رسالة الماجستير',
+        cv: 'السيرة الذاتية',
+        recommendation_letter: 'خطابات التوصية',
+        additional_certificate: 'شهادات إضافية',
+      },
+      upload: 'رفع',
+      addAnother: 'إضافة ملف آخر',
+      uploading: 'جارٍ الرفع…',
+      uploadError: 'تعذّر رفع الملف. تحقّق من صيغته وحجمه ثم حاول مرة أخرى.',
+      preview: 'معاينة',
+      remove: 'حذف',
+      nextStep: 'بعد ذلك ستختار برنامجك. هذه الخطوة قادمة قريبًا.',
+    },
   },
   admin: {
     cycles: {

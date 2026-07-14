@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { useMyApplication } from '../../../shared/api/generated/endpoints'
 import { PersonalInfoStep } from './PersonalInfoStep'
 import { EmailVerifyStep } from './EmailVerifyStep'
+import { DocumentsStep } from './DocumentsStep'
 import { WIZARD_STEP, WIZARD_STEP_KEYS, stepForStatus } from './wizardSteps'
 
 /**
@@ -75,15 +76,10 @@ export function ApplyPage() {
         )}
         {activeStep >= WIZARD_STEP.documents && (
           <Box>
-            <Typography variant="h6" gutterBottom>
-              {t('wizard.steps.documents')}
-            </Typography>
             <Alert severity="success" sx={{ mb: 2 }}>
               {t('verify.verified')}
             </Alert>
-            <Typography variant="body2" color="text.secondary">
-              {t('wizard.comingSoon')}
-            </Typography>
+            <DocumentsStep application={application} />
           </Box>
         )}
       </Paper>

@@ -1,4 +1,5 @@
 import DashboardIcon from '@mui/icons-material/Dashboard'
+import AssignmentIcon from '@mui/icons-material/Assignment'
 import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import ApartmentIcon from '@mui/icons-material/Apartment'
@@ -15,6 +16,12 @@ import { PERMISSION } from '../shared/access/permissions'
  */
 export const navItems: NavItem[] = [
   { key: 'dashboard', to: '/', icon: <DashboardIcon /> },
+  {
+    key: 'apply',
+    to: '/apply',
+    icon: <AssignmentIcon />,
+    permission: PERMISSION.submitApplication,
+  },
   {
     key: 'browse',
     to: '/catalog',

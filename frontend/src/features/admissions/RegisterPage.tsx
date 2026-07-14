@@ -24,7 +24,7 @@ import { useAuth } from '../auth/useAuth'
  * is open it shows an "admissions closed" state; when exactly one is open it just
  * takes the applicant's details; when several are open it adds a cycle picker.
  * On success the applicant is signed in (the server established the session) and
- * lands on the authenticated home — their draft wizard follows in a later ticket.
+ * lands in their application wizard (ticket 04) to fill Step 1.
  */
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -53,7 +53,7 @@ export function RegisterPage() {
         // server files the application into it automatically.
         ...(multipleOpen && cycleId !== '' ? { admission_cycle_id: cycleId } : {}),
       })
-      navigate('/', { replace: true })
+      navigate('/apply', { replace: true })
     } catch {
       // Failure state is surfaced from `registerError` below.
     }

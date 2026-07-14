@@ -7,6 +7,7 @@
  * keys the UI actually gates on live here.
  */
 export const PERMISSION = {
+  submitApplication: 'application.submit',
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
   manageCalendar: 'calendar.manage',

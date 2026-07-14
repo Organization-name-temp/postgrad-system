@@ -8,8 +8,10 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Identity\Internal\Audit\EloquentAuditLogger;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Internal\Registration\EloquentApplicantRegistrar;
+use Modules\Identity\Internal\Registration\EloquentEmailVerifier;
 use Modules\Identity\Public\Contracts\ApplicantRegistrar;
 use Modules\Identity\Public\Contracts\AuditLogger;
+use Modules\Identity\Public\Contracts\EmailVerifier;
 use Modules\Identity\Public\Enums\Permission;
 
 class IdentityServiceProvider extends ServiceProvider
@@ -18,6 +20,7 @@ class IdentityServiceProvider extends ServiceProvider
     {
         $this->app->bind(AuditLogger::class, EloquentAuditLogger::class);
         $this->app->bind(ApplicantRegistrar::class, EloquentApplicantRegistrar::class);
+        $this->app->bind(EmailVerifier::class, EloquentEmailVerifier::class);
     }
 
     public function boot(): void

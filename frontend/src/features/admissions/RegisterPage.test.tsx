@@ -66,7 +66,7 @@ function renderRegister() {
         <Routes>
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<div>Login screen</div>} />
-          <Route path="/" element={<div>Home dashboard</div>} />
+          <Route path="/apply" element={<div>Application wizard</div>} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,
@@ -105,7 +105,7 @@ describe('RegisterPage', () => {
     expect(await screen.findByLabelText(/admission cycle/i)).toBeInTheDocument()
   })
 
-  it('registers and lands the applicant on the authenticated home', async () => {
+  it('registers and lands the applicant in their application wizard', async () => {
     srv.openCycles = [{ id: 7, name_en: 'Fall 2026', name_ar: 'خريف 2026' }]
     // delay: null removes the inter-keystroke wait — this fills four fields and
     // then awaits a mutation + /me refetch + navigation, which is slow enough to
@@ -120,9 +120,9 @@ describe('RegisterPage', () => {
 
     await user.click(screen.getByRole('button', { name: /register and start/i }))
 
-    // Navigated to the authenticated home, and the server got the details (no
+    // Navigated into the application wizard, and the server got the details (no
     // admission_cycle_id — the single open Cycle is chosen server-side).
-    expect(await screen.findByText('Home dashboard')).toBeInTheDocument()
+    expect(await screen.findByText('Application wizard')).toBeInTheDocument()
     expect(srv.registerBody).toEqual({
       name: 'Sara Applicant',
       email: 'sara@example.test',

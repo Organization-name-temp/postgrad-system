@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
+use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
+use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
 use Modules\Admissions\Internal\Http\Controllers\RegistrationController;
 
 /*
@@ -23,6 +25,28 @@ Route::get('/admission-cycles/open', [AdmissionCycleController::class, 'open']);
 // (the `register` limiter, defined in AdmissionsServiceProvider); it establishes
 // the applicant's session itself (ticket 03).
 Route::post('/register', RegistrationController::class)->middleware('throttle:register');
+
+// Public (signed, not session-authed): the emailed-style verification link. The
+// signature is the credential — the link may be clicked from anywhere — so this
+// sits outside the auth group, guarded by `signed` (bad/expired → 403). Declared
+// before the model-bound applicant routes and constrained to an integer id.
+Route::get('/applications/{application}/verify-email', [EmailVerificationController::class, 'verify'])
+    ->middleware('signed')
+    ->whereNumber('application')
+    ->name('admissions.verify-email');
+
+// Applicant-owned Step-1 wizard (ticket 04). Each acts on the signed-in applicant's
+// own Application implicitly — no id in the path — so no ownership policy is needed
+// beyond an authenticated session.
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/application', [ApplicationController::class, 'show']);
+    Route::patch('/application', [ApplicationController::class, 'update']);
+    Route::post('/application/submit', [ApplicationController::class, 'submit']);
+    // Resend is throttled per applicant to a few attempts per day (BR-72); the
+    // `verify-resend` limiter is defined in AdmissionsServiceProvider.
+    Route::post('/application/resend-verification', [EmailVerificationController::class, 'resend'])
+        ->middleware('throttle:verify-resend');
+});
 
 Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
     Route::get('/admission-cycles', [AdmissionCycleController::class, 'index']);

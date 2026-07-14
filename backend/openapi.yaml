@@ -188,6 +188,682 @@ paths:
                 - password
                 - password_confirmation
       security: []
+  '/api/v1/applications/{application_id}/verify-email':
+    get:
+      summary: 'Verify email (signed link).'
+      operationId: verifyEmailsignedLink
+      description: "The signed, expiring link the applicant received on submitting Step 1. A\nvalid signature marks their email verified and moves a `submitted`\nApplication to `email_verified`; re-clicking is idempotent. Tampered or\nexpired links are refused (403) by the `signed` middleware."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: email_verified
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: email_verified
+        403:
+          description: 'bad signature'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Invalid signature.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid signature.'
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: application_id
+        description: 'The ID of the application the link verifies.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/application:
+    get:
+      summary: 'My application.'
+      operationId: myApplication
+      description: "The signed-in applicant's current Application — its status and the whole\nStep-1 snapshot (fields the applicant has not yet provided come back null),\nso the SPA can render and resume the wizard at the right step."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: submitted
+                    admission_cycle_id: 1
+                    name_en: 'Sara Applicant'
+                    name_ar: 'سارة المتقدمة'
+                    national_id: '29001010101010'
+                    phone: '+201000000000'
+                    date_of_birth: '1998-05-20'
+                    nationality: Egyptian
+                    gender: Female
+                    address_country: Egypt
+                    address_city: Alexandria
+                    address_street: '15 Corniche Road'
+                    previous_university: 'Cairo University'
+                    graduation_certificate_name: 'BSc in Computer Science'
+                    graduation_date: '2020-07-01'
+                    previous_degree: BSc
+                    previous_major: 'Computer Science'
+                    graduation_gpa: '3.50'
+                    graduation_cgpa: '3.45'
+                    gpa_scale: '4.0'
+                    is_ejust_graduate: false
+                    applying_for_degree: MSc
+                    english_test: IELTS
+                    english_score: '7.50'
+                    native_arabic_speaker: true
+                    submitted_at: '2026-07-14T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: submitted
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+                      name_en:
+                        type: string
+                        example: 'Sara Applicant'
+                      name_ar:
+                        type: string
+                        example: 'سارة المتقدمة'
+                      national_id:
+                        type: string
+                        example: '29001010101010'
+                      phone:
+                        type: string
+                        example: '+201000000000'
+                      date_of_birth:
+                        type: string
+                        example: '1998-05-20'
+                      nationality:
+                        type: string
+                        example: Egyptian
+                      gender:
+                        type: string
+                        example: Female
+                      address_country:
+                        type: string
+                        example: Egypt
+                      address_city:
+                        type: string
+                        example: Alexandria
+                      address_street:
+                        type: string
+                        example: '15 Corniche Road'
+                      previous_university:
+                        type: string
+                        example: 'Cairo University'
+                      graduation_certificate_name:
+                        type: string
+                        example: 'BSc in Computer Science'
+                      graduation_date:
+                        type: string
+                        example: '2020-07-01'
+                      previous_degree:
+                        type: string
+                        example: BSc
+                      previous_major:
+                        type: string
+                        example: 'Computer Science'
+                      graduation_gpa:
+                        type: string
+                        example: '3.50'
+                      graduation_cgpa:
+                        type: string
+                        example: '3.45'
+                      gpa_scale:
+                        type: string
+                        example: '4.0'
+                      is_ejust_graduate:
+                        type: boolean
+                        example: false
+                      applying_for_degree:
+                        type: string
+                        example: MSc
+                      english_test:
+                        type: string
+                        example: IELTS
+                      english_score:
+                        type: string
+                        example: '7.50'
+                      native_arabic_speaker:
+                        type: boolean
+                        example: true
+                      submitted_at:
+                        type: string
+                        example: '2026-07-14T10:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No application found.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No application found.'
+      tags:
+        - Admissions
+      security: []
+    patch:
+      summary: 'Save Step 1 (partial).'
+      operationId: saveStep1partial
+      description: "Persists whatever personal-info fields the applicant has entered so far,\nkeeping the Application a Draft so they can resume later. Each provided field\nis validated (bilingually); missing fields are allowed. Editing is only\npossible while the Application is still a Draft."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: draft
+                    admission_cycle_id: 1
+                    name_en: 'Sara Applicant'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: draft
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+                      name_en:
+                        type: string
+                        example: 'Sara Applicant'
+        409:
+          description: 'not editable'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application can no longer be edited.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application can no longer be edited.'
+        422:
+          description: validation
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The gender field must be a valid value.'
+                  errors:
+                    gender:
+                      - 'The gender field must be a valid value.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The gender field must be a valid value.'
+                  errors:
+                    type: object
+                    properties:
+                      gender:
+                        type: array
+                        example:
+                          - 'The gender field must be a valid value.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name_en:
+                  type: string
+                  description: 'Full name in English.'
+                  example: 'Sara Applicant'
+                name_ar:
+                  type: string
+                  description: 'Full name in Arabic.'
+                  example: 'سارة المتقدمة'
+                national_id:
+                  type: string
+                  description: 'National ID / passport; unique within the cycle.'
+                  example: '29001010101010'
+                phone:
+                  type: string
+                  description: 'Contact phone.'
+                  example: '+201000000000'
+                date_of_birth:
+                  type: string
+                  description: 'Date of birth (Y-m-d), in the past.'
+                  example: '1998-05-20'
+                nationality:
+                  type: string
+                  description: Nationality.
+                  example: Egyptian
+                gender:
+                  type: string
+                  description: 'One of Male, Female.'
+                  example: Female
+                address_country:
+                  type: string
+                  description: Country.
+                  example: Egypt
+                address_city:
+                  type: string
+                  description: City.
+                  example: Alexandria
+                address_street:
+                  type: string
+                  description: 'Street address.'
+                  example: '15 Corniche Road'
+                previous_university:
+                  type: string
+                  description: 'Previous university.'
+                  example: 'Cairo University'
+                graduation_certificate_name:
+                  type: string
+                  description: 'Name of the graduation certificate.'
+                  example: 'BSc in Computer Science'
+                graduation_date:
+                  type: string
+                  description: 'Graduation date (Y-m-d).'
+                  example: '2020-07-01'
+                previous_degree:
+                  type: string
+                  description: 'One of BSc, MSc, PhD.'
+                  example: BSc
+                previous_major:
+                  type: string
+                  description: 'Previous major/specialization.'
+                  example: 'Computer Science'
+                graduation_gpa:
+                  type: number
+                  description: 'Graduation GPA.'
+                  example: 3.5
+                graduation_cgpa:
+                  type: number
+                  description: 'Graduation CGPA.'
+                  example: 3.45
+                gpa_scale:
+                  type: string
+                  description: 'One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'
+                  example: '4.0'
+                is_ejust_graduate:
+                  type: boolean
+                  description: 'Whether the applicant graduated from E-JUST.'
+                  example: false
+                applying_for_degree:
+                  type: string
+                  description: 'Degree applied for; one of MSc, PhD.'
+                  example: MSc
+                english_test:
+                  type: string
+                  description: 'English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'
+                  example: IELTS
+                english_score:
+                  type: number
+                  description: 'Score for the chosen test; required unless the test is None.'
+                  example: 7.5
+                native_arabic_speaker:
+                  type: boolean
+                  description: 'Whether the applicant is a native Arabic speaker.'
+                  example: true
+      security: []
+  /api/v1/application/submit:
+    post:
+      summary: 'Submit Step 1.'
+      operationId: submitStep1
+      description: "Validates the complete personal-info snapshot, persists it, and moves the\nDraft forward: an unverified applicant to `submitted` with a fresh, signed\nverification link returned in `verification_url` (and logged); an applicant\nwhose email is already verified straight to `email_verified` (the shortcut),\nwith `verification_url` null. Either way the applicant cannot reach the\ndocuments step until their email is verified."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'verification required'
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: submitted
+                        admission_cycle_id: 1
+                        name_en: 'Sara Applicant'
+                      verification_url: 'http://localhost/api/v1/applications/1/verify-email?expires=1784000000&signature=abc123'
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: submitted
+                          admission_cycle_id:
+                            type: integer
+                            example: 1
+                          name_en:
+                            type: string
+                            example: 'Sara Applicant'
+                      verification_url:
+                        type: string
+                        example: 'http://localhost/api/v1/applications/1/verify-email?expires=1784000000&signature=abc123'
+                  -
+                    description: 'already verified'
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: email_verified
+                        admission_cycle_id: 1
+                        name_en: 'Sara Applicant'
+                      verification_url: null
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: email_verified
+                          admission_cycle_id:
+                            type: integer
+                            example: 1
+                          name_en:
+                            type: string
+                            example: 'Sara Applicant'
+                      verification_url:
+                        type: string
+                        example: null
+                        nullable: true
+        409:
+          description: 'already submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Step 1 has already been submitted for this application.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Step 1 has already been submitted for this application.'
+        422:
+          description: incomplete
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The name ar field is required.'
+                  errors:
+                    name_ar:
+                      - 'The name ar field is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The name ar field is required.'
+                  errors:
+                    type: object
+                    properties:
+                      name_ar:
+                        type: array
+                        example:
+                          - 'The name ar field is required.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name_en:
+                  type: string
+                  description: 'Full name in English.'
+                  example: 'Sara Applicant'
+                name_ar:
+                  type: string
+                  description: 'Full name in Arabic.'
+                  example: 'سارة المتقدمة'
+                national_id:
+                  type: string
+                  description: 'National ID / passport; unique within the cycle.'
+                  example: '29001010101010'
+                phone:
+                  type: string
+                  description: 'Contact phone.'
+                  example: '+201000000000'
+                date_of_birth:
+                  type: string
+                  description: 'Date of birth (Y-m-d), in the past.'
+                  example: '1998-05-20'
+                nationality:
+                  type: string
+                  description: Nationality.
+                  example: Egyptian
+                gender:
+                  type: string
+                  description: 'One of Male, Female.'
+                  example: Female
+                address_country:
+                  type: string
+                  description: Country.
+                  example: Egypt
+                address_city:
+                  type: string
+                  description: City.
+                  example: Alexandria
+                address_street:
+                  type: string
+                  description: 'Street address.'
+                  example: '15 Corniche Road'
+                previous_university:
+                  type: string
+                  description: 'Previous university.'
+                  example: 'Cairo University'
+                graduation_certificate_name:
+                  type: string
+                  description: 'Name of the graduation certificate.'
+                  example: 'BSc in Computer Science'
+                graduation_date:
+                  type: string
+                  description: 'Graduation date (Y-m-d).'
+                  example: '2020-07-01'
+                previous_degree:
+                  type: string
+                  description: 'One of BSc, MSc, PhD.'
+                  example: BSc
+                previous_major:
+                  type: string
+                  description: 'Previous major/specialization.'
+                  example: 'Computer Science'
+                graduation_gpa:
+                  type: number
+                  description: 'Graduation GPA.'
+                  example: 3.5
+                graduation_cgpa:
+                  type: number
+                  description: 'Graduation CGPA.'
+                  example: 3.45
+                gpa_scale:
+                  type: string
+                  description: 'One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'
+                  example: '4.0'
+                is_ejust_graduate:
+                  type: boolean
+                  description: 'Whether the applicant graduated from E-JUST.'
+                  example: false
+                applying_for_degree:
+                  type: string
+                  description: 'Degree applied for; one of MSc, PhD.'
+                  example: MSc
+                english_test:
+                  type: string
+                  description: 'English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'
+                  example: IELTS
+                english_score:
+                  type: number
+                  description: 'Score for the chosen test; required unless the test is None.'
+                  example: 7.5
+                native_arabic_speaker:
+                  type: boolean
+                  description: 'Whether the applicant is a native Arabic speaker.'
+                  example: true
+              required:
+                - name_en
+                - name_ar
+                - national_id
+                - phone
+                - date_of_birth
+                - nationality
+                - gender
+                - address_country
+                - address_city
+                - address_street
+                - previous_university
+                - graduation_certificate_name
+                - graduation_date
+                - previous_degree
+                - previous_major
+                - graduation_gpa
+                - graduation_cgpa
+                - gpa_scale
+                - is_ejust_graduate
+                - applying_for_degree
+                - english_test
+                - native_arabic_speaker
+      security: []
+  /api/v1/application/resend-verification:
+    post:
+      summary: 'Resend the verification link.'
+      operationId: resendTheVerificationLink
+      description: "Issues a fresh signed link for the signed-in applicant's Application (in\n`verification_url`, and logged), for recovering a missed one. Allowed only\nwhile the Application is awaiting verification (`submitted`), and throttled to\na few attempts per day (BR-72) — the sixth in a day is turned away with 429."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: submitted
+                    admission_cycle_id: 1
+                    name_en: 'Sara Applicant'
+                  verification_url: 'http://localhost/api/v1/applications/1/verify-email?expires=1784000000&signature=abc123'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: submitted
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+                      name_en:
+                        type: string
+                        example: 'Sara Applicant'
+                  verification_url:
+                    type: string
+                    example: 'http://localhost/api/v1/applications/1/verify-email?expires=1784000000&signature=abc123'
+        409:
+          description: 'not awaiting verification'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application is not awaiting email verification.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application is not awaiting email verification.'
+        429:
+          description: throttled
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Too Many Attempts.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Too Many Attempts.'
+      tags:
+        - Admissions
+      security: []
   /api/v1/admission-cycles:
     get:
       summary: 'List Admission Cycles.'

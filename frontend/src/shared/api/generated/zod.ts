@@ -52,6 +52,179 @@ export const RegisterAndStartAnApplicationResponse = zod.object({
 
 
 /**
+ * The signed, expiring link the applicant received on submitting Step 1. A
+ * valid signature marks their email verified and moves a `submitted`
+ * Application to `email_verified`; re-clicking is idempotent. Tampered or
+ * expired links are refused (403) by the `signed` middleware.
+ * @summary Verify email (signed link).
+ */
+export const VerifyEmailsignedLinkParams = zod.object({
+  "application_id": zod.number().describe('The ID of the application the link verifies.')
+})
+
+export const VerifyEmailsignedLinkResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * The signed-in applicant's current Application — its status and the whole
+ * Step-1 snapshot (fields the applicant has not yet provided come back null),
+ * so the SPA can render and resume the wizard at the right step.
+ * @summary My application.
+ */
+export const MyApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "date_of_birth": zod.string().optional(),
+  "nationality": zod.string().optional(),
+  "gender": zod.string().optional(),
+  "address_country": zod.string().optional(),
+  "address_city": zod.string().optional(),
+  "address_street": zod.string().optional(),
+  "previous_university": zod.string().optional(),
+  "graduation_certificate_name": zod.string().optional(),
+  "graduation_date": zod.string().optional(),
+  "previous_degree": zod.string().optional(),
+  "previous_major": zod.string().optional(),
+  "graduation_gpa": zod.string().optional(),
+  "graduation_cgpa": zod.string().optional(),
+  "gpa_scale": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "english_test": zod.string().optional(),
+  "english_score": zod.string().optional(),
+  "native_arabic_speaker": zod.boolean().optional(),
+  "submitted_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Persists whatever personal-info fields the applicant has entered so far,
+ * keeping the Application a Draft so they can resume later. Each provided field
+ * is validated (bilingually); missing fields are allowed. Editing is only
+ * possible while the Application is still a Draft.
+ * @summary Save Step 1 (partial).
+ */
+export const SaveStep1partialBody = zod.object({
+  "name_en": zod.string().optional().describe('Full name in English.'),
+  "name_ar": zod.string().optional().describe('Full name in Arabic.'),
+  "national_id": zod.string().optional().describe('National ID \/ passport; unique within the cycle.'),
+  "phone": zod.string().optional().describe('Contact phone.'),
+  "date_of_birth": zod.string().optional().describe('Date of birth (Y-m-d), in the past.'),
+  "nationality": zod.string().optional().describe('Nationality.'),
+  "gender": zod.string().optional().describe('One of Male, Female.'),
+  "address_country": zod.string().optional().describe('Country.'),
+  "address_city": zod.string().optional().describe('City.'),
+  "address_street": zod.string().optional().describe('Street address.'),
+  "previous_university": zod.string().optional().describe('Previous university.'),
+  "graduation_certificate_name": zod.string().optional().describe('Name of the graduation certificate.'),
+  "graduation_date": zod.string().optional().describe('Graduation date (Y-m-d).'),
+  "previous_degree": zod.string().optional().describe('One of BSc, MSc, PhD.'),
+  "previous_major": zod.string().optional().describe('Previous major\/specialization.'),
+  "graduation_gpa": zod.number().optional().describe('Graduation GPA.'),
+  "graduation_cgpa": zod.number().optional().describe('Graduation CGPA.'),
+  "gpa_scale": zod.string().optional().describe('One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'),
+  "is_ejust_graduate": zod.boolean().optional().describe('Whether the applicant graduated from E-JUST.'),
+  "applying_for_degree": zod.string().optional().describe('Degree applied for; one of MSc, PhD.'),
+  "english_test": zod.string().optional().describe('English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'),
+  "english_score": zod.number().optional().describe('Score for the chosen test; required unless the test is None.'),
+  "native_arabic_speaker": zod.boolean().optional().describe('Whether the applicant is a native Arabic speaker.')
+})
+
+export const SaveStep1partialResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Validates the complete personal-info snapshot, persists it, and moves the
+ * Draft forward: an unverified applicant to `submitted` with a fresh, signed
+ * verification link returned in `verification_url` (and logged); an applicant
+ * whose email is already verified straight to `email_verified` (the shortcut),
+ * with `verification_url` null. Either way the applicant cannot reach the
+ * documents step until their email is verified.
+ * @summary Submit Step 1.
+ */
+export const SubmitStep1Body = zod.object({
+  "name_en": zod.string().describe('Full name in English.'),
+  "name_ar": zod.string().describe('Full name in Arabic.'),
+  "national_id": zod.string().describe('National ID \/ passport; unique within the cycle.'),
+  "phone": zod.string().describe('Contact phone.'),
+  "date_of_birth": zod.string().describe('Date of birth (Y-m-d), in the past.'),
+  "nationality": zod.string().describe('Nationality.'),
+  "gender": zod.string().describe('One of Male, Female.'),
+  "address_country": zod.string().describe('Country.'),
+  "address_city": zod.string().describe('City.'),
+  "address_street": zod.string().describe('Street address.'),
+  "previous_university": zod.string().describe('Previous university.'),
+  "graduation_certificate_name": zod.string().describe('Name of the graduation certificate.'),
+  "graduation_date": zod.string().describe('Graduation date (Y-m-d).'),
+  "previous_degree": zod.string().describe('One of BSc, MSc, PhD.'),
+  "previous_major": zod.string().describe('Previous major\/specialization.'),
+  "graduation_gpa": zod.number().describe('Graduation GPA.'),
+  "graduation_cgpa": zod.number().describe('Graduation CGPA.'),
+  "gpa_scale": zod.string().describe('One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'),
+  "is_ejust_graduate": zod.boolean().describe('Whether the applicant graduated from E-JUST.'),
+  "applying_for_degree": zod.string().describe('Degree applied for; one of MSc, PhD.'),
+  "english_test": zod.string().describe('English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'),
+  "english_score": zod.number().optional().describe('Score for the chosen test; required unless the test is None.'),
+  "native_arabic_speaker": zod.boolean().describe('Whether the applicant is a native Arabic speaker.')
+})
+
+export const SubmitStep1Response = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional(),
+  "verification_url": zod.string().optional()
+}).describe('verification required'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional(),
+  "verification_url": zod.string().nullish()
+}).describe('already verified')])
+
+
+/**
+ * Issues a fresh signed link for the signed-in applicant's Application (in
+ * `verification_url`, and logged), for recovering a missed one. Allowed only
+ * while the Application is awaiting verification (`submitted`), and throttled to
+ * a few attempts per day (BR-72) — the sixth in a day is turned away with 429.
+ * @summary Resend the verification link.
+ */
+export const ResendTheVerificationLinkResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional(),
+  "verification_url": zod.string().optional()
+})
+
+
+/**
  * Newest intake first. Requires calendar.manage — this is the management
  * list; the public registration screen uses the open-cycle lookup instead.
  * @summary List Admission Cycles.

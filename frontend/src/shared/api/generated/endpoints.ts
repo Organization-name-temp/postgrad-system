@@ -76,6 +76,235 @@ export type RegisterAndStartAnApplication422 = {
   errors?: RegisterAndStartAnApplication422Errors;
 };
 
+export type VerifyEmailsignedLink200Data = {
+  id?: number;
+  status?: string;
+};
+
+export type VerifyEmailsignedLink200 = {
+  data?: VerifyEmailsignedLink200Data;
+};
+
+export type VerifyEmailsignedLink403 = {
+  message?: string;
+};
+
+export type MyApplication200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  phone?: string;
+  date_of_birth?: string;
+  nationality?: string;
+  gender?: string;
+  address_country?: string;
+  address_city?: string;
+  address_street?: string;
+  previous_university?: string;
+  graduation_certificate_name?: string;
+  graduation_date?: string;
+  previous_degree?: string;
+  previous_major?: string;
+  graduation_gpa?: string;
+  graduation_cgpa?: string;
+  gpa_scale?: string;
+  is_ejust_graduate?: boolean;
+  applying_for_degree?: string;
+  english_test?: string;
+  english_score?: string;
+  native_arabic_speaker?: boolean;
+  submitted_at?: string;
+};
+
+export type MyApplication200 = {
+  data?: MyApplication200Data;
+};
+
+export type MyApplication401 = {
+  message?: string;
+};
+
+export type MyApplication404 = {
+  message?: string;
+};
+
+export type SaveStep1partialBody = {
+  /** Full name in English. */
+  name_en?: string;
+  /** Full name in Arabic. */
+  name_ar?: string;
+  /** National ID / passport; unique within the cycle. */
+  national_id?: string;
+  /** Contact phone. */
+  phone?: string;
+  /** Date of birth (Y-m-d), in the past. */
+  date_of_birth?: string;
+  /** Nationality. */
+  nationality?: string;
+  /** One of Male, Female. */
+  gender?: string;
+  /** Country. */
+  address_country?: string;
+  /** City. */
+  address_city?: string;
+  /** Street address. */
+  address_street?: string;
+  /** Previous university. */
+  previous_university?: string;
+  /** Name of the graduation certificate. */
+  graduation_certificate_name?: string;
+  /** Graduation date (Y-m-d). */
+  graduation_date?: string;
+  /** One of BSc, MSc, PhD. */
+  previous_degree?: string;
+  /** Previous major/specialization. */
+  previous_major?: string;
+  /** Graduation GPA. */
+  graduation_gpa?: number;
+  /** Graduation CGPA. */
+  graduation_cgpa?: number;
+  /** One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100. */
+  gpa_scale?: string;
+  /** Whether the applicant graduated from E-JUST. */
+  is_ejust_graduate?: boolean;
+  /** Degree applied for; one of MSc, PhD. */
+  applying_for_degree?: string;
+  /** English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. */
+  english_test?: string;
+  /** Score for the chosen test; required unless the test is None. */
+  english_score?: number;
+  /** Whether the applicant is a native Arabic speaker. */
+  native_arabic_speaker?: boolean;
+};
+
+export type SaveStep1partial200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+
+export type SaveStep1partial200 = {
+  data?: SaveStep1partial200Data;
+};
+
+export type SaveStep1partial409 = {
+  message?: string;
+};
+
+export type SaveStep1partial422Errors = {
+  gender?: string[];
+};
+
+export type SaveStep1partial422 = {
+  message?: string;
+  errors?: SaveStep1partial422Errors;
+};
+
+export type SubmitStep1Body = {
+  /** Full name in English. */
+  name_en: string;
+  /** Full name in Arabic. */
+  name_ar: string;
+  /** National ID / passport; unique within the cycle. */
+  national_id: string;
+  /** Contact phone. */
+  phone: string;
+  /** Date of birth (Y-m-d), in the past. */
+  date_of_birth: string;
+  /** Nationality. */
+  nationality: string;
+  /** One of Male, Female. */
+  gender: string;
+  /** Country. */
+  address_country: string;
+  /** City. */
+  address_city: string;
+  /** Street address. */
+  address_street: string;
+  /** Previous university. */
+  previous_university: string;
+  /** Name of the graduation certificate. */
+  graduation_certificate_name: string;
+  /** Graduation date (Y-m-d). */
+  graduation_date: string;
+  /** One of BSc, MSc, PhD. */
+  previous_degree: string;
+  /** Previous major/specialization. */
+  previous_major: string;
+  /** Graduation GPA. */
+  graduation_gpa: number;
+  /** Graduation CGPA. */
+  graduation_cgpa: number;
+  /** One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100. */
+  gpa_scale: string;
+  /** Whether the applicant graduated from E-JUST. */
+  is_ejust_graduate: boolean;
+  /** Degree applied for; one of MSc, PhD. */
+  applying_for_degree: string;
+  /** English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. */
+  english_test: string;
+  /** Score for the chosen test; required unless the test is None. */
+  english_score?: number;
+  /** Whether the applicant is a native Arabic speaker. */
+  native_arabic_speaker: boolean;
+};
+
+export type SubmitStep1200 = {
+  data?: {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+  verification_url?: string;
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+  /** @nullable */
+  verification_url?: string | null;
+};
+
+export type SubmitStep1409 = {
+  message?: string;
+};
+
+export type SubmitStep1422Errors = {
+  name_ar?: string[];
+};
+
+export type SubmitStep1422 = {
+  message?: string;
+  errors?: SubmitStep1422Errors;
+};
+
+export type ResendTheVerificationLink200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+
+export type ResendTheVerificationLink200 = {
+  data?: ResendTheVerificationLink200Data;
+  verification_url?: string;
+};
+
+export type ResendTheVerificationLink409 = {
+  message?: string;
+};
+
+export type ResendTheVerificationLink429 = {
+  message?: string;
+};
+
 export type ListAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -1240,6 +1469,406 @@ export const useRegisterAndStartAnApplication = <TError = RegisterAndStartAnAppl
         TContext
       > => {
       return useMutation(getRegisterAndStartAnApplicationMutationOptions(options), queryClient);
+    }
+
+/**
+ * The signed, expiring link the applicant received on submitting Step 1. A
+ * valid signature marks their email verified and moves a `submitted`
+ * Application to `email_verified`; re-clicking is idempotent. Tampered or
+ * expired links are refused (403) by the `signed` middleware.
+ * @summary Verify email (signed link).
+ */
+export const verifyEmailsignedLink = (
+    applicationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<VerifyEmailsignedLink200>(
+      {url: `/api/v1/applications/${applicationId}/verify-email`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getVerifyEmailsignedLinkQueryKey = (applicationId: number,) => {
+    return [
+    `/api/v1/applications/${applicationId}/verify-email`
+    ] as const;
+    }
+
+
+export const getVerifyEmailsignedLinkQueryOptions = <TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getVerifyEmailsignedLinkQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof verifyEmailsignedLink>>> = ({ signal }) => verifyEmailsignedLink(applicationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type VerifyEmailsignedLinkQueryResult = NonNullable<Awaited<ReturnType<typeof verifyEmailsignedLink>>>
+export type VerifyEmailsignedLinkQueryError = VerifyEmailsignedLink403
+
+
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>,
+          TError,
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>,
+          TError,
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Verify email (signed link).
+ */
+
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getVerifyEmailsignedLinkQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The signed-in applicant's current Application — its status and the whole
+ * Step-1 snapshot (fields the applicant has not yet provided come back null),
+ * so the SPA can render and resume the wizard at the right step.
+ * @summary My application.
+ */
+export const myApplication = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyApplication200>(
+      {url: `/api/v1/application`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyApplicationQueryKey = () => {
+    return [
+    `/api/v1/application`
+    ] as const;
+    }
+
+
+export const getMyApplicationQueryOptions = <TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyApplicationQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myApplication>>> = ({ signal }) => myApplication(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyApplicationQueryResult = NonNullable<Awaited<ReturnType<typeof myApplication>>>
+export type MyApplicationQueryError = MyApplication401 | MyApplication404
+
+
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myApplication>>,
+          TError,
+          Awaited<ReturnType<typeof myApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myApplication>>,
+          TError,
+          Awaited<ReturnType<typeof myApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My application.
+ */
+
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyApplicationQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Persists whatever personal-info fields the applicant has entered so far,
+ * keeping the Application a Draft so they can resume later. Each provided field
+ * is validated (bilingually); missing fields are allowed. Editing is only
+ * possible while the Application is still a Draft.
+ * @summary Save Step 1 (partial).
+ */
+export const saveStep1partial = (
+    saveStep1partialBody?: SaveStep1partialBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SaveStep1partial200>(
+      {url: `/api/v1/application`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: saveStep1partialBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSaveStep1partialMutationOptions = <TError = SaveStep1partial409 | SaveStep1partial422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveStep1partial>>, TError,{data?: SaveStep1partialBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof saveStep1partial>>, TError,{data?: SaveStep1partialBody}, TContext> => {
+
+const mutationKey = ['saveStep1partial'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveStep1partial>>, {data?: SaveStep1partialBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  saveStep1partial(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveStep1partialMutationResult = NonNullable<Awaited<ReturnType<typeof saveStep1partial>>>
+    export type SaveStep1partialMutationBody = SaveStep1partialBody | undefined
+    export type SaveStep1partialMutationError = SaveStep1partial409 | SaveStep1partial422
+
+    /**
+ * @summary Save Step 1 (partial).
+ */
+export const useSaveStep1partial = <TError = SaveStep1partial409 | SaveStep1partial422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveStep1partial>>, TError,{data?: SaveStep1partialBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveStep1partial>>,
+        TError,
+        {data?: SaveStep1partialBody},
+        TContext
+      > => {
+      return useMutation(getSaveStep1partialMutationOptions(options), queryClient);
+    }
+
+/**
+ * Validates the complete personal-info snapshot, persists it, and moves the
+ * Draft forward: an unverified applicant to `submitted` with a fresh, signed
+ * verification link returned in `verification_url` (and logged); an applicant
+ * whose email is already verified straight to `email_verified` (the shortcut),
+ * with `verification_url` null. Either way the applicant cannot reach the
+ * documents step until their email is verified.
+ * @summary Submit Step 1.
+ */
+export const submitStep1 = (
+    submitStep1Body: SubmitStep1Body,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitStep1200>(
+      {url: `/api/v1/application/submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitStep1Body, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitStep1MutationOptions = <TError = SubmitStep1409 | SubmitStep1422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitStep1>>, TError,{data: SubmitStep1Body}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitStep1>>, TError,{data: SubmitStep1Body}, TContext> => {
+
+const mutationKey = ['submitStep1'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitStep1>>, {data: SubmitStep1Body}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitStep1(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitStep1MutationResult = NonNullable<Awaited<ReturnType<typeof submitStep1>>>
+    export type SubmitStep1MutationBody = SubmitStep1Body
+    export type SubmitStep1MutationError = SubmitStep1409 | SubmitStep1422
+
+    /**
+ * @summary Submit Step 1.
+ */
+export const useSubmitStep1 = <TError = SubmitStep1409 | SubmitStep1422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitStep1>>, TError,{data: SubmitStep1Body}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitStep1>>,
+        TError,
+        {data: SubmitStep1Body},
+        TContext
+      > => {
+      return useMutation(getSubmitStep1MutationOptions(options), queryClient);
+    }
+
+/**
+ * Issues a fresh signed link for the signed-in applicant's Application (in
+ * `verification_url`, and logged), for recovering a missed one. Allowed only
+ * while the Application is awaiting verification (`submitted`), and throttled to
+ * a few attempts per day (BR-72) — the sixth in a day is turned away with 429.
+ * @summary Resend the verification link.
+ */
+export const resendTheVerificationLink = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ResendTheVerificationLink200>(
+      {url: `/api/v1/application/resend-verification`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getResendTheVerificationLinkMutationOptions = <TError = ResendTheVerificationLink409 | ResendTheVerificationLink429,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resendTheVerificationLink>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resendTheVerificationLink>>, TError,void, TContext> => {
+
+const mutationKey = ['resendTheVerificationLink'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resendTheVerificationLink>>, void> = () => {
+
+
+          return  resendTheVerificationLink()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResendTheVerificationLinkMutationResult = NonNullable<Awaited<ReturnType<typeof resendTheVerificationLink>>>
+
+    export type ResendTheVerificationLinkMutationError = ResendTheVerificationLink409 | ResendTheVerificationLink429
+
+    /**
+ * @summary Resend the verification link.
+ */
+export const useResendTheVerificationLink = <TError = ResendTheVerificationLink409 | ResendTheVerificationLink429,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resendTheVerificationLink>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resendTheVerificationLink>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getResendTheVerificationLinkMutationOptions(options), queryClient);
     }
 
 /**

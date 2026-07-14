@@ -38,6 +38,14 @@ deptrac:
       collectors:
         - type: classLike
           value: '^Modules\\Admissions\\Internal\\.*'
+    - name: Notifications_Public
+      collectors:
+        - type: classLike
+          value: '^Modules\\Notifications\\Public\\.*'
+    - name: Notifications_Internal
+      collectors:
+        - type: classLike
+          value: '^Modules\\Notifications\\Internal\\.*'
   ruleset:
     # The app may orchestrate modules only through their Public facades.
     App:
@@ -64,5 +72,16 @@ deptrac:
       - Identity_Public
     Admissions_Internal:
       - Admissions_Public
+      - Identity_Public
+    # Notifications (Phase 2, ticket 02) is cross-cutting: any module may enqueue a
+    # notification through Notifications\Public, but Notifications itself reaches
+    # only Identity\Public (user ids) and never any other module. The inbound edges
+    # (Admissions → Notifications\Public, App → Notifications\Public) are opened by
+    # the tickets that first consume them.
+    Notifications_Public:
+      - Notifications_Internal
+      - Identity_Public
+    Notifications_Internal:
+      - Notifications_Public
       - Identity_Public
     # No rule grants anyone access to another module's *_Internal — that is the seam.

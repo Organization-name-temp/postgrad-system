@@ -202,6 +202,28 @@ export const en = {
       },
     },
   },
+  notifications: {
+    title: 'Notifications',
+    open: 'Open notifications',
+    openWithCount: 'Open notifications, {{count}} unread',
+    markAllRead: 'Mark all as read',
+    markRead: 'Mark as read',
+    empty: 'You have no notifications.',
+    loading: 'Loading notifications',
+    loadError: 'Could not load notifications.',
+    // One template per NotificationType (keyed by a dot-free alias — the server
+    // sends dotted values like "interview.scheduled"). `fallback` renders any
+    // type the SPA does not yet know how to phrase (a later ticket's new type).
+    types: {
+      applicationReturned: 'Your application was returned for revision.',
+      interviewScheduled: 'Your interview has been scheduled.',
+      interviewReminder: 'Reminder: you have an upcoming interview.',
+      decisionRecorded: 'A decision has been recorded on your application.',
+      applicationAccepted:
+        'Congratulations — you have been accepted. Your University ID is {{university_id}}.',
+      fallback: 'You have a new notification.',
+    },
+  },
   admin: {
     cycles: {
       title: 'Admission cycles',

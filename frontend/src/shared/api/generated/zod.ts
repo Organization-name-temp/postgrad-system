@@ -1025,3 +1025,69 @@ export const UpdateCurrentUserResponse = zod.object({
   "permissions": zod.array(zod.string()).optional()
 }).optional()
 })
+
+
+/**
+ * Paginated, newest-first. Scoped to the authenticated user.
+ * @summary List my notifications.
+ */
+export const ListMyNotificationsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "type": zod.string().optional(),
+  "data": zod.object({
+  "scheduled_at": zod.string().optional()
+}).optional(),
+  "read_at": zod.string().nullish(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * The number the bell badge shows. Scoped to the authenticated user.
+ * @summary My unread count.
+ */
+export const MyUnreadCountResponse = zod.object({
+  "data": zod.object({
+  "count": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * Clears the caller's unread count in one call; touches only their own rows.
+ * @summary Mark all my notifications read.
+ */
+export const MarkAllMyNotificationsReadResponse = zod.looseObject({
+
+})
+
+
+/**
+ * Idempotent. A notification that is not the caller's is not found (404), so
+ * it can never be read on someone else's behalf.
+ * @summary Mark one notification read.
+ */
+export const MarkOneNotificationReadParams = zod.object({
+  "notification": zod.number().describe('The ID of the notification.')
+})
+
+export const MarkOneNotificationReadResponse = zod.looseObject({
+
+})

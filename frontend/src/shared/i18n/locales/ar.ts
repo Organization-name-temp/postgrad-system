@@ -199,6 +199,24 @@ export const ar = {
       },
     },
   },
+  notifications: {
+    title: 'الإشعارات',
+    open: 'فتح الإشعارات',
+    openWithCount: 'فتح الإشعارات، {{count}} غير مقروء',
+    markAllRead: 'تعليم الكل كمقروء',
+    markRead: 'تعليم كمقروء',
+    empty: 'ليس لديك إشعارات.',
+    loading: 'جارٍ تحميل الإشعارات',
+    loadError: 'تعذّر تحميل الإشعارات.',
+    types: {
+      applicationReturned: 'أُعيد طلبك للتعديل.',
+      interviewScheduled: 'تم تحديد موعد مقابلتك.',
+      interviewReminder: 'تذكير: لديك مقابلة قادمة.',
+      decisionRecorded: 'تم تسجيل قرار بشأن طلبك.',
+      applicationAccepted: 'تهانينا — تم قبولك. الرقم الجامعي الخاص بك هو {{university_id}}.',
+      fallback: 'لديك إشعار جديد.',
+    },
+  },
   admin: {
     cycles: {
       title: 'دورات القبول',

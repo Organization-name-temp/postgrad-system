@@ -972,6 +972,60 @@ export type UpdateCurrentUser422 = {
   errors?: UpdateCurrentUser422Errors;
 };
 
+export type ListMyNotifications200DataItemData = {
+  scheduled_at?: string;
+};
+
+export type ListMyNotifications200DataItem = {
+  id?: number;
+  type?: string;
+  data?: ListMyNotifications200DataItemData;
+  /** @nullable */
+  read_at?: string | null;
+  created_at?: string;
+};
+
+export type ListMyNotifications200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ListMyNotifications200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type ListMyNotifications200 = {
+  data?: ListMyNotifications200DataItem[];
+  links?: ListMyNotifications200Links;
+  meta?: ListMyNotifications200Meta;
+};
+
+export type MyUnreadCount200Data = {
+  count?: number;
+};
+
+export type MyUnreadCount200 = {
+  data?: MyUnreadCount200Data;
+};
+
+export type MarkAllMyNotificationsRead204 = { [key: string]: unknown };
+
+export type MarkOneNotificationRead204 = { [key: string]: unknown };
+
+export type MarkOneNotificationRead404 = {
+  message?: string;
+};
+
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
@@ -4224,4 +4278,321 @@ export const useUpdateCurrentUser = <TError = UpdateCurrentUser422,
         TContext
       > => {
       return useMutation(getUpdateCurrentUserMutationOptions(options), queryClient);
+    }
+
+/**
+ * Paginated, newest-first. Scoped to the authenticated user.
+ * @summary List my notifications.
+ */
+export const listMyNotifications = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListMyNotifications200>(
+      {url: `/api/v1/notifications`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListMyNotificationsQueryKey = () => {
+    return [
+    `/api/v1/notifications`
+    ] as const;
+    }
+
+
+export const getListMyNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyNotificationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyNotifications>>> = ({ signal }) => listMyNotifications(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListMyNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyNotifications>>>
+export type ListMyNotificationsQueryError = unknown
+
+
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMyNotifications>>,
+          TError,
+          Awaited<ReturnType<typeof listMyNotifications>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMyNotifications>>,
+          TError,
+          Awaited<ReturnType<typeof listMyNotifications>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List my notifications.
+ */
+
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListMyNotificationsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The number the bell badge shows. Scoped to the authenticated user.
+ * @summary My unread count.
+ */
+export const myUnreadCount = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyUnreadCount200>(
+      {url: `/api/v1/notifications/unread-count`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyUnreadCountQueryKey = () => {
+    return [
+    `/api/v1/notifications/unread-count`
+    ] as const;
+    }
+
+
+export const getMyUnreadCountQueryOptions = <TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyUnreadCountQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myUnreadCount>>> = ({ signal }) => myUnreadCount(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyUnreadCountQueryResult = NonNullable<Awaited<ReturnType<typeof myUnreadCount>>>
+export type MyUnreadCountQueryError = unknown
+
+
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myUnreadCount>>,
+          TError,
+          Awaited<ReturnType<typeof myUnreadCount>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myUnreadCount>>,
+          TError,
+          Awaited<ReturnType<typeof myUnreadCount>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My unread count.
+ */
+
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyUnreadCountQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Clears the caller's unread count in one call; touches only their own rows.
+ * @summary Mark all my notifications read.
+ */
+export const markAllMyNotificationsRead = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MarkAllMyNotificationsRead204>(
+      {url: `/api/v1/notifications/read-all`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getMarkAllMyNotificationsReadMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, TError,void, TContext> => {
+
+const mutationKey = ['markAllMyNotificationsRead'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, void> = () => {
+
+
+          return  markAllMyNotificationsRead()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkAllMyNotificationsReadMutationResult = NonNullable<Awaited<ReturnType<typeof markAllMyNotificationsRead>>>
+
+    export type MarkAllMyNotificationsReadMutationError = unknown
+
+    /**
+ * @summary Mark all my notifications read.
+ */
+export const useMarkAllMyNotificationsRead = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof markAllMyNotificationsRead>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getMarkAllMyNotificationsReadMutationOptions(options), queryClient);
+    }
+
+/**
+ * Idempotent. A notification that is not the caller's is not found (404), so
+ * it can never be read on someone else's behalf.
+ * @summary Mark one notification read.
+ */
+export const markOneNotificationRead = (
+    notification: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MarkOneNotificationRead204>(
+      {url: `/api/v1/notifications/${notification}/read`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getMarkOneNotificationReadMutationOptions = <TError = MarkOneNotificationRead404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markOneNotificationRead>>, TError,{notification: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof markOneNotificationRead>>, TError,{notification: number}, TContext> => {
+
+const mutationKey = ['markOneNotificationRead'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markOneNotificationRead>>, {notification: number}> = (props) => {
+          const {notification} = props ?? {};
+
+          return  markOneNotificationRead(notification,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkOneNotificationReadMutationResult = NonNullable<Awaited<ReturnType<typeof markOneNotificationRead>>>
+
+    export type MarkOneNotificationReadMutationError = MarkOneNotificationRead404
+
+    /**
+ * @summary Mark one notification read.
+ */
+export const useMarkOneNotificationRead = <TError = MarkOneNotificationRead404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markOneNotificationRead>>, TError,{notification: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof markOneNotificationRead>>,
+        TError,
+        {notification: number},
+        TContext
+      > => {
+      return useMutation(getMarkOneNotificationReadMutationOptions(options), queryClient);
     }

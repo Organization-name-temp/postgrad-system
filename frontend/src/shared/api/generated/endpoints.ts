@@ -40,6 +40,42 @@ export type ListCurrentlyOpenAdmissionCycles200 = {
   data?: ListCurrentlyOpenAdmissionCycles200DataItem[];
 };
 
+export type RegisterAndStartAnApplicationBody = {
+  /** The applicant's full name. */
+  name: string;
+  /** A unique email address; becomes the login. */
+  email: string;
+  /** At least 8 characters; must match the confirmation. */
+  password: string;
+  /** Repeat of the password. */
+  password_confirmation: string;
+  /** The open Cycle to apply to. Required only when more than one Cycle is open; otherwise the single open Cycle is used. */
+  admission_cycle_id?: number;
+};
+
+export type RegisterAndStartAnApplication201Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+};
+
+export type RegisterAndStartAnApplication201 = {
+  data?: RegisterAndStartAnApplication201Data;
+};
+
+export type RegisterAndStartAnApplication409 = {
+  message?: string;
+};
+
+export type RegisterAndStartAnApplication422Errors = {
+  email?: string[];
+};
+
+export type RegisterAndStartAnApplication422 = {
+  message?: string;
+  errors?: RegisterAndStartAnApplication422Errors;
+};
+
 export type ListAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -1136,6 +1172,75 @@ export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<t
 
 
 
+
+/**
+ * Open only while an Admission Cycle's window is open: refused when none is
+ * open, auto-filed into the one open Cycle, or (when several are open) filed
+ * into the chosen one. Rate-limited per client. On success the applicant is
+ * authenticated and their Draft Application is returned.
+ * @summary Register and start an application.
+ */
+export const registerAndStartAnApplication = (
+    registerAndStartAnApplicationBody: RegisterAndStartAnApplicationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RegisterAndStartAnApplication201>(
+      {url: `/api/v1/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: registerAndStartAnApplicationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRegisterAndStartAnApplicationMutationOptions = <TError = RegisterAndStartAnApplication409 | RegisterAndStartAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAndStartAnApplication>>, TError,{data: RegisterAndStartAnApplicationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof registerAndStartAnApplication>>, TError,{data: RegisterAndStartAnApplicationBody}, TContext> => {
+
+const mutationKey = ['registerAndStartAnApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerAndStartAnApplication>>, {data: RegisterAndStartAnApplicationBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerAndStartAnApplication(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterAndStartAnApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof registerAndStartAnApplication>>>
+    export type RegisterAndStartAnApplicationMutationBody = RegisterAndStartAnApplicationBody
+    export type RegisterAndStartAnApplicationMutationError = RegisterAndStartAnApplication409 | RegisterAndStartAnApplication422
+
+    /**
+ * @summary Register and start an application.
+ */
+export const useRegisterAndStartAnApplication = <TError = RegisterAndStartAnApplication409 | RegisterAndStartAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAndStartAnApplication>>, TError,{data: RegisterAndStartAnApplicationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof registerAndStartAnApplication>>,
+        TError,
+        {data: RegisterAndStartAnApplicationBody},
+        TContext
+      > => {
+      return useMutation(getRegisterAndStartAnApplicationMutationOptions(options), queryClient);
+    }
 
 /**
  * Newest intake first. Requires calendar.manage — this is the management

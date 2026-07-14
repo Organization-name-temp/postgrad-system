@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Modules\Admissions\Internal\Enums\IntakeTerm;
 
@@ -69,6 +70,18 @@ class AdmissionCycle extends Model
     protected static function newFactory(): AdmissionCycleFactory
     {
         return AdmissionCycleFactory::new();
+    }
+
+    /**
+     * The Applications filed into this Cycle. Every Application belongs to exactly
+     * one Cycle (a per-cycle intake), starting from the Draft that self-registration
+     * creates (ticket 03).
+     *
+     * @return HasMany<Application, $this>
+     */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class);
     }
 
     /**

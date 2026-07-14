@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
+use Modules\Admissions\Internal\Http\Controllers\RegistrationController;
 
 /*
 | Admissions routes, mounted under /api/v1 by AdmissionsServiceProvider.
@@ -17,6 +18,11 @@ use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 
 // Public: currently-open cycles for the (unauthenticated) registration screen.
 Route::get('/admission-cycles/open', [AdmissionCycleController::class, 'open']);
+
+// Public: register and start an application. Unauthenticated and rate-limited
+// (the `register` limiter, defined in AdmissionsServiceProvider); it establishes
+// the applicant's session itself (ticket 03).
+Route::post('/register', RegistrationController::class)->middleware('throttle:register');
 
 Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
     Route::get('/admission-cycles', [AdmissionCycleController::class, 'index']);

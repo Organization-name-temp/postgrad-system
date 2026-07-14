@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '../features/auth/LoginPage'
+import { RegisterPage } from '../features/admissions/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
 import { DashboardPage } from '../features/auth/DashboardPage'
 import { FacultiesPage } from '../features/catalog/faculties/FacultiesPage'
@@ -32,6 +33,7 @@ export function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             {StyleGallery && (
               <Route
                 path="/style"

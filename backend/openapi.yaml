@@ -86,6 +86,108 @@ paths:
       tags:
         - Admissions
       security: []
+  /api/v1/register:
+    post:
+      summary: 'Register and start an application.'
+      operationId: registerAndStartAnApplication
+      description: "Open only while an Admission Cycle's window is open: refused when none is\nopen, auto-filed into the one open Cycle, or (when several are open) filed\ninto the chosen one. Rate-limited per client. On success the applicant is\nauthenticated and their Draft Application is returned."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: draft
+                    admission_cycle_id: 1
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: draft
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+        409:
+          description: 'admissions closed'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Admissions are currently closed.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Admissions are currently closed.'
+        422:
+          description: validation
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The email has already been taken.'
+                  errors:
+                    email:
+                      - 'The email has already been taken.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The email has already been taken.'
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - 'The email has already been taken.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: "The applicant's full name."
+                  example: 'Sara Applicant'
+                email:
+                  type: string
+                  description: 'A unique email address; becomes the login.'
+                  example: sara@example.com
+                password:
+                  type: string
+                  description: 'At least 8 characters; must match the confirmation.'
+                  example: correct-horse
+                password_confirmation:
+                  type: string
+                  description: 'Repeat of the password.'
+                  example: correct-horse
+                admission_cycle_id:
+                  type: integer
+                  description: 'The open Cycle to apply to. Required only when more than one Cycle is open; otherwise the single open Cycle is used.'
+                  example: 1
+              required:
+                - name
+                - email
+                - password
+                - password_confirmation
+      security: []
   /api/v1/admission-cycles:
     get:
       summary: 'List Admission Cycles.'

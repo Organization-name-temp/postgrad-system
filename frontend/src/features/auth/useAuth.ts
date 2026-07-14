@@ -3,10 +3,14 @@ import {
   useCurrentUser,
   useLogIn,
   useLogOut,
+  useRegisterAndStartAnApplication,
   useUpdateCurrentUser,
   getCurrentUserQueryKey,
 } from '../../shared/api/generated/endpoints'
-import type { CurrentUser200Data } from '../../shared/api/generated/endpoints'
+import type {
+  CurrentUser200Data,
+  RegisterAndStartAnApplicationBody,
+} from '../../shared/api/generated/endpoints'
 import { usePermissions } from '../../shared/access/usePermissions'
 import { fetchCsrfCookie } from './csrf'
 
@@ -25,6 +29,13 @@ export interface UseAuth {
   loginError: unknown
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  isRegistering: boolean
+  registerError: unknown
+  /**
+   * Self-register and start an application. Like login it establishes a Sanctum
+   * session server-side, so it primes CSRF then re-probes `/me` on success.
+   */
+  register: (body: RegisterAndStartAnApplicationBody) => Promise<void>
   /** Persist the UI language to the signed-in user's `preferred_locale`. */
   persistLocale: (locale: string) => Promise<void>
 }
@@ -39,11 +50,18 @@ export function useAuth(): UseAuth {
   const me = useCurrentUser()
   const loginMutation = useLogIn()
   const logoutMutation = useLogOut()
+  const registerMutation = useRegisterAndStartAnApplication()
   const updateLocaleMutation = useUpdateCurrentUser()
 
   const login = async (email: string, password: string): Promise<void> => {
     await fetchCsrfCookie()
     await loginMutation.mutateAsync({ data: { email, password } })
+    await queryClient.invalidateQueries({ queryKey: getCurrentUserQueryKey() })
+  }
+
+  const register = async (body: RegisterAndStartAnApplicationBody): Promise<void> => {
+    await fetchCsrfCookie()
+    await registerMutation.mutateAsync({ data: body })
     await queryClient.invalidateQueries({ queryKey: getCurrentUserQueryKey() })
   }
 
@@ -77,6 +95,9 @@ export function useAuth(): UseAuth {
     loginError: loginMutation.error,
     login,
     logout,
+    isRegistering: registerMutation.isPending,
+    registerError: registerMutation.error,
+    register,
     persistLocale,
   }
 }

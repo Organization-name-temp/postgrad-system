@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Identity\Internal\Audit\EloquentAuditLogger;
 use Modules\Identity\Internal\Models\User;
+use Modules\Identity\Internal\Registration\EloquentApplicantRegistrar;
+use Modules\Identity\Public\Contracts\ApplicantRegistrar;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Enums\Permission;
 
@@ -15,6 +17,7 @@ class IdentityServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(AuditLogger::class, EloquentAuditLogger::class);
+        $this->app->bind(ApplicantRegistrar::class, EloquentApplicantRegistrar::class);
     }
 
     public function boot(): void

@@ -41,6 +41,8 @@ export const en = {
       error: 'Unable to sign in. Please try again.',
       email: 'Email',
       password: 'Password',
+      noAccount: 'New applicant?',
+      register: 'Start an application',
     },
     dashboard: {
       title: 'Dashboard',
@@ -222,6 +224,29 @@ export const en = {
       applicationAccepted:
         'Congratulations — you have been accepted. Your University ID is {{university_id}}.',
       fallback: 'You have a new notification.',
+    },
+  },
+  admissions: {
+    register: {
+      title: 'Start your application',
+      intro:
+        'Create your account to apply to E-JUST. Registering starts your application straight away — there is no separate sign-up.',
+      name: 'Full name',
+      email: 'Email',
+      password: 'Password',
+      passwordConfirmation: 'Confirm password',
+      cycle: 'Admission cycle',
+      cycleHelp: 'More than one intake is open. Choose the one you are applying to.',
+      submit: 'Register and start',
+      submitting: 'Starting your application…',
+      error: 'Could not start your application. Please check your details and try again.',
+      haveAccount: 'Already have an account?',
+      signIn: 'Sign in',
+      loading: 'Checking whether admissions are open…',
+      loadError: 'Could not check whether admissions are open. Please try again.',
+      closedTitle: 'Admissions are currently closed',
+      closedBody:
+        'There is no open admission cycle right now. Please check back when the next intake opens.',
     },
   },
   admin: {

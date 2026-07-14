@@ -28,6 +28,30 @@ export const ListCurrentlyOpenAdmissionCyclesResponse = zod.object({
 
 
 /**
+ * Open only while an Admission Cycle's window is open: refused when none is
+ * open, auto-filed into the one open Cycle, or (when several are open) filed
+ * into the chosen one. Rate-limited per client. On success the applicant is
+ * authenticated and their Draft Application is returned.
+ * @summary Register and start an application.
+ */
+export const RegisterAndStartAnApplicationBody = zod.object({
+  "name": zod.string().describe('The applicant\'s full name.'),
+  "email": zod.string().describe('A unique email address; becomes the login.'),
+  "password": zod.string().describe('At least 8 characters; must match the confirmation.'),
+  "password_confirmation": zod.string().describe('Repeat of the password.'),
+  "admission_cycle_id": zod.number().optional().describe('The open Cycle to apply to. Required only when more than one Cycle is open; otherwise the single open Cycle is used.')
+})
+
+export const RegisterAndStartAnApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional()
+}).optional()
+})
+
+
+/**
  * Newest intake first. Requires calendar.manage — this is the management
  * list; the public registration screen uses the open-cycle lookup instead.
  * @summary List Admission Cycles.

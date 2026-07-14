@@ -21,6 +21,9 @@ function authState(overrides: Partial<UseAuth>): UseAuth {
     loginError: undefined,
     login: vi.fn(),
     logout: vi.fn(),
+    isRegistering: false,
+    registerError: undefined,
+    register: vi.fn(),
     persistLocale: vi.fn(),
     ...overrides,
   }

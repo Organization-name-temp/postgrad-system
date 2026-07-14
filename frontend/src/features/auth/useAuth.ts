@@ -25,6 +25,12 @@ export interface UseAuth {
   permissions: string[]
   /** Whether the signed-in user holds a given permission key. */
   hasPermission: (permission: string) => boolean
+  /** The signed-in user's role codes from `/me`, mirrored for UX gating. */
+  roles: string[]
+  /** Whether the signed-in user holds a given role code. */
+  hasRole: (role: string) => boolean
+  /** Whether the user is a System/Super Administrator (R09/R10) — the admin gate. */
+  isAdmin: boolean
   isLoggingIn: boolean
   loginError: unknown
   login: (email: string, password: string) => Promise<void>
@@ -81,9 +87,9 @@ export function useAuth(): UseAuth {
     await queryClient.invalidateQueries({ queryKey: getCurrentUserQueryKey() })
   }
 
-  // Permission reading is cross-cutting, so it lives in shared/access; useAuth
-  // delegates rather than keeping its own copy (one source of the rule).
-  const { permissions, hasPermission } = usePermissions()
+  // Permission and role reading is cross-cutting, so it lives in shared/access;
+  // useAuth delegates rather than keeping its own copy (one source of the rule).
+  const { permissions, hasPermission, roles, hasRole, isAdmin } = usePermissions()
 
   return {
     user: me.data?.data,
@@ -91,6 +97,9 @@ export function useAuth(): UseAuth {
     isAuthenticated,
     permissions,
     hasPermission,
+    roles,
+    hasRole,
+    isAdmin,
     isLoggingIn: loginMutation.isPending,
     loginError: loginMutation.error,
     login,

@@ -314,13 +314,28 @@ class Application extends Model
     }
 
     /**
-     * Student Affairs rejects the application at screening, with a reason:
-     * {@see ApplicationStatus::UnderSAReview} → {@see ApplicationStatus::Rejected}
-     * (terminal). Legal only from `UnderSAReview` (else 409).
+     * Reject the application with a reason, ending it at
+     * {@see ApplicationStatus::Rejected} (terminal). Used by both reviewer gates:
+     * Student Affairs at screening ({@see ApplicationStatus::UnderSAReview}, ticket 07)
+     * and the Dean after review ({@see ApplicationStatus::UnderDeanReview}, ticket 08)
+     * — the two states the transition map allows into `Rejected`. Any other status is
+     * a 409. The actor is the rejecting reviewer.
      */
     public function reject(int $actorId, string $note): void
     {
         $this->transitionTo(ApplicationStatus::Rejected, actorId: $actorId, note: $note);
+    }
+
+    /**
+     * The Dean approves the application for interview:
+     * {@see ApplicationStatus::UnderDeanReview} → {@see ApplicationStatus::InterviewScheduled}
+     * (ticket 08). The status moves now; the concrete slot booking follows in
+     * ticket 09. Legal only from `UnderDeanReview` (else 409). The actor is the Dean;
+     * an optional `$note` records any comment on the timeline.
+     */
+    public function approveForInterview(int $actorId, ?string $note = null): void
+    {
+        $this->transitionTo(ApplicationStatus::InterviewScheduled, actorId: $actorId, note: $note);
     }
 
     /**

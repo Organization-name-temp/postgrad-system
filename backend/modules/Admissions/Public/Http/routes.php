@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
+use Modules\Admissions\Internal\Http\Controllers\DeanReviewController;
 use Modules\Admissions\Internal\Http\Controllers\DocumentController;
 use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
 use Modules\Admissions\Internal\Http\Controllers\ProgramSelectionController;
@@ -81,6 +82,14 @@ Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function ()
     Route::get('/applications', [ApplicationScreeningController::class, 'index']);
     Route::get('/applications/{application}', [ApplicationScreeningController::class, 'show'])->whereNumber('application');
     Route::post('/applications/{application}/screen', [ApplicationScreeningController::class, 'screen'])->whereNumber('application');
+});
+
+// Dean review (ticket 08). The Dean's faculty-scoped queue and decision, gated on
+// `application.screen`; the per-application faculty scope (out-of-faculty → 403) is
+// enforced inside the controller via the Dean↔Faculty assignment mapping.
+Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
+    Route::get('/dean/applications', [DeanReviewController::class, 'index']);
+    Route::post('/dean/applications/{application}/review', [DeanReviewController::class, 'review'])->whereNumber('application');
 });
 
 // Streaming download (ticket 05). Sanctum-authed but not applicant-scoped: served

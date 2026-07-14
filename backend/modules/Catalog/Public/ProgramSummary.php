@@ -16,7 +16,10 @@ use Modules\Catalog\Public\Enums\DegreeLevel;
  * Admissions is the first consumer (program selection, ticket 06): it validates a
  * chosen Program exists, checks the degree-qualification rule against
  * {@see $degreeLevel}, and renders these summaries on the review and reviewer
- * screens. An immutable value object — the facade builds it, callers only read it.
+ * screens. Ticket 08 adds {@see $facultyId} — the opaque id of the owning Faculty —
+ * so the Dean queue can route an application to its Faculty's Dean (resolved
+ * `application → program_id → facultyId`, ADR-0012) without a cross-module join.
+ * An immutable value object — the facade builds it, callers only read it.
  */
 final readonly class ProgramSummary
 {
@@ -26,6 +29,7 @@ final readonly class ProgramSummary
         public string $nameEn,
         public string $nameAr,
         public DegreeLevel $degreeLevel,
+        public int $facultyId,
         public string $departmentNameEn,
         public string $departmentNameAr,
         public string $facultyNameEn,

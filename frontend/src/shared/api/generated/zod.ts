@@ -7,6 +7,71 @@
 import * as zod from 'zod';
 
 /**
+ * The R07 (Dean) users an administrator may assign to a Faculty — the source for
+ * the assignment screen's Dean picker. Admin-only (R09/R10).
+ * @summary List assignable Deans.
+ */
+export const ListAssignableDeansResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Every current assignment with the assigned Dean's identity and the opaque
+ * Faculty id. Admin-only (R09/R10).
+ * @summary List Dean↔Faculty assignments.
+ */
+export const ListDeanFacultyAssignmentsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "dean_name": zod.string().optional(),
+  "dean_email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Creates one Dean↔Faculty routing row. The user must hold the Dean role (R07)
+ * and the (Dean, Faculty) pair must not already exist — either fails validation
+ * (422). Admin-only (R09/R10).
+ * @summary Assign a Dean to a Faculty.
+ */
+export const AssignADeanToAFacultyBody = zod.object({
+  "user_id": zod.number().describe('The Dean (R07 user) to assign.'),
+  "faculty_id": zod.number().describe('The opaque Catalog Faculty id.')
+})
+
+export const AssignADeanToAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "dean_name": zod.string().optional(),
+  "dean_email": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Dean from a Faculty.
+ */
+export const UnassignADeanFromAFacultyParams = zod.object({
+  "assignment_id": zod.number().describe('The assignment row id.')
+})
+
+export const UnassignADeanFromAFacultyResponse = zod.looseObject({
+
+})
+
+
+/**
  * Public, unauthenticated: the front door the registration screen reads to
  * know whether (and into which intake) a stranger may apply. Returns only
  * Cycles that are active and whose window contains the current moment.
@@ -497,6 +562,70 @@ export const ScreenAnApplicationResponse = zod.union([zod.object({
   "status": zod.string().optional()
 }).optional()
 }).describe('returned')])
+
+
+/**
+ * The `under_dean_review` applications whose primary Program's Faculty is among
+ * the signed-in Dean's assigned Faculties, oldest-first, each with the applicant's
+ * identity, resolved primary Program, and days waited since entering Dean review.
+ * A Dean with no assigned Faculty (or a non-Dean reviewer) sees an empty queue.
+ * @summary Dean review queue.
+ */
+export const DeanReviewQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * `approve` moves the application to `interview_scheduled` (the concrete slot
+ * booking follows in interview scheduling); `reject` ends it as `rejected` with a
+ * reason. Both notify the applicant. The application must belong to one of the
+ * Dean's Faculties — otherwise 403, regardless of the action. Acting on an
+ * application that is not `under_dean_review` is an illegal transition (409). The
+ * surface is gated on `application.screen`.
+ * @summary Dean decision on an application.
+ */
+export const DeanDecisionOnAnApplicationParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const DeanDecisionOnAnApplicationBody = zod.object({
+  "action": zod.string().describe('One of approve, reject.'),
+  "note": zod.string().nullish().describe('The Dean\'s note; required for reject (the reason).')
+})
+
+export const DeanDecisionOnAnApplicationResponse = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('approved for interview'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('rejected')])
 
 
 /**

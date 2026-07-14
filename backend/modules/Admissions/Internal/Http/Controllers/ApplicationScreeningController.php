@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
+use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
+use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationStatusTransitionResource;
@@ -14,7 +16,6 @@ use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\Enums\Permission;
 use Modules\Notifications\Public\Contracts\Notifier;
-use Modules\Notifications\Public\Enums\NotificationType;
 
 /**
  * @group Admissions
@@ -34,6 +35,9 @@ use Modules\Notifications\Public\Enums\NotificationType;
  */
 class ApplicationScreeningController
 {
+    use NotifiesApplicant;
+    use ResolvesQueuePrograms;
+
     /**
      * Screening queue.
      *
@@ -56,13 +60,8 @@ class ApplicationScreeningController
 
         // Resolve every queued application's primary Program in one facade read
         // (ADR-0012) and stash it per row, so rendering the queue is a single Catalog
-        // read rather than one per application.
-        $ids = $applications->pluck('primary_program_id')->filter()->unique()->values()->all();
-        $summaries = $ids === [] ? [] : $catalog->findMany($ids);
-        $applications->each(function (Application $application) use ($summaries): void {
-            $id = $application->primary_program_id;
-            $application->setAttribute('resolved_primary_program', $id === null ? null : ($summaries[$id] ?? null));
-        });
+        // read rather than one per application (shared with the Dean queue).
+        $this->attachPrimaryPrograms($applications, $catalog);
 
         return ApplicationQueueResource::collection($applications);
     }
@@ -165,22 +164,13 @@ class ApplicationScreeningController
     private function returnForRevision(Application $application, int $actorId, string $note, Notifier $notifier): void
     {
         $application->returnForRevision($actorId, $note);
-
-        $notifier->notify((int) $application->user_id, NotificationType::ApplicationReturned, [
-            'application_id' => $application->getKey(),
-            'note' => $note,
-        ]);
+        $this->notifyReturnedForRevision($notifier, $application, $note);
     }
 
     /** Reject at screening, then notify the applicant of the outcome and reason. */
     private function reject(Application $application, int $actorId, string $note, Notifier $notifier): void
     {
         $application->reject($actorId, $note);
-
-        $notifier->notify((int) $application->user_id, NotificationType::DecisionRecorded, [
-            'application_id' => $application->getKey(),
-            'decision' => ApplicationStatus::Rejected->value,
-            'reason' => $note,
-        ]);
+        $this->notifyDecisionRecorded($notifier, $application, ApplicationStatus::Rejected, $note);
     }
 }

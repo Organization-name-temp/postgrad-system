@@ -6,6 +6,8 @@ info:
 servers:
   - url: 'http://localhost'
 tags:
+  - name: Administration
+    description: "\nThe Dean↔Faculty assignment admin surface (ticket 08) — the system's first\n**role-gated** surface. Every endpoint sits behind the `admin` middleware, so\nonly a System/Super Administrator (R09/R10) may read or change the mapping;\nordinary staff — even a Dean — get a 403 (BR-75). No new permission is invented\nfor this (ADR-0008 intact): admin org-routing is a role concern, not a §3.2\nmatrix function.\n\nAn administrator lists the current assignments, picks a Dean (an R07 user) and a\nFaculty (opaque Catalog id, no FK — ADR-0012) to assign, or removes a row. The\nDean review queue (Admissions) reads the resulting mapping through the\nIdentity\\Public DeanAssignments facade."
   - name: Admissions
     description: "\nManage Admission Cycles — the windowed Fall/Spring intake (e.g. \"Fall 2026\")\nevery Application hangs off. Listing/creating/editing/activating requires the\ncalendar.manage permission (Student Affairs or a Dean). A Cycle is \"open\" when\nit is active and the current moment falls inside its window — derived, never a\nstored status column (ADR-0012, ticket 01). Cycles are deactivated, never\ndeleted. The {@see self::open()} lookup is public — it feeds the\nunauthenticated registration screen."
   - name: Catalog
@@ -15,6 +17,292 @@ tags:
   - name: Notifications
     description: "\nA signed-in user's own in-app notifications — the data behind the shell's bell\n(ticket 02). Every endpoint is scoped to the authenticated user by\n{@see Notification::scopeForUser()}, so no request can list, count, or mutate\nanother user's notifications (a foreign id simply is not found → 404). Content\nis a type + payload; the SPA renders it bilingually, so nothing here is\nlocalised server-side."
 paths:
+  /api/v1/admin/deans:
+    get:
+      summary: 'List assignable Deans.'
+      operationId: listAssignableDeans
+      description: "The R07 (Dean) users an administrator may assign to a Faculty — the source for\nthe assignment screen's Dean picker. Admin-only (R09/R10)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 7
+                      name: 'Dr. Dean of Engineering'
+                      email: dean.eng@ejust.edu.eg
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 7
+                        name: 'Dr. Dean of Engineering'
+                        email: dean.eng@ejust.edu.eg
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 7
+                        name:
+                          type: string
+                          example: 'Dr. Dean of Engineering'
+                        email:
+                          type: string
+                          example: dean.eng@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
+  /api/v1/admin/faculty-dean-assignments:
+    get:
+      summary: 'List Dean↔Faculty assignments.'
+      operationId: listDeanFacultyAssignments
+      description: "Every current assignment with the assigned Dean's identity and the opaque\nFaculty id. Admin-only (R09/R10)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      user_id: 7
+                      faculty_id: 3
+                      dean_name: 'Dr. Dean of Engineering'
+                      dean_email: dean.eng@ejust.edu.eg
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        user_id: 7
+                        faculty_id: 3
+                        dean_name: 'Dr. Dean of Engineering'
+                        dean_email: dean.eng@ejust.edu.eg
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: integer
+                          example: 7
+                        faculty_id:
+                          type: integer
+                          example: 3
+                        dean_name:
+                          type: string
+                          example: 'Dr. Dean of Engineering'
+                        dean_email:
+                          type: string
+                          example: dean.eng@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
+    post:
+      summary: 'Assign a Dean to a Faculty.'
+      operationId: assignADeanToAFaculty
+      description: "Creates one Dean↔Faculty routing row. The user must hold the Dean role (R07)\nand the (Dean, Faculty) pair must not already exist — either fails validation\n(422). Admin-only (R09/R10)."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    user_id: 7
+                    faculty_id: 3
+                    dean_name: 'Dr. Dean of Engineering'
+                    dean_email: dean.eng@ejust.edu.eg
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      user_id:
+                        type: integer
+                        example: 7
+                      faculty_id:
+                        type: integer
+                        example: 3
+                      dean_name:
+                        type: string
+                        example: 'Dr. Dean of Engineering'
+                      dean_email:
+                        type: string
+                        example: dean.eng@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'not a Dean'
+                    type: object
+                    example:
+                      message: 'The selected user is not a Dean.'
+                      errors:
+                        user_id:
+                          - 'The selected user is not a Dean.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'The selected user is not a Dean.'
+                      errors:
+                        type: object
+                        properties:
+                          user_id:
+                            type: array
+                            example:
+                              - 'The selected user is not a Dean.'
+                            items:
+                              type: string
+                  -
+                    description: 'already assigned'
+                    type: object
+                    example:
+                      message: 'This Dean is already assigned to that faculty.'
+                      errors:
+                        faculty_id:
+                          - 'This Dean is already assigned to that faculty.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'This Dean is already assigned to that faculty.'
+                      errors:
+                        type: object
+                        properties:
+                          faculty_id:
+                            type: array
+                            example:
+                              - 'This Dean is already assigned to that faculty.'
+                            items:
+                              type: string
+      tags:
+        - Administration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  description: 'The Dean (R07 user) to assign.'
+                  example: 7
+                faculty_id:
+                  type: integer
+                  description: 'The opaque Catalog Faculty id.'
+                  example: 3
+              required:
+                - user_id
+                - faculty_id
+      security: []
+  '/api/v1/admin/faculty-dean-assignments/{assignment_id}':
+    delete:
+      summary: 'Unassign a Dean from a Faculty.'
+      operationId: unassignADeanFromAFaculty
+      description: 'Removes one routing row. Admin-only (R09/R10).'
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+                properties: {}
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model.'
+      tags:
+        - Administration
+      security: []
+    parameters:
+      -
+        in: path
+        name: assignment_id
+        description: 'The assignment row id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/admission-cycles/open:
     get:
       summary: 'List currently-open Admission Cycles.'
@@ -1993,6 +2281,265 @@ paths:
                   type: string
                   description: "The reviewer's note; required for return and reject."
                   example: 'Please re-upload a clearer copy of your transcript.'
+                  nullable: true
+              required:
+                - action
+      security: []
+    parameters:
+      -
+        in: path
+        name: application_id
+        description: "The application's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/dean/applications:
+    get:
+      summary: 'Dean review queue.'
+      operationId: deanReviewQueue
+      description: "The `under_dean_review` applications whose primary Program's Faculty is among\nthe signed-in Dean's assigned Faculties, oldest-first, each with the applicant's\nidentity, resolved primary Program, and days waited since entering Dean review.\nA Dean with no assigned Faculty (or a non-Dean reviewer) sees an empty queue."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      status: under_dean_review
+                      name_en: 'Sara Applicant'
+                      name_ar: 'سارة المتقدمة'
+                      national_id: '29001010101010'
+                      applying_for_degree: MSc
+                      primary_program:
+                        id: 1
+                        code: MSC-CE
+                        name_en: 'MSc in Computer Engineering'
+                        name_ar: 'ماجستير هندسة الحاسوب'
+                        degree_level: MSc
+                        department_name_en: 'Computer Engineering'
+                        department_name_ar: 'هندسة الحاسوب'
+                        faculty_name_en: 'Faculty of Engineering'
+                        faculty_name_ar: 'كلية الهندسة'
+                      finalized_at: '2026-07-10T10:00:00+00:00'
+                      review_entered_at: '2026-07-11T10:00:00+00:00'
+                      age_days: 3
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        status: under_dean_review
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        national_id: '29001010101010'
+                        applying_for_degree: MSc
+                        primary_program:
+                          id: 1
+                          code: MSC-CE
+                          name_en: 'MSc in Computer Engineering'
+                          name_ar: 'ماجستير هندسة الحاسوب'
+                          degree_level: MSc
+                          department_name_en: 'Computer Engineering'
+                          department_name_ar: 'هندسة الحاسوب'
+                          faculty_name_en: 'Faculty of Engineering'
+                          faculty_name_ar: 'كلية الهندسة'
+                        finalized_at: '2026-07-10T10:00:00+00:00'
+                        review_entered_at: '2026-07-11T10:00:00+00:00'
+                        age_days: 3
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        status:
+                          type: string
+                          example: under_dean_review
+                        name_en:
+                          type: string
+                          example: 'Sara Applicant'
+                        name_ar:
+                          type: string
+                          example: 'سارة المتقدمة'
+                        national_id:
+                          type: string
+                          example: '29001010101010'
+                        applying_for_degree:
+                          type: string
+                          example: MSc
+                        primary_program:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: MSC-CE
+                            name_en:
+                              type: string
+                              example: 'MSc in Computer Engineering'
+                            name_ar:
+                              type: string
+                              example: 'ماجستير هندسة الحاسوب'
+                            degree_level:
+                              type: string
+                              example: MSc
+                            department_name_en:
+                              type: string
+                              example: 'Computer Engineering'
+                            department_name_ar:
+                              type: string
+                              example: 'هندسة الحاسوب'
+                            faculty_name_en:
+                              type: string
+                              example: 'Faculty of Engineering'
+                            faculty_name_ar:
+                              type: string
+                              example: 'كلية الهندسة'
+                        finalized_at:
+                          type: string
+                          example: '2026-07-10T10:00:00+00:00'
+                        review_entered_at:
+                          type: string
+                          example: '2026-07-11T10:00:00+00:00'
+                        age_days:
+                          type: integer
+                          example: 3
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+  '/api/v1/dean/applications/{application_id}/review':
+    post:
+      summary: 'Dean decision on an application.'
+      operationId: deanDecisionOnAnApplication
+      description: "`approve` moves the application to `interview_scheduled` (the concrete slot\nbooking follows in interview scheduling); `reject` ends it as `rejected` with a\nreason. Both notify the applicant. The application must belong to one of the\nDean's Faculties — otherwise 403, regardless of the action. Acting on an\napplication that is not `under_dean_review` is an illegal transition (409). The\nsurface is gated on `application.screen`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'approved for interview'
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: interview_scheduled
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: interview_scheduled
+                  -
+                    description: rejected
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: rejected
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: rejected
+        403:
+          description: 'out of faculty'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'not under dean review'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application cannot move from under_sa_review to interview_scheduled.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application cannot move from under_sa_review to interview_scheduled.'
+        422:
+          description: 'missing reason'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The note field is required when action is reject.'
+                  errors:
+                    note:
+                      - 'The note field is required when action is reject.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The note field is required when action is reject.'
+                  errors:
+                    type: object
+                    properties:
+                      note:
+                        type: array
+                        example:
+                          - 'The note field is required when action is reject.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: 'One of approve, reject.'
+                  example: approve
+                note:
+                  type: string
+                  description: "The Dean's note; required for reject (the reason)."
+                  example: 'The interview panel did not recommend admission.'
                   nullable: true
               required:
                 - action

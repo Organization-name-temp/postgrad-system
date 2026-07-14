@@ -15,7 +15,10 @@ import { CatalogTreePage } from '../features/catalog/tree/CatalogTreePage'
 import { ApplyPage } from '../features/admissions/wizard/ApplyPage'
 import { ScreeningQueuePage } from '../features/admissions/screening/ScreeningQueuePage'
 import { ApplicationReviewPage } from '../features/admissions/screening/ApplicationReviewPage'
+import { DeanQueuePage } from '../features/admissions/dean/DeanQueuePage'
+import { DeanReviewPage } from '../features/admissions/dean/DeanReviewPage'
 import { CyclesPage } from '../features/admin/cycles/CyclesPage'
+import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 
@@ -53,6 +56,8 @@ export function App() {
                 <Route path="/apply" element={<ApplyPage />} />
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
+                <Route path="/dean" element={<DeanQueuePage />} />
+                <Route path="/dean/:applicationId" element={<DeanReviewPage />} />
                 <Route path="/catalog" element={<CatalogTreePage />} />
                 <Route path="/catalog/faculties" element={<FacultiesPage />} />
                 <Route path="/catalog/departments" element={<DepartmentsPage />} />
@@ -61,6 +66,7 @@ export function App() {
                 <Route path="/catalog/courses" element={<CoursesPage />} />
                 <Route path="/catalog/courses/:courseId" element={<CourseEditPage />} />
                 <Route path="/admin/cycles" element={<CyclesPage />} />
+                <Route path="/admin/assignments" element={<AssignmentsPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

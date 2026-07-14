@@ -17,6 +17,9 @@ function authState(overrides: Partial<UseAuth>): UseAuth {
     isAuthenticated: false,
     permissions: [],
     hasPermission: () => false,
+    roles: [],
+    hasRole: () => false,
+    isAdmin: false,
     isLoggingIn: false,
     loginError: undefined,
     login: vi.fn(),
@@ -32,6 +35,13 @@ function authState(overrides: Partial<UseAuth>): UseAuth {
 const items: NavItem[] = [
   { key: 'dashboard', to: '/', icon: <span /> },
   { key: 'catalog', to: '/catalog', icon: <span />, permission: 'catalog.manage' },
+  {
+    key: 'assignments',
+    to: '/admin/assignments',
+    icon: <span />,
+    section: 'administration',
+    adminOnly: true,
+  },
 ]
 
 function renderNav(initial = '/') {
@@ -68,5 +78,19 @@ describe('SideNav', () => {
     const { container } = renderNav('/')
     expect(container.querySelector('a[href="/"]')).toHaveAttribute('aria-current', 'page')
     expect(container.querySelector('a[href="/catalog"]')).not.toHaveAttribute('aria-current')
+  })
+
+  it('hides the admin-only Administration section from a non-admin', () => {
+    mockedUseAuth.mockReturnValue(authState({ hasPermission: () => true, isAdmin: false }))
+    const { container, queryByText } = renderNav()
+    expect(container.querySelector('a[href="/admin/assignments"]')).not.toBeInTheDocument()
+    expect(queryByText('Administration')).not.toBeInTheDocument()
+  })
+
+  it('shows the Administration section to an administrator', () => {
+    mockedUseAuth.mockReturnValue(authState({ isAdmin: true }))
+    const { container, getByText } = renderNav()
+    expect(container.querySelector('a[href="/admin/assignments"]')).toBeInTheDocument()
+    expect(getByText('Administration')).toBeInTheDocument()
   })
 })

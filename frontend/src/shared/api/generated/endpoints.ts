@@ -24,6 +24,81 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type ListAssignableDeans200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableDeans200 = {
+  data?: ListAssignableDeans200DataItem[];
+};
+
+export type ListAssignableDeans403 = {
+  message?: string;
+};
+
+export type ListDeanFacultyAssignments200DataItem = {
+  id?: number;
+  user_id?: number;
+  faculty_id?: number;
+  dean_name?: string;
+  dean_email?: string;
+};
+
+export type ListDeanFacultyAssignments200 = {
+  data?: ListDeanFacultyAssignments200DataItem[];
+};
+
+export type ListDeanFacultyAssignments403 = {
+  message?: string;
+};
+
+export type AssignADeanToAFacultyBody = {
+  /** The Dean (R07 user) to assign. */
+  user_id: number;
+  /** The opaque Catalog Faculty id. */
+  faculty_id: number;
+};
+
+export type AssignADeanToAFaculty201Data = {
+  id?: number;
+  user_id?: number;
+  faculty_id?: number;
+  dean_name?: string;
+  dean_email?: string;
+};
+
+export type AssignADeanToAFaculty201 = {
+  data?: AssignADeanToAFaculty201Data;
+};
+
+export type AssignADeanToAFaculty403 = {
+  message?: string;
+};
+
+export type AssignADeanToAFaculty422 = {
+  message?: string;
+  errors?: {
+  user_id?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  faculty_id?: string[];
+};
+};
+
+export type UnassignADeanFromAFaculty204 = { [key: string]: unknown };
+
+export type UnassignADeanFromAFaculty403 = {
+  message?: string;
+};
+
+export type UnassignADeanFromAFaculty404 = {
+  message?: string;
+};
+
 export type ListCurrentlyOpenAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -612,6 +687,73 @@ export type ScreenAnApplication422Errors = {
 export type ScreenAnApplication422 = {
   message?: string;
   errors?: ScreenAnApplication422Errors;
+};
+
+export type DeanReviewQueue200DataItemPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type DeanReviewQueue200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  primary_program?: DeanReviewQueue200DataItemPrimaryProgram;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type DeanReviewQueue200 = {
+  data?: DeanReviewQueue200DataItem[];
+};
+
+export type DeanReviewQueue403 = {
+  message?: string;
+};
+
+export type DeanDecisionOnAnApplicationBody = {
+  /** One of approve, reject. */
+  action: string;
+  /**
+     * The Dean's note; required for reject (the reason).
+     * @nullable
+     */
+  note?: string | null;
+};
+
+export type DeanDecisionOnAnApplication200 = {
+  data?: {
+  id?: number;
+  status?: string;
+};
+};
+
+export type DeanDecisionOnAnApplication403 = {
+  message?: string;
+};
+
+export type DeanDecisionOnAnApplication409 = {
+  message?: string;
+};
+
+export type DeanDecisionOnAnApplication422Errors = {
+  note?: string[];
+};
+
+export type DeanDecisionOnAnApplication422 = {
+  message?: string;
+  errors?: DeanDecisionOnAnApplication422Errors;
 };
 
 export type StreamADocument403 = {
@@ -1618,6 +1760,328 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * The R07 (Dean) users an administrator may assign to a Faculty — the source for
+ * the assignment screen's Dean picker. Admin-only (R09/R10).
+ * @summary List assignable Deans.
+ */
+export const listAssignableDeans = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableDeans200>(
+      {url: `/api/v1/admin/deans`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableDeansQueryKey = () => {
+    return [
+    `/api/v1/admin/deans`
+    ] as const;
+    }
+
+
+export const getListAssignableDeansQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableDeansQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableDeans>>> = ({ signal }) => listAssignableDeans(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableDeansQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableDeans>>>
+export type ListAssignableDeansQueryError = ListAssignableDeans403
+
+
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDeans>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDeans>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDeans>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDeans>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable Deans.
+ */
+
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableDeansQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every current assignment with the assigned Dean's identity and the opaque
+ * Faculty id. Admin-only (R09/R10).
+ * @summary List Dean↔Faculty assignments.
+ */
+export const listDeanFacultyAssignments = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListDeanFacultyAssignments200>(
+      {url: `/api/v1/admin/faculty-dean-assignments`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListDeanFacultyAssignmentsQueryKey = () => {
+    return [
+    `/api/v1/admin/faculty-dean-assignments`
+    ] as const;
+    }
+
+
+export const getListDeanFacultyAssignmentsQueryOptions = <TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDeanFacultyAssignmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDeanFacultyAssignments>>> = ({ signal }) => listDeanFacultyAssignments(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListDeanFacultyAssignmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listDeanFacultyAssignments>>>
+export type ListDeanFacultyAssignmentsQueryError = ListDeanFacultyAssignments403
+
+
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Dean↔Faculty assignments.
+ */
+
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListDeanFacultyAssignmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Creates one Dean↔Faculty routing row. The user must hold the Dean role (R07)
+ * and the (Dean, Faculty) pair must not already exist — either fails validation
+ * (422). Admin-only (R09/R10).
+ * @summary Assign a Dean to a Faculty.
+ */
+export const assignADeanToAFaculty = (
+    assignADeanToAFacultyBody: AssignADeanToAFacultyBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AssignADeanToAFaculty201>(
+      {url: `/api/v1/admin/faculty-dean-assignments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: assignADeanToAFacultyBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAssignADeanToAFacultyMutationOptions = <TError = AssignADeanToAFaculty403 | AssignADeanToAFaculty422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADeanToAFaculty>>, TError,{data: AssignADeanToAFacultyBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof assignADeanToAFaculty>>, TError,{data: AssignADeanToAFacultyBody}, TContext> => {
+
+const mutationKey = ['assignADeanToAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignADeanToAFaculty>>, {data: AssignADeanToAFacultyBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  assignADeanToAFaculty(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignADeanToAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof assignADeanToAFaculty>>>
+    export type AssignADeanToAFacultyMutationBody = AssignADeanToAFacultyBody
+    export type AssignADeanToAFacultyMutationError = AssignADeanToAFaculty403 | AssignADeanToAFaculty422
+
+    /**
+ * @summary Assign a Dean to a Faculty.
+ */
+export const useAssignADeanToAFaculty = <TError = AssignADeanToAFaculty403 | AssignADeanToAFaculty422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADeanToAFaculty>>, TError,{data: AssignADeanToAFacultyBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignADeanToAFaculty>>,
+        TError,
+        {data: AssignADeanToAFacultyBody},
+        TContext
+      > => {
+      return useMutation(getAssignADeanToAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Dean from a Faculty.
+ */
+export const unassignADeanFromAFaculty = (
+    assignmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UnassignADeanFromAFaculty204>(
+      {url: `/api/v1/admin/faculty-dean-assignments/${assignmentId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getUnassignADeanFromAFacultyMutationOptions = <TError = UnassignADeanFromAFaculty403 | UnassignADeanFromAFaculty404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, TError,{assignmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, TError,{assignmentId: number}, TContext> => {
+
+const mutationKey = ['unassignADeanFromAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, {assignmentId: number}> = (props) => {
+          const {assignmentId} = props ?? {};
+
+          return  unassignADeanFromAFaculty(assignmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnassignADeanFromAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>>
+
+    export type UnassignADeanFromAFacultyMutationError = UnassignADeanFromAFaculty403 | UnassignADeanFromAFaculty404
+
+    /**
+ * @summary Unassign a Dean from a Faculty.
+ */
+export const useUnassignADeanFromAFaculty = <TError = UnassignADeanFromAFaculty403 | UnassignADeanFromAFaculty404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, TError,{assignmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unassignADeanFromAFaculty>>,
+        TError,
+        {assignmentId: number},
+        TContext
+      > => {
+      return useMutation(getUnassignADeanFromAFacultyMutationOptions(options), queryClient);
+    }
 
 /**
  * Public, unauthenticated: the front door the registration screen reads to
@@ -2895,6 +3359,175 @@ export const useScreenAnApplication = <TError = ScreenAnApplication403 | ScreenA
         TContext
       > => {
       return useMutation(getScreenAnApplicationMutationOptions(options), queryClient);
+    }
+
+/**
+ * The `under_dean_review` applications whose primary Program's Faculty is among
+ * the signed-in Dean's assigned Faculties, oldest-first, each with the applicant's
+ * identity, resolved primary Program, and days waited since entering Dean review.
+ * A Dean with no assigned Faculty (or a non-Dean reviewer) sees an empty queue.
+ * @summary Dean review queue.
+ */
+export const deanReviewQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeanReviewQueue200>(
+      {url: `/api/v1/dean/applications`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeanReviewQueueQueryKey = () => {
+    return [
+    `/api/v1/dean/applications`
+    ] as const;
+    }
+
+
+export const getDeanReviewQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDeanReviewQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanReviewQueue>>> = ({ signal }) => deanReviewQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DeanReviewQueueQueryResult = NonNullable<Awaited<ReturnType<typeof deanReviewQueue>>>
+export type DeanReviewQueueQueryError = DeanReviewQueue403
+
+
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Dean review queue.
+ */
+
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDeanReviewQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * `approve` moves the application to `interview_scheduled` (the concrete slot
+ * booking follows in interview scheduling); `reject` ends it as `rejected` with a
+ * reason. Both notify the applicant. The application must belong to one of the
+ * Dean's Faculties — otherwise 403, regardless of the action. Acting on an
+ * application that is not `under_dean_review` is an illegal transition (409). The
+ * surface is gated on `application.screen`.
+ * @summary Dean decision on an application.
+ */
+export const deanDecisionOnAnApplication = (
+    applicationId: number,
+    deanDecisionOnAnApplicationBody: DeanDecisionOnAnApplicationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeanDecisionOnAnApplication200>(
+      {url: `/api/v1/dean/applications/${applicationId}/review`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: deanDecisionOnAnApplicationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getDeanDecisionOnAnApplicationMutationOptions = <TError = DeanDecisionOnAnApplication403 | DeanDecisionOnAnApplication409 | DeanDecisionOnAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, TError,{applicationId: number;data: DeanDecisionOnAnApplicationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, TError,{applicationId: number;data: DeanDecisionOnAnApplicationBody}, TContext> => {
+
+const mutationKey = ['deanDecisionOnAnApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, {applicationId: number;data: DeanDecisionOnAnApplicationBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  deanDecisionOnAnApplication(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeanDecisionOnAnApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>>
+    export type DeanDecisionOnAnApplicationMutationBody = DeanDecisionOnAnApplicationBody
+    export type DeanDecisionOnAnApplicationMutationError = DeanDecisionOnAnApplication403 | DeanDecisionOnAnApplication409 | DeanDecisionOnAnApplication422
+
+    /**
+ * @summary Dean decision on an application.
+ */
+export const useDeanDecisionOnAnApplication = <TError = DeanDecisionOnAnApplication403 | DeanDecisionOnAnApplication409 | DeanDecisionOnAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, TError,{applicationId: number;data: DeanDecisionOnAnApplicationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deanDecisionOnAnApplication>>,
+        TError,
+        {applicationId: number;data: DeanDecisionOnAnApplicationBody},
+        TContext
+      > => {
+      return useMutation(getDeanDecisionOnAnApplicationMutationOptions(options), queryClient);
     }
 
 /**

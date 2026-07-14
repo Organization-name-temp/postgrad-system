@@ -25,6 +25,14 @@ enum NotificationType: string
     /** An application was returned for revision. Payload: reviewer `note`. */
     case ApplicationReturned = 'application.returned';
 
+    /**
+     * The Dean approved the application for interview (ticket 08). Distinct from
+     * {@see self::InterviewScheduled}: the applicant is told an interview is coming,
+     * before Student Affairs books the concrete slot (ticket 09). Payload:
+     * `application_id`.
+     */
+    case ApprovedForInterview = 'application.approved_for_interview';
+
     /** An interview was scheduled. Payload: `scheduled_at`, `mode`, location/link. */
     case InterviewScheduled = 'interview.scheduled';
 

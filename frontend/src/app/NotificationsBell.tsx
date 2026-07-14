@@ -41,6 +41,7 @@ const POLL_INTERVAL_MS = 30_000
  */
 const TYPE_ALIAS: Record<string, string> = {
   'application.returned': 'applicationReturned',
+  'application.approved_for_interview': 'approvedForInterview',
   'interview.scheduled': 'interviewScheduled',
   'interview.reminder': 'interviewReminder',
   'decision.recorded': 'decisionRecorded',

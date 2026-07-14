@@ -4,19 +4,23 @@ namespace Modules\Admissions\Internal\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Http\Resources\Concerns\RendersProgramSummary;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Public\ProgramSummary;
 
 /**
- * A single row of the Student Affairs screening queue (ticket 07) — the compact view
- * a reviewer scans before opening an application in full. Carries who is applying and
- * for what (name, national id, applying-for degree, resolved primary Program summary),
- * the current status, and the **derived age**: how long the application has waited
- * since it entered review, computed on demand from the timeline (`occurred_at` of the
- * entry into `under_sa_review`), never stored (spec §SLAs). The full detail + document
- * list come from the {@see ApplicationResource} `show` endpoint.
+ * A single row of a reviewer queue — the compact view a reviewer scans before opening
+ * an application in full. Carries who is applying and for what (name, national id,
+ * applying-for degree, resolved primary Program summary), the current status, and the
+ * **derived age**: how long the application has waited *in its current status*,
+ * computed on demand from the timeline (`occurred_at` of the entry into that status),
+ * never stored (spec §SLAs). The full detail + document list come from the
+ * {@see ApplicationResource} `show` endpoint.
+ *
+ * Aging from the *current* status makes this one row serve both queues: the Student
+ * Affairs queue (ticket 07, `under_sa_review`) and the faculty-scoped Dean queue
+ * (ticket 08, `under_dean_review`) each show days waited since entering their own
+ * stage.
  *
  * The primary Program summary is resolved through the `Catalog\Public` facade once
  * for the whole queue and stashed on the model by the controller (`resolved_primary_program`)
@@ -35,7 +39,7 @@ class ApplicationQueueResource extends JsonResource
         /** @var Application $application */
         $application = $this->resource;
 
-        $enteredReviewAt = $application->enteredStatusAt(ApplicationStatus::UnderSAReview);
+        $enteredReviewAt = $application->enteredStatusAt($application->status);
         $program = $application->getAttribute('resolved_primary_program');
 
         return [

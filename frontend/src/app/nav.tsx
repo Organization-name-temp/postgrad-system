@@ -7,6 +7,8 @@ import SchoolIcon from '@mui/icons-material/School'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import EventNoteIcon from '@mui/icons-material/EventNote'
 import FactCheckIcon from '@mui/icons-material/FactCheck'
+import GavelIcon from '@mui/icons-material/Gavel'
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 
@@ -27,6 +29,12 @@ export const navItems: NavItem[] = [
     key: 'screening',
     to: '/screening',
     icon: <FactCheckIcon />,
+    permission: PERMISSION.screenApplications,
+  },
+  {
+    key: 'deanReview',
+    to: '/dean',
+    icon: <GavelIcon />,
     permission: PERMISSION.screenApplications,
   },
   {
@@ -64,5 +72,14 @@ export const navItems: NavItem[] = [
     to: '/admin/cycles',
     icon: <EventNoteIcon />,
     permission: PERMISSION.manageCalendar,
+  },
+  // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
+  // under its own subheader — the first role-gated (not permission-gated) nav section.
+  {
+    key: 'assignments',
+    to: '/admin/assignments',
+    icon: <SupervisorAccountIcon />,
+    section: 'administration',
+    adminOnly: true,
   },
 ]

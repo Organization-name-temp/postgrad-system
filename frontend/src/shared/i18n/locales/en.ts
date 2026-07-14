@@ -261,6 +261,9 @@ export const en = {
         program: 'Program',
         review: 'Review',
       },
+      underReviewTitle: 'Your application has been submitted',
+      underReviewBody:
+        'It is now with Student Affairs for review. You will be notified as it progresses.',
     },
     personalInfo: {
       title: 'Personal information',
@@ -347,7 +350,41 @@ export const en = {
       uploadError: 'Could not upload the file. Please check its format and size and try again.',
       preview: 'Preview',
       remove: 'Remove',
-      nextStep: 'Next you will choose your program. That step is coming soon.',
+      nextStep: 'Next, choose the program you are applying to.',
+      continue: 'Continue to program selection',
+    },
+    program: {
+      title: 'Choose your program',
+      intro:
+        'Browse E-JUST’s programs and pick one primary program to apply to, and optionally one alternative. Your previous degree must qualify you for the program you choose.',
+      primaryLabel: 'Primary choice',
+      alternativeLabel: 'Alternative choice',
+      setPrimary: 'Primary',
+      setAlternative: 'Alternative',
+      none: 'Not chosen yet',
+      loading: 'Loading programs',
+      loadError: 'Could not load the program list. Please try again.',
+      saveError: 'Could not save your choice. Please review it and try again.',
+      back: 'Back',
+      saveContinue: 'Save & continue',
+      saving: 'Saving…',
+    },
+    review: {
+      title: 'Review & submit',
+      intro:
+        'Check your details before you finalize. Once submitted, your application goes to Student Affairs for review.',
+      sections: {
+        applicant: 'Applicant',
+        programs: 'Programs',
+        documents: 'Documents',
+      },
+      noAlternative: 'None',
+      documentsUploaded: '{{count}} document(s) uploaded',
+      back: 'Back',
+      finalize: 'Finalize application',
+      finalizing: 'Submitting…',
+      finalizeError:
+        'Could not finalize your application. Make sure a program is chosen and every required document is uploaded.',
     },
   },
   admin: {

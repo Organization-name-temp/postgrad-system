@@ -255,7 +255,7 @@ paths:
                 example:
                   data:
                     id: 1
-                    status: submitted
+                    status: email_verified
                     admission_cycle_id: 1
                     name_en: 'Sara Applicant'
                     name_ar: 'سارة المتقدمة'
@@ -281,6 +281,29 @@ paths:
                     english_score: '7.50'
                     native_arabic_speaker: true
                     submitted_at: '2026-07-14T10:00:00+00:00'
+                    primary_program_id: 1
+                    alternative_program_id: 2
+                    primary_program:
+                      id: 1
+                      code: MSC-CE
+                      name_en: 'MSc in Computer Engineering'
+                      name_ar: 'ماجستير هندسة الحاسوب'
+                      degree_level: MSc
+                      department_name_en: 'Computer Engineering'
+                      department_name_ar: 'هندسة الحاسوب'
+                      faculty_name_en: 'Faculty of Engineering'
+                      faculty_name_ar: 'كلية الهندسة'
+                    alternative_program:
+                      id: 2
+                      code: MSC-EE
+                      name_en: 'MSc in Electrical Engineering'
+                      name_ar: 'ماجستير الهندسة الكهربية'
+                      degree_level: MSc
+                      department_name_en: 'Electrical Engineering'
+                      department_name_ar: 'الهندسة الكهربية'
+                      faculty_name_en: 'Faculty of Engineering'
+                      faculty_name_ar: 'كلية الهندسة'
+                    finalized_at: null
                     documents:
                       -
                         id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
@@ -299,7 +322,7 @@ paths:
                         example: 1
                       status:
                         type: string
-                        example: submitted
+                        example: email_verified
                       admission_cycle_id:
                         type: integer
                         example: 1
@@ -375,6 +398,76 @@ paths:
                       submitted_at:
                         type: string
                         example: '2026-07-14T10:00:00+00:00'
+                      primary_program_id:
+                        type: integer
+                        example: 1
+                      alternative_program_id:
+                        type: integer
+                        example: 2
+                      primary_program:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: MSC-CE
+                          name_en:
+                            type: string
+                            example: 'MSc in Computer Engineering'
+                          name_ar:
+                            type: string
+                            example: 'ماجستير هندسة الحاسوب'
+                          degree_level:
+                            type: string
+                            example: MSc
+                          department_name_en:
+                            type: string
+                            example: 'Computer Engineering'
+                          department_name_ar:
+                            type: string
+                            example: 'هندسة الحاسوب'
+                          faculty_name_en:
+                            type: string
+                            example: 'Faculty of Engineering'
+                          faculty_name_ar:
+                            type: string
+                            example: 'كلية الهندسة'
+                      alternative_program:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          code:
+                            type: string
+                            example: MSC-EE
+                          name_en:
+                            type: string
+                            example: 'MSc in Electrical Engineering'
+                          name_ar:
+                            type: string
+                            example: 'ماجستير الهندسة الكهربية'
+                          degree_level:
+                            type: string
+                            example: MSc
+                          department_name_en:
+                            type: string
+                            example: 'Electrical Engineering'
+                          department_name_ar:
+                            type: string
+                            example: 'الهندسة الكهربية'
+                          faculty_name_en:
+                            type: string
+                            example: 'Faculty of Engineering'
+                          faculty_name_ar:
+                            type: string
+                            example: 'كلية الهندسة'
+                      finalized_at:
+                        type: string
+                        example: null
+                        nullable: true
                       documents:
                         type: array
                         example:
@@ -1085,6 +1178,208 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/application/programs:
+    patch:
+      summary: 'Choose program(s).'
+      operationId: choosePrograms
+      description: "Validates and stores the applicant's primary and optional alternative Program.\nEach id must be a real Program; the primary's degree level must match the\n`applying_for_degree` from Step 1; and the applicant's previous degree must\nqualify them for each chosen Program's level. A bad id, a level mismatch, or an\nunqualified Program is a 422; selecting once the application has left the\napplicant's hands (finalized/in review) is a 409."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: email_verified
+                    admission_cycle_id: 1
+                    primary_program_id: 1
+                    alternative_program_id: 2
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: email_verified
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+                      primary_program_id:
+                        type: integer
+                        example: 1
+                      alternative_program_id:
+                        type: integer
+                        example: 2
+        409:
+          description: locked
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application can no longer be edited.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application can no longer be edited.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'unknown program'
+                    type: object
+                    example:
+                      message: 'The selected program could not be found.'
+                      errors:
+                        primary_program_id:
+                          - 'The selected program could not be found.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'The selected program could not be found.'
+                      errors:
+                        type: object
+                        properties:
+                          primary_program_id:
+                            type: array
+                            example:
+                              - 'The selected program could not be found.'
+                            items:
+                              type: string
+                  -
+                    description: 'not qualified'
+                    type: object
+                    example:
+                      message: 'Your previous degree does not qualify you for this program.'
+                      errors:
+                        primary_program_id:
+                          - 'Your previous degree does not qualify you for this program.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Your previous degree does not qualify you for this program.'
+                      errors:
+                        type: object
+                        properties:
+                          primary_program_id:
+                            type: array
+                            example:
+                              - 'Your previous degree does not qualify you for this program.'
+                            items:
+                              type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                primary_program_id:
+                  type: integer
+                  description: "The chosen primary Program's id."
+                  example: 1
+                alternative_program_id:
+                  type: integer
+                  description: "An optional second-choice Program's id; must differ from the primary."
+                  example: 2
+                  nullable: true
+              required:
+                - primary_program_id
+      security: []
+  /api/v1/application/finalize:
+    post:
+      summary: 'Finalize the application.'
+      operationId: finalizeTheApplication
+      description: "The last wizard step: moves a complete application from `email_verified` into\nStudent Affairs review (`under_sa_review`) and stamps `finalized_at`. A complete\napplication has a primary Program chosen (program-selection step) and every\nrequired and conditionally-required document uploaded (the English certificate\nif a test was reported, the MSc thesis for a PhD applicant). A missing\nprerequisite is a 422; finalizing anything not awaiting finalize (not\n`email_verified`) is a 409."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: under_sa_review
+                    admission_cycle_id: 1
+                    finalized_at: '2026-07-14T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: under_sa_review
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+                      finalized_at:
+                        type: string
+                        example: '2026-07-14T10:00:00+00:00'
+        409:
+          description: 'not ready to finalize'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application is not ready to be finalized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application is not ready to be finalized.'
+        422:
+          description: 'missing prerequisites'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Choose a program before finalizing your application.'
+                  errors:
+                    primary_program_id:
+                      - 'Choose a program before finalizing your application.'
+                    documents:
+                      - 'Upload every required document before finalizing your application.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Choose a program before finalizing your application.'
+                  errors:
+                    type: object
+                    properties:
+                      primary_program_id:
+                        type: array
+                        example:
+                          - 'Choose a program before finalizing your application.'
+                        items:
+                          type: string
+                      documents:
+                        type: array
+                        example:
+                          - 'Upload every required document before finalizing your application.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      security: []
   '/api/v1/documents/{document_ulid}':
     get:
       summary: 'Stream a document.'

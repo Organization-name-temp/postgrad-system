@@ -5,12 +5,12 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Catalog\Internal\Enums\CourseCategory;
 use Modules\Catalog\Internal\Enums\CourseLevel;
-use Modules\Catalog\Internal\Enums\DegreeLevel;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\Enums\DegreeLevel;
 
 /**
  * Seeds a realistic, bilingual E-JUST catalog so the browse tree, Course detail,

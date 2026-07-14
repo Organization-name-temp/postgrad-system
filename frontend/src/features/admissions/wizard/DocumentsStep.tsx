@@ -31,6 +31,8 @@ import type { DocumentRequirement, DocumentTypeConfig } from './documentTypes'
 
 interface DocumentsStepProps {
   application: MyApplication200Data
+  /** Advance to program selection. Omitted where the step is shown standalone. */
+  onContinue?: () => void
 }
 
 /** Requirement → the MUI Chip colour that conveys how strongly it is needed. */
@@ -56,7 +58,7 @@ function formatSize(bytes: number | undefined): string {
  * surfaces a bad type/format/size/over-count as an inline 422 message. Documents
  * lock once the application enters review (the API then answers 409).
  */
-export function DocumentsStep({ application }: DocumentsStepProps) {
+export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
   const { t } = useTranslation('admissions')
   const queryClient = useQueryClient()
 
@@ -210,6 +212,14 @@ export function DocumentsStep({ application }: DocumentsStepProps) {
       <Alert severity="info" sx={{ mt: 3 }}>
         {t('documents.nextStep')}
       </Alert>
+
+      {onContinue && (
+        <Stack direction="row" sx={{ mt: 3, justifyContent: 'flex-end' }}>
+          <Button variant="contained" onClick={onContinue}>
+            {t('documents.continue')}
+          </Button>
+        </Stack>
+      )}
     </Box>
   )
 }

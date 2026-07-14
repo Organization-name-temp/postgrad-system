@@ -3,9 +3,9 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\Catalog\Internal\Enums\DegreeLevel;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\Enums\DegreeLevel;
 
 /**
  * @extends Factory<Program>

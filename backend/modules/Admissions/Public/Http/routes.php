@@ -5,6 +5,7 @@ use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
 use Modules\Admissions\Internal\Http\Controllers\DocumentController;
 use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
+use Modules\Admissions\Internal\Http\Controllers\ProgramSelectionController;
 use Modules\Admissions\Internal\Http\Controllers\RegistrationController;
 
 /*
@@ -53,6 +54,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // 404s a document that is not theirs.
     Route::post('/application/documents', [DocumentController::class, 'store']);
     Route::delete('/application/documents/{document}', [DocumentController::class, 'destroy'])->whereUlid('document');
+
+    // Program selection + finalize (ticket 06). Selection validates the chosen
+    // Catalog Program(s) through the Catalog\Public facade (ADR-0012); finalize
+    // gates on a complete application and moves EmailVerified → UnderSAReview.
+    Route::patch('/application/programs', [ProgramSelectionController::class, 'update']);
+    Route::post('/application/finalize', [ApplicationController::class, 'finalize']);
 });
 
 // Streaming download (ticket 05). Sanctum-authed but not applicant-scoped: served

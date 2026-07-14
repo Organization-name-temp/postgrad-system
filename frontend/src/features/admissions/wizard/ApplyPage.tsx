@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Alert,
+  AlertTitle,
   Box,
   CircularProgress,
   Paper,
@@ -14,22 +15,28 @@ import { useMyApplication } from '../../../shared/api/generated/endpoints'
 import { PersonalInfoStep } from './PersonalInfoStep'
 import { EmailVerifyStep } from './EmailVerifyStep'
 import { DocumentsStep } from './DocumentsStep'
-import { WIZARD_STEP, WIZARD_STEP_KEYS, stepForStatus } from './wizardSteps'
+import { ProgramStep } from './ProgramStep'
+import { ReviewStep } from './ReviewStep'
+import { WIZARD_STEP, WIZARD_STEP_KEYS, isFinalized, stepForStatus } from './wizardSteps'
+
+/** The post-verification sub-steps the applicant walks client-side (the server
+ *  status stays `email_verified` across all three until finalize). */
+type PostVerifyStep = 'documents' | 'program' | 'review'
 
 /**
  * The applicant's multi-step application wizard. The server's Application status
- * drives which step is active (so a reload resumes in place); ticket 04 builds
- * Step 1 (personal info) and Step 2 (email verification), with documents, program
- * selection, and review shown as upcoming. The verification link issued on submit
- * is held here and handed to the verify step.
+ * drives the phase — personal info (`draft`), email verification (`submitted`), and,
+ * once verified, the post-verification sub-wizard (documents → program → review)
+ * that the SPA navigates locally since the status holds at `email_verified` until
+ * finalize. Finalizing moves the application into review, where the wizard shows a
+ * read-only confirmation. A reload always resumes in the right phase.
  */
 export function ApplyPage() {
   const { t } = useTranslation('admissions')
   const { data, isPending, isError } = useMyApplication()
   const application = data?.data
   const [verificationUrl, setVerificationUrl] = useState<string | null>(null)
-
-  const activeStep = stepForStatus(application?.status)
+  const [postVerifyStep, setPostVerifyStep] = useState<PostVerifyStep>('documents')
 
   if (isPending) {
     return (
@@ -53,6 +60,19 @@ export function ApplyPage() {
     )
   }
 
+  const status = application.status
+  const finalized = isFinalized(status)
+  const verified = status === 'email_verified'
+
+  // Which Stepper node reads as active: a finalized application reads as done; the
+  // post-verify phase tracks its local sub-step; everything earlier follows the
+  // shared status→step mapping (stepForStatus).
+  const activeStep = finalized
+    ? WIZARD_STEP_KEYS.length
+    : verified
+      ? WIZARD_STEP[postVerifyStep]
+      : stepForStatus(status)
+
   return (
     <Box sx={{ py: 2 }}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -68,19 +88,37 @@ export function ApplyPage() {
       </Stepper>
 
       <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
-        {activeStep === WIZARD_STEP.personalInfo && (
-          <PersonalInfoStep application={application} onSubmitted={setVerificationUrl} />
-        )}
-        {activeStep === WIZARD_STEP.verifyEmail && (
-          <EmailVerifyStep verificationUrl={verificationUrl} onResent={setVerificationUrl} />
-        )}
-        {activeStep >= WIZARD_STEP.documents && (
+        {finalized ? (
+          <Alert severity="success">
+            <AlertTitle>{t('wizard.underReviewTitle')}</AlertTitle>
+            {t('wizard.underReviewBody')}
+          </Alert>
+        ) : verified ? (
           <Box>
             <Alert severity="success" sx={{ mb: 2 }}>
               {t('verify.verified')}
             </Alert>
-            <DocumentsStep application={application} />
+            {postVerifyStep === 'documents' && (
+              <DocumentsStep
+                application={application}
+                onContinue={() => setPostVerifyStep('program')}
+              />
+            )}
+            {postVerifyStep === 'program' && (
+              <ProgramStep
+                application={application}
+                onBack={() => setPostVerifyStep('documents')}
+                onContinue={() => setPostVerifyStep('review')}
+              />
+            )}
+            {postVerifyStep === 'review' && (
+              <ReviewStep application={application} onBack={() => setPostVerifyStep('program')} />
+            )}
           </Box>
+        ) : status === 'submitted' ? (
+          <EmailVerifyStep verificationUrl={verificationUrl} onResent={setVerificationUrl} />
+        ) : (
+          <PersonalInfoStep application={application} onSubmitted={setVerificationUrl} />
         )}
       </Paper>
     </Box>

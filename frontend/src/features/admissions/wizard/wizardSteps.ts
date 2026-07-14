@@ -27,8 +27,9 @@ export const WIZARD_STEP = {
 /**
  * The active step for a given Application status. `draft` is still filling Step 1;
  * `submitted` is awaiting email verification; anything past that (`email_verified`
- * onward) has cleared the ticket-04 steps and rests at documents — the next
- * ticket's surface. An unknown/absent status starts at the beginning.
+ * onward) has cleared the ticket-04 steps and rests at documents — the entry into
+ * the post-verification phase (documents → program → review), whose sub-step the
+ * wizard then drives client-side. An unknown/absent status starts at the beginning.
  */
 export function stepForStatus(status: string | undefined): number {
   switch (status) {
@@ -41,4 +42,21 @@ export function stepForStatus(status: string | undefined): number {
     default:
       return WIZARD_STEP.documents
   }
+}
+
+/**
+ * The statuses in which the applicant is still filling the wizard (before finalize
+ * hands the application to Student Affairs). Everything after `email_verified` is
+ * finalized/in-review — {@see isFinalized} — where the wizard shows a read-only
+ * "submitted for review" confirmation rather than any editable step.
+ */
+const PRE_FINALIZE_STATUSES = ['draft', 'submitted', 'email_verified']
+
+/**
+ * Whether the application has been finalized — i.e. moved past the applicant's
+ * wizard (`under_sa_review` onward). Ticket 06 finalizes into `under_sa_review`;
+ * the full status timeline arrives in a later ticket.
+ */
+export function isFinalized(status: string | undefined): boolean {
+  return status !== undefined && !PRE_FINALIZE_STATUSES.includes(status)
 }

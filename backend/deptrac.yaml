@@ -64,15 +64,17 @@ deptrac:
       - Catalog_Public
       - Identity_Public
     # Admissions (Phase 2) is the first module with multiple cross-module edges.
-    # Ticket 01 opens only the Identity\Public edge (calendar.manage lives in the
-    # §3.2 matrix); the Catalog\Public and Notifications\Public edges are added by
-    # the tickets that first consume them (program selection, notifications).
+    # Ticket 01 opened the Identity\Public edge (calendar.manage lives in the §3.2
+    # matrix); ticket 06 opens the Catalog\Public edge (program selection reads the
+    # ProgramCatalog facade + DegreeLevel, ADR-0012). The Notifications\Public edge
+    # is added by the ticket that first enqueues a notification.
     Admissions_Public:
       - Admissions_Internal
       - Identity_Public
     Admissions_Internal:
       - Admissions_Public
       - Identity_Public
+      - Catalog_Public
     # Notifications (Phase 2, ticket 02) is cross-cutting: any module may enqueue a
     # notification through Notifications\Public, but Notifications itself reaches
     # only Identity\Public (user ids) and never any other module. The inbound edges

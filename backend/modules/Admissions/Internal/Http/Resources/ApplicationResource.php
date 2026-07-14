@@ -5,13 +5,21 @@ namespace Modules\Admissions\Internal\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Catalog\Public\ProgramSummary;
 
 /**
  * An Application in the { data: ... } envelope. Carries the Application's identity
  * (id/status/cycle) plus the Step-1 personal-info snapshot filled so far — nulls
  * where the applicant has not yet provided a field — so the SPA can render and
- * resume the wizard. The documents uploaded so far are included (ticket 05);
- * program selection and the status timeline are added by later tickets.
+ * resume the wizard. The documents uploaded so far (ticket 05) and the selected
+ * program(s) (ticket 06) are included; the status timeline is added by later tickets.
+ *
+ * Program selection is surfaced two ways: the opaque `primary_program_id` /
+ * `alternative_program_id` the applicant stores, and — resolved through the
+ * `Catalog\Public` {@see ProgramCatalog} facade (ADR-0012) — a `primary_program` /
+ * `alternative_program` summary object for the review and reviewer screens to
+ * render without re-reading the catalog tree. A dropped reference resolves to null.
  *
  * The verification link is *not* part of this payload: it is returned only by the
  * submit and resend endpoints (which add `verification_url` alongside `data`), so
@@ -26,6 +34,13 @@ class ApplicationResource extends JsonResource
     {
         /** @var Application $application */
         $application = $this->resource;
+
+        // Resolve the chosen program(s) in one facade read (empty ids ⇒ no read).
+        $programIds = array_values(array_filter(
+            [$application->primary_program_id, $application->alternative_program_id],
+            static fn (?int $id): bool => $id !== null,
+        ));
+        $programs = $programIds === [] ? [] : app(ProgramCatalog::class)->findMany($programIds);
 
         return [
             'id' => $application->getKey(),
@@ -52,14 +67,47 @@ class ApplicationResource extends JsonResource
             'graduation_cgpa' => $application->graduation_cgpa,
             'gpa_scale' => $application->gpa_scale?->value,
             'is_ejust_graduate' => $application->is_ejust_graduate,
-            'applying_for_degree' => $application->applying_for_degree,
+            'applying_for_degree' => $application->applying_for_degree?->value,
             'english_test' => $application->english_test?->value,
             'english_score' => $application->english_score,
             'native_arabic_speaker' => $application->native_arabic_speaker,
             'submitted_at' => $application->submitted_at?->toIso8601String(),
 
+            // Program selection (ticket 06): the opaque refs plus resolved summaries.
+            'primary_program_id' => $application->primary_program_id,
+            'alternative_program_id' => $application->alternative_program_id,
+            'primary_program' => $this->summary($programs[$application->primary_program_id] ?? null),
+            'alternative_program' => $this->summary($programs[$application->alternative_program_id] ?? null),
+
+            'finalized_at' => $application->finalized_at?->toIso8601String(),
+
             // Documents uploaded so far (ticket 05).
             'documents' => ApplicationDocumentResource::collection($application->documents),
+        ];
+    }
+
+    /**
+     * A {@see ProgramSummary} as the flat, bilingual object the SPA renders, or null
+     * when the reference is unset or dangling (ADR-0012 — no FK guarantees existence).
+     *
+     * @return array<string, mixed>|null
+     */
+    private function summary(?ProgramSummary $program): ?array
+    {
+        if ($program === null) {
+            return null;
+        }
+
+        return [
+            'id' => $program->id,
+            'code' => $program->code,
+            'name_en' => $program->nameEn,
+            'name_ar' => $program->nameAr,
+            'degree_level' => $program->degreeLevel->value,
+            'department_name_en' => $program->departmentNameEn,
+            'department_name_ar' => $program->departmentNameAr,
+            'faculty_name_en' => $program->facultyNameEn,
+            'faculty_name_ar' => $program->facultyNameAr,
         ];
     }
 }

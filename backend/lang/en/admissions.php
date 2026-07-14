@@ -17,6 +17,16 @@ return [
         'locked' => 'Documents can no longer be changed for this application.',
         'too_many' => 'You can upload at most :max document(s) of this type.',
     ],
+    'program' => [
+        'not_found' => 'The selected program could not be found.',
+        'degree_mismatch' => 'The selected program does not match the degree you are applying for.',
+        'not_qualified' => 'Your previous degree does not qualify you for this program.',
+    ],
+    'finalize' => [
+        'not_ready' => 'This application is not ready to be finalized.',
+        'no_program' => 'Choose a program before finalizing your application.',
+        'missing_documents' => 'Upload every required document before finalizing your application.',
+    ],
     'verification' => [
         'not_pending' => 'This application is not awaiting email verification.',
     ],

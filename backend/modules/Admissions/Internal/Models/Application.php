@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
+use Modules\Admissions\Internal\Enums\DocumentRequirement;
+use Modules\Admissions\Internal\Enums\DocumentType;
 use Modules\Admissions\Internal\Enums\EnglishTest;
 use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
 use Modules\Admissions\Internal\Enums\PreviousDegree;
+use Modules\Catalog\Public\Enums\DegreeLevel;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -50,11 +53,14 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * @property ?string $graduation_cgpa
  * @property ?GpaScale $gpa_scale
  * @property ?bool $is_ejust_graduate
- * @property ?string $applying_for_degree
+ * @property ?DegreeLevel $applying_for_degree
  * @property ?EnglishTest $english_test
  * @property ?string $english_score
  * @property ?bool $native_arabic_speaker
+ * @property ?int $primary_program_id
+ * @property ?int $alternative_program_id
  * @property ?Carbon $submitted_at
+ * @property ?Carbon $finalized_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -97,6 +103,10 @@ class Application extends Model
         'english_test',
         'english_score',
         'native_arabic_speaker',
+        // Program selection (ticket 06): opaque Catalog Program refs, validated to
+        // exist and pass the qualification rule by the controller before assignment.
+        'primary_program_id',
+        'alternative_program_id',
     ];
 
     /**
@@ -121,6 +131,10 @@ class Application extends Model
             'previous_degree' => PreviousDegree::class,
             'gpa_scale' => GpaScale::class,
             'english_test' => EnglishTest::class,
+            // The degree applied for is a Catalog\Public DegreeLevel now the seam is
+            // open (ticket 06, ADR-0012) — so the finalize + qualification checks
+            // compare it against a Program's level type-safely, not as a raw string.
+            'applying_for_degree' => DegreeLevel::class,
             'date_of_birth' => 'date',
             'graduation_date' => 'date',
             'graduation_gpa' => 'decimal:2',
@@ -128,7 +142,10 @@ class Application extends Model
             'english_score' => 'decimal:2',
             'is_ejust_graduate' => 'boolean',
             'native_arabic_speaker' => 'boolean',
+            'primary_program_id' => 'integer',
+            'alternative_program_id' => 'integer',
             'submitted_at' => 'datetime',
+            'finalized_at' => 'datetime',
         ];
     }
 
@@ -168,6 +185,28 @@ class Application extends Model
      */
     public function areDocumentsEditable(): bool
     {
+        return $this->isInApplicantHands();
+    }
+
+    /**
+     * Whether the applicant may still choose or change their Program(s) (ticket 06).
+     * Program selection is editable in exactly the same window as documents — while
+     * the application is still in the applicant's hands — and locks on finalize, when
+     * it enters review.
+     */
+    public function isProgramSelectable(): bool
+    {
+        return $this->isInApplicantHands();
+    }
+
+    /**
+     * The statuses in which the application still belongs to the applicant, before
+     * finalize hands it to Student Affairs. Documents and program selection are both
+     * editable in exactly this window; the Step-1 snapshot locks earlier (Draft only,
+     * {@see self::isApplicantEditable()}).
+     */
+    private function isInApplicantHands(): bool
+    {
         return in_array($this->status, [
             ApplicationStatus::Draft,
             ApplicationStatus::Submitted,
@@ -203,6 +242,76 @@ class Application extends Model
     {
         $this->transitionTo(ApplicationStatus::EmailVerified, [ApplicationStatus::Submitted]);
         $this->save();
+    }
+
+    /**
+     * Finalize a complete application into Student Affairs review:
+     * {@see ApplicationStatus::EmailVerified} → {@see ApplicationStatus::UnderSAReview},
+     * stamping `finalized_at`. Any other status is an illegal move (→ 409).
+     *
+     * Completeness — a primary Program plus every required and conditionally-required
+     * document — is a *business* precondition the caller checks first (a missing
+     * prerequisite is a 422, not a state conflict); see
+     * {@see self::missingRequiredDocumentTypes()} and {@see self::hasPrimaryProgram()}.
+     * This method only performs the guarded transition once those hold.
+     */
+    public function finalize(): void
+    {
+        $this->transitionTo(ApplicationStatus::UnderSAReview, [ApplicationStatus::EmailVerified]);
+        $this->finalized_at = now();
+        $this->save();
+    }
+
+    /** Whether a primary Program has been chosen — the first finalize prerequisite. */
+    public function hasPrimaryProgram(): bool
+    {
+        return $this->primary_program_id !== null;
+    }
+
+    /**
+     * The DocumentTypes this application must hold at least one of before it can be
+     * finalized: the always-{@see DocumentRequirement::Required} set, plus the
+     * conditionally-required documents this particular application actually owes —
+     * the English-proficiency certificate once a test (other than None) is reported,
+     * and the MSc thesis when applying for a PhD (BR-66/67). The static
+     * requirement/size/format rules live on {@see DocumentType}; which *conditionals*
+     * apply is resolved here, against this application's own snapshot.
+     *
+     * @return list<DocumentType>
+     */
+    public function requiredDocumentTypesForFinalize(): array
+    {
+        $types = array_values(array_filter(
+            DocumentType::cases(),
+            static fn (DocumentType $type): bool => $type->requirement() === DocumentRequirement::Required,
+        ));
+
+        if ($this->english_test !== null && $this->english_test !== EnglishTest::None) {
+            $types[] = DocumentType::EnglishCertificate;
+        }
+
+        if ($this->applying_for_degree === DegreeLevel::PhD) {
+            $types[] = DocumentType::MscThesis;
+        }
+
+        return $types;
+    }
+
+    /**
+     * The required DocumentTypes still missing an upload — empty when the document
+     * side of finalize is satisfied. Reads the loaded `documents` relation, so the
+     * caller should have it available (the wizard endpoints eager-load it).
+     *
+     * @return list<DocumentType>
+     */
+    public function missingRequiredDocumentTypes(): array
+    {
+        $uploaded = $this->documents->pluck('document_type')->all();
+
+        return array_values(array_filter(
+            $this->requiredDocumentTypesForFinalize(),
+            static fn (DocumentType $type): bool => ! in_array($type, $uploaded, true),
+        ));
     }
 
     /**

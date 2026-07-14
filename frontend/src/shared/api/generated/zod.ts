@@ -105,6 +105,31 @@ export const MyApplicationResponse = zod.object({
   "english_score": zod.string().optional(),
   "native_arabic_speaker": zod.boolean().optional(),
   "submitted_at": zod.string().optional(),
+  "primary_program_id": zod.number().optional(),
+  "alternative_program_id": zod.number().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "alternative_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().nullish(),
   "documents": zod.array(zod.object({
   "id": zod.string().optional(),
   "document_type": zod.string().optional(),
@@ -271,6 +296,51 @@ export const RemoveADocumentParams = zod.object({
 })
 
 export const RemoveADocumentResponse = zod.string()
+
+
+/**
+ * Validates and stores the applicant's primary and optional alternative Program.
+ * Each id must be a real Program; the primary's degree level must match the
+ * `applying_for_degree` from Step 1; and the applicant's previous degree must
+ * qualify them for each chosen Program's level. A bad id, a level mismatch, or an
+ * unqualified Program is a 422; selecting once the application has left the
+ * applicant's hands (finalized/in review) is a 409.
+ * @summary Choose program(s).
+ */
+export const ChooseProgramsBody = zod.object({
+  "primary_program_id": zod.number().describe('The chosen primary Program\'s id.'),
+  "alternative_program_id": zod.number().nullish().describe('An optional second-choice Program\'s id; must differ from the primary.')
+})
+
+export const ChooseProgramsResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "primary_program_id": zod.number().optional(),
+  "alternative_program_id": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * The last wizard step: moves a complete application from `email_verified` into
+ * Student Affairs review (`under_sa_review`) and stamps `finalized_at`. A complete
+ * application has a primary Program chosen (program-selection step) and every
+ * required and conditionally-required document uploaded (the English certificate
+ * if a test was reported, the MSc thesis for a PhD applicant). A missing
+ * prerequisite is a 422; finalizing anything not awaiting finalize (not
+ * `email_verified`) is a 409.
+ * @summary Finalize the application.
+ */
+export const FinalizeTheApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "finalized_at": zod.string().optional()
+}).optional()
+})
 
 
 /**

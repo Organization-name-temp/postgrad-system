@@ -89,6 +89,30 @@ export type VerifyEmailsignedLink403 = {
   message?: string;
 };
 
+export type MyApplication200DataPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type MyApplication200DataAlternativeProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
 export type MyApplication200DataDocumentsItem = {
   id?: string;
   document_type?: string;
@@ -127,6 +151,12 @@ export type MyApplication200Data = {
   english_score?: string;
   native_arabic_speaker?: boolean;
   submitted_at?: string;
+  primary_program_id?: number;
+  alternative_program_id?: number;
+  primary_program?: MyApplication200DataPrimaryProgram;
+  alternative_program?: MyApplication200DataAlternativeProgram;
+  /** @nullable */
+  finalized_at?: string | null;
   documents?: MyApplication200DataDocumentsItem[];
 };
 
@@ -359,6 +389,64 @@ export type RemoveADocument404 = {
 
 export type RemoveADocument409 = {
   message?: string;
+};
+
+export type ChooseProgramsBody = {
+  /** The chosen primary Program's id. */
+  primary_program_id: number;
+  /**
+     * An optional second-choice Program's id; must differ from the primary.
+     * @nullable
+     */
+  alternative_program_id?: number | null;
+};
+
+export type ChoosePrograms200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  primary_program_id?: number;
+  alternative_program_id?: number;
+};
+
+export type ChoosePrograms200 = {
+  data?: ChoosePrograms200Data;
+};
+
+export type ChoosePrograms409 = {
+  message?: string;
+};
+
+export type ChoosePrograms422 = {
+  message?: string;
+  errors?: {
+  primary_program_id?: string[];
+};
+};
+
+export type FinalizeTheApplication200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  finalized_at?: string;
+};
+
+export type FinalizeTheApplication200 = {
+  data?: FinalizeTheApplication200Data;
+};
+
+export type FinalizeTheApplication409 = {
+  message?: string;
+};
+
+export type FinalizeTheApplication422Errors = {
+  primary_program_id?: string[];
+  documents?: string[];
+};
+
+export type FinalizeTheApplication422 = {
+  message?: string;
+  errors?: FinalizeTheApplication422Errors;
 };
 
 export type StreamADocument403 = {
@@ -2069,6 +2157,147 @@ export const useRemoveADocument = <TError = RemoveADocument404 | RemoveADocument
         TContext
       > => {
       return useMutation(getRemoveADocumentMutationOptions(options), queryClient);
+    }
+
+/**
+ * Validates and stores the applicant's primary and optional alternative Program.
+ * Each id must be a real Program; the primary's degree level must match the
+ * `applying_for_degree` from Step 1; and the applicant's previous degree must
+ * qualify them for each chosen Program's level. A bad id, a level mismatch, or an
+ * unqualified Program is a 422; selecting once the application has left the
+ * applicant's hands (finalized/in review) is a 409.
+ * @summary Choose program(s).
+ */
+export const choosePrograms = (
+    chooseProgramsBody: ChooseProgramsBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ChoosePrograms200>(
+      {url: `/api/v1/application/programs`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: chooseProgramsBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getChooseProgramsMutationOptions = <TError = ChoosePrograms409 | ChoosePrograms422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof choosePrograms>>, TError,{data: ChooseProgramsBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof choosePrograms>>, TError,{data: ChooseProgramsBody}, TContext> => {
+
+const mutationKey = ['choosePrograms'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof choosePrograms>>, {data: ChooseProgramsBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  choosePrograms(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChooseProgramsMutationResult = NonNullable<Awaited<ReturnType<typeof choosePrograms>>>
+    export type ChooseProgramsMutationBody = ChooseProgramsBody
+    export type ChooseProgramsMutationError = ChoosePrograms409 | ChoosePrograms422
+
+    /**
+ * @summary Choose program(s).
+ */
+export const useChoosePrograms = <TError = ChoosePrograms409 | ChoosePrograms422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof choosePrograms>>, TError,{data: ChooseProgramsBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof choosePrograms>>,
+        TError,
+        {data: ChooseProgramsBody},
+        TContext
+      > => {
+      return useMutation(getChooseProgramsMutationOptions(options), queryClient);
+    }
+
+/**
+ * The last wizard step: moves a complete application from `email_verified` into
+ * Student Affairs review (`under_sa_review`) and stamps `finalized_at`. A complete
+ * application has a primary Program chosen (program-selection step) and every
+ * required and conditionally-required document uploaded (the English certificate
+ * if a test was reported, the MSc thesis for a PhD applicant). A missing
+ * prerequisite is a 422; finalizing anything not awaiting finalize (not
+ * `email_verified`) is a 409.
+ * @summary Finalize the application.
+ */
+export const finalizeTheApplication = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<FinalizeTheApplication200>(
+      {url: `/api/v1/application/finalize`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getFinalizeTheApplicationMutationOptions = <TError = FinalizeTheApplication409 | FinalizeTheApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeTheApplication>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof finalizeTheApplication>>, TError,void, TContext> => {
+
+const mutationKey = ['finalizeTheApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof finalizeTheApplication>>, void> = () => {
+
+
+          return  finalizeTheApplication()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FinalizeTheApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof finalizeTheApplication>>>
+
+    export type FinalizeTheApplicationMutationError = FinalizeTheApplication409 | FinalizeTheApplication422
+
+    /**
+ * @summary Finalize the application.
+ */
+export const useFinalizeTheApplication = <TError = FinalizeTheApplication409 | FinalizeTheApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeTheApplication>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof finalizeTheApplication>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getFinalizeTheApplicationMutationOptions(options), queryClient);
     }
 
 /**

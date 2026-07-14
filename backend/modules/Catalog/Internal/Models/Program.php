@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Catalog\Internal\Enums\CourseCategory;
-use Modules\Catalog\Internal\Enums\DegreeLevel;
+use Modules\Catalog\Public\Enums\DegreeLevel;
 
 /**
  * A Program — a degree offering (MSc/PhD) under a Department. It carries its

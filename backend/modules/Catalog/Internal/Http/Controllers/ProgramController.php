@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 use Modules\Catalog\Internal\Enums\CourseCategory;
-use Modules\Catalog\Internal\Enums\DegreeLevel;
 use Modules\Catalog\Internal\Http\Resources\ProgramResource;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
+use Modules\Catalog\Public\Enums\DegreeLevel;
 
 /**
  * @group Catalog

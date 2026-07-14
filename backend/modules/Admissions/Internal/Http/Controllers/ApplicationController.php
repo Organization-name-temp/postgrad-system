@@ -5,6 +5,8 @@ namespace Modules\Admissions\Internal\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Enums\EnglishTest;
 use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
@@ -13,6 +15,7 @@ use Modules\Admissions\Internal\Http\Concerns\ResolvesCurrentApplication;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Verification\EmailVerificationLink;
+use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Identity\Public\Contracts\EmailVerifier;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -37,7 +40,7 @@ class ApplicationController
      * Step-1 snapshot (fields the applicant has not yet provided come back null),
      * so the SPA can render and resume the wizard at the right step.
      *
-     * @response 200 {"data": {"id": 1, "status": "submitted", "admission_cycle_id": 1, "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "phone": "+201000000000", "date_of_birth": "1998-05-20", "nationality": "Egyptian", "gender": "Female", "address_country": "Egypt", "address_city": "Alexandria", "address_street": "15 Corniche Road", "previous_university": "Cairo University", "graduation_certificate_name": "BSc in Computer Science", "graduation_date": "2020-07-01", "previous_degree": "BSc", "previous_major": "Computer Science", "graduation_gpa": "3.50", "graduation_cgpa": "3.45", "gpa_scale": "4.0", "is_ejust_graduate": false, "applying_for_degree": "MSc", "english_test": "IELTS", "english_score": "7.50", "native_arabic_speaker": true, "submitted_at": "2026-07-14T10:00:00+00:00", "documents": [{"id": "01ARZ3NDEKTSV4RRFFQ69G5FAV", "document_type": "graduation_certificate", "original_filename": "certificate.pdf", "mime": "application/pdf", "size_bytes": 24576, "uploaded_at": "2026-07-14T10:00:00+00:00", "download_url": "http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV"}]}}
+     * @response 200 {"data": {"id": 1, "status": "email_verified", "admission_cycle_id": 1, "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "phone": "+201000000000", "date_of_birth": "1998-05-20", "nationality": "Egyptian", "gender": "Female", "address_country": "Egypt", "address_city": "Alexandria", "address_street": "15 Corniche Road", "previous_university": "Cairo University", "graduation_certificate_name": "BSc in Computer Science", "graduation_date": "2020-07-01", "previous_degree": "BSc", "previous_major": "Computer Science", "graduation_gpa": "3.50", "graduation_cgpa": "3.45", "gpa_scale": "4.0", "is_ejust_graduate": false, "applying_for_degree": "MSc", "english_test": "IELTS", "english_score": "7.50", "native_arabic_speaker": true, "submitted_at": "2026-07-14T10:00:00+00:00", "primary_program_id": 1, "alternative_program_id": 2, "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "alternative_program": {"id": 2, "code": "MSC-EE", "name_en": "MSc in Electrical Engineering", "name_ar": "ماجستير الهندسة الكهربية", "degree_level": "MSc", "department_name_en": "Electrical Engineering", "department_name_ar": "الهندسة الكهربية", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": null, "documents": [{"id": "01ARZ3NDEKTSV4RRFFQ69G5FAV", "document_type": "graduation_certificate", "original_filename": "certificate.pdf", "mime": "application/pdf", "size_bytes": 24576, "uploaded_at": "2026-07-14T10:00:00+00:00", "download_url": "http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV"}]}}
      * @response 401 {"message": "Unauthenticated."}
      * @response 404 {"message": "No application found."}
      */
@@ -157,13 +160,60 @@ class ApplicationController
     }
 
     /**
+     * Finalize the application.
+     *
+     * The last wizard step: moves a complete application from `email_verified` into
+     * Student Affairs review (`under_sa_review`) and stamps `finalized_at`. A complete
+     * application has a primary Program chosen (program-selection step) and every
+     * required and conditionally-required document uploaded (the English certificate
+     * if a test was reported, the MSc thesis for a PhD applicant). A missing
+     * prerequisite is a 422; finalizing anything not awaiting finalize (not
+     * `email_verified`) is a 409.
+     *
+     * @response 200 {"data": {"id": 1, "status": "under_sa_review", "admission_cycle_id": 1, "finalized_at": "2026-07-14T10:00:00+00:00"}}
+     * @response 409 scenario="not ready to finalize" {"message": "This application is not ready to be finalized."}
+     * @response 422 scenario="missing prerequisites" {"message": "Choose a program before finalizing your application.", "errors": {"primary_program_id": ["Choose a program before finalizing your application."], "documents": ["Upload every required document before finalizing your application."]}}
+     */
+    public function finalize(Request $request): ApplicationResource
+    {
+        $application = $this->currentApplication($request);
+
+        // Legality first: finalize is only meaningful from EmailVerified. A Draft or
+        // already-finalized application is a state conflict (409), not a validation
+        // failure — so it is distinguished from the "incomplete" case below.
+        if ($application->status !== ApplicationStatus::EmailVerified) {
+            throw new ConflictHttpException(__('admissions.finalize.not_ready'));
+        }
+
+        // Completeness (a primary Program + all owed documents) is a business
+        // precondition → 422, surfaced per field so the review step can highlight it.
+        $errors = [];
+
+        if (! $application->hasPrimaryProgram()) {
+            $errors['primary_program_id'] = [__('admissions.finalize.no_program')];
+        }
+
+        if ($application->missingRequiredDocumentTypes() !== []) {
+            $errors['documents'] = [__('admissions.finalize.missing_documents')];
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+
+        $application->finalize();
+
+        return new ApplicationResource($application);
+    }
+
+    /**
      * Validation rules for the Step-1 snapshot. On submit (`$required`) every field
      * is required; on partial save each is `sometimes` (validated only if present).
      * `national_id` is unique within the Application's Cycle (duplicate person in
      * one intake → 422, BR-03); `english_score` is required unless the test is None.
-     * `applying_for_degree` is validated against MSc/PhD as a plain string — the
-     * Catalog\Public seam that binds it to a DegreeLevel and cross-checks the chosen
-     * Program opens in ticket 06 (ADR-0012).
+     * `applying_for_degree` is a Catalog\Public {@see DegreeLevel} (MSc/PhD) — the
+     * program-selection step (ticket 06) cross-checks it against the chosen Program's
+     * level and the qualification rule (ADR-0012).
      *
      * @return array<string, array<int, mixed>>
      */
@@ -196,7 +246,7 @@ class ApplicationController
             'graduation_cgpa' => [$presence, 'numeric', 'min:0', 'max:100'],
             'gpa_scale' => [$presence, Rule::enum(GpaScale::class)],
             'is_ejust_graduate' => [$presence, 'boolean'],
-            'applying_for_degree' => [$presence, Rule::in(['MSc', 'PhD'])],
+            'applying_for_degree' => [$presence, Rule::enum(DegreeLevel::class)],
             'english_test' => [$presence, Rule::enum(EnglishTest::class)],
             // A score is required for any real test, forbidden semantics for None
             // (nullable so None may omit it). On partial save it is simply optional.

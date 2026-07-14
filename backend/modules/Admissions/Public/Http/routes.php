@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
+use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
 use Modules\Admissions\Internal\Http\Controllers\DocumentController;
 use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
 use Modules\Admissions\Internal\Http\Controllers\ProgramSelectionController;
@@ -60,6 +61,26 @@ Route::middleware('auth:sanctum')->group(function () {
     // gates on a complete application and moves EmailVerified → UnderSAReview.
     Route::patch('/application/programs', [ProgramSelectionController::class, 'update']);
     Route::post('/application/finalize', [ApplicationController::class, 'finalize']);
+
+    // Resubmit after revision (ticket 07): ReturnedForRevision → UnderSAReview, once
+    // the applicant has addressed the reviewer's instructions.
+    Route::post('/application/resubmit', [ApplicationController::class, 'resubmit']);
+});
+
+// Status timeline (ticket 07). Sanctum-authed but not applicant-scoped: readable by
+// the owning applicant *or* a reviewer holding `application.screen` (checked in the
+// controller), anyone else → 403. Declared before the reviewer group so it is not
+// swallowed by the `can:application.screen` gate the applicant does not hold.
+Route::middleware('auth:sanctum')
+    ->get('/applications/{application}/timeline', [ApplicationScreeningController::class, 'timeline'])
+    ->whereNumber('application');
+
+// Reviewer screening (ticket 07). The Student Affairs queue, application detail, and
+// the screen action, all gated on `application.screen` (SA / Dean).
+Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
+    Route::get('/applications', [ApplicationScreeningController::class, 'index']);
+    Route::get('/applications/{application}', [ApplicationScreeningController::class, 'show'])->whereNumber('application');
+    Route::post('/applications/{application}/screen', [ApplicationScreeningController::class, 'screen'])->whereNumber('application');
 });
 
 // Streaming download (ticket 05). Sanctum-authed but not applicant-scoped: served

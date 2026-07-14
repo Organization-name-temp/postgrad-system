@@ -449,6 +449,171 @@ export type FinalizeTheApplication422 = {
   errors?: FinalizeTheApplication422Errors;
 };
 
+export type ResubmitAfterRevision200Data = {
+  id?: number;
+  status?: string;
+};
+
+export type ResubmitAfterRevision200 = {
+  data?: ResubmitAfterRevision200Data;
+};
+
+export type ResubmitAfterRevision401 = {
+  message?: string;
+};
+
+export type ResubmitAfterRevision409 = {
+  message?: string;
+};
+
+export type ResubmitAfterRevision422Errors = {
+  documents?: string[];
+};
+
+export type ResubmitAfterRevision422 = {
+  message?: string;
+  errors?: ResubmitAfterRevision422Errors;
+};
+
+export type StatusTimeline200DataItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  note?: string | null;
+  occurred_at?: string;
+};
+
+export type StatusTimeline200 = {
+  data?: StatusTimeline200DataItem[];
+};
+
+export type StatusTimeline403 = {
+  message?: string;
+};
+
+export type ScreeningQueue200DataItemPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type ScreeningQueue200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  primary_program?: ScreeningQueue200DataItemPrimaryProgram;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type ScreeningQueue200 = {
+  data?: ScreeningQueue200DataItem[];
+};
+
+export type ScreeningQueue403 = {
+  message?: string;
+};
+
+export type ReviewAnApplication200DataPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type ReviewAnApplication200DataDocumentsItem = {
+  id?: string;
+  document_type?: string;
+  original_filename?: string;
+  mime?: string;
+  size_bytes?: number;
+  uploaded_at?: string;
+  download_url?: string;
+};
+
+export type ReviewAnApplication200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  phone?: string;
+  nationality?: string;
+  gender?: string;
+  previous_degree?: string;
+  previous_university?: string;
+  graduation_gpa?: string;
+  applying_for_degree?: string;
+  english_test?: string;
+  english_score?: string;
+  primary_program?: ReviewAnApplication200DataPrimaryProgram;
+  documents?: ReviewAnApplication200DataDocumentsItem[];
+};
+
+export type ReviewAnApplication200 = {
+  data?: ReviewAnApplication200Data;
+};
+
+export type ReviewAnApplication403 = {
+  message?: string;
+};
+
+export type ReviewAnApplication404 = {
+  message?: string;
+};
+
+export type ScreenAnApplicationBody = {
+  /** One of approve, return, reject. */
+  action: string;
+  /**
+     * The reviewer's note; required for return and reject.
+     * @nullable
+     */
+  note?: string | null;
+};
+
+export type ScreenAnApplication200 = {
+  data?: {
+  id?: number;
+  status?: string;
+};
+};
+
+export type ScreenAnApplication403 = {
+  message?: string;
+};
+
+export type ScreenAnApplication409 = {
+  message?: string;
+};
+
+export type ScreenAnApplication422Errors = {
+  note?: string[];
+};
+
+export type ScreenAnApplication422 = {
+  message?: string;
+  errors?: ScreenAnApplication422Errors;
+};
+
 export type StreamADocument403 = {
   message?: string;
 };
@@ -2298,6 +2463,438 @@ export const useFinalizeTheApplication = <TError = FinalizeTheApplication409 | F
         TContext
       > => {
       return useMutation(getFinalizeTheApplicationMutationOptions(options), queryClient);
+    }
+
+/**
+ * Sends a returned application back into Student Affairs review once the applicant
+ * has addressed the reviewer's instructions (FR-ADM-005.3): `returned_for_revision`
+ * → `under_sa_review`. Legal only from `returned_for_revision` (any other status is
+ * a 409 — there is nothing to resubmit); and, like finalize, the application must
+ * still be complete — a primary Program and every owed document — so an applicant
+ * cannot delete a required document and push an incomplete application back into
+ * review (story 20's "only complete applications reach review" invariant, 422).
+ * @summary Resubmit after revision.
+ */
+export const resubmitAfterRevision = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ResubmitAfterRevision200>(
+      {url: `/api/v1/application/resubmit`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getResubmitAfterRevisionMutationOptions = <TError = ResubmitAfterRevision401 | ResubmitAfterRevision409 | ResubmitAfterRevision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resubmitAfterRevision>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resubmitAfterRevision>>, TError,void, TContext> => {
+
+const mutationKey = ['resubmitAfterRevision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resubmitAfterRevision>>, void> = () => {
+
+
+          return  resubmitAfterRevision()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResubmitAfterRevisionMutationResult = NonNullable<Awaited<ReturnType<typeof resubmitAfterRevision>>>
+
+    export type ResubmitAfterRevisionMutationError = ResubmitAfterRevision401 | ResubmitAfterRevision409 | ResubmitAfterRevision422
+
+    /**
+ * @summary Resubmit after revision.
+ */
+export const useResubmitAfterRevision = <TError = ResubmitAfterRevision401 | ResubmitAfterRevision409 | ResubmitAfterRevision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resubmitAfterRevision>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resubmitAfterRevision>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getResubmitAfterRevisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * An application's append-only status history (from/to/note/when), oldest-first —
+ * the applicant's visible progress and the decision audit trail. Readable by the
+ * owning applicant or any reviewer (`application.screen`); anyone else → 403.
+ * @summary Status timeline.
+ */
+export const statusTimeline = (
+    applicationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<StatusTimeline200>(
+      {url: `/api/v1/applications/${applicationId}/timeline`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getStatusTimelineQueryKey = (applicationId: number,) => {
+    return [
+    `/api/v1/applications/${applicationId}/timeline`
+    ] as const;
+    }
+
+
+export const getStatusTimelineQueryOptions = <TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStatusTimelineQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof statusTimeline>>> = ({ signal }) => statusTimeline(applicationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StatusTimelineQueryResult = NonNullable<Awaited<ReturnType<typeof statusTimeline>>>
+export type StatusTimelineQueryError = StatusTimeline403
+
+
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof statusTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof statusTimeline>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof statusTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof statusTimeline>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Status timeline.
+ */
+
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStatusTimelineQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The applications awaiting Student Affairs screening (`under_sa_review`),
+ * oldest-first, each with the applicant's identity, chosen primary Program, and a
+ * **derived age** — whole days waited since entering review, computed from the
+ * timeline, never stored. Gated on `application.screen`.
+ * @summary Screening queue.
+ */
+export const screeningQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScreeningQueue200>(
+      {url: `/api/v1/applications`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getScreeningQueueQueryKey = () => {
+    return [
+    `/api/v1/applications`
+    ] as const;
+    }
+
+
+export const getScreeningQueueQueryOptions = <TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getScreeningQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof screeningQueue>>> = ({ signal }) => screeningQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ScreeningQueueQueryResult = NonNullable<Awaited<ReturnType<typeof screeningQueue>>>
+export type ScreeningQueueQueryError = ScreeningQueue403
+
+
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof screeningQueue>>,
+          TError,
+          Awaited<ReturnType<typeof screeningQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof screeningQueue>>,
+          TError,
+          Awaited<ReturnType<typeof screeningQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Screening queue.
+ */
+
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getScreeningQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The full application — the Step-1 snapshot, resolved Program(s), and the
+ * uploaded documents — for a reviewer to assess completeness and authenticity
+ * before acting. Gated on `application.screen`.
+ * @summary Review an application.
+ */
+export const reviewAnApplication = (
+    applicationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReviewAnApplication200>(
+      {url: `/api/v1/applications/${applicationId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getReviewAnApplicationQueryKey = (applicationId: number,) => {
+    return [
+    `/api/v1/applications/${applicationId}`
+    ] as const;
+    }
+
+
+export const getReviewAnApplicationQueryOptions = <TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReviewAnApplicationQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof reviewAnApplication>>> = ({ signal }) => reviewAnApplication(applicationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReviewAnApplicationQueryResult = NonNullable<Awaited<ReturnType<typeof reviewAnApplication>>>
+export type ReviewAnApplicationQueryError = ReviewAnApplication403 | ReviewAnApplication404
+
+
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reviewAnApplication>>,
+          TError,
+          Awaited<ReturnType<typeof reviewAnApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reviewAnApplication>>,
+          TError,
+          Awaited<ReturnType<typeof reviewAnApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Review an application.
+ */
+
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReviewAnApplicationQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The Student Affairs decision on a queued application: `approve` auto-advances it
+ * through the transient `sa_approved` to `under_dean_review` in one action;
+ * `return` sends it back to the applicant as `returned_for_revision` with the
+ * reviewer's instructions; `reject` ends it as `rejected` with a reason. `return`
+ * and `reject` require a note and notify the applicant. Any action on an
+ * application not `under_sa_review` is an illegal transition (409). Gated on
+ * `application.screen`.
+ * @summary Screen an application.
+ */
+export const screenAnApplication = (
+    applicationId: number,
+    screenAnApplicationBody: ScreenAnApplicationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScreenAnApplication200>(
+      {url: `/api/v1/applications/${applicationId}/screen`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: screenAnApplicationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getScreenAnApplicationMutationOptions = <TError = ScreenAnApplication403 | ScreenAnApplication409 | ScreenAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof screenAnApplication>>, TError,{applicationId: number;data: ScreenAnApplicationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof screenAnApplication>>, TError,{applicationId: number;data: ScreenAnApplicationBody}, TContext> => {
+
+const mutationKey = ['screenAnApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof screenAnApplication>>, {applicationId: number;data: ScreenAnApplicationBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  screenAnApplication(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScreenAnApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof screenAnApplication>>>
+    export type ScreenAnApplicationMutationBody = ScreenAnApplicationBody
+    export type ScreenAnApplicationMutationError = ScreenAnApplication403 | ScreenAnApplication409 | ScreenAnApplication422
+
+    /**
+ * @summary Screen an application.
+ */
+export const useScreenAnApplication = <TError = ScreenAnApplication403 | ScreenAnApplication409 | ScreenAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof screenAnApplication>>, TError,{applicationId: number;data: ScreenAnApplicationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof screenAnApplication>>,
+        TError,
+        {applicationId: number;data: ScreenAnApplicationBody},
+        TContext
+      > => {
+      return useMutation(getScreenAnApplicationMutationOptions(options), queryClient);
     }
 
 /**

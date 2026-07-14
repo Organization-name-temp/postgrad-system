@@ -6,6 +6,7 @@ import ApartmentIcon from '@mui/icons-material/Apartment'
 import SchoolIcon from '@mui/icons-material/School'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import EventNoteIcon from '@mui/icons-material/EventNote'
+import FactCheckIcon from '@mui/icons-material/FactCheck'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 
@@ -21,6 +22,12 @@ export const navItems: NavItem[] = [
     to: '/apply',
     icon: <AssignmentIcon />,
     permission: PERMISSION.submitApplication,
+  },
+  {
+    key: 'screening',
+    to: '/screening',
+    icon: <FactCheckIcon />,
+    permission: PERMISSION.screenApplications,
   },
   {
     key: 'browse',

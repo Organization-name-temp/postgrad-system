@@ -4,16 +4,17 @@ namespace Modules\Admissions\Internal\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Admissions\Internal\Http\Resources\Concerns\RendersProgramSummary;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Public\ProgramCatalog;
-use Modules\Catalog\Public\ProgramSummary;
 
 /**
  * An Application in the { data: ... } envelope. Carries the Application's identity
  * (id/status/cycle) plus the Step-1 personal-info snapshot filled so far — nulls
  * where the applicant has not yet provided a field — so the SPA can render and
  * resume the wizard. The documents uploaded so far (ticket 05) and the selected
- * program(s) (ticket 06) are included; the status timeline is added by later tickets.
+ * program(s) (ticket 06) are included; the status timeline is a separate read
+ * (`GET /applications/{id}/timeline`, ticket 07), not embedded here.
  *
  * Program selection is surfaced two ways: the opaque `primary_program_id` /
  * `alternative_program_id` the applicant stores, and — resolved through the
@@ -29,6 +30,8 @@ use Modules\Catalog\Public\ProgramSummary;
  */
 class ApplicationResource extends JsonResource
 {
+    use RendersProgramSummary;
+
     /** @return array<string, mixed> */
     public function toArray(Request $request): array
     {
@@ -76,38 +79,13 @@ class ApplicationResource extends JsonResource
             // Program selection (ticket 06): the opaque refs plus resolved summaries.
             'primary_program_id' => $application->primary_program_id,
             'alternative_program_id' => $application->alternative_program_id,
-            'primary_program' => $this->summary($programs[$application->primary_program_id] ?? null),
-            'alternative_program' => $this->summary($programs[$application->alternative_program_id] ?? null),
+            'primary_program' => $this->programSummaryArray($programs[$application->primary_program_id] ?? null),
+            'alternative_program' => $this->programSummaryArray($programs[$application->alternative_program_id] ?? null),
 
             'finalized_at' => $application->finalized_at?->toIso8601String(),
 
             // Documents uploaded so far (ticket 05).
             'documents' => ApplicationDocumentResource::collection($application->documents),
-        ];
-    }
-
-    /**
-     * A {@see ProgramSummary} as the flat, bilingual object the SPA renders, or null
-     * when the reference is unset or dangling (ADR-0012 — no FK guarantees existence).
-     *
-     * @return array<string, mixed>|null
-     */
-    private function summary(?ProgramSummary $program): ?array
-    {
-        if ($program === null) {
-            return null;
-        }
-
-        return [
-            'id' => $program->id,
-            'code' => $program->code,
-            'name_en' => $program->nameEn,
-            'name_ar' => $program->nameAr,
-            'degree_level' => $program->degreeLevel->value,
-            'department_name_en' => $program->departmentNameEn,
-            'department_name_ar' => $program->departmentNameAr,
-            'faculty_name_en' => $program->facultyNameEn,
-            'faculty_name_ar' => $program->facultyNameAr,
         ];
     }
 }

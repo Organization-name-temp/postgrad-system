@@ -88,4 +88,21 @@ class ApplicationFactory extends Factory
             'submitted_at' => now(),
         ]);
     }
+
+    /**
+     * A finalized Application resting in Student Affairs review (UnderSAReview) — the
+     * shape the screening queue works (ticket 07): a complete Step-1 snapshot, its
+     * owner's email verified, submitted and finalized. Callers set the program and
+     * documents they need per case; the entry-into-review timeline row (which drives
+     * queue aging) is added explicitly where a test asserts on it.
+     */
+    public function underReview(): static
+    {
+        return $this->withPersonalInfo()->state(fn (): array => [
+            'user_id' => User::factory(),
+            'status' => ApplicationStatus::UnderSAReview,
+            'submitted_at' => now(),
+            'finalized_at' => now(),
+        ]);
+    }
 }

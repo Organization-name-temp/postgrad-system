@@ -185,8 +185,53 @@ class ApplicationController
             throw new ConflictHttpException(__('admissions.finalize.not_ready'));
         }
 
-        // Completeness (a primary Program + all owed documents) is a business
-        // precondition → 422, surfaced per field so the review step can highlight it.
+        $this->assertReadyForReview($application);
+        $application->finalize();
+
+        return new ApplicationResource($application);
+    }
+
+    /**
+     * Resubmit after revision.
+     *
+     * Sends a returned application back into Student Affairs review once the applicant
+     * has addressed the reviewer's instructions (FR-ADM-005.3): `returned_for_revision`
+     * → `under_sa_review`. Legal only from `returned_for_revision` (any other status is
+     * a 409 — there is nothing to resubmit); and, like finalize, the application must
+     * still be complete — a primary Program and every owed document — so an applicant
+     * cannot delete a required document and push an incomplete application back into
+     * review (story 20's "only complete applications reach review" invariant, 422).
+     *
+     * @response 200 {"data": {"id": 1, "status": "under_sa_review"}}
+     * @response 401 {"message": "Unauthenticated."}
+     * @response 409 scenario="nothing to resubmit" {"message": "This application has not been returned for revision."}
+     * @response 422 scenario="incomplete" {"message": "Upload every required document before finalizing your application.", "errors": {"documents": ["Upload every required document before finalizing your application."]}}
+     */
+    public function resubmit(Request $request): ApplicationResource
+    {
+        $application = $this->currentApplication($request);
+
+        // State conflict before completeness, mirroring finalize: an application that
+        // was never returned is a 409, not a 422.
+        if ($application->status !== ApplicationStatus::ReturnedForRevision) {
+            throw new ConflictHttpException(__('admissions.resubmit.not_returned'));
+        }
+
+        $this->assertReadyForReview($application);
+        $application->resubmitForReview();
+
+        return new ApplicationResource($application);
+    }
+
+    /**
+     * Assert the application is complete enough to enter Student Affairs review: a
+     * primary Program is chosen and every required and conditionally-required document
+     * is uploaded. A missing prerequisite is a business precondition → 422, surfaced
+     * per field so the review step can highlight it. Shared by finalize (first entry
+     * into review) and resubmit (re-entry after revision).
+     */
+    private function assertReadyForReview(Application $application): void
+    {
         $errors = [];
 
         if (! $application->hasPrimaryProgram()) {
@@ -200,10 +245,6 @@ class ApplicationController
         if ($errors !== []) {
             throw ValidationException::withMessages($errors);
         }
-
-        $application->finalize();
-
-        return new ApplicationResource($application);
     }
 
     /**

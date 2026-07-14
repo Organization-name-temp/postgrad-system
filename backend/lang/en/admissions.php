@@ -27,7 +27,15 @@ return [
         'no_program' => 'Choose a program before finalizing your application.',
         'missing_documents' => 'Upload every required document before finalizing your application.',
     ],
+    'resubmit' => [
+        'not_returned' => 'This application has not been returned for revision.',
+    ],
     'verification' => [
         'not_pending' => 'This application is not awaiting email verification.',
+    ],
+    // The hand-rolled status machine's 409 (ticket 07): the requested move is not a
+    // legal transition from the application's current state.
+    'transition' => [
+        'illegal' => 'This application cannot move from :from to :to.',
     ],
 ];

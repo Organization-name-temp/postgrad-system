@@ -167,14 +167,31 @@ class Application extends Model
     }
 
     /**
-     * Whether the applicant may still edit the snapshot. Editing is open while the
-     * Application has not yet left the applicant's hands — Draft here in ticket 04,
-     * widened to the other applicant-editable states (ReturnedForRevision, …) by
-     * the workflow tickets.
+     * The append-only status timeline (ticket 07), oldest-first. Each named action
+     * appends one row; the API exposes it read-only as the applicant's status history.
+     *
+     * @return HasMany<ApplicationStatusTransition, $this>
+     */
+    public function statusTransitions(): HasMany
+    {
+        return $this->hasMany(ApplicationStatusTransition::class)
+            ->orderBy('occurred_at')
+            ->orderBy('id');
+    }
+
+    /**
+     * Whether the applicant may still edit the Step-1 snapshot. Open while the
+     * application is still a Draft, and again once Student Affairs returns it for
+     * revision — the two states where the whole application is back in the
+     * applicant's hands. It locks the moment they submit and stays locked through
+     * review (widening the ticket-04 Draft-only rule for the return→resubmit loop).
      */
     public function isApplicantEditable(): bool
     {
-        return $this->status === ApplicationStatus::Draft;
+        return in_array($this->status, [
+            ApplicationStatus::Draft,
+            ApplicationStatus::ReturnedForRevision,
+        ], true);
     }
 
     /**
@@ -221,27 +238,25 @@ class Application extends Model
      * awaiting email verification — or, when the applicant's email is *already*
      * verified, straight to {@see ApplicationStatus::EmailVerified} (the
      * pre-verified shortcut, e.g. a rejected applicant re-applying in a later
-     * Cycle). Either way it stamps `submitted_at`.
+     * Cycle). Either way it stamps `submitted_at`. The applicant is the actor.
      */
     public function submit(bool $emailAlreadyVerified): void
     {
+        $this->submitted_at = now();
         $this->transitionTo(
             $emailAlreadyVerified ? ApplicationStatus::EmailVerified : ApplicationStatus::Submitted,
-            [ApplicationStatus::Draft],
+            actorId: $this->user_id,
         );
-        $this->submitted_at = now();
-        $this->save();
     }
 
     /**
      * Record that the applicant has verified their email: {@see ApplicationStatus::Submitted}
      * → {@see ApplicationStatus::EmailVerified}. The applicant cannot reach the
-     * documents step until this has happened.
+     * documents step until this has happened. The applicant is the actor.
      */
     public function markEmailVerified(): void
     {
-        $this->transitionTo(ApplicationStatus::EmailVerified, [ApplicationStatus::Submitted]);
-        $this->save();
+        $this->transitionTo(ApplicationStatus::EmailVerified, actorId: $this->user_id);
     }
 
     /**
@@ -253,13 +268,73 @@ class Application extends Model
      * document — is a *business* precondition the caller checks first (a missing
      * prerequisite is a 422, not a state conflict); see
      * {@see self::missingRequiredDocumentTypes()} and {@see self::hasPrimaryProgram()}.
-     * This method only performs the guarded transition once those hold.
+     * This method only performs the guarded transition once those hold. The applicant
+     * is the actor.
      */
     public function finalize(): void
     {
-        $this->transitionTo(ApplicationStatus::UnderSAReview, [ApplicationStatus::EmailVerified]);
         $this->finalized_at = now();
-        $this->save();
+        $this->transitionTo(ApplicationStatus::UnderSAReview, actorId: $this->user_id);
+    }
+
+    /**
+     * Resubmit a returned application: {@see ApplicationStatus::ReturnedForRevision}
+     * → {@see ApplicationStatus::UnderSAReview}, back into the Student Affairs queue
+     * after the applicant has addressed the reviewer's instructions (FR-ADM-005.3).
+     * The applicant is the actor; any other status is a 409.
+     */
+    public function resubmitForReview(): void
+    {
+        $this->transitionTo(ApplicationStatus::UnderSAReview, actorId: $this->user_id);
+    }
+
+    /**
+     * Student Affairs approves the application for Dean review. Approving auto-advances
+     * through the transient {@see ApplicationStatus::SAApproved} straight to
+     * {@see ApplicationStatus::UnderDeanReview} in one action (two timeline rows: the
+     * SA approval carries the reviewer's `$note`; the forward is automatic and has no
+     * actor). Legal only from {@see ApplicationStatus::UnderSAReview} (else 409).
+     */
+    public function approveForDeanReview(int $actorId, ?string $note = null): void
+    {
+        $this->transitionTo(ApplicationStatus::SAApproved, actorId: $actorId, note: $note);
+        $this->transitionTo(ApplicationStatus::UnderDeanReview);
+    }
+
+    /**
+     * Student Affairs returns the application to the applicant for revision, with
+     * instructions: {@see ApplicationStatus::UnderSAReview} →
+     * {@see ApplicationStatus::ReturnedForRevision}. The `$note` is the reviewer's
+     * instructions, recorded on the timeline and surfaced to the applicant. Legal
+     * only from `UnderSAReview` (else 409).
+     */
+    public function returnForRevision(int $actorId, string $note): void
+    {
+        $this->transitionTo(ApplicationStatus::ReturnedForRevision, actorId: $actorId, note: $note);
+    }
+
+    /**
+     * Student Affairs rejects the application at screening, with a reason:
+     * {@see ApplicationStatus::UnderSAReview} → {@see ApplicationStatus::Rejected}
+     * (terminal). Legal only from `UnderSAReview` (else 409).
+     */
+    public function reject(int $actorId, string $note): void
+    {
+        $this->transitionTo(ApplicationStatus::Rejected, actorId: $actorId, note: $note);
+    }
+
+    /**
+     * When the application last entered the given status — the `occurred_at` of the
+     * most recent transition into it — or null if it has never done so. Reads the
+     * loaded `statusTransitions` relation (ordered oldest-first), so the caller
+     * should eager-load it. Used to derive the Student Affairs queue's aging (days
+     * since entering review) on demand, never stored (spec §SLAs).
+     */
+    public function enteredStatusAt(ApplicationStatus $status): ?Carbon
+    {
+        return $this->statusTransitions
+            ->where('to_status', $status)
+            ->last()?->occurred_at;
     }
 
     /** Whether a primary Program has been chosen — the first finalize prerequisite. */
@@ -315,23 +390,38 @@ class Application extends Model
     }
 
     /**
-     * Guard a status change: the current status must be one of `$allowedFrom`,
-     * otherwise the move is illegal and refused with a 409 (a conflict with the
-     * Application's current state, distinct from input validation). Ticket 07
-     * generalises this into a static allowed-transitions map over every status and
-     * layers the append-only transition log on top; ticket 04 guards only the two
-     * early moves it owns.
+     * Perform one guarded status change and record it on the append-only timeline.
+     * The move must be legal per the static allowed-transitions map on
+     * {@see ApplicationStatus::allowedTransitions()}; anything else is refused with a
+     * 409 (a conflict with the Application's current state, distinct from input
+     * validation). On success the new status is persisted (alongside any attributes
+     * the caller set first, e.g. `submitted_at`/`finalized_at`) and one
+     * {@see ApplicationStatusTransition} row is appended (from/to/actor/note/occurred_at).
      *
-     * @param  list<ApplicationStatus>  $allowedFrom
+     * The `$actorId` is the user who caused the move — the applicant for self-service
+     * moves, the reviewer for screening actions, or null for an automatic step (the
+     * SAApproved → UnderDeanReview forward). `$note` carries a reviewer's instructions
+     * or a decision reason.
      */
-    private function transitionTo(ApplicationStatus $to, array $allowedFrom): void
+    private function transitionTo(ApplicationStatus $to, ?int $actorId = null, ?string $note = null): void
     {
-        if (! in_array($this->status, $allowedFrom, true)) {
+        $from = $this->status;
+
+        if (! $from->canTransitionTo($to)) {
             throw new ConflictHttpException(
-                "Cannot move an application from {$this->status->value} to {$to->value}.",
+                __('admissions.transition.illegal', ['from' => $from->value, 'to' => $to->value]),
             );
         }
 
         $this->status = $to;
+        $this->save();
+
+        $this->statusTransitions()->create([
+            'from_status' => $from,
+            'to_status' => $to,
+            'actor_user_id' => $actorId,
+            'note' => $note,
+            'occurred_at' => now(),
+        ]);
     }
 }

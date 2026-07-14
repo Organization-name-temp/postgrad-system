@@ -344,6 +344,162 @@ export const FinalizeTheApplicationResponse = zod.object({
 
 
 /**
+ * Sends a returned application back into Student Affairs review once the applicant
+ * has addressed the reviewer's instructions (FR-ADM-005.3): `returned_for_revision`
+ * → `under_sa_review`. Legal only from `returned_for_revision` (any other status is
+ * a 409 — there is nothing to resubmit); and, like finalize, the application must
+ * still be complete — a primary Program and every owed document — so an applicant
+ * cannot delete a required document and push an incomplete application back into
+ * review (story 20's "only complete applications reach review" invariant, 422).
+ * @summary Resubmit after revision.
+ */
+export const ResubmitAfterRevisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * An application's append-only status history (from/to/note/when), oldest-first —
+ * the applicant's visible progress and the decision audit trail. Readable by the
+ * owning applicant or any reviewer (`application.screen`); anyone else → 403.
+ * @summary Status timeline.
+ */
+export const StatusTimelineParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const StatusTimelineResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "note": zod.string().nullish(),
+  "occurred_at": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * The applications awaiting Student Affairs screening (`under_sa_review`),
+ * oldest-first, each with the applicant's identity, chosen primary Program, and a
+ * **derived age** — whole days waited since entering review, computed from the
+ * timeline, never stored. Gated on `application.screen`.
+ * @summary Screening queue.
+ */
+export const ScreeningQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * The full application — the Step-1 snapshot, resolved Program(s), and the
+ * uploaded documents — for a reviewer to assess completeness and authenticity
+ * before acting. Gated on `application.screen`.
+ * @summary Review an application.
+ */
+export const ReviewAnApplicationParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const ReviewAnApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "nationality": zod.string().optional(),
+  "gender": zod.string().optional(),
+  "previous_degree": zod.string().optional(),
+  "previous_university": zod.string().optional(),
+  "graduation_gpa": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "english_test": zod.string().optional(),
+  "english_score": zod.string().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "documents": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "document_type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "mime": zod.string().optional(),
+  "size_bytes": zod.number().optional(),
+  "uploaded_at": zod.string().optional(),
+  "download_url": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * The Student Affairs decision on a queued application: `approve` auto-advances it
+ * through the transient `sa_approved` to `under_dean_review` in one action;
+ * `return` sends it back to the applicant as `returned_for_revision` with the
+ * reviewer's instructions; `reject` ends it as `rejected` with a reason. `return`
+ * and `reject` require a note and notify the applicant. Any action on an
+ * application not `under_sa_review` is an illegal transition (409). Gated on
+ * `application.screen`.
+ * @summary Screen an application.
+ */
+export const ScreenAnApplicationParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const ScreenAnApplicationBody = zod.object({
+  "action": zod.string().describe('One of approve, return, reject.'),
+  "note": zod.string().nullish().describe('The reviewer\'s note; required for return and reject.')
+})
+
+export const ScreenAnApplicationResponse = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('approved'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('returned')])
+
+
+/**
  * Serves the stored file inline to the owning applicant or to a reviewer holding
  * `application.screen`; anyone else is refused with a 403. The ULID in the path
  * is the only handle — the storage path and row id are never exposed.

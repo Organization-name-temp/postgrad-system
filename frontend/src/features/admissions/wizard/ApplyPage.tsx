@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   Alert,
-  AlertTitle,
   Box,
   CircularProgress,
   Paper,
@@ -18,6 +17,8 @@ import { DocumentsStep } from './DocumentsStep'
 import { ProgramStep } from './ProgramStep'
 import { ReviewStep } from './ReviewStep'
 import { WIZARD_STEP, WIZARD_STEP_KEYS, isFinalized, stepForStatus } from './wizardSteps'
+import { StatusView } from '../StatusView'
+import { ReturnedNotice } from '../ReturnedNotice'
 
 /** The post-verification sub-steps the applicant walks client-side (the server
  *  status stays `email_verified` across all three until finalize). */
@@ -61,15 +62,20 @@ export function ApplyPage() {
   }
 
   const status = application.status
-  const finalized = isFinalized(status)
+  // A returned application is back in the applicant's hands: it re-walks the
+  // post-verify sub-wizard (documents → program → review) and resubmits, rather than
+  // showing the read-only status view that every other post-finalize status does.
+  const returned = status === 'returned_for_revision'
+  const inReview = isFinalized(status) && !returned
   const verified = status === 'email_verified'
+  const editing = verified || returned
 
-  // Which Stepper node reads as active: a finalized application reads as done; the
-  // post-verify phase tracks its local sub-step; everything earlier follows the
-  // shared status→step mapping (stepForStatus).
-  const activeStep = finalized
+  // Which Stepper node reads as active: an in-review application reads as done; the
+  // post-verify / resubmit phase tracks its local sub-step; everything earlier
+  // follows the shared status→step mapping (stepForStatus).
+  const activeStep = inReview
     ? WIZARD_STEP_KEYS.length
-    : verified
+    : editing
       ? WIZARD_STEP[postVerifyStep]
       : stepForStatus(status)
 
@@ -88,16 +94,17 @@ export function ApplyPage() {
       </Stepper>
 
       <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
-        {finalized ? (
-          <Alert severity="success">
-            <AlertTitle>{t('wizard.underReviewTitle')}</AlertTitle>
-            {t('wizard.underReviewBody')}
-          </Alert>
-        ) : verified ? (
+        {inReview ? (
+          <StatusView applicationId={application.id ?? 0} status={status} />
+        ) : editing ? (
           <Box>
-            <Alert severity="success" sx={{ mb: 2 }}>
-              {t('verify.verified')}
-            </Alert>
+            {returned ? (
+              <ReturnedNotice applicationId={application.id ?? 0} />
+            ) : (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                {t('verify.verified')}
+              </Alert>
+            )}
             {postVerifyStep === 'documents' && (
               <DocumentsStep
                 application={application}
@@ -112,7 +119,11 @@ export function ApplyPage() {
               />
             )}
             {postVerifyStep === 'review' && (
-              <ReviewStep application={application} onBack={() => setPostVerifyStep('program')} />
+              <ReviewStep
+                application={application}
+                mode={returned ? 'resubmit' : 'finalize'}
+                onBack={() => setPostVerifyStep('program')}
+              />
             )}
           </Box>
         ) : status === 'submitted' ? (

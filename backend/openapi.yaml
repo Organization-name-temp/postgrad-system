@@ -1380,6 +1380,632 @@ paths:
       tags:
         - Admissions
       security: []
+  /api/v1/application/resubmit:
+    post:
+      summary: 'Resubmit after revision.'
+      operationId: resubmitAfterRevision
+      description: "Sends a returned application back into Student Affairs review once the applicant\nhas addressed the reviewer's instructions (FR-ADM-005.3): `returned_for_revision`\n→ `under_sa_review`. Legal only from `returned_for_revision` (any other status is\na 409 — there is nothing to resubmit); and, like finalize, the application must\nstill be complete — a primary Program and every owed document — so an applicant\ncannot delete a required document and push an incomplete application back into\nreview (story 20's \"only complete applications reach review\" invariant, 422)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: under_sa_review
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: under_sa_review
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        409:
+          description: 'nothing to resubmit'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application has not been returned for revision.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application has not been returned for revision.'
+        422:
+          description: incomplete
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Upload every required document before finalizing your application.'
+                  errors:
+                    documents:
+                      - 'Upload every required document before finalizing your application.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Upload every required document before finalizing your application.'
+                  errors:
+                    type: object
+                    properties:
+                      documents:
+                        type: array
+                        example:
+                          - 'Upload every required document before finalizing your application.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      security: []
+  '/api/v1/applications/{application_id}/timeline':
+    get:
+      summary: 'Status timeline.'
+      operationId: statusTimeline
+      description: "An application's append-only status history (from/to/note/when), oldest-first —\nthe applicant's visible progress and the decision audit trail. Readable by the\nowning applicant or any reviewer (`application.screen`); anyone else → 403."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      from_status: email_verified
+                      to_status: under_sa_review
+                      actor_user_id: 5
+                      note: null
+                      occurred_at: '2026-07-10T10:00:00+00:00'
+                    -
+                      id: 2
+                      from_status: under_sa_review
+                      to_status: returned_for_revision
+                      actor_user_id: 2
+                      note: 'Please re-upload a clearer transcript.'
+                      occurred_at: '2026-07-11T09:00:00+00:00'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        from_status: email_verified
+                        to_status: under_sa_review
+                        actor_user_id: 5
+                        note: null
+                        occurred_at: '2026-07-10T10:00:00+00:00'
+                      - id: 2
+                        from_status: under_sa_review
+                        to_status: returned_for_revision
+                        actor_user_id: 2
+                        note: 'Please re-upload a clearer transcript.'
+                        occurred_at: '2026-07-11T09:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        from_status:
+                          type: string
+                          example: email_verified
+                        to_status:
+                          type: string
+                          example: under_sa_review
+                        actor_user_id:
+                          type: integer
+                          example: 5
+                        note:
+                          type: string
+                          example: null
+                          nullable: true
+                        occurred_at:
+                          type: string
+                          example: '2026-07-10T10:00:00+00:00'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: application_id
+        description: "The application's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/applications:
+    get:
+      summary: 'Screening queue.'
+      operationId: screeningQueue
+      description: "The applications awaiting Student Affairs screening (`under_sa_review`),\noldest-first, each with the applicant's identity, chosen primary Program, and a\n**derived age** — whole days waited since entering review, computed from the\ntimeline, never stored. Gated on `application.screen`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      status: under_sa_review
+                      name_en: 'Sara Applicant'
+                      name_ar: 'سارة المتقدمة'
+                      national_id: '29001010101010'
+                      applying_for_degree: MSc
+                      primary_program:
+                        id: 1
+                        code: MSC-CE
+                        name_en: 'MSc in Computer Engineering'
+                        name_ar: 'ماجستير هندسة الحاسوب'
+                        degree_level: MSc
+                        department_name_en: 'Computer Engineering'
+                        department_name_ar: 'هندسة الحاسوب'
+                        faculty_name_en: 'Faculty of Engineering'
+                        faculty_name_ar: 'كلية الهندسة'
+                      finalized_at: '2026-07-10T10:00:00+00:00'
+                      review_entered_at: '2026-07-10T10:00:00+00:00'
+                      age_days: 4
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        status: under_sa_review
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        national_id: '29001010101010'
+                        applying_for_degree: MSc
+                        primary_program:
+                          id: 1
+                          code: MSC-CE
+                          name_en: 'MSc in Computer Engineering'
+                          name_ar: 'ماجستير هندسة الحاسوب'
+                          degree_level: MSc
+                          department_name_en: 'Computer Engineering'
+                          department_name_ar: 'هندسة الحاسوب'
+                          faculty_name_en: 'Faculty of Engineering'
+                          faculty_name_ar: 'كلية الهندسة'
+                        finalized_at: '2026-07-10T10:00:00+00:00'
+                        review_entered_at: '2026-07-10T10:00:00+00:00'
+                        age_days: 4
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        status:
+                          type: string
+                          example: under_sa_review
+                        name_en:
+                          type: string
+                          example: 'Sara Applicant'
+                        name_ar:
+                          type: string
+                          example: 'سارة المتقدمة'
+                        national_id:
+                          type: string
+                          example: '29001010101010'
+                        applying_for_degree:
+                          type: string
+                          example: MSc
+                        primary_program:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: MSC-CE
+                            name_en:
+                              type: string
+                              example: 'MSc in Computer Engineering'
+                            name_ar:
+                              type: string
+                              example: 'ماجستير هندسة الحاسوب'
+                            degree_level:
+                              type: string
+                              example: MSc
+                            department_name_en:
+                              type: string
+                              example: 'Computer Engineering'
+                            department_name_ar:
+                              type: string
+                              example: 'هندسة الحاسوب'
+                            faculty_name_en:
+                              type: string
+                              example: 'Faculty of Engineering'
+                            faculty_name_ar:
+                              type: string
+                              example: 'كلية الهندسة'
+                        finalized_at:
+                          type: string
+                          example: '2026-07-10T10:00:00+00:00'
+                        review_entered_at:
+                          type: string
+                          example: '2026-07-10T10:00:00+00:00'
+                        age_days:
+                          type: integer
+                          example: 4
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+  '/api/v1/applications/{application_id}':
+    get:
+      summary: 'Review an application.'
+      operationId: reviewAnApplication
+      description: "The full application — the Step-1 snapshot, resolved Program(s), and the\nuploaded documents — for a reviewer to assess completeness and authenticity\nbefore acting. Gated on `application.screen`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: under_sa_review
+                    admission_cycle_id: 1
+                    name_en: 'Sara Applicant'
+                    name_ar: 'سارة المتقدمة'
+                    national_id: '29001010101010'
+                    phone: '+201000000000'
+                    nationality: Egyptian
+                    gender: Female
+                    previous_degree: BSc
+                    previous_university: 'Cairo University'
+                    graduation_gpa: '3.50'
+                    applying_for_degree: MSc
+                    english_test: IELTS
+                    english_score: '7.50'
+                    primary_program:
+                      id: 1
+                      code: MSC-CE
+                      name_en: 'MSc in Computer Engineering'
+                      name_ar: 'ماجستير هندسة الحاسوب'
+                      degree_level: MSc
+                      department_name_en: 'Computer Engineering'
+                      department_name_ar: 'هندسة الحاسوب'
+                      faculty_name_en: 'Faculty of Engineering'
+                      faculty_name_ar: 'كلية الهندسة'
+                    documents:
+                      -
+                        id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                        document_type: graduation_certificate
+                        original_filename: certificate.pdf
+                        mime: application/pdf
+                        size_bytes: 24576
+                        uploaded_at: '2026-07-14T10:00:00+00:00'
+                        download_url: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: under_sa_review
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+                      name_en:
+                        type: string
+                        example: 'Sara Applicant'
+                      name_ar:
+                        type: string
+                        example: 'سارة المتقدمة'
+                      national_id:
+                        type: string
+                        example: '29001010101010'
+                      phone:
+                        type: string
+                        example: '+201000000000'
+                      nationality:
+                        type: string
+                        example: Egyptian
+                      gender:
+                        type: string
+                        example: Female
+                      previous_degree:
+                        type: string
+                        example: BSc
+                      previous_university:
+                        type: string
+                        example: 'Cairo University'
+                      graduation_gpa:
+                        type: string
+                        example: '3.50'
+                      applying_for_degree:
+                        type: string
+                        example: MSc
+                      english_test:
+                        type: string
+                        example: IELTS
+                      english_score:
+                        type: string
+                        example: '7.50'
+                      primary_program:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: MSC-CE
+                          name_en:
+                            type: string
+                            example: 'MSc in Computer Engineering'
+                          name_ar:
+                            type: string
+                            example: 'ماجستير هندسة الحاسوب'
+                          degree_level:
+                            type: string
+                            example: MSc
+                          department_name_en:
+                            type: string
+                            example: 'Computer Engineering'
+                          department_name_ar:
+                            type: string
+                            example: 'هندسة الحاسوب'
+                          faculty_name_en:
+                            type: string
+                            example: 'Faculty of Engineering'
+                          faculty_name_ar:
+                            type: string
+                            example: 'كلية الهندسة'
+                      documents:
+                        type: array
+                        example:
+                          - id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                            document_type: graduation_certificate
+                            original_filename: certificate.pdf
+                            mime: application/pdf
+                            size_bytes: 24576
+                            uploaded_at: '2026-07-14T10:00:00+00:00'
+                            download_url: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                            document_type:
+                              type: string
+                              example: graduation_certificate
+                            original_filename:
+                              type: string
+                              example: certificate.pdf
+                            mime:
+                              type: string
+                              example: application/pdf
+                            size_bytes:
+                              type: integer
+                              example: 24576
+                            uploaded_at:
+                              type: string
+                              example: '2026-07-14T10:00:00+00:00'
+                            download_url:
+                              type: string
+                              example: 'http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model.'
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: application_id
+        description: "The application's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/applications/{application_id}/screen':
+    post:
+      summary: 'Screen an application.'
+      operationId: screenAnApplication
+      description: "The Student Affairs decision on a queued application: `approve` auto-advances it\nthrough the transient `sa_approved` to `under_dean_review` in one action;\n`return` sends it back to the applicant as `returned_for_revision` with the\nreviewer's instructions; `reject` ends it as `rejected` with a reason. `return`\nand `reject` require a note and notify the applicant. Any action on an\napplication not `under_sa_review` is an illegal transition (409). Gated on\n`application.screen`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: approved
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: under_dean_review
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: under_dean_review
+                  -
+                    description: returned
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: returned_for_revision
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: returned_for_revision
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'not under review'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application cannot move from draft to sa_approved.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application cannot move from draft to sa_approved.'
+        422:
+          description: 'missing note'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The note field is required when action is return.'
+                  errors:
+                    note:
+                      - 'The note field is required when action is return.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The note field is required when action is return.'
+                  errors:
+                    type: object
+                    properties:
+                      note:
+                        type: array
+                        example:
+                          - 'The note field is required when action is return.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: 'One of approve, return, reject.'
+                  example: approve
+                note:
+                  type: string
+                  description: "The reviewer's note; required for return and reject."
+                  example: 'Please re-upload a clearer copy of your transcript.'
+                  nullable: true
+              required:
+                - action
+      security: []
+    parameters:
+      -
+        in: path
+        name: application_id
+        description: "The application's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
   '/api/v1/documents/{document_ulid}':
     get:
       summary: 'Stream a document.'

@@ -6,11 +6,570 @@ info:
 servers:
   - url: 'http://localhost'
 tags:
+  - name: Admissions
+    description: "\nManage Admission Cycles — the windowed Fall/Spring intake (e.g. \"Fall 2026\")\nevery Application hangs off. Listing/creating/editing/activating requires the\ncalendar.manage permission (Student Affairs or a Dean). A Cycle is \"open\" when\nit is active and the current moment falls inside its window — derived, never a\nstored status column (ADR-0012, ticket 01). Cycles are deactivated, never\ndeleted. The {@see self::open()} lookup is public — it feeds the\nunauthenticated registration screen."
   - name: Catalog
     description: "\nThe catalog browse tree — the whole academic hierarchy (Faculty → Department →\nProgram → Category → Course) in a single read-model payload so the front end can\nrender and search it client-side without chatty per-node requests (FR-PCM-002,\nspec §API). Every node carries both language names; Course nodes carry their\nactive status so retired courses read accessibly. Reading requires catalog.view —\nthe catalog is universally browsable (ADR-0008). \"University\" is a synthetic root\nthe SPA prepends; it is not an entity, so it is not in this payload."
   - name: Endpoints
     description: ''
 paths:
+  /api/v1/admission-cycles/open:
+    get:
+      summary: 'List currently-open Admission Cycles.'
+      operationId: listCurrentlyOpenAdmissionCycles
+      description: "Public, unauthenticated: the front door the registration screen reads to\nknow whether (and into which intake) a stranger may apply. Returns only\nCycles that are active and whose window contains the current moment."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      intake_term: Fall
+                      year: 2026
+                      name_en: 'Fall 2026'
+                      name_ar: 'خريف 2026'
+                      opens_at: '2026-06-01T00:00:00+00:00'
+                      closes_at: '2026-08-01T00:00:00+00:00'
+                      is_active: true
+                      is_open: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        intake_term: Fall
+                        year: 2026
+                        name_en: 'Fall 2026'
+                        name_ar: 'خريف 2026'
+                        opens_at: '2026-06-01T00:00:00+00:00'
+                        closes_at: '2026-08-01T00:00:00+00:00'
+                        is_active: true
+                        is_open: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        intake_term:
+                          type: string
+                          example: Fall
+                        year:
+                          type: integer
+                          example: 2026
+                        name_en:
+                          type: string
+                          example: 'Fall 2026'
+                        name_ar:
+                          type: string
+                          example: 'خريف 2026'
+                        opens_at:
+                          type: string
+                          example: '2026-06-01T00:00:00+00:00'
+                        closes_at:
+                          type: string
+                          example: '2026-08-01T00:00:00+00:00'
+                        is_active:
+                          type: boolean
+                          example: true
+                        is_open:
+                          type: boolean
+                          example: true
+      tags:
+        - Admissions
+      security: []
+  /api/v1/admission-cycles:
+    get:
+      summary: 'List Admission Cycles.'
+      operationId: listAdmissionCycles
+      description: "Newest intake first. Requires calendar.manage — this is the management\nlist; the public registration screen uses the open-cycle lookup instead."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      intake_term: Fall
+                      year: 2026
+                      name_en: 'Fall 2026'
+                      name_ar: 'خريف 2026'
+                      opens_at: '2026-06-01T00:00:00+00:00'
+                      closes_at: '2026-08-01T00:00:00+00:00'
+                      is_active: true
+                      is_open: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        intake_term: Fall
+                        year: 2026
+                        name_en: 'Fall 2026'
+                        name_ar: 'خريف 2026'
+                        opens_at: '2026-06-01T00:00:00+00:00'
+                        closes_at: '2026-08-01T00:00:00+00:00'
+                        is_active: true
+                        is_open: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        intake_term:
+                          type: string
+                          example: Fall
+                        year:
+                          type: integer
+                          example: 2026
+                        name_en:
+                          type: string
+                          example: 'Fall 2026'
+                        name_ar:
+                          type: string
+                          example: 'خريف 2026'
+                        opens_at:
+                          type: string
+                          example: '2026-06-01T00:00:00+00:00'
+                        closes_at:
+                          type: string
+                          example: '2026-08-01T00:00:00+00:00'
+                        is_active:
+                          type: boolean
+                          example: true
+                        is_open:
+                          type: boolean
+                          example: true
+      tags:
+        - Admissions
+      security: []
+    post:
+      summary: 'Create an Admission Cycle.'
+      operationId: createAnAdmissionCycle
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    intake_term: Fall
+                    year: 2026
+                    name_en: 'Fall 2026'
+                    name_ar: 'خريف 2026'
+                    opens_at: '2026-06-01T00:00:00+00:00'
+                    closes_at: '2026-08-01T00:00:00+00:00'
+                    is_active: true
+                    is_open: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      intake_term:
+                        type: string
+                        example: Fall
+                      year:
+                        type: integer
+                        example: 2026
+                      name_en:
+                        type: string
+                        example: 'Fall 2026'
+                      name_ar:
+                        type: string
+                        example: 'خريف 2026'
+                      opens_at:
+                        type: string
+                        example: '2026-06-01T00:00:00+00:00'
+                      closes_at:
+                        type: string
+                        example: '2026-08-01T00:00:00+00:00'
+                      is_active:
+                        type: boolean
+                        example: true
+                      is_open:
+                        type: boolean
+                        example: true
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The intake term has already been taken.'
+                  errors:
+                    intake_term:
+                      - 'The intake term has already been taken.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The intake term has already been taken.'
+                  errors:
+                    type: object
+                    properties:
+                      intake_term:
+                        type: array
+                        example:
+                          - 'The intake term has already been taken.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                intake_term:
+                  type: string
+                  description: 'Fall or Spring.'
+                  example: Fall
+                year:
+                  type: integer
+                  description: 'The intake year.'
+                  example: 2026
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'Fall 2026'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'خريف 2026'
+                opens_at:
+                  type: string
+                  description: 'When the application window opens (ISO 8601).'
+                  example: '2026-06-01T00:00:00+00:00'
+                closes_at:
+                  type: string
+                  description: 'When the application window closes (ISO 8601, after opens_at).'
+                  example: '2026-08-01T00:00:00+00:00'
+              required:
+                - intake_term
+                - year
+                - name_en
+                - name_ar
+                - opens_at
+                - closes_at
+      security: []
+  '/api/v1/admission-cycles/{admission_cycle_id}':
+    get:
+      summary: 'Show an Admission Cycle.'
+      operationId: showAnAdmissionCycle
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    intake_term: Fall
+                    year: 2026
+                    name_en: 'Fall 2026'
+                    name_ar: 'خريف 2026'
+                    opens_at: '2026-06-01T00:00:00+00:00'
+                    closes_at: '2026-08-01T00:00:00+00:00'
+                    is_active: true
+                    is_open: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      intake_term:
+                        type: string
+                        example: Fall
+                      year:
+                        type: integer
+                        example: 2026
+                      name_en:
+                        type: string
+                        example: 'Fall 2026'
+                      name_ar:
+                        type: string
+                        example: 'خريف 2026'
+                      opens_at:
+                        type: string
+                        example: '2026-06-01T00:00:00+00:00'
+                      closes_at:
+                        type: string
+                        example: '2026-08-01T00:00:00+00:00'
+                      is_active:
+                        type: boolean
+                        example: true
+                      is_open:
+                        type: boolean
+                        example: true
+      tags:
+        - Admissions
+      security: []
+    patch:
+      summary: 'Update an Admission Cycle.'
+      operationId: updateAnAdmissionCycle
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    intake_term: Fall
+                    year: 2026
+                    name_en: 'Fall 2026'
+                    name_ar: 'خريف 2026'
+                    opens_at: '2026-06-01T00:00:00+00:00'
+                    closes_at: '2026-08-01T00:00:00+00:00'
+                    is_active: true
+                    is_open: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      intake_term:
+                        type: string
+                        example: Fall
+                      year:
+                        type: integer
+                        example: 2026
+                      name_en:
+                        type: string
+                        example: 'Fall 2026'
+                      name_ar:
+                        type: string
+                        example: 'خريف 2026'
+                      opens_at:
+                        type: string
+                        example: '2026-06-01T00:00:00+00:00'
+                      closes_at:
+                        type: string
+                        example: '2026-08-01T00:00:00+00:00'
+                      is_active:
+                        type: boolean
+                        example: true
+                      is_open:
+                        type: boolean
+                        example: true
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                intake_term:
+                  type: string
+                  description: 'Fall or Spring.'
+                  example: Fall
+                year:
+                  type: integer
+                  description: 'The intake year.'
+                  example: 2026
+                name_en:
+                  type: string
+                  description: 'English name.'
+                  example: 'Fall 2026'
+                name_ar:
+                  type: string
+                  description: 'Arabic name.'
+                  example: 'خريف 2026'
+                opens_at:
+                  type: string
+                  description: 'When the application window opens (ISO 8601).'
+                  example: '2026-06-01T00:00:00+00:00'
+                closes_at:
+                  type: string
+                  description: 'When the application window closes (ISO 8601, after opens_at).'
+                  example: '2026-08-01T00:00:00+00:00'
+              required:
+                - intake_term
+                - year
+                - name_en
+                - name_ar
+                - opens_at
+                - closes_at
+      security: []
+    parameters:
+      -
+        in: path
+        name: admission_cycle_id
+        description: 'The ID of the admission cycle.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admission-cycles/{admission_cycle_id}/activate':
+    post:
+      summary: 'Activate an Admission Cycle.'
+      operationId: activateAnAdmissionCycle
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    intake_term: Fall
+                    year: 2026
+                    name_en: 'Fall 2026'
+                    name_ar: 'خريف 2026'
+                    opens_at: '2026-06-01T00:00:00+00:00'
+                    closes_at: '2026-08-01T00:00:00+00:00'
+                    is_active: true
+                    is_open: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      intake_term:
+                        type: string
+                        example: Fall
+                      year:
+                        type: integer
+                        example: 2026
+                      name_en:
+                        type: string
+                        example: 'Fall 2026'
+                      name_ar:
+                        type: string
+                        example: 'خريف 2026'
+                      opens_at:
+                        type: string
+                        example: '2026-06-01T00:00:00+00:00'
+                      closes_at:
+                        type: string
+                        example: '2026-08-01T00:00:00+00:00'
+                      is_active:
+                        type: boolean
+                        example: true
+                      is_open:
+                        type: boolean
+                        example: true
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: admission_cycle_id
+        description: 'The ID of the admission cycle.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/admission-cycles/{admission_cycle_id}/deactivate':
+    post:
+      summary: 'Deactivate an Admission Cycle.'
+      operationId: deactivateAnAdmissionCycle
+      description: "Deactivating closes the Cycle regardless of its window — no new application\ncan start against it — without deleting it or its Applications."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    intake_term: Fall
+                    year: 2026
+                    name_en: 'Fall 2026'
+                    name_ar: 'خريف 2026'
+                    opens_at: '2026-06-01T00:00:00+00:00'
+                    closes_at: '2026-08-01T00:00:00+00:00'
+                    is_active: false
+                    is_open: false
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      intake_term:
+                        type: string
+                        example: Fall
+                      year:
+                        type: integer
+                        example: 2026
+                      name_en:
+                        type: string
+                        example: 'Fall 2026'
+                      name_ar:
+                        type: string
+                        example: 'خريف 2026'
+                      opens_at:
+                        type: string
+                        example: '2026-06-01T00:00:00+00:00'
+                      closes_at:
+                        type: string
+                        example: '2026-08-01T00:00:00+00:00'
+                      is_active:
+                        type: boolean
+                        example: false
+                      is_open:
+                        type: boolean
+                        example: false
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: admission_cycle_id
+        description: 'The ID of the admission cycle.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/catalog/tree:
     get:
       summary: 'The catalog browse tree.'

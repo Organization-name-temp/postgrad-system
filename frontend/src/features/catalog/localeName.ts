@@ -1,13 +1,4 @@
-/**
- * Picks a catalog entity's name in the active locale, falling back when the
- * chosen language's name is absent. Every catalog entity (Faculty, Department,
- * Program, Course) carries paired name_en/name_ar, so this lives at the feature
- * root beside the status→chip map rather than being repeated per component.
- */
-export function pickLocaleName(
-  entity: { name_en?: string; name_ar?: string },
-  lang: string,
-  fallback = '',
-): string {
-  return (lang === 'ar' ? entity.name_ar : entity.name_en) ?? fallback
-}
+// The locale-name picker now lives in `shared/i18n` (every bilingual feature
+// needs it, not just catalog). Re-exported here so catalog's existing imports
+// keep working through the feature-relative path.
+export { pickLocaleName } from '../../shared/i18n/localeName'

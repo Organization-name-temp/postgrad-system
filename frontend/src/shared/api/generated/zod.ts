@@ -7,6 +7,173 @@
 import * as zod from 'zod';
 
 /**
+ * Public, unauthenticated: the front door the registration screen reads to
+ * know whether (and into which intake) a stranger may apply. Returns only
+ * Cycles that are active and whose window contains the current moment.
+ * @summary List currently-open Admission Cycles.
+ */
+export const ListCurrentlyOpenAdmissionCyclesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * Newest intake first. Requires calendar.manage — this is the management
+ * list; the public registration screen uses the open-cycle lookup instead.
+ * @summary List Admission Cycles.
+ */
+export const ListAdmissionCyclesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create an Admission Cycle.
+ */
+export const CreateAnAdmissionCycleBody = zod.object({
+  "intake_term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The intake year.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "opens_at": zod.string().describe('When the application window opens (ISO 8601).'),
+  "closes_at": zod.string().describe('When the application window closes (ISO 8601, after opens_at).')
+})
+
+export const CreateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show an Admission Cycle.
+ */
+export const ShowAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const ShowAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update an Admission Cycle.
+ */
+export const UpdateAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const UpdateAnAdmissionCycleBody = zod.object({
+  "intake_term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The intake year.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "opens_at": zod.string().describe('When the application window opens (ISO 8601).'),
+  "closes_at": zod.string().describe('When the application window closes (ISO 8601, after opens_at).')
+})
+
+export const UpdateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate an Admission Cycle.
+ */
+export const ActivateAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const ActivateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating closes the Cycle regardless of its window — no new application
+ * can start against it — without deleting it or its Applications.
+ * @summary Deactivate an Admission Cycle.
+ */
+export const DeactivateAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const DeactivateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * Faculties are ordered by code; within each Program the three Categories are
  * always present in bylaw order (Preparatory, Program Core, Research Elective)
  * with their required credit hours, and Courses within a Category follow the

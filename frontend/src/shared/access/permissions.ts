@@ -9,4 +9,5 @@
 export const PERMISSION = {
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
+  manageCalendar: 'calendar.manage',
 } as const

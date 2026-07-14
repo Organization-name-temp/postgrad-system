@@ -24,6 +24,157 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type ListCurrentlyOpenAdmissionCycles200DataItem = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ListCurrentlyOpenAdmissionCycles200 = {
+  data?: ListCurrentlyOpenAdmissionCycles200DataItem[];
+};
+
+export type ListAdmissionCycles200DataItem = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ListAdmissionCycles200 = {
+  data?: ListAdmissionCycles200DataItem[];
+};
+
+export type CreateAnAdmissionCycleBody = {
+  /** Fall or Spring. */
+  intake_term: string;
+  /** The intake year. */
+  year: number;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** When the application window opens (ISO 8601). */
+  opens_at: string;
+  /** When the application window closes (ISO 8601, after opens_at). */
+  closes_at: string;
+};
+
+export type CreateAnAdmissionCycle201Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type CreateAnAdmissionCycle201 = {
+  data?: CreateAnAdmissionCycle201Data;
+};
+
+export type CreateAnAdmissionCycle422Errors = {
+  intake_term?: string[];
+};
+
+export type CreateAnAdmissionCycle422 = {
+  message?: string;
+  errors?: CreateAnAdmissionCycle422Errors;
+};
+
+export type ShowAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ShowAnAdmissionCycle200 = {
+  data?: ShowAnAdmissionCycle200Data;
+};
+
+export type UpdateAnAdmissionCycleBody = {
+  /** Fall or Spring. */
+  intake_term: string;
+  /** The intake year. */
+  year: number;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** When the application window opens (ISO 8601). */
+  opens_at: string;
+  /** When the application window closes (ISO 8601, after opens_at). */
+  closes_at: string;
+};
+
+export type UpdateAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type UpdateAnAdmissionCycle200 = {
+  data?: UpdateAnAdmissionCycle200Data;
+};
+
+export type ActivateAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ActivateAnAdmissionCycle200 = {
+  data?: ActivateAnAdmissionCycle200Data;
+};
+
+export type DeactivateAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type DeactivateAnAdmissionCycle200 = {
+  data?: DeactivateAnAdmissionCycle200Data;
+};
+
 export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem = {
   id?: number;
   code?: string;
@@ -835,6 +986,549 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * Public, unauthenticated: the front door the registration screen reads to
+ * know whether (and into which intake) a stranger may apply. Returns only
+ * Cycles that are active and whose window contains the current moment.
+ * @summary List currently-open Admission Cycles.
+ */
+export const listCurrentlyOpenAdmissionCycles = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListCurrentlyOpenAdmissionCycles200>(
+      {url: `/api/v1/admission-cycles/open`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListCurrentlyOpenAdmissionCyclesQueryKey = () => {
+    return [
+    `/api/v1/admission-cycles/open`
+    ] as const;
+    }
+
+
+export const getListCurrentlyOpenAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCurrentlyOpenAdmissionCyclesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>> = ({ signal }) => listCurrentlyOpenAdmissionCycles(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCurrentlyOpenAdmissionCyclesQueryResult = NonNullable<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>>
+export type ListCurrentlyOpenAdmissionCyclesQueryError = unknown
+
+
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List currently-open Admission Cycles.
+ */
+
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCurrentlyOpenAdmissionCyclesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Newest intake first. Requires calendar.manage — this is the management
+ * list; the public registration screen uses the open-cycle lookup instead.
+ * @summary List Admission Cycles.
+ */
+export const listAdmissionCycles = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAdmissionCycles200>(
+      {url: `/api/v1/admission-cycles`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAdmissionCyclesQueryKey = () => {
+    return [
+    `/api/v1/admission-cycles`
+    ] as const;
+    }
+
+
+export const getListAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdmissionCyclesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdmissionCycles>>> = ({ signal }) => listAdmissionCycles(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdmissionCyclesQueryResult = NonNullable<Awaited<ReturnType<typeof listAdmissionCycles>>>
+export type ListAdmissionCyclesQueryError = unknown
+
+
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Admission Cycles.
+ */
+
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdmissionCyclesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create an Admission Cycle.
+ */
+export const createAnAdmissionCycle = (
+    createAnAdmissionCycleBody: CreateAnAdmissionCycleBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAnAdmissionCycle201>(
+      {url: `/api/v1/admission-cycles`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAnAdmissionCycleBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAnAdmissionCycleMutationOptions = <TError = CreateAnAdmissionCycle422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnAdmissionCycle>>, TError,{data: CreateAnAdmissionCycleBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAnAdmissionCycle>>, TError,{data: CreateAnAdmissionCycleBody}, TContext> => {
+
+const mutationKey = ['createAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAnAdmissionCycle>>, {data: CreateAnAdmissionCycleBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAnAdmissionCycle(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof createAnAdmissionCycle>>>
+    export type CreateAnAdmissionCycleMutationBody = CreateAnAdmissionCycleBody
+    export type CreateAnAdmissionCycleMutationError = CreateAnAdmissionCycle422
+
+    /**
+ * @summary Create an Admission Cycle.
+ */
+export const useCreateAnAdmissionCycle = <TError = CreateAnAdmissionCycle422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnAdmissionCycle>>, TError,{data: CreateAnAdmissionCycleBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAnAdmissionCycle>>,
+        TError,
+        {data: CreateAnAdmissionCycleBody},
+        TContext
+      > => {
+      return useMutation(getCreateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show an Admission Cycle.
+ */
+export const showAnAdmissionCycle = (
+    admissionCycleId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowAnAdmissionCycleQueryKey = (admissionCycleId: number,) => {
+    return [
+    `/api/v1/admission-cycles/${admissionCycleId}`
+    ] as const;
+    }
+
+
+export const getShowAnAdmissionCycleQueryOptions = <TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowAnAdmissionCycleQueryKey(admissionCycleId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showAnAdmissionCycle>>> = ({ signal }) => showAnAdmissionCycle(admissionCycleId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: admissionCycleId !== null && admissionCycleId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowAnAdmissionCycleQueryResult = NonNullable<Awaited<ReturnType<typeof showAnAdmissionCycle>>>
+export type ShowAnAdmissionCycleQueryError = unknown
+
+
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>,
+          TError,
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>,
+          TError,
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show an Admission Cycle.
+ */
+
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowAnAdmissionCycleQueryOptions(admissionCycleId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Update an Admission Cycle.
+ */
+export const updateAnAdmissionCycle = (
+    admissionCycleId: number,
+    updateAnAdmissionCycleBody: UpdateAnAdmissionCycleBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAnAdmissionCycleBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateAnAdmissionCycleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, TError,{admissionCycleId: number;data: UpdateAnAdmissionCycleBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, TError,{admissionCycleId: number;data: UpdateAnAdmissionCycleBody}, TContext> => {
+
+const mutationKey = ['updateAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, {admissionCycleId: number;data: UpdateAnAdmissionCycleBody}> = (props) => {
+          const {admissionCycleId,data} = props ?? {};
+
+          return  updateAnAdmissionCycle(admissionCycleId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof updateAnAdmissionCycle>>>
+    export type UpdateAnAdmissionCycleMutationBody = UpdateAnAdmissionCycleBody
+    export type UpdateAnAdmissionCycleMutationError = unknown
+
+    /**
+ * @summary Update an Admission Cycle.
+ */
+export const useUpdateAnAdmissionCycle = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, TError,{admissionCycleId: number;data: UpdateAnAdmissionCycleBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAnAdmissionCycle>>,
+        TError,
+        {admissionCycleId: number;data: UpdateAnAdmissionCycleBody},
+        TContext
+      > => {
+      return useMutation(getUpdateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Activate an Admission Cycle.
+ */
+export const activateAnAdmissionCycle = (
+    admissionCycleId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ActivateAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}/activate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getActivateAnAdmissionCycleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext> => {
+
+const mutationKey = ['activateAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, {admissionCycleId: number}> = (props) => {
+          const {admissionCycleId} = props ?? {};
+
+          return  activateAnAdmissionCycle(admissionCycleId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof activateAnAdmissionCycle>>>
+
+    export type ActivateAnAdmissionCycleMutationError = unknown
+
+    /**
+ * @summary Activate an Admission Cycle.
+ */
+export const useActivateAnAdmissionCycle = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof activateAnAdmissionCycle>>,
+        TError,
+        {admissionCycleId: number},
+        TContext
+      > => {
+      return useMutation(getActivateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deactivating closes the Cycle regardless of its window — no new application
+ * can start against it — without deleting it or its Applications.
+ * @summary Deactivate an Admission Cycle.
+ */
+export const deactivateAnAdmissionCycle = (
+    admissionCycleId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeactivateAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}/deactivate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeactivateAnAdmissionCycleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext> => {
+
+const mutationKey = ['deactivateAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, {admissionCycleId: number}> = (props) => {
+          const {admissionCycleId} = props ?? {};
+
+          return  deactivateAnAdmissionCycle(admissionCycleId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeactivateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>>
+
+    export type DeactivateAnAdmissionCycleMutationError = unknown
+
+    /**
+ * @summary Deactivate an Admission Cycle.
+ */
+export const useDeactivateAnAdmissionCycle = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>,
+        TError,
+        {admissionCycleId: number},
+        TContext
+      > => {
+      return useMutation(getDeactivateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
 
 /**
  * Faculties are ordered by code; within each Program the three Categories are

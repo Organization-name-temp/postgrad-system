@@ -30,6 +30,14 @@ deptrac:
       collectors:
         - type: classLike
           value: '^Modules\\Catalog\\Internal\\.*'
+    - name: Admissions_Public
+      collectors:
+        - type: classLike
+          value: '^Modules\\Admissions\\Public\\.*'
+    - name: Admissions_Internal
+      collectors:
+        - type: classLike
+          value: '^Modules\\Admissions\\Internal\\.*'
   ruleset:
     # The app may orchestrate modules only through their Public facades.
     App:
@@ -46,5 +54,15 @@ deptrac:
       - Identity_Public
     Catalog_Internal:
       - Catalog_Public
+      - Identity_Public
+    # Admissions (Phase 2) is the first module with multiple cross-module edges.
+    # Ticket 01 opens only the Identity\Public edge (calendar.manage lives in the
+    # §3.2 matrix); the Catalog\Public and Notifications\Public edges are added by
+    # the tickets that first consume them (program selection, notifications).
+    Admissions_Public:
+      - Admissions_Internal
+      - Identity_Public
+    Admissions_Internal:
+      - Admissions_Public
       - Identity_Public
     # No rule grants anyone access to another module's *_Internal — that is the seam.

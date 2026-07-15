@@ -111,6 +111,23 @@ it('blocks finalize when the conditionally-required English certificate is missi
         ->assertJsonValidationErrors('documents');
 });
 
+it('names the specific missing documents in the finalize error', function () {
+    // IELTS reported (withPersonalInfo default) → the English certificate is owed;
+    // uploading only three of the four always-required documents also leaves the photo.
+    $application = finalizableApplicant();
+    attachDocuments($application, [DocumentType::GraduationCertificate, DocumentType::Transcript, DocumentType::NationalId]);
+
+    $message = test()->postJson('/api/v1/application/finalize')
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('documents')
+        ->json('errors.documents.0');
+
+    // The message enumerates exactly what is outstanding, not a generic "upload everything".
+    expect($message)
+        ->toContain('Personal photo')                    // the missing always-required document
+        ->toContain('English proficiency certificate');  // the missing conditional (IELTS reported)
+});
+
 it('does not require an English certificate when no test was reported', function () {
     $application = finalizableApplicant(['english_test' => EnglishTest::None, 'english_score' => null]);
     attachDocuments($application, REQUIRED_DOCUMENT_TYPES);
@@ -132,9 +149,13 @@ it('requires a PhD applicant to have uploaded their MSc thesis', function () {
     // All the always-required docs, but no MSc thesis.
     attachDocuments($application, REQUIRED_DOCUMENT_TYPES);
 
-    test()->postJson('/api/v1/application/finalize')
+    $message = test()->postJson('/api/v1/application/finalize')
         ->assertStatus(422)
-        ->assertJsonValidationErrors('documents');
+        ->assertJsonValidationErrors('documents')
+        ->json('errors.documents.0');
+
+    // The error names the outstanding thesis specifically (not a generic message).
+    expect($message)->toContain('MSc thesis');
 
     // Adding the thesis completes it.
     attachDocuments($application, [DocumentType::MscThesis]);

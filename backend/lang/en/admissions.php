@@ -6,6 +6,9 @@
 // messages live in lang/{locale}/validation.php; this file holds only the custom
 // domain messages the Admissions controllers raise directly.
 return [
+    // Locale-aware separator for lists built in a message (e.g. the missing-documents
+    // enumeration) — Arabic uses its own comma, so it must not be hardcoded.
+    'list_separator' => ', ',
     'registration' => [
         'closed' => 'Admissions are currently closed.',
     ],
@@ -16,6 +19,19 @@ return [
     'documents' => [
         'locked' => 'Documents can no longer be changed for this application.',
         'too_many' => 'You can upload at most :max document(s) of this type.',
+        // Human-readable DocumentType names, used to enumerate what is still missing
+        // at finalize (keyed by the enum value).
+        'types' => [
+            'graduation_certificate' => 'Graduation certificate',
+            'transcript' => 'Academic transcript',
+            'national_id' => 'National ID / passport',
+            'photo' => 'Personal photo',
+            'english_certificate' => 'English proficiency certificate',
+            'msc_thesis' => 'MSc thesis',
+            'cv' => 'CV',
+            'recommendation_letter' => 'Recommendation letter',
+            'additional_certificate' => 'Additional certificate',
+        ],
     ],
     'program' => [
         'not_found' => 'The selected program could not be found.',
@@ -25,7 +41,7 @@ return [
     'finalize' => [
         'not_ready' => 'This application is not ready to be finalized.',
         'no_program' => 'Choose a program before finalizing your application.',
-        'missing_documents' => 'Upload every required document before finalizing your application.',
+        'missing_documents' => 'Upload the following required document(s) before finalizing: :documents.',
     ],
     'resubmit' => [
         'not_returned' => 'This application has not been returned for revision.',

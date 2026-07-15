@@ -585,6 +585,7 @@ export const ar = {
       remove: 'حذف',
       nextStep: 'بعد ذلك، اختر البرنامج الذي تتقدّم إليه.',
       continue: 'المتابعة إلى اختيار البرنامج',
+      missingRequired: 'ارفع المستندات المطلوبة للمتابعة: {{documents}}.',
     },
     program: {
       title: 'اختر برنامجك',

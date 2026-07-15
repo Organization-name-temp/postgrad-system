@@ -26,6 +26,7 @@ import {
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
+import { openDocument } from '../openDocument'
 import { ApplicationStatusChip } from '../ApplicationStatusChip'
 import { StatusTimeline } from '../StatusTimeline'
 
@@ -169,7 +170,14 @@ export function DeanReviewPage() {
                 <ListItemText
                   primary={
                     document.download_url ? (
-                      <Link href={document.download_url} target="_blank" rel="noopener">
+                      <Link
+                        component="button"
+                        type="button"
+                        onClick={() => {
+                          if (document.download_url) void openDocument(document.download_url)
+                        }}
+                        sx={{ textAlign: 'start' }}
+                      >
                         {document.original_filename}
                       </Link>
                     ) : (

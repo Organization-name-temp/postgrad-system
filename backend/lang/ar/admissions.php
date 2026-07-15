@@ -2,6 +2,8 @@
 
 // Arabic Admissions domain lines, selected when the request negotiates `ar`.
 return [
+    // فاصل القوائم المبنية داخل رسالة (مثل تعداد المستندات الناقصة) — بالفاصلة العربية.
+    'list_separator' => '، ',
     'registration' => [
         'closed' => 'باب القبول مغلق حاليًا.',
     ],
@@ -12,6 +14,18 @@ return [
     'documents' => [
         'locked' => 'لم يعد من الممكن تغيير مستندات هذا الطلب.',
         'too_many' => 'يمكنك رفع :max مستند كحد أقصى من هذا النوع.',
+        // أسماء أنواع المستندات، تُستخدم لتعداد المستندات الناقصة عند الإرسال النهائي.
+        'types' => [
+            'graduation_certificate' => 'شهادة التخرج',
+            'transcript' => 'كشف الدرجات',
+            'national_id' => 'الهوية الوطنية / جواز السفر',
+            'photo' => 'صورة شخصية',
+            'english_certificate' => 'شهادة إتقان اللغة الإنجليزية',
+            'msc_thesis' => 'رسالة الماجستير',
+            'cv' => 'السيرة الذاتية',
+            'recommendation_letter' => 'خطاب توصية',
+            'additional_certificate' => 'شهادة إضافية',
+        ],
     ],
     'program' => [
         'not_found' => 'تعذّر العثور على البرنامج المحدد.',
@@ -21,7 +35,7 @@ return [
     'finalize' => [
         'not_ready' => 'هذا الطلب غير جاهز للإرسال النهائي.',
         'no_program' => 'اختر برنامجًا قبل الإرسال النهائي لطلبك.',
-        'missing_documents' => 'ارفع جميع المستندات المطلوبة قبل الإرسال النهائي لطلبك.',
+        'missing_documents' => 'ارفع المستندات المطلوبة التالية قبل الإرسال النهائي: :documents.',
     ],
     'resubmit' => [
         'not_returned' => 'لم يُعَد هذا الطلب للمراجعة.',

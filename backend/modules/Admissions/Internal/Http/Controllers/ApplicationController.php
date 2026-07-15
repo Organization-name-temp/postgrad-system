@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
+use Modules\Admissions\Internal\Enums\DocumentType;
 use Modules\Admissions\Internal\Enums\EnglishTest;
 use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
@@ -238,8 +239,18 @@ class ApplicationController
             $errors['primary_program_id'] = [__('admissions.finalize.no_program')];
         }
 
-        if ($application->missingRequiredDocumentTypes() !== []) {
-            $errors['documents'] = [__('admissions.finalize.missing_documents')];
+        $missingDocuments = $application->missingRequiredDocumentTypes();
+        if ($missingDocuments !== []) {
+            // Enumerate exactly which documents are outstanding (including the
+            // conditionally-required ones this application owes) rather than a generic
+            // "upload everything" the applicant can't act on.
+            $names = array_map(
+                static fn (DocumentType $type): string => __('admissions.documents.types.'.$type->value),
+                $missingDocuments,
+            );
+            $errors['documents'] = [__('admissions.finalize.missing_documents', [
+                'documents' => implode(__('admissions.list_separator'), $names),
+            ])];
         }
 
         if ($errors !== []) {

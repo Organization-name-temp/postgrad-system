@@ -599,6 +599,7 @@ export const en = {
       remove: 'Remove',
       nextStep: 'Next, choose the program you are applying to.',
       continue: 'Continue to program selection',
+      missingRequired: 'Upload the required documents to continue: {{documents}}.',
     },
     program: {
       title: 'Choose your program',

@@ -26,8 +26,10 @@ import type {
   MyApplication200DataDocumentsItem,
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
+import { openDocument } from '../openDocument'
 import { DOCUMENT_TYPES } from './documentTypes'
 import type { DocumentRequirement, DocumentTypeConfig } from './documentTypes'
+import { ENGLISH_TEST_NONE } from './fieldOptions'
 
 interface DocumentsStepProps {
   application: MyApplication200Data
@@ -40,6 +42,32 @@ const REQUIREMENT_COLOR: Record<DocumentRequirement, 'error' | 'warning' | 'defa
   required: 'error',
   conditional: 'warning',
   optional: 'default',
+}
+
+/**
+ * The requirement for a document given the applicant's own Step-1 answers. The English
+ * certificate becomes Required once a test other than "None" is reported, and the MSc
+ * thesis once the applicant is applying for a PhD — mirroring the backend's finalize
+ * check (Application::requiredDocumentTypesForFinalize), so a conditional document
+ * reads as Required the moment it is actually owed rather than looking optional until
+ * finalize refuses it.
+ */
+function effectiveRequirement(
+  config: DocumentTypeConfig,
+  application: MyApplication200Data,
+): DocumentRequirement {
+  if (
+    config.type === 'english_certificate' &&
+    application.english_test != null &&
+    application.english_test !== ENGLISH_TEST_NONE
+  ) {
+    return 'required'
+  }
+  if (config.type === 'msc_thesis' && application.applying_for_degree === 'PhD') {
+    return 'required'
+  }
+
+  return config.requirement
 }
 
 /** A compact, human-readable file size (KB below 1 MB, otherwise MB). */
@@ -59,7 +87,7 @@ function formatSize(bytes: number | undefined): string {
  * lock once the application enters review (the API then answers 409).
  */
 export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
-  const { t } = useTranslation('admissions')
+  const { t, i18n } = useTranslation('admissions')
   const queryClient = useQueryClient()
 
   // One upload/remove mutation drives every widget; `activeType` scopes the busy
@@ -73,6 +101,16 @@ export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
   const documents = application.documents ?? []
   const documentsOfType = (type: string): MyApplication200DataDocumentsItem[] =>
     documents.filter((document) => document.document_type === type)
+
+  // Which documents this application must hold to proceed — the always-required set
+  // plus any conditional documents the applicant's answers have promoted — and which
+  // of those are still missing. Continue is gated on there being none outstanding.
+  const missingRequired = DOCUMENT_TYPES.filter(
+    (config) =>
+      effectiveRequirement(config, application) === 'required' &&
+      documentsOfType(config.type).length === 0,
+  )
+  const canContinue = missingRequired.length === 0
 
   const handleUpload = (config: DocumentTypeConfig, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -91,7 +129,9 @@ export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
 
   const preview = (document: MyApplication200DataDocumentsItem) => {
     if (document.download_url) {
-      window.open(document.download_url, '_blank', 'noopener,noreferrer')
+      // Fetched through the authenticated client and opened as a blob — a direct
+      // link carries no auth context and is refused (ADR-0016).
+      void openDocument(document.download_url)
     }
   }
 
@@ -107,6 +147,7 @@ export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
       <Stack spacing={2} sx={{ mt: 2 }}>
         {DOCUMENT_TYPES.map((config) => {
           const uploaded = documentsOfType(config.type)
+          const requirement = effectiveRequirement(config, application)
           const atCap = uploaded.length >= config.maxCount
           const busy = activeType === config.type && (upload.isPending || remove.isPending)
           const error =
@@ -132,9 +173,9 @@ export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
                 </Box>
                 <Chip
                   size="small"
-                  color={REQUIREMENT_COLOR[config.requirement]}
-                  label={t(`documents.requirements.${config.requirement}`)}
-                  variant={config.requirement === 'optional' ? 'outlined' : 'filled'}
+                  color={REQUIREMENT_COLOR[requirement]}
+                  label={t(`documents.requirements.${requirement}`)}
+                  variant={requirement === 'optional' ? 'outlined' : 'filled'}
                 />
               </Stack>
 
@@ -213,9 +254,20 @@ export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
         {t('documents.nextStep')}
       </Alert>
 
+      {onContinue && !canContinue && (
+        <Alert severity="warning" sx={{ mt: 2 }}>
+          {t('documents.missingRequired', {
+            documents: new Intl.ListFormat(i18n.language, {
+              style: 'long',
+              type: 'conjunction',
+            }).format(missingRequired.map((config) => t(`documents.types.${config.type}`))),
+          })}
+        </Alert>
+      )}
+
       {onContinue && (
         <Stack direction="row" sx={{ mt: 3, justifyContent: 'flex-end' }}>
-          <Button variant="contained" onClick={onContinue}>
+          <Button variant="contained" onClick={onContinue} disabled={!canContinue}>
             {t('documents.continue')}
           </Button>
         </Stack>

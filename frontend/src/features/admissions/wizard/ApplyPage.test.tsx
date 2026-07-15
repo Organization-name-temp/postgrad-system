@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
@@ -15,6 +15,15 @@ const LINK = 'http://localhost/api/v1/applications/1/verify-email?expires=1&sign
 const srv = vi.hoisted(() => ({
   status: 'draft' as string,
   submitShouldFail: false,
+  // The applicant's snapshot the in-memory server holds, so a PATCH edit is
+  // observable on the next read (the wizard refetches after saving).
+  name_en: undefined as string | undefined,
+}))
+
+// Every call the wizard makes through the shared mutator, so the PATCH re-save on
+// back-navigation is asserted end-to-end rather than stubbed at the hook.
+const calls = vi.hoisted(() => ({
+  list: [] as Array<{ method?: string; url?: string; data?: unknown }>,
 }))
 
 vi.mock('../../../shared/api/http', () => ({
@@ -28,6 +37,7 @@ vi.mock('../../../shared/api/http', () => ({
   },
   customInstance: (config: AxiosRequestConfig) => {
     const url = config.url ?? ''
+    calls.list.push({ method: config.method, url, data: config.data })
     if (url.endsWith('/application/submit')) {
       if (srv.submitShouldFail) {
         return Promise.reject({
@@ -54,7 +64,14 @@ vi.mock('../../../shared/api/http', () => ({
       })
     }
     if (url.endsWith('/application')) {
-      return Promise.resolve({ data: { id: 1, status: srv.status, admission_cycle_id: 1 } })
+      // PATCH persists the edited field so a later read reflects it.
+      if (config.method === 'PATCH') {
+        const body = (config.data ?? {}) as { name_en?: string }
+        if (body.name_en !== undefined) srv.name_en = body.name_en
+      }
+      return Promise.resolve({
+        data: { id: 1, status: srv.status, admission_cycle_id: 1, name_en: srv.name_en },
+      })
     }
     return Promise.resolve({})
   },
@@ -75,6 +92,8 @@ describe('ApplyPage', () => {
   beforeEach(() => {
     srv.status = 'draft'
     srv.submitShouldFail = false
+    srv.name_en = undefined
+    calls.list = []
   })
 
   it('opens a draft on the personal-info step', async () => {
@@ -121,4 +140,36 @@ describe('ApplyPage', () => {
     await user.click(screen.getByRole('button', { name: /resend link/i }))
     expect(await screen.findByRole('link', { name: /verify-email/i })).toHaveAttribute('href', LINK)
   })
+
+  it('goes Back from documents to personal info, edits a field, and persists it via PATCH', async () => {
+    // A verified applicant resting on the documents step — the post-verify phase.
+    srv.status = 'email_verified'
+    const user = userEvent.setup({ delay: null })
+    renderApply()
+
+    // From documents, Back returns to the personal-info step for editing.
+    await user.click(await screen.findByRole('button', { name: /^back$/i }))
+    expect(await screen.findByText('Personal information')).toBeInTheDocument()
+
+    // Correct a field and continue: the edit is saved through PATCH /application …
+    // (fireEvent sets the value in one render, keeping the 24-field form snappy).
+    fireEvent.change(screen.getByLabelText(/full name \(english\)/i), {
+      target: { value: 'Corrected Name' },
+    })
+    await user.click(screen.getByRole('button', { name: /save & continue/i }))
+
+    await waitFor(() =>
+      expect(
+        calls.list.some(
+          (call) =>
+            call.method === 'PATCH' &&
+            call.url === '/api/v1/application' &&
+            (call.data as { name_en?: string } | undefined)?.name_en === 'Corrected Name',
+        ),
+      ).toBe(true),
+    )
+
+    // … and the wizard returns to the documents step.
+    expect(await screen.findByText(/choose the program you are applying to/i)).toBeInTheDocument()
+  }, 15000)
 })

@@ -21,8 +21,19 @@ import { StatusView } from '../StatusView'
 import { ReturnedNotice } from '../ReturnedNotice'
 
 /** The post-verification sub-steps the applicant walks client-side (the server
- *  status stays `email_verified` across all three until finalize). */
-type PostVerifyStep = 'documents' | 'program' | 'review'
+ *  status stays `email_verified` across all of them until finalize). `personal` is
+ *  reached only by going Back from Documents to correct the snapshot (Phase 2.5 B3);
+ *  the forward path is documents → program → review. */
+type PostVerifyStep = 'personal' | 'documents' | 'program' | 'review'
+
+/** Which Stepper node a post-verify sub-step lights up. `personal` maps back to the
+ *  first node so Back-navigation reads correctly on the shared stepper. */
+const POST_VERIFY_STEP_INDEX: Record<PostVerifyStep, number> = {
+  personal: WIZARD_STEP.personalInfo,
+  documents: WIZARD_STEP.documents,
+  program: WIZARD_STEP.program,
+  review: WIZARD_STEP.review,
+}
 
 /**
  * The applicant's multi-step application wizard. The server's Application status
@@ -76,7 +87,7 @@ export function ApplyPage() {
   const activeStep = inReview
     ? WIZARD_STEP_KEYS.length
     : editing
-      ? WIZARD_STEP[postVerifyStep]
+      ? POST_VERIFY_STEP_INDEX[postVerifyStep]
       : stepForStatus(status)
 
   return (
@@ -105,9 +116,16 @@ export function ApplyPage() {
                 {t('verify.verified')}
               </Alert>
             )}
+            {postVerifyStep === 'personal' && (
+              <PersonalInfoStep
+                application={application}
+                onBack={() => setPostVerifyStep('documents')}
+              />
+            )}
             {postVerifyStep === 'documents' && (
               <DocumentsStep
                 application={application}
+                onBack={() => setPostVerifyStep('personal')}
                 onContinue={() => setPostVerifyStep('program')}
               />
             )}

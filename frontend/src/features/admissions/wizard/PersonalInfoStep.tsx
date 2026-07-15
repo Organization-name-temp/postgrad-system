@@ -37,8 +37,15 @@ import {
 
 interface PersonalInfoStepProps {
   application: MyApplication200Data | undefined
-  /** Called after a successful submit with the issued verification link (null when the applicant was already verified). */
-  onSubmitted: (verificationUrl: string | null) => void
+  /** Called after a successful submit with the issued verification link (null when the applicant was already verified). Submit-flow only. */
+  onSubmitted?: (verificationUrl: string | null) => void
+  /**
+   * Edit-flow (post-verification back-navigation): when provided, the step edits the
+   * existing snapshot via the per-step save (PATCH) and returns here rather than
+   * submitting Step 1 and issuing a verification link. Set by the wizard when the
+   * applicant reaches this step by going Back from Documents (Phase 2.5 B3).
+   */
+  onBack?: () => void
 }
 
 /** The editable form state — every field a string (or boolean for the two flags). */
@@ -177,7 +184,7 @@ function toPartialBody(form: FormState): SaveStep1partialBody {
  * resume. Server-side validation failures are shown inline beside each field
  * (already localized by the API), so errors read in the applicant's language.
  */
-export function PersonalInfoStep({ application, onSubmitted }: PersonalInfoStepProps) {
+export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalInfoStepProps) {
   const { t } = useTranslation('admissions')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -186,10 +193,16 @@ export function PersonalInfoStep({ application, onSubmitted }: PersonalInfoStepP
   const submit = useSubmitStep1()
   const save = useSaveStep1partial()
 
+  // Edit-flow: reached by going Back from a later step to correct a field. The
+  // snapshot is already submitted, so the primary action re-saves it (PATCH) and
+  // returns, rather than re-submitting Step 1.
+  const editing = onBack !== undefined
+
   const fieldErrors = apiFieldErrors(submit.error ?? save.error)
-  const generalError = submit.isError
-    ? (apiErrorMessage(submit.error) ?? t('personalInfo.submitError'))
-    : undefined
+  const generalError =
+    submit.isError || save.isError
+      ? (apiErrorMessage(submit.error ?? save.error) ?? t('personalInfo.submitError'))
+      : undefined
   const busy = submit.isPending || save.isPending
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
@@ -197,30 +210,39 @@ export function PersonalInfoStep({ application, onSubmitted }: PersonalInfoStepP
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: getMyApplicationQueryKey() })
 
-  const handleContinue = (event: FormEvent) => {
-    event.preventDefault()
-    submit.mutate(
-      { data: toSubmitBody(form) },
-      {
-        onSuccess: async (result) => {
-          await refresh()
-          onSubmitted(result.verification_url ?? null)
-        },
-      },
-    )
-  }
-
-  const handleSaveLater = () => {
+  /** Persist the entered fields as a partial draft, then run `after` once the fresh
+   *  snapshot has been reloaded — shared by "save & finish later" and the edit-flow
+   *  Back-navigation save. */
+  const savePartial = (after: () => void) =>
     save.mutate(
       { data: toPartialBody(form) },
       {
         onSuccess: async () => {
           await refresh()
-          navigate('/', { replace: true })
+          after()
+        },
+      },
+    )
+
+  const handleContinue = (event: FormEvent) => {
+    event.preventDefault()
+    if (editing) {
+      // Persist the correction, then return to the step the applicant came from.
+      savePartial(() => onBack?.())
+      return
+    }
+    submit.mutate(
+      { data: toSubmitBody(form) },
+      {
+        onSuccess: async (result) => {
+          await refresh()
+          onSubmitted?.(result.verification_url ?? null)
         },
       },
     )
   }
+
+  const handleSaveLater = () => savePartial(() => navigate('/', { replace: true }))
 
   /** A text/number field wired to form state, with the server's inline error for it. */
   const text = (name: keyof FormState, opts: { type?: string; required?: boolean } = {}) => (
@@ -333,11 +355,19 @@ export function PersonalInfoStep({ application, onSubmitted }: PersonalInfoStepP
 
       <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
         <Button type="submit" variant="contained" disabled={busy}>
-          {submit.isPending ? t('personalInfo.saving') : t('personalInfo.saveContinue')}
+          {(editing ? save.isPending : submit.isPending)
+            ? t('personalInfo.saving')
+            : t('personalInfo.saveContinue')}
         </Button>
-        <Button type="button" variant="outlined" onClick={handleSaveLater} disabled={busy}>
-          {t('personalInfo.saveLater')}
-        </Button>
+        {editing ? (
+          <Button type="button" variant="outlined" onClick={onBack} disabled={busy}>
+            {t('personalInfo.back')}
+          </Button>
+        ) : (
+          <Button type="button" variant="outlined" onClick={handleSaveLater} disabled={busy}>
+            {t('personalInfo.saveLater')}
+          </Button>
+        )}
       </Stack>
     </Box>
   )

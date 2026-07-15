@@ -552,6 +552,7 @@ export const en = {
       scoreHelp: 'Required unless your test is “None”.',
       saveContinue: 'Save & continue',
       saveLater: 'Save & finish later',
+      back: 'Back',
       saving: 'Saving…',
       submitError: 'Could not submit. Please fix the highlighted fields and try again.',
     },
@@ -599,6 +600,7 @@ export const en = {
       remove: 'Remove',
       nextStep: 'Next, choose the program you are applying to.',
       continue: 'Continue to program selection',
+      back: 'Back',
       missingRequired: 'Upload the required documents to continue: {{documents}}.',
     },
     program: {

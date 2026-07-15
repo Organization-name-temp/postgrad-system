@@ -35,6 +35,8 @@ interface DocumentsStepProps {
   application: MyApplication200Data
   /** Advance to program selection. Omitted where the step is shown standalone. */
   onContinue?: () => void
+  /** Return to the personal-info step to correct a field (Phase 2.5 B3). Omitted where the step is shown standalone. */
+  onBack?: () => void
 }
 
 /** Requirement → the MUI Chip colour that conveys how strongly it is needed. */
@@ -86,7 +88,7 @@ function formatSize(bytes: number | undefined): string {
  * surfaces a bad type/format/size/over-count as an inline 422 message. Documents
  * lock once the application enters review (the API then answers 409).
  */
-export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
+export function DocumentsStep({ application, onContinue, onBack }: DocumentsStepProps) {
   const { t, i18n } = useTranslation('admissions')
   const queryClient = useQueryClient()
 
@@ -265,11 +267,22 @@ export function DocumentsStep({ application, onContinue }: DocumentsStepProps) {
         </Alert>
       )}
 
-      {onContinue && (
-        <Stack direction="row" sx={{ mt: 3, justifyContent: 'flex-end' }}>
-          <Button variant="contained" onClick={onContinue} disabled={!canContinue}>
-            {t('documents.continue')}
-          </Button>
+      {(onBack || onContinue) && (
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{ mt: 3, justifyContent: onBack ? 'space-between' : 'flex-end' }}
+        >
+          {onBack && (
+            <Button variant="outlined" onClick={onBack}>
+              {t('documents.back')}
+            </Button>
+          )}
+          {onContinue && (
+            <Button variant="contained" onClick={onContinue} disabled={!canContinue}>
+              {t('documents.continue')}
+            </Button>
+          )}
         </Stack>
       )}
     </Box>

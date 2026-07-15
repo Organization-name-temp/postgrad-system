@@ -820,7 +820,7 @@ paths:
     patch:
       summary: 'Save Step 1 (partial).'
       operationId: saveStep1partial
-      description: "Persists whatever personal-info fields the applicant has entered so far,\nkeeping the Application a Draft so they can resume later. Each provided field\nis validated (bilingually); missing fields are allowed. Editing is only\npossible while the Application is still a Draft."
+      description: "Persists whatever personal-info fields the applicant has entered so far, so\nthey can save and resume, or go Back from a later step to correct one. Each\nprovided field is validated (bilingually); missing fields are allowed. Editing\nstays open while the application is in the applicant's hands (through email\nverification) and locks once it enters Student Affairs review."
       parameters: []
       responses:
         200:

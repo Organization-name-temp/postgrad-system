@@ -209,10 +209,11 @@ export const MyApplicationResponse = zod.object({
 
 
 /**
- * Persists whatever personal-info fields the applicant has entered so far,
- * keeping the Application a Draft so they can resume later. Each provided field
- * is validated (bilingually); missing fields are allowed. Editing is only
- * possible while the Application is still a Draft.
+ * Persists whatever personal-info fields the applicant has entered so far, so
+ * they can save and resume, or go Back from a later step to correct one. Each
+ * provided field is validated (bilingually); missing fields are allowed. Editing
+ * stays open while the application is in the applicant's hands (through email
+ * verification) and locks once it enters Student Affairs review.
  * @summary Save Step 1 (partial).
  */
 export const SaveStep1partialBody = zod.object({

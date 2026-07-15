@@ -101,8 +101,27 @@ it('allows the same national id in a different cycle', function () {
         ->assertOk();
 });
 
-it('blocks saving once the application has left the draft state', function () {
-    $application = Application::factory()->submitted()->create();
+it('keeps the snapshot editable through email verification, so back-navigation can fix a field pre-finalize', function () {
+    // The documents-step state: submitted and email-verified, still in the applicant's
+    // hands. Phase 2.5 B3 restores Back-to-personal-info from Documents, which re-saves
+    // through this endpoint, so both states must accept an edit (not lock at submit).
+    foreach (['submitted', 'email_verified'] as $status) {
+        $application = Application::factory()->withPersonalInfo()->create(['status' => $status]);
+        Sanctum::actingAs(userOf($application));
+
+        test()->patchJson('/api/v1/application', ['name_en' => 'Corrected '.$status])
+            ->assertOk()
+            ->assertJsonPath('data.name_en', 'Corrected '.$status);
+
+        $this->assertDatabaseHas('applications', [
+            'id' => $application->id,
+            'name_en' => 'Corrected '.$status,
+        ]);
+    }
+});
+
+it('blocks editing the snapshot once the application enters review', function () {
+    $application = Application::factory()->underReview()->create();
     Sanctum::actingAs(userOf($application));
 
     test()->patchJson('/api/v1/application', ['name_en' => 'Changed'])

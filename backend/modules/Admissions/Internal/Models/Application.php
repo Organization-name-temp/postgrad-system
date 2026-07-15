@@ -201,13 +201,13 @@ class Application extends Model
     }
 
     /**
-     * Whether the applicant may still edit the Step-1 snapshot. Open while the
-     * application is still a Draft, and again once Student Affairs returns it for
-     * revision — the two states where the whole application is back in the
-     * applicant's hands. It locks the moment they submit and stays locked through
-     * review (widening the ticket-04 Draft-only rule for the return→resubmit loop).
+     * Whether Step 1 may still be *submitted* — from a fresh Draft, or a returned
+     * application being pushed back for review. This is the one-time commit that
+     * issues email verification, so it locks the moment the application is submitted.
+     * Distinct from {@see isSnapshotEditable()}, which governs *editing* the captured
+     * fields and stays open longer (through email verification).
      */
-    public function isApplicantEditable(): bool
+    public function canSubmitStep1(): bool
     {
         return in_array($this->status, [
             ApplicationStatus::Draft,
@@ -216,10 +216,24 @@ class Application extends Model
     }
 
     /**
-     * Whether the applicant may still add or remove documents (ticket 05). Documents
-     * stay editable a little longer than the Step-1 snapshot: through submission and
-     * email verification, and again whenever the application is returned for revision
-     * — but they lock the moment it enters review (UnderSAReview onward).
+     * Whether the applicant may still edit the Step-1 snapshot. Open throughout the
+     * window the application is in the applicant's hands — the same window in which
+     * documents and program selection stay editable ({@see areDocumentsEditable()},
+     * {@see isProgramSelectable()}) — so an applicant on the documents step can go
+     * Back and fix a personal-info field before finalizing (Phase 2.5 B3). It locks
+     * the moment the application enters Student Affairs review (UnderSAReview onward).
+     */
+    public function isSnapshotEditable(): bool
+    {
+        return $this->isInApplicantHands();
+    }
+
+    /**
+     * Whether the applicant may still add or remove documents (ticket 05). Editable
+     * throughout the applicant-hands window — through submission and email verification,
+     * and again whenever the application is returned for revision — the same window the
+     * Step-1 snapshot and program selection use; all three lock the moment it enters
+     * review (UnderSAReview onward).
      */
     public function areDocumentsEditable(): bool
     {
@@ -239,9 +253,10 @@ class Application extends Model
 
     /**
      * The statuses in which the application still belongs to the applicant, before
-     * finalize hands it to Student Affairs. Documents and program selection are both
-     * editable in exactly this window; the Step-1 snapshot locks earlier (Draft only,
-     * {@see self::isApplicantEditable()}).
+     * finalize hands it to Student Affairs. The Step-1 snapshot, documents, and program
+     * selection are all editable in exactly this window ({@see isSnapshotEditable()},
+     * {@see areDocumentsEditable()}, {@see isProgramSelectable()}); submitting Step 1 is
+     * the narrower one-time action ({@see canSubmitStep1()}).
      */
     private function isInApplicantHands(): bool
     {

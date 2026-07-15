@@ -538,6 +538,7 @@ export const ar = {
       scoreHelp: 'مطلوبة ما لم يكن اختبارك «لا يوجد».',
       saveContinue: 'حفظ ومتابعة',
       saveLater: 'حفظ وإكمال لاحقًا',
+      back: 'رجوع',
       saving: 'جارٍ الحفظ…',
       submitError: 'تعذّر الإرسال. يرجى تصحيح الحقول المميّزة والمحاولة مرة أخرى.',
     },
@@ -585,6 +586,7 @@ export const ar = {
       remove: 'حذف',
       nextStep: 'بعد ذلك، اختر البرنامج الذي تتقدّم إليه.',
       continue: 'المتابعة إلى اختيار البرنامج',
+      back: 'رجوع',
       missingRequired: 'ارفع المستندات المطلوبة للمتابعة: {{documents}}.',
     },
     program: {

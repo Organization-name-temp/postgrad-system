@@ -37,6 +37,9 @@ export const en = {
       myInterviews: 'My interviews',
       assignments: 'Faculty deans',
       sections: {
+        admissions: 'Admissions',
+        catalog: 'Catalog',
+        calendar: 'Calendar',
         administration: 'Administration',
       },
     },

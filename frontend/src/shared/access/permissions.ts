@@ -7,7 +7,6 @@
  * keys the UI actually gates on live here.
  */
 export const PERMISSION = {
-  submitApplication: 'application.submit',
   screenApplications: 'application.screen',
   scheduleInterview: 'interview.schedule',
   decideApplicants: 'applicant.decide',

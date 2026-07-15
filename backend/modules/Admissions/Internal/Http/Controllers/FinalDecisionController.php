@@ -68,19 +68,19 @@ class FinalDecisionController
      * @response 200 {"data": [{"id": 1, "status": "interview_completed", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-12T10:00:00+00:00", "age_days": 3}]}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function index(Request $request, DeanAssignments $assignments, ProgramCatalog $catalog): AnonymousResourceCollection
+    public function index(Request $request, DeanAssignments $assignments, ProgramCatalog $catalog, Directory $directory): AnonymousResourceCollection
     {
-        $facultyIds = $assignments->facultiesForDean((int) $request->user()?->getAuthIdentifier());
-
         // Post-interview applications awaiting a first decision, plus the held offers
-        // awaiting resolution — faculty-scoped exactly like the Dean review queue.
-        $scoped = $this->deanFacultyQueue($facultyIds, [
+        // awaiting resolution. An administrator sees them unscoped across every Faculty
+        // (ADR-0015); a Dean sees only their own, faculty-scoped exactly like the Dean
+        // review queue.
+        $queue = $this->deanOrAdminQueue($request, [
             ApplicationStatus::InterviewCompleted,
             ApplicationStatus::ConditionallyAccepted,
             ApplicationStatus::Waitlisted,
-        ], $catalog);
+        ], $assignments, $catalog, $directory);
 
-        return ApplicationQueueResource::collection($scoped);
+        return ApplicationQueueResource::collection($queue);
     }
 
     /**
@@ -151,8 +151,9 @@ class FinalDecisionController
         ]);
 
         // Routing integrity before state: an application outside this Dean's Faculties
-        // is refused (403) whatever the action.
-        $this->authorizeDeanFacultyScope($request, $application, $assignments, $catalog);
+        // is refused (403) whatever the action. An administrator bypasses the scope
+        // (ADR-0015).
+        $this->authorizeDeanFacultyScope($request, $application, $assignments, $catalog, $directory);
 
         $actorId = (int) $request->user()?->getAuthIdentifier();
 

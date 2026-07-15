@@ -45,6 +45,20 @@ function renderGuard(permission?: string) {
   )
 }
 
+function renderRoleGuard(roles: readonly string[]) {
+  return render(
+    <MemoryRouter initialEntries={['/private']}>
+      <Routes>
+        <Route path="/login" element={<div>Login screen</div>} />
+        <Route path="/" element={<div>Dashboard home</div>} />
+        <Route element={<RequireAuth roles={roles} />}>
+          <Route path="/private" element={<div>Secret dashboard</div>} />
+        </Route>
+      </Routes>
+    </MemoryRouter>,
+  )
+}
+
 describe('RequireAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -104,6 +118,38 @@ describe('RequireAuth', () => {
     )
 
     renderGuard('catalog.manage')
+
+    expect(screen.getByText('Dashboard home')).toBeInTheDocument()
+    expect(screen.queryByText('Secret dashboard')).not.toBeInTheDocument()
+  })
+
+  it('renders the route when the user holds one of the required roles (persona guard)', () => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        isAuthenticated: true,
+        user: { id: 1 },
+        roles: ['R01'],
+        hasRole: (role) => role === 'R01',
+      }),
+    )
+
+    renderRoleGuard(['R01'])
+
+    expect(screen.getByText('Secret dashboard')).toBeInTheDocument()
+  })
+
+  it('redirects an authenticated user who lacks the required role', () => {
+    // An admin (holds every permission) hitting a persona route they are not the Role for.
+    mockedUseAuth.mockReturnValue(
+      authState({
+        isAuthenticated: true,
+        user: { id: 1 },
+        roles: ['R09'],
+        hasRole: (role) => role === 'R09',
+      }),
+    )
+
+    renderRoleGuard(['R01'])
 
     expect(screen.getByText('Dashboard home')).toBeInTheDocument()
     expect(screen.queryByText('Secret dashboard')).not.toBeInTheDocument()

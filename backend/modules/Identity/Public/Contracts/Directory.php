@@ -37,4 +37,16 @@ interface Directory
      * @return array<int, UserSummary>
      */
     public function findMany(array $userIds): array;
+
+    /**
+     * Whether the given user is a System (R09) or Super (R10) Administrator — the
+     * "administrator" the `admin` route-middleware already recognises (ADR-0008).
+     * Identity owns what an administrator *is*; a consumer reads it here rather than
+     * inspecting roles itself, so the definition stays in one place.
+     *
+     * Admissions is the consumer: the administrative override (ADR-0015) lets an admin
+     * bypass the Dean faculty-scope and interviewer row-level guards that the permission
+     * matrix does not cover. `false` for an unknown user id.
+     */
+    public function isAdministrator(int $userId): bool;
 }

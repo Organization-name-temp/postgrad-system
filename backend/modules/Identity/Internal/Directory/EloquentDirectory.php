@@ -43,6 +43,14 @@ class EloquentDirectory implements Directory
             ->all();
     }
 
+    public function isAdministrator(int $userId): bool
+    {
+        $user = User::query()->find($userId);
+
+        return $user !== null
+            && ($user->hasRole(Role::SystemAdmin) || $user->hasRole(Role::SuperAdmin));
+    }
+
     private function toSummary(User $user): UserSummary
     {
         return new UserSummary(

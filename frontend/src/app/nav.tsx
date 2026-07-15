@@ -15,32 +15,56 @@ import ScheduleIcon from '@mui/icons-material/Schedule'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
-import { ROLE } from '../shared/access/roles'
+import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
 
 /**
- * The app's navigation destinations. Each later phase (and each catalog entity)
- * appends its own entries, with the permission that gates them. The dev-only
+ * The app's navigation destinations, classified two ways (ADR-0015, ticket 11):
+ *
+ * - **Persona** items — "My application", "My interviews" — gate on the user's actual
+ *   Role, never on an inherited Permission, so an admin (who holds every Permission,
+ *   ADR-0008) is not shown another role's home screen. They stay in the header-less
+ *   top group alongside the Dashboard.
+ * - **Capability** items gate on a Permission and carry an area `section`
+ *   (admissions / catalog / calendar / administration) so the shell renders one
+ *   `ListSubheader` per non-empty area.
+ *
+ * Each later phase (and each catalog entity) appends its own entries. The dev-only
  * `/style` gallery link is added by the ticket that builds that route.
  */
 export const navItems: NavItem[] = [
+  // Personal / persona items — header-less top group.
   { key: 'dashboard', to: '/', icon: <DashboardIcon /> },
+  // "My application" is the Applicant's home (R01); an admin has no Application, so it
+  // gates on the Role, not on `application.submit` (which admins inherit).
   {
     key: 'apply',
     to: '/apply',
     icon: <AssignmentIcon />,
-    permission: PERMISSION.submitApplication,
+    roles: [ROLE.applicant],
   },
+  // The interviewer's own queue (ticket 09): gated on the Instructor role, not a
+  // permission — an interviewer holds no reviewer permission. Admins see it too, to
+  // reach the (now unscoped) evaluation write-path for oversight (ADR-0015, ticket 10).
+  {
+    key: 'myInterviews',
+    to: '/interviews/mine',
+    icon: <RecordVoiceOverIcon />,
+    roles: [ROLE.instructor, ...ADMIN_ROLES],
+  },
+  // Admissions — the reviewer / Dean / scheduling capability surfaces.
   {
     key: 'screening',
     to: '/screening',
     icon: <FactCheckIcon />,
     permission: PERMISSION.screenApplications,
+    section: 'admissions',
   },
   {
     key: 'deanReview',
     to: '/dean',
     icon: <GavelIcon />,
     permission: PERMISSION.screenApplications,
+    section: 'admissions',
   },
   // The Dean's post-interview decisions queue (ticket 12): accept/conditional/waitlist/
   // reject. Gated on applicant.decide — the Dean-only permission (R07).
@@ -49,6 +73,7 @@ export const navItems: NavItem[] = [
     to: '/dean/decisions',
     icon: <HowToRegIcon />,
     permission: PERMISSION.decideApplicants,
+    section: 'admissions',
   },
   // Interview scheduling surface (ticket 09): Student Affairs / Dean (interview.schedule).
   {
@@ -56,56 +81,58 @@ export const navItems: NavItem[] = [
     to: '/interviews/scheduling',
     icon: <ScheduleIcon />,
     permission: PERMISSION.scheduleInterview,
+    section: 'admissions',
   },
   {
     key: 'interviewSlots',
     to: '/interviews/slots',
     icon: <EventAvailableIcon />,
     permission: PERMISSION.scheduleInterview,
+    section: 'admissions',
   },
-  // The interviewer's own queue (ticket 09): gated on the Instructor role, not a
-  // permission — an interviewer holds no reviewer permission.
-  {
-    key: 'myInterviews',
-    to: '/interviews/mine',
-    icon: <RecordVoiceOverIcon />,
-    roles: [ROLE.instructor],
-  },
+  // Catalog — the academic-structure browse + admin CRUD (Phase 1).
   {
     key: 'browse',
     to: '/catalog',
     icon: <TravelExploreIcon />,
     permission: PERMISSION.viewCatalog,
+    section: 'catalog',
   },
   {
     key: 'faculties',
     to: '/catalog/faculties',
     icon: <AccountTreeIcon />,
     permission: PERMISSION.viewCatalog,
+    section: 'catalog',
   },
   {
     key: 'departments',
     to: '/catalog/departments',
     icon: <ApartmentIcon />,
     permission: PERMISSION.viewCatalog,
+    section: 'catalog',
   },
   {
     key: 'programs',
     to: '/catalog/programs',
     icon: <SchoolIcon />,
     permission: PERMISSION.viewCatalog,
+    section: 'catalog',
   },
   {
     key: 'courses',
     to: '/catalog/courses',
     icon: <MenuBookIcon />,
     permission: PERMISSION.viewCatalog,
+    section: 'catalog',
   },
+  // Calendar — the admission-cycle windows (Phase 2).
   {
     key: 'cycles',
     to: '/admin/cycles',
     icon: <EventNoteIcon />,
     permission: PERMISSION.manageCalendar,
+    section: 'calendar',
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

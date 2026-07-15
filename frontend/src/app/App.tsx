@@ -26,6 +26,7 @@ import { CyclesPage } from '../features/admin/cycles/CyclesPage'
 import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
+import { ROLE } from '../shared/access/roles'
 
 // Dev-only design-system gallery. Gating the lazy import on `import.meta.env.DEV`
 // keeps both the route AND its chunk out of production builds.
@@ -58,7 +59,11 @@ export function App() {
             <Route element={<RequireAuth />}>
               <Route element={<AuthenticatedLayout />}>
                 <Route path="/" element={<DashboardPage />} />
-                <Route path="/apply" element={<ApplyPage />} />
+                {/* Persona-guarded: only actual Applicants (R01) reach the wizard; an
+                    admin who merely inherits application.submit is sent home (ticket 11). */}
+                <Route element={<RequireAuth roles={[ROLE.applicant]} />}>
+                  <Route path="/apply" element={<ApplyPage />} />
+                </Route>
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
                 <Route path="/dean" element={<DeanQueuePage />} />

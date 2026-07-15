@@ -2,6 +2,7 @@
 
 namespace Modules\Admissions\Internal\Http\Concerns;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
@@ -10,6 +11,8 @@ use Modules\Admissions\Internal\Http\Controllers\FinalDecisionController;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Identity\Public\Contracts\DeanAssignments;
+use Modules\Identity\Public\Contracts\Directory;
 
 /**
  * Resolve the primary Program summary for a whole reviewer queue in one facade read
@@ -22,6 +25,36 @@ use Modules\Catalog\Public\ProgramCatalog;
  */
 trait ResolvesQueuePrograms
 {
+    use IdentifiesAdministrator;
+
+    /**
+     * The reviewer queue the signed-in user should see for the given statuses: an
+     * administrator oversees every Faculty unscoped (ADR-0015), while a Dean sees only
+     * the applications whose Faculty they are assigned to. This is the single place the
+     * admin-vs-scoped choice is made for both Dean queues (review, decisions), so the
+     * two surfaces pick their queue identically.
+     *
+     * @param  list<ApplicationStatus>  $statuses
+     * @return Collection<int, Application>
+     */
+    protected function deanOrAdminQueue(
+        Request $request,
+        array $statuses,
+        DeanAssignments $assignments,
+        ProgramCatalog $catalog,
+        Directory $directory,
+    ): Collection {
+        if ($this->actingAsAdministrator($request, $directory)) {
+            return $this->statusQueue($statuses, $catalog);
+        }
+
+        return $this->deanFacultyQueue(
+            $assignments->facultiesForDean((int) $request->user()?->getAuthIdentifier()),
+            $statuses,
+            $catalog,
+        );
+    }
+
     /**
      * @param  Collection<int, Application>  $applications
      */
@@ -37,12 +70,36 @@ trait ResolvesQueuePrograms
     }
 
     /**
+     * Every application in the given statuses, oldest-first (by when they finalized),
+     * each with its primary Program resolved and stashed in one facade read (ADR-0012)
+     * — the unscoped queue. This is what an administrator sees (ADR-0015): oversight
+     * across all Faculties and Cycles. The faculty-scoped Dean queue is this, filtered.
+     *
+     * @param  list<ApplicationStatus>  $statuses
+     * @return Collection<int, Application>
+     */
+    protected function statusQueue(array $statuses, ProgramCatalog $catalog): Collection
+    {
+        $applications = Application::query()
+            ->with('statusTransitions')
+            ->whereIn('status', $statuses)
+            ->orderBy('finalized_at')
+            ->orderBy('id')
+            ->get();
+
+        $this->attachPrimaryPrograms($applications, $catalog);
+
+        return $applications;
+    }
+
+    /**
      * A faculty-scoped Dean queue: the applications in the given statuses whose primary
      * Program's Faculty is among the Dean's assigned Faculties, oldest-first (by when
      * they finalized), each with its primary Program resolved and stashed. No assigned
      * Faculties ⇒ an empty queue. Shared by the Dean review queue (`under_dean_review`,
      * ticket 08) and the Dean decisions queue (post-interview, ticket 12), which differ
-     * only in the statuses they list — the faculty scope + resolve is identical.
+     * only in the statuses they list — the faculty scope + resolve is identical. An
+     * administrator uses {@see self::statusQueue()} instead, which is unscoped (ADR-0015).
      *
      * @param  list<int>  $facultyIds
      * @param  list<ApplicationStatus>  $statuses
@@ -54,18 +111,8 @@ trait ResolvesQueuePrograms
             return new Collection;
         }
 
-        $applications = Application::query()
-            ->with('statusTransitions')
-            ->whereIn('status', $statuses)
-            ->orderBy('finalized_at')
-            ->orderBy('id')
-            ->get();
-
-        // One facade read for the whole queue (ADR-0012); keep only the applications
-        // whose Faculty this Dean covers.
-        $this->attachPrimaryPrograms($applications, $catalog);
-
-        return $applications
+        // Keep only the applications whose Faculty this Dean covers.
+        return $this->statusQueue($statuses, $catalog)
             ->filter(function (Application $application) use ($facultyIds): bool {
                 $summary = $application->getAttribute('resolved_primary_program');
 

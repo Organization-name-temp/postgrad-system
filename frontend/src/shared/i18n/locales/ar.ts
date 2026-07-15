@@ -36,6 +36,9 @@ export const ar = {
       myInterviews: 'مقابلاتي',
       assignments: 'عمداء الكليات',
       sections: {
+        admissions: 'القبول',
+        catalog: 'الدليل',
+        calendar: 'التقويم',
         administration: 'الإدارة',
       },
     },

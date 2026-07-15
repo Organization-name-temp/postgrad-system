@@ -8,6 +8,7 @@ use Modules\Admissions\Internal\Http\Controllers\FinalDecisionController;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\Contracts\DeanAssignments;
+use Modules\Identity\Public\Contracts\Directory;
 
 /**
  * Dean faculty-scoping — the per-application routing-integrity check shared by the two
@@ -24,17 +25,27 @@ use Modules\Identity\Public\Contracts\DeanAssignments;
  */
 trait ScopesToDeanFaculty
 {
+    use IdentifiesAdministrator;
+
     /**
      * Assert the signed-in Dean may act on this application — its primary Program's
      * Faculty is among the Dean's assigned Faculties. A dropped/absent Program reference
      * (no FK, ADR-0012) or an out-of-faculty Program is refused with a 403.
+     *
+     * An administrator (R09/R10) bypasses the faculty scope entirely (ADR-0015): they
+     * oversee every Faculty through this same surface, so they are never refused here.
      */
     protected function authorizeDeanFacultyScope(
         Request $request,
         Application $application,
         DeanAssignments $assignments,
         ProgramCatalog $catalog,
+        Directory $directory,
     ): void {
+        if ($this->actingAsAdministrator($request, $directory)) {
+            return;
+        }
+
         $programId = $application->primary_program_id;
         $summary = $programId === null ? null : $catalog->find($programId);
         $facultyIds = $assignments->facultiesForDean((int) $request->user()?->getAuthIdentifier());

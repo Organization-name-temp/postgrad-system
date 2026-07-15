@@ -8,8 +8,14 @@
  * Only the roles the UI actually gates on live here. `ADMIN_ROLES` is the pair that
  * opens the Administration surface (System / Super Administrator) — the first
  * role-gated (not permission-gated) surface, ticket 08.
+ *
+ * `applicant` and `instructor` gate the **persona** nav items — "My application" and
+ * "My interviews" — on the user's actual Role, not on an inherited Permission, so an
+ * admin (who holds every Permission, ADR-0008) does not see another role's home screen
+ * (ADR-0015, ticket 11).
  */
 export const ROLE = {
+  applicant: 'R01',
   instructor: 'R04',
   systemAdmin: 'R09',
   superAdmin: 'R10',

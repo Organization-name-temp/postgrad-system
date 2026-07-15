@@ -2271,7 +2271,7 @@ paths:
     get:
       summary: 'Interviews assigned to me.'
       operationId: interviewsAssignedToMe
-      description: "The interviews booked into the signed-in user's own slots, soonest-first, each\nwith the applicant's identity and the slot details — the interviewer's queue.\nEmpty for a user who is not the assigned interviewer on any slot."
+      description: "The interviews booked into the signed-in user's own slots, soonest-first, each\nwith the applicant's identity and the slot details — the interviewer's queue.\nEmpty for a user who is not the assigned interviewer on any slot. An administrator\nsees **every** interview instead (ADR-0015), so they can reach the evaluation\nwrite-path through this same screen."
       parameters: []
       responses:
         200:
@@ -2437,7 +2437,7 @@ paths:
     post:
       summary: 'Record my evaluation.'
       operationId: recordMyEvaluation
-      description: "The assigned interviewer records a score (1–10) and optional notes for the\ninterview. Only the interviewer the slot is assigned to may do this — anyone else\nis a 403. An evaluation cannot be recorded once the interview is complete (409)."
+      description: "The assigned interviewer records a score (1–10) and optional notes for the\ninterview. Only the interviewer the slot is assigned to may do this — anyone else\nis a 403 — **except** an administrator (R09/R10), who may record or override any\ninterview's evaluation, that write attributed to them in the Audit Log (ADR-0015).\nAn evaluation cannot be recorded once the interview is complete (409)."
       parameters: []
       responses:
         200:

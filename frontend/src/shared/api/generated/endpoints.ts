@@ -4072,7 +4072,9 @@ export const useRescheduleMyInterview = <TError = RescheduleMyInterview404 | Res
 /**
  * The interviews booked into the signed-in user's own slots, soonest-first, each
  * with the applicant's identity and the slot details — the interviewer's queue.
- * Empty for a user who is not the assigned interviewer on any slot.
+ * Empty for a user who is not the assigned interviewer on any slot. An administrator
+ * sees **every** interview instead (ADR-0015), so they can reach the evaluation
+ * write-path through this same screen.
  * @summary Interviews assigned to me.
  */
 export const interviewsAssignedToMe = (
@@ -4168,7 +4170,9 @@ export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof inte
 /**
  * The assigned interviewer records a score (1–10) and optional notes for the
  * interview. Only the interviewer the slot is assigned to may do this — anyone else
- * is a 403. An evaluation cannot be recorded once the interview is complete (409).
+ * is a 403 — **except** an administrator (R09/R10), who may record or override any
+ * interview's evaluation, that write attributed to them in the Audit Log (ADR-0015).
+ * An evaluation cannot be recorded once the interview is complete (409).
  * @summary Record my evaluation.
  */
 export const recordMyEvaluation = (

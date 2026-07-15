@@ -1217,6 +1217,8 @@ export type ReviewAnApplication200Data = {
   english_test?: string;
   english_score?: string;
   primary_program?: ReviewAnApplication200DataPrimaryProgram;
+  conditions?: string;
+  waitlist_position?: number;
   documents?: ReviewAnApplication200DataDocumentsItem[];
 };
 
@@ -1331,6 +1333,127 @@ export type DeanDecisionOnAnApplication422Errors = {
 export type DeanDecisionOnAnApplication422 = {
   message?: string;
   errors?: DeanDecisionOnAnApplication422Errors;
+};
+
+export type DeanDecisionsQueue200DataItemPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type DeanDecisionsQueue200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  primary_program?: DeanDecisionsQueue200DataItemPrimaryProgram;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type DeanDecisionsQueue200 = {
+  data?: DeanDecisionsQueue200DataItem[];
+};
+
+export type DeanDecisionsQueue403 = {
+  message?: string;
+};
+
+export type AdvisorsForTheDecisionForm200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type AdvisorsForTheDecisionForm200Meta = {
+  suggested_advisor_id?: number;
+};
+
+export type AdvisorsForTheDecisionForm200 = {
+  data?: AdvisorsForTheDecisionForm200DataItem[];
+  meta?: AdvisorsForTheDecisionForm200Meta;
+};
+
+export type AdvisorsForTheDecisionForm403 = {
+  message?: string;
+};
+
+export type RecordTheFinalDecisionBody = {
+  /** One of accept, conditional, waitlist, reject. */
+  action: string;
+  /**
+     * The advisor to assign on accept; defaults to the least-loaded advisor.
+     * @nullable
+     */
+  advisor_id?: number | null;
+  /**
+     * when action is conditional. The offer's conditions.
+     * @nullable
+     */
+  conditions: string | null;
+  /**
+     * when action is waitlist. The applicant's place.
+     * @nullable
+     */
+  waitlist_position: number | null;
+  /**
+     * when action is reject. The reason.
+     * @nullable
+     */
+  note: string | null;
+};
+
+export type RecordTheFinalDecision200 = {
+  data?: {
+  id?: number;
+  status?: string;
+};
+  meta?: {
+  university_id?: string;
+};
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+  conditions?: string;
+};
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+  waitlist_position?: number;
+};
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+};
+};
+
+export type RecordTheFinalDecision403 = {
+  message?: string;
+};
+
+export type RecordTheFinalDecision409 = {
+  message?: string;
+};
+
+export type RecordTheFinalDecision422Errors = {
+  advisor_id?: string[];
+};
+
+export type RecordTheFinalDecision422 = {
+  message?: string;
+  errors?: RecordTheFinalDecision422Errors;
 };
 
 export type StreamADocument403 = {
@@ -2220,6 +2343,15 @@ export type CurrentUser200DataRolesItem = {
   name?: string;
 };
 
+export type CurrentUser200DataStudent = {
+  university_id?: string;
+  program_id?: number;
+  enrollment_term?: string;
+  admission_cycle_id?: number;
+  advisor_id?: number;
+  admitted_at?: string;
+};
+
 export type CurrentUser200Data = {
   id?: number;
   name?: string;
@@ -2227,6 +2359,7 @@ export type CurrentUser200Data = {
   preferred_locale?: string;
   roles?: CurrentUser200DataRolesItem[];
   permissions?: string[];
+  student?: CurrentUser200DataStudent;
 };
 
 export type CurrentUser200 = {
@@ -5320,6 +5453,275 @@ export const useDeanDecisionOnAnApplication = <TError = DeanDecisionOnAnApplicat
     }
 
 /**
+ * The applications awaiting the signed-in Dean's final decision — those resting at
+ * `interview_completed` (a first decision is due) and those held at
+ * `conditionally_accepted` / `waitlisted` (a resolution is due) — whose primary
+ * Program's Faculty is among the Dean's assigned Faculties, oldest-first (by when
+ * they were finalized), each with the applicant's identity, resolved primary
+ * Program, and days waited in the current status. Same faculty-scoping as the Dean
+ * review queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.
+ * Gated on `applicant.decide` (Dean only).
+ * @summary Dean decisions queue.
+ */
+export const deanDecisionsQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeanDecisionsQueue200>(
+      {url: `/api/v1/dean/decisions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeanDecisionsQueueQueryKey = () => {
+    return [
+    `/api/v1/dean/decisions`
+    ] as const;
+    }
+
+
+export const getDeanDecisionsQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDeanDecisionsQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanDecisionsQueue>>> = ({ signal }) => deanDecisionsQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DeanDecisionsQueueQueryResult = NonNullable<Awaited<ReturnType<typeof deanDecisionsQueue>>>
+export type DeanDecisionsQueueQueryError = DeanDecisionsQueue403
+
+
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanDecisionsQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanDecisionsQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanDecisionsQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanDecisionsQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Dean decisions queue.
+ */
+
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDeanDecisionsQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The academic advisors (R03) the Dean may assign, with the least-loaded one
+ * pre-selected in `meta.suggested_advisor_id` (null when no advisor exists). Gated
+ * on `applicant.decide`.
+ * @summary Advisors for the decision form.
+ */
+export const advisorsForTheDecisionForm = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorsForTheDecisionForm200>(
+      {url: `/api/v1/dean/advisors`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorsForTheDecisionFormQueryKey = () => {
+    return [
+    `/api/v1/dean/advisors`
+    ] as const;
+    }
+
+
+export const getAdvisorsForTheDecisionFormQueryOptions = <TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdvisorsForTheDecisionFormQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>> = ({ signal }) => advisorsForTheDecisionForm(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdvisorsForTheDecisionFormQueryResult = NonNullable<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>>
+export type AdvisorsForTheDecisionFormQueryError = AdvisorsForTheDecisionForm403
+
+
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>,
+          TError,
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>,
+          TError,
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Advisors for the decision form.
+ */
+
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdvisorsForTheDecisionFormQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * `accept` mints the Student (University ID on `meta.university_id`, R01→R02, advisor
+ * assigned) and works from `interview_completed` as the first decision, or from
+ * `conditionally_accepted`/`waitlisted` as a resolution. `conditional` and `waitlist`
+ * hold the application (recording `conditions` / `waitlist_position`); `reject` ends
+ * it. The application must belong to one of the Dean's Faculties (else 403); an action
+ * illegal from the current status is a 409. Gated on `applicant.decide`.
+ * @summary Record the final decision.
+ */
+export const recordTheFinalDecision = (
+    applicationId: number,
+    recordTheFinalDecisionBody: RecordTheFinalDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordTheFinalDecision200>(
+      {url: `/api/v1/dean/applications/${applicationId}/decide`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: recordTheFinalDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordTheFinalDecisionMutationOptions = <TError = RecordTheFinalDecision403 | RecordTheFinalDecision409 | RecordTheFinalDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheFinalDecision>>, TError,{applicationId: number;data: RecordTheFinalDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordTheFinalDecision>>, TError,{applicationId: number;data: RecordTheFinalDecisionBody}, TContext> => {
+
+const mutationKey = ['recordTheFinalDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordTheFinalDecision>>, {applicationId: number;data: RecordTheFinalDecisionBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  recordTheFinalDecision(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordTheFinalDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof recordTheFinalDecision>>>
+    export type RecordTheFinalDecisionMutationBody = RecordTheFinalDecisionBody
+    export type RecordTheFinalDecisionMutationError = RecordTheFinalDecision403 | RecordTheFinalDecision409 | RecordTheFinalDecision422
+
+    /**
+ * @summary Record the final decision.
+ */
+export const useRecordTheFinalDecision = <TError = RecordTheFinalDecision403 | RecordTheFinalDecision409 | RecordTheFinalDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheFinalDecision>>, TError,{applicationId: number;data: RecordTheFinalDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordTheFinalDecision>>,
+        TError,
+        {applicationId: number;data: RecordTheFinalDecisionBody},
+        TContext
+      > => {
+      return useMutation(getRecordTheFinalDecisionMutationOptions(options), queryClient);
+    }
+
+/**
  * Serves the stored file inline to the owning applicant or to a reviewer holding
  * `application.screen`; anyone else is refused with a 403. The ULID in the path
  * is the only handle — the storage path and row id are never exposed.
@@ -8399,7 +8801,10 @@ export const useLogOut = <TError = unknown,
 
 /**
  * The authenticated user + roles (and, from ticket 05, effective
- * permissions); the SPA's authority source for route guards.
+ * permissions); the SPA's authority source for route guards. Once the user holds
+ * the Student role (R02), `student` carries their `Student` anchor — University ID,
+ * program, enrollment term, advisor — so a newly-admitted user sees their student
+ * identity on sign-in (ADR-0013); it is `null` for everyone who is not a Student.
  * @summary Current user.
  */
 export const currentUser = (

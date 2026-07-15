@@ -56,29 +56,7 @@ class DeanReviewController
     {
         $facultyIds = $assignments->facultiesForDean((int) $request->user()?->getAuthIdentifier());
 
-        if ($facultyIds === []) {
-            return ApplicationQueueResource::collection([]);
-        }
-
-        $applications = Application::query()
-            ->with('statusTransitions')
-            ->where('status', ApplicationStatus::UnderDeanReview)
-            ->orderBy('finalized_at')
-            ->orderBy('id')
-            ->get();
-
-        // One facade read for the whole queue (ADR-0012): resolve and stash every
-        // application's primary Program (shared with the SA queue), then keep only
-        // those whose Faculty this Dean covers.
-        $this->attachPrimaryPrograms($applications, $catalog);
-
-        $scoped = $applications
-            ->filter(function (Application $application) use ($facultyIds): bool {
-                $summary = $application->getAttribute('resolved_primary_program');
-
-                return $summary !== null && in_array($summary->facultyId, $facultyIds, true);
-            })
-            ->values();
+        $scoped = $this->deanFacultyQueue($facultyIds, [ApplicationStatus::UnderDeanReview], $catalog);
 
         return ApplicationQueueResource::collection($scoped);
     }

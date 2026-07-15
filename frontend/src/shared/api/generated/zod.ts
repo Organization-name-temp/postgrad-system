@@ -987,6 +987,8 @@ export const ReviewAnApplicationResponse = zod.object({
   "faculty_name_en": zod.string().optional(),
   "faculty_name_ar": zod.string().optional()
 }).optional(),
+  "conditions": zod.string().optional(),
+  "waitlist_position": zod.number().optional(),
   "documents": zod.array(zod.object({
   "id": zod.string().optional(),
   "document_type": zod.string().optional(),
@@ -1089,6 +1091,110 @@ export const DeanDecisionOnAnApplicationResponse = zod.union([zod.object({
   "status": zod.string().optional()
 }).optional()
 }).describe('approved for interview'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('rejected')])
+
+
+/**
+ * The applications awaiting the signed-in Dean's final decision — those resting at
+ * `interview_completed` (a first decision is due) and those held at
+ * `conditionally_accepted` / `waitlisted` (a resolution is due) — whose primary
+ * Program's Faculty is among the Dean's assigned Faculties, oldest-first (by when
+ * they were finalized), each with the applicant's identity, resolved primary
+ * Program, and days waited in the current status. Same faculty-scoping as the Dean
+ * review queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.
+ * Gated on `applicant.decide` (Dean only).
+ * @summary Dean decisions queue.
+ */
+export const DeanDecisionsQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * The academic advisors (R03) the Dean may assign, with the least-loaded one
+ * pre-selected in `meta.suggested_advisor_id` (null when no advisor exists). Gated
+ * on `applicant.decide`.
+ * @summary Advisors for the decision form.
+ */
+export const AdvisorsForTheDecisionFormResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional(),
+  "meta": zod.object({
+  "suggested_advisor_id": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * `accept` mints the Student (University ID on `meta.university_id`, R01→R02, advisor
+ * assigned) and works from `interview_completed` as the first decision, or from
+ * `conditionally_accepted`/`waitlisted` as a resolution. `conditional` and `waitlist`
+ * hold the application (recording `conditions` / `waitlist_position`); `reject` ends
+ * it. The application must belong to one of the Dean's Faculties (else 403); an action
+ * illegal from the current status is a 409. Gated on `applicant.decide`.
+ * @summary Record the final decision.
+ */
+export const RecordTheFinalDecisionParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const RecordTheFinalDecisionBody = zod.object({
+  "action": zod.string().describe('One of accept, conditional, waitlist, reject.'),
+  "advisor_id": zod.number().nullish().describe('The advisor to assign on accept; defaults to the least-loaded advisor.'),
+  "conditions": zod.string().nullable().describe('when action is conditional. The offer\'s conditions.'),
+  "waitlist_position": zod.number().nullable().describe('when action is waitlist. The applicant\'s place.'),
+  "note": zod.string().nullable().describe('when action is reject. The reason.')
+})
+
+export const RecordTheFinalDecisionResponse = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional(),
+  "meta": zod.object({
+  "university_id": zod.string().optional()
+}).optional()
+}).describe('accepted (Student minted)'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "conditions": zod.string().optional()
+}).optional()
+}).describe('conditionally accepted'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "waitlist_position": zod.number().optional()
+}).optional()
+}).describe('waitlisted'),zod.object({
   "data": zod.object({
   "id": zod.number().optional(),
   "status": zod.string().optional()
@@ -2068,7 +2174,10 @@ export const LogOutResponse = zod.looseObject({
 
 /**
  * The authenticated user + roles (and, from ticket 05, effective
- * permissions); the SPA's authority source for route guards.
+ * permissions); the SPA's authority source for route guards. Once the user holds
+ * the Student role (R02), `student` carries their `Student` anchor — University ID,
+ * program, enrollment term, advisor — so a newly-admitted user sees their student
+ * identity on sign-in (ADR-0013); it is `null` for everyone who is not a Student.
  * @summary Current user.
  */
 export const CurrentUserResponse = zod.object({
@@ -2081,7 +2190,15 @@ export const CurrentUserResponse = zod.object({
   "code": zod.string().optional(),
   "name": zod.string().optional()
 })).optional(),
-  "permissions": zod.array(zod.string()).optional()
+  "permissions": zod.array(zod.string()).optional(),
+  "student": zod.object({
+  "university_id": zod.string().optional(),
+  "program_id": zod.number().optional(),
+  "enrollment_term": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "advisor_id": zod.number().optional(),
+  "admitted_at": zod.string().optional()
+}).optional()
 }).optional()
 })
 

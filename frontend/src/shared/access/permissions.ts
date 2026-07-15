@@ -10,6 +10,7 @@ export const PERMISSION = {
   submitApplication: 'application.submit',
   screenApplications: 'application.screen',
   scheduleInterview: 'interview.schedule',
+  decideApplicants: 'applicant.decide',
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
   manageCalendar: 'calendar.manage',

@@ -146,6 +146,10 @@ Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function ()
 // the controller, as for Dean review. `advisors` is a literal segment, declared with
 // the id-bound decide route in one permission group.
 Route::middleware(['auth:sanctum', 'can:applicant.decide'])->group(function () {
+    // The Dean's post-interview worklist: applications awaiting a decision or holding a
+    // conditional/waitlist offer. Literal segment, declared before the id-bound decide
+    // route in the same permission group.
+    Route::get('/dean/decisions', [FinalDecisionController::class, 'index']);
     Route::get('/dean/advisors', [FinalDecisionController::class, 'advisors']);
     Route::post('/dean/applications/{application}/decide', [FinalDecisionController::class, 'decide'])->whereNumber('application');
 });

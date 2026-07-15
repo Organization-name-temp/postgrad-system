@@ -8,6 +8,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook'
 import EventNoteIcon from '@mui/icons-material/EventNote'
 import FactCheckIcon from '@mui/icons-material/FactCheck'
 import GavelIcon from '@mui/icons-material/Gavel'
+import HowToRegIcon from '@mui/icons-material/HowToReg'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import ScheduleIcon from '@mui/icons-material/Schedule'
@@ -40,6 +41,14 @@ export const navItems: NavItem[] = [
     to: '/dean',
     icon: <GavelIcon />,
     permission: PERMISSION.screenApplications,
+  },
+  // The Dean's post-interview decisions queue (ticket 12): accept/conditional/waitlist/
+  // reject. Gated on applicant.decide — the Dean-only permission (R07).
+  {
+    key: 'deanDecisions',
+    to: '/dean/decisions',
+    icon: <HowToRegIcon />,
+    permission: PERMISSION.decideApplicants,
   },
   // Interview scheduling surface (ticket 09): Student Affairs / Dean (interview.schedule).
   {

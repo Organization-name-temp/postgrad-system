@@ -17,6 +17,8 @@ import { ScreeningQueuePage } from '../features/admissions/screening/ScreeningQu
 import { ApplicationReviewPage } from '../features/admissions/screening/ApplicationReviewPage'
 import { DeanQueuePage } from '../features/admissions/dean/DeanQueuePage'
 import { DeanReviewPage } from '../features/admissions/dean/DeanReviewPage'
+import { DeanDecisionQueuePage } from '../features/admissions/dean/DeanDecisionQueuePage'
+import { DeanDecisionPage } from '../features/admissions/dean/DeanDecisionPage'
 import { SlotsPage } from '../features/admissions/interviews/SlotsPage'
 import { SchedulingPage } from '../features/admissions/interviews/SchedulingPage'
 import { InterviewerPage } from '../features/admissions/interviews/InterviewerPage'
@@ -60,6 +62,8 @@ export function App() {
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
                 <Route path="/dean" element={<DeanQueuePage />} />
+                <Route path="/dean/decisions" element={<DeanDecisionQueuePage />} />
+                <Route path="/dean/decisions/:applicationId" element={<DeanDecisionPage />} />
                 <Route path="/dean/:applicationId" element={<DeanReviewPage />} />
                 <Route path="/interviews/scheduling" element={<SchedulingPage />} />
                 <Route path="/interviews/slots" element={<SlotsPage />} />

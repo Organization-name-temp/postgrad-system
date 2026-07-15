@@ -4,6 +4,7 @@ namespace Modules\Admissions\Internal\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -12,7 +13,9 @@ use Illuminate\Validation\ValidationException;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
+use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Concerns\ScopesToDeanFaculty;
+use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Public\ProgramCatalog;
@@ -47,7 +50,38 @@ use Modules\Notifications\Public\Contracts\Notifier;
 class FinalDecisionController
 {
     use NotifiesApplicant;
+    use ResolvesQueuePrograms;
     use ScopesToDeanFaculty;
+
+    /**
+     * Dean decisions queue.
+     *
+     * The applications awaiting the signed-in Dean's final decision — those resting at
+     * `interview_completed` (a first decision is due) and those held at
+     * `conditionally_accepted` / `waitlisted` (a resolution is due) — whose primary
+     * Program's Faculty is among the Dean's assigned Faculties, oldest-first (by when
+     * they were finalized), each with the applicant's identity, resolved primary
+     * Program, and days waited in the current status. Same faculty-scoping as the Dean
+     * review queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.
+     * Gated on `applicant.decide` (Dean only).
+     *
+     * @response 200 {"data": [{"id": 1, "status": "interview_completed", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-12T10:00:00+00:00", "age_days": 3}]}
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function index(Request $request, DeanAssignments $assignments, ProgramCatalog $catalog): AnonymousResourceCollection
+    {
+        $facultyIds = $assignments->facultiesForDean((int) $request->user()?->getAuthIdentifier());
+
+        // Post-interview applications awaiting a first decision, plus the held offers
+        // awaiting resolution — faculty-scoped exactly like the Dean review queue.
+        $scoped = $this->deanFacultyQueue($facultyIds, [
+            ApplicationStatus::InterviewCompleted,
+            ApplicationStatus::ConditionallyAccepted,
+            ApplicationStatus::Waitlisted,
+        ], $catalog);
+
+        return ApplicationQueueResource::collection($scoped);
+    }
 
     /**
      * Advisors for the decision form.

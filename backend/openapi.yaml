@@ -3874,6 +3874,8 @@ paths:
                       department_name_ar: 'هندسة الحاسوب'
                       faculty_name_en: 'Faculty of Engineering'
                       faculty_name_ar: 'كلية الهندسة'
+                    conditions: 'Submit the final transcript by September.'
+                    waitlist_position: 2
                     documents:
                       -
                         id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
@@ -3962,6 +3964,12 @@ paths:
                           faculty_name_ar:
                             type: string
                             example: 'كلية الهندسة'
+                      conditions:
+                        type: string
+                        example: 'Submit the final transcript by September.'
+                      waitlist_position:
+                        type: integer
+                        example: 2
                       documents:
                         type: array
                         example:
@@ -4416,6 +4424,140 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/dean/decisions:
+    get:
+      summary: 'Dean decisions queue.'
+      operationId: deanDecisionsQueue
+      description: "The applications awaiting the signed-in Dean's final decision — those resting at\n`interview_completed` (a first decision is due) and those held at\n`conditionally_accepted` / `waitlisted` (a resolution is due) — whose primary\nProgram's Faculty is among the Dean's assigned Faculties, oldest-first (by when\nthey were finalized), each with the applicant's identity, resolved primary\nProgram, and days waited in the current status. Same faculty-scoping as the Dean\nreview queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.\nGated on `applicant.decide` (Dean only)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      status: interview_completed
+                      name_en: 'Sara Applicant'
+                      name_ar: 'سارة المتقدمة'
+                      national_id: '29001010101010'
+                      applying_for_degree: MSc
+                      primary_program:
+                        id: 1
+                        code: MSC-CE
+                        name_en: 'MSc in Computer Engineering'
+                        name_ar: 'ماجستير هندسة الحاسوب'
+                        degree_level: MSc
+                        department_name_en: 'Computer Engineering'
+                        department_name_ar: 'هندسة الحاسوب'
+                        faculty_name_en: 'Faculty of Engineering'
+                        faculty_name_ar: 'كلية الهندسة'
+                      finalized_at: '2026-07-10T10:00:00+00:00'
+                      review_entered_at: '2026-07-12T10:00:00+00:00'
+                      age_days: 3
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        status: interview_completed
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        national_id: '29001010101010'
+                        applying_for_degree: MSc
+                        primary_program:
+                          id: 1
+                          code: MSC-CE
+                          name_en: 'MSc in Computer Engineering'
+                          name_ar: 'ماجستير هندسة الحاسوب'
+                          degree_level: MSc
+                          department_name_en: 'Computer Engineering'
+                          department_name_ar: 'هندسة الحاسوب'
+                          faculty_name_en: 'Faculty of Engineering'
+                          faculty_name_ar: 'كلية الهندسة'
+                        finalized_at: '2026-07-10T10:00:00+00:00'
+                        review_entered_at: '2026-07-12T10:00:00+00:00'
+                        age_days: 3
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        status:
+                          type: string
+                          example: interview_completed
+                        name_en:
+                          type: string
+                          example: 'Sara Applicant'
+                        name_ar:
+                          type: string
+                          example: 'سارة المتقدمة'
+                        national_id:
+                          type: string
+                          example: '29001010101010'
+                        applying_for_degree:
+                          type: string
+                          example: MSc
+                        primary_program:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: MSC-CE
+                            name_en:
+                              type: string
+                              example: 'MSc in Computer Engineering'
+                            name_ar:
+                              type: string
+                              example: 'ماجستير هندسة الحاسوب'
+                            degree_level:
+                              type: string
+                              example: MSc
+                            department_name_en:
+                              type: string
+                              example: 'Computer Engineering'
+                            department_name_ar:
+                              type: string
+                              example: 'هندسة الحاسوب'
+                            faculty_name_en:
+                              type: string
+                              example: 'Faculty of Engineering'
+                            faculty_name_ar:
+                              type: string
+                              example: 'كلية الهندسة'
+                        finalized_at:
+                          type: string
+                          example: '2026-07-10T10:00:00+00:00'
+                        review_entered_at:
+                          type: string
+                          example: '2026-07-12T10:00:00+00:00'
+                        age_days:
+                          type: integer
+                          example: 3
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
   /api/v1/dean/advisors:
     get:
       summary: 'Advisors for the decision form.'
@@ -7866,7 +8008,7 @@ paths:
     get:
       summary: 'Current user.'
       operationId: currentUser
-      description: "The authenticated user + roles (and, from ticket 05, effective\npermissions); the SPA's authority source for route guards."
+      description: "The authenticated user + roles (and, from ticket 05, effective\npermissions); the SPA's authority source for route guards. Once the user holds\nthe Student role (R02), `student` carries their `Student` anchor — University ID,\nprogram, enrollment term, advisor — so a newly-admitted user sees their student\nidentity on sign-in (ADR-0013); it is `null` for everyone who is not a Student."
       parameters: []
       responses:
         200:
@@ -7877,78 +8019,94 @@ paths:
                 type: object
                 example:
                   data:
-                    id: 1
-                    name: 'Student Affairs'
-                    email: r05@ejust.test
+                    id: 2
+                    name: 'Sara Applicant'
+                    email: sara@example.com
                     preferred_locale: en
                     roles:
                       -
-                        code: R05
-                        name: 'Student Affairs Staff'
+                        code: R02
+                        name: Student
                     permissions:
-                      - documents.upload
-                      - application.view_status
-                      - application.screen
-                      - interview.schedule
-                      - courses.register_for_student
-                      - registration.approve
-                      - catalog.view
-                      - grades.enter
-                      - grades.view_student
+                      - courses.register_self
+                      - exemption.submit
+                      - transfer_waiver.submit
+                      - grades.view_own
                       - transcript.view_unofficial
-                      - transcript.issue_official
                       - transcript.export
                       - standing.monitor
-                      - calendar.manage
+                      - catalog.view
+                    student:
+                      university_id: 2026-MSC-CE-0001
+                      program_id: 1
+                      enrollment_term: 'Fall 2026'
+                      admission_cycle_id: 1
+                      advisor_id: 3
+                      admitted_at: '2026-07-15T10:00:00+00:00'
                 properties:
                   data:
                     type: object
                     properties:
                       id:
                         type: integer
-                        example: 1
+                        example: 2
                       name:
                         type: string
-                        example: 'Student Affairs'
+                        example: 'Sara Applicant'
                       email:
                         type: string
-                        example: r05@ejust.test
+                        example: sara@example.com
                       preferred_locale:
                         type: string
                         example: en
                       roles:
                         type: array
                         example:
-                          - code: R05
-                            name: 'Student Affairs Staff'
+                          - code: R02
+                            name: Student
                         items:
                           type: object
                           properties:
                             code:
                               type: string
-                              example: R05
+                              example: R02
                             name:
                               type: string
-                              example: 'Student Affairs Staff'
+                              example: Student
                       permissions:
                         type: array
                         example:
-                          - documents.upload
-                          - application.view_status
-                          - application.screen
-                          - interview.schedule
-                          - courses.register_for_student
-                          - registration.approve
-                          - catalog.view
-                          - grades.enter
-                          - grades.view_student
+                          - courses.register_self
+                          - exemption.submit
+                          - transfer_waiver.submit
+                          - grades.view_own
                           - transcript.view_unofficial
-                          - transcript.issue_official
                           - transcript.export
                           - standing.monitor
-                          - calendar.manage
+                          - catalog.view
                         items:
                           type: string
+                      student:
+                        type: object
+                        properties:
+                          university_id:
+                            type: string
+                            example: 2026-MSC-CE-0001
+                          program_id:
+                            type: integer
+                            example: 1
+                          enrollment_term:
+                            type: string
+                            example: 'Fall 2026'
+                          admission_cycle_id:
+                            type: integer
+                            example: 1
+                          advisor_id:
+                            type: integer
+                            example: 3
+                          admitted_at:
+                            type: string
+                            example: '2026-07-15T10:00:00+00:00'
         401:
           description: ''
           content:

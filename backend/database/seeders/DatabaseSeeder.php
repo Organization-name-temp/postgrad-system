@@ -32,5 +32,10 @@ class DatabaseSeeder extends Seeder
         // The realistic E-JUST academic catalog the browse tree and later phases run
         // against (Phase 1). Idempotent, so re-seeding the dev DB is safe.
         $this->call(CatalogSeeder::class);
+
+        // The Admissions demo (Phase 2): an open cycle, deans/advisors/interviewers, one
+        // Application resting in each status (the Accepted one a real minted Student),
+        // interview slots, and sample documents. Runs after the catalog it references.
+        $this->call(AdmissionsSeeder::class);
     }
 }

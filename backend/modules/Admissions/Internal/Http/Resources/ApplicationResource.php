@@ -84,6 +84,12 @@ class ApplicationResource extends JsonResource
 
             'finalized_at' => $application->finalized_at?->toIso8601String(),
 
+            // Final-decision extras (ticket 10): the terms of a conditional offer and
+            // the place of a waitlisted applicant. Null until — and unless — the Dean's
+            // decision sets them.
+            'conditions' => $application->conditions,
+            'waitlist_position' => $application->waitlist_position,
+
             // Documents uploaded so far (ticket 05).
             'documents' => ApplicationDocumentResource::collection($application->documents),
         ];

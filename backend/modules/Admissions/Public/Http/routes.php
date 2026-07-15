@@ -8,6 +8,7 @@ use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
 use Modules\Admissions\Internal\Http\Controllers\DeanReviewController;
 use Modules\Admissions\Internal\Http\Controllers\DocumentController;
 use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
+use Modules\Admissions\Internal\Http\Controllers\FinalDecisionController;
 use Modules\Admissions\Internal\Http\Controllers\InterviewEvaluationController;
 use Modules\Admissions\Internal\Http\Controllers\InterviewSchedulingController;
 use Modules\Admissions\Internal\Http\Controllers\InterviewSlotController;
@@ -136,6 +137,17 @@ Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function ()
 Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
     Route::get('/dean/applications', [DeanReviewController::class, 'index']);
     Route::post('/dean/applications/{application}/review', [DeanReviewController::class, 'review'])->whereNumber('application');
+});
+
+// Final decision (ticket 10). The Dean's post-interview decision — accept (which mints
+// a Student), conditionally accept, waitlist, reject — plus the resolutions of held
+// offers, and the advisor picker the form pre-fills. Gated on `applicant.decide` (Dean
+// only, R07); the per-application faculty scope (out-of-faculty → 403) is enforced in
+// the controller, as for Dean review. `advisors` is a literal segment, declared with
+// the id-bound decide route in one permission group.
+Route::middleware(['auth:sanctum', 'can:applicant.decide'])->group(function () {
+    Route::get('/dean/advisors', [FinalDecisionController::class, 'advisors']);
+    Route::post('/dean/applications/{application}/decide', [FinalDecisionController::class, 'decide'])->whereNumber('application');
 });
 
 // Streaming download (ticket 05). Sanctum-authed but not applicant-scoped: served

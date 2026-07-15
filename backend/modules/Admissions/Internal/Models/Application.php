@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Enums\DocumentRequirement;
 use Modules\Admissions\Internal\Enums\DocumentType;
@@ -17,6 +18,10 @@ use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
 use Modules\Admissions\Internal\Enums\PreviousDegree;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Identity\Public\AdmitStudent;
+use Modules\Identity\Public\AdmittedStudent;
+use Modules\Identity\Public\Contracts\StudentEnrollment;
+use Modules\Identity\Public\StudentIdentity;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -60,6 +65,8 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * @property ?bool $native_arabic_speaker
  * @property ?int $primary_program_id
  * @property ?int $alternative_program_id
+ * @property ?string $conditions
+ * @property ?int $waitlist_position
  * @property ?Carbon $submitted_at
  * @property ?Carbon $finalized_at
  * @property Carbon $created_at
@@ -145,6 +152,7 @@ class Application extends Model
             'native_arabic_speaker' => 'boolean',
             'primary_program_id' => 'integer',
             'alternative_program_id' => 'integer',
+            'waitlist_position' => 'integer',
             'submitted_at' => 'datetime',
             'finalized_at' => 'datetime',
         ];
@@ -328,11 +336,12 @@ class Application extends Model
 
     /**
      * Reject the application with a reason, ending it at
-     * {@see ApplicationStatus::Rejected} (terminal). Used by both reviewer gates:
-     * Student Affairs at screening ({@see ApplicationStatus::UnderSAReview}, ticket 07)
-     * and the Dean after review ({@see ApplicationStatus::UnderDeanReview}, ticket 08)
-     * — the two states the transition map allows into `Rejected`. Any other status is
-     * a 409. The actor is the rejecting reviewer.
+     * {@see ApplicationStatus::Rejected} (terminal). Every reviewer gate that can
+     * refuse an application funnels through here — the states the transition map allows
+     * into `Rejected`: Student Affairs at screening (`UnderSAReview`, ticket 07), the
+     * Dean after review (`UnderDeanReview`, ticket 08), and the Dean's final decision or
+     * a resolution of a held offer (`InterviewCompleted`/`ConditionallyAccepted`/`Waitlisted`,
+     * ticket 10). Any other status is a 409. The actor is the rejecting reviewer.
      */
     public function reject(int $actorId, string $note): void
     {
@@ -375,6 +384,77 @@ class Application extends Model
     public function completeInterview(int $actorId): void
     {
         $this->transitionTo(ApplicationStatus::InterviewCompleted, actorId: $actorId);
+    }
+
+    /**
+     * The Dean accepts the applicant — the terminal `Accepted` transition (ticket 10)
+     * and the phase's climax. Legal from `InterviewCompleted` (the direct decision) and
+     * from `ConditionallyAccepted`/`Waitlisted` (a later resolution to Accepted) — any
+     * other status is a 409.
+     *
+     * The status change and the acceptance mint run in **one transaction** here
+     * (ADR-0013): the guarded transition, then {@see StudentEnrollment::admit()} across
+     * the Identity\Public seam — so an `Accepted` application and its Student (University
+     * ID, R01→R02, advisor, audit entry) commit together, and no Student can exist
+     * without an acceptance. The caller resolves the advisor and Program code into
+     * `$command` (data Admissions holds but Identity must not read from Catalog) and
+     * dispatches the `AdmissionAccepted` side-effect event only once this returns. The
+     * actor is the deciding Dean.
+     */
+    public function accept(int $actorId, StudentEnrollment $enrollment, AdmitStudent $command): AdmittedStudent
+    {
+        return DB::transaction(function () use ($actorId, $enrollment, $command): AdmittedStudent {
+            $this->transitionTo(ApplicationStatus::Accepted, actorId: $actorId);
+
+            return $enrollment->admit($command);
+        });
+    }
+
+    /**
+     * The frozen identity snapshot to carry onto the Student anchor at acceptance
+     * (ADR-0013). Assembled from this application's own Step-1 fields — mapping an
+     * Application's personal info to a {@see StudentIdentity} is the Application's own
+     * knowledge, so the decision controller does not reach across these columns itself.
+     * Only meaningful once the snapshot is complete (finalize enforces that before an
+     * application can reach a decision).
+     */
+    public function identitySnapshot(): StudentIdentity
+    {
+        return new StudentIdentity(
+            nameEn: (string) $this->name_en,
+            nameAr: (string) $this->name_ar,
+            nationalId: (string) $this->national_id,
+            dateOfBirth: $this->date_of_birth?->format('Y-m-d') ?? '',
+            nationality: (string) $this->nationality,
+            gender: $this->gender->value,
+        );
+    }
+
+    /**
+     * The Dean makes a conditional offer: `InterviewCompleted` →
+     * {@see ApplicationStatus::ConditionallyAccepted}, recording the free-text
+     * `$conditions` both on the application (for later resolution) and on the timeline
+     * (the applicant sees the terms). Held short of admission — no Student is minted —
+     * until the Dean resolves it to Accepted or Rejected. Legal only from
+     * `InterviewCompleted` (else 409); the actor is the Dean.
+     */
+    public function acceptConditionally(int $actorId, string $conditions): void
+    {
+        $this->conditions = $conditions;
+        $this->transitionTo(ApplicationStatus::ConditionallyAccepted, actorId: $actorId, note: $conditions);
+    }
+
+    /**
+     * The Dean waitlists the applicant: `InterviewCompleted` →
+     * {@see ApplicationStatus::Waitlisted}, recording their `$position`. Held — no
+     * Student is minted — until the Dean resolves it to Accepted (a spot opened) or
+     * Rejected (the cycle closed). Legal only from `InterviewCompleted` (else 409); the
+     * actor is the Dean.
+     */
+    public function waitlist(int $actorId, int $position): void
+    {
+        $this->waitlist_position = $position;
+        $this->transitionTo(ApplicationStatus::Waitlisted, actorId: $actorId);
     }
 
     /**

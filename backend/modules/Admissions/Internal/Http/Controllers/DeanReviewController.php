@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
+use Modules\Admissions\Internal\Http\Concerns\ScopesToDeanFaculty;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Models\Application;
@@ -38,6 +39,7 @@ class DeanReviewController
 {
     use NotifiesApplicant;
     use ResolvesQueuePrograms;
+    use ScopesToDeanFaculty;
 
     /**
      * Dean review queue.
@@ -117,7 +119,7 @@ class DeanReviewController
         // Routing integrity before state: an application outside this Dean's Faculties
         // is refused (403) whatever its status, so a Dean cannot act on another
         // Faculty's applicants even by guessing an id.
-        $this->authorizeFacultyScope($request, $application, $assignments, $catalog);
+        $this->authorizeDeanFacultyScope($request, $application, $assignments, $catalog);
 
         $actorId = (int) $request->user()?->getAuthIdentifier();
         $note = $validated['note'] ?? null;
@@ -138,25 +140,5 @@ class DeanReviewController
         });
 
         return new ApplicationResource($application);
-    }
-
-    /**
-     * Assert the signed-in Dean may act on this application — its primary Program's
-     * Faculty is among the Dean's assigned Faculties. A dropped/absent Program
-     * reference (no FK, ADR-0012) or an out-of-faculty Program is refused with a 403.
-     */
-    private function authorizeFacultyScope(
-        Request $request,
-        Application $application,
-        DeanAssignments $assignments,
-        ProgramCatalog $catalog,
-    ): void {
-        $programId = $application->primary_program_id;
-        $summary = $programId === null ? null : $catalog->find($programId);
-        $facultyIds = $assignments->facultiesForDean((int) $request->user()?->getAuthIdentifier());
-
-        if ($summary === null || ! in_array($summary->facultyId, $facultyIds, true)) {
-            abort(403);
-        }
     }
 }

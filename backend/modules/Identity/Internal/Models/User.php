@@ -69,6 +69,20 @@ class User extends Authenticatable
     public function assignRole(Role $role): void
     {
         $this->userRoles()->firstOrCreate(['role' => $role->value]);
+        $this->unsetRelation('userRoles');
+    }
+
+    /**
+     * Remove a role from this user — the counterpart to {@see self::assignRole()}
+     * the acceptance mint uses to strip the Applicant role (R01) once it grants
+     * Student (R02), so an admitted user no longer carries applicant rights (ADR-0013).
+     * A no-op if the user does not hold the role. Any loaded `userRoles` relation is
+     * dropped so a subsequent {@see self::roles()} reflects the change.
+     */
+    public function removeRole(Role $role): void
+    {
+        $this->userRoles()->where('role', $role->value)->delete();
+        $this->unsetRelation('userRoles');
     }
 
     public function hasRole(Role $role): bool

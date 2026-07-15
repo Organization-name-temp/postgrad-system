@@ -45,6 +45,14 @@ return [
         'reschedule_exhausted' => 'You have already rescheduled this interview once.',
         'already_completed' => 'This interview has already been completed.',
     ],
+    // Final decision + acceptance mint (ticket 10): the validation the decision
+    // controller raises directly (422) when the advisor for an acceptance cannot be
+    // resolved, or the application has no program to admit into.
+    'decision' => [
+        'no_program' => 'This application has no program to admit the applicant into.',
+        'advisor_not_r03' => 'The selected advisor must be an academic advisor.',
+        'no_advisor' => 'No academic advisor is available to assign.',
+    ],
     // The hand-rolled status machine's 409 (ticket 07): the requested move is not a
     // legal transition from the application's current state.
     'transition' => [

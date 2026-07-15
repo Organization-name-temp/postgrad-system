@@ -22,8 +22,12 @@ trait NotifiesApplicant
 {
     /**
      * Notify the applicant that a non-acceptance decision was recorded on their
-     * application — a rejection at any review stage (Student Affairs screening or Dean
-     * review). `$reason` is the reviewer's stated reason.
+     * application: a rejection at any stage (Student Affairs screening or Dean review),
+     * or the Dean's final hold decisions — Conditionally Accepted or Waitlisted
+     * (ticket 10). `$decision` is the recorded status and `$reason` the reviewer's note
+     * (a rejection reason or the offer's conditions), null where none applies. The
+     * acceptance itself is *not* routed here — it raises its own `AdmissionAccepted`
+     * event and notification (ADR-0013).
      */
     protected function notifyDecisionRecorded(
         Notifier $notifier,

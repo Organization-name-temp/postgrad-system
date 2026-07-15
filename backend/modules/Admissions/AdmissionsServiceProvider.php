@@ -4,9 +4,12 @@ namespace Modules\Admissions;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Admissions\Internal\Events\AdmissionAccepted;
+use Modules\Admissions\Internal\Listeners\SendAcceptanceNotification;
 
 class AdmissionsServiceProvider extends ServiceProvider
 {
@@ -15,6 +18,11 @@ class AdmissionsServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
 
         $this->registerRateLimiters();
+
+        // The acceptance mint's one Phase-2 side-effect (ADR-0013): the applicant is
+        // notified they were accepted. Wired explicitly (not by auto-discovery) so the
+        // module's single domain event and its listener stay visible in one place.
+        Event::listen(AdmissionAccepted::class, SendAcceptanceNotification::class);
 
         // The module owns its /api/v1 routes (ADR-0002). Authorization gates are
         // registered from the §3.2 matrix by Identity (ADR-0008); Admissions

@@ -4416,6 +4416,260 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/dean/advisors:
+    get:
+      summary: 'Advisors for the decision form.'
+      operationId: advisorsForTheDecisionForm
+      description: "The academic advisors (R03) the Dean may assign, with the least-loaded one\npre-selected in `meta.suggested_advisor_id` (null when no advisor exists). Gated\non `applicant.decide`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 3
+                      name: 'Dr. Advisor'
+                      email: advisor@ejust.test
+                  meta:
+                    suggested_advisor_id: 3
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 3
+                        name: 'Dr. Advisor'
+                        email: advisor@ejust.test
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 3
+                        name:
+                          type: string
+                          example: 'Dr. Advisor'
+                        email:
+                          type: string
+                          example: advisor@ejust.test
+                  meta:
+                    type: object
+                    properties:
+                      suggested_advisor_id:
+                        type: integer
+                        example: 3
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+  '/api/v1/dean/applications/{application_id}/decide':
+    post:
+      summary: 'Record the final decision.'
+      operationId: recordTheFinalDecision
+      description: "`accept` mints the Student (University ID on `meta.university_id`, R01→R02, advisor\nassigned) and works from `interview_completed` as the first decision, or from\n`conditionally_accepted`/`waitlisted` as a resolution. `conditional` and `waitlist`\nhold the application (recording `conditions` / `waitlist_position`); `reject` ends\nit. The application must belong to one of the Dean's Faculties (else 403); an action\nillegal from the current status is a 409. Gated on `applicant.decide`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'accepted (Student minted)'
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: accepted
+                      meta:
+                        university_id: 2026-MSC-CE-0001
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: accepted
+                      meta:
+                        type: object
+                        properties:
+                          university_id:
+                            type: string
+                            example: 2026-MSC-CE-0001
+                  -
+                    description: 'conditionally accepted'
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: conditionally_accepted
+                        conditions: 'Submit the final transcript by September.'
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: conditionally_accepted
+                          conditions:
+                            type: string
+                            example: 'Submit the final transcript by September.'
+                  -
+                    description: waitlisted
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: waitlisted
+                        waitlist_position: 2
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: waitlisted
+                          waitlist_position:
+                            type: integer
+                            example: 2
+                  -
+                    description: rejected
+                    type: object
+                    example:
+                      data:
+                        id: 1
+                        status: rejected
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: rejected
+        403:
+          description: 'out of faculty'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'not decidable from current status'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application cannot move from under_dean_review to accepted.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application cannot move from under_dean_review to accepted.'
+        422:
+          description: 'advisor is not an advisor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The selected advisor must be an academic advisor.'
+                  errors:
+                    advisor_id:
+                      - 'The selected advisor must be an academic advisor.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The selected advisor must be an academic advisor.'
+                  errors:
+                    type: object
+                    properties:
+                      advisor_id:
+                        type: array
+                        example:
+                          - 'The selected advisor must be an academic advisor.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: 'One of accept, conditional, waitlist, reject.'
+                  example: accept
+                advisor_id:
+                  type: integer
+                  description: 'The advisor to assign on accept; defaults to the least-loaded advisor.'
+                  example: 3
+                  nullable: true
+                conditions:
+                  type: string
+                  description: "when action is conditional. The offer's conditions."
+                  example: 'Submit the final transcript by September.'
+                  nullable: true
+                waitlist_position:
+                  type: integer
+                  description: "when action is waitlist. The applicant's place."
+                  example: 2
+                  nullable: true
+                note:
+                  type: string
+                  description: 'when action is reject. The reason.'
+                  example: 'The panel did not recommend admission.'
+                  nullable: true
+              required:
+                - action
+                - conditions
+                - waitlist_position
+                - note
+      security: []
+    parameters:
+      -
+        in: path
+        name: application_id
+        description: "The application's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
   '/api/v1/documents/{document_ulid}':
     get:
       summary: 'Stream a document.'

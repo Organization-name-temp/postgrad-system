@@ -116,6 +116,15 @@ The terminal outcome recorded after interview: Accepted, Conditionally Accepted,
 Waitlisted, or Rejected. Conditionally Accepted and Waitlisted are not resting ends —
 each later resolves to Accepted or Rejected.
 
+**Identification Type**:
+How an Applicant is identified on their Application — a National ID (an Egyptian
+citizen's 14-digit number) or a Passport (an alphanumeric travel-document number, for a
+non-Egyptian or overseas Applicant). Chosen on the personal-info step; it selects the
+format the identifier is validated against. Stored with the identifier, which is unique
+within an Admission Cycle.
+_Avoid_: ID kind; "document type" (Document Type is the uploaded-file taxonomy — a
+different thing that happens to share the word "type").
+
 ## Notifications
 
 **Notification**:

@@ -78,6 +78,13 @@ export function DeanDecisionPage() {
 
   const application = detail.data?.data
   const advisorOptions = advisors.data?.data ?? []
+  // Disable the advisor select only once the query has *settled* with no advisors —
+  // never merely while it is loading. A field disabled during the load flips to enabled
+  // when advisors arrive (and the suggestion pre-fills), animating its label's colour up
+  // from the muted disabled tone to the resting tone; that transition passes through a
+  // sub-AA grey axe can catch mid-flight. Staying enabled keeps the label at its resting
+  // (accessible) colour throughout, so only the shrink transform animates (phase 2.5).
+  const noAdvisors = !advisors.isPending && advisorOptions.length === 0
   const actionError = decide.isError
     ? (apiErrorMessage(decide.error) ?? t('decisions.actionError'))
     : undefined
@@ -238,15 +245,11 @@ export function DeanDecisionPage() {
               <TextField
                 select
                 label={t('decisions.advisor')}
-                helperText={
-                  advisorOptions.length === 0
-                    ? t('decisions.noAdvisors')
-                    : t('decisions.advisorHelp')
-                }
+                helperText={noAdvisors ? t('decisions.noAdvisors') : t('decisions.advisorHelp')}
                 value={advisorId === '' ? '' : String(advisorId)}
                 onChange={(event) => setAdvisorId(Number(event.target.value))}
                 fullWidth
-                disabled={advisorOptions.length === 0}
+                disabled={noAdvisors}
                 sx={{ mb: 2, maxWidth: 480 }}
               >
                 {advisorOptions.map((advisor) => (

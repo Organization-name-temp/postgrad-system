@@ -146,9 +146,7 @@ export function ApplyPage() {
           return (
             <Step key={key}>
               {clickable ? (
-                <StepButton onClick={() => goToStep(target)}>
-                  {t(`wizard.steps.${key}`)}
-                </StepButton>
+                <StepButton onClick={() => goToStep(target)}>{t(`wizard.steps.${key}`)}</StepButton>
               ) : (
                 <StepLabel>{t(`wizard.steps.${key}`)}</StepLabel>
               )}

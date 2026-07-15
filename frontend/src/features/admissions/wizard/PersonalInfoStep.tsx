@@ -362,7 +362,9 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
   const gpaDisabled = gpaScale === ''
   const gpaCeiling = gpaScaleCeiling(gpaScale)
   const gpaHint =
-    gpaCeiling !== null ? t('personalInfo.gpaHelp', { max: gpaCeiling }) : t('personalInfo.gpaScaleFirst')
+    gpaCeiling !== null
+      ? t('personalInfo.gpaHelp', { max: gpaCeiling })
+      : t('personalInfo.gpaScaleFirst')
 
   /** A GPA/CGPA field: a numeric input disabled until a scale is chosen, then bounded
    *  by the scale's ceiling (the cross-field rule lives in the schema). */

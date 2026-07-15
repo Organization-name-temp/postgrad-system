@@ -114,7 +114,10 @@ export function ApplicationRecordDetail({ application, timeline }: ApplicationRe
       {section(
         t('review.sections.programs'),
         <>
-          {row(t('program.primaryLabel'), programName(application.primary_program, t('review.empty')))}
+          {row(
+            t('program.primaryLabel'),
+            programName(application.primary_program, t('review.empty')),
+          )}
           {row(
             t('program.alternativeLabel'),
             programName(application.alternative_program, t('review.noAlternative')),

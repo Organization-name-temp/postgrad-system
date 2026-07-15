@@ -19,6 +19,14 @@ return [
         // format of the chosen Identification Type (14 digits for a National ID,
         // 6–9 alphanumeric for a Passport).
         'invalid_identifier' => 'The identifier does not match the selected identification type.',
+        // Raised by the GPA-vs-scale rule when a GPA/CGPA exceeds the chosen scale's
+        // ceiling (e.g. 90 on a 4.0 scale).
+        'gpa_above_scale' => 'The GPA cannot exceed the chosen scale’s maximum of :ceiling.',
+        // Raised by the english_score rule when the score falls outside the selected
+        // test's official range (e.g. an IELTS of 250).
+        'english_score_out_of_range' => 'The :test score must be between :min and :max.',
+        // Raised when a score is supplied for the "None" test, which carries no score.
+        'english_score_not_allowed' => 'The selected test does not take a score.',
     ],
     'documents' => [
         'locked' => 'Documents can no longer be changed for this application.',

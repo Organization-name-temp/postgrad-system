@@ -2,10 +2,12 @@ import { z } from 'zod'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 import {
   APPLYING_DEGREES,
+  ENGLISH_SCORE_RANGES,
   ENGLISH_TESTS,
   ENGLISH_TEST_NONE,
   GENDERS,
   GPA_SCALES,
+  gpaScaleCeiling,
   ID_TYPES,
   PREVIOUS_DEGREES,
 } from './fieldOptions'
@@ -52,9 +54,6 @@ export interface PersonalInfoValues {
   native_arabic_speaker: boolean
 }
 
-/** The server's `english_score` ceiling — a blanket 0–300 (tightened per test in ticket 07). */
-const ENGLISH_SCORE_MAX = 300
-
 /**
  * The identifier format per Identification Type — its pattern and the message key to
  * show when it fails — mirroring the server `IdentificationType`. Kept in one place so
@@ -65,9 +64,6 @@ export const ID_FORMATS: Record<string, { pattern: RegExp; messageKey: string }>
   national_id: { pattern: /^\d{14}$/, messageKey: 'validation.nationalId' },
   passport: { pattern: /^[A-Za-z0-9]{6,9}$/, messageKey: 'validation.passport' },
 }
-
-/** The server's blanket GPA/CGPA ceiling — 0–100 (tied to the chosen scale in ticket 07). */
-const GPA_MAX = 100
 
 /** Midnight today, for the two "not in the future" date checks. */
 function startOfToday(): number {
@@ -100,16 +96,15 @@ export function buildPersonalInfoSchema(t: Translator) {
   const choice = <T extends readonly [string, ...string[]]>(values: T) =>
     z.enum(values, { error: t('validation.select') })
 
-  /** A required numeric text field bounded 0 ≤ v ≤ `max`. */
-  const number = (max: number) =>
+  /** A required, non-negative numeric text field. The upper bound is applied
+   *  cross-field (GPA vs its chosen scale) in `superRefine`, not fixed here. */
+  const number = () =>
     z
       .string()
       .trim()
       .min(1, required)
       .refine((v) => v !== '' && !Number.isNaN(Number(v)), { error: t('validation.number') })
-      .refine((v) => Number(v) >= 0 && Number(v) <= max, {
-        error: t('validation.range', { min: 0, max }),
-      })
+      .refine((v) => Number(v) >= 0, { error: t('validation.nonNegative') })
 
   /** A required date that must not be in the future — strictly past when `allowToday` is false. */
   const pastDate = (allowToday: boolean) =>
@@ -158,8 +153,8 @@ export function buildPersonalInfoSchema(t: Translator) {
       graduation_date: pastDate(true),
       previous_degree: choice(PREVIOUS_DEGREES),
       previous_major: text(200),
-      graduation_gpa: number(GPA_MAX),
-      graduation_cgpa: number(GPA_MAX),
+      graduation_gpa: number(),
+      graduation_cgpa: number(),
       gpa_scale: choice(GPA_SCALES),
       is_ejust_graduate: z.boolean(),
       applying_for_degree: choice(APPLYING_DEGREES),
@@ -177,8 +172,26 @@ export function buildPersonalInfoSchema(t: Translator) {
         ctx.addIssue({ code: 'custom', path: ['national_id'], message: t(format.messageKey) })
       }
 
-      // English score mirrors the server's `required_unless:english_test,None` plus
-      // the blanket 0–300 range: required and bounded for any real test, ignored for None.
+      // GPA/CGPA are bounded by the chosen scale's ceiling (a 90 on a 4.0 scale is
+      // invalid) — the cross-field mirror of the server's rule. Runs only once a scale
+      // is chosen; the fields stay disabled until then, so there is nothing to check.
+      const ceiling = gpaScaleCeiling(values.gpa_scale)
+      if (ceiling !== null) {
+        for (const field of ['graduation_gpa', 'graduation_cgpa'] as const) {
+          const raw = values[field].trim()
+          if (raw !== '' && !Number.isNaN(Number(raw)) && Number(raw) > ceiling) {
+            ctx.addIssue({
+              code: 'custom',
+              path: [field],
+              message: t('validation.range', { min: 0, max: ceiling }),
+            })
+          }
+        }
+      }
+
+      // English score mirrors the server's `required_unless:english_test,None` plus the
+      // per-test range: required for any real test and bounded by that test's official
+      // range ({@see ENGLISH_SCORE_RANGES}); ignored for None.
       const raw = values.english_score.trim()
       const needsScore = values.english_test !== ENGLISH_TEST_NONE
       if (needsScore && raw === '') {
@@ -189,13 +202,14 @@ export function buildPersonalInfoSchema(t: Translator) {
         })
         return
       }
-      if (raw !== '') {
+      const range = ENGLISH_SCORE_RANGES[values.english_test]
+      if (raw !== '' && range) {
         const score = Number(raw)
-        if (Number.isNaN(score) || score < 0 || score > ENGLISH_SCORE_MAX) {
+        if (Number.isNaN(score) || score < range[0] || score > range[1]) {
           ctx.addIssue({
             code: 'custom',
             path: ['english_score'],
-            message: t('validation.range', { min: 0, max: ENGLISH_SCORE_MAX }),
+            message: t('validation.range', { min: range[0], max: range[1] }),
           })
         }
       }

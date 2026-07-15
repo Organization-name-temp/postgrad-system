@@ -196,6 +196,74 @@ it('rejects a nationality outside the ISO 3166-1 alpha-2 list', function () {
         ->assertJsonValidationErrors('nationality');
 });
 
+it('rejects a GPA above the chosen scale’s ceiling', function () {
+    // Phase 2.5 ticket 07: a GPA is bounded by its scale — 90 on a 4.0 scale is a 422,
+    // where the same 90 on the 100 scale is fine.
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'gpa_scale' => '4.0',
+        'graduation_gpa' => 90,
+        'graduation_cgpa' => 3.5,
+    ]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('graduation_gpa');
+
+    // The same value is in range on a percentage scale.
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'gpa_scale' => '100',
+        'graduation_gpa' => 90,
+        'graduation_cgpa' => 88,
+    ]))->assertOk();
+});
+
+it('rejects a CGPA above the chosen scale’s ceiling', function () {
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'gpa_scale' => '4.0',
+        'graduation_gpa' => 3.5,
+        'graduation_cgpa' => 4.5,
+    ]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('graduation_cgpa');
+});
+
+it('rejects an english score outside the selected test’s range', function () {
+    // Phase 2.5 ticket 07: an IELTS band is 0–9, so 250 is a 422; a TOEFL iBT 0–120
+    // accepts the mid-range 100.
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'english_test' => 'IELTS',
+        'english_score' => 250,
+    ]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('english_score');
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'english_test' => 'TOEFL iBT',
+        'english_score' => 100,
+    ]))->assertOk();
+});
+
+it('rejects an english score below the selected test’s floor', function () {
+    // TOEFL PBT starts at 310 — a 200 is below the floor even though it is a positive
+    // number the old blanket 0–300 rule would have accepted.
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'english_test' => 'TOEFL PBT',
+        'english_score' => 200,
+    ]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('english_score');
+});
+
 it('requires an english score unless the test is None', function () {
     [$user] = draftApplicant();
     Sanctum::actingAs($user);
@@ -203,6 +271,20 @@ it('requires an english score unless the test is None', function () {
     test()->postJson('/api/v1/application/submit', snapshotPayload([
         'english_test' => 'IELTS',
         'english_score' => null,
+    ]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('english_score');
+});
+
+it('rejects a score supplied for the None english test', function () {
+    // None carries no score — a supplied score is meaningless, and (with the blanket
+    // 0–300 ceiling gone) must not slip through unbounded.
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'english_test' => 'None',
+        'english_score' => 99999,
     ]))
         ->assertStatus(422)
         ->assertJsonValidationErrors('english_score');

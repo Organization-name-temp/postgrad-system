@@ -3870,14 +3870,28 @@ paths:
                     national_id: '29001010101010'
                     id_type: national_id
                     phone: '+201000000000'
+                    date_of_birth: '1998-05-20'
                     nationality: EG
                     gender: Female
-                    previous_degree: BSc
+                    address_country: Egypt
+                    address_city: Alexandria
+                    address_street: '15 Corniche Road'
                     previous_university: 'Cairo University'
+                    graduation_certificate_name: 'BSc in Computer Science'
+                    graduation_date: '2020-07-01'
+                    previous_degree: BSc
+                    previous_major: 'Computer Science'
                     graduation_gpa: '3.50'
+                    graduation_cgpa: '3.45'
+                    gpa_scale: '4.0'
+                    is_ejust_graduate: false
                     applying_for_degree: MSc
                     english_test: IELTS
                     english_score: '7.50'
+                    native_arabic_speaker: true
+                    submitted_at: '2026-07-14T10:00:00+00:00'
+                    primary_program_id: 1
+                    alternative_program_id: 2
                     primary_program:
                       id: 1
                       code: MSC-CE
@@ -3888,6 +3902,17 @@ paths:
                       department_name_ar: 'هندسة الحاسوب'
                       faculty_name_en: 'Faculty of Engineering'
                       faculty_name_ar: 'كلية الهندسة'
+                    alternative_program:
+                      id: 2
+                      code: MSC-EE
+                      name_en: 'MSc in Electrical Engineering'
+                      name_ar: 'ماجستير الهندسة الكهربية'
+                      degree_level: MSc
+                      department_name_en: 'Electrical Engineering'
+                      department_name_ar: 'الهندسة الكهربية'
+                      faculty_name_en: 'Faculty of Engineering'
+                      faculty_name_ar: 'كلية الهندسة'
+                    finalized_at: null
                     conditions: 'Submit the final transcript by September.'
                     waitlist_position: 2
                     documents:
@@ -3927,21 +3952,51 @@ paths:
                       phone:
                         type: string
                         example: '+201000000000'
+                      date_of_birth:
+                        type: string
+                        example: '1998-05-20'
                       nationality:
                         type: string
                         example: EG
                       gender:
                         type: string
                         example: Female
-                      previous_degree:
+                      address_country:
                         type: string
-                        example: BSc
+                        example: Egypt
+                      address_city:
+                        type: string
+                        example: Alexandria
+                      address_street:
+                        type: string
+                        example: '15 Corniche Road'
                       previous_university:
                         type: string
                         example: 'Cairo University'
+                      graduation_certificate_name:
+                        type: string
+                        example: 'BSc in Computer Science'
+                      graduation_date:
+                        type: string
+                        example: '2020-07-01'
+                      previous_degree:
+                        type: string
+                        example: BSc
+                      previous_major:
+                        type: string
+                        example: 'Computer Science'
                       graduation_gpa:
                         type: string
                         example: '3.50'
+                      graduation_cgpa:
+                        type: string
+                        example: '3.45'
+                      gpa_scale:
+                        type: string
+                        example: '4.0'
+                      is_ejust_graduate:
+                        type: boolean
+                        example: false
                       applying_for_degree:
                         type: string
                         example: MSc
@@ -3951,6 +4006,18 @@ paths:
                       english_score:
                         type: string
                         example: '7.50'
+                      native_arabic_speaker:
+                        type: boolean
+                        example: true
+                      submitted_at:
+                        type: string
+                        example: '2026-07-14T10:00:00+00:00'
+                      primary_program_id:
+                        type: integer
+                        example: 1
+                      alternative_program_id:
+                        type: integer
+                        example: 2
                       primary_program:
                         type: object
                         properties:
@@ -3981,6 +4048,40 @@ paths:
                           faculty_name_ar:
                             type: string
                             example: 'كلية الهندسة'
+                      alternative_program:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          code:
+                            type: string
+                            example: MSC-EE
+                          name_en:
+                            type: string
+                            example: 'MSc in Electrical Engineering'
+                          name_ar:
+                            type: string
+                            example: 'ماجستير الهندسة الكهربية'
+                          degree_level:
+                            type: string
+                            example: MSc
+                          department_name_en:
+                            type: string
+                            example: 'Electrical Engineering'
+                          department_name_ar:
+                            type: string
+                            example: 'الهندسة الكهربية'
+                          faculty_name_en:
+                            type: string
+                            example: 'Faculty of Engineering'
+                          faculty_name_ar:
+                            type: string
+                            example: 'كلية الهندسة'
+                      finalized_at:
+                        type: string
+                        example: null
+                        nullable: true
                       conditions:
                         type: string
                         example: 'Submit the final transcript by September.'

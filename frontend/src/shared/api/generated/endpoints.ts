@@ -1195,6 +1195,18 @@ export type ReviewAnApplication200DataPrimaryProgram = {
   faculty_name_ar?: string;
 };
 
+export type ReviewAnApplication200DataAlternativeProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
 export type ReviewAnApplication200DataDocumentsItem = {
   id?: string;
   document_type?: string;
@@ -1214,15 +1226,32 @@ export type ReviewAnApplication200Data = {
   national_id?: string;
   id_type?: string;
   phone?: string;
+  date_of_birth?: string;
   nationality?: string;
   gender?: string;
-  previous_degree?: string;
+  address_country?: string;
+  address_city?: string;
+  address_street?: string;
   previous_university?: string;
+  graduation_certificate_name?: string;
+  graduation_date?: string;
+  previous_degree?: string;
+  previous_major?: string;
   graduation_gpa?: string;
+  graduation_cgpa?: string;
+  gpa_scale?: string;
+  is_ejust_graduate?: boolean;
   applying_for_degree?: string;
   english_test?: string;
   english_score?: string;
+  native_arabic_speaker?: boolean;
+  submitted_at?: string;
+  primary_program_id?: number;
+  alternative_program_id?: number;
   primary_program?: ReviewAnApplication200DataPrimaryProgram;
+  alternative_program?: ReviewAnApplication200DataAlternativeProgram;
+  /** @nullable */
+  finalized_at?: string | null;
   conditions?: string;
   waitlist_position?: number;
   documents?: ReviewAnApplication200DataDocumentsItem[];

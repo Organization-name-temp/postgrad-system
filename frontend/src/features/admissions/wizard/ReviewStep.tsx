@@ -11,6 +11,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
+import EditIcon from '@mui/icons-material/Edit'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
@@ -18,13 +19,13 @@ import {
   useFinalizeTheApplication,
   useResubmitAfterRevision,
 } from '../../../shared/api/generated/endpoints'
-import type {
-  MyApplication200Data,
-  MyApplication200DataPrimaryProgram,
-} from '../../../shared/api/generated/endpoints'
+import type { MyApplication200Data } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
-import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { formatDate } from '../../../shared/datetime'
+import { DetailRow, useReviewFormatting } from '../reviewFormatting'
+
+/** The wizard steps the applicant can jump back to and edit from the Review summary. */
+export type ReviewEditStep = 'personal' | 'documents' | 'program'
 
 interface ReviewStepProps {
   application: MyApplication200Data
@@ -36,6 +37,11 @@ interface ReviewStepProps {
    * returned_for_revision → under_sa_review.
    */
   mode?: 'finalize' | 'resubmit'
+  /**
+   * Jump back to a specific wizard step to correct that section, returning to Review
+   * afterwards (ticket 08). When omitted, sections render without an Edit affordance.
+   */
+  onEdit?: (step: ReviewEditStep) => void
 }
 
 /**
@@ -49,7 +55,7 @@ interface ReviewStepProps {
  * Affairs review. A missing prerequisite comes back as an inline 422; this is the
  * deliberate, last act before review.
  */
-export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewStepProps) {
+export function ReviewStep({ application, onBack, mode = 'finalize', onEdit }: ReviewStepProps) {
   const { t, i18n } = useTranslation('admissions')
   const queryClient = useQueryClient()
 
@@ -63,10 +69,7 @@ export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewSte
       t(mode === 'resubmit' ? 'wizard.resubmitError' : 'review.finalizeError'))
     : undefined
 
-  const programName = (
-    program: MyApplication200DataPrimaryProgram | undefined,
-    missing: string,
-  ): string => (program ? pickLocaleName(program, i18n.language, program.code ?? '') : missing)
+  const { shown, bool, enumLabel, programName } = useReviewFormatting()
 
   const documents = application.documents ?? []
 
@@ -81,34 +84,33 @@ export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewSte
     }
   }
 
-  // A missing/blank value reads as an em dash rather than a gap the applicant might
-  // mistake for a real (empty) answer.
-  const shown = (value: string | number | null | undefined): string =>
-    value === null || value === undefined || value === '' ? t('review.empty') : String(value)
-  const bool = (value: boolean | undefined): string => t(value ? 'review.yes' : 'review.no')
-  // Enum values carry their own labels; fall back to the raw value if unlabelled.
-  const enumLabel = (prefix: string, value: string | undefined): string =>
-    value ? t(`${prefix}.${value}`, { defaultValue: value }) : t('review.empty')
-
-  const row = (label: string, value: string) => (
-    <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
-      <Typography variant="body2" color="text.secondary">
-        {label}
-      </Typography>
-      <Typography variant="body2" sx={{ fontWeight: 500, textAlign: 'end' }}>
-        {value}
-      </Typography>
-    </Stack>
-  )
+  const row = (label: string, value: string) => <DetailRow label={label} value={value} />
 
   const field = (name: keyof MyApplication200Data, value: string) =>
     row(t(`personalInfo.fields.${name}`), value)
 
-  const section = (title: string, children: ReactNode) => (
-    <Paper variant="outlined" sx={{ p: 2 }}>
-      <Divider textAlign="left" sx={{ mb: 1 }}>
+  // A section header: the divider title, plus a per-section Edit action that jumps back
+  // to that step (and returns here) when the wizard supplies an `onEdit` (ticket 08).
+  const sectionHeader = (title: string, editStep?: ReviewEditStep) => (
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1 }}>
+      <Divider textAlign="left" sx={{ flexGrow: 1 }}>
         {title}
       </Divider>
+      {onEdit && editStep && (
+        <Button
+          size="small"
+          startIcon={<EditIcon fontSize="small" />}
+          onClick={() => onEdit(editStep)}
+        >
+          {t('review.edit')}
+        </Button>
+      )}
+    </Stack>
+  )
+
+  const section = (title: string, children: ReactNode, editStep?: ReviewEditStep) => (
+    <Paper variant="outlined" sx={{ p: 2 }}>
+      {sectionHeader(title, editStep)}
       <Stack spacing={0.5}>{children}</Stack>
     </Paper>
   )
@@ -133,6 +135,7 @@ export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewSte
             {field('nationality', shown(application.nationality))}
             {field('gender', enumLabel('personalInfo.genders', application.gender))}
           </>,
+          'personal',
         )}
 
         {section(
@@ -143,6 +146,7 @@ export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewSte
             {field('address_city', shown(application.address_city))}
             {field('address_street', shown(application.address_street))}
           </>,
+          'personal',
         )}
 
         {section(
@@ -168,6 +172,7 @@ export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewSte
             )}
             {field('is_ejust_graduate', bool(application.is_ejust_graduate))}
           </>,
+          'personal',
         )}
 
         {section(
@@ -177,6 +182,7 @@ export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewSte
             {field('english_score', shown(application.english_score))}
             {field('native_arabic_speaker', bool(application.native_arabic_speaker))}
           </>,
+          'personal',
         )}
 
         {section(
@@ -191,12 +197,11 @@ export function ReviewStep({ application, onBack, mode = 'finalize' }: ReviewSte
               programName(application.alternative_program, t('review.noAlternative')),
             )}
           </>,
+          'program',
         )}
 
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Divider textAlign="left" sx={{ mb: 1 }}>
-            {t('review.sections.documents')}
-          </Divider>
+          {sectionHeader(t('review.sections.documents'), 'documents')}
           <Typography variant="body2" gutterBottom>
             {t('review.documentsUploaded', { count: documents.length })}
           </Typography>

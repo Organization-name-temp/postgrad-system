@@ -277,9 +277,24 @@ class ApplicationController
      *  - `phone` is stored canonical E.164 (`+` then 1–15 digits); the shape is re-checked.
      *  - `nationality` is an ISO 3166-1 alpha-2 code, checked against {@see IsoCountries}.
      *
-     * `english_score` is required unless the test is None. `applying_for_degree` is a
-     * Catalog\Public {@see DegreeLevel} (MSc/PhD), cross-checked against the chosen
-     * Program at program selection (ADR-0012).
+     * `applying_for_degree` is a Catalog\Public {@see DegreeLevel} (MSc/PhD),
+     * cross-checked against the chosen Program at program selection (ADR-0012).
+     *
+     * Phase 2.5 (ticket 07) ties the two academic scores to their scale/test rather
+     * than a blanket range — the client Zod schema mirrors these, but this stays the
+     * authoritative gate (ADR-0014):
+     *  - `graduation_gpa` / `graduation_cgpa` are bounded `0 ≤ v ≤ scale ceiling`
+     *    ({@see GpaScale::ceiling}) once a `gpa_scale` is chosen — so a 90 on a 4.0
+     *    scale is a 422.
+     *  - `english_score` must fall within the selected test's official range
+     *    ({@see EnglishTest::scoreRange}) — an IELTS of 250 is a 422 — and stays
+     *    required unless the test is None.
+     *
+     * The two cross-field rules run only when their driving field (`gpa_scale` /
+     * `english_test`) is present, so a partial save of just a score is not
+     * prematurely rejected; submit requires the driver, so the bound is always
+     * enforced there. A blanket `max:100` on the GPA fields still applies as a
+     * standing ceiling for the scale-less partial-save case.
      *
      * @return array<string, array<int, mixed>>
      */
@@ -322,18 +337,73 @@ class ApplicationController
             'graduation_date' => [$presence, 'date', 'before_or_equal:today'],
             'previous_degree' => [$presence, Rule::enum(PreviousDegree::class)],
             'previous_major' => [$presence, 'string', 'max:200'],
-            'graduation_gpa' => [$presence, 'numeric', 'min:0', 'max:100'],
-            'graduation_cgpa' => [$presence, 'numeric', 'min:0', 'max:100'],
+            'graduation_gpa' => [$presence, 'numeric', 'min:0', 'max:100', $this->withinGpaScale($request)],
+            'graduation_cgpa' => [$presence, 'numeric', 'min:0', 'max:100', $this->withinGpaScale($request)],
             'gpa_scale' => [$presence, Rule::enum(GpaScale::class)],
             'is_ejust_graduate' => [$presence, 'boolean'],
             'applying_for_degree' => [$presence, Rule::enum(DegreeLevel::class)],
             'english_test' => [$presence, Rule::enum(EnglishTest::class)],
             // A score is required for any real test, forbidden semantics for None
             // (nullable so None may omit it). On partial save it is simply optional.
-            'english_score' => $required
-                ? ['required_unless:english_test,None', 'nullable', 'numeric', 'min:0', 'max:300']
-                : ['sometimes', 'nullable', 'numeric', 'min:0', 'max:300'],
+            // The range is tied to the chosen test (an IELTS of 250 is a 422); the
+            // blanket 0–300 is gone.
+            'english_score' => array_merge(
+                $required
+                    ? ['required_unless:english_test,None', 'nullable', 'numeric']
+                    : ['sometimes', 'nullable', 'numeric'],
+                [$this->withinEnglishTestRange($request)],
+            ),
             'native_arabic_speaker' => [$presence, 'boolean'],
         ];
+    }
+
+    /**
+     * A rule bounding a GPA/CGPA value by the chosen `gpa_scale`'s ceiling
+     * ({@see GpaScale::ceiling}). It runs only when a scale is present — so a partial
+     * save of just the GPA (no scale yet) is not prematurely rejected; submit requires
+     * the scale, so the ceiling is always enforced there. Numeric/`min:0` are handled
+     * by the sibling rules; this one owns the upper bound "≤ the scale ceiling".
+     */
+    private function withinGpaScale(Request $request): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail) use ($request): void {
+            $scale = GpaScale::tryFrom((string) $request->input('gpa_scale', ''));
+            if ($scale !== null && is_numeric($value) && ! $scale->allows((float) $value)) {
+                $fail(__('admissions.application.gpa_above_scale', ['ceiling' => $scale->value]));
+            }
+        };
+    }
+
+    /**
+     * A rule bounding `english_score` to the selected `english_test`'s official range
+     * ({@see EnglishTest::scoreRange}). It runs only when a test is present and a numeric
+     * score was supplied — a partial save without a test, or None with no score, defers.
+     * A real test bounds the score to its range; None carries **no** score, so any score
+     * supplied for it is rejected (its {@see EnglishTest::scoreRange} is null, so
+     * {@see EnglishTest::allowsScore} refuses every value) — replacing the old blanket
+     * `max:300`, which otherwise left a None score unbounded once that ceiling was removed.
+     */
+    private function withinEnglishTestRange(Request $request): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail) use ($request): void {
+            $test = EnglishTest::tryFrom((string) $request->input('english_test', ''));
+            if ($test === null || ! is_numeric($value) || $test->allowsScore((float) $value)) {
+                return;
+            }
+
+            $range = $test->scoreRange();
+            if ($range === null) {
+                // None (no range): a score is meaningless for it.
+                $fail(__('admissions.application.english_score_not_allowed'));
+
+                return;
+            }
+
+            $fail(__('admissions.application.english_score_out_of_range', [
+                'test' => $test->value,
+                'min' => $range[0],
+                'max' => $range[1],
+            ]));
+        };
     }
 }

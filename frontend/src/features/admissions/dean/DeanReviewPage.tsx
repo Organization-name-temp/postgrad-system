@@ -5,10 +5,6 @@ import {
   Button,
   CircularProgress,
   Divider,
-  Link,
-  List,
-  ListItem,
-  ListItemText,
   Paper,
   Stack,
   TextField,
@@ -26,9 +22,8 @@ import {
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
-import { openDocument } from '../openDocument'
+import { ApplicationRecordDetail } from '../ApplicationRecordDetail'
 import { ApplicationStatusChip } from '../ApplicationStatusChip'
-import { StatusTimeline } from '../StatusTimeline'
 
 /**
  * The Dean review screen (ticket 08). A Dean opens one of their faculty's approved
@@ -88,9 +83,6 @@ export function DeanReviewPage() {
   }
 
   const applicantName = pickLocaleName(application, i18n.language, application.national_id ?? '')
-  const program = application.primary_program
-  const programName = program ? pickLocaleName(program, i18n.language, program.code ?? '—') : '—'
-  const documents = application.documents ?? []
 
   const submit = (action: 'approve' | 'reject') => {
     decide.mutate(
@@ -104,17 +96,6 @@ export function DeanReviewPage() {
     )
   }
 
-  const row = (label: string, value: string) => (
-    <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between' }}>
-      <Typography variant="body2" color="text.secondary">
-        {label}
-      </Typography>
-      <Typography variant="body2" sx={{ fontWeight: 500, textAlign: 'end' }}>
-        {value}
-      </Typography>
-    </Stack>
-  )
-
   return (
     <Box sx={{ py: 2 }}>
       {backButton}
@@ -127,78 +108,14 @@ export function DeanReviewPage() {
       </Stack>
 
       <Stack spacing={2}>
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Divider textAlign="left" sx={{ mb: 1 }}>
-            {t('screening.sections.applicant')}
-          </Divider>
-          <Stack spacing={0.5}>
-            {row(t('personalInfo.fields.national_id'), application.national_id ?? '')}
-            {row(t('personalInfo.fields.nationality'), application.nationality ?? '')}
-            {row(t('personalInfo.fields.previous_degree'), application.previous_degree ?? '')}
-            {row(
-              t('personalInfo.fields.previous_university'),
-              application.previous_university ?? '',
-            )}
-            {row(t('personalInfo.fields.graduation_gpa'), application.graduation_gpa ?? '')}
-            {row(t('personalInfo.fields.english_test'), application.english_test ?? '')}
-          </Stack>
-        </Paper>
-
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Divider textAlign="left" sx={{ mb: 1 }}>
-            {t('screening.sections.program')}
-          </Divider>
-          <Stack spacing={0.5}>
-            {row(t('program.primaryLabel'), programName)}
-            {row(
-              t('personalInfo.fields.applying_for_degree'),
-              application.applying_for_degree ?? '',
-            )}
-          </Stack>
-        </Paper>
-
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Divider textAlign="left" sx={{ mb: 1 }}>
-            {t('screening.sections.documents')}
-          </Divider>
-          <Typography variant="body2" gutterBottom>
-            {t('screening.documentsUploaded', { count: documents.length })}
-          </Typography>
-          <List dense disablePadding>
-            {documents.map((document) => (
-              <ListItem key={document.id} disableGutters>
-                <ListItemText
-                  primary={
-                    document.download_url ? (
-                      <Link
-                        component="button"
-                        type="button"
-                        onClick={() => {
-                          if (document.download_url) void openDocument(document.download_url)
-                        }}
-                        sx={{ textAlign: 'start' }}
-                      >
-                        {document.original_filename}
-                      </Link>
-                    ) : (
-                      document.original_filename
-                    )
-                  }
-                  secondary={t(`documents.types.${document.document_type}`)}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
-
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <StatusTimeline
-            entries={timeline.data?.data ?? []}
-            currentStatus={application.status}
-            isPending={timeline.isPending}
-            isError={timeline.isError}
-          />
-        </Paper>
+        <ApplicationRecordDetail
+          application={application}
+          timeline={{
+            entries: timeline.data?.data ?? [],
+            isPending: timeline.isPending,
+            isError: timeline.isError,
+          }}
+        />
 
         <Paper variant="outlined" sx={{ p: 2 }}>
           <Divider textAlign="left" sx={{ mb: 1 }}>

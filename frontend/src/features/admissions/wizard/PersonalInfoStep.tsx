@@ -31,10 +31,12 @@ import type {
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
 import {
   APPLYING_DEGREES,
+  ENGLISH_SCORE_RANGES,
   ENGLISH_TESTS,
   ENGLISH_TEST_NONE,
   GENDERS,
   GPA_SCALES,
+  gpaScaleCeiling,
   ID_TYPES,
   ID_TYPE_NATIONAL,
   PREVIOUS_DEGREES,
@@ -344,7 +346,45 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
     />
   )
 
-  const scoreDisabled = watch('english_test') === ENGLISH_TEST_NONE
+  const englishTest = watch('english_test')
+  const scoreDisabled = englishTest === ENGLISH_TEST_NONE
+  // A proactive range hint for the score, driven by the chosen test (an IELTS reads
+  // "0–9"), falling back to the presence rule when no real test is picked.
+  const scoreRange = ENGLISH_SCORE_RANGES[englishTest]
+  const scoreHint = scoreRange
+    ? t('personalInfo.scoreRangeHelp', { min: scoreRange[0], max: scoreRange[1] })
+    : t('personalInfo.scoreHelp')
+
+  // GPA/CGPA are gated on the scale (ticket 07): disabled until a scale is chosen, then
+  // bounded by that scale's ceiling. The hint reads the ceiling once known, else nudges
+  // the applicant to pick the scale first.
+  const gpaScale = watch('gpa_scale')
+  const gpaDisabled = gpaScale === ''
+  const gpaCeiling = gpaScaleCeiling(gpaScale)
+  const gpaHint =
+    gpaCeiling !== null ? t('personalInfo.gpaHelp', { max: gpaCeiling }) : t('personalInfo.gpaScaleFirst')
+
+  /** A GPA/CGPA field: a numeric input disabled until a scale is chosen, then bounded
+   *  by the scale's ceiling (the cross-field rule lives in the schema). */
+  const gpaField = (name: 'graduation_gpa' | 'graduation_cgpa') => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <TextField
+          {...field}
+          value={(field.value as string) ?? ''}
+          label={t(`personalInfo.fields.${name}`)}
+          type="number"
+          required
+          fullWidth
+          disabled={gpaDisabled}
+          error={Boolean(fieldState.error)}
+          helperText={fieldState.error?.message ?? gpaHint}
+        />
+      )}
+    />
+  )
 
   // A proactive format hint for the identifier, driven by the chosen ID type (the same
   // message the validator would show), so the applicant knows the expected shape up front.
@@ -474,9 +514,41 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
         {text('graduation_date', { type: 'date', required: true })}
         {select('previous_degree', PREVIOUS_DEGREES, 'personalInfo.degrees')}
         {text('previous_major', { required: true })}
-        {text('graduation_gpa', { type: 'number', required: true })}
-        {text('graduation_cgpa', { type: 'number', required: true })}
-        {select('gpa_scale', GPA_SCALES)}
+        {/* The scale comes first: it drives (and unlocks) the GPA/CGPA fields below. */}
+        <Controller
+          control={control}
+          name="gpa_scale"
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              value={(field.value as string) ?? ''}
+              onChange={(event) => {
+                field.onChange(event)
+                // The GPA bound depends on the scale — re-check the GPA fields against
+                // the new ceiling, but only ones already filled, so choosing a scale
+                // doesn't prematurely flag the still-empty inputs as required.
+                const filled = (['graduation_gpa', 'graduation_cgpa'] as const).filter(
+                  (name) => getValues(name) !== '',
+                )
+                if (filled.length > 0) void trigger(filled)
+              }}
+              select
+              label={t('personalInfo.fields.gpa_scale')}
+              required
+              fullWidth
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message}
+            >
+              {GPA_SCALES.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        />
+        {gpaField('graduation_gpa')}
+        {gpaField('graduation_cgpa')}
         {select('applying_for_degree', APPLYING_DEGREES, 'personalInfo.degrees')}
         {flag('is_ejust_graduate')}
 
@@ -522,7 +594,7 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
               fullWidth
               disabled={scoreDisabled}
               error={Boolean(fieldState.error)}
-              helperText={fieldState.error?.message ?? t('personalInfo.scoreHelp')}
+              helperText={fieldState.error?.message ?? scoreHint}
             />
           )}
         />

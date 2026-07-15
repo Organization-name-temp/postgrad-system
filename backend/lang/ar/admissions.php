@@ -11,6 +11,9 @@ return [
         'not_editable' => 'لم يعد من الممكن تعديل هذا الطلب.',
         'already_submitted' => 'تم بالفعل إرسال الخطوة الأولى لهذا الطلب.',
         'invalid_identifier' => 'المعرّف لا يطابق نوع الهوية المحدد.',
+        'gpa_above_scale' => 'لا يمكن أن يتجاوز المعدل الحد الأقصى للمقياس المختار وهو :ceiling.',
+        'english_score_out_of_range' => 'يجب أن تكون درجة :test بين :min و :max.',
+        'english_score_not_allowed' => 'الاختبار المحدد لا يتطلب درجة.',
     ],
     'documents' => [
         'locked' => 'لم يعد من الممكن تغيير مستندات هذا الطلب.',

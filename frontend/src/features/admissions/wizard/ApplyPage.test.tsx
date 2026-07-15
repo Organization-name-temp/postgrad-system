@@ -215,4 +215,39 @@ describe('ApplyPage', () => {
     // … and the wizard returns to the documents step.
     expect(await screen.findByText(/choose the program you are applying to/i)).toBeInTheDocument()
   }, 15000)
+
+  it('jumps between completed steps via the stepper, skipping the verified email step', async () => {
+    // A verified applicant in the post-verify phase (resting on documents).
+    srv.status = 'email_verified'
+    const user = userEvent.setup({ delay: null })
+    renderApply()
+
+    // The reachable steps are clickable tabs; the already-verified email step is not.
+    expect(await screen.findByRole('tab', { name: /personal info/i })).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: /verify email/i })).not.toBeInTheDocument()
+
+    // Clicking the personal-info step jumps straight to it.
+    await user.click(screen.getByRole('tab', { name: /personal info/i }))
+    expect(await screen.findByText('Personal information')).toBeInTheDocument()
+  }, 15000)
+
+  it('edits a section from the Review step and returns to Review, preserving values', async () => {
+    srv.status = 'email_verified'
+    const user = userEvent.setup({ delay: null })
+    renderApply()
+
+    // Jump to Review via the stepper (the steps are tabs).
+    await user.click(await screen.findByRole('tab', { name: /review/i }))
+    expect(await screen.findByText('Review & submit')).toBeInTheDocument()
+
+    // Edit the first (identity) section → lands on the personal-info step, values intact.
+    const editButtons = await screen.findAllByRole('button', { name: /^edit$/i })
+    await user.click(editButtons[0])
+    expect(await screen.findByText('Personal information')).toBeInTheDocument()
+    expect(screen.getByLabelText(/full name \(english\)/i)).toHaveValue('Sara Applicant')
+
+    // Leaving the edited step returns to Review (not the linear documents neighbour).
+    await user.click(screen.getByRole('button', { name: /save & continue/i }))
+    expect(await screen.findByText('Review & submit')).toBeInTheDocument()
+  }, 15000)
 })

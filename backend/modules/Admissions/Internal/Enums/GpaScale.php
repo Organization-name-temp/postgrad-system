@@ -19,4 +19,29 @@ enum GpaScale: string
     case SevenPointZero = '7.0';
     case TenPointZero = '10.0';
     case Percentage = '100';
+
+    /**
+     * The largest value a GPA/CGPA on this scale may take — the scale's ceiling
+     * (a 4.0-scale GPA is `0 ≤ v ≤ 4.0`, a percentage `0 ≤ v ≤ 100`). Each case's
+     * backing value *is* its ceiling by construction, so this reads it directly;
+     * it exists as behaviour on the enum (ADR-0008) so the `graduation_gpa` /
+     * `graduation_cgpa` rule and its client Zod mirror (ADR-0014) share one source
+     * rather than re-deriving the bound. GPA-scale conversion stays out of scope —
+     * the value is only *bounded* by its scale, never converted between scales.
+     */
+    public function ceiling(): float
+    {
+        return (float) $this->value;
+    }
+
+    /**
+     * Whether the given GPA/CGPA is valid on this scale — non-negative and no greater
+     * than the scale's {@see self::ceiling}. The authoritative check the
+     * `graduation_gpa`/`graduation_cgpa` rule calls; the client Zod schema mirrors the
+     * same bound (ADR-0014).
+     */
+    public function allows(float $value): bool
+    {
+        return $value >= 0.0 && $value <= $this->ceiling();
+    }
 }

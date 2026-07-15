@@ -427,6 +427,474 @@ export const ResubmitAfterRevisionResponse = zod.object({
 
 
 /**
+ * The interview slots still open, soonest-first — the applicant's picker for their
+ * one reschedule. Same shape as the Student Affairs slot list.
+ * @summary Open slots to reschedule into.
+ */
+export const OpenSlotsToRescheduleIntoResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().nullish(),
+  "meeting_link": zod.string().optional(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * The interview booked for the signed-in applicant's current application — the
+ * when/where/who, the confirmation status, and whether a reschedule is still
+ * available. 404 when none has been scheduled yet.
+ * @summary My interview.
+ */
+export const MyInterviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * The applicant accepts the booked interview: `pending_confirmation` → `confirmed`.
+ * Confirming an already-confirmed interview is a 409.
+ * @summary Confirm my interview.
+ */
+export const ConfirmMyInterviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * Move the interview to another open slot, using the applicant's single allowed
+ * reschedule (BR-11); it returns to `pending_confirmation` for the new slot. A
+ * second reschedule is refused (409). The target must be an open slot (422/409).
+ * @summary Reschedule my interview.
+ */
+export const RescheduleMyInterviewBody = zod.object({
+  "interview_slot_id": zod.number().describe('The open slot to move to.')
+})
+
+export const RescheduleMyInterviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().nullish(),
+  "meeting_link": zod.string().optional(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * The interviews booked into the signed-in user's own slots, soonest-first, each
+ * with the applicant's identity and the slot details — the interviewer's queue.
+ * Empty for a user who is not the assigned interviewer on any slot.
+ * @summary Interviews assigned to me.
+ */
+export const InterviewsAssignedToMeResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.object({
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "status": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The assigned interviewer records a score (1–10) and optional notes for the
+ * interview. Only the interviewer the slot is assigned to may do this — anyone else
+ * is a 403. An evaluation cannot be recorded once the interview is complete (409).
+ * @summary Record my evaluation.
+ */
+export const RecordMyEvaluationParams = zod.object({
+  "interview_id": zod.number().describe('The interview\'s id.')
+})
+
+export const RecordMyEvaluationBody = zod.object({
+  "score": zod.number().describe('The interview score, 1–10.'),
+  "notes": zod.string().nullish().describe('Free-text notes on the interview.')
+})
+
+export const RecordMyEvaluationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.number().optional(),
+  "evaluation_notes": zod.string().optional(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * The Dean-approved applications (`interview_scheduled`) that have **not** yet been
+ * booked into a slot, oldest-first — Student Affairs' scheduling worklist, each with
+ * the applicant's identity, resolved primary Program, and days waited since Dean
+ * approval. Gated on `interview.schedule`.
+ * @summary Applications awaiting interview scheduling.
+ */
+export const ApplicationsAwaitingInterviewSchedulingResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.string().nullish(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * The faculty Users (Instructors) an interview slot may be assigned to — the
+ * source for the slot form's interviewer picker. Gated on `interview.schedule`.
+ * @summary List assignable interviewers.
+ */
+export const ListAssignableInterviewersResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * The whole slot pool, soonest-first, each with its resolved interviewer and
+ * whether it is still open. Gated on `interview.schedule`.
+ * @summary List interview slots.
+ */
+export const ListInterviewSlotsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * One appointment in the pool: a future time, a duration, an assigned faculty
+ * interviewer, and a mode with its coordinate (an in-person `location` or a virtual
+ * `meeting_link`). Gated on `interview.schedule`.
+ * @summary Create an interview slot.
+ */
+export const CreateAnInterviewSlotBody = zod.object({
+  "scheduled_at": zod.string().describe('The appointment time (ISO-8601), in the future.'),
+  "duration_minutes": zod.number().describe('Length in minutes (15–240).'),
+  "interviewer_id": zod.number().describe('A faculty (Instructor) User to conduct it.'),
+  "mode": zod.string().describe('One of in_person, virtual.'),
+  "location": zod.string().optional().describe('The in-person location; required when mode is in_person.'),
+  "meeting_link": zod.string().optional().describe('The virtual meeting link; required when mode is virtual.')
+})
+
+export const CreateAnInterviewSlotResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Change an **open** slot's time, duration, interviewer, or mode. A slot with an
+ * interview already booked into it cannot be edited (409) — its time/interviewer
+ * are what the applicant was told. Gated on `interview.schedule`.
+ * @summary Update an interview slot.
+ */
+export const UpdateAnInterviewSlotParams = zod.object({
+  "interview_slot_id": zod.number().describe('The slot\'s id.')
+})
+
+export const UpdateAnInterviewSlotBody = zod.object({
+  "scheduled_at": zod.string().describe('The appointment time (ISO-8601), in the future.'),
+  "duration_minutes": zod.number().describe('Length in minutes (15–240).'),
+  "interviewer_id": zod.number().describe('A faculty (Instructor) User to conduct it.'),
+  "mode": zod.string().describe('One of in_person, virtual.'),
+  "location": zod.string().optional().describe('The in-person location; required when mode is in_person.'),
+  "meeting_link": zod.string().optional().describe('The virtual meeting link; required when mode is virtual.')
+})
+
+export const UpdateAnInterviewSlotResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().nullish(),
+  "meeting_link": zod.string().optional(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Remove an **open** slot from the pool. A slot with an interview booked into it
+ * cannot be deleted (409). Gated on `interview.schedule`.
+ * @summary Delete an interview slot.
+ */
+export const DeleteAnInterviewSlotParams = zod.object({
+  "interview_slot_id": zod.number().describe('The slot\'s id.')
+})
+
+export const DeleteAnInterviewSlotResponse = zod.looseObject({
+
+})
+
+
+/**
+ * Every interview that has been booked, most-recent-first, each with the applicant
+ * being interviewed, the slot details, its confirmation status, and any recorded
+ * evaluation — Student Affairs' view for tracking interviews and marking them
+ * complete. Gated on `interview.schedule`.
+ * @summary Booked interviews.
+ */
+export const BookedInterviewsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.number().optional(),
+  "evaluation_notes": zod.string().optional(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.object({
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "status": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Books the applicant's interview into an open slot and notifies them of the
+ * details. Legal only while the application is `interview_scheduled` and has no
+ * interview yet, and the slot is still open — otherwise 409. Gated on
+ * `interview.schedule`.
+ * @summary Schedule an applicant into an interview slot.
+ */
+export const ScheduleAnApplicantIntoAnInterviewSlotParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const ScheduleAnApplicantIntoAnInterviewSlotBody = zod.object({
+  "interview_slot_id": zod.number().describe('The open slot to book.')
+})
+
+export const ScheduleAnApplicantIntoAnInterviewSlotResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * Records that the interview happened and advances the application
+ * `interview_scheduled` → `interview_completed`, from where the Dean records the
+ * final decision. Completing an already-complete interview, or one whose
+ * application is not `interview_scheduled`, is a 409. Gated on `interview.schedule`.
+ * @summary Mark an interview complete.
+ */
+export const MarkAnInterviewCompleteParams = zod.object({
+  "interview_id": zod.number().describe('The interview\'s id.')
+})
+
+export const MarkAnInterviewCompleteResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.number().optional(),
+  "evaluation_notes": zod.string().optional(),
+  "completed_at": zod.string().optional(),
+  "slot": zod.string().nullish(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
  * An application's append-only status history (from/to/note/when), oldest-first —
  * the applicant's visible progress and the decision audit trail. Readable by the
  * owning applicant or any reviewer (`application.screen`); anyone else → 403.

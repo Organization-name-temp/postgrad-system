@@ -105,4 +105,20 @@ class ApplicationFactory extends Factory
             'finalized_at' => now(),
         ]);
     }
+
+    /**
+     * A Dean-approved Application awaiting/undergoing its interview (InterviewScheduled)
+     * — the shape ticket 09 works: Student Affairs books a slot for it, the applicant
+     * confirms or reschedules, the interviewer evaluates, and completion moves it on.
+     * A complete, verified, finalized snapshot owned by its own fresh User.
+     */
+    public function interviewScheduled(): static
+    {
+        return $this->withPersonalInfo()->state(fn (): array => [
+            'user_id' => User::factory(),
+            'status' => ApplicationStatus::InterviewScheduled,
+            'submitted_at' => now(),
+            'finalized_at' => now(),
+        ]);
+    }
 }

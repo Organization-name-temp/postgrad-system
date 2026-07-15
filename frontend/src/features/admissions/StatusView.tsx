@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useStatusTimeline } from '../../shared/api/generated/endpoints'
 import { ApplicationStatusChip } from './ApplicationStatusChip'
 import { StatusTimeline } from './StatusTimeline'
+import { InterviewPanel } from './interviews/InterviewPanel'
 
 interface StatusViewProps {
   applicationId: number
@@ -34,6 +35,10 @@ export function StatusView({ applicationId, status }: StatusViewProps) {
         <AlertTitle>{t('wizard.underReviewTitle')}</AlertTitle>
         {t('wizard.underReviewBody')}
       </Alert>
+
+      {/* Once the Dean approves for interview, the applicant confirms/reschedules here
+          (ticket 09) — shown only in that status; every other in-review status is watch-only. */}
+      {status === 'interview_scheduled' && <InterviewPanel />}
 
       <StatusTimeline
         entries={timeline.data?.data ?? []}

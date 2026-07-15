@@ -18,7 +18,7 @@ import {
   useUpdateAnAdmissionCycle,
 } from '../../../shared/api/generated/endpoints'
 import type { ListAdmissionCycles200DataItem } from '../../../shared/api/generated/endpoints'
-import { isoToInputValue } from './dateTime'
+import { isoToInputValue } from '../../../shared/datetime'
 
 interface CycleFormDialogProps {
   open: boolean

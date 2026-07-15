@@ -13,7 +13,7 @@ import type { ListAdmissionCycles200DataItem } from '../../../shared/api/generat
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { cycleState, cycleStatusChip } from './cycleStatus'
-import { formatDate } from './dateTime'
+import { formatDate } from '../../../shared/datetime'
 
 interface CycleRowProps {
   cycle: ListAdmissionCycles200DataItem

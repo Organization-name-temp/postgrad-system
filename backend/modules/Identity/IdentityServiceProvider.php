@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Identity\Internal\Assignments\EloquentDeanAssignments;
 use Modules\Identity\Internal\Audit\EloquentAuditLogger;
+use Modules\Identity\Internal\Directory\EloquentDirectory;
 use Modules\Identity\Internal\Http\Middleware\EnsureAdministrator;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Internal\Registration\EloquentApplicantRegistrar;
@@ -15,6 +16,7 @@ use Modules\Identity\Internal\Registration\EloquentEmailVerifier;
 use Modules\Identity\Public\Contracts\ApplicantRegistrar;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DeanAssignments;
+use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\EmailVerifier;
 use Modules\Identity\Public\Enums\Permission;
 
@@ -26,6 +28,7 @@ class IdentityServiceProvider extends ServiceProvider
         $this->app->bind(ApplicantRegistrar::class, EloquentApplicantRegistrar::class);
         $this->app->bind(EmailVerifier::class, EloquentEmailVerifier::class);
         $this->app->bind(DeanAssignments::class, EloquentDeanAssignments::class);
+        $this->app->bind(Directory::class, EloquentDirectory::class);
     }
 
     public function boot(Router $router): void

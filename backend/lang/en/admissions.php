@@ -33,6 +33,18 @@ return [
     'verification' => [
         'not_pending' => 'This application is not awaiting email verification.',
     ],
+    // Interview slots + scheduling + evaluation (ticket 09): the domain conflicts the
+    // interview controllers raise directly (409), plus the not-a-faculty-interviewer
+    // validation message (422).
+    'interview' => [
+        'not_faculty' => 'The selected interviewer is not a faculty member.',
+        'slot_booked' => 'This slot has an interview booked and cannot be changed.',
+        'not_awaiting_scheduling' => 'This application is not awaiting interview scheduling.',
+        'already_scheduled' => 'This application already has an interview scheduled.',
+        'not_pending' => 'This interview is not awaiting confirmation.',
+        'reschedule_exhausted' => 'You have already rescheduled this interview once.',
+        'already_completed' => 'This interview has already been completed.',
+    ],
     // The hand-rolled status machine's 409 (ticket 07): the requested move is not a
     // legal transition from the application's current state.
     'transition' => [

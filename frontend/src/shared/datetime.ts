@@ -1,9 +1,10 @@
-// The API stores/returns cycle timestamps in UTC (the app timezone is UTC —
-// ADR-0005 localhost build). To keep the admin form's round-trip exact — no
-// drift when a manager re-saves an unchanged window — both the value shown in
-// the `datetime-local` input and the read-only window column are rendered in
-// UTC wall-clock, and the naive value the input emits is sent back verbatim (the
-// backend parses it as UTC). Everyone therefore sees the one canonical time.
+// Cross-cutting date helpers for the `datetime-local` form inputs and read-only
+// timestamp columns. The API stores/returns timestamps in UTC (the app timezone —
+// ADR-0005 localhost build), so both the value shown in an input and the read-only
+// display are rendered in UTC wall-clock, and the naive value the input emits is sent
+// back verbatim (the backend parses it as UTC). Everyone therefore sees the one
+// canonical time. Shared because more than one feature edits UTC windows/times (the
+// admission-cycle window, ticket 01; interview slots, ticket 09).
 
 /**
  * Convert a server ISO-8601 timestamp into the value an
@@ -23,9 +24,9 @@ export function isoToInputValue(iso: string | undefined): string {
 }
 
 /**
- * Format an ISO-8601 timestamp as a locale-aware date (in UTC, to match the
- * form) for read-only display — e.g. the cycle window column. Returns an empty
- * string for missing input.
+ * Format an ISO-8601 timestamp as a locale-aware date (in UTC, to match the form)
+ * for read-only display — e.g. the cycle window column. Returns an empty string for
+ * missing input.
  */
 export function formatDate(iso: string | undefined, locale: string): string {
   if (!iso) {

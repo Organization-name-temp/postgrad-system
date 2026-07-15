@@ -92,3 +92,15 @@ function userOf(Application $application): User
 {
     return User::query()->findOrFail($application->user_id);
 }
+
+/**
+ * A fresh faculty User holding the Instructor role — the interviewer-eligible role
+ * (ticket 09). Shared by the interview slot and evaluation feature tests.
+ */
+function facultyInterviewer(): User
+{
+    $user = User::factory()->create();
+    $user->assignRole(Role::Instructor);
+
+    return $user;
+}

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Enums\DocumentRequirement;
@@ -164,6 +165,18 @@ class Application extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(ApplicationDocument::class);
+    }
+
+    /**
+     * The interview booked for this application (ticket 09), if any — one per
+     * application. Created when Student Affairs schedules the applicant into a slot;
+     * absent until then.
+     *
+     * @return HasOne<Interview, $this>
+     */
+    public function interview(): HasOne
+    {
+        return $this->hasOne(Interview::class);
     }
 
     /**
@@ -336,6 +349,32 @@ class Application extends Model
     public function approveForInterview(int $actorId, ?string $note = null): void
     {
         $this->transitionTo(ApplicationStatus::InterviewScheduled, actorId: $actorId, note: $note);
+    }
+
+    /**
+     * Whether the application is at the point where Student Affairs may book a concrete
+     * interview slot for it — the Dean has approved it for interview
+     * ({@see ApplicationStatus::InterviewScheduled}) but it has not yet moved on. This
+     * gates scheduling (ticket 09): booking is not itself a status transition (the
+     * status is already `interview_scheduled`), so the guard is a plain state check,
+     * surfaced by the controller as a 409 when it fails.
+     */
+    public function isAwaitingInterviewScheduling(): bool
+    {
+        return $this->status === ApplicationStatus::InterviewScheduled;
+    }
+
+    /**
+     * Student Affairs marks the interview complete once it has happened:
+     * {@see ApplicationStatus::InterviewScheduled} → {@see ApplicationStatus::InterviewCompleted}
+     * (ticket 09), from where the Dean records the final decision (ticket 10). The
+     * matching {@see Interview::markCompleted()} stamp is performed together in one
+     * transaction by the controller. Legal only from `interview_scheduled` (else 409);
+     * the actor is the completing Student Affairs staffer.
+     */
+    public function completeInterview(int $actorId): void
+    {
+        $this->transitionTo(ApplicationStatus::InterviewCompleted, actorId: $actorId);
     }
 
     /**

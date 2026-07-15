@@ -550,6 +550,583 @@ export type ResubmitAfterRevision422 = {
   errors?: ResubmitAfterRevision422Errors;
 };
 
+export type OpenSlotsToRescheduleInto200DataItemInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type OpenSlotsToRescheduleInto200DataItem = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  /** @nullable */
+  location?: string | null;
+  meeting_link?: string;
+  interviewer_id?: number;
+  interviewer?: OpenSlotsToRescheduleInto200DataItemInterviewer;
+  is_open?: boolean;
+};
+
+export type OpenSlotsToRescheduleInto200 = {
+  data?: OpenSlotsToRescheduleInto200DataItem[];
+};
+
+export type MyInterview200DataSlotInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type MyInterview200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: MyInterview200DataSlotInterviewer;
+  is_open?: boolean;
+};
+
+export type MyInterview200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: MyInterview200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type MyInterview200 = {
+  data?: MyInterview200Data;
+};
+
+export type MyInterview404 = {
+  message?: string;
+};
+
+export type ConfirmMyInterview200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type ConfirmMyInterview200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: ConfirmMyInterview200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type ConfirmMyInterview200 = {
+  data?: ConfirmMyInterview200Data;
+};
+
+export type ConfirmMyInterview404 = {
+  message?: string;
+};
+
+export type ConfirmMyInterview409 = {
+  message?: string;
+};
+
+export type RescheduleMyInterviewBody = {
+  /** The open slot to move to. */
+  interview_slot_id: number;
+};
+
+export type RescheduleMyInterview200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  /** @nullable */
+  location?: string | null;
+  meeting_link?: string;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type RescheduleMyInterview200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: RescheduleMyInterview200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type RescheduleMyInterview200 = {
+  data?: RescheduleMyInterview200Data;
+};
+
+export type RescheduleMyInterview404 = {
+  message?: string;
+};
+
+export type RescheduleMyInterview409 = {
+  message?: string;
+};
+
+export type RescheduleMyInterview422Errors = {
+  interview_slot_id?: string[];
+};
+
+export type RescheduleMyInterview422 = {
+  message?: string;
+  errors?: RescheduleMyInterview422Errors;
+};
+
+export type InterviewsAssignedToMe200DataItemSlotInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type InterviewsAssignedToMe200DataItemSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: InterviewsAssignedToMe200DataItemSlotInterviewer;
+  is_open?: boolean;
+};
+
+export type InterviewsAssignedToMe200DataItemApplicant = {
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  status?: string;
+};
+
+export type InterviewsAssignedToMe200DataItem = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: InterviewsAssignedToMe200DataItemSlot;
+  applicant?: InterviewsAssignedToMe200DataItemApplicant;
+};
+
+export type InterviewsAssignedToMe200 = {
+  data?: InterviewsAssignedToMe200DataItem[];
+};
+
+export type RecordMyEvaluationBody = {
+  /** The interview score, 1–10. */
+  score: number;
+  /**
+     * Free-text notes on the interview.
+     * @nullable
+     */
+  notes?: string | null;
+};
+
+export type RecordMyEvaluation200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type RecordMyEvaluation200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  evaluation_score?: number;
+  evaluation_notes?: string;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: RecordMyEvaluation200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type RecordMyEvaluation200 = {
+  data?: RecordMyEvaluation200Data;
+};
+
+export type RecordMyEvaluation403 = {
+  message?: string;
+};
+
+export type RecordMyEvaluation409 = {
+  message?: string;
+};
+
+export type RecordMyEvaluation422Errors = {
+  score?: string[];
+};
+
+export type RecordMyEvaluation422 = {
+  message?: string;
+  errors?: RecordMyEvaluation422Errors;
+};
+
+export type ApplicationsAwaitingInterviewScheduling200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  /** @nullable */
+  primary_program?: string | null;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type ApplicationsAwaitingInterviewScheduling200 = {
+  data?: ApplicationsAwaitingInterviewScheduling200DataItem[];
+};
+
+export type ApplicationsAwaitingInterviewScheduling403 = {
+  message?: string;
+};
+
+export type ListAssignableInterviewers200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableInterviewers200 = {
+  data?: ListAssignableInterviewers200DataItem[];
+};
+
+export type ListAssignableInterviewers403 = {
+  message?: string;
+};
+
+export type ListInterviewSlots200DataItemInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListInterviewSlots200DataItem = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: ListInterviewSlots200DataItemInterviewer;
+  is_open?: boolean;
+};
+
+export type ListInterviewSlots200 = {
+  data?: ListInterviewSlots200DataItem[];
+};
+
+export type ListInterviewSlots403 = {
+  message?: string;
+};
+
+export type CreateAnInterviewSlotBody = {
+  /** The appointment time (ISO-8601), in the future. */
+  scheduled_at: string;
+  /** Length in minutes (15–240). */
+  duration_minutes: number;
+  /** A faculty (Instructor) User to conduct it. */
+  interviewer_id: number;
+  /** One of in_person, virtual. */
+  mode: string;
+  /** The in-person location; required when mode is in_person. */
+  location?: string;
+  /** The virtual meeting link; required when mode is virtual. */
+  meeting_link?: string;
+};
+
+export type CreateAnInterviewSlot201DataInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type CreateAnInterviewSlot201Data = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: CreateAnInterviewSlot201DataInterviewer;
+  is_open?: boolean;
+};
+
+export type CreateAnInterviewSlot201 = {
+  data?: CreateAnInterviewSlot201Data;
+};
+
+export type CreateAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type CreateAnInterviewSlot422Errors = {
+  interviewer_id?: string[];
+};
+
+export type CreateAnInterviewSlot422 = {
+  message?: string;
+  errors?: CreateAnInterviewSlot422Errors;
+};
+
+export type UpdateAnInterviewSlotBody = {
+  /** The appointment time (ISO-8601), in the future. */
+  scheduled_at: string;
+  /** Length in minutes (15–240). */
+  duration_minutes: number;
+  /** A faculty (Instructor) User to conduct it. */
+  interviewer_id: number;
+  /** One of in_person, virtual. */
+  mode: string;
+  /** The in-person location; required when mode is in_person. */
+  location?: string;
+  /** The virtual meeting link; required when mode is virtual. */
+  meeting_link?: string;
+};
+
+export type UpdateAnInterviewSlot200DataInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type UpdateAnInterviewSlot200Data = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  /** @nullable */
+  location?: string | null;
+  meeting_link?: string;
+  interviewer_id?: number;
+  interviewer?: UpdateAnInterviewSlot200DataInterviewer;
+  is_open?: boolean;
+};
+
+export type UpdateAnInterviewSlot200 = {
+  data?: UpdateAnInterviewSlot200Data;
+};
+
+export type UpdateAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type UpdateAnInterviewSlot409 = {
+  message?: string;
+};
+
+export type DeleteAnInterviewSlot204 = { [key: string]: unknown };
+
+export type DeleteAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type DeleteAnInterviewSlot409 = {
+  message?: string;
+};
+
+export type BookedInterviews200DataItemSlotInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type BookedInterviews200DataItemSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: BookedInterviews200DataItemSlotInterviewer;
+  is_open?: boolean;
+};
+
+export type BookedInterviews200DataItemApplicant = {
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  status?: string;
+};
+
+export type BookedInterviews200DataItem = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  evaluation_score?: number;
+  evaluation_notes?: string;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: BookedInterviews200DataItemSlot;
+  applicant?: BookedInterviews200DataItemApplicant;
+};
+
+export type BookedInterviews200 = {
+  data?: BookedInterviews200DataItem[];
+};
+
+export type BookedInterviews403 = {
+  message?: string;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlotBody = {
+  /** The open slot to book. */
+  interview_slot_id: number;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot201DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot201Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: ScheduleAnApplicantIntoAnInterviewSlot201DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot201 = {
+  data?: ScheduleAnApplicantIntoAnInterviewSlot201Data;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot409 = {
+  message?: string;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot422Errors = {
+  interview_slot_id?: string[];
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot422 = {
+  message?: string;
+  errors?: ScheduleAnApplicantIntoAnInterviewSlot422Errors;
+};
+
+export type MarkAnInterviewComplete200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  evaluation_score?: number;
+  evaluation_notes?: string;
+  completed_at?: string;
+  /** @nullable */
+  slot?: string | null;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type MarkAnInterviewComplete200 = {
+  data?: MarkAnInterviewComplete200Data;
+};
+
+export type MarkAnInterviewComplete403 = {
+  message?: string;
+};
+
+export type MarkAnInterviewComplete409 = {
+  message?: string;
+};
+
 export type StatusTimeline200DataItem = {
   id?: number;
   from_status?: string;
@@ -2997,6 +3574,1218 @@ export const useResubmitAfterRevision = <TError = ResubmitAfterRevision401 | Res
         TContext
       > => {
       return useMutation(getResubmitAfterRevisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * The interview slots still open, soonest-first — the applicant's picker for their
+ * one reschedule. Same shape as the Student Affairs slot list.
+ * @summary Open slots to reschedule into.
+ */
+export const openSlotsToRescheduleInto = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenSlotsToRescheduleInto200>(
+      {url: `/api/v1/application/interview/slots`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenSlotsToRescheduleIntoQueryKey = () => {
+    return [
+    `/api/v1/application/interview/slots`
+    ] as const;
+    }
+
+
+export const getOpenSlotsToRescheduleIntoQueryOptions = <TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenSlotsToRescheduleIntoQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>> = ({ signal }) => openSlotsToRescheduleInto(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenSlotsToRescheduleIntoQueryResult = NonNullable<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>>
+export type OpenSlotsToRescheduleIntoQueryError = unknown
+
+
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>,
+          TError,
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>,
+          TError,
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open slots to reschedule into.
+ */
+
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenSlotsToRescheduleIntoQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The interview booked for the signed-in applicant's current application — the
+ * when/where/who, the confirmation status, and whether a reschedule is still
+ * available. 404 when none has been scheduled yet.
+ * @summary My interview.
+ */
+export const myInterview = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyInterview200>(
+      {url: `/api/v1/application/interview`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyInterviewQueryKey = () => {
+    return [
+    `/api/v1/application/interview`
+    ] as const;
+    }
+
+
+export const getMyInterviewQueryOptions = <TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyInterviewQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myInterview>>> = ({ signal }) => myInterview(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyInterviewQueryResult = NonNullable<Awaited<ReturnType<typeof myInterview>>>
+export type MyInterviewQueryError = MyInterview404
+
+
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myInterview>>,
+          TError,
+          Awaited<ReturnType<typeof myInterview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myInterview>>,
+          TError,
+          Awaited<ReturnType<typeof myInterview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My interview.
+ */
+
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyInterviewQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The applicant accepts the booked interview: `pending_confirmation` → `confirmed`.
+ * Confirming an already-confirmed interview is a 409.
+ * @summary Confirm my interview.
+ */
+export const confirmMyInterview = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ConfirmMyInterview200>(
+      {url: `/api/v1/application/interview/confirm`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getConfirmMyInterviewMutationOptions = <TError = ConfirmMyInterview404 | ConfirmMyInterview409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmMyInterview>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof confirmMyInterview>>, TError,void, TContext> => {
+
+const mutationKey = ['confirmMyInterview'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmMyInterview>>, void> = () => {
+
+
+          return  confirmMyInterview()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmMyInterviewMutationResult = NonNullable<Awaited<ReturnType<typeof confirmMyInterview>>>
+
+    export type ConfirmMyInterviewMutationError = ConfirmMyInterview404 | ConfirmMyInterview409
+
+    /**
+ * @summary Confirm my interview.
+ */
+export const useConfirmMyInterview = <TError = ConfirmMyInterview404 | ConfirmMyInterview409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmMyInterview>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof confirmMyInterview>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getConfirmMyInterviewMutationOptions(options), queryClient);
+    }
+
+/**
+ * Move the interview to another open slot, using the applicant's single allowed
+ * reschedule (BR-11); it returns to `pending_confirmation` for the new slot. A
+ * second reschedule is refused (409). The target must be an open slot (422/409).
+ * @summary Reschedule my interview.
+ */
+export const rescheduleMyInterview = (
+    rescheduleMyInterviewBody: RescheduleMyInterviewBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RescheduleMyInterview200>(
+      {url: `/api/v1/application/interview/reschedule`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: rescheduleMyInterviewBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRescheduleMyInterviewMutationOptions = <TError = RescheduleMyInterview404 | RescheduleMyInterview409 | RescheduleMyInterview422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rescheduleMyInterview>>, TError,{data: RescheduleMyInterviewBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof rescheduleMyInterview>>, TError,{data: RescheduleMyInterviewBody}, TContext> => {
+
+const mutationKey = ['rescheduleMyInterview'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rescheduleMyInterview>>, {data: RescheduleMyInterviewBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  rescheduleMyInterview(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RescheduleMyInterviewMutationResult = NonNullable<Awaited<ReturnType<typeof rescheduleMyInterview>>>
+    export type RescheduleMyInterviewMutationBody = RescheduleMyInterviewBody
+    export type RescheduleMyInterviewMutationError = RescheduleMyInterview404 | RescheduleMyInterview409 | RescheduleMyInterview422
+
+    /**
+ * @summary Reschedule my interview.
+ */
+export const useRescheduleMyInterview = <TError = RescheduleMyInterview404 | RescheduleMyInterview409 | RescheduleMyInterview422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rescheduleMyInterview>>, TError,{data: RescheduleMyInterviewBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof rescheduleMyInterview>>,
+        TError,
+        {data: RescheduleMyInterviewBody},
+        TContext
+      > => {
+      return useMutation(getRescheduleMyInterviewMutationOptions(options), queryClient);
+    }
+
+/**
+ * The interviews booked into the signed-in user's own slots, soonest-first, each
+ * with the applicant's identity and the slot details — the interviewer's queue.
+ * Empty for a user who is not the assigned interviewer on any slot.
+ * @summary Interviews assigned to me.
+ */
+export const interviewsAssignedToMe = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<InterviewsAssignedToMe200>(
+      {url: `/api/v1/interviews/assigned`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getInterviewsAssignedToMeQueryKey = () => {
+    return [
+    `/api/v1/interviews/assigned`
+    ] as const;
+    }
+
+
+export const getInterviewsAssignedToMeQueryOptions = <TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInterviewsAssignedToMeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof interviewsAssignedToMe>>> = ({ signal }) => interviewsAssignedToMe(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InterviewsAssignedToMeQueryResult = NonNullable<Awaited<ReturnType<typeof interviewsAssignedToMe>>>
+export type InterviewsAssignedToMeQueryError = unknown
+
+
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>,
+          TError,
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>,
+          TError,
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Interviews assigned to me.
+ */
+
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInterviewsAssignedToMeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The assigned interviewer records a score (1–10) and optional notes for the
+ * interview. Only the interviewer the slot is assigned to may do this — anyone else
+ * is a 403. An evaluation cannot be recorded once the interview is complete (409).
+ * @summary Record my evaluation.
+ */
+export const recordMyEvaluation = (
+    interviewId: number,
+    recordMyEvaluationBody: RecordMyEvaluationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordMyEvaluation200>(
+      {url: `/api/v1/interviews/${interviewId}/evaluation`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: recordMyEvaluationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordMyEvaluationMutationOptions = <TError = RecordMyEvaluation403 | RecordMyEvaluation409 | RecordMyEvaluation422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordMyEvaluation>>, TError,{interviewId: number;data: RecordMyEvaluationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordMyEvaluation>>, TError,{interviewId: number;data: RecordMyEvaluationBody}, TContext> => {
+
+const mutationKey = ['recordMyEvaluation'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordMyEvaluation>>, {interviewId: number;data: RecordMyEvaluationBody}> = (props) => {
+          const {interviewId,data} = props ?? {};
+
+          return  recordMyEvaluation(interviewId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordMyEvaluationMutationResult = NonNullable<Awaited<ReturnType<typeof recordMyEvaluation>>>
+    export type RecordMyEvaluationMutationBody = RecordMyEvaluationBody
+    export type RecordMyEvaluationMutationError = RecordMyEvaluation403 | RecordMyEvaluation409 | RecordMyEvaluation422
+
+    /**
+ * @summary Record my evaluation.
+ */
+export const useRecordMyEvaluation = <TError = RecordMyEvaluation403 | RecordMyEvaluation409 | RecordMyEvaluation422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordMyEvaluation>>, TError,{interviewId: number;data: RecordMyEvaluationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordMyEvaluation>>,
+        TError,
+        {interviewId: number;data: RecordMyEvaluationBody},
+        TContext
+      > => {
+      return useMutation(getRecordMyEvaluationMutationOptions(options), queryClient);
+    }
+
+/**
+ * The Dean-approved applications (`interview_scheduled`) that have **not** yet been
+ * booked into a slot, oldest-first — Student Affairs' scheduling worklist, each with
+ * the applicant's identity, resolved primary Program, and days waited since Dean
+ * approval. Gated on `interview.schedule`.
+ * @summary Applications awaiting interview scheduling.
+ */
+export const applicationsAwaitingInterviewScheduling = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ApplicationsAwaitingInterviewScheduling200>(
+      {url: `/api/v1/applications/awaiting-interview`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getApplicationsAwaitingInterviewSchedulingQueryKey = () => {
+    return [
+    `/api/v1/applications/awaiting-interview`
+    ] as const;
+    }
+
+
+export const getApplicationsAwaitingInterviewSchedulingQueryOptions = <TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getApplicationsAwaitingInterviewSchedulingQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>> = ({ signal }) => applicationsAwaitingInterviewScheduling(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ApplicationsAwaitingInterviewSchedulingQueryResult = NonNullable<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>>
+export type ApplicationsAwaitingInterviewSchedulingQueryError = ApplicationsAwaitingInterviewScheduling403
+
+
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>,
+          TError,
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>,
+          TError,
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Applications awaiting interview scheduling.
+ */
+
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getApplicationsAwaitingInterviewSchedulingQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The faculty Users (Instructors) an interview slot may be assigned to — the
+ * source for the slot form's interviewer picker. Gated on `interview.schedule`.
+ * @summary List assignable interviewers.
+ */
+export const listAssignableInterviewers = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableInterviewers200>(
+      {url: `/api/v1/interview-slots/interviewers`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableInterviewersQueryKey = () => {
+    return [
+    `/api/v1/interview-slots/interviewers`
+    ] as const;
+    }
+
+
+export const getListAssignableInterviewersQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableInterviewersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableInterviewers>>> = ({ signal }) => listAssignableInterviewers(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableInterviewersQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableInterviewers>>>
+export type ListAssignableInterviewersQueryError = ListAssignableInterviewers403
+
+
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInterviewers>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInterviewers>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInterviewers>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInterviewers>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable interviewers.
+ */
+
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableInterviewersQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The whole slot pool, soonest-first, each with its resolved interviewer and
+ * whether it is still open. Gated on `interview.schedule`.
+ * @summary List interview slots.
+ */
+export const listInterviewSlots = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListInterviewSlots200>(
+      {url: `/api/v1/interview-slots`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListInterviewSlotsQueryKey = () => {
+    return [
+    `/api/v1/interview-slots`
+    ] as const;
+    }
+
+
+export const getListInterviewSlotsQueryOptions = <TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInterviewSlotsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterviewSlots>>> = ({ signal }) => listInterviewSlots(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListInterviewSlotsQueryResult = NonNullable<Awaited<ReturnType<typeof listInterviewSlots>>>
+export type ListInterviewSlotsQueryError = ListInterviewSlots403
+
+
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInterviewSlots>>,
+          TError,
+          Awaited<ReturnType<typeof listInterviewSlots>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInterviewSlots>>,
+          TError,
+          Awaited<ReturnType<typeof listInterviewSlots>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List interview slots.
+ */
+
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListInterviewSlotsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * One appointment in the pool: a future time, a duration, an assigned faculty
+ * interviewer, and a mode with its coordinate (an in-person `location` or a virtual
+ * `meeting_link`). Gated on `interview.schedule`.
+ * @summary Create an interview slot.
+ */
+export const createAnInterviewSlot = (
+    createAnInterviewSlotBody: CreateAnInterviewSlotBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAnInterviewSlot201>(
+      {url: `/api/v1/interview-slots`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAnInterviewSlotBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAnInterviewSlotMutationOptions = <TError = CreateAnInterviewSlot403 | CreateAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnInterviewSlot>>, TError,{data: CreateAnInterviewSlotBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAnInterviewSlot>>, TError,{data: CreateAnInterviewSlotBody}, TContext> => {
+
+const mutationKey = ['createAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAnInterviewSlot>>, {data: CreateAnInterviewSlotBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAnInterviewSlot(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof createAnInterviewSlot>>>
+    export type CreateAnInterviewSlotMutationBody = CreateAnInterviewSlotBody
+    export type CreateAnInterviewSlotMutationError = CreateAnInterviewSlot403 | CreateAnInterviewSlot422
+
+    /**
+ * @summary Create an interview slot.
+ */
+export const useCreateAnInterviewSlot = <TError = CreateAnInterviewSlot403 | CreateAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnInterviewSlot>>, TError,{data: CreateAnInterviewSlotBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAnInterviewSlot>>,
+        TError,
+        {data: CreateAnInterviewSlotBody},
+        TContext
+      > => {
+      return useMutation(getCreateAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Change an **open** slot's time, duration, interviewer, or mode. A slot with an
+ * interview already booked into it cannot be edited (409) — its time/interviewer
+ * are what the applicant was told. Gated on `interview.schedule`.
+ * @summary Update an interview slot.
+ */
+export const updateAnInterviewSlot = (
+    interviewSlotId: number,
+    updateAnInterviewSlotBody: UpdateAnInterviewSlotBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateAnInterviewSlot200>(
+      {url: `/api/v1/interview-slots/${interviewSlotId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAnInterviewSlotBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateAnInterviewSlotMutationOptions = <TError = UpdateAnInterviewSlot403 | UpdateAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnInterviewSlot>>, TError,{interviewSlotId: number;data: UpdateAnInterviewSlotBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateAnInterviewSlot>>, TError,{interviewSlotId: number;data: UpdateAnInterviewSlotBody}, TContext> => {
+
+const mutationKey = ['updateAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAnInterviewSlot>>, {interviewSlotId: number;data: UpdateAnInterviewSlotBody}> = (props) => {
+          const {interviewSlotId,data} = props ?? {};
+
+          return  updateAnInterviewSlot(interviewSlotId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof updateAnInterviewSlot>>>
+    export type UpdateAnInterviewSlotMutationBody = UpdateAnInterviewSlotBody
+    export type UpdateAnInterviewSlotMutationError = UpdateAnInterviewSlot403 | UpdateAnInterviewSlot409
+
+    /**
+ * @summary Update an interview slot.
+ */
+export const useUpdateAnInterviewSlot = <TError = UpdateAnInterviewSlot403 | UpdateAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnInterviewSlot>>, TError,{interviewSlotId: number;data: UpdateAnInterviewSlotBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAnInterviewSlot>>,
+        TError,
+        {interviewSlotId: number;data: UpdateAnInterviewSlotBody},
+        TContext
+      > => {
+      return useMutation(getUpdateAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Remove an **open** slot from the pool. A slot with an interview booked into it
+ * cannot be deleted (409). Gated on `interview.schedule`.
+ * @summary Delete an interview slot.
+ */
+export const deleteAnInterviewSlot = (
+    interviewSlotId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeleteAnInterviewSlot204>(
+      {url: `/api/v1/interview-slots/${interviewSlotId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeleteAnInterviewSlotMutationOptions = <TError = DeleteAnInterviewSlot403 | DeleteAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, TError,{interviewSlotId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, TError,{interviewSlotId: number}, TContext> => {
+
+const mutationKey = ['deleteAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, {interviewSlotId: number}> = (props) => {
+          const {interviewSlotId} = props ?? {};
+
+          return  deleteAnInterviewSlot(interviewSlotId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAnInterviewSlot>>>
+
+    export type DeleteAnInterviewSlotMutationError = DeleteAnInterviewSlot403 | DeleteAnInterviewSlot409
+
+    /**
+ * @summary Delete an interview slot.
+ */
+export const useDeleteAnInterviewSlot = <TError = DeleteAnInterviewSlot403 | DeleteAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, TError,{interviewSlotId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAnInterviewSlot>>,
+        TError,
+        {interviewSlotId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Every interview that has been booked, most-recent-first, each with the applicant
+ * being interviewed, the slot details, its confirmation status, and any recorded
+ * evaluation — Student Affairs' view for tracking interviews and marking them
+ * complete. Gated on `interview.schedule`.
+ * @summary Booked interviews.
+ */
+export const bookedInterviews = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<BookedInterviews200>(
+      {url: `/api/v1/interviews`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getBookedInterviewsQueryKey = () => {
+    return [
+    `/api/v1/interviews`
+    ] as const;
+    }
+
+
+export const getBookedInterviewsQueryOptions = <TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getBookedInterviewsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof bookedInterviews>>> = ({ signal }) => bookedInterviews(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type BookedInterviewsQueryResult = NonNullable<Awaited<ReturnType<typeof bookedInterviews>>>
+export type BookedInterviewsQueryError = BookedInterviews403
+
+
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof bookedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof bookedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof bookedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof bookedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Booked interviews.
+ */
+
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getBookedInterviewsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Books the applicant's interview into an open slot and notifies them of the
+ * details. Legal only while the application is `interview_scheduled` and has no
+ * interview yet, and the slot is still open — otherwise 409. Gated on
+ * `interview.schedule`.
+ * @summary Schedule an applicant into an interview slot.
+ */
+export const scheduleAnApplicantIntoAnInterviewSlot = (
+    applicationId: number,
+    scheduleAnApplicantIntoAnInterviewSlotBody: ScheduleAnApplicantIntoAnInterviewSlotBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScheduleAnApplicantIntoAnInterviewSlot201>(
+      {url: `/api/v1/applications/${applicationId}/interview`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: scheduleAnApplicantIntoAnInterviewSlotBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getScheduleAnApplicantIntoAnInterviewSlotMutationOptions = <TError = ScheduleAnApplicantIntoAnInterviewSlot403 | ScheduleAnApplicantIntoAnInterviewSlot409 | ScheduleAnApplicantIntoAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, TError,{applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, TError,{applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}, TContext> => {
+
+const mutationKey = ['scheduleAnApplicantIntoAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, {applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  scheduleAnApplicantIntoAnInterviewSlot(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduleAnApplicantIntoAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>>
+    export type ScheduleAnApplicantIntoAnInterviewSlotMutationBody = ScheduleAnApplicantIntoAnInterviewSlotBody
+    export type ScheduleAnApplicantIntoAnInterviewSlotMutationError = ScheduleAnApplicantIntoAnInterviewSlot403 | ScheduleAnApplicantIntoAnInterviewSlot409 | ScheduleAnApplicantIntoAnInterviewSlot422
+
+    /**
+ * @summary Schedule an applicant into an interview slot.
+ */
+export const useScheduleAnApplicantIntoAnInterviewSlot = <TError = ScheduleAnApplicantIntoAnInterviewSlot403 | ScheduleAnApplicantIntoAnInterviewSlot409 | ScheduleAnApplicantIntoAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, TError,{applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>,
+        TError,
+        {applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody},
+        TContext
+      > => {
+      return useMutation(getScheduleAnApplicantIntoAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Records that the interview happened and advances the application
+ * `interview_scheduled` → `interview_completed`, from where the Dean records the
+ * final decision. Completing an already-complete interview, or one whose
+ * application is not `interview_scheduled`, is a 409. Gated on `interview.schedule`.
+ * @summary Mark an interview complete.
+ */
+export const markAnInterviewComplete = (
+    interviewId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MarkAnInterviewComplete200>(
+      {url: `/api/v1/interviews/${interviewId}/complete`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getMarkAnInterviewCompleteMutationOptions = <TError = MarkAnInterviewComplete403 | MarkAnInterviewComplete409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAnInterviewComplete>>, TError,{interviewId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof markAnInterviewComplete>>, TError,{interviewId: number}, TContext> => {
+
+const mutationKey = ['markAnInterviewComplete'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markAnInterviewComplete>>, {interviewId: number}> = (props) => {
+          const {interviewId} = props ?? {};
+
+          return  markAnInterviewComplete(interviewId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkAnInterviewCompleteMutationResult = NonNullable<Awaited<ReturnType<typeof markAnInterviewComplete>>>
+
+    export type MarkAnInterviewCompleteMutationError = MarkAnInterviewComplete403 | MarkAnInterviewComplete409
+
+    /**
+ * @summary Mark an interview complete.
+ */
+export const useMarkAnInterviewComplete = <TError = MarkAnInterviewComplete403 | MarkAnInterviewComplete409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAnInterviewComplete>>, TError,{interviewId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof markAnInterviewComplete>>,
+        TError,
+        {interviewId: number},
+        TContext
+      > => {
+      return useMutation(getMarkAnInterviewCompleteMutationOptions(options), queryClient);
     }
 
 /**

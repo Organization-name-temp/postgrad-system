@@ -9,8 +9,12 @@ import EventNoteIcon from '@mui/icons-material/EventNote'
 import FactCheckIcon from '@mui/icons-material/FactCheck'
 import GavelIcon from '@mui/icons-material/Gavel'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+import EventAvailableIcon from '@mui/icons-material/EventAvailable'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
+import { ROLE } from '../shared/access/roles'
 
 /**
  * The app's navigation destinations. Each later phase (and each catalog entity)
@@ -36,6 +40,27 @@ export const navItems: NavItem[] = [
     to: '/dean',
     icon: <GavelIcon />,
     permission: PERMISSION.screenApplications,
+  },
+  // Interview scheduling surface (ticket 09): Student Affairs / Dean (interview.schedule).
+  {
+    key: 'interviewScheduling',
+    to: '/interviews/scheduling',
+    icon: <ScheduleIcon />,
+    permission: PERMISSION.scheduleInterview,
+  },
+  {
+    key: 'interviewSlots',
+    to: '/interviews/slots',
+    icon: <EventAvailableIcon />,
+    permission: PERMISSION.scheduleInterview,
+  },
+  // The interviewer's own queue (ticket 09): gated on the Instructor role, not a
+  // permission — an interviewer holds no reviewer permission.
+  {
+    key: 'myInterviews',
+    to: '/interviews/mine',
+    icon: <RecordVoiceOverIcon />,
+    roles: [ROLE.instructor],
   },
   {
     key: 'browse',

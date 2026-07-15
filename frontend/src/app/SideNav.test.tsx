@@ -42,6 +42,7 @@ const items: NavItem[] = [
     section: 'administration',
     adminOnly: true,
   },
+  { key: 'myInterviews', to: '/interviews/mine', icon: <span />, roles: ['R04'] },
 ]
 
 function renderNav(initial = '/') {
@@ -92,5 +93,17 @@ describe('SideNav', () => {
     const { container, getByText } = renderNav()
     expect(container.querySelector('a[href="/admin/assignments"]')).toBeInTheDocument()
     expect(getByText('Administration')).toBeInTheDocument()
+  })
+
+  it('hides a role-gated item from a user without the role', () => {
+    mockedUseAuth.mockReturnValue(authState({ hasRole: () => false }))
+    const { container } = renderNav()
+    expect(container.querySelector('a[href="/interviews/mine"]')).not.toBeInTheDocument()
+  })
+
+  it('shows a role-gated item to a user who holds the role', () => {
+    mockedUseAuth.mockReturnValue(authState({ hasRole: (r) => r === 'R04' }))
+    const { container } = renderNav()
+    expect(container.querySelector('a[href="/interviews/mine"]')).toBeInTheDocument()
   })
 })

@@ -1746,6 +1746,1869 @@ paths:
       tags:
         - Admissions
       security: []
+  /api/v1/application/interview/slots:
+    get:
+      summary: 'Open slots to reschedule into.'
+      operationId: openSlotsToRescheduleInto
+      description: "The interview slots still open, soonest-first — the applicant's picker for their\none reschedule. Same shape as the Student Affairs slot list."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 2
+                      scheduled_at: '2026-07-22T13:00:00+00:00'
+                      duration_minutes: 30
+                      mode: virtual
+                      location: null
+                      meeting_link: 'https://meet.ejust.edu.eg/abc'
+                      interviewer_id: 5
+                      interviewer:
+                        id: 5
+                        name: 'Dr. Second Instructor'
+                        email: instructor2@ejust.test
+                      is_open: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 2
+                        scheduled_at: '2026-07-22T13:00:00+00:00'
+                        duration_minutes: 30
+                        mode: virtual
+                        location: null
+                        meeting_link: 'https://meet.ejust.edu.eg/abc'
+                        interviewer_id: 5
+                        interviewer:
+                          id: 5
+                          name: 'Dr. Second Instructor'
+                          email: instructor2@ejust.test
+                        is_open: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        scheduled_at:
+                          type: string
+                          example: '2026-07-22T13:00:00+00:00'
+                        duration_minutes:
+                          type: integer
+                          example: 30
+                        mode:
+                          type: string
+                          example: virtual
+                        location:
+                          type: string
+                          example: null
+                          nullable: true
+                        meeting_link:
+                          type: string
+                          example: 'https://meet.ejust.edu.eg/abc'
+                        interviewer_id:
+                          type: integer
+                          example: 5
+                        interviewer:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 5
+                            name:
+                              type: string
+                              example: 'Dr. Second Instructor'
+                            email:
+                              type: string
+                              example: instructor2@ejust.test
+                        is_open:
+                          type: boolean
+                          example: true
+      tags:
+        - Admissions
+      security: []
+  /api/v1/application/interview:
+    get:
+      summary: 'My interview.'
+      operationId: myInterview
+      description: "The interview booked for the signed-in applicant's current application — the\nwhen/where/who, the confirmation status, and whether a reschedule is still\navailable. 404 when none has been scheduled yet."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    application_id: 1
+                    status: pending_confirmation
+                    reschedule_count: 0
+                    can_reschedule: true
+                    evaluation_score: null
+                    evaluation_notes: null
+                    completed_at: null
+                    slot:
+                      id: 1
+                      scheduled_at: '2026-07-20T10:00:00+00:00'
+                      duration_minutes: 30
+                      mode: in_person
+                      location: 'Building C, Room 204'
+                      meeting_link: null
+                      interviewer_id: 4
+                      interviewer:
+                        id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                      is_open: false
+                    applicant: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      application_id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: pending_confirmation
+                      reschedule_count:
+                        type: integer
+                        example: 0
+                      can_reschedule:
+                        type: boolean
+                        example: true
+                      evaluation_score:
+                        type: string
+                        example: null
+                        nullable: true
+                      evaluation_notes:
+                        type: string
+                        example: null
+                        nullable: true
+                      completed_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      slot:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          scheduled_at:
+                            type: string
+                            example: '2026-07-20T10:00:00+00:00'
+                          duration_minutes:
+                            type: integer
+                            example: 30
+                          mode:
+                            type: string
+                            example: in_person
+                          location:
+                            type: string
+                            example: 'Building C, Room 204'
+                          meeting_link:
+                            type: string
+                            example: null
+                            nullable: true
+                          interviewer_id:
+                            type: integer
+                            example: 4
+                          interviewer:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 4
+                              name:
+                                type: string
+                                example: 'Dr. Instructor'
+                              email:
+                                type: string
+                                example: instructor@ejust.test
+                          is_open:
+                            type: boolean
+                            example: false
+                      applicant:
+                        type: string
+                        example: null
+                        nullable: true
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model.'
+      tags:
+        - Admissions
+      security: []
+  /api/v1/application/interview/confirm:
+    post:
+      summary: 'Confirm my interview.'
+      operationId: confirmMyInterview
+      description: "The applicant accepts the booked interview: `pending_confirmation` → `confirmed`.\nConfirming an already-confirmed interview is a 409."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    application_id: 1
+                    status: confirmed
+                    reschedule_count: 0
+                    can_reschedule: true
+                    evaluation_score: null
+                    evaluation_notes: null
+                    completed_at: null
+                    slot:
+                      id: 1
+                      scheduled_at: '2026-07-20T10:00:00+00:00'
+                      duration_minutes: 30
+                      mode: in_person
+                      location: 'Building C, Room 204'
+                      meeting_link: null
+                      interviewer_id: 4
+                      interviewer: null
+                      is_open: false
+                    applicant: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      application_id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: confirmed
+                      reschedule_count:
+                        type: integer
+                        example: 0
+                      can_reschedule:
+                        type: boolean
+                        example: true
+                      evaluation_score:
+                        type: string
+                        example: null
+                        nullable: true
+                      evaluation_notes:
+                        type: string
+                        example: null
+                        nullable: true
+                      completed_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      slot:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          scheduled_at:
+                            type: string
+                            example: '2026-07-20T10:00:00+00:00'
+                          duration_minutes:
+                            type: integer
+                            example: 30
+                          mode:
+                            type: string
+                            example: in_person
+                          location:
+                            type: string
+                            example: 'Building C, Room 204'
+                          meeting_link:
+                            type: string
+                            example: null
+                            nullable: true
+                          interviewer_id:
+                            type: integer
+                            example: 4
+                          interviewer:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_open:
+                            type: boolean
+                            example: false
+                      applicant:
+                        type: string
+                        example: null
+                        nullable: true
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model.'
+        409:
+          description: 'nothing to confirm'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This interview is not awaiting confirmation.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This interview is not awaiting confirmation.'
+      tags:
+        - Admissions
+      security: []
+  /api/v1/application/interview/reschedule:
+    post:
+      summary: 'Reschedule my interview.'
+      operationId: rescheduleMyInterview
+      description: "Move the interview to another open slot, using the applicant's single allowed\nreschedule (BR-11); it returns to `pending_confirmation` for the new slot. A\nsecond reschedule is refused (409). The target must be an open slot (422/409)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    application_id: 1
+                    status: pending_confirmation
+                    reschedule_count: 1
+                    can_reschedule: false
+                    evaluation_score: null
+                    evaluation_notes: null
+                    completed_at: null
+                    slot:
+                      id: 2
+                      scheduled_at: '2026-07-22T13:00:00+00:00'
+                      duration_minutes: 30
+                      mode: virtual
+                      location: null
+                      meeting_link: 'https://meet.ejust.edu.eg/abc'
+                      interviewer_id: 5
+                      interviewer: null
+                      is_open: false
+                    applicant: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      application_id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: pending_confirmation
+                      reschedule_count:
+                        type: integer
+                        example: 1
+                      can_reschedule:
+                        type: boolean
+                        example: false
+                      evaluation_score:
+                        type: string
+                        example: null
+                        nullable: true
+                      evaluation_notes:
+                        type: string
+                        example: null
+                        nullable: true
+                      completed_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      slot:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          scheduled_at:
+                            type: string
+                            example: '2026-07-22T13:00:00+00:00'
+                          duration_minutes:
+                            type: integer
+                            example: 30
+                          mode:
+                            type: string
+                            example: virtual
+                          location:
+                            type: string
+                            example: null
+                            nullable: true
+                          meeting_link:
+                            type: string
+                            example: 'https://meet.ejust.edu.eg/abc'
+                          interviewer_id:
+                            type: integer
+                            example: 5
+                          interviewer:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_open:
+                            type: boolean
+                            example: false
+                      applicant:
+                        type: string
+                        example: null
+                        nullable: true
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model.'
+        409:
+          description: 'reschedule already used / slot taken'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You have already rescheduled this interview once.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You have already rescheduled this interview once.'
+        422:
+          description: 'no such open slot'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The selected interview slot id is invalid.'
+                  errors:
+                    interview_slot_id:
+                      - 'The selected interview slot id is invalid.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The selected interview slot id is invalid.'
+                  errors:
+                    type: object
+                    properties:
+                      interview_slot_id:
+                        type: array
+                        example:
+                          - 'The selected interview slot id is invalid.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                interview_slot_id:
+                  type: integer
+                  description: 'The open slot to move to.'
+                  example: 2
+              required:
+                - interview_slot_id
+      security: []
+  /api/v1/interviews/assigned:
+    get:
+      summary: 'Interviews assigned to me.'
+      operationId: interviewsAssignedToMe
+      description: "The interviews booked into the signed-in user's own slots, soonest-first, each\nwith the applicant's identity and the slot details — the interviewer's queue.\nEmpty for a user who is not the assigned interviewer on any slot."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      application_id: 1
+                      status: confirmed
+                      reschedule_count: 0
+                      can_reschedule: true
+                      evaluation_score: null
+                      evaluation_notes: null
+                      completed_at: null
+                      slot:
+                        id: 1
+                        scheduled_at: '2026-07-20T10:00:00+00:00'
+                        duration_minutes: 30
+                        mode: in_person
+                        location: 'Building C, Room 204'
+                        meeting_link: null
+                        interviewer_id: 4
+                        interviewer:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                        is_open: false
+                      applicant:
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        national_id: '29001010101010'
+                        applying_for_degree: MSc
+                        status: interview_scheduled
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        application_id: 1
+                        status: confirmed
+                        reschedule_count: 0
+                        can_reschedule: true
+                        evaluation_score: null
+                        evaluation_notes: null
+                        completed_at: null
+                        slot:
+                          id: 1
+                          scheduled_at: '2026-07-20T10:00:00+00:00'
+                          duration_minutes: 30
+                          mode: in_person
+                          location: 'Building C, Room 204'
+                          meeting_link: null
+                          interviewer_id: 4
+                          interviewer:
+                            id: 4
+                            name: 'Dr. Instructor'
+                            email: instructor@ejust.test
+                          is_open: false
+                        applicant:
+                          name_en: 'Sara Applicant'
+                          name_ar: 'سارة المتقدمة'
+                          national_id: '29001010101010'
+                          applying_for_degree: MSc
+                          status: interview_scheduled
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        application_id:
+                          type: integer
+                          example: 1
+                        status:
+                          type: string
+                          example: confirmed
+                        reschedule_count:
+                          type: integer
+                          example: 0
+                        can_reschedule:
+                          type: boolean
+                          example: true
+                        evaluation_score:
+                          type: string
+                          example: null
+                          nullable: true
+                        evaluation_notes:
+                          type: string
+                          example: null
+                          nullable: true
+                        completed_at:
+                          type: string
+                          example: null
+                          nullable: true
+                        slot:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            scheduled_at:
+                              type: string
+                              example: '2026-07-20T10:00:00+00:00'
+                            duration_minutes:
+                              type: integer
+                              example: 30
+                            mode:
+                              type: string
+                              example: in_person
+                            location:
+                              type: string
+                              example: 'Building C, Room 204'
+                            meeting_link:
+                              type: string
+                              example: null
+                              nullable: true
+                            interviewer_id:
+                              type: integer
+                              example: 4
+                            interviewer:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 4
+                                name:
+                                  type: string
+                                  example: 'Dr. Instructor'
+                                email:
+                                  type: string
+                                  example: instructor@ejust.test
+                            is_open:
+                              type: boolean
+                              example: false
+                        applicant:
+                          type: object
+                          properties:
+                            name_en:
+                              type: string
+                              example: 'Sara Applicant'
+                            name_ar:
+                              type: string
+                              example: 'سارة المتقدمة'
+                            national_id:
+                              type: string
+                              example: '29001010101010'
+                            applying_for_degree:
+                              type: string
+                              example: MSc
+                            status:
+                              type: string
+                              example: interview_scheduled
+      tags:
+        - Admissions
+      security: []
+  '/api/v1/interviews/{interview_id}/evaluation':
+    post:
+      summary: 'Record my evaluation.'
+      operationId: recordMyEvaluation
+      description: "The assigned interviewer records a score (1–10) and optional notes for the\ninterview. Only the interviewer the slot is assigned to may do this — anyone else\nis a 403. An evaluation cannot be recorded once the interview is complete (409)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    application_id: 1
+                    status: confirmed
+                    reschedule_count: 0
+                    can_reschedule: true
+                    evaluation_score: 8
+                    evaluation_notes: 'Strong candidate; clear research direction.'
+                    completed_at: null
+                    slot:
+                      id: 1
+                      scheduled_at: '2026-07-20T10:00:00+00:00'
+                      duration_minutes: 30
+                      mode: in_person
+                      location: 'Building C, Room 204'
+                      meeting_link: null
+                      interviewer_id: 4
+                      interviewer: null
+                      is_open: false
+                    applicant: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      application_id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: confirmed
+                      reschedule_count:
+                        type: integer
+                        example: 0
+                      can_reschedule:
+                        type: boolean
+                        example: true
+                      evaluation_score:
+                        type: integer
+                        example: 8
+                      evaluation_notes:
+                        type: string
+                        example: 'Strong candidate; clear research direction.'
+                      completed_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      slot:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          scheduled_at:
+                            type: string
+                            example: '2026-07-20T10:00:00+00:00'
+                          duration_minutes:
+                            type: integer
+                            example: 30
+                          mode:
+                            type: string
+                            example: in_person
+                          location:
+                            type: string
+                            example: 'Building C, Room 204'
+                          meeting_link:
+                            type: string
+                            example: null
+                            nullable: true
+                          interviewer_id:
+                            type: integer
+                            example: 4
+                          interviewer:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_open:
+                            type: boolean
+                            example: false
+                      applicant:
+                        type: string
+                        example: null
+                        nullable: true
+        403:
+          description: 'not the assigned interviewer'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'already complete'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This interview has already been completed.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This interview has already been completed.'
+        422:
+          description: 'bad score'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The score field is required.'
+                  errors:
+                    score:
+                      - 'The score field is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The score field is required.'
+                  errors:
+                    type: object
+                    properties:
+                      score:
+                        type: array
+                        example:
+                          - 'The score field is required.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                score:
+                  type: integer
+                  description: 'The interview score, 1–10.'
+                  example: 8
+                notes:
+                  type: string
+                  description: 'Free-text notes on the interview.'
+                  example: 'Strong candidate; clear research direction.'
+                  nullable: true
+              required:
+                - score
+      security: []
+    parameters:
+      -
+        in: path
+        name: interview_id
+        description: "The interview's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/applications/awaiting-interview:
+    get:
+      summary: 'Applications awaiting interview scheduling.'
+      operationId: applicationsAwaitingInterviewScheduling
+      description: "The Dean-approved applications (`interview_scheduled`) that have **not** yet been\nbooked into a slot, oldest-first — Student Affairs' scheduling worklist, each with\nthe applicant's identity, resolved primary Program, and days waited since Dean\napproval. Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      status: interview_scheduled
+                      name_en: 'Sara Applicant'
+                      name_ar: 'سارة المتقدمة'
+                      national_id: '29001010101010'
+                      applying_for_degree: MSc
+                      primary_program: null
+                      finalized_at: '2026-07-10T10:00:00+00:00'
+                      review_entered_at: '2026-07-12T10:00:00+00:00'
+                      age_days: 3
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        status: interview_scheduled
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        national_id: '29001010101010'
+                        applying_for_degree: MSc
+                        primary_program: null
+                        finalized_at: '2026-07-10T10:00:00+00:00'
+                        review_entered_at: '2026-07-12T10:00:00+00:00'
+                        age_days: 3
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        status:
+                          type: string
+                          example: interview_scheduled
+                        name_en:
+                          type: string
+                          example: 'Sara Applicant'
+                        name_ar:
+                          type: string
+                          example: 'سارة المتقدمة'
+                        national_id:
+                          type: string
+                          example: '29001010101010'
+                        applying_for_degree:
+                          type: string
+                          example: MSc
+                        primary_program:
+                          type: string
+                          example: null
+                          nullable: true
+                        finalized_at:
+                          type: string
+                          example: '2026-07-10T10:00:00+00:00'
+                        review_entered_at:
+                          type: string
+                          example: '2026-07-12T10:00:00+00:00'
+                        age_days:
+                          type: integer
+                          example: 3
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+  /api/v1/interview-slots/interviewers:
+    get:
+      summary: 'List assignable interviewers.'
+      operationId: listAssignableInterviewers
+      description: "The faculty Users (Instructors) an interview slot may be assigned to — the\nsource for the slot form's interviewer picker. Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 4
+                      name: 'Dr. Instructor'
+                      email: instructor@ejust.test
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 4
+                        name:
+                          type: string
+                          example: 'Dr. Instructor'
+                        email:
+                          type: string
+                          example: instructor@ejust.test
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+  /api/v1/interview-slots:
+    get:
+      summary: 'List interview slots.'
+      operationId: listInterviewSlots
+      description: "The whole slot pool, soonest-first, each with its resolved interviewer and\nwhether it is still open. Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      scheduled_at: '2026-07-20T10:00:00+00:00'
+                      duration_minutes: 30
+                      mode: in_person
+                      location: 'Building C, Room 204'
+                      meeting_link: null
+                      interviewer_id: 4
+                      interviewer:
+                        id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                      is_open: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        scheduled_at: '2026-07-20T10:00:00+00:00'
+                        duration_minutes: 30
+                        mode: in_person
+                        location: 'Building C, Room 204'
+                        meeting_link: null
+                        interviewer_id: 4
+                        interviewer:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                        is_open: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        scheduled_at:
+                          type: string
+                          example: '2026-07-20T10:00:00+00:00'
+                        duration_minutes:
+                          type: integer
+                          example: 30
+                        mode:
+                          type: string
+                          example: in_person
+                        location:
+                          type: string
+                          example: 'Building C, Room 204'
+                        meeting_link:
+                          type: string
+                          example: null
+                          nullable: true
+                        interviewer_id:
+                          type: integer
+                          example: 4
+                        interviewer:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            name:
+                              type: string
+                              example: 'Dr. Instructor'
+                            email:
+                              type: string
+                              example: instructor@ejust.test
+                        is_open:
+                          type: boolean
+                          example: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+    post:
+      summary: 'Create an interview slot.'
+      operationId: createAnInterviewSlot
+      description: "One appointment in the pool: a future time, a duration, an assigned faculty\ninterviewer, and a mode with its coordinate (an in-person `location` or a virtual\n`meeting_link`). Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    scheduled_at: '2026-07-20T10:00:00+00:00'
+                    duration_minutes: 30
+                    mode: in_person
+                    location: 'Building C, Room 204'
+                    meeting_link: null
+                    interviewer_id: 4
+                    interviewer:
+                      id: 4
+                      name: 'Dr. Instructor'
+                      email: instructor@ejust.test
+                    is_open: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      scheduled_at:
+                        type: string
+                        example: '2026-07-20T10:00:00+00:00'
+                      duration_minutes:
+                        type: integer
+                        example: 30
+                      mode:
+                        type: string
+                        example: in_person
+                      location:
+                        type: string
+                        example: 'Building C, Room 204'
+                      meeting_link:
+                        type: string
+                        example: null
+                        nullable: true
+                      interviewer_id:
+                        type: integer
+                        example: 4
+                      interviewer:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          name:
+                            type: string
+                            example: 'Dr. Instructor'
+                          email:
+                            type: string
+                            example: instructor@ejust.test
+                      is_open:
+                        type: boolean
+                        example: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        422:
+          description: 'not a faculty interviewer'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The selected interviewer is not a faculty member.'
+                  errors:
+                    interviewer_id:
+                      - 'The selected interviewer is not a faculty member.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The selected interviewer is not a faculty member.'
+                  errors:
+                    type: object
+                    properties:
+                      interviewer_id:
+                        type: array
+                        example:
+                          - 'The selected interviewer is not a faculty member.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduled_at:
+                  type: string
+                  description: 'The appointment time (ISO-8601), in the future.'
+                  example: '2026-07-20T10:00:00Z'
+                duration_minutes:
+                  type: integer
+                  description: 'Length in minutes (15–240).'
+                  example: 30
+                interviewer_id:
+                  type: integer
+                  description: 'A faculty (Instructor) User to conduct it.'
+                  example: 4
+                mode:
+                  type: string
+                  description: 'One of in_person, virtual.'
+                  example: in_person
+                location:
+                  type: string
+                  description: 'The in-person location; required when mode is in_person.'
+                  example: 'Building C, Room 204'
+                meeting_link:
+                  type: string
+                  description: 'The virtual meeting link; required when mode is virtual.'
+                  example: 'https://meet.ejust.edu.eg/abc'
+              required:
+                - scheduled_at
+                - duration_minutes
+                - interviewer_id
+                - mode
+      security: []
+  '/api/v1/interview-slots/{interview_slot_id}':
+    patch:
+      summary: 'Update an interview slot.'
+      operationId: updateAnInterviewSlot
+      description: "Change an **open** slot's time, duration, interviewer, or mode. A slot with an\ninterview already booked into it cannot be edited (409) — its time/interviewer\nare what the applicant was told. Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    scheduled_at: '2026-07-21T14:00:00+00:00'
+                    duration_minutes: 45
+                    mode: virtual
+                    location: null
+                    meeting_link: 'https://meet.ejust.edu.eg/abc'
+                    interviewer_id: 4
+                    interviewer:
+                      id: 4
+                      name: 'Dr. Instructor'
+                      email: instructor@ejust.test
+                    is_open: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      scheduled_at:
+                        type: string
+                        example: '2026-07-21T14:00:00+00:00'
+                      duration_minutes:
+                        type: integer
+                        example: 45
+                      mode:
+                        type: string
+                        example: virtual
+                      location:
+                        type: string
+                        example: null
+                        nullable: true
+                      meeting_link:
+                        type: string
+                        example: 'https://meet.ejust.edu.eg/abc'
+                      interviewer_id:
+                        type: integer
+                        example: 4
+                      interviewer:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          name:
+                            type: string
+                            example: 'Dr. Instructor'
+                          email:
+                            type: string
+                            example: instructor@ejust.test
+                      is_open:
+                        type: boolean
+                        example: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'slot is booked'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This slot has an interview booked and cannot be changed.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This slot has an interview booked and cannot be changed.'
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scheduled_at:
+                  type: string
+                  description: 'The appointment time (ISO-8601), in the future.'
+                  example: '2026-07-21T14:00:00Z'
+                duration_minutes:
+                  type: integer
+                  description: 'Length in minutes (15–240).'
+                  example: 45
+                interviewer_id:
+                  type: integer
+                  description: 'A faculty (Instructor) User to conduct it.'
+                  example: 4
+                mode:
+                  type: string
+                  description: 'One of in_person, virtual.'
+                  example: virtual
+                location:
+                  type: string
+                  description: 'The in-person location; required when mode is in_person.'
+                  example: 'Building C, Room 204'
+                meeting_link:
+                  type: string
+                  description: 'The virtual meeting link; required when mode is virtual.'
+                  example: 'https://meet.ejust.edu.eg/abc'
+              required:
+                - scheduled_at
+                - duration_minutes
+                - interviewer_id
+                - mode
+      security: []
+    delete:
+      summary: 'Delete an interview slot.'
+      operationId: deleteAnInterviewSlot
+      description: "Remove an **open** slot from the pool. A slot with an interview booked into it\ncannot be deleted (409). Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+                properties: {}
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'slot is booked'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This slot has an interview booked and cannot be changed.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This slot has an interview booked and cannot be changed.'
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: interview_slot_id
+        description: "The slot's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/interviews:
+    get:
+      summary: 'Booked interviews.'
+      operationId: bookedInterviews
+      description: "Every interview that has been booked, most-recent-first, each with the applicant\nbeing interviewed, the slot details, its confirmation status, and any recorded\nevaluation — Student Affairs' view for tracking interviews and marking them\ncomplete. Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      application_id: 1
+                      status: confirmed
+                      reschedule_count: 0
+                      can_reschedule: true
+                      evaluation_score: 8
+                      evaluation_notes: 'Strong candidate.'
+                      completed_at: null
+                      slot:
+                        id: 1
+                        scheduled_at: '2026-07-20T10:00:00+00:00'
+                        duration_minutes: 30
+                        mode: in_person
+                        location: 'Building C, Room 204'
+                        meeting_link: null
+                        interviewer_id: 4
+                        interviewer:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                        is_open: false
+                      applicant:
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        national_id: '29001010101010'
+                        applying_for_degree: MSc
+                        status: interview_scheduled
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        application_id: 1
+                        status: confirmed
+                        reschedule_count: 0
+                        can_reschedule: true
+                        evaluation_score: 8
+                        evaluation_notes: 'Strong candidate.'
+                        completed_at: null
+                        slot:
+                          id: 1
+                          scheduled_at: '2026-07-20T10:00:00+00:00'
+                          duration_minutes: 30
+                          mode: in_person
+                          location: 'Building C, Room 204'
+                          meeting_link: null
+                          interviewer_id: 4
+                          interviewer:
+                            id: 4
+                            name: 'Dr. Instructor'
+                            email: instructor@ejust.test
+                          is_open: false
+                        applicant:
+                          name_en: 'Sara Applicant'
+                          name_ar: 'سارة المتقدمة'
+                          national_id: '29001010101010'
+                          applying_for_degree: MSc
+                          status: interview_scheduled
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        application_id:
+                          type: integer
+                          example: 1
+                        status:
+                          type: string
+                          example: confirmed
+                        reschedule_count:
+                          type: integer
+                          example: 0
+                        can_reschedule:
+                          type: boolean
+                          example: true
+                        evaluation_score:
+                          type: integer
+                          example: 8
+                        evaluation_notes:
+                          type: string
+                          example: 'Strong candidate.'
+                        completed_at:
+                          type: string
+                          example: null
+                          nullable: true
+                        slot:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            scheduled_at:
+                              type: string
+                              example: '2026-07-20T10:00:00+00:00'
+                            duration_minutes:
+                              type: integer
+                              example: 30
+                            mode:
+                              type: string
+                              example: in_person
+                            location:
+                              type: string
+                              example: 'Building C, Room 204'
+                            meeting_link:
+                              type: string
+                              example: null
+                              nullable: true
+                            interviewer_id:
+                              type: integer
+                              example: 4
+                            interviewer:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 4
+                                name:
+                                  type: string
+                                  example: 'Dr. Instructor'
+                                email:
+                                  type: string
+                                  example: instructor@ejust.test
+                            is_open:
+                              type: boolean
+                              example: false
+                        applicant:
+                          type: object
+                          properties:
+                            name_en:
+                              type: string
+                              example: 'Sara Applicant'
+                            name_ar:
+                              type: string
+                              example: 'سارة المتقدمة'
+                            national_id:
+                              type: string
+                              example: '29001010101010'
+                            applying_for_degree:
+                              type: string
+                              example: MSc
+                            status:
+                              type: string
+                              example: interview_scheduled
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+  '/api/v1/applications/{application_id}/interview':
+    post:
+      summary: 'Schedule an applicant into an interview slot.'
+      operationId: scheduleAnApplicantIntoAnInterviewSlot
+      description: "Books the applicant's interview into an open slot and notifies them of the\ndetails. Legal only while the application is `interview_scheduled` and has no\ninterview yet, and the slot is still open — otherwise 409. Gated on\n`interview.schedule`."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    application_id: 1
+                    status: pending_confirmation
+                    reschedule_count: 0
+                    can_reschedule: true
+                    evaluation_score: null
+                    evaluation_notes: null
+                    completed_at: null
+                    slot:
+                      id: 1
+                      scheduled_at: '2026-07-20T10:00:00+00:00'
+                      duration_minutes: 30
+                      mode: in_person
+                      location: 'Building C, Room 204'
+                      meeting_link: null
+                      interviewer_id: 4
+                      interviewer: null
+                      is_open: false
+                    applicant: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      application_id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: pending_confirmation
+                      reschedule_count:
+                        type: integer
+                        example: 0
+                      can_reschedule:
+                        type: boolean
+                        example: true
+                      evaluation_score:
+                        type: string
+                        example: null
+                        nullable: true
+                      evaluation_notes:
+                        type: string
+                        example: null
+                        nullable: true
+                      completed_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      slot:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          scheduled_at:
+                            type: string
+                            example: '2026-07-20T10:00:00+00:00'
+                          duration_minutes:
+                            type: integer
+                            example: 30
+                          mode:
+                            type: string
+                            example: in_person
+                          location:
+                            type: string
+                            example: 'Building C, Room 204'
+                          meeting_link:
+                            type: string
+                            example: null
+                            nullable: true
+                          interviewer_id:
+                            type: integer
+                            example: 4
+                          interviewer:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_open:
+                            type: boolean
+                            example: false
+                      applicant:
+                        type: string
+                        example: null
+                        nullable: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'not ready / already booked / slot taken'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application is not awaiting interview scheduling.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application is not awaiting interview scheduling.'
+        422:
+          description: 'no such slot'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'The selected interview slot id is invalid.'
+                  errors:
+                    interview_slot_id:
+                      - 'The selected interview slot id is invalid.'
+                properties:
+                  message:
+                    type: string
+                    example: 'The selected interview slot id is invalid.'
+                  errors:
+                    type: object
+                    properties:
+                      interview_slot_id:
+                        type: array
+                        example:
+                          - 'The selected interview slot id is invalid.'
+                        items:
+                          type: string
+      tags:
+        - Admissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                interview_slot_id:
+                  type: integer
+                  description: 'The open slot to book.'
+                  example: 1
+              required:
+                - interview_slot_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: application_id
+        description: "The application's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/interviews/{interview_id}/complete':
+    post:
+      summary: 'Mark an interview complete.'
+      operationId: markAnInterviewComplete
+      description: "Records that the interview happened and advances the application\n`interview_scheduled` → `interview_completed`, from where the Dean records the\nfinal decision. Completing an already-complete interview, or one whose\napplication is not `interview_scheduled`, is a 409. Gated on `interview.schedule`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    application_id: 1
+                    status: confirmed
+                    reschedule_count: 0
+                    can_reschedule: true
+                    evaluation_score: 8
+                    evaluation_notes: 'Strong candidate.'
+                    completed_at: '2026-07-20T11:00:00+00:00'
+                    slot: null
+                    applicant: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      application_id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: confirmed
+                      reschedule_count:
+                        type: integer
+                        example: 0
+                      can_reschedule:
+                        type: boolean
+                        example: true
+                      evaluation_score:
+                        type: integer
+                        example: 8
+                      evaluation_notes:
+                        type: string
+                        example: 'Strong candidate.'
+                      completed_at:
+                        type: string
+                        example: '2026-07-20T11:00:00+00:00'
+                      slot:
+                        type: string
+                        example: null
+                        nullable: true
+                      applicant:
+                        type: string
+                        example: null
+                        nullable: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'already complete / wrong status'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This application cannot move from interview_completed to interview_completed.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This application cannot move from interview_completed to interview_completed.'
+      tags:
+        - Admissions
+      security: []
+    parameters:
+      -
+        in: path
+        name: interview_id
+        description: "The interview's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
   '/api/v1/applications/{application_id}/timeline':
     get:
       summary: 'Status timeline.'

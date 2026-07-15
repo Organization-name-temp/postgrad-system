@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, isoToInputValue } from './dateTime'
+import { formatDate, isoToInputValue } from './datetime'
 
 describe('isoToInputValue', () => {
   it('renders the UTC wall-clock so the datetime-local round-trip does not drift', () => {

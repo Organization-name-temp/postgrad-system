@@ -10,6 +10,7 @@
  * role-gated (not permission-gated) surface, ticket 08.
  */
 export const ROLE = {
+  instructor: 'R04',
   systemAdmin: 'R09',
   superAdmin: 'R10',
 } as const

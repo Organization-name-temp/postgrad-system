@@ -30,6 +30,13 @@ export interface NavItem {
    * permission gate (admins hold every permission, ADR-0008).
    */
   adminOnly?: boolean
+  /**
+   * Role codes any of which reveals the item — for a surface reached by role rather
+   * than permission (e.g. the interviewer's queue, ticket 09: interviewers hold no
+   * reviewer permission, so their nav entry is gated on the Instructor role). Absent =
+   * no role gate.
+   */
+  roles?: readonly string[]
 }
 
 /**
@@ -43,11 +50,14 @@ export interface NavItem {
  */
 export function SideNav({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => void }) {
   const { t } = useTranslation('common')
-  const { hasPermission, isAdmin } = useAuth()
+  const { hasPermission, hasRole, isAdmin } = useAuth()
   const { pathname } = useLocation()
 
   const visible = items.filter(
-    (item) => (!item.permission || hasPermission(item.permission)) && (!item.adminOnly || isAdmin),
+    (item) =>
+      (!item.permission || hasPermission(item.permission)) &&
+      (!item.adminOnly || isAdmin) &&
+      (!item.roles || item.roles.some((role) => hasRole(role))),
   )
   const general = visible.filter((item) => !item.section)
   const sections = [...new Set(visible.map((item) => item.section).filter(Boolean))] as string[]

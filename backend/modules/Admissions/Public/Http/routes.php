@@ -2,11 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
+use Modules\Admissions\Internal\Http\Controllers\ApplicantInterviewController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
 use Modules\Admissions\Internal\Http\Controllers\DeanReviewController;
 use Modules\Admissions\Internal\Http\Controllers\DocumentController;
 use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
+use Modules\Admissions\Internal\Http\Controllers\InterviewEvaluationController;
+use Modules\Admissions\Internal\Http\Controllers\InterviewSchedulingController;
+use Modules\Admissions\Internal\Http\Controllers\InterviewSlotController;
 use Modules\Admissions\Internal\Http\Controllers\ProgramSelectionController;
 use Modules\Admissions\Internal\Http\Controllers\RegistrationController;
 
@@ -66,6 +70,48 @@ Route::middleware('auth:sanctum')->group(function () {
     // Resubmit after revision (ticket 07): ReturnedForRevision → UnderSAReview, once
     // the applicant has addressed the reviewer's instructions.
     Route::post('/application/resubmit', [ApplicationController::class, 'resubmit']);
+
+    // Applicant interview (ticket 09): the applicant views their booked interview,
+    // sees the open slots they could move to, and either confirms it or reschedules
+    // it once. These act on the signed-in applicant's own interview implicitly (no id
+    // in the path), so an authenticated session is the only gate. `slots` is declared
+    // before the bare `interview` GET so it is not read as a sub-resource of it.
+    Route::get('/application/interview/slots', [ApplicantInterviewController::class, 'openSlots']);
+    Route::get('/application/interview', [ApplicantInterviewController::class, 'show']);
+    Route::post('/application/interview/confirm', [ApplicantInterviewController::class, 'confirm']);
+    Route::post('/application/interview/reschedule', [ApplicantInterviewController::class, 'reschedule']);
+});
+
+// Interviewer evaluation (ticket 09). Sanctum-authed but **not** permission-gated: an
+// interviewer holds no reviewer permission, so authorization is row-level — the
+// controller allows an action only for the interviewer the slot is assigned to
+// (anyone else → 403). `assigned` is declared before the id-bound evaluation route.
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/interviews/assigned', [InterviewEvaluationController::class, 'index']);
+    Route::post('/interviews/{interview}/evaluation', [InterviewEvaluationController::class, 'store'])
+        ->whereNumber('interview');
+});
+
+// Interview scheduling surface (ticket 09), gated on `interview.schedule` (Student
+// Affairs / Dean): the slot pool CRUD + interviewer picker, booking an approved
+// applicant into a slot, and marking an interview complete. The `interviewers` picker
+// is declared before the model-bound slot routes and the id params are constrained to
+// integers so it is never read as a slot id.
+Route::middleware(['auth:sanctum', 'can:interview.schedule'])->group(function () {
+    // Student Affairs' scheduling worklist: Dean-approved applicants not yet booked.
+    // Declared before the model-bound `/applications/{application}` reviewer routes;
+    // the literal segment cannot be read as an integer id (they are whereNumber-bound).
+    Route::get('/applications/awaiting-interview', [InterviewSchedulingController::class, 'index']);
+
+    Route::get('/interview-slots/interviewers', [InterviewSlotController::class, 'interviewers']);
+    Route::get('/interview-slots', [InterviewSlotController::class, 'index']);
+    Route::post('/interview-slots', [InterviewSlotController::class, 'store']);
+    Route::patch('/interview-slots/{interview_slot}', [InterviewSlotController::class, 'update'])->whereNumber('interview_slot');
+    Route::delete('/interview-slots/{interview_slot}', [InterviewSlotController::class, 'destroy'])->whereNumber('interview_slot');
+
+    Route::get('/interviews', [InterviewSchedulingController::class, 'booked']);
+    Route::post('/applications/{application}/interview', [InterviewSchedulingController::class, 'store'])->whereNumber('application');
+    Route::post('/interviews/{interview}/complete', [InterviewSchedulingController::class, 'complete'])->whereNumber('interview');
 });
 
 // Status timeline (ticket 07). Sanctum-authed but not applicant-scoped: readable by

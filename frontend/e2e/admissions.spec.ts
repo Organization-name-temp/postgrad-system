@@ -113,7 +113,9 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   // Nationality is a searchable ISO-3166 list, stored as the alpha-2 code (ticket 06).
   await selectAutocomplete(page, 'Nationality', 'Egypt', 'Egypt')
   await selectOption(page, 'Gender', 'Male')
-  await page.getByLabel('Country').fill('Egypt')
+  // Scope by role: the phone field's "Country code" is a combobox; the address
+  // "Country" is the textbox — getByLabel alone matches both (ticket 06).
+  await page.getByRole('textbox', { name: 'Country' }).fill('Egypt')
   await page.getByLabel('City').fill('Alexandria')
   await page.getByLabel('Street').fill('15 Corniche Road')
   await page.getByLabel('Previous university').fill('Cairo University')
@@ -121,9 +123,10 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await page.getByLabel('Graduation date').fill('2020-07-01')
   await selectOption(page, 'Previous degree', 'BSc')
   await page.getByLabel('Previous major').fill('Computer Science')
+  // GPA/CGPA are disabled until a scale is chosen (ticket 07) — pick the scale first.
+  await selectOption(page, 'GPA scale', '4.0')
   await page.getByLabel('Graduation GPA').fill('3.5')
   await page.getByLabel('Graduation CGPA').fill('3.45')
-  await selectOption(page, 'GPA scale', '4.0')
   await selectOption(page, 'Applying for', 'MSc')
   // "None" avoids the conditional English-certificate requirement at finalize.
   await selectOption(page, 'English proficiency test', 'None')

@@ -8,6 +8,17 @@
  */
 export const GENDERS = ['Male', 'Female'] as const
 
+/**
+ * Identification Type values, mirroring the backend `IdentificationType` enum
+ * (national_id = exactly 14 digits, passport = 6–9 alphanumeric). Drives which
+ * format the identifier field is validated against (ticket 06); the server
+ * re-validates. Labels are localized (personalInfo.idTypes.*).
+ */
+export const ID_TYPES = ['national_id', 'passport'] as const
+
+/** The default/most common identification type — an Egyptian National ID. */
+export const ID_TYPE_NATIONAL = 'national_id'
+
 export const PREVIOUS_DEGREES = ['BSc', 'MSc', 'PhD'] as const
 
 export const APPLYING_DEGREES = ['MSc', 'PhD'] as const

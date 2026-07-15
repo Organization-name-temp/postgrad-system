@@ -40,7 +40,7 @@ class StudentFactory extends Factory
             'name_ar' => 'سارة المتقدمة',
             'national_id' => fake()->unique()->numerify('##############'),
             'date_of_birth' => fake()->dateTimeBetween('-40 years', '-22 years')->format('Y-m-d'),
-            'nationality' => 'Egyptian',
+            'nationality' => 'EG',
             'gender' => 'Female',
             'admitted_at' => now(),
         ];

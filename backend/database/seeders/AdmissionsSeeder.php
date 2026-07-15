@@ -12,6 +12,7 @@ use Modules\Admissions\Internal\Enums\DocumentType;
 use Modules\Admissions\Internal\Enums\EnglishTest;
 use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
+use Modules\Admissions\Internal\Enums\IdentificationType;
 use Modules\Admissions\Internal\Enums\IntakeTerm;
 use Modules\Admissions\Internal\Enums\InterviewMode;
 use Modules\Admissions\Internal\Enums\InterviewStatus;
@@ -243,9 +244,10 @@ class AdmissionsSeeder extends Seeder
             'name_en' => $nameEn,
             'name_ar' => $nameAr,
             'national_id' => $nationalId,
+            'id_type' => IdentificationType::NationalId,
             'phone' => '+201000000000',
             'date_of_birth' => '1998-05-20',
-            'nationality' => 'Egyptian',
+            'nationality' => 'EG',
             'gender' => $gender,
             'address_country' => 'Egypt',
             'address_city' => 'Alexandria',
@@ -421,7 +423,7 @@ class AdmissionsSeeder extends Seeder
                 nameAr: $nameAr,
                 nationalId: $nationalId,
                 dateOfBirth: '1998-05-20',
-                nationality: 'Egyptian',
+                nationality: 'EG',
                 gender: $gender->value,
             ),
         ));

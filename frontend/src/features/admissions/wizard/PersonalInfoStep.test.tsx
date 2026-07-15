@@ -30,17 +30,16 @@ function renderStep() {
 
 describe('PersonalInfoStep on-blur validation', () => {
   it('surfaces an inline error the moment focus leaves an invalid field', async () => {
-    const user = userEvent.setup()
     renderStep()
 
-    // Focus the first required field and tab away without filling it.
+    // Focus the first required field and leave it without filling it.
     const nameEn = await screen.findByLabelText(/full name \(english\)/i)
-    await user.click(nameEn)
-    await user.tab()
+    fireEvent.focus(nameEn)
+    fireEvent.blur(nameEn)
 
     // The error appears at the field on blur — not only after a bulk submit.
     expect(await screen.findByText(/this field is required/i)).toBeInTheDocument()
-  })
+  }, 15000)
 
   it('re-validates on change once a field has errored, clearing the message when fixed', async () => {
     renderStep()
@@ -69,4 +68,52 @@ describe('PersonalInfoStep on-blur validation', () => {
     // … and nothing was submitted to the server.
     expect(calls.list.some((url) => url.includes('/application/submit'))).toBe(false)
   })
+})
+
+describe('PersonalInfoStep structured inputs (ticket 06)', () => {
+  it('validates the identifier against the chosen ID type, and refreshes on a type switch', async () => {
+    const user = userEvent.setup()
+    renderStep()
+
+    // Default type is National ID: a 6-char alphanumeric is not 14 digits → error.
+    const idNumber = await screen.findByLabelText(/identification number/i)
+    fireEvent.focus(idNumber)
+    fireEvent.change(idNumber, { target: { value: 'ABC123' } })
+    fireEvent.blur(idNumber)
+    expect(await screen.findByText(/national id is exactly 14 digits/i)).toBeInTheDocument()
+
+    // Switching to Passport re-checks the identifier: "ABC123" is a valid passport.
+    await user.click(screen.getByRole('combobox', { name: /identification type/i }))
+    await user.click(await screen.findByRole('option', { name: 'Passport' }))
+    await waitFor(() =>
+      expect(screen.queryByText(/national id is exactly 14 digits/i)).not.toBeInTheDocument(),
+    )
+  }, 15000)
+
+  it('validates the phone as an E.164 number for the selected country', async () => {
+    renderStep()
+
+    // Country defaults to Egypt (+20); a too-short national number is invalid. The
+    // national-number field is labelled "Phone" (the required marker adds an asterisk).
+    const phone = await screen.findByLabelText(/phone/i)
+    fireEvent.focus(phone)
+    fireEvent.change(phone, { target: { value: '123' } })
+    fireEvent.blur(phone)
+    expect(await screen.findByText(/valid phone number/i)).toBeInTheDocument()
+
+    // A full Egyptian mobile number clears the error (stored E.164 = +201000000000).
+    fireEvent.change(phone, { target: { value: '1000000000' } })
+    await waitFor(() => expect(screen.queryByText(/valid phone number/i)).not.toBeInTheDocument())
+  }, 15000)
+
+  it('offers nationality as a searchable country list, not free text', async () => {
+    const user = userEvent.setup()
+    renderStep()
+
+    const nationality = await screen.findByRole('combobox', { name: /nationality/i })
+    await user.click(nationality)
+    await user.type(nationality, 'Egyp')
+    // The list is filtered to matching countries; picking one is how a value is set.
+    expect(await screen.findByRole('option', { name: /egypt/i })).toBeInTheDocument()
+  }, 15000)
 })

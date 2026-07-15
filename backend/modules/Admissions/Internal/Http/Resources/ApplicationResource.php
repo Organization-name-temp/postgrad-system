@@ -54,6 +54,7 @@ class ApplicationResource extends JsonResource
             'name_en' => $application->name_en,
             'name_ar' => $application->name_ar,
             'national_id' => $application->national_id,
+            'id_type' => $application->id_type?->value,
             'phone' => $application->phone,
             'date_of_birth' => $application->date_of_birth?->format('Y-m-d'),
             'nationality' => $application->nationality,

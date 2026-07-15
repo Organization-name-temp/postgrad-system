@@ -7,6 +7,7 @@ use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Enums\EnglishTest;
 use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
+use Modules\Admissions\Internal\Enums\IdentificationType;
 use Modules\Admissions\Internal\Enums\PreviousDegree;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
@@ -53,9 +54,10 @@ class ApplicationFactory extends Factory
             'name_en' => fake()->name(),
             'name_ar' => 'سارة المتقدمة',
             'national_id' => fake()->unique()->numerify('##############'),
+            'id_type' => IdentificationType::NationalId,
             'phone' => fake()->numerify('+20##########'),
             'date_of_birth' => fake()->dateTimeBetween('-40 years', '-22 years')->format('Y-m-d'),
-            'nationality' => 'Egyptian',
+            'nationality' => 'EG',
             'gender' => Gender::Female,
             'address_country' => 'Egypt',
             'address_city' => fake()->city(),

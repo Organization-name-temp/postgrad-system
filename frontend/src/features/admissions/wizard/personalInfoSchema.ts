@@ -1,12 +1,15 @@
 import { z } from 'zod'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 import {
   APPLYING_DEGREES,
   ENGLISH_TESTS,
   ENGLISH_TEST_NONE,
   GENDERS,
   GPA_SCALES,
+  ID_TYPES,
   PREVIOUS_DEGREES,
 } from './fieldOptions'
+import { isCountryCode } from './countries'
 
 /**
  * A minimal translator — the admissions-scoped `t` from react-i18next. The schema
@@ -25,6 +28,7 @@ export type Translator = (key: string, options?: Record<string, unknown>) => str
 export interface PersonalInfoValues {
   name_en: string
   name_ar: string
+  id_type: string
   national_id: string
   phone: string
   date_of_birth: string
@@ -50,6 +54,17 @@ export interface PersonalInfoValues {
 
 /** The server's `english_score` ceiling — a blanket 0–300 (tightened per test in ticket 07). */
 const ENGLISH_SCORE_MAX = 300
+
+/**
+ * The identifier format per Identification Type — its pattern and the message key to
+ * show when it fails — mirroring the server `IdentificationType`. Kept in one place so
+ * the schema's cross-field check and the step's proactive hint share a single mapping
+ * (no scattered `id_type` switch).
+ */
+export const ID_FORMATS: Record<string, { pattern: RegExp; messageKey: string }> = {
+  national_id: { pattern: /^\d{14}$/, messageKey: 'validation.nationalId' },
+  passport: { pattern: /^[A-Za-z0-9]{6,9}$/, messageKey: 'validation.passport' },
+}
 
 /** The server's blanket GPA/CGPA ceiling — 0–100 (tied to the chosen scale in ticket 07). */
 const GPA_MAX = 100
@@ -117,10 +132,23 @@ export function buildPersonalInfoSchema(t: Translator) {
     .object({
       name_en: text(100, 2),
       name_ar: text(100, 2),
-      national_id: text(50),
-      phone: text(30),
+      id_type: choice(ID_TYPES),
+      // Presence here; the format is cross-field against id_type (refined below).
+      national_id: z.string().trim().min(1, required),
+      // Stored E.164; must be a valid number (refine skips the empty case so the
+      // "required" message wins there, not "invalid phone").
+      phone: z
+        .string()
+        .trim()
+        .min(1, required)
+        .refine((v) => v === '' || isValidPhoneNumber(v), { error: t('validation.phone') }),
       date_of_birth: pastDate(false),
-      nationality: text(100),
+      // An ISO 3166-1 alpha-2 code chosen from the list.
+      nationality: z
+        .string()
+        .trim()
+        .min(1, required)
+        .refine((v) => v === '' || isCountryCode(v), { error: t('validation.nationality') }),
       gender: choice(GENDERS),
       address_country: text(100),
       address_city: text(100),
@@ -141,6 +169,14 @@ export function buildPersonalInfoSchema(t: Translator) {
       native_arabic_speaker: z.boolean(),
     })
     .superRefine((values, ctx) => {
+      // The identifier must match the chosen Identification Type's format — 14 digits
+      // for a National ID, 6–9 alphanumeric for a Passport (mirrors the server).
+      const id = values.national_id.trim()
+      const format = ID_FORMATS[values.id_type]
+      if (id !== '' && format && !format.pattern.test(id)) {
+        ctx.addIssue({ code: 'custom', path: ['national_id'], message: t(format.messageKey) })
+      }
+
       // English score mirrors the server's `required_unless:english_test,None` plus
       // the blanket 0–300 range: required and bounded for any real test, ignored for None.
       const raw = values.english_score.trim()

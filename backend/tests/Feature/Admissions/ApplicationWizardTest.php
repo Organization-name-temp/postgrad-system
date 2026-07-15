@@ -40,7 +40,7 @@ it('saves a partial Step-1 snapshot and keeps the application a draft (save & re
     test()->patchJson('/api/v1/application', [
         'name_en' => 'Sara Applicant',
         'name_ar' => 'سارة المتقدمة',
-        'nationality' => 'Egyptian',
+        'nationality' => 'EG',
     ])
         ->assertOk()
         ->assertJsonPath('data.status', 'draft')
@@ -135,6 +135,65 @@ it('refuses to submit Step 1 until the snapshot is complete', function () {
     test()->postJson('/api/v1/application/submit', ['name_en' => 'Sara Applicant'])
         ->assertStatus(422)
         ->assertJsonValidationErrors(['name_ar', 'national_id', 'gender', 'previous_degree']);
+});
+
+it('rejects a National ID that is not exactly 14 digits', function () {
+    // Phase 2.5 ticket 06: a National ID is `^\d{14}$` — 13 or 15 digits is a 422.
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    foreach (['2900101010101', '290010101010101'] as $bad) {
+        test()->postJson('/api/v1/application/submit', snapshotPayload([
+            'id_type' => 'national_id',
+            'national_id' => $bad,
+        ]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('national_id');
+    }
+});
+
+it('validates a Passport identifier as 6–9 alphanumeric', function () {
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    // Too short (5) and too long (10) are both a 422 …
+    foreach (['AB123', 'AB12345678'] as $bad) {
+        test()->postJson('/api/v1/application/submit', snapshotPayload([
+            'id_type' => 'passport',
+            'national_id' => $bad,
+            'nationality' => 'US',
+        ]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('national_id');
+    }
+
+    // … an 8-character alphanumeric passport is accepted.
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'id_type' => 'passport',
+        'national_id' => 'X1234567',
+        'nationality' => 'US',
+    ]))->assertOk();
+});
+
+it('rejects a phone that is not a canonical E.164 number', function () {
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    foreach (['01000000000', '+0123456789', 'not-a-phone'] as $bad) {
+        test()->postJson('/api/v1/application/submit', snapshotPayload(['phone' => $bad]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('phone');
+    }
+});
+
+it('rejects a nationality outside the ISO 3166-1 alpha-2 list', function () {
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    // The old free-text value ("Egyptian") is no longer accepted — it must be a code.
+    test()->postJson('/api/v1/application/submit', snapshotPayload(['nationality' => 'Egyptian']))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('nationality');
 });
 
 it('requires an english score unless the test is None', function () {

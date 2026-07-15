@@ -16,6 +16,7 @@ use Modules\Admissions\Internal\Enums\DocumentType;
 use Modules\Admissions\Internal\Enums\EnglishTest;
 use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
+use Modules\Admissions\Internal\Enums\IdentificationType;
 use Modules\Admissions\Internal\Enums\PreviousDegree;
 use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Identity\Public\AdmitStudent;
@@ -43,6 +44,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * @property ?string $name_en
  * @property ?string $name_ar
  * @property ?string $national_id
+ * @property ?IdentificationType $id_type
  * @property ?string $phone
  * @property ?Carbon $date_of_birth
  * @property ?string $nationality
@@ -91,6 +93,7 @@ class Application extends Model
         'name_en',
         'name_ar',
         'national_id',
+        'id_type',
         'phone',
         'date_of_birth',
         'nationality',
@@ -135,6 +138,7 @@ class Application extends Model
     {
         return [
             'status' => ApplicationStatus::class,
+            'id_type' => IdentificationType::class,
             'gender' => Gender::class,
             'previous_degree' => PreviousDegree::class,
             'gpa_scale' => GpaScale::class,

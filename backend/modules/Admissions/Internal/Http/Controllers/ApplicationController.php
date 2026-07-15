@@ -2,6 +2,7 @@
 
 namespace Modules\Admissions\Internal\Http\Controllers;
 
+use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,10 +12,12 @@ use Modules\Admissions\Internal\Enums\DocumentType;
 use Modules\Admissions\Internal\Enums\EnglishTest;
 use Modules\Admissions\Internal\Enums\Gender;
 use Modules\Admissions\Internal\Enums\GpaScale;
+use Modules\Admissions\Internal\Enums\IdentificationType;
 use Modules\Admissions\Internal\Enums\PreviousDegree;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesCurrentApplication;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Internal\Support\IsoCountries;
 use Modules\Admissions\Internal\Verification\EmailVerificationLink;
 use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Identity\Public\Contracts\EmailVerifier;
@@ -41,7 +44,7 @@ class ApplicationController
      * Step-1 snapshot (fields the applicant has not yet provided come back null),
      * so the SPA can render and resume the wizard at the right step.
      *
-     * @response 200 {"data": {"id": 1, "status": "email_verified", "admission_cycle_id": 1, "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "phone": "+201000000000", "date_of_birth": "1998-05-20", "nationality": "Egyptian", "gender": "Female", "address_country": "Egypt", "address_city": "Alexandria", "address_street": "15 Corniche Road", "previous_university": "Cairo University", "graduation_certificate_name": "BSc in Computer Science", "graduation_date": "2020-07-01", "previous_degree": "BSc", "previous_major": "Computer Science", "graduation_gpa": "3.50", "graduation_cgpa": "3.45", "gpa_scale": "4.0", "is_ejust_graduate": false, "applying_for_degree": "MSc", "english_test": "IELTS", "english_score": "7.50", "native_arabic_speaker": true, "submitted_at": "2026-07-14T10:00:00+00:00", "primary_program_id": 1, "alternative_program_id": 2, "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "alternative_program": {"id": 2, "code": "MSC-EE", "name_en": "MSc in Electrical Engineering", "name_ar": "ماجستير الهندسة الكهربية", "degree_level": "MSc", "department_name_en": "Electrical Engineering", "department_name_ar": "الهندسة الكهربية", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": null, "documents": [{"id": "01ARZ3NDEKTSV4RRFFQ69G5FAV", "document_type": "graduation_certificate", "original_filename": "certificate.pdf", "mime": "application/pdf", "size_bytes": 24576, "uploaded_at": "2026-07-14T10:00:00+00:00", "download_url": "http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV"}]}}
+     * @response 200 {"data": {"id": 1, "status": "email_verified", "admission_cycle_id": 1, "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "id_type": "national_id", "phone": "+201000000000", "date_of_birth": "1998-05-20", "nationality": "EG", "gender": "Female", "address_country": "Egypt", "address_city": "Alexandria", "address_street": "15 Corniche Road", "previous_university": "Cairo University", "graduation_certificate_name": "BSc in Computer Science", "graduation_date": "2020-07-01", "previous_degree": "BSc", "previous_major": "Computer Science", "graduation_gpa": "3.50", "graduation_cgpa": "3.45", "gpa_scale": "4.0", "is_ejust_graduate": false, "applying_for_degree": "MSc", "english_test": "IELTS", "english_score": "7.50", "native_arabic_speaker": true, "submitted_at": "2026-07-14T10:00:00+00:00", "primary_program_id": 1, "alternative_program_id": 2, "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "alternative_program": {"id": 2, "code": "MSC-EE", "name_en": "MSc in Electrical Engineering", "name_ar": "ماجستير الهندسة الكهربية", "degree_level": "MSc", "department_name_en": "Electrical Engineering", "department_name_ar": "الهندسة الكهربية", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": null, "documents": [{"id": "01ARZ3NDEKTSV4RRFFQ69G5FAV", "document_type": "graduation_certificate", "original_filename": "certificate.pdf", "mime": "application/pdf", "size_bytes": 24576, "uploaded_at": "2026-07-14T10:00:00+00:00", "download_url": "http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV"}]}}
      * @response 401 {"message": "Unauthenticated."}
      * @response 404 {"message": "No application found."}
      */
@@ -61,10 +64,11 @@ class ApplicationController
      *
      * @bodyParam name_en string Full name in English. Example: Sara Applicant
      * @bodyParam name_ar string Full name in Arabic. Example: سارة المتقدمة
-     * @bodyParam national_id string National ID / passport; unique within the cycle. Example: 29001010101010
-     * @bodyParam phone string Contact phone. Example: +201000000000
+     * @bodyParam id_type string Identification type; one of national_id, passport. Example: national_id
+     * @bodyParam national_id string Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle. Example: 29001010101010
+     * @bodyParam phone string Contact phone in E.164 form. Example: +201000000000
      * @bodyParam date_of_birth string Date of birth (Y-m-d), in the past. Example: 1998-05-20
-     * @bodyParam nationality string Nationality. Example: Egyptian
+     * @bodyParam nationality string Nationality as an ISO 3166-1 alpha-2 code. Example: EG
      * @bodyParam gender string One of Male, Female. Example: Female
      * @bodyParam address_country string Country. Example: Egypt
      * @bodyParam address_city string City. Example: Alexandria
@@ -95,7 +99,7 @@ class ApplicationController
             throw new ConflictHttpException(__('admissions.application.not_editable'));
         }
 
-        $application->update($request->validate($this->snapshotRules($application, required: false)));
+        $application->update($request->validate($this->snapshotRules($request, $application, required: false)));
 
         return new ApplicationResource($application);
     }
@@ -112,10 +116,11 @@ class ApplicationController
      *
      * @bodyParam name_en string required Full name in English. Example: Sara Applicant
      * @bodyParam name_ar string required Full name in Arabic. Example: سارة المتقدمة
-     * @bodyParam national_id string required National ID / passport; unique within the cycle. Example: 29001010101010
-     * @bodyParam phone string required Contact phone. Example: +201000000000
+     * @bodyParam id_type string required Identification type; one of national_id, passport. Example: national_id
+     * @bodyParam national_id string required Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle. Example: 29001010101010
+     * @bodyParam phone string required Contact phone in E.164 form. Example: +201000000000
      * @bodyParam date_of_birth string required Date of birth (Y-m-d), in the past. Example: 1998-05-20
-     * @bodyParam nationality string required Nationality. Example: Egyptian
+     * @bodyParam nationality string required Nationality as an ISO 3166-1 alpha-2 code. Example: EG
      * @bodyParam gender string required One of Male, Female. Example: Female
      * @bodyParam address_country string required Country. Example: Egypt
      * @bodyParam address_city string required City. Example: Alexandria
@@ -147,7 +152,7 @@ class ApplicationController
             throw new ConflictHttpException(__('admissions.application.already_submitted'));
         }
 
-        $application->fill($request->validate($this->snapshotRules($application, required: true)));
+        $application->fill($request->validate($this->snapshotRules($request, $application, required: true)));
 
         // Identity owns email verification; a User whose email is already verified
         // (e.g. re-applying in a later Cycle) skips straight to EmailVerified.
@@ -262,30 +267,52 @@ class ApplicationController
     /**
      * Validation rules for the Step-1 snapshot. On submit (`$required`) every field
      * is required; on partial save each is `sometimes` (validated only if present).
-     * `national_id` is unique within the Application's Cycle (duplicate person in
-     * one intake → 422, BR-03); `english_score` is required unless the test is None.
-     * `applying_for_degree` is a Catalog\Public {@see DegreeLevel} (MSc/PhD) — the
-     * program-selection step (ticket 06) cross-checks it against the chosen Program's
-     * level and the qualification rule (ADR-0012).
+     *
+     * Phase 2.5 (ticket 06) tightens the three error-prone free-text fields into
+     * structured, validated ones — the client Zod schema mirrors these, but this is
+     * the authoritative gate (ADR-0014):
+     *  - `id_type` selects the identifier format; `national_id` must match it — exactly
+     *    14 digits for a National ID, 6–9 alphanumeric for a Passport — and stays unique
+     *    within the Cycle (duplicate person in one intake → 422, BR-03).
+     *  - `phone` is stored canonical E.164 (`+` then 1–15 digits); the shape is re-checked.
+     *  - `nationality` is an ISO 3166-1 alpha-2 code, checked against {@see IsoCountries}.
+     *
+     * `english_score` is required unless the test is None. `applying_for_degree` is a
+     * Catalog\Public {@see DegreeLevel} (MSc/PhD), cross-checked against the chosen
+     * Program at program selection (ADR-0012).
      *
      * @return array<string, array<int, mixed>>
      */
-    private function snapshotRules(Application $application, bool $required): array
+    private function snapshotRules(Request $request, Application $application, bool $required): array
     {
         $presence = $required ? 'required' : 'sometimes';
 
         return [
             'name_en' => [$presence, 'string', 'min:2', 'max:100'],
             'name_ar' => [$presence, 'string', 'min:2', 'max:100'],
+            'id_type' => [$presence, Rule::enum(IdentificationType::class)],
             'national_id' => [
+                // A blanket length ceiling that always applies — so even a partial save
+                // of just the identifier (before its id_type is known, when the format
+                // rule below is deferred) still has a bound. Both formats fit well under it.
                 $presence, 'string', 'max:50',
+                // The identifier must match the format of the chosen Identification
+                // Type. The rule runs only when both are present — so a partial save of
+                // just the identifier (no id_type yet) is not prematurely rejected;
+                // submit requires both, so the format is always enforced there.
+                function (string $attribute, mixed $value, Closure $fail) use ($request): void {
+                    $type = IdentificationType::tryFrom((string) $request->input('id_type', ''));
+                    if ($type !== null && ! $type->matches((string) $value)) {
+                        $fail(__('admissions.application.invalid_identifier'));
+                    }
+                },
                 Rule::unique('applications', 'national_id')
                     ->where('admission_cycle_id', $application->admission_cycle_id)
                     ->ignore($application->getKey()),
             ],
-            'phone' => [$presence, 'string', 'max:30'],
+            'phone' => [$presence, 'string', 'regex:/^\+[1-9]\d{1,14}$/'],
             'date_of_birth' => [$presence, 'date', 'before:today'],
-            'nationality' => [$presence, 'string', 'max:100'],
+            'nationality' => [$presence, 'string', Rule::in(IsoCountries::codes())],
             'gender' => [$presence, Rule::enum(Gender::class)],
             'address_country' => [$presence, 'string', 'max:100'],
             'address_city' => [$presence, 'string', 'max:100'],

@@ -15,6 +15,10 @@ return [
     'application' => [
         'not_editable' => 'This application can no longer be edited.',
         'already_submitted' => 'Step 1 has already been submitted for this application.',
+        // Raised by the national_id format rule when the identifier does not match the
+        // format of the chosen Identification Type (14 digits for a National ID,
+        // 6–9 alphanumeric for a Passport).
+        'invalid_identifier' => 'The identifier does not match the selected identification type.',
     ],
     'documents' => [
         'locked' => 'Documents can no longer be changed for this application.',

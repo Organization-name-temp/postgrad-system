@@ -7,6 +7,12 @@ import type { AxiosRequestConfig } from 'axios'
 import '../../../shared/i18n/config' // initialise i18next so useTranslation works
 import { ApplyPage } from './ApplyPage'
 
+// The personal-info step now renders two country pickers (nationality + phone), each
+// building a localized list of ~250 entries on mount — cheap in a browser, but slow
+// enough in jsdom under full-suite load to blow the 5s default. Give these end-to-end
+// wizard tests more headroom.
+vi.setConfig({ testTimeout: 15000 })
+
 const LINK = 'http://localhost/api/v1/applications/1/verify-email?expires=1&signature=abc'
 
 // A complete, client-valid Step-1 snapshot. The personal-info step now validates on
@@ -16,10 +22,11 @@ const LINK = 'http://localhost/api/v1/applications/1/verify-email?expires=1&sign
 const SNAPSHOT = {
   name_en: 'Sara Applicant',
   name_ar: 'سارة المتقدمة',
+  id_type: 'national_id',
   national_id: '29001010101010',
   phone: '+201000000000',
   date_of_birth: '1998-05-20',
-  nationality: 'Egyptian',
+  nationality: 'EG',
   gender: 'Female',
   address_country: 'Egypt',
   address_city: 'Alexandria',

@@ -205,6 +205,7 @@ export type MyApplication200Data = {
   name_en?: string;
   name_ar?: string;
   national_id?: string;
+  id_type?: string;
   phone?: string;
   date_of_birth?: string;
   nationality?: string;
@@ -252,13 +253,15 @@ export type SaveStep1partialBody = {
   name_en?: string;
   /** Full name in Arabic. */
   name_ar?: string;
-  /** National ID / passport; unique within the cycle. */
+  /** Identification type; one of national_id, passport. */
+  id_type?: string;
+  /** Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle. */
   national_id?: string;
-  /** Contact phone. */
+  /** Contact phone in E.164 form. */
   phone?: string;
   /** Date of birth (Y-m-d), in the past. */
   date_of_birth?: string;
-  /** Nationality. */
+  /** Nationality as an ISO 3166-1 alpha-2 code. */
   nationality?: string;
   /** One of Male, Female. */
   gender?: string;
@@ -325,13 +328,15 @@ export type SubmitStep1Body = {
   name_en: string;
   /** Full name in Arabic. */
   name_ar: string;
-  /** National ID / passport; unique within the cycle. */
+  /** Identification type; one of national_id, passport. */
+  id_type: string;
+  /** Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle. */
   national_id: string;
-  /** Contact phone. */
+  /** Contact phone in E.164 form. */
   phone: string;
   /** Date of birth (Y-m-d), in the past. */
   date_of_birth: string;
-  /** Nationality. */
+  /** Nationality as an ISO 3166-1 alpha-2 code. */
   nationality: string;
   /** One of Male, Female. */
   gender: string;
@@ -1207,6 +1212,7 @@ export type ReviewAnApplication200Data = {
   name_en?: string;
   name_ar?: string;
   national_id?: string;
+  id_type?: string;
   phone?: string;
   nationality?: string;
   gender?: string;

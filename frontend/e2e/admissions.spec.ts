@@ -52,6 +52,15 @@ async function selectOption(page: Page, label: string, option: string) {
   await page.getByRole('option', { name: option, exact: true }).click()
 }
 
+// A searchable MUI Autocomplete (e.g. nationality, ticket 06): open it, type to filter,
+// then pick the matching option.
+async function selectAutocomplete(page: Page, label: string, query: string, option: string) {
+  const box = page.getByRole('combobox', { name: label })
+  await box.click()
+  await box.fill(query)
+  await page.getByRole('option', { name: option }).first().click()
+}
+
 // A per-step screenshot, attached to the HTML report CI uploads (ticket 12 artifacts).
 async function capture(page: Page, testInfo: TestInfo, name: string) {
   await testInfo.attach(name, {
@@ -95,10 +104,14 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   // ── 2a. Personal info ───────────────────────────────────────────────────────────
   await page.getByLabel('Full name (English)').fill(APPLICANT.name)
   await page.getByLabel('Full name (Arabic)').fill('متقدم الاختبار')
-  await page.getByLabel('National ID / passport').fill(APPLICANT.nationalId)
-  await page.getByLabel('Phone').fill('+201000000000')
+  await selectOption(page, 'Identification type', 'National ID')
+  await page.getByLabel('Identification number').fill(APPLICANT.nationalId)
+  // Phone is a country-selector + national number (default Egypt, +20); type the
+  // national part — the field stores canonical E.164 (ticket 06).
+  await page.getByLabel('Phone', { exact: false }).fill('1000000000')
   await page.getByLabel('Date of birth').fill('1998-05-20')
-  await page.getByLabel('Nationality').fill('Egyptian')
+  // Nationality is a searchable ISO-3166 list, stored as the alpha-2 code (ticket 06).
+  await selectAutocomplete(page, 'Nationality', 'Egypt', 'Egypt')
   await selectOption(page, 'Gender', 'Male')
   await page.getByLabel('Country').fill('Egypt')
   await page.getByLabel('City').fill('Alexandria')

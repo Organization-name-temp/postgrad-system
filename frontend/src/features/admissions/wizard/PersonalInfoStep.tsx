@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Checkbox,
@@ -34,9 +35,13 @@ import {
   ENGLISH_TEST_NONE,
   GENDERS,
   GPA_SCALES,
+  ID_TYPES,
+  ID_TYPE_NATIONAL,
   PREVIOUS_DEGREES,
 } from './fieldOptions'
-import { buildPersonalInfoSchema } from './personalInfoSchema'
+import { countryOptions } from './countries'
+import { PhoneField } from './PhoneField'
+import { buildPersonalInfoSchema, ID_FORMATS } from './personalInfoSchema'
 import type { PersonalInfoValues } from './personalInfoSchema'
 
 interface PersonalInfoStepProps {
@@ -57,6 +62,9 @@ function seed(application: MyApplication200Data | undefined): PersonalInfoValues
   return {
     name_en: application?.name_en ?? '',
     name_ar: application?.name_ar ?? '',
+    // Default a fresh form to National ID (the common case for local applicants);
+    // a resumed snapshot keeps whatever was chosen.
+    id_type: application?.id_type ?? ID_TYPE_NATIONAL,
     national_id: application?.national_id ?? '',
     phone: application?.phone ?? '',
     date_of_birth: application?.date_of_birth ?? '',
@@ -87,6 +95,7 @@ function toSubmitBody(form: PersonalInfoValues): SubmitStep1Body {
   return {
     name_en: form.name_en,
     name_ar: form.name_ar,
+    id_type: form.id_type,
     national_id: form.national_id,
     phone: form.phone,
     date_of_birth: form.date_of_birth,
@@ -123,6 +132,7 @@ function toPartialBody(form: PersonalInfoValues): SaveStep1partialBody {
   const text: Array<keyof SaveStep1partialBody & keyof PersonalInfoValues> = [
     'name_en',
     'name_ar',
+    'id_type',
     'national_id',
     'phone',
     'date_of_birth',
@@ -166,9 +176,12 @@ function toPartialBody(form: PersonalInfoValues): SaveStep1partialBody {
  * completeness, so a half-filled form can still be resumed.
  */
 export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalInfoStepProps) {
-  const { t } = useTranslation('admissions')
+  const { t, i18n } = useTranslation('admissions')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  // The nationality options, localized to the active language and sorted by label.
+  const nationalities = useMemo(() => countryOptions(i18n.language), [i18n.language])
 
   const submit = useSubmitStep1()
   const save = useSaveStep1partial()
@@ -179,7 +192,7 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
   const schema = useMemo(() => buildPersonalInfoSchema(t), [t])
   const resolver = useMemo(() => zodResolver(schema) as Resolver<PersonalInfoValues>, [schema])
 
-  const { control, handleSubmit, getValues, setValue, setError, watch } =
+  const { control, handleSubmit, getValues, setValue, setError, trigger, watch } =
     useForm<PersonalInfoValues>({
       // `onTouched` is exactly ADR-0014's rule: validate a field on its first blur,
       // then re-validate it on every change once it has been touched/errored.
@@ -333,6 +346,11 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
 
   const scoreDisabled = watch('english_test') === ENGLISH_TEST_NONE
 
+  // A proactive format hint for the identifier, driven by the chosen ID type (the same
+  // message the validator would show), so the applicant knows the expected shape up front.
+  const idType = watch('id_type')
+  const identifierHint = ID_FORMATS[idType] ? t(ID_FORMATS[idType].messageKey) : undefined
+
   return (
     <Box
       component="form"
@@ -359,10 +377,90 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
         <Divider textAlign="left">{t('personalInfo.sections.identity')}</Divider>
         {text('name_en', { required: true })}
         {text('name_ar', { required: true })}
-        {text('national_id', { required: true })}
-        {text('phone', { required: true })}
+        <Controller
+          control={control}
+          name="id_type"
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              value={(field.value as string) ?? ''}
+              onChange={(event) => {
+                field.onChange(event)
+                // The identifier's format depends on this choice — re-check it so a
+                // switch (e.g. National ID → Passport) refreshes any inline error now.
+                void trigger('national_id')
+              }}
+              select
+              label={t('personalInfo.fields.id_type')}
+              required
+              fullWidth
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message}
+            >
+              {ID_TYPES.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {t(`personalInfo.idTypes.${option}`)}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        />
+        <Controller
+          control={control}
+          name="national_id"
+          render={({ field, fieldState }) => (
+            <TextField
+              {...field}
+              value={(field.value as string) ?? ''}
+              label={t('personalInfo.fields.national_id')}
+              required
+              fullWidth
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message ?? identifierHint}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="phone"
+          render={({ field, fieldState }) => (
+            <PhoneField
+              value={(field.value as string) ?? ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              label={t('personalInfo.fields.phone')}
+              countryLabelText={t('personalInfo.fields.phone_country')}
+              lang={i18n.language}
+              error={Boolean(fieldState.error)}
+              helperText={fieldState.error?.message ?? t('personalInfo.phoneHelp')}
+            />
+          )}
+        />
         {text('date_of_birth', { type: 'date', required: true })}
-        {text('nationality', { required: true })}
+        <Controller
+          control={control}
+          name="nationality"
+          render={({ field, fieldState }) => (
+            <Autocomplete
+              options={nationalities}
+              value={nationalities.find((option) => option.code === field.value) ?? null}
+              getOptionLabel={(option) => option.label}
+              isOptionEqualToValue={(option, value) => option.code === value.code}
+              onChange={(_event, option) => field.onChange(option?.code ?? '')}
+              onBlur={field.onBlur}
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={t('personalInfo.fields.nationality')}
+                  required
+                  error={Boolean(fieldState.error)}
+                  helperText={fieldState.error?.message}
+                />
+              )}
+            />
+          )}
+        />
         {select('gender', GENDERS, 'personalInfo.genders')}
 
         <Divider textAlign="left">{t('personalInfo.sections.address')}</Divider>

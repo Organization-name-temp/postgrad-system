@@ -548,9 +548,10 @@ paths:
                     name_en: 'Sara Applicant'
                     name_ar: 'سارة المتقدمة'
                     national_id: '29001010101010'
+                    id_type: national_id
                     phone: '+201000000000'
                     date_of_birth: '1998-05-20'
-                    nationality: Egyptian
+                    nationality: EG
                     gender: Female
                     address_country: Egypt
                     address_city: Alexandria
@@ -623,6 +624,9 @@ paths:
                       national_id:
                         type: string
                         example: '29001010101010'
+                      id_type:
+                        type: string
+                        example: national_id
                       phone:
                         type: string
                         example: '+201000000000'
@@ -631,7 +635,7 @@ paths:
                         example: '1998-05-20'
                       nationality:
                         type: string
-                        example: Egyptian
+                        example: EG
                       gender:
                         type: string
                         example: Female
@@ -904,13 +908,17 @@ paths:
                   type: string
                   description: 'Full name in Arabic.'
                   example: 'سارة المتقدمة'
+                id_type:
+                  type: string
+                  description: 'Identification type; one of national_id, passport.'
+                  example: national_id
                 national_id:
                   type: string
-                  description: 'National ID / passport; unique within the cycle.'
+                  description: 'Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle.'
                   example: '29001010101010'
                 phone:
                   type: string
-                  description: 'Contact phone.'
+                  description: 'Contact phone in E.164 form.'
                   example: '+201000000000'
                 date_of_birth:
                   type: string
@@ -918,8 +926,8 @@ paths:
                   example: '1998-05-20'
                 nationality:
                   type: string
-                  description: Nationality.
-                  example: Egyptian
+                  description: 'Nationality as an ISO 3166-1 alpha-2 code.'
+                  example: EG
                 gender:
                   type: string
                   description: 'One of Male, Female.'
@@ -1114,13 +1122,17 @@ paths:
                   type: string
                   description: 'Full name in Arabic.'
                   example: 'سارة المتقدمة'
+                id_type:
+                  type: string
+                  description: 'Identification type; one of national_id, passport.'
+                  example: national_id
                 national_id:
                   type: string
-                  description: 'National ID / passport; unique within the cycle.'
+                  description: 'Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle.'
                   example: '29001010101010'
                 phone:
                   type: string
-                  description: 'Contact phone.'
+                  description: 'Contact phone in E.164 form.'
                   example: '+201000000000'
                 date_of_birth:
                   type: string
@@ -1128,8 +1140,8 @@ paths:
                   example: '1998-05-20'
                 nationality:
                   type: string
-                  description: Nationality.
-                  example: Egyptian
+                  description: 'Nationality as an ISO 3166-1 alpha-2 code.'
+                  example: EG
                 gender:
                   type: string
                   description: 'One of Male, Female.'
@@ -1201,6 +1213,7 @@ paths:
               required:
                 - name_en
                 - name_ar
+                - id_type
                 - national_id
                 - phone
                 - date_of_birth
@@ -3855,8 +3868,9 @@ paths:
                     name_en: 'Sara Applicant'
                     name_ar: 'سارة المتقدمة'
                     national_id: '29001010101010'
+                    id_type: national_id
                     phone: '+201000000000'
-                    nationality: Egyptian
+                    nationality: EG
                     gender: Female
                     previous_degree: BSc
                     previous_university: 'Cairo University'
@@ -3907,12 +3921,15 @@ paths:
                       national_id:
                         type: string
                         example: '29001010101010'
+                      id_type:
+                        type: string
+                        example: national_id
                       phone:
                         type: string
                         example: '+201000000000'
                       nationality:
                         type: string
-                        example: Egyptian
+                        example: EG
                       gender:
                         type: string
                         example: Female

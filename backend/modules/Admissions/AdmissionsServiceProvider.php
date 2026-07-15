@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Admissions\Internal\Console\Commands\FlagOverdueApplications;
+use Modules\Admissions\Internal\Console\Commands\SendInterviewReminders;
 use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Listeners\SendAcceptanceNotification;
 
@@ -18,6 +20,7 @@ class AdmissionsServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
 
         $this->registerRateLimiters();
+        $this->registerConsoleCommands();
 
         // The acceptance mint's one Phase-2 side-effect (ADR-0013): the applicant is
         // notified they were accepted. Wired explicitly (not by auto-discovery) so the
@@ -30,6 +33,23 @@ class AdmissionsServiceProvider extends ServiceProvider
         Route::middleware('api')
             ->prefix('api/v1')
             ->group(__DIR__.'/Public/Http/routes.php');
+    }
+
+    /**
+     * The module's manually-run console commands (ticket 11): the SLA overdue-flagger
+     * and the interview-reminder nudge. Registered only when running in the console —
+     * they have no HTTP surface — and left to Laravel's container for their `handle()`
+     * dependencies (the Public facades they read). Both notify only; neither changes
+     * any application status.
+     */
+    private function registerConsoleCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                FlagOverdueApplications::class,
+                SendInterviewReminders::class,
+            ]);
+        }
     }
 
     /**

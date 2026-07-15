@@ -36,8 +36,21 @@ enum NotificationType: string
     /** An interview was scheduled. Payload: `scheduled_at`, `mode`, location/link. */
     case InterviewScheduled = 'interview.scheduled';
 
-    /** A reminder that a scheduled interview is coming up. Payload: `scheduled_at`. */
+    /**
+     * A reminder that a scheduled interview is coming up (ticket 11), raised by the
+     * manual `admissions:send-interview-reminders` command to both the applicant and the
+     * assigned interviewer. Payload: `scheduled_at`, `application_id`.
+     */
     case InterviewReminder = 'interview.reminder';
+
+    /**
+     * An application has waited past its review SLA and needs a reviewer's attention
+     * (ticket 11). Raised by the manual `admissions:flag-overdue` command to the
+     * relevant reviewer — Student Affairs for screening, the Faculty's Dean(s) for Dean
+     * review — never to the applicant; it changes no status. Payload: `application_id`,
+     * `stage` (`sa_screening`/`dean_review`), `age_days`.
+     */
+    case ApplicationOverdue = 'application.overdue';
 
     /** A non-acceptance final decision. Payload: `decision`, optional `reason`. */
     case DecisionRecorded = 'decision.recorded';

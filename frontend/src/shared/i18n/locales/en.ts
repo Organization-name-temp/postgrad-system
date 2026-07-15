@@ -234,6 +234,7 @@ export const en = {
       decisionRecorded: 'A decision has been recorded on your application.',
       applicationAccepted:
         'Congratulations — you have been accepted. Your University ID is {{university_id}}.',
+      applicationOverdue: 'An application awaiting your review is overdue.',
       fallback: 'You have a new notification.',
     },
   },

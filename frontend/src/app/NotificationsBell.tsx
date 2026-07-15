@@ -46,6 +46,7 @@ const TYPE_ALIAS: Record<string, string> = {
   'interview.reminder': 'interviewReminder',
   'decision.recorded': 'decisionRecorded',
   'application.accepted': 'applicationAccepted',
+  'application.overdue': 'applicationOverdue',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

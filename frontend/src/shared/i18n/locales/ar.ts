@@ -227,6 +227,7 @@ export const ar = {
       interviewReminder: 'تذكير: لديك مقابلة قادمة.',
       decisionRecorded: 'تم تسجيل قرار بشأن طلبك.',
       applicationAccepted: 'تهانينا — تم قبولك. الرقم الجامعي الخاص بك هو {{university_id}}.',
+      applicationOverdue: 'هناك طلب بانتظار مراجعتك تجاوز الموعد المحدد.',
       fallback: 'لديك إشعار جديد.',
     },
   },

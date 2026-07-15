@@ -9,6 +9,36 @@ import { ApplyPage } from './ApplyPage'
 
 const LINK = 'http://localhost/api/v1/applications/1/verify-email?expires=1&signature=abc'
 
+// A complete, client-valid Step-1 snapshot. The personal-info step now validates on
+// the client (RHF + Zod, ADR-0014) before it will submit, so the wizard-flow tests
+// seed a filled form — an empty draft is deliberately blocked at the client now, and
+// is covered by PersonalInfoStep's own on-blur test instead.
+const SNAPSHOT = {
+  name_en: 'Sara Applicant',
+  name_ar: 'سارة المتقدمة',
+  national_id: '29001010101010',
+  phone: '+201000000000',
+  date_of_birth: '1998-05-20',
+  nationality: 'Egyptian',
+  gender: 'Female',
+  address_country: 'Egypt',
+  address_city: 'Alexandria',
+  address_street: '15 Corniche Road',
+  previous_university: 'Cairo University',
+  graduation_certificate_name: 'BSc in Computer Science',
+  graduation_date: '2020-07-01',
+  previous_degree: 'BSc',
+  previous_major: 'Computer Science',
+  graduation_gpa: '3.50',
+  graduation_cgpa: '3.45',
+  gpa_scale: '4.0',
+  is_ejust_graduate: false,
+  applying_for_degree: 'MSc',
+  english_test: 'IELTS',
+  english_score: '7.50',
+  native_arabic_speaker: true,
+}
+
 // A tiny in-memory server behind the shared Axios mutator, so the wizard drives
 // the REAL generated hooks: the status → step derivation, the submit → verify →
 // documents progression, and inline 422 handling are observed, not stubbed.
@@ -70,7 +100,13 @@ vi.mock('../../../shared/api/http', () => ({
         if (body.name_en !== undefined) srv.name_en = body.name_en
       }
       return Promise.resolve({
-        data: { id: 1, status: srv.status, admission_cycle_id: 1, name_en: srv.name_en },
+        data: {
+          ...SNAPSHOT,
+          id: 1,
+          status: srv.status,
+          admission_cycle_id: 1,
+          name_en: srv.name_en ?? SNAPSHOT.name_en,
+        },
       })
     }
     return Promise.resolve({})

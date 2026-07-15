@@ -556,6 +556,18 @@ export const en = {
       saving: 'Saving…',
       submitError: 'Could not submit. Please fix the highlighted fields and try again.',
     },
+    validation: {
+      required: 'This field is required.',
+      min: 'Must be at least {{count}} characters.',
+      max: 'Must be at most {{count}} characters.',
+      number: 'Enter a number.',
+      range: 'Must be between {{min}} and {{max}}.',
+      date: 'Enter a valid date.',
+      datePast: 'Must be a date in the past.',
+      dateNotFuture: 'Cannot be in the future.',
+      select: 'Choose one of the options.',
+      scoreRequired: 'Enter your score for the selected test.',
+    },
     verify: {
       title: 'Verify your email',
       intro:

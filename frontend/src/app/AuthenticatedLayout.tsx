@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../features/auth/useAuth'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeModeToggle } from './ThemeModeToggle'
+import { NotificationsBell } from './NotificationsBell'
 import { UserMenu } from './UserMenu'
 import { SideNav } from './SideNav'
 import { AppBrand } from './AppBrand'
@@ -103,6 +104,7 @@ export function AuthenticatedLayout() {
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <LanguageSwitcher />
             <ThemeModeToggle />
+            <NotificationsBell />
             <UserMenu />
           </Stack>
         </Toolbar>

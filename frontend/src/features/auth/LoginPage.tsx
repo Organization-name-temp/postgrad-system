@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Alert, Box, Button, Container, TextField, Typography } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { Alert, Box, Button, Container, Link, TextField, Typography } from '@mui/material'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useServiceHealthCheck } from '../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../shared/api/errors'
@@ -67,6 +67,13 @@ export function LoginPage() {
         <Button type="submit" variant="contained" fullWidth disabled={isLoggingIn} sx={{ mt: 2 }}>
           {isLoggingIn ? t('login.submitting') : t('login.submit')}
         </Button>
+
+        <Typography variant="body2" sx={{ mt: 3 }}>
+          {t('login.noAccount')}{' '}
+          <Link component={RouterLink} to="/register">
+            {t('login.register')}
+          </Link>
+        </Typography>
 
         <ApiStatus />
       </Box>

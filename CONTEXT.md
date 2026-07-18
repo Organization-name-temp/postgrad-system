@@ -50,6 +50,17 @@ their Roles. Enforced on the API and mirrored on the SPA for display only — th
 never the authority.
 _Avoid_: privilege, right, capability ("Permission" is canonical).
 
+**University ID**:
+The unique student identifier minted by Identity when an Applicant is accepted, formatted
+`{year}-{programCode}-{NNNN}` (e.g. `2026-CSE-0001`) — the year of the Admission Cycle, the
+accepted Program's code, and a per-(year, program) sequence. Distinct from the User id.
+
+**Student anchor**:
+The `Student` record Identity creates at acceptance — 1:1 with a User, holding the
+University ID, the (opaque) Program reference, enrollment term, assigned Advisor, and an
+identity snapshot. It is only the *anchor*; the growing academic record (Enrollments,
+Grades, Credit-Hour Summary, Standing) is owned by later modules and references it by id.
+
 **Audit Log**:
 The append-only record of security- and data-sensitive events (authentication events now;
 sensitive-data CRUD later), retained long-term. Entries are never updated or deleted and
@@ -59,14 +70,68 @@ _Avoid_: activity log, history, event log (the domain-event stream is a separate
 ## Admissions
 
 **Application**:
-An Applicant's single submission for admission, moving through a fixed sequence of
-statuses (Draft → Submitted → Email Verified → Under SA Review → … → Accepted/Rejected).
-The workflow object, distinct from the Applicant who owns it.
+An Applicant's submission for admission within one Admission Cycle, moving through a
+fixed sequence of statuses (Draft → Submitted → Email Verified → Under SA Review → … →
+Accepted/Rejected). The workflow object, distinct from the Applicant who owns it. One
+Applicant holds at most one Application per Cycle, but may re-apply in a later Cycle.
 _Avoid_: submission, form, request.
+
+**Admission Cycle**:
+A single admission intake — one Intake Term of one year (e.g. "Fall 2026") — with an
+application window (open/close). Applications belong to exactly one Cycle; an Applicant
+can only start an Application while a Cycle's window is open. The Cycle also fixes the
+enrollment term a successful Applicant is admitted into.
+_Avoid_: intake, season, round, admission year (the Cycle, not a bare year, is canonical).
+
+**Intake Term**:
+The semester an Admission Cycle admits into — Fall or Spring (E-JUST's two main
+semesters). Combined with a year it names a Cycle and is unique per year.
+
+**Application Status**:
+Where an Application sits in its fixed workflow — one of Draft, Submitted, Email Verified,
+Under SA Review, SA Approved, Returned for Revision, Under Dean Review, Interview Scheduled,
+Interview Completed, Accepted, Conditionally Accepted, Waitlisted, Rejected. Only the
+transitions defined by the workflow are legal; each change is timestamped, attributed, and
+optionally carries a reviewer note.
+
+**Status Transition**:
+One append-only record of an Application moving from one Status to another — who, when, and
+an optional note (a screening comment, revision instruction, or rejection reason). The
+Application's Status Transitions are its applicant-visible timeline and its decision audit
+trail; distinct from the security Audit Log.
+
+**Interview Slot**:
+An offered interview appointment — a date/time, an assigned interviewer (a faculty User),
+and a mode (in-person or virtual with a meeting link). Created by Student Affairs; holds
+exactly one Applicant. The pool of open Slots is what an Applicant is scheduled into or
+reschedules within.
+
+**Interview**:
+One Applicant's booking of one Interview Slot, carrying its confirmation state, a single
+allowed reschedule, and — once conducted — the interviewer's evaluation score and notes.
+Only the assigned interviewer may record the evaluation.
 
 **Admission Decision**:
 The terminal outcome recorded after interview: Accepted, Conditionally Accepted,
-Waitlisted, or Rejected.
+Waitlisted, or Rejected. Conditionally Accepted and Waitlisted are not resting ends —
+each later resolves to Accepted or Rejected.
+
+**Identification Type**:
+How an Applicant is identified on their Application — a National ID (an Egyptian
+citizen's 14-digit number) or a Passport (an alphanumeric travel-document number, for a
+non-Egyptian or overseas Applicant). Chosen on the personal-info step; it selects the
+format the identifier is validated against. Stored with the identifier, which is unique
+within an Admission Cycle.
+_Avoid_: ID kind; "document type" (Document Type is the uploaded-file taxonomy — a
+different thing that happens to share the word "type").
+
+## Notifications
+
+**Notification**:
+An in-app message delivered to one User's notification bell, carrying a type and a data
+payload (never pre-rendered text — the SPA renders it bilingually from the type). Read via a
+polled endpoint; no email, SMS, or websocket. Distinct from the Audit Log (security record)
+and the in-process domain-event stream (module-to-module, not user-facing).
 
 ## Catalog
 

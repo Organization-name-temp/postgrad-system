@@ -24,6 +24,1612 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type ListAssignableDeans200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableDeans200 = {
+  data?: ListAssignableDeans200DataItem[];
+};
+
+export type ListAssignableDeans403 = {
+  message?: string;
+};
+
+export type ListDeanFacultyAssignments200DataItem = {
+  id?: number;
+  user_id?: number;
+  faculty_id?: number;
+  dean_name?: string;
+  dean_email?: string;
+};
+
+export type ListDeanFacultyAssignments200 = {
+  data?: ListDeanFacultyAssignments200DataItem[];
+};
+
+export type ListDeanFacultyAssignments403 = {
+  message?: string;
+};
+
+export type AssignADeanToAFacultyBody = {
+  /** The Dean (R07 user) to assign. */
+  user_id: number;
+  /** The opaque Catalog Faculty id. */
+  faculty_id: number;
+};
+
+export type AssignADeanToAFaculty201Data = {
+  id?: number;
+  user_id?: number;
+  faculty_id?: number;
+  dean_name?: string;
+  dean_email?: string;
+};
+
+export type AssignADeanToAFaculty201 = {
+  data?: AssignADeanToAFaculty201Data;
+};
+
+export type AssignADeanToAFaculty403 = {
+  message?: string;
+};
+
+export type AssignADeanToAFaculty422 = {
+  message?: string;
+  errors?: {
+  user_id?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  faculty_id?: string[];
+};
+};
+
+export type UnassignADeanFromAFaculty204 = { [key: string]: unknown };
+
+export type UnassignADeanFromAFaculty403 = {
+  message?: string;
+};
+
+export type UnassignADeanFromAFaculty404 = {
+  message?: string;
+};
+
+export type ListCurrentlyOpenAdmissionCycles200DataItem = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ListCurrentlyOpenAdmissionCycles200 = {
+  data?: ListCurrentlyOpenAdmissionCycles200DataItem[];
+};
+
+export type RegisterAndStartAnApplicationBody = {
+  /** The applicant's full name. */
+  name: string;
+  /** A unique email address; becomes the login. */
+  email: string;
+  /** At least 8 characters; must match the confirmation. */
+  password: string;
+  /** Repeat of the password. */
+  password_confirmation: string;
+  /** The open Cycle to apply to. Required only when more than one Cycle is open; otherwise the single open Cycle is used. */
+  admission_cycle_id?: number;
+};
+
+export type RegisterAndStartAnApplication201Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+};
+
+export type RegisterAndStartAnApplication201 = {
+  data?: RegisterAndStartAnApplication201Data;
+};
+
+export type RegisterAndStartAnApplication409 = {
+  message?: string;
+};
+
+export type RegisterAndStartAnApplication422Errors = {
+  email?: string[];
+};
+
+export type RegisterAndStartAnApplication422 = {
+  message?: string;
+  errors?: RegisterAndStartAnApplication422Errors;
+};
+
+export type VerifyEmailsignedLink200Data = {
+  id?: number;
+  status?: string;
+};
+
+export type VerifyEmailsignedLink200 = {
+  data?: VerifyEmailsignedLink200Data;
+};
+
+export type VerifyEmailsignedLink403 = {
+  message?: string;
+};
+
+export type MyApplication200DataPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type MyApplication200DataAlternativeProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type MyApplication200DataDocumentsItem = {
+  id?: string;
+  document_type?: string;
+  original_filename?: string;
+  mime?: string;
+  size_bytes?: number;
+  uploaded_at?: string;
+  download_url?: string;
+};
+
+export type MyApplication200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  id_type?: string;
+  phone?: string;
+  date_of_birth?: string;
+  nationality?: string;
+  gender?: string;
+  address_country?: string;
+  address_city?: string;
+  address_street?: string;
+  previous_university?: string;
+  graduation_certificate_name?: string;
+  graduation_date?: string;
+  previous_degree?: string;
+  previous_major?: string;
+  graduation_gpa?: string;
+  graduation_cgpa?: string;
+  gpa_scale?: string;
+  is_ejust_graduate?: boolean;
+  applying_for_degree?: string;
+  english_test?: string;
+  english_score?: string;
+  native_arabic_speaker?: boolean;
+  submitted_at?: string;
+  primary_program_id?: number;
+  alternative_program_id?: number;
+  primary_program?: MyApplication200DataPrimaryProgram;
+  alternative_program?: MyApplication200DataAlternativeProgram;
+  /** @nullable */
+  finalized_at?: string | null;
+  documents?: MyApplication200DataDocumentsItem[];
+};
+
+export type MyApplication200 = {
+  data?: MyApplication200Data;
+};
+
+export type MyApplication401 = {
+  message?: string;
+};
+
+export type MyApplication404 = {
+  message?: string;
+};
+
+export type SaveStep1partialBody = {
+  /** Full name in English. */
+  name_en?: string;
+  /** Full name in Arabic. */
+  name_ar?: string;
+  /** Identification type; one of national_id, passport. */
+  id_type?: string;
+  /** Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle. */
+  national_id?: string;
+  /** Contact phone in E.164 form. */
+  phone?: string;
+  /** Date of birth (Y-m-d), in the past. */
+  date_of_birth?: string;
+  /** Nationality as an ISO 3166-1 alpha-2 code. */
+  nationality?: string;
+  /** One of Male, Female. */
+  gender?: string;
+  /** Country. */
+  address_country?: string;
+  /** City. */
+  address_city?: string;
+  /** Street address. */
+  address_street?: string;
+  /** Previous university. */
+  previous_university?: string;
+  /** Name of the graduation certificate. */
+  graduation_certificate_name?: string;
+  /** Graduation date (Y-m-d). */
+  graduation_date?: string;
+  /** One of BSc, MSc, PhD. */
+  previous_degree?: string;
+  /** Previous major/specialization. */
+  previous_major?: string;
+  /** Graduation GPA. */
+  graduation_gpa?: number;
+  /** Graduation CGPA. */
+  graduation_cgpa?: number;
+  /** One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100. */
+  gpa_scale?: string;
+  /** Whether the applicant graduated from E-JUST. */
+  is_ejust_graduate?: boolean;
+  /** Degree applied for; one of MSc, PhD. */
+  applying_for_degree?: string;
+  /** English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. */
+  english_test?: string;
+  /** Score for the chosen test; required unless the test is None. */
+  english_score?: number;
+  /** Whether the applicant is a native Arabic speaker. */
+  native_arabic_speaker?: boolean;
+};
+
+export type SaveStep1partial200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+
+export type SaveStep1partial200 = {
+  data?: SaveStep1partial200Data;
+};
+
+export type SaveStep1partial409 = {
+  message?: string;
+};
+
+export type SaveStep1partial422Errors = {
+  gender?: string[];
+};
+
+export type SaveStep1partial422 = {
+  message?: string;
+  errors?: SaveStep1partial422Errors;
+};
+
+export type SubmitStep1Body = {
+  /** Full name in English. */
+  name_en: string;
+  /** Full name in Arabic. */
+  name_ar: string;
+  /** Identification type; one of national_id, passport. */
+  id_type: string;
+  /** Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle. */
+  national_id: string;
+  /** Contact phone in E.164 form. */
+  phone: string;
+  /** Date of birth (Y-m-d), in the past. */
+  date_of_birth: string;
+  /** Nationality as an ISO 3166-1 alpha-2 code. */
+  nationality: string;
+  /** One of Male, Female. */
+  gender: string;
+  /** Country. */
+  address_country: string;
+  /** City. */
+  address_city: string;
+  /** Street address. */
+  address_street: string;
+  /** Previous university. */
+  previous_university: string;
+  /** Name of the graduation certificate. */
+  graduation_certificate_name: string;
+  /** Graduation date (Y-m-d). */
+  graduation_date: string;
+  /** One of BSc, MSc, PhD. */
+  previous_degree: string;
+  /** Previous major/specialization. */
+  previous_major: string;
+  /** Graduation GPA. */
+  graduation_gpa: number;
+  /** Graduation CGPA. */
+  graduation_cgpa: number;
+  /** One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100. */
+  gpa_scale: string;
+  /** Whether the applicant graduated from E-JUST. */
+  is_ejust_graduate: boolean;
+  /** Degree applied for; one of MSc, PhD. */
+  applying_for_degree: string;
+  /** English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. */
+  english_test: string;
+  /** Score for the chosen test; required unless the test is None. */
+  english_score?: number;
+  /** Whether the applicant is a native Arabic speaker. */
+  native_arabic_speaker: boolean;
+};
+
+export type SubmitStep1200 = {
+  data?: {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+  verification_url?: string;
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+  /** @nullable */
+  verification_url?: string | null;
+};
+
+export type SubmitStep1409 = {
+  message?: string;
+};
+
+export type SubmitStep1422Errors = {
+  name_ar?: string[];
+};
+
+export type SubmitStep1422 = {
+  message?: string;
+  errors?: SubmitStep1422Errors;
+};
+
+export type ResendTheVerificationLink200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+};
+
+export type ResendTheVerificationLink200 = {
+  data?: ResendTheVerificationLink200Data;
+  verification_url?: string;
+};
+
+export type ResendTheVerificationLink409 = {
+  message?: string;
+};
+
+export type ResendTheVerificationLink429 = {
+  message?: string;
+};
+
+export type UploadADocumentBody = {
+  /** The kind of document. One of graduation_certificate, transcript, national_id, photo, english_certificate, msc_thesis, cv, recommendation_letter, additional_certificate. */
+  document_type: string;
+  /** The file to upload (PDF or image, within the type's size limit). */
+  file: Blob;
+};
+
+export type UploadADocument201Data = {
+  id?: string;
+  document_type?: string;
+  original_filename?: string;
+  mime?: string;
+  size_bytes?: number;
+  uploaded_at?: string;
+  download_url?: string;
+};
+
+export type UploadADocument201 = {
+  data?: UploadADocument201Data;
+};
+
+export type UploadADocument409 = {
+  message?: string;
+};
+
+export type UploadADocument422 = {
+  message?: string;
+  errors?: {
+  document_type?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  file?: string[];
+};
+};
+
+export type RemoveADocument404 = {
+  message?: string;
+};
+
+export type RemoveADocument409 = {
+  message?: string;
+};
+
+export type ChooseProgramsBody = {
+  /** The chosen primary Program's id. */
+  primary_program_id: number;
+  /**
+     * An optional second-choice Program's id; must differ from the primary.
+     * @nullable
+     */
+  alternative_program_id?: number | null;
+};
+
+export type ChoosePrograms200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  primary_program_id?: number;
+  alternative_program_id?: number;
+};
+
+export type ChoosePrograms200 = {
+  data?: ChoosePrograms200Data;
+};
+
+export type ChoosePrograms409 = {
+  message?: string;
+};
+
+export type ChoosePrograms422 = {
+  message?: string;
+  errors?: {
+  primary_program_id?: string[];
+};
+};
+
+export type FinalizeTheApplication200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  finalized_at?: string;
+};
+
+export type FinalizeTheApplication200 = {
+  data?: FinalizeTheApplication200Data;
+};
+
+export type FinalizeTheApplication409 = {
+  message?: string;
+};
+
+export type FinalizeTheApplication422Errors = {
+  primary_program_id?: string[];
+  documents?: string[];
+};
+
+export type FinalizeTheApplication422 = {
+  message?: string;
+  errors?: FinalizeTheApplication422Errors;
+};
+
+export type ResubmitAfterRevision200Data = {
+  id?: number;
+  status?: string;
+};
+
+export type ResubmitAfterRevision200 = {
+  data?: ResubmitAfterRevision200Data;
+};
+
+export type ResubmitAfterRevision401 = {
+  message?: string;
+};
+
+export type ResubmitAfterRevision409 = {
+  message?: string;
+};
+
+export type ResubmitAfterRevision422Errors = {
+  documents?: string[];
+};
+
+export type ResubmitAfterRevision422 = {
+  message?: string;
+  errors?: ResubmitAfterRevision422Errors;
+};
+
+export type OpenSlotsToRescheduleInto200DataItemInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type OpenSlotsToRescheduleInto200DataItem = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  /** @nullable */
+  location?: string | null;
+  meeting_link?: string;
+  interviewer_id?: number;
+  interviewer?: OpenSlotsToRescheduleInto200DataItemInterviewer;
+  is_open?: boolean;
+};
+
+export type OpenSlotsToRescheduleInto200 = {
+  data?: OpenSlotsToRescheduleInto200DataItem[];
+};
+
+export type MyInterview200DataSlotInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type MyInterview200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: MyInterview200DataSlotInterviewer;
+  is_open?: boolean;
+};
+
+export type MyInterview200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: MyInterview200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type MyInterview200 = {
+  data?: MyInterview200Data;
+};
+
+export type MyInterview404 = {
+  message?: string;
+};
+
+export type ConfirmMyInterview200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type ConfirmMyInterview200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: ConfirmMyInterview200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type ConfirmMyInterview200 = {
+  data?: ConfirmMyInterview200Data;
+};
+
+export type ConfirmMyInterview404 = {
+  message?: string;
+};
+
+export type ConfirmMyInterview409 = {
+  message?: string;
+};
+
+export type RescheduleMyInterviewBody = {
+  /** The open slot to move to. */
+  interview_slot_id: number;
+};
+
+export type RescheduleMyInterview200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  /** @nullable */
+  location?: string | null;
+  meeting_link?: string;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type RescheduleMyInterview200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: RescheduleMyInterview200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type RescheduleMyInterview200 = {
+  data?: RescheduleMyInterview200Data;
+};
+
+export type RescheduleMyInterview404 = {
+  message?: string;
+};
+
+export type RescheduleMyInterview409 = {
+  message?: string;
+};
+
+export type RescheduleMyInterview422Errors = {
+  interview_slot_id?: string[];
+};
+
+export type RescheduleMyInterview422 = {
+  message?: string;
+  errors?: RescheduleMyInterview422Errors;
+};
+
+export type InterviewsAssignedToMe200DataItemSlotInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type InterviewsAssignedToMe200DataItemSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: InterviewsAssignedToMe200DataItemSlotInterviewer;
+  is_open?: boolean;
+};
+
+export type InterviewsAssignedToMe200DataItemApplicant = {
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  status?: string;
+};
+
+export type InterviewsAssignedToMe200DataItem = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: InterviewsAssignedToMe200DataItemSlot;
+  applicant?: InterviewsAssignedToMe200DataItemApplicant;
+};
+
+export type InterviewsAssignedToMe200 = {
+  data?: InterviewsAssignedToMe200DataItem[];
+};
+
+export type RecordMyEvaluationBody = {
+  /** The interview score, 1–10. */
+  score: number;
+  /**
+     * Free-text notes on the interview.
+     * @nullable
+     */
+  notes?: string | null;
+};
+
+export type RecordMyEvaluation200DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type RecordMyEvaluation200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  evaluation_score?: number;
+  evaluation_notes?: string;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: RecordMyEvaluation200DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type RecordMyEvaluation200 = {
+  data?: RecordMyEvaluation200Data;
+};
+
+export type RecordMyEvaluation403 = {
+  message?: string;
+};
+
+export type RecordMyEvaluation409 = {
+  message?: string;
+};
+
+export type RecordMyEvaluation422Errors = {
+  score?: string[];
+};
+
+export type RecordMyEvaluation422 = {
+  message?: string;
+  errors?: RecordMyEvaluation422Errors;
+};
+
+export type ApplicationsAwaitingInterviewScheduling200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  /** @nullable */
+  primary_program?: string | null;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type ApplicationsAwaitingInterviewScheduling200 = {
+  data?: ApplicationsAwaitingInterviewScheduling200DataItem[];
+};
+
+export type ApplicationsAwaitingInterviewScheduling403 = {
+  message?: string;
+};
+
+export type ListAssignableInterviewers200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableInterviewers200 = {
+  data?: ListAssignableInterviewers200DataItem[];
+};
+
+export type ListAssignableInterviewers403 = {
+  message?: string;
+};
+
+export type ListInterviewSlots200DataItemInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListInterviewSlots200DataItem = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: ListInterviewSlots200DataItemInterviewer;
+  is_open?: boolean;
+};
+
+export type ListInterviewSlots200 = {
+  data?: ListInterviewSlots200DataItem[];
+};
+
+export type ListInterviewSlots403 = {
+  message?: string;
+};
+
+export type CreateAnInterviewSlotBody = {
+  /** The appointment time (ISO-8601), in the future. */
+  scheduled_at: string;
+  /** Length in minutes (15–240). */
+  duration_minutes: number;
+  /** A faculty (Instructor) User to conduct it. */
+  interviewer_id: number;
+  /** One of in_person, virtual. */
+  mode: string;
+  /** The in-person location; required when mode is in_person. */
+  location?: string;
+  /** The virtual meeting link; required when mode is virtual. */
+  meeting_link?: string;
+};
+
+export type CreateAnInterviewSlot201DataInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type CreateAnInterviewSlot201Data = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: CreateAnInterviewSlot201DataInterviewer;
+  is_open?: boolean;
+};
+
+export type CreateAnInterviewSlot201 = {
+  data?: CreateAnInterviewSlot201Data;
+};
+
+export type CreateAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type CreateAnInterviewSlot422Errors = {
+  interviewer_id?: string[];
+};
+
+export type CreateAnInterviewSlot422 = {
+  message?: string;
+  errors?: CreateAnInterviewSlot422Errors;
+};
+
+export type UpdateAnInterviewSlotBody = {
+  /** The appointment time (ISO-8601), in the future. */
+  scheduled_at: string;
+  /** Length in minutes (15–240). */
+  duration_minutes: number;
+  /** A faculty (Instructor) User to conduct it. */
+  interviewer_id: number;
+  /** One of in_person, virtual. */
+  mode: string;
+  /** The in-person location; required when mode is in_person. */
+  location?: string;
+  /** The virtual meeting link; required when mode is virtual. */
+  meeting_link?: string;
+};
+
+export type UpdateAnInterviewSlot200DataInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type UpdateAnInterviewSlot200Data = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  /** @nullable */
+  location?: string | null;
+  meeting_link?: string;
+  interviewer_id?: number;
+  interviewer?: UpdateAnInterviewSlot200DataInterviewer;
+  is_open?: boolean;
+};
+
+export type UpdateAnInterviewSlot200 = {
+  data?: UpdateAnInterviewSlot200Data;
+};
+
+export type UpdateAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type UpdateAnInterviewSlot409 = {
+  message?: string;
+};
+
+export type DeleteAnInterviewSlot204 = { [key: string]: unknown };
+
+export type DeleteAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type DeleteAnInterviewSlot409 = {
+  message?: string;
+};
+
+export type BookedInterviews200DataItemSlotInterviewer = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type BookedInterviews200DataItemSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  interviewer?: BookedInterviews200DataItemSlotInterviewer;
+  is_open?: boolean;
+};
+
+export type BookedInterviews200DataItemApplicant = {
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  status?: string;
+};
+
+export type BookedInterviews200DataItem = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  evaluation_score?: number;
+  evaluation_notes?: string;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: BookedInterviews200DataItemSlot;
+  applicant?: BookedInterviews200DataItemApplicant;
+};
+
+export type BookedInterviews200 = {
+  data?: BookedInterviews200DataItem[];
+};
+
+export type BookedInterviews403 = {
+  message?: string;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlotBody = {
+  /** The open slot to book. */
+  interview_slot_id: number;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot201DataSlot = {
+  id?: number;
+  scheduled_at?: string;
+  duration_minutes?: number;
+  mode?: string;
+  location?: string;
+  /** @nullable */
+  meeting_link?: string | null;
+  interviewer_id?: number;
+  /** @nullable */
+  interviewer?: string | null;
+  is_open?: boolean;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot201Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  /** @nullable */
+  evaluation_score?: string | null;
+  /** @nullable */
+  evaluation_notes?: string | null;
+  /** @nullable */
+  completed_at?: string | null;
+  slot?: ScheduleAnApplicantIntoAnInterviewSlot201DataSlot;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot201 = {
+  data?: ScheduleAnApplicantIntoAnInterviewSlot201Data;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot403 = {
+  message?: string;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot409 = {
+  message?: string;
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot422Errors = {
+  interview_slot_id?: string[];
+};
+
+export type ScheduleAnApplicantIntoAnInterviewSlot422 = {
+  message?: string;
+  errors?: ScheduleAnApplicantIntoAnInterviewSlot422Errors;
+};
+
+export type MarkAnInterviewComplete200Data = {
+  id?: number;
+  application_id?: number;
+  status?: string;
+  reschedule_count?: number;
+  can_reschedule?: boolean;
+  evaluation_score?: number;
+  evaluation_notes?: string;
+  completed_at?: string;
+  /** @nullable */
+  slot?: string | null;
+  /** @nullable */
+  applicant?: string | null;
+};
+
+export type MarkAnInterviewComplete200 = {
+  data?: MarkAnInterviewComplete200Data;
+};
+
+export type MarkAnInterviewComplete403 = {
+  message?: string;
+};
+
+export type MarkAnInterviewComplete409 = {
+  message?: string;
+};
+
+export type StatusTimeline200DataItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  note?: string | null;
+  occurred_at?: string;
+};
+
+export type StatusTimeline200 = {
+  data?: StatusTimeline200DataItem[];
+};
+
+export type StatusTimeline403 = {
+  message?: string;
+};
+
+export type ScreeningQueue200DataItemPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type ScreeningQueue200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  primary_program?: ScreeningQueue200DataItemPrimaryProgram;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type ScreeningQueue200 = {
+  data?: ScreeningQueue200DataItem[];
+};
+
+export type ScreeningQueue403 = {
+  message?: string;
+};
+
+export type ReviewAnApplication200DataPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type ReviewAnApplication200DataAlternativeProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type ReviewAnApplication200DataDocumentsItem = {
+  id?: string;
+  document_type?: string;
+  original_filename?: string;
+  mime?: string;
+  size_bytes?: number;
+  uploaded_at?: string;
+  download_url?: string;
+};
+
+export type ReviewAnApplication200Data = {
+  id?: number;
+  status?: string;
+  admission_cycle_id?: number;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  id_type?: string;
+  phone?: string;
+  date_of_birth?: string;
+  nationality?: string;
+  gender?: string;
+  address_country?: string;
+  address_city?: string;
+  address_street?: string;
+  previous_university?: string;
+  graduation_certificate_name?: string;
+  graduation_date?: string;
+  previous_degree?: string;
+  previous_major?: string;
+  graduation_gpa?: string;
+  graduation_cgpa?: string;
+  gpa_scale?: string;
+  is_ejust_graduate?: boolean;
+  applying_for_degree?: string;
+  english_test?: string;
+  english_score?: string;
+  native_arabic_speaker?: boolean;
+  submitted_at?: string;
+  primary_program_id?: number;
+  alternative_program_id?: number;
+  primary_program?: ReviewAnApplication200DataPrimaryProgram;
+  alternative_program?: ReviewAnApplication200DataAlternativeProgram;
+  /** @nullable */
+  finalized_at?: string | null;
+  conditions?: string;
+  waitlist_position?: number;
+  documents?: ReviewAnApplication200DataDocumentsItem[];
+};
+
+export type ReviewAnApplication200 = {
+  data?: ReviewAnApplication200Data;
+};
+
+export type ReviewAnApplication403 = {
+  message?: string;
+};
+
+export type ReviewAnApplication404 = {
+  message?: string;
+};
+
+export type ScreenAnApplicationBody = {
+  /** One of approve, return, reject. */
+  action: string;
+  /**
+     * The reviewer's note; required for return and reject.
+     * @nullable
+     */
+  note?: string | null;
+};
+
+export type ScreenAnApplication200 = {
+  data?: {
+  id?: number;
+  status?: string;
+};
+};
+
+export type ScreenAnApplication403 = {
+  message?: string;
+};
+
+export type ScreenAnApplication409 = {
+  message?: string;
+};
+
+export type ScreenAnApplication422Errors = {
+  note?: string[];
+};
+
+export type ScreenAnApplication422 = {
+  message?: string;
+  errors?: ScreenAnApplication422Errors;
+};
+
+export type DeanReviewQueue200DataItemPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type DeanReviewQueue200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  primary_program?: DeanReviewQueue200DataItemPrimaryProgram;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type DeanReviewQueue200 = {
+  data?: DeanReviewQueue200DataItem[];
+};
+
+export type DeanReviewQueue403 = {
+  message?: string;
+};
+
+export type DeanDecisionOnAnApplicationBody = {
+  /** One of approve, reject. */
+  action: string;
+  /**
+     * The Dean's note; required for reject (the reason).
+     * @nullable
+     */
+  note?: string | null;
+};
+
+export type DeanDecisionOnAnApplication200 = {
+  data?: {
+  id?: number;
+  status?: string;
+};
+};
+
+export type DeanDecisionOnAnApplication403 = {
+  message?: string;
+};
+
+export type DeanDecisionOnAnApplication409 = {
+  message?: string;
+};
+
+export type DeanDecisionOnAnApplication422Errors = {
+  note?: string[];
+};
+
+export type DeanDecisionOnAnApplication422 = {
+  message?: string;
+  errors?: DeanDecisionOnAnApplication422Errors;
+};
+
+export type DeanDecisionsQueue200DataItemPrimaryProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type DeanDecisionsQueue200DataItem = {
+  id?: number;
+  status?: string;
+  name_en?: string;
+  name_ar?: string;
+  national_id?: string;
+  applying_for_degree?: string;
+  primary_program?: DeanDecisionsQueue200DataItemPrimaryProgram;
+  finalized_at?: string;
+  review_entered_at?: string;
+  age_days?: number;
+};
+
+export type DeanDecisionsQueue200 = {
+  data?: DeanDecisionsQueue200DataItem[];
+};
+
+export type DeanDecisionsQueue403 = {
+  message?: string;
+};
+
+export type AdvisorsForTheDecisionForm200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type AdvisorsForTheDecisionForm200Meta = {
+  suggested_advisor_id?: number;
+};
+
+export type AdvisorsForTheDecisionForm200 = {
+  data?: AdvisorsForTheDecisionForm200DataItem[];
+  meta?: AdvisorsForTheDecisionForm200Meta;
+};
+
+export type AdvisorsForTheDecisionForm403 = {
+  message?: string;
+};
+
+export type RecordTheFinalDecisionBody = {
+  /** One of accept, conditional, waitlist, reject. */
+  action: string;
+  /**
+     * The advisor to assign on accept; defaults to the least-loaded advisor.
+     * @nullable
+     */
+  advisor_id?: number | null;
+  /**
+     * when action is conditional. The offer's conditions.
+     * @nullable
+     */
+  conditions: string | null;
+  /**
+     * when action is waitlist. The applicant's place.
+     * @nullable
+     */
+  waitlist_position: number | null;
+  /**
+     * when action is reject. The reason.
+     * @nullable
+     */
+  note: string | null;
+};
+
+export type RecordTheFinalDecision200 = {
+  data?: {
+  id?: number;
+  status?: string;
+};
+  meta?: {
+  university_id?: string;
+};
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+  conditions?: string;
+};
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+  waitlist_position?: number;
+};
+} | {
+  data?: {
+  id?: number;
+  status?: string;
+};
+};
+
+export type RecordTheFinalDecision403 = {
+  message?: string;
+};
+
+export type RecordTheFinalDecision409 = {
+  message?: string;
+};
+
+export type RecordTheFinalDecision422Errors = {
+  advisor_id?: string[];
+};
+
+export type RecordTheFinalDecision422 = {
+  message?: string;
+  errors?: RecordTheFinalDecision422Errors;
+};
+
+export type StreamADocument403 = {
+  message?: string;
+};
+
+export type ListAdmissionCycles200DataItem = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ListAdmissionCycles200 = {
+  data?: ListAdmissionCycles200DataItem[];
+};
+
+export type CreateAnAdmissionCycleBody = {
+  /** Fall or Spring. */
+  intake_term: string;
+  /** The intake year. */
+  year: number;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** When the application window opens (ISO 8601). */
+  opens_at: string;
+  /** When the application window closes (ISO 8601, after opens_at). */
+  closes_at: string;
+};
+
+export type CreateAnAdmissionCycle201Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type CreateAnAdmissionCycle201 = {
+  data?: CreateAnAdmissionCycle201Data;
+};
+
+export type CreateAnAdmissionCycle422Errors = {
+  intake_term?: string[];
+};
+
+export type CreateAnAdmissionCycle422 = {
+  message?: string;
+  errors?: CreateAnAdmissionCycle422Errors;
+};
+
+export type ShowAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ShowAnAdmissionCycle200 = {
+  data?: ShowAnAdmissionCycle200Data;
+};
+
+export type UpdateAnAdmissionCycleBody = {
+  /** Fall or Spring. */
+  intake_term: string;
+  /** The intake year. */
+  year: number;
+  /** English name. */
+  name_en: string;
+  /** Arabic name. */
+  name_ar: string;
+  /** When the application window opens (ISO 8601). */
+  opens_at: string;
+  /** When the application window closes (ISO 8601, after opens_at). */
+  closes_at: string;
+};
+
+export type UpdateAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type UpdateAnAdmissionCycle200 = {
+  data?: UpdateAnAdmissionCycle200Data;
+};
+
+export type ActivateAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type ActivateAnAdmissionCycle200 = {
+  data?: ActivateAnAdmissionCycle200Data;
+};
+
+export type DeactivateAnAdmissionCycle200Data = {
+  id?: number;
+  intake_term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  opens_at?: string;
+  closes_at?: string;
+  is_active?: boolean;
+  is_open?: boolean;
+};
+
+export type DeactivateAnAdmissionCycle200 = {
+  data?: DeactivateAnAdmissionCycle200Data;
+};
+
 export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem = {
   id?: number;
   code?: string;
@@ -772,6 +2378,15 @@ export type CurrentUser200DataRolesItem = {
   name?: string;
 };
 
+export type CurrentUser200DataStudent = {
+  university_id?: string;
+  program_id?: number;
+  enrollment_term?: string;
+  admission_cycle_id?: number;
+  advisor_id?: number;
+  admitted_at?: string;
+};
+
 export type CurrentUser200Data = {
   id?: number;
   name?: string;
@@ -779,6 +2394,7 @@ export type CurrentUser200Data = {
   preferred_locale?: string;
   roles?: CurrentUser200DataRolesItem[];
   permissions?: string[];
+  student?: CurrentUser200DataStudent;
 };
 
 export type CurrentUser200 = {
@@ -821,6 +2437,60 @@ export type UpdateCurrentUser422 = {
   errors?: UpdateCurrentUser422Errors;
 };
 
+export type ListMyNotifications200DataItemData = {
+  scheduled_at?: string;
+};
+
+export type ListMyNotifications200DataItem = {
+  id?: number;
+  type?: string;
+  data?: ListMyNotifications200DataItemData;
+  /** @nullable */
+  read_at?: string | null;
+  created_at?: string;
+};
+
+export type ListMyNotifications200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ListMyNotifications200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type ListMyNotifications200 = {
+  data?: ListMyNotifications200DataItem[];
+  links?: ListMyNotifications200Links;
+  meta?: ListMyNotifications200Meta;
+};
+
+export type MyUnreadCount200Data = {
+  count?: number;
+};
+
+export type MyUnreadCount200 = {
+  data?: MyUnreadCount200Data;
+};
+
+export type MarkAllMyNotificationsRead204 = { [key: string]: unknown };
+
+export type MarkOneNotificationRead204 = { [key: string]: unknown };
+
+export type MarkOneNotificationRead404 = {
+  message?: string;
+};
+
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
@@ -835,6 +2505,3804 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * The R07 (Dean) users an administrator may assign to a Faculty — the source for
+ * the assignment screen's Dean picker. Admin-only (R09/R10).
+ * @summary List assignable Deans.
+ */
+export const listAssignableDeans = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableDeans200>(
+      {url: `/api/v1/admin/deans`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableDeansQueryKey = () => {
+    return [
+    `/api/v1/admin/deans`
+    ] as const;
+    }
+
+
+export const getListAssignableDeansQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableDeansQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableDeans>>> = ({ signal }) => listAssignableDeans(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableDeansQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableDeans>>>
+export type ListAssignableDeansQueryError = ListAssignableDeans403
+
+
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDeans>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDeans>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDeans>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDeans>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable Deans.
+ */
+
+export function useListAssignableDeans<TData = Awaited<ReturnType<typeof listAssignableDeans>>, TError = ListAssignableDeans403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDeans>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableDeansQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every current assignment with the assigned Dean's identity and the opaque
+ * Faculty id. Admin-only (R09/R10).
+ * @summary List Dean↔Faculty assignments.
+ */
+export const listDeanFacultyAssignments = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListDeanFacultyAssignments200>(
+      {url: `/api/v1/admin/faculty-dean-assignments`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListDeanFacultyAssignmentsQueryKey = () => {
+    return [
+    `/api/v1/admin/faculty-dean-assignments`
+    ] as const;
+    }
+
+
+export const getListDeanFacultyAssignmentsQueryOptions = <TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDeanFacultyAssignmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDeanFacultyAssignments>>> = ({ signal }) => listDeanFacultyAssignments(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListDeanFacultyAssignmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listDeanFacultyAssignments>>>
+export type ListDeanFacultyAssignmentsQueryError = ListDeanFacultyAssignments403
+
+
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDeanFacultyAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Dean↔Faculty assignments.
+ */
+
+export function useListDeanFacultyAssignments<TData = Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError = ListDeanFacultyAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDeanFacultyAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListDeanFacultyAssignmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Creates one Dean↔Faculty routing row. The user must hold the Dean role (R07)
+ * and the (Dean, Faculty) pair must not already exist — either fails validation
+ * (422). Admin-only (R09/R10).
+ * @summary Assign a Dean to a Faculty.
+ */
+export const assignADeanToAFaculty = (
+    assignADeanToAFacultyBody: AssignADeanToAFacultyBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AssignADeanToAFaculty201>(
+      {url: `/api/v1/admin/faculty-dean-assignments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: assignADeanToAFacultyBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAssignADeanToAFacultyMutationOptions = <TError = AssignADeanToAFaculty403 | AssignADeanToAFaculty422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADeanToAFaculty>>, TError,{data: AssignADeanToAFacultyBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof assignADeanToAFaculty>>, TError,{data: AssignADeanToAFacultyBody}, TContext> => {
+
+const mutationKey = ['assignADeanToAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignADeanToAFaculty>>, {data: AssignADeanToAFacultyBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  assignADeanToAFaculty(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignADeanToAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof assignADeanToAFaculty>>>
+    export type AssignADeanToAFacultyMutationBody = AssignADeanToAFacultyBody
+    export type AssignADeanToAFacultyMutationError = AssignADeanToAFaculty403 | AssignADeanToAFaculty422
+
+    /**
+ * @summary Assign a Dean to a Faculty.
+ */
+export const useAssignADeanToAFaculty = <TError = AssignADeanToAFaculty403 | AssignADeanToAFaculty422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADeanToAFaculty>>, TError,{data: AssignADeanToAFacultyBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignADeanToAFaculty>>,
+        TError,
+        {data: AssignADeanToAFacultyBody},
+        TContext
+      > => {
+      return useMutation(getAssignADeanToAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Dean from a Faculty.
+ */
+export const unassignADeanFromAFaculty = (
+    assignmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UnassignADeanFromAFaculty204>(
+      {url: `/api/v1/admin/faculty-dean-assignments/${assignmentId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getUnassignADeanFromAFacultyMutationOptions = <TError = UnassignADeanFromAFaculty403 | UnassignADeanFromAFaculty404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, TError,{assignmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, TError,{assignmentId: number}, TContext> => {
+
+const mutationKey = ['unassignADeanFromAFaculty'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, {assignmentId: number}> = (props) => {
+          const {assignmentId} = props ?? {};
+
+          return  unassignADeanFromAFaculty(assignmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnassignADeanFromAFacultyMutationResult = NonNullable<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>>
+
+    export type UnassignADeanFromAFacultyMutationError = UnassignADeanFromAFaculty403 | UnassignADeanFromAFaculty404
+
+    /**
+ * @summary Unassign a Dean from a Faculty.
+ */
+export const useUnassignADeanFromAFaculty = <TError = UnassignADeanFromAFaculty403 | UnassignADeanFromAFaculty404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADeanFromAFaculty>>, TError,{assignmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unassignADeanFromAFaculty>>,
+        TError,
+        {assignmentId: number},
+        TContext
+      > => {
+      return useMutation(getUnassignADeanFromAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * Public, unauthenticated: the front door the registration screen reads to
+ * know whether (and into which intake) a stranger may apply. Returns only
+ * Cycles that are active and whose window contains the current moment.
+ * @summary List currently-open Admission Cycles.
+ */
+export const listCurrentlyOpenAdmissionCycles = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListCurrentlyOpenAdmissionCycles200>(
+      {url: `/api/v1/admission-cycles/open`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListCurrentlyOpenAdmissionCyclesQueryKey = () => {
+    return [
+    `/api/v1/admission-cycles/open`
+    ] as const;
+    }
+
+
+export const getListCurrentlyOpenAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCurrentlyOpenAdmissionCyclesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>> = ({ signal }) => listCurrentlyOpenAdmissionCycles(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListCurrentlyOpenAdmissionCyclesQueryResult = NonNullable<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>>
+export type ListCurrentlyOpenAdmissionCyclesQueryError = unknown
+
+
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List currently-open Admission Cycles.
+ */
+
+export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListCurrentlyOpenAdmissionCyclesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Open only while an Admission Cycle's window is open: refused when none is
+ * open, auto-filed into the one open Cycle, or (when several are open) filed
+ * into the chosen one. Rate-limited per client. On success the applicant is
+ * authenticated and their Draft Application is returned.
+ * @summary Register and start an application.
+ */
+export const registerAndStartAnApplication = (
+    registerAndStartAnApplicationBody: RegisterAndStartAnApplicationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RegisterAndStartAnApplication201>(
+      {url: `/api/v1/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: registerAndStartAnApplicationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRegisterAndStartAnApplicationMutationOptions = <TError = RegisterAndStartAnApplication409 | RegisterAndStartAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAndStartAnApplication>>, TError,{data: RegisterAndStartAnApplicationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof registerAndStartAnApplication>>, TError,{data: RegisterAndStartAnApplicationBody}, TContext> => {
+
+const mutationKey = ['registerAndStartAnApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerAndStartAnApplication>>, {data: RegisterAndStartAnApplicationBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerAndStartAnApplication(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterAndStartAnApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof registerAndStartAnApplication>>>
+    export type RegisterAndStartAnApplicationMutationBody = RegisterAndStartAnApplicationBody
+    export type RegisterAndStartAnApplicationMutationError = RegisterAndStartAnApplication409 | RegisterAndStartAnApplication422
+
+    /**
+ * @summary Register and start an application.
+ */
+export const useRegisterAndStartAnApplication = <TError = RegisterAndStartAnApplication409 | RegisterAndStartAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerAndStartAnApplication>>, TError,{data: RegisterAndStartAnApplicationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof registerAndStartAnApplication>>,
+        TError,
+        {data: RegisterAndStartAnApplicationBody},
+        TContext
+      > => {
+      return useMutation(getRegisterAndStartAnApplicationMutationOptions(options), queryClient);
+    }
+
+/**
+ * The signed, expiring link the applicant received on submitting Step 1. A
+ * valid signature marks their email verified and moves a `submitted`
+ * Application to `email_verified`; re-clicking is idempotent. Tampered or
+ * expired links are refused (403) by the `signed` middleware.
+ * @summary Verify email (signed link).
+ */
+export const verifyEmailsignedLink = (
+    applicationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<VerifyEmailsignedLink200>(
+      {url: `/api/v1/applications/${applicationId}/verify-email`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getVerifyEmailsignedLinkQueryKey = (applicationId: number,) => {
+    return [
+    `/api/v1/applications/${applicationId}/verify-email`
+    ] as const;
+    }
+
+
+export const getVerifyEmailsignedLinkQueryOptions = <TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getVerifyEmailsignedLinkQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof verifyEmailsignedLink>>> = ({ signal }) => verifyEmailsignedLink(applicationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type VerifyEmailsignedLinkQueryResult = NonNullable<Awaited<ReturnType<typeof verifyEmailsignedLink>>>
+export type VerifyEmailsignedLinkQueryError = VerifyEmailsignedLink403
+
+
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>,
+          TError,
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>,
+          TError,
+          Awaited<ReturnType<typeof verifyEmailsignedLink>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Verify email (signed link).
+ */
+
+export function useVerifyEmailsignedLink<TData = Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError = VerifyEmailsignedLink403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyEmailsignedLink>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getVerifyEmailsignedLinkQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The signed-in applicant's current Application — its status and the whole
+ * Step-1 snapshot (fields the applicant has not yet provided come back null),
+ * so the SPA can render and resume the wizard at the right step.
+ * @summary My application.
+ */
+export const myApplication = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyApplication200>(
+      {url: `/api/v1/application`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyApplicationQueryKey = () => {
+    return [
+    `/api/v1/application`
+    ] as const;
+    }
+
+
+export const getMyApplicationQueryOptions = <TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyApplicationQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myApplication>>> = ({ signal }) => myApplication(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyApplicationQueryResult = NonNullable<Awaited<ReturnType<typeof myApplication>>>
+export type MyApplicationQueryError = MyApplication401 | MyApplication404
+
+
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myApplication>>,
+          TError,
+          Awaited<ReturnType<typeof myApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myApplication>>,
+          TError,
+          Awaited<ReturnType<typeof myApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My application.
+ */
+
+export function useMyApplication<TData = Awaited<ReturnType<typeof myApplication>>, TError = MyApplication401 | MyApplication404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyApplicationQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Persists whatever personal-info fields the applicant has entered so far, so
+ * they can save and resume, or go Back from a later step to correct one. Each
+ * provided field is validated (bilingually); missing fields are allowed. Editing
+ * stays open while the application is in the applicant's hands (through email
+ * verification) and locks once it enters Student Affairs review.
+ * @summary Save Step 1 (partial).
+ */
+export const saveStep1partial = (
+    saveStep1partialBody?: SaveStep1partialBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SaveStep1partial200>(
+      {url: `/api/v1/application`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: saveStep1partialBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSaveStep1partialMutationOptions = <TError = SaveStep1partial409 | SaveStep1partial422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveStep1partial>>, TError,{data?: SaveStep1partialBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof saveStep1partial>>, TError,{data?: SaveStep1partialBody}, TContext> => {
+
+const mutationKey = ['saveStep1partial'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveStep1partial>>, {data?: SaveStep1partialBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  saveStep1partial(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveStep1partialMutationResult = NonNullable<Awaited<ReturnType<typeof saveStep1partial>>>
+    export type SaveStep1partialMutationBody = SaveStep1partialBody | undefined
+    export type SaveStep1partialMutationError = SaveStep1partial409 | SaveStep1partial422
+
+    /**
+ * @summary Save Step 1 (partial).
+ */
+export const useSaveStep1partial = <TError = SaveStep1partial409 | SaveStep1partial422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveStep1partial>>, TError,{data?: SaveStep1partialBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveStep1partial>>,
+        TError,
+        {data?: SaveStep1partialBody},
+        TContext
+      > => {
+      return useMutation(getSaveStep1partialMutationOptions(options), queryClient);
+    }
+
+/**
+ * Validates the complete personal-info snapshot, persists it, and moves the
+ * Draft forward: an unverified applicant to `submitted` with a fresh, signed
+ * verification link returned in `verification_url` (and logged); an applicant
+ * whose email is already verified straight to `email_verified` (the shortcut),
+ * with `verification_url` null. Either way the applicant cannot reach the
+ * documents step until their email is verified.
+ * @summary Submit Step 1.
+ */
+export const submitStep1 = (
+    submitStep1Body: SubmitStep1Body,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitStep1200>(
+      {url: `/api/v1/application/submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitStep1Body, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitStep1MutationOptions = <TError = SubmitStep1409 | SubmitStep1422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitStep1>>, TError,{data: SubmitStep1Body}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitStep1>>, TError,{data: SubmitStep1Body}, TContext> => {
+
+const mutationKey = ['submitStep1'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitStep1>>, {data: SubmitStep1Body}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitStep1(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitStep1MutationResult = NonNullable<Awaited<ReturnType<typeof submitStep1>>>
+    export type SubmitStep1MutationBody = SubmitStep1Body
+    export type SubmitStep1MutationError = SubmitStep1409 | SubmitStep1422
+
+    /**
+ * @summary Submit Step 1.
+ */
+export const useSubmitStep1 = <TError = SubmitStep1409 | SubmitStep1422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitStep1>>, TError,{data: SubmitStep1Body}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitStep1>>,
+        TError,
+        {data: SubmitStep1Body},
+        TContext
+      > => {
+      return useMutation(getSubmitStep1MutationOptions(options), queryClient);
+    }
+
+/**
+ * Issues a fresh signed link for the signed-in applicant's Application (in
+ * `verification_url`, and logged), for recovering a missed one. Allowed only
+ * while the Application is awaiting verification (`submitted`), and throttled to
+ * a few attempts per day (BR-72) — the sixth in a day is turned away with 429.
+ * @summary Resend the verification link.
+ */
+export const resendTheVerificationLink = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ResendTheVerificationLink200>(
+      {url: `/api/v1/application/resend-verification`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getResendTheVerificationLinkMutationOptions = <TError = ResendTheVerificationLink409 | ResendTheVerificationLink429,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resendTheVerificationLink>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resendTheVerificationLink>>, TError,void, TContext> => {
+
+const mutationKey = ['resendTheVerificationLink'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resendTheVerificationLink>>, void> = () => {
+
+
+          return  resendTheVerificationLink()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResendTheVerificationLinkMutationResult = NonNullable<Awaited<ReturnType<typeof resendTheVerificationLink>>>
+
+    export type ResendTheVerificationLinkMutationError = ResendTheVerificationLink409 | ResendTheVerificationLink429
+
+    /**
+ * @summary Resend the verification link.
+ */
+export const useResendTheVerificationLink = <TError = ResendTheVerificationLink409 | ResendTheVerificationLink429,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resendTheVerificationLink>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resendTheVerificationLink>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getResendTheVerificationLinkMutationOptions(options), queryClient);
+    }
+
+/**
+ * Validates the file against the chosen {@see DocumentType}'s rules — allowed
+ * formats, size ceiling, and how many of that type the application may hold —
+ * stores it on the private disk under a fresh ULID, and returns the created
+ * document. A bad type, wrong format, oversize file, or one copy too many is a
+ * 422; uploading once the application has left the applicant's hands is a 409.
+ * @summary Upload a document.
+ */
+export const uploadADocument = (
+    uploadADocumentBody: UploadADocumentBody,
+ signal?: AbortSignal
+) => {
+
+      const formData = new FormData();
+formData.append(`document_type`, uploadADocumentBody.document_type);
+formData.append(`file`, uploadADocumentBody.file);
+
+      return customInstance<UploadADocument201>(
+      {url: `/api/v1/application/documents`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
+    },
+      );
+    }
+
+
+
+
+export const getUploadADocumentMutationOptions = <TError = UploadADocument409 | UploadADocument422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadADocument>>, TError,{data: UploadADocumentBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof uploadADocument>>, TError,{data: UploadADocumentBody}, TContext> => {
+
+const mutationKey = ['uploadADocument'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadADocument>>, {data: UploadADocumentBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  uploadADocument(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadADocumentMutationResult = NonNullable<Awaited<ReturnType<typeof uploadADocument>>>
+    export type UploadADocumentMutationBody = UploadADocumentBody
+    export type UploadADocumentMutationError = UploadADocument409 | UploadADocument422
+
+    /**
+ * @summary Upload a document.
+ */
+export const useUploadADocument = <TError = UploadADocument409 | UploadADocument422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadADocument>>, TError,{data: UploadADocumentBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadADocument>>,
+        TError,
+        {data: UploadADocumentBody},
+        TContext
+      > => {
+      return useMutation(getUploadADocumentMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deletes the file (bytes and metadata) from the signed-in applicant's own
+ * application, freeing its slot so a replacement can be uploaded. Allowed only
+ * while the application is still applicant-editable; a document that is not the
+ * current applicant's is a 404, and a locked application is a 409.
+ * @summary Remove a document.
+ */
+export const removeADocument = (
+    documentUlid: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<string>(
+      {url: `/api/v1/application/documents/${documentUlid}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getRemoveADocumentMutationOptions = <TError = RemoveADocument404 | RemoveADocument409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeADocument>>, TError,{documentUlid: string}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof removeADocument>>, TError,{documentUlid: string}, TContext> => {
+
+const mutationKey = ['removeADocument'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeADocument>>, {documentUlid: string}> = (props) => {
+          const {documentUlid} = props ?? {};
+
+          return  removeADocument(documentUlid,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveADocumentMutationResult = NonNullable<Awaited<ReturnType<typeof removeADocument>>>
+
+    export type RemoveADocumentMutationError = RemoveADocument404 | RemoveADocument409
+
+    /**
+ * @summary Remove a document.
+ */
+export const useRemoveADocument = <TError = RemoveADocument404 | RemoveADocument409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeADocument>>, TError,{documentUlid: string}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeADocument>>,
+        TError,
+        {documentUlid: string},
+        TContext
+      > => {
+      return useMutation(getRemoveADocumentMutationOptions(options), queryClient);
+    }
+
+/**
+ * Validates and stores the applicant's primary and optional alternative Program.
+ * Each id must be a real Program; the primary's degree level must match the
+ * `applying_for_degree` from Step 1; and the applicant's previous degree must
+ * qualify them for each chosen Program's level. A bad id, a level mismatch, or an
+ * unqualified Program is a 422; selecting once the application has left the
+ * applicant's hands (finalized/in review) is a 409.
+ * @summary Choose program(s).
+ */
+export const choosePrograms = (
+    chooseProgramsBody: ChooseProgramsBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ChoosePrograms200>(
+      {url: `/api/v1/application/programs`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: chooseProgramsBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getChooseProgramsMutationOptions = <TError = ChoosePrograms409 | ChoosePrograms422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof choosePrograms>>, TError,{data: ChooseProgramsBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof choosePrograms>>, TError,{data: ChooseProgramsBody}, TContext> => {
+
+const mutationKey = ['choosePrograms'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof choosePrograms>>, {data: ChooseProgramsBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  choosePrograms(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChooseProgramsMutationResult = NonNullable<Awaited<ReturnType<typeof choosePrograms>>>
+    export type ChooseProgramsMutationBody = ChooseProgramsBody
+    export type ChooseProgramsMutationError = ChoosePrograms409 | ChoosePrograms422
+
+    /**
+ * @summary Choose program(s).
+ */
+export const useChoosePrograms = <TError = ChoosePrograms409 | ChoosePrograms422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof choosePrograms>>, TError,{data: ChooseProgramsBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof choosePrograms>>,
+        TError,
+        {data: ChooseProgramsBody},
+        TContext
+      > => {
+      return useMutation(getChooseProgramsMutationOptions(options), queryClient);
+    }
+
+/**
+ * The last wizard step: moves a complete application from `email_verified` into
+ * Student Affairs review (`under_sa_review`) and stamps `finalized_at`. A complete
+ * application has a primary Program chosen (program-selection step) and every
+ * required and conditionally-required document uploaded (the English certificate
+ * if a test was reported, the MSc thesis for a PhD applicant). A missing
+ * prerequisite is a 422; finalizing anything not awaiting finalize (not
+ * `email_verified`) is a 409.
+ * @summary Finalize the application.
+ */
+export const finalizeTheApplication = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<FinalizeTheApplication200>(
+      {url: `/api/v1/application/finalize`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getFinalizeTheApplicationMutationOptions = <TError = FinalizeTheApplication409 | FinalizeTheApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeTheApplication>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof finalizeTheApplication>>, TError,void, TContext> => {
+
+const mutationKey = ['finalizeTheApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof finalizeTheApplication>>, void> = () => {
+
+
+          return  finalizeTheApplication()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FinalizeTheApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof finalizeTheApplication>>>
+
+    export type FinalizeTheApplicationMutationError = FinalizeTheApplication409 | FinalizeTheApplication422
+
+    /**
+ * @summary Finalize the application.
+ */
+export const useFinalizeTheApplication = <TError = FinalizeTheApplication409 | FinalizeTheApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeTheApplication>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof finalizeTheApplication>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getFinalizeTheApplicationMutationOptions(options), queryClient);
+    }
+
+/**
+ * Sends a returned application back into Student Affairs review once the applicant
+ * has addressed the reviewer's instructions (FR-ADM-005.3): `returned_for_revision`
+ * → `under_sa_review`. Legal only from `returned_for_revision` (any other status is
+ * a 409 — there is nothing to resubmit); and, like finalize, the application must
+ * still be complete — a primary Program and every owed document — so an applicant
+ * cannot delete a required document and push an incomplete application back into
+ * review (story 20's "only complete applications reach review" invariant, 422).
+ * @summary Resubmit after revision.
+ */
+export const resubmitAfterRevision = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ResubmitAfterRevision200>(
+      {url: `/api/v1/application/resubmit`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getResubmitAfterRevisionMutationOptions = <TError = ResubmitAfterRevision401 | ResubmitAfterRevision409 | ResubmitAfterRevision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resubmitAfterRevision>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof resubmitAfterRevision>>, TError,void, TContext> => {
+
+const mutationKey = ['resubmitAfterRevision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resubmitAfterRevision>>, void> = () => {
+
+
+          return  resubmitAfterRevision()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResubmitAfterRevisionMutationResult = NonNullable<Awaited<ReturnType<typeof resubmitAfterRevision>>>
+
+    export type ResubmitAfterRevisionMutationError = ResubmitAfterRevision401 | ResubmitAfterRevision409 | ResubmitAfterRevision422
+
+    /**
+ * @summary Resubmit after revision.
+ */
+export const useResubmitAfterRevision = <TError = ResubmitAfterRevision401 | ResubmitAfterRevision409 | ResubmitAfterRevision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resubmitAfterRevision>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof resubmitAfterRevision>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getResubmitAfterRevisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * The interview slots still open, soonest-first — the applicant's picker for their
+ * one reschedule. Same shape as the Student Affairs slot list.
+ * @summary Open slots to reschedule into.
+ */
+export const openSlotsToRescheduleInto = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenSlotsToRescheduleInto200>(
+      {url: `/api/v1/application/interview/slots`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenSlotsToRescheduleIntoQueryKey = () => {
+    return [
+    `/api/v1/application/interview/slots`
+    ] as const;
+    }
+
+
+export const getOpenSlotsToRescheduleIntoQueryOptions = <TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenSlotsToRescheduleIntoQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>> = ({ signal }) => openSlotsToRescheduleInto(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenSlotsToRescheduleIntoQueryResult = NonNullable<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>>
+export type OpenSlotsToRescheduleIntoQueryError = unknown
+
+
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>,
+          TError,
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>,
+          TError,
+          Awaited<ReturnType<typeof openSlotsToRescheduleInto>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open slots to reschedule into.
+ */
+
+export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenSlotsToRescheduleIntoQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The interview booked for the signed-in applicant's current application — the
+ * when/where/who, the confirmation status, and whether a reschedule is still
+ * available. 404 when none has been scheduled yet.
+ * @summary My interview.
+ */
+export const myInterview = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyInterview200>(
+      {url: `/api/v1/application/interview`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyInterviewQueryKey = () => {
+    return [
+    `/api/v1/application/interview`
+    ] as const;
+    }
+
+
+export const getMyInterviewQueryOptions = <TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyInterviewQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myInterview>>> = ({ signal }) => myInterview(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyInterviewQueryResult = NonNullable<Awaited<ReturnType<typeof myInterview>>>
+export type MyInterviewQueryError = MyInterview404
+
+
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myInterview>>,
+          TError,
+          Awaited<ReturnType<typeof myInterview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myInterview>>,
+          TError,
+          Awaited<ReturnType<typeof myInterview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My interview.
+ */
+
+export function useMyInterview<TData = Awaited<ReturnType<typeof myInterview>>, TError = MyInterview404>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myInterview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyInterviewQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The applicant accepts the booked interview: `pending_confirmation` → `confirmed`.
+ * Confirming an already-confirmed interview is a 409.
+ * @summary Confirm my interview.
+ */
+export const confirmMyInterview = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ConfirmMyInterview200>(
+      {url: `/api/v1/application/interview/confirm`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getConfirmMyInterviewMutationOptions = <TError = ConfirmMyInterview404 | ConfirmMyInterview409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmMyInterview>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof confirmMyInterview>>, TError,void, TContext> => {
+
+const mutationKey = ['confirmMyInterview'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmMyInterview>>, void> = () => {
+
+
+          return  confirmMyInterview()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmMyInterviewMutationResult = NonNullable<Awaited<ReturnType<typeof confirmMyInterview>>>
+
+    export type ConfirmMyInterviewMutationError = ConfirmMyInterview404 | ConfirmMyInterview409
+
+    /**
+ * @summary Confirm my interview.
+ */
+export const useConfirmMyInterview = <TError = ConfirmMyInterview404 | ConfirmMyInterview409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmMyInterview>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof confirmMyInterview>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getConfirmMyInterviewMutationOptions(options), queryClient);
+    }
+
+/**
+ * Move the interview to another open slot, using the applicant's single allowed
+ * reschedule (BR-11); it returns to `pending_confirmation` for the new slot. A
+ * second reschedule is refused (409). The target must be an open slot (422/409).
+ * @summary Reschedule my interview.
+ */
+export const rescheduleMyInterview = (
+    rescheduleMyInterviewBody: RescheduleMyInterviewBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RescheduleMyInterview200>(
+      {url: `/api/v1/application/interview/reschedule`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: rescheduleMyInterviewBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRescheduleMyInterviewMutationOptions = <TError = RescheduleMyInterview404 | RescheduleMyInterview409 | RescheduleMyInterview422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rescheduleMyInterview>>, TError,{data: RescheduleMyInterviewBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof rescheduleMyInterview>>, TError,{data: RescheduleMyInterviewBody}, TContext> => {
+
+const mutationKey = ['rescheduleMyInterview'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rescheduleMyInterview>>, {data: RescheduleMyInterviewBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  rescheduleMyInterview(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RescheduleMyInterviewMutationResult = NonNullable<Awaited<ReturnType<typeof rescheduleMyInterview>>>
+    export type RescheduleMyInterviewMutationBody = RescheduleMyInterviewBody
+    export type RescheduleMyInterviewMutationError = RescheduleMyInterview404 | RescheduleMyInterview409 | RescheduleMyInterview422
+
+    /**
+ * @summary Reschedule my interview.
+ */
+export const useRescheduleMyInterview = <TError = RescheduleMyInterview404 | RescheduleMyInterview409 | RescheduleMyInterview422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rescheduleMyInterview>>, TError,{data: RescheduleMyInterviewBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof rescheduleMyInterview>>,
+        TError,
+        {data: RescheduleMyInterviewBody},
+        TContext
+      > => {
+      return useMutation(getRescheduleMyInterviewMutationOptions(options), queryClient);
+    }
+
+/**
+ * The interviews booked into the signed-in user's own slots, soonest-first, each
+ * with the applicant's identity and the slot details — the interviewer's queue.
+ * Empty for a user who is not the assigned interviewer on any slot. An administrator
+ * sees **every** interview instead (ADR-0015), so they can reach the evaluation
+ * write-path through this same screen.
+ * @summary Interviews assigned to me.
+ */
+export const interviewsAssignedToMe = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<InterviewsAssignedToMe200>(
+      {url: `/api/v1/interviews/assigned`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getInterviewsAssignedToMeQueryKey = () => {
+    return [
+    `/api/v1/interviews/assigned`
+    ] as const;
+    }
+
+
+export const getInterviewsAssignedToMeQueryOptions = <TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getInterviewsAssignedToMeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof interviewsAssignedToMe>>> = ({ signal }) => interviewsAssignedToMe(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type InterviewsAssignedToMeQueryResult = NonNullable<Awaited<ReturnType<typeof interviewsAssignedToMe>>>
+export type InterviewsAssignedToMeQueryError = unknown
+
+
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>,
+          TError,
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>,
+          TError,
+          Awaited<ReturnType<typeof interviewsAssignedToMe>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Interviews assigned to me.
+ */
+
+export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getInterviewsAssignedToMeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The assigned interviewer records a score (1–10) and optional notes for the
+ * interview. Only the interviewer the slot is assigned to may do this — anyone else
+ * is a 403 — **except** an administrator (R09/R10), who may record or override any
+ * interview's evaluation, that write attributed to them in the Audit Log (ADR-0015).
+ * An evaluation cannot be recorded once the interview is complete (409).
+ * @summary Record my evaluation.
+ */
+export const recordMyEvaluation = (
+    interviewId: number,
+    recordMyEvaluationBody: RecordMyEvaluationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordMyEvaluation200>(
+      {url: `/api/v1/interviews/${interviewId}/evaluation`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: recordMyEvaluationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordMyEvaluationMutationOptions = <TError = RecordMyEvaluation403 | RecordMyEvaluation409 | RecordMyEvaluation422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordMyEvaluation>>, TError,{interviewId: number;data: RecordMyEvaluationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordMyEvaluation>>, TError,{interviewId: number;data: RecordMyEvaluationBody}, TContext> => {
+
+const mutationKey = ['recordMyEvaluation'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordMyEvaluation>>, {interviewId: number;data: RecordMyEvaluationBody}> = (props) => {
+          const {interviewId,data} = props ?? {};
+
+          return  recordMyEvaluation(interviewId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordMyEvaluationMutationResult = NonNullable<Awaited<ReturnType<typeof recordMyEvaluation>>>
+    export type RecordMyEvaluationMutationBody = RecordMyEvaluationBody
+    export type RecordMyEvaluationMutationError = RecordMyEvaluation403 | RecordMyEvaluation409 | RecordMyEvaluation422
+
+    /**
+ * @summary Record my evaluation.
+ */
+export const useRecordMyEvaluation = <TError = RecordMyEvaluation403 | RecordMyEvaluation409 | RecordMyEvaluation422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordMyEvaluation>>, TError,{interviewId: number;data: RecordMyEvaluationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordMyEvaluation>>,
+        TError,
+        {interviewId: number;data: RecordMyEvaluationBody},
+        TContext
+      > => {
+      return useMutation(getRecordMyEvaluationMutationOptions(options), queryClient);
+    }
+
+/**
+ * The Dean-approved applications (`interview_scheduled`) that have **not** yet been
+ * booked into a slot, oldest-first — Student Affairs' scheduling worklist, each with
+ * the applicant's identity, resolved primary Program, and days waited since Dean
+ * approval. Gated on `interview.schedule`.
+ * @summary Applications awaiting interview scheduling.
+ */
+export const applicationsAwaitingInterviewScheduling = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ApplicationsAwaitingInterviewScheduling200>(
+      {url: `/api/v1/applications/awaiting-interview`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getApplicationsAwaitingInterviewSchedulingQueryKey = () => {
+    return [
+    `/api/v1/applications/awaiting-interview`
+    ] as const;
+    }
+
+
+export const getApplicationsAwaitingInterviewSchedulingQueryOptions = <TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getApplicationsAwaitingInterviewSchedulingQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>> = ({ signal }) => applicationsAwaitingInterviewScheduling(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ApplicationsAwaitingInterviewSchedulingQueryResult = NonNullable<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>>
+export type ApplicationsAwaitingInterviewSchedulingQueryError = ApplicationsAwaitingInterviewScheduling403
+
+
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>,
+          TError,
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>,
+          TError,
+          Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Applications awaiting interview scheduling.
+ */
+
+export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getApplicationsAwaitingInterviewSchedulingQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The faculty Users (Instructors) an interview slot may be assigned to — the
+ * source for the slot form's interviewer picker. Gated on `interview.schedule`.
+ * @summary List assignable interviewers.
+ */
+export const listAssignableInterviewers = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableInterviewers200>(
+      {url: `/api/v1/interview-slots/interviewers`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableInterviewersQueryKey = () => {
+    return [
+    `/api/v1/interview-slots/interviewers`
+    ] as const;
+    }
+
+
+export const getListAssignableInterviewersQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableInterviewersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableInterviewers>>> = ({ signal }) => listAssignableInterviewers(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableInterviewersQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableInterviewers>>>
+export type ListAssignableInterviewersQueryError = ListAssignableInterviewers403
+
+
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInterviewers>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInterviewers>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInterviewers>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInterviewers>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable interviewers.
+ */
+
+export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableInterviewersQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The whole slot pool, soonest-first, each with its resolved interviewer and
+ * whether it is still open. Gated on `interview.schedule`.
+ * @summary List interview slots.
+ */
+export const listInterviewSlots = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListInterviewSlots200>(
+      {url: `/api/v1/interview-slots`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListInterviewSlotsQueryKey = () => {
+    return [
+    `/api/v1/interview-slots`
+    ] as const;
+    }
+
+
+export const getListInterviewSlotsQueryOptions = <TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInterviewSlotsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterviewSlots>>> = ({ signal }) => listInterviewSlots(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListInterviewSlotsQueryResult = NonNullable<Awaited<ReturnType<typeof listInterviewSlots>>>
+export type ListInterviewSlotsQueryError = ListInterviewSlots403
+
+
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInterviewSlots>>,
+          TError,
+          Awaited<ReturnType<typeof listInterviewSlots>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listInterviewSlots>>,
+          TError,
+          Awaited<ReturnType<typeof listInterviewSlots>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List interview slots.
+ */
+
+export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListInterviewSlotsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * One appointment in the pool: a future time, a duration, an assigned faculty
+ * interviewer, and a mode with its coordinate (an in-person `location` or a virtual
+ * `meeting_link`). Gated on `interview.schedule`.
+ * @summary Create an interview slot.
+ */
+export const createAnInterviewSlot = (
+    createAnInterviewSlotBody: CreateAnInterviewSlotBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAnInterviewSlot201>(
+      {url: `/api/v1/interview-slots`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAnInterviewSlotBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAnInterviewSlotMutationOptions = <TError = CreateAnInterviewSlot403 | CreateAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnInterviewSlot>>, TError,{data: CreateAnInterviewSlotBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAnInterviewSlot>>, TError,{data: CreateAnInterviewSlotBody}, TContext> => {
+
+const mutationKey = ['createAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAnInterviewSlot>>, {data: CreateAnInterviewSlotBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAnInterviewSlot(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof createAnInterviewSlot>>>
+    export type CreateAnInterviewSlotMutationBody = CreateAnInterviewSlotBody
+    export type CreateAnInterviewSlotMutationError = CreateAnInterviewSlot403 | CreateAnInterviewSlot422
+
+    /**
+ * @summary Create an interview slot.
+ */
+export const useCreateAnInterviewSlot = <TError = CreateAnInterviewSlot403 | CreateAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnInterviewSlot>>, TError,{data: CreateAnInterviewSlotBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAnInterviewSlot>>,
+        TError,
+        {data: CreateAnInterviewSlotBody},
+        TContext
+      > => {
+      return useMutation(getCreateAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Change an **open** slot's time, duration, interviewer, or mode. A slot with an
+ * interview already booked into it cannot be edited (409) — its time/interviewer
+ * are what the applicant was told. Gated on `interview.schedule`.
+ * @summary Update an interview slot.
+ */
+export const updateAnInterviewSlot = (
+    interviewSlotId: number,
+    updateAnInterviewSlotBody: UpdateAnInterviewSlotBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateAnInterviewSlot200>(
+      {url: `/api/v1/interview-slots/${interviewSlotId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAnInterviewSlotBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateAnInterviewSlotMutationOptions = <TError = UpdateAnInterviewSlot403 | UpdateAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnInterviewSlot>>, TError,{interviewSlotId: number;data: UpdateAnInterviewSlotBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateAnInterviewSlot>>, TError,{interviewSlotId: number;data: UpdateAnInterviewSlotBody}, TContext> => {
+
+const mutationKey = ['updateAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAnInterviewSlot>>, {interviewSlotId: number;data: UpdateAnInterviewSlotBody}> = (props) => {
+          const {interviewSlotId,data} = props ?? {};
+
+          return  updateAnInterviewSlot(interviewSlotId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof updateAnInterviewSlot>>>
+    export type UpdateAnInterviewSlotMutationBody = UpdateAnInterviewSlotBody
+    export type UpdateAnInterviewSlotMutationError = UpdateAnInterviewSlot403 | UpdateAnInterviewSlot409
+
+    /**
+ * @summary Update an interview slot.
+ */
+export const useUpdateAnInterviewSlot = <TError = UpdateAnInterviewSlot403 | UpdateAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnInterviewSlot>>, TError,{interviewSlotId: number;data: UpdateAnInterviewSlotBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAnInterviewSlot>>,
+        TError,
+        {interviewSlotId: number;data: UpdateAnInterviewSlotBody},
+        TContext
+      > => {
+      return useMutation(getUpdateAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Remove an **open** slot from the pool. A slot with an interview booked into it
+ * cannot be deleted (409). Gated on `interview.schedule`.
+ * @summary Delete an interview slot.
+ */
+export const deleteAnInterviewSlot = (
+    interviewSlotId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeleteAnInterviewSlot204>(
+      {url: `/api/v1/interview-slots/${interviewSlotId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeleteAnInterviewSlotMutationOptions = <TError = DeleteAnInterviewSlot403 | DeleteAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, TError,{interviewSlotId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, TError,{interviewSlotId: number}, TContext> => {
+
+const mutationKey = ['deleteAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, {interviewSlotId: number}> = (props) => {
+          const {interviewSlotId} = props ?? {};
+
+          return  deleteAnInterviewSlot(interviewSlotId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAnInterviewSlot>>>
+
+    export type DeleteAnInterviewSlotMutationError = DeleteAnInterviewSlot403 | DeleteAnInterviewSlot409
+
+    /**
+ * @summary Delete an interview slot.
+ */
+export const useDeleteAnInterviewSlot = <TError = DeleteAnInterviewSlot403 | DeleteAnInterviewSlot409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAnInterviewSlot>>, TError,{interviewSlotId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAnInterviewSlot>>,
+        TError,
+        {interviewSlotId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Every interview that has been booked, most-recent-first, each with the applicant
+ * being interviewed, the slot details, its confirmation status, and any recorded
+ * evaluation — Student Affairs' view for tracking interviews and marking them
+ * complete. Gated on `interview.schedule`.
+ * @summary Booked interviews.
+ */
+export const bookedInterviews = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<BookedInterviews200>(
+      {url: `/api/v1/interviews`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getBookedInterviewsQueryKey = () => {
+    return [
+    `/api/v1/interviews`
+    ] as const;
+    }
+
+
+export const getBookedInterviewsQueryOptions = <TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getBookedInterviewsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof bookedInterviews>>> = ({ signal }) => bookedInterviews(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type BookedInterviewsQueryResult = NonNullable<Awaited<ReturnType<typeof bookedInterviews>>>
+export type BookedInterviewsQueryError = BookedInterviews403
+
+
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof bookedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof bookedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof bookedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof bookedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Booked interviews.
+ */
+
+export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getBookedInterviewsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Books the applicant's interview into an open slot and notifies them of the
+ * details. Legal only while the application is `interview_scheduled` and has no
+ * interview yet, and the slot is still open — otherwise 409. Gated on
+ * `interview.schedule`.
+ * @summary Schedule an applicant into an interview slot.
+ */
+export const scheduleAnApplicantIntoAnInterviewSlot = (
+    applicationId: number,
+    scheduleAnApplicantIntoAnInterviewSlotBody: ScheduleAnApplicantIntoAnInterviewSlotBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScheduleAnApplicantIntoAnInterviewSlot201>(
+      {url: `/api/v1/applications/${applicationId}/interview`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: scheduleAnApplicantIntoAnInterviewSlotBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getScheduleAnApplicantIntoAnInterviewSlotMutationOptions = <TError = ScheduleAnApplicantIntoAnInterviewSlot403 | ScheduleAnApplicantIntoAnInterviewSlot409 | ScheduleAnApplicantIntoAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, TError,{applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, TError,{applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}, TContext> => {
+
+const mutationKey = ['scheduleAnApplicantIntoAnInterviewSlot'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, {applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  scheduleAnApplicantIntoAnInterviewSlot(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScheduleAnApplicantIntoAnInterviewSlotMutationResult = NonNullable<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>>
+    export type ScheduleAnApplicantIntoAnInterviewSlotMutationBody = ScheduleAnApplicantIntoAnInterviewSlotBody
+    export type ScheduleAnApplicantIntoAnInterviewSlotMutationError = ScheduleAnApplicantIntoAnInterviewSlot403 | ScheduleAnApplicantIntoAnInterviewSlot409 | ScheduleAnApplicantIntoAnInterviewSlot422
+
+    /**
+ * @summary Schedule an applicant into an interview slot.
+ */
+export const useScheduleAnApplicantIntoAnInterviewSlot = <TError = ScheduleAnApplicantIntoAnInterviewSlot403 | ScheduleAnApplicantIntoAnInterviewSlot409 | ScheduleAnApplicantIntoAnInterviewSlot422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>, TError,{applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scheduleAnApplicantIntoAnInterviewSlot>>,
+        TError,
+        {applicationId: number;data: ScheduleAnApplicantIntoAnInterviewSlotBody},
+        TContext
+      > => {
+      return useMutation(getScheduleAnApplicantIntoAnInterviewSlotMutationOptions(options), queryClient);
+    }
+
+/**
+ * Records that the interview happened and advances the application
+ * `interview_scheduled` → `interview_completed`, from where the Dean records the
+ * final decision. Completing an already-complete interview, or one whose
+ * application is not `interview_scheduled`, is a 409. Gated on `interview.schedule`.
+ * @summary Mark an interview complete.
+ */
+export const markAnInterviewComplete = (
+    interviewId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MarkAnInterviewComplete200>(
+      {url: `/api/v1/interviews/${interviewId}/complete`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getMarkAnInterviewCompleteMutationOptions = <TError = MarkAnInterviewComplete403 | MarkAnInterviewComplete409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAnInterviewComplete>>, TError,{interviewId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof markAnInterviewComplete>>, TError,{interviewId: number}, TContext> => {
+
+const mutationKey = ['markAnInterviewComplete'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markAnInterviewComplete>>, {interviewId: number}> = (props) => {
+          const {interviewId} = props ?? {};
+
+          return  markAnInterviewComplete(interviewId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkAnInterviewCompleteMutationResult = NonNullable<Awaited<ReturnType<typeof markAnInterviewComplete>>>
+
+    export type MarkAnInterviewCompleteMutationError = MarkAnInterviewComplete403 | MarkAnInterviewComplete409
+
+    /**
+ * @summary Mark an interview complete.
+ */
+export const useMarkAnInterviewComplete = <TError = MarkAnInterviewComplete403 | MarkAnInterviewComplete409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAnInterviewComplete>>, TError,{interviewId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof markAnInterviewComplete>>,
+        TError,
+        {interviewId: number},
+        TContext
+      > => {
+      return useMutation(getMarkAnInterviewCompleteMutationOptions(options), queryClient);
+    }
+
+/**
+ * An application's append-only status history (from/to/note/when), oldest-first —
+ * the applicant's visible progress and the decision audit trail. Readable by the
+ * owning applicant or any reviewer (`application.screen`); anyone else → 403.
+ * @summary Status timeline.
+ */
+export const statusTimeline = (
+    applicationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<StatusTimeline200>(
+      {url: `/api/v1/applications/${applicationId}/timeline`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getStatusTimelineQueryKey = (applicationId: number,) => {
+    return [
+    `/api/v1/applications/${applicationId}/timeline`
+    ] as const;
+    }
+
+
+export const getStatusTimelineQueryOptions = <TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStatusTimelineQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof statusTimeline>>> = ({ signal }) => statusTimeline(applicationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StatusTimelineQueryResult = NonNullable<Awaited<ReturnType<typeof statusTimeline>>>
+export type StatusTimelineQueryError = StatusTimeline403
+
+
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof statusTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof statusTimeline>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof statusTimeline>>,
+          TError,
+          Awaited<ReturnType<typeof statusTimeline>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Status timeline.
+ */
+
+export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeline>>, TError = StatusTimeline403>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof statusTimeline>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStatusTimelineQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The applications awaiting Student Affairs screening (`under_sa_review`),
+ * oldest-first, each with the applicant's identity, chosen primary Program, and a
+ * **derived age** — whole days waited since entering review, computed from the
+ * timeline, never stored. Gated on `application.screen`.
+ * @summary Screening queue.
+ */
+export const screeningQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScreeningQueue200>(
+      {url: `/api/v1/applications`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getScreeningQueueQueryKey = () => {
+    return [
+    `/api/v1/applications`
+    ] as const;
+    }
+
+
+export const getScreeningQueueQueryOptions = <TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getScreeningQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof screeningQueue>>> = ({ signal }) => screeningQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ScreeningQueueQueryResult = NonNullable<Awaited<ReturnType<typeof screeningQueue>>>
+export type ScreeningQueueQueryError = ScreeningQueue403
+
+
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof screeningQueue>>,
+          TError,
+          Awaited<ReturnType<typeof screeningQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof screeningQueue>>,
+          TError,
+          Awaited<ReturnType<typeof screeningQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Screening queue.
+ */
+
+export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getScreeningQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The full application — the Step-1 snapshot, resolved Program(s), and the
+ * uploaded documents — for a reviewer to assess completeness and authenticity
+ * before acting. Gated on `application.screen`.
+ * @summary Review an application.
+ */
+export const reviewAnApplication = (
+    applicationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReviewAnApplication200>(
+      {url: `/api/v1/applications/${applicationId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getReviewAnApplicationQueryKey = (applicationId: number,) => {
+    return [
+    `/api/v1/applications/${applicationId}`
+    ] as const;
+    }
+
+
+export const getReviewAnApplicationQueryOptions = <TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getReviewAnApplicationQueryKey(applicationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof reviewAnApplication>>> = ({ signal }) => reviewAnApplication(applicationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: applicationId !== null && applicationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReviewAnApplicationQueryResult = NonNullable<Awaited<ReturnType<typeof reviewAnApplication>>>
+export type ReviewAnApplicationQueryError = ReviewAnApplication403 | ReviewAnApplication404
+
+
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reviewAnApplication>>,
+          TError,
+          Awaited<ReturnType<typeof reviewAnApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof reviewAnApplication>>,
+          TError,
+          Awaited<ReturnType<typeof reviewAnApplication>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Review an application.
+ */
+
+export function useReviewAnApplication<TData = Awaited<ReturnType<typeof reviewAnApplication>>, TError = ReviewAnApplication403 | ReviewAnApplication404>(
+ applicationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reviewAnApplication>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getReviewAnApplicationQueryOptions(applicationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The Student Affairs decision on a queued application: `approve` auto-advances it
+ * through the transient `sa_approved` to `under_dean_review` in one action;
+ * `return` sends it back to the applicant as `returned_for_revision` with the
+ * reviewer's instructions; `reject` ends it as `rejected` with a reason. `return`
+ * and `reject` require a note and notify the applicant. Any action on an
+ * application not `under_sa_review` is an illegal transition (409). Gated on
+ * `application.screen`.
+ * @summary Screen an application.
+ */
+export const screenAnApplication = (
+    applicationId: number,
+    screenAnApplicationBody: ScreenAnApplicationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScreenAnApplication200>(
+      {url: `/api/v1/applications/${applicationId}/screen`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: screenAnApplicationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getScreenAnApplicationMutationOptions = <TError = ScreenAnApplication403 | ScreenAnApplication409 | ScreenAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof screenAnApplication>>, TError,{applicationId: number;data: ScreenAnApplicationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof screenAnApplication>>, TError,{applicationId: number;data: ScreenAnApplicationBody}, TContext> => {
+
+const mutationKey = ['screenAnApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof screenAnApplication>>, {applicationId: number;data: ScreenAnApplicationBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  screenAnApplication(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScreenAnApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof screenAnApplication>>>
+    export type ScreenAnApplicationMutationBody = ScreenAnApplicationBody
+    export type ScreenAnApplicationMutationError = ScreenAnApplication403 | ScreenAnApplication409 | ScreenAnApplication422
+
+    /**
+ * @summary Screen an application.
+ */
+export const useScreenAnApplication = <TError = ScreenAnApplication403 | ScreenAnApplication409 | ScreenAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof screenAnApplication>>, TError,{applicationId: number;data: ScreenAnApplicationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof screenAnApplication>>,
+        TError,
+        {applicationId: number;data: ScreenAnApplicationBody},
+        TContext
+      > => {
+      return useMutation(getScreenAnApplicationMutationOptions(options), queryClient);
+    }
+
+/**
+ * The `under_dean_review` applications whose primary Program's Faculty is among
+ * the signed-in Dean's assigned Faculties, oldest-first, each with the applicant's
+ * identity, resolved primary Program, and days waited since entering Dean review.
+ * A Dean with no assigned Faculty (or a non-Dean reviewer) sees an empty queue.
+ * @summary Dean review queue.
+ */
+export const deanReviewQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeanReviewQueue200>(
+      {url: `/api/v1/dean/applications`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeanReviewQueueQueryKey = () => {
+    return [
+    `/api/v1/dean/applications`
+    ] as const;
+    }
+
+
+export const getDeanReviewQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDeanReviewQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanReviewQueue>>> = ({ signal }) => deanReviewQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DeanReviewQueueQueryResult = NonNullable<Awaited<ReturnType<typeof deanReviewQueue>>>
+export type DeanReviewQueueQueryError = DeanReviewQueue403
+
+
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Dean review queue.
+ */
+
+export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDeanReviewQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * `approve` moves the application to `interview_scheduled` (the concrete slot
+ * booking follows in interview scheduling); `reject` ends it as `rejected` with a
+ * reason. Both notify the applicant. The application must belong to one of the
+ * Dean's Faculties — otherwise 403, regardless of the action. Acting on an
+ * application that is not `under_dean_review` is an illegal transition (409). The
+ * surface is gated on `application.screen`.
+ * @summary Dean decision on an application.
+ */
+export const deanDecisionOnAnApplication = (
+    applicationId: number,
+    deanDecisionOnAnApplicationBody: DeanDecisionOnAnApplicationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeanDecisionOnAnApplication200>(
+      {url: `/api/v1/dean/applications/${applicationId}/review`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: deanDecisionOnAnApplicationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getDeanDecisionOnAnApplicationMutationOptions = <TError = DeanDecisionOnAnApplication403 | DeanDecisionOnAnApplication409 | DeanDecisionOnAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, TError,{applicationId: number;data: DeanDecisionOnAnApplicationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, TError,{applicationId: number;data: DeanDecisionOnAnApplicationBody}, TContext> => {
+
+const mutationKey = ['deanDecisionOnAnApplication'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, {applicationId: number;data: DeanDecisionOnAnApplicationBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  deanDecisionOnAnApplication(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeanDecisionOnAnApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>>
+    export type DeanDecisionOnAnApplicationMutationBody = DeanDecisionOnAnApplicationBody
+    export type DeanDecisionOnAnApplicationMutationError = DeanDecisionOnAnApplication403 | DeanDecisionOnAnApplication409 | DeanDecisionOnAnApplication422
+
+    /**
+ * @summary Dean decision on an application.
+ */
+export const useDeanDecisionOnAnApplication = <TError = DeanDecisionOnAnApplication403 | DeanDecisionOnAnApplication409 | DeanDecisionOnAnApplication422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deanDecisionOnAnApplication>>, TError,{applicationId: number;data: DeanDecisionOnAnApplicationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deanDecisionOnAnApplication>>,
+        TError,
+        {applicationId: number;data: DeanDecisionOnAnApplicationBody},
+        TContext
+      > => {
+      return useMutation(getDeanDecisionOnAnApplicationMutationOptions(options), queryClient);
+    }
+
+/**
+ * The applications awaiting the signed-in Dean's final decision — those resting at
+ * `interview_completed` (a first decision is due) and those held at
+ * `conditionally_accepted` / `waitlisted` (a resolution is due) — whose primary
+ * Program's Faculty is among the Dean's assigned Faculties, oldest-first (by when
+ * they were finalized), each with the applicant's identity, resolved primary
+ * Program, and days waited in the current status. Same faculty-scoping as the Dean
+ * review queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.
+ * Gated on `applicant.decide` (Dean only).
+ * @summary Dean decisions queue.
+ */
+export const deanDecisionsQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeanDecisionsQueue200>(
+      {url: `/api/v1/dean/decisions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeanDecisionsQueueQueryKey = () => {
+    return [
+    `/api/v1/dean/decisions`
+    ] as const;
+    }
+
+
+export const getDeanDecisionsQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDeanDecisionsQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanDecisionsQueue>>> = ({ signal }) => deanDecisionsQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DeanDecisionsQueueQueryResult = NonNullable<Awaited<ReturnType<typeof deanDecisionsQueue>>>
+export type DeanDecisionsQueueQueryError = DeanDecisionsQueue403
+
+
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanDecisionsQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanDecisionsQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof deanDecisionsQueue>>,
+          TError,
+          Awaited<ReturnType<typeof deanDecisionsQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Dean decisions queue.
+ */
+
+export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDeanDecisionsQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The academic advisors (R03) the Dean may assign, with the least-loaded one
+ * pre-selected in `meta.suggested_advisor_id` (null when no advisor exists). Gated
+ * on `applicant.decide`.
+ * @summary Advisors for the decision form.
+ */
+export const advisorsForTheDecisionForm = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorsForTheDecisionForm200>(
+      {url: `/api/v1/dean/advisors`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorsForTheDecisionFormQueryKey = () => {
+    return [
+    `/api/v1/dean/advisors`
+    ] as const;
+    }
+
+
+export const getAdvisorsForTheDecisionFormQueryOptions = <TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdvisorsForTheDecisionFormQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>> = ({ signal }) => advisorsForTheDecisionForm(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdvisorsForTheDecisionFormQueryResult = NonNullable<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>>
+export type AdvisorsForTheDecisionFormQueryError = AdvisorsForTheDecisionForm403
+
+
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>,
+          TError,
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>,
+          TError,
+          Awaited<ReturnType<typeof advisorsForTheDecisionForm>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Advisors for the decision form.
+ */
+
+export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdvisorsForTheDecisionFormQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * `accept` mints the Student (University ID on `meta.university_id`, R01→R02, advisor
+ * assigned) and works from `interview_completed` as the first decision, or from
+ * `conditionally_accepted`/`waitlisted` as a resolution. `conditional` and `waitlist`
+ * hold the application (recording `conditions` / `waitlist_position`); `reject` ends
+ * it. The application must belong to one of the Dean's Faculties (else 403); an action
+ * illegal from the current status is a 409. Gated on `applicant.decide`.
+ * @summary Record the final decision.
+ */
+export const recordTheFinalDecision = (
+    applicationId: number,
+    recordTheFinalDecisionBody: RecordTheFinalDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordTheFinalDecision200>(
+      {url: `/api/v1/dean/applications/${applicationId}/decide`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: recordTheFinalDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordTheFinalDecisionMutationOptions = <TError = RecordTheFinalDecision403 | RecordTheFinalDecision409 | RecordTheFinalDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheFinalDecision>>, TError,{applicationId: number;data: RecordTheFinalDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordTheFinalDecision>>, TError,{applicationId: number;data: RecordTheFinalDecisionBody}, TContext> => {
+
+const mutationKey = ['recordTheFinalDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordTheFinalDecision>>, {applicationId: number;data: RecordTheFinalDecisionBody}> = (props) => {
+          const {applicationId,data} = props ?? {};
+
+          return  recordTheFinalDecision(applicationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordTheFinalDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof recordTheFinalDecision>>>
+    export type RecordTheFinalDecisionMutationBody = RecordTheFinalDecisionBody
+    export type RecordTheFinalDecisionMutationError = RecordTheFinalDecision403 | RecordTheFinalDecision409 | RecordTheFinalDecision422
+
+    /**
+ * @summary Record the final decision.
+ */
+export const useRecordTheFinalDecision = <TError = RecordTheFinalDecision403 | RecordTheFinalDecision409 | RecordTheFinalDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheFinalDecision>>, TError,{applicationId: number;data: RecordTheFinalDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordTheFinalDecision>>,
+        TError,
+        {applicationId: number;data: RecordTheFinalDecisionBody},
+        TContext
+      > => {
+      return useMutation(getRecordTheFinalDecisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * Serves the stored file inline to the owning applicant or to a reviewer holding
+ * `application.screen`; anyone else is refused with a 403. The ULID in the path
+ * is the only handle — the storage path and row id are never exposed.
+ * @summary Stream a document.
+ */
+export const streamADocument = (
+    documentUlid: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<unknown>(
+      {url: `/api/v1/documents/${documentUlid}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getStreamADocumentQueryKey = (documentUlid: string,) => {
+    return [
+    `/api/v1/documents/${documentUlid}`
+    ] as const;
+    }
+
+
+export const getStreamADocumentQueryOptions = <TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getStreamADocumentQueryKey(documentUlid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof streamADocument>>> = ({ signal }) => streamADocument(documentUlid, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: documentUlid !== null && documentUlid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type StreamADocumentQueryResult = NonNullable<Awaited<ReturnType<typeof streamADocument>>>
+export type StreamADocumentQueryError = StreamADocument403
+
+
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof streamADocument>>,
+          TError,
+          Awaited<ReturnType<typeof streamADocument>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof streamADocument>>,
+          TError,
+          Awaited<ReturnType<typeof streamADocument>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Stream a document.
+ */
+
+export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocument>>, TError = StreamADocument403>(
+ documentUlid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof streamADocument>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getStreamADocumentQueryOptions(documentUlid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Newest intake first. Requires calendar.manage — this is the management
+ * list; the public registration screen uses the open-cycle lookup instead.
+ * @summary List Admission Cycles.
+ */
+export const listAdmissionCycles = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAdmissionCycles200>(
+      {url: `/api/v1/admission-cycles`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAdmissionCyclesQueryKey = () => {
+    return [
+    `/api/v1/admission-cycles`
+    ] as const;
+    }
+
+
+export const getListAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAdmissionCyclesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdmissionCycles>>> = ({ signal }) => listAdmissionCycles(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAdmissionCyclesQueryResult = NonNullable<Awaited<ReturnType<typeof listAdmissionCycles>>>
+export type ListAdmissionCyclesQueryError = unknown
+
+
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof listAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Admission Cycles.
+ */
+
+export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAdmissionCyclesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create an Admission Cycle.
+ */
+export const createAnAdmissionCycle = (
+    createAnAdmissionCycleBody: CreateAnAdmissionCycleBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAnAdmissionCycle201>(
+      {url: `/api/v1/admission-cycles`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAnAdmissionCycleBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAnAdmissionCycleMutationOptions = <TError = CreateAnAdmissionCycle422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnAdmissionCycle>>, TError,{data: CreateAnAdmissionCycleBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAnAdmissionCycle>>, TError,{data: CreateAnAdmissionCycleBody}, TContext> => {
+
+const mutationKey = ['createAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAnAdmissionCycle>>, {data: CreateAnAdmissionCycleBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAnAdmissionCycle(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof createAnAdmissionCycle>>>
+    export type CreateAnAdmissionCycleMutationBody = CreateAnAdmissionCycleBody
+    export type CreateAnAdmissionCycleMutationError = CreateAnAdmissionCycle422
+
+    /**
+ * @summary Create an Admission Cycle.
+ */
+export const useCreateAnAdmissionCycle = <TError = CreateAnAdmissionCycle422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAnAdmissionCycle>>, TError,{data: CreateAnAdmissionCycleBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAnAdmissionCycle>>,
+        TError,
+        {data: CreateAnAdmissionCycleBody},
+        TContext
+      > => {
+      return useMutation(getCreateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show an Admission Cycle.
+ */
+export const showAnAdmissionCycle = (
+    admissionCycleId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowAnAdmissionCycleQueryKey = (admissionCycleId: number,) => {
+    return [
+    `/api/v1/admission-cycles/${admissionCycleId}`
+    ] as const;
+    }
+
+
+export const getShowAnAdmissionCycleQueryOptions = <TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowAnAdmissionCycleQueryKey(admissionCycleId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showAnAdmissionCycle>>> = ({ signal }) => showAnAdmissionCycle(admissionCycleId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: admissionCycleId !== null && admissionCycleId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowAnAdmissionCycleQueryResult = NonNullable<Awaited<ReturnType<typeof showAnAdmissionCycle>>>
+export type ShowAnAdmissionCycleQueryError = unknown
+
+
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>,
+          TError,
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>,
+          TError,
+          Awaited<ReturnType<typeof showAnAdmissionCycle>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show an Admission Cycle.
+ */
+
+export function useShowAnAdmissionCycle<TData = Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError = unknown>(
+ admissionCycleId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showAnAdmissionCycle>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowAnAdmissionCycleQueryOptions(admissionCycleId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Update an Admission Cycle.
+ */
+export const updateAnAdmissionCycle = (
+    admissionCycleId: number,
+    updateAnAdmissionCycleBody: UpdateAnAdmissionCycleBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateAnAdmissionCycleBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateAnAdmissionCycleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, TError,{admissionCycleId: number;data: UpdateAnAdmissionCycleBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, TError,{admissionCycleId: number;data: UpdateAnAdmissionCycleBody}, TContext> => {
+
+const mutationKey = ['updateAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, {admissionCycleId: number;data: UpdateAnAdmissionCycleBody}> = (props) => {
+          const {admissionCycleId,data} = props ?? {};
+
+          return  updateAnAdmissionCycle(admissionCycleId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof updateAnAdmissionCycle>>>
+    export type UpdateAnAdmissionCycleMutationBody = UpdateAnAdmissionCycleBody
+    export type UpdateAnAdmissionCycleMutationError = unknown
+
+    /**
+ * @summary Update an Admission Cycle.
+ */
+export const useUpdateAnAdmissionCycle = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateAnAdmissionCycle>>, TError,{admissionCycleId: number;data: UpdateAnAdmissionCycleBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateAnAdmissionCycle>>,
+        TError,
+        {admissionCycleId: number;data: UpdateAnAdmissionCycleBody},
+        TContext
+      > => {
+      return useMutation(getUpdateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Activate an Admission Cycle.
+ */
+export const activateAnAdmissionCycle = (
+    admissionCycleId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ActivateAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}/activate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getActivateAnAdmissionCycleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext> => {
+
+const mutationKey = ['activateAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, {admissionCycleId: number}> = (props) => {
+          const {admissionCycleId} = props ?? {};
+
+          return  activateAnAdmissionCycle(admissionCycleId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ActivateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof activateAnAdmissionCycle>>>
+
+    export type ActivateAnAdmissionCycleMutationError = unknown
+
+    /**
+ * @summary Activate an Admission Cycle.
+ */
+export const useActivateAnAdmissionCycle = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof activateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof activateAnAdmissionCycle>>,
+        TError,
+        {admissionCycleId: number},
+        TContext
+      > => {
+      return useMutation(getActivateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
+
+/**
+ * Deactivating closes the Cycle regardless of its window — no new application
+ * can start against it — without deleting it or its Applications.
+ * @summary Deactivate an Admission Cycle.
+ */
+export const deactivateAnAdmissionCycle = (
+    admissionCycleId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeactivateAnAdmissionCycle200>(
+      {url: `/api/v1/admission-cycles/${admissionCycleId}/deactivate`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeactivateAnAdmissionCycleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext> => {
+
+const mutationKey = ['deactivateAnAdmissionCycle'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, {admissionCycleId: number}> = (props) => {
+          const {admissionCycleId} = props ?? {};
+
+          return  deactivateAnAdmissionCycle(admissionCycleId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeactivateAnAdmissionCycleMutationResult = NonNullable<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>>
+
+    export type DeactivateAnAdmissionCycleMutationError = unknown
+
+    /**
+ * @summary Deactivate an Admission Cycle.
+ */
+export const useDeactivateAnAdmissionCycle = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>, TError,{admissionCycleId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deactivateAnAdmissionCycle>>,
+        TError,
+        {admissionCycleId: number},
+        TContext
+      > => {
+      return useMutation(getDeactivateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
 
 /**
  * Faculties are ordered by code; within each Program the three Categories are
@@ -3373,7 +8841,10 @@ export const useLogOut = <TError = unknown,
 
 /**
  * The authenticated user + roles (and, from ticket 05, effective
- * permissions); the SPA's authority source for route guards.
+ * permissions); the SPA's authority source for route guards. Once the user holds
+ * the Student role (R02), `student` carries their `Student` anchor — University ID,
+ * program, enrollment term, advisor — so a newly-admitted user sees their student
+ * identity on sign-in (ADR-0013); it is `null` for everyone who is not a Student.
  * @summary Current user.
  */
 export const currentUser = (
@@ -3530,4 +9001,321 @@ export const useUpdateCurrentUser = <TError = UpdateCurrentUser422,
         TContext
       > => {
       return useMutation(getUpdateCurrentUserMutationOptions(options), queryClient);
+    }
+
+/**
+ * Paginated, newest-first. Scoped to the authenticated user.
+ * @summary List my notifications.
+ */
+export const listMyNotifications = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListMyNotifications200>(
+      {url: `/api/v1/notifications`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListMyNotificationsQueryKey = () => {
+    return [
+    `/api/v1/notifications`
+    ] as const;
+    }
+
+
+export const getListMyNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyNotificationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyNotifications>>> = ({ signal }) => listMyNotifications(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListMyNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyNotifications>>>
+export type ListMyNotificationsQueryError = unknown
+
+
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMyNotifications>>,
+          TError,
+          Awaited<ReturnType<typeof listMyNotifications>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMyNotifications>>,
+          TError,
+          Awaited<ReturnType<typeof listMyNotifications>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List my notifications.
+ */
+
+export function useListMyNotifications<TData = Awaited<ReturnType<typeof listMyNotifications>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMyNotifications>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListMyNotificationsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The number the bell badge shows. Scoped to the authenticated user.
+ * @summary My unread count.
+ */
+export const myUnreadCount = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyUnreadCount200>(
+      {url: `/api/v1/notifications/unread-count`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyUnreadCountQueryKey = () => {
+    return [
+    `/api/v1/notifications/unread-count`
+    ] as const;
+    }
+
+
+export const getMyUnreadCountQueryOptions = <TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyUnreadCountQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myUnreadCount>>> = ({ signal }) => myUnreadCount(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyUnreadCountQueryResult = NonNullable<Awaited<ReturnType<typeof myUnreadCount>>>
+export type MyUnreadCountQueryError = unknown
+
+
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myUnreadCount>>,
+          TError,
+          Awaited<ReturnType<typeof myUnreadCount>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myUnreadCount>>,
+          TError,
+          Awaited<ReturnType<typeof myUnreadCount>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My unread count.
+ */
+
+export function useMyUnreadCount<TData = Awaited<ReturnType<typeof myUnreadCount>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myUnreadCount>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyUnreadCountQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Clears the caller's unread count in one call; touches only their own rows.
+ * @summary Mark all my notifications read.
+ */
+export const markAllMyNotificationsRead = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MarkAllMyNotificationsRead204>(
+      {url: `/api/v1/notifications/read-all`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getMarkAllMyNotificationsReadMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, TError,void, TContext> => {
+
+const mutationKey = ['markAllMyNotificationsRead'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, void> = () => {
+
+
+          return  markAllMyNotificationsRead()
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkAllMyNotificationsReadMutationResult = NonNullable<Awaited<ReturnType<typeof markAllMyNotificationsRead>>>
+
+    export type MarkAllMyNotificationsReadMutationError = unknown
+
+    /**
+ * @summary Mark all my notifications read.
+ */
+export const useMarkAllMyNotificationsRead = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markAllMyNotificationsRead>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof markAllMyNotificationsRead>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getMarkAllMyNotificationsReadMutationOptions(options), queryClient);
+    }
+
+/**
+ * Idempotent. A notification that is not the caller's is not found (404), so
+ * it can never be read on someone else's behalf.
+ * @summary Mark one notification read.
+ */
+export const markOneNotificationRead = (
+    notification: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MarkOneNotificationRead204>(
+      {url: `/api/v1/notifications/${notification}/read`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getMarkOneNotificationReadMutationOptions = <TError = MarkOneNotificationRead404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markOneNotificationRead>>, TError,{notification: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof markOneNotificationRead>>, TError,{notification: number}, TContext> => {
+
+const mutationKey = ['markOneNotificationRead'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markOneNotificationRead>>, {notification: number}> = (props) => {
+          const {notification} = props ?? {};
+
+          return  markOneNotificationRead(notification,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkOneNotificationReadMutationResult = NonNullable<Awaited<ReturnType<typeof markOneNotificationRead>>>
+
+    export type MarkOneNotificationReadMutationError = MarkOneNotificationRead404
+
+    /**
+ * @summary Mark one notification read.
+ */
+export const useMarkOneNotificationRead = <TError = MarkOneNotificationRead404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markOneNotificationRead>>, TError,{notification: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof markOneNotificationRead>>,
+        TError,
+        {notification: number},
+        TContext
+      > => {
+      return useMutation(getMarkOneNotificationReadMutationOptions(options), queryClient);
     }

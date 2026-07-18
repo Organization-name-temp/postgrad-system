@@ -198,16 +198,70 @@ lives in [CONTEXT.md](../CONTEXT.md) and the two hard-to-reverse choices in
 - **Demo:** browse the University→Faculty→Dept→Program→Course tree; open course details.
 
 ### Phase 2 — Admissions (SRS §4.2)
-- **Admissions module:** multi-step application (Personal Info → Email Verify → Documents
-  → Program Selection), status machine (Draft → … → Accepted/Rejected, FR-ADM-009).
-- Email verification: link **shown on screen / logged** (no email sent).
-- Document upload to **local disk** (type/size validation; no malware scan).
-- Workflow: SA screening → Dean review → interview scheduling → final decision, with
-  configurable SLAs surfaced but enforced via a manual artisan command.
-- **Acceptance** publishes `AdmissionAccepted` → Identity mints a University ID and
-  transitions R01→R02, creates the academic record, and applies automatic exemptions.
-- Minimal **Calendar** support (interview slots) built just-in-time here.
-- **Demo:** an applicant applies, is screened/approved/interviewed, accepted → Student.
+The design below was sharpened in a `/grill-with-docs` session; the resolved glossary lives
+in [CONTEXT.md](../CONTEXT.md) and the two hard-to-reverse choices in
+[ADR-0012](./adr/0012-cross-module-reads-by-id-and-dto.md) (cross-module reads by id + DTO,
+no FK) and [ADR-0013](./adr/0013-acceptance-handoff-student-anchor.md) (acceptance hand-off
++ Student anchor owned by Identity). Full applicant→Student workflow, thin but complete.
+
+- **Two new modules** (`Public`/`Internal` each): **Admissions** and **Notifications**.
+  New deptrac edges: `Admissions → {Catalog, Identity, Notifications}\Public`,
+  `App → {Admissions, Notifications}\Public`; every `Internal` stays sealed.
+- **Public self-registration** (the first unauthenticated, rate-limited route): registering
+  **is** starting the application — one atomic act minting a User (R01) + a `Draft`
+  Application, **gated on an open Admission Cycle**. Laravel's built-in signed email
+  verification, link **shown on screen + logged** (24h; resend ≤ 5/24h; pre-verified
+  shortcut). Account hardening stays deferred (ADR-0005).
+- **AdmissionCycle** (ADR-0012 consumer): a windowed **Intake Term** (Fall/Spring) + year,
+  unique per year, managed under `ManageAcademicCalendar`. An Application belongs to one
+  Cycle; one per `(national_id, cycle)`; **re-application allowed in a later Cycle**.
+- **Application aggregate:** personal info is a **per-cycle snapshot** (typed columns +
+  enums; `PreviousDegree` extended to BSc/MSc/PhD). Primary + optional alternative **Program
+  referenced by opaque id via a `Catalog\Public` read DTO facade — no cross-module FK**
+  (ADR-0012); qualification rule = same-or-one-step-up ladder. Hand-rolled **13-state**
+  machine (`ApplicationStatus` enum + static transition map; illegal → 409). Append-only
+  **`application_status_transitions`** (who/when/note) = the applicant timeline *and* the
+  decision audit trail — distinct from the Identity Audit Log.
+- **Documents** (FR-ADM-003): a `DocumentType` enum carries its own rules (required/
+  conditional/optional, size cap, formats, cardinality); stored to the **private local
+  disk** (no malware scan / encryption-at-rest, ADR-0005); ULID public identifier; served
+  by an **authorized streaming route** (owner or `ScreenApplications`); conditional-required
+  enforced at finalize.
+- **Review pipeline:** SA screen (approve/return/reject) → Dean (**faculty-scoped**)
+  approve-for-interview/reject → **slot-pool interviews** (`InterviewSlot` + `Interview`;
+  interviewer authorised by assignment, not a new permission; one reschedule) → Dean
+  decision. SLAs config-driven; aging **derived on-demand**; a **flag/notify-only** artisan
+  command marks overdue (**business days**, Fri/Sat weekend); interview reminders (48h/24h)
+  via a second artisan command.
+- **Terminal decisions:** the Student mint fires **only** on the `Accepted` transition.
+  `ConditionallyAccepted` (free-text conditions) and `Waitlisted` (position) are holding
+  states the Dean later resolves to Accepted or Rejected.
+- **Acceptance hand-off** (ADR-0013): `Application::accept()` calls `Identity\Public::admit()`
+  **synchronously in the same transaction** — creates the thin **`Student` anchor** (owned by
+  Identity, 1:1 with User; University ID + opaque program ref + enrollment term + advisor +
+  identity snapshot), mints **`{year}-{programCode}-{NNNN}`**, **replaces R01→R02**, writes an
+  Identity audit entry. `AdmissionAccepted` (the project's first in-process domain event) fires
+  for side-effects (acceptance notification). **Advisor = least-loaded R03** (derived), pre-filled
+  + overridable. **Automatic exemptions deferred to Phase 5** (inputs captured; the event is the hook).
+- **Identity also gains:** the **Dean↔Faculty assignment** (opaque faculty ref) with a
+  minimal **admin management UI — gated on the R09/R10 _role_** (first role-gated surface; no
+  new permission), and the `Identity\Public` student/advisor read surface.
+- **Notifications module:** in-app only, `type` + JSON payload rendered **bilingually** on the
+  SPA, **polled bell** (fills the Phase-0.5 shell slot); no email/SMS/websocket.
+  Events-for-acceptance, direct `Notifier::notify()` for routine notices.
+- **Frontend:** `features/admissions` (multi-step wizard with **per-step save**, reuses the
+  Phase-1 catalog tree + `StatusChip`, status timeline) + reviewer queues + `features/admin`
+  assignments; polled bell.
+- **DoD:** Pest feature-first + targeted units (transition map, University-ID gen,
+  business-days, least-loaded, qualification, `DocumentType`); **one comprehensive multi-role
+  Playwright smoke** (applicant → SA → Dean → interviewer → Student); deptrac + axe gates.
+  Deterministic seeder: open **Fall 2026** cycle, one Application per status, 3–4 advisors,
+  a Dean per Faculty (assignments seeded), interview slots, a sample document file.
+- **Deferred:** real email/SMS; malware scan / encryption-at-rest; automatic exemptions
+  (Phase 5); SLA auto-enforcement; the full academic calendar (§4.11); GPA-scale conversion.
+- **Demo:** a stranger registers into the open cycle, completes the wizard, is screened by SA,
+  approved by the faculty Dean, interviewed, and accepted → becomes a Student with a
+  University ID, an advisor, and role R02.
 
 ### Phase 3 — Enrollment (SRS §4.4, §4.5, §4.6 partial)
 - **Enrollment module:** `RegistrationRequest` → Advisor approval → `Enrollment`

@@ -7,6 +7,1396 @@
 import * as zod from 'zod';
 
 /**
+ * The R07 (Dean) users an administrator may assign to a Faculty — the source for
+ * the assignment screen's Dean picker. Admin-only (R09/R10).
+ * @summary List assignable Deans.
+ */
+export const ListAssignableDeansResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Every current assignment with the assigned Dean's identity and the opaque
+ * Faculty id. Admin-only (R09/R10).
+ * @summary List Dean↔Faculty assignments.
+ */
+export const ListDeanFacultyAssignmentsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "dean_name": zod.string().optional(),
+  "dean_email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Creates one Dean↔Faculty routing row. The user must hold the Dean role (R07)
+ * and the (Dean, Faculty) pair must not already exist — either fails validation
+ * (422). Admin-only (R09/R10).
+ * @summary Assign a Dean to a Faculty.
+ */
+export const AssignADeanToAFacultyBody = zod.object({
+  "user_id": zod.number().describe('The Dean (R07 user) to assign.'),
+  "faculty_id": zod.number().describe('The opaque Catalog Faculty id.')
+})
+
+export const AssignADeanToAFacultyResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "faculty_id": zod.number().optional(),
+  "dean_name": zod.string().optional(),
+  "dean_email": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Dean from a Faculty.
+ */
+export const UnassignADeanFromAFacultyParams = zod.object({
+  "assignment_id": zod.number().describe('The assignment row id.')
+})
+
+export const UnassignADeanFromAFacultyResponse = zod.looseObject({
+
+})
+
+
+/**
+ * Public, unauthenticated: the front door the registration screen reads to
+ * know whether (and into which intake) a stranger may apply. Returns only
+ * Cycles that are active and whose window contains the current moment.
+ * @summary List currently-open Admission Cycles.
+ */
+export const ListCurrentlyOpenAdmissionCyclesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * Open only while an Admission Cycle's window is open: refused when none is
+ * open, auto-filed into the one open Cycle, or (when several are open) filed
+ * into the chosen one. Rate-limited per client. On success the applicant is
+ * authenticated and their Draft Application is returned.
+ * @summary Register and start an application.
+ */
+export const RegisterAndStartAnApplicationBody = zod.object({
+  "name": zod.string().describe('The applicant\'s full name.'),
+  "email": zod.string().describe('A unique email address; becomes the login.'),
+  "password": zod.string().describe('At least 8 characters; must match the confirmation.'),
+  "password_confirmation": zod.string().describe('Repeat of the password.'),
+  "admission_cycle_id": zod.number().optional().describe('The open Cycle to apply to. Required only when more than one Cycle is open; otherwise the single open Cycle is used.')
+})
+
+export const RegisterAndStartAnApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * The signed, expiring link the applicant received on submitting Step 1. A
+ * valid signature marks their email verified and moves a `submitted`
+ * Application to `email_verified`; re-clicking is idempotent. Tampered or
+ * expired links are refused (403) by the `signed` middleware.
+ * @summary Verify email (signed link).
+ */
+export const VerifyEmailsignedLinkParams = zod.object({
+  "application_id": zod.number().describe('The ID of the application the link verifies.')
+})
+
+export const VerifyEmailsignedLinkResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * The signed-in applicant's current Application — its status and the whole
+ * Step-1 snapshot (fields the applicant has not yet provided come back null),
+ * so the SPA can render and resume the wizard at the right step.
+ * @summary My application.
+ */
+export const MyApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "id_type": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "date_of_birth": zod.string().optional(),
+  "nationality": zod.string().optional(),
+  "gender": zod.string().optional(),
+  "address_country": zod.string().optional(),
+  "address_city": zod.string().optional(),
+  "address_street": zod.string().optional(),
+  "previous_university": zod.string().optional(),
+  "graduation_certificate_name": zod.string().optional(),
+  "graduation_date": zod.string().optional(),
+  "previous_degree": zod.string().optional(),
+  "previous_major": zod.string().optional(),
+  "graduation_gpa": zod.string().optional(),
+  "graduation_cgpa": zod.string().optional(),
+  "gpa_scale": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "english_test": zod.string().optional(),
+  "english_score": zod.string().optional(),
+  "native_arabic_speaker": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "primary_program_id": zod.number().optional(),
+  "alternative_program_id": zod.number().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "alternative_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().nullish(),
+  "documents": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "document_type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "mime": zod.string().optional(),
+  "size_bytes": zod.number().optional(),
+  "uploaded_at": zod.string().optional(),
+  "download_url": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Persists whatever personal-info fields the applicant has entered so far, so
+ * they can save and resume, or go Back from a later step to correct one. Each
+ * provided field is validated (bilingually); missing fields are allowed. Editing
+ * stays open while the application is in the applicant's hands (through email
+ * verification) and locks once it enters Student Affairs review.
+ * @summary Save Step 1 (partial).
+ */
+export const SaveStep1partialBody = zod.object({
+  "name_en": zod.string().optional().describe('Full name in English.'),
+  "name_ar": zod.string().optional().describe('Full name in Arabic.'),
+  "id_type": zod.string().optional().describe('Identification type; one of national_id, passport.'),
+  "national_id": zod.string().optional().describe('Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle.'),
+  "phone": zod.string().optional().describe('Contact phone in E.164 form.'),
+  "date_of_birth": zod.string().optional().describe('Date of birth (Y-m-d), in the past.'),
+  "nationality": zod.string().optional().describe('Nationality as an ISO 3166-1 alpha-2 code.'),
+  "gender": zod.string().optional().describe('One of Male, Female.'),
+  "address_country": zod.string().optional().describe('Country.'),
+  "address_city": zod.string().optional().describe('City.'),
+  "address_street": zod.string().optional().describe('Street address.'),
+  "previous_university": zod.string().optional().describe('Previous university.'),
+  "graduation_certificate_name": zod.string().optional().describe('Name of the graduation certificate.'),
+  "graduation_date": zod.string().optional().describe('Graduation date (Y-m-d).'),
+  "previous_degree": zod.string().optional().describe('One of BSc, MSc, PhD.'),
+  "previous_major": zod.string().optional().describe('Previous major\/specialization.'),
+  "graduation_gpa": zod.number().optional().describe('Graduation GPA.'),
+  "graduation_cgpa": zod.number().optional().describe('Graduation CGPA.'),
+  "gpa_scale": zod.string().optional().describe('One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'),
+  "is_ejust_graduate": zod.boolean().optional().describe('Whether the applicant graduated from E-JUST.'),
+  "applying_for_degree": zod.string().optional().describe('Degree applied for; one of MSc, PhD.'),
+  "english_test": zod.string().optional().describe('English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'),
+  "english_score": zod.number().optional().describe('Score for the chosen test; required unless the test is None.'),
+  "native_arabic_speaker": zod.boolean().optional().describe('Whether the applicant is a native Arabic speaker.')
+})
+
+export const SaveStep1partialResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Validates the complete personal-info snapshot, persists it, and moves the
+ * Draft forward: an unverified applicant to `submitted` with a fresh, signed
+ * verification link returned in `verification_url` (and logged); an applicant
+ * whose email is already verified straight to `email_verified` (the shortcut),
+ * with `verification_url` null. Either way the applicant cannot reach the
+ * documents step until their email is verified.
+ * @summary Submit Step 1.
+ */
+export const SubmitStep1Body = zod.object({
+  "name_en": zod.string().describe('Full name in English.'),
+  "name_ar": zod.string().describe('Full name in Arabic.'),
+  "id_type": zod.string().describe('Identification type; one of national_id, passport.'),
+  "national_id": zod.string().describe('Identifier matching the id_type (14 digits for national_id, 6–9 alphanumeric for passport); unique within the cycle.'),
+  "phone": zod.string().describe('Contact phone in E.164 form.'),
+  "date_of_birth": zod.string().describe('Date of birth (Y-m-d), in the past.'),
+  "nationality": zod.string().describe('Nationality as an ISO 3166-1 alpha-2 code.'),
+  "gender": zod.string().describe('One of Male, Female.'),
+  "address_country": zod.string().describe('Country.'),
+  "address_city": zod.string().describe('City.'),
+  "address_street": zod.string().describe('Street address.'),
+  "previous_university": zod.string().describe('Previous university.'),
+  "graduation_certificate_name": zod.string().describe('Name of the graduation certificate.'),
+  "graduation_date": zod.string().describe('Graduation date (Y-m-d).'),
+  "previous_degree": zod.string().describe('One of BSc, MSc, PhD.'),
+  "previous_major": zod.string().describe('Previous major\/specialization.'),
+  "graduation_gpa": zod.number().describe('Graduation GPA.'),
+  "graduation_cgpa": zod.number().describe('Graduation CGPA.'),
+  "gpa_scale": zod.string().describe('One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'),
+  "is_ejust_graduate": zod.boolean().describe('Whether the applicant graduated from E-JUST.'),
+  "applying_for_degree": zod.string().describe('Degree applied for; one of MSc, PhD.'),
+  "english_test": zod.string().describe('English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'),
+  "english_score": zod.number().optional().describe('Score for the chosen test; required unless the test is None.'),
+  "native_arabic_speaker": zod.boolean().describe('Whether the applicant is a native Arabic speaker.')
+})
+
+export const SubmitStep1Response = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional(),
+  "verification_url": zod.string().optional()
+}).describe('verification required'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional(),
+  "verification_url": zod.string().nullish()
+}).describe('already verified')])
+
+
+/**
+ * Issues a fresh signed link for the signed-in applicant's Application (in
+ * `verification_url`, and logged), for recovering a missed one. Allowed only
+ * while the Application is awaiting verification (`submitted`), and throttled to
+ * a few attempts per day (BR-72) — the sixth in a day is turned away with 429.
+ * @summary Resend the verification link.
+ */
+export const ResendTheVerificationLinkResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional()
+}).optional(),
+  "verification_url": zod.string().optional()
+})
+
+
+/**
+ * Validates the file against the chosen {@see DocumentType}'s rules — allowed
+ * formats, size ceiling, and how many of that type the application may hold —
+ * stores it on the private disk under a fresh ULID, and returns the created
+ * document. A bad type, wrong format, oversize file, or one copy too many is a
+ * 422; uploading once the application has left the applicant's hands is a 409.
+ * @summary Upload a document.
+ */
+export const UploadADocumentBody = zod.object({
+  "document_type": zod.string().describe('The kind of document. One of graduation_certificate, transcript, national_id, photo, english_certificate, msc_thesis, cv, recommendation_letter, additional_certificate.'),
+  "file": zod.instanceof(File)
+})
+
+export const UploadADocumentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.string().optional(),
+  "document_type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "mime": zod.string().optional(),
+  "size_bytes": zod.number().optional(),
+  "uploaded_at": zod.string().optional(),
+  "download_url": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Deletes the file (bytes and metadata) from the signed-in applicant's own
+ * application, freeing its slot so a replacement can be uploaded. Allowed only
+ * while the application is still applicant-editable; a document that is not the
+ * current applicant's is a 404, and a locked application is a 409.
+ * @summary Remove a document.
+ */
+export const RemoveADocumentParams = zod.object({
+  "document_ulid": zod.string().describe('The ULID of the document to remove.')
+})
+
+export const RemoveADocumentResponse = zod.string()
+
+
+/**
+ * Validates and stores the applicant's primary and optional alternative Program.
+ * Each id must be a real Program; the primary's degree level must match the
+ * `applying_for_degree` from Step 1; and the applicant's previous degree must
+ * qualify them for each chosen Program's level. A bad id, a level mismatch, or an
+ * unqualified Program is a 422; selecting once the application has left the
+ * applicant's hands (finalized/in review) is a 409.
+ * @summary Choose program(s).
+ */
+export const ChooseProgramsBody = zod.object({
+  "primary_program_id": zod.number().describe('The chosen primary Program\'s id.'),
+  "alternative_program_id": zod.number().nullish().describe('An optional second-choice Program\'s id; must differ from the primary.')
+})
+
+export const ChooseProgramsResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "primary_program_id": zod.number().optional(),
+  "alternative_program_id": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * The last wizard step: moves a complete application from `email_verified` into
+ * Student Affairs review (`under_sa_review`) and stamps `finalized_at`. A complete
+ * application has a primary Program chosen (program-selection step) and every
+ * required and conditionally-required document uploaded (the English certificate
+ * if a test was reported, the MSc thesis for a PhD applicant). A missing
+ * prerequisite is a 422; finalizing anything not awaiting finalize (not
+ * `email_verified`) is a 409.
+ * @summary Finalize the application.
+ */
+export const FinalizeTheApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "finalized_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Sends a returned application back into Student Affairs review once the applicant
+ * has addressed the reviewer's instructions (FR-ADM-005.3): `returned_for_revision`
+ * → `under_sa_review`. Legal only from `returned_for_revision` (any other status is
+ * a 409 — there is nothing to resubmit); and, like finalize, the application must
+ * still be complete — a primary Program and every owed document — so an applicant
+ * cannot delete a required document and push an incomplete application back into
+ * review (story 20's "only complete applications reach review" invariant, 422).
+ * @summary Resubmit after revision.
+ */
+export const ResubmitAfterRevisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * The interview slots still open, soonest-first — the applicant's picker for their
+ * one reschedule. Same shape as the Student Affairs slot list.
+ * @summary Open slots to reschedule into.
+ */
+export const OpenSlotsToRescheduleIntoResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().nullish(),
+  "meeting_link": zod.string().optional(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * The interview booked for the signed-in applicant's current application — the
+ * when/where/who, the confirmation status, and whether a reschedule is still
+ * available. 404 when none has been scheduled yet.
+ * @summary My interview.
+ */
+export const MyInterviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * The applicant accepts the booked interview: `pending_confirmation` → `confirmed`.
+ * Confirming an already-confirmed interview is a 409.
+ * @summary Confirm my interview.
+ */
+export const ConfirmMyInterviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * Move the interview to another open slot, using the applicant's single allowed
+ * reschedule (BR-11); it returns to `pending_confirmation` for the new slot. A
+ * second reschedule is refused (409). The target must be an open slot (422/409).
+ * @summary Reschedule my interview.
+ */
+export const RescheduleMyInterviewBody = zod.object({
+  "interview_slot_id": zod.number().describe('The open slot to move to.')
+})
+
+export const RescheduleMyInterviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().nullish(),
+  "meeting_link": zod.string().optional(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * The interviews booked into the signed-in user's own slots, soonest-first, each
+ * with the applicant's identity and the slot details — the interviewer's queue.
+ * Empty for a user who is not the assigned interviewer on any slot. An administrator
+ * sees **every** interview instead (ADR-0015), so they can reach the evaluation
+ * write-path through this same screen.
+ * @summary Interviews assigned to me.
+ */
+export const InterviewsAssignedToMeResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.object({
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "status": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The assigned interviewer records a score (1–10) and optional notes for the
+ * interview. Only the interviewer the slot is assigned to may do this — anyone else
+ * is a 403 — **except** an administrator (R09/R10), who may record or override any
+ * interview's evaluation, that write attributed to them in the Audit Log (ADR-0015).
+ * An evaluation cannot be recorded once the interview is complete (409).
+ * @summary Record my evaluation.
+ */
+export const RecordMyEvaluationParams = zod.object({
+  "interview_id": zod.number().describe('The interview\'s id.')
+})
+
+export const RecordMyEvaluationBody = zod.object({
+  "score": zod.number().describe('The interview score, 1–10.'),
+  "notes": zod.string().nullish().describe('Free-text notes on the interview.')
+})
+
+export const RecordMyEvaluationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.number().optional(),
+  "evaluation_notes": zod.string().optional(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * The Dean-approved applications (`interview_scheduled`) that have **not** yet been
+ * booked into a slot, oldest-first — Student Affairs' scheduling worklist, each with
+ * the applicant's identity, resolved primary Program, and days waited since Dean
+ * approval. Gated on `interview.schedule`.
+ * @summary Applications awaiting interview scheduling.
+ */
+export const ApplicationsAwaitingInterviewSchedulingResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.string().nullish(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * The faculty Users (Instructors) an interview slot may be assigned to — the
+ * source for the slot form's interviewer picker. Gated on `interview.schedule`.
+ * @summary List assignable interviewers.
+ */
+export const ListAssignableInterviewersResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * The whole slot pool, soonest-first, each with its resolved interviewer and
+ * whether it is still open. Gated on `interview.schedule`.
+ * @summary List interview slots.
+ */
+export const ListInterviewSlotsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * One appointment in the pool: a future time, a duration, an assigned faculty
+ * interviewer, and a mode with its coordinate (an in-person `location` or a virtual
+ * `meeting_link`). Gated on `interview.schedule`.
+ * @summary Create an interview slot.
+ */
+export const CreateAnInterviewSlotBody = zod.object({
+  "scheduled_at": zod.string().describe('The appointment time (ISO-8601), in the future.'),
+  "duration_minutes": zod.number().describe('Length in minutes (15–240).'),
+  "interviewer_id": zod.number().describe('A faculty (Instructor) User to conduct it.'),
+  "mode": zod.string().describe('One of in_person, virtual.'),
+  "location": zod.string().optional().describe('The in-person location; required when mode is in_person.'),
+  "meeting_link": zod.string().optional().describe('The virtual meeting link; required when mode is virtual.')
+})
+
+export const CreateAnInterviewSlotResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Change an **open** slot's time, duration, interviewer, or mode. A slot with an
+ * interview already booked into it cannot be edited (409) — its time/interviewer
+ * are what the applicant was told. Gated on `interview.schedule`.
+ * @summary Update an interview slot.
+ */
+export const UpdateAnInterviewSlotParams = zod.object({
+  "interview_slot_id": zod.number().describe('The slot\'s id.')
+})
+
+export const UpdateAnInterviewSlotBody = zod.object({
+  "scheduled_at": zod.string().describe('The appointment time (ISO-8601), in the future.'),
+  "duration_minutes": zod.number().describe('Length in minutes (15–240).'),
+  "interviewer_id": zod.number().describe('A faculty (Instructor) User to conduct it.'),
+  "mode": zod.string().describe('One of in_person, virtual.'),
+  "location": zod.string().optional().describe('The in-person location; required when mode is in_person.'),
+  "meeting_link": zod.string().optional().describe('The virtual meeting link; required when mode is virtual.')
+})
+
+export const UpdateAnInterviewSlotResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().nullish(),
+  "meeting_link": zod.string().optional(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Remove an **open** slot from the pool. A slot with an interview booked into it
+ * cannot be deleted (409). Gated on `interview.schedule`.
+ * @summary Delete an interview slot.
+ */
+export const DeleteAnInterviewSlotParams = zod.object({
+  "interview_slot_id": zod.number().describe('The slot\'s id.')
+})
+
+export const DeleteAnInterviewSlotResponse = zod.looseObject({
+
+})
+
+
+/**
+ * Every interview that has been booked, most-recent-first, each with the applicant
+ * being interviewed, the slot details, its confirmation status, and any recorded
+ * evaluation — Student Affairs' view for tracking interviews and marking them
+ * complete. Gated on `interview.schedule`.
+ * @summary Booked interviews.
+ */
+export const BookedInterviewsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.number().optional(),
+  "evaluation_notes": zod.string().optional(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.object({
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "status": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Books the applicant's interview into an open slot and notifies them of the
+ * details. Legal only while the application is `interview_scheduled` and has no
+ * interview yet, and the slot is still open — otherwise 409. Gated on
+ * `interview.schedule`.
+ * @summary Schedule an applicant into an interview slot.
+ */
+export const ScheduleAnApplicantIntoAnInterviewSlotParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const ScheduleAnApplicantIntoAnInterviewSlotBody = zod.object({
+  "interview_slot_id": zod.number().describe('The open slot to book.')
+})
+
+export const ScheduleAnApplicantIntoAnInterviewSlotResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.string().nullish(),
+  "evaluation_notes": zod.string().nullish(),
+  "completed_at": zod.string().nullish(),
+  "slot": zod.object({
+  "id": zod.number().optional(),
+  "scheduled_at": zod.string().optional(),
+  "duration_minutes": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "location": zod.string().optional(),
+  "meeting_link": zod.string().nullish(),
+  "interviewer_id": zod.number().optional(),
+  "interviewer": zod.string().nullish(),
+  "is_open": zod.boolean().optional()
+}).optional(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * Records that the interview happened and advances the application
+ * `interview_scheduled` → `interview_completed`, from where the Dean records the
+ * final decision. Completing an already-complete interview, or one whose
+ * application is not `interview_scheduled`, is a 409. Gated on `interview.schedule`.
+ * @summary Mark an interview complete.
+ */
+export const MarkAnInterviewCompleteParams = zod.object({
+  "interview_id": zod.number().describe('The interview\'s id.')
+})
+
+export const MarkAnInterviewCompleteResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "application_id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "reschedule_count": zod.number().optional(),
+  "can_reschedule": zod.boolean().optional(),
+  "evaluation_score": zod.number().optional(),
+  "evaluation_notes": zod.string().optional(),
+  "completed_at": zod.string().optional(),
+  "slot": zod.string().nullish(),
+  "applicant": zod.string().nullish()
+}).optional()
+})
+
+
+/**
+ * An application's append-only status history (from/to/note/when), oldest-first —
+ * the applicant's visible progress and the decision audit trail. Readable by the
+ * owning applicant or any reviewer (`application.screen`); anyone else → 403.
+ * @summary Status timeline.
+ */
+export const StatusTimelineParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const StatusTimelineResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "note": zod.string().nullish(),
+  "occurred_at": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * The applications awaiting Student Affairs screening (`under_sa_review`),
+ * oldest-first, each with the applicant's identity, chosen primary Program, and a
+ * **derived age** — whole days waited since entering review, computed from the
+ * timeline, never stored. Gated on `application.screen`.
+ * @summary Screening queue.
+ */
+export const ScreeningQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * The full application — the Step-1 snapshot, resolved Program(s), and the
+ * uploaded documents — for a reviewer to assess completeness and authenticity
+ * before acting. Gated on `application.screen`.
+ * @summary Review an application.
+ */
+export const ReviewAnApplicationParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const ReviewAnApplicationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "id_type": zod.string().optional(),
+  "phone": zod.string().optional(),
+  "date_of_birth": zod.string().optional(),
+  "nationality": zod.string().optional(),
+  "gender": zod.string().optional(),
+  "address_country": zod.string().optional(),
+  "address_city": zod.string().optional(),
+  "address_street": zod.string().optional(),
+  "previous_university": zod.string().optional(),
+  "graduation_certificate_name": zod.string().optional(),
+  "graduation_date": zod.string().optional(),
+  "previous_degree": zod.string().optional(),
+  "previous_major": zod.string().optional(),
+  "graduation_gpa": zod.string().optional(),
+  "graduation_cgpa": zod.string().optional(),
+  "gpa_scale": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "english_test": zod.string().optional(),
+  "english_score": zod.string().optional(),
+  "native_arabic_speaker": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "primary_program_id": zod.number().optional(),
+  "alternative_program_id": zod.number().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "alternative_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().nullish(),
+  "conditions": zod.string().optional(),
+  "waitlist_position": zod.number().optional(),
+  "documents": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "document_type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "mime": zod.string().optional(),
+  "size_bytes": zod.number().optional(),
+  "uploaded_at": zod.string().optional(),
+  "download_url": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * The Student Affairs decision on a queued application: `approve` auto-advances it
+ * through the transient `sa_approved` to `under_dean_review` in one action;
+ * `return` sends it back to the applicant as `returned_for_revision` with the
+ * reviewer's instructions; `reject` ends it as `rejected` with a reason. `return`
+ * and `reject` require a note and notify the applicant. Any action on an
+ * application not `under_sa_review` is an illegal transition (409). Gated on
+ * `application.screen`.
+ * @summary Screen an application.
+ */
+export const ScreenAnApplicationParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const ScreenAnApplicationBody = zod.object({
+  "action": zod.string().describe('One of approve, return, reject.'),
+  "note": zod.string().nullish().describe('The reviewer\'s note; required for return and reject.')
+})
+
+export const ScreenAnApplicationResponse = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('approved'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('returned')])
+
+
+/**
+ * The `under_dean_review` applications whose primary Program's Faculty is among
+ * the signed-in Dean's assigned Faculties, oldest-first, each with the applicant's
+ * identity, resolved primary Program, and days waited since entering Dean review.
+ * A Dean with no assigned Faculty (or a non-Dean reviewer) sees an empty queue.
+ * @summary Dean review queue.
+ */
+export const DeanReviewQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * `approve` moves the application to `interview_scheduled` (the concrete slot
+ * booking follows in interview scheduling); `reject` ends it as `rejected` with a
+ * reason. Both notify the applicant. The application must belong to one of the
+ * Dean's Faculties — otherwise 403, regardless of the action. Acting on an
+ * application that is not `under_dean_review` is an illegal transition (409). The
+ * surface is gated on `application.screen`.
+ * @summary Dean decision on an application.
+ */
+export const DeanDecisionOnAnApplicationParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const DeanDecisionOnAnApplicationBody = zod.object({
+  "action": zod.string().describe('One of approve, reject.'),
+  "note": zod.string().nullish().describe('The Dean\'s note; required for reject (the reason).')
+})
+
+export const DeanDecisionOnAnApplicationResponse = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('approved for interview'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('rejected')])
+
+
+/**
+ * The applications awaiting the signed-in Dean's final decision — those resting at
+ * `interview_completed` (a first decision is due) and those held at
+ * `conditionally_accepted` / `waitlisted` (a resolution is due) — whose primary
+ * Program's Faculty is among the Dean's assigned Faculties, oldest-first (by when
+ * they were finalized), each with the applicant's identity, resolved primary
+ * Program, and days waited in the current status. Same faculty-scoping as the Dean
+ * review queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.
+ * Gated on `applicant.decide` (Dean only).
+ * @summary Dean decisions queue.
+ */
+export const DeanDecisionsQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "national_id": zod.string().optional(),
+  "applying_for_degree": zod.string().optional(),
+  "primary_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "finalized_at": zod.string().optional(),
+  "review_entered_at": zod.string().optional(),
+  "age_days": zod.number().optional()
+})).optional()
+})
+
+
+/**
+ * The academic advisors (R03) the Dean may assign, with the least-loaded one
+ * pre-selected in `meta.suggested_advisor_id` (null when no advisor exists). Gated
+ * on `applicant.decide`.
+ * @summary Advisors for the decision form.
+ */
+export const AdvisorsForTheDecisionFormResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional(),
+  "meta": zod.object({
+  "suggested_advisor_id": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * `accept` mints the Student (University ID on `meta.university_id`, R01→R02, advisor
+ * assigned) and works from `interview_completed` as the first decision, or from
+ * `conditionally_accepted`/`waitlisted` as a resolution. `conditional` and `waitlist`
+ * hold the application (recording `conditions` / `waitlist_position`); `reject` ends
+ * it. The application must belong to one of the Dean's Faculties (else 403); an action
+ * illegal from the current status is a 409. Gated on `applicant.decide`.
+ * @summary Record the final decision.
+ */
+export const RecordTheFinalDecisionParams = zod.object({
+  "application_id": zod.number().describe('The application\'s id.')
+})
+
+export const RecordTheFinalDecisionBody = zod.object({
+  "action": zod.string().describe('One of accept, conditional, waitlist, reject.'),
+  "advisor_id": zod.number().nullish().describe('The advisor to assign on accept; defaults to the least-loaded advisor.'),
+  "conditions": zod.string().nullable().describe('when action is conditional. The offer\'s conditions.'),
+  "waitlist_position": zod.number().nullable().describe('when action is waitlist. The applicant\'s place.'),
+  "note": zod.string().nullable().describe('when action is reject. The reason.')
+})
+
+export const RecordTheFinalDecisionResponse = zod.union([zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional(),
+  "meta": zod.object({
+  "university_id": zod.string().optional()
+}).optional()
+}).describe('accepted (Student minted)'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "conditions": zod.string().optional()
+}).optional()
+}).describe('conditionally accepted'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "waitlist_position": zod.number().optional()
+}).optional()
+}).describe('waitlisted'),zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional()
+}).optional()
+}).describe('rejected')])
+
+
+/**
+ * Serves the stored file inline to the owning applicant or to a reviewer holding
+ * `application.screen`; anyone else is refused with a 403. The ULID in the path
+ * is the only handle — the storage path and row id are never exposed.
+ * @summary Stream a document.
+ */
+export const StreamADocumentParams = zod.object({
+  "document_ulid": zod.string().describe('The ULID of the document to stream.')
+})
+
+export const StreamADocumentResponse = zod.void()
+
+
+/**
+ * Newest intake first. Requires calendar.manage — this is the management
+ * list; the public registration screen uses the open-cycle lookup instead.
+ * @summary List Admission Cycles.
+ */
+export const ListAdmissionCyclesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create an Admission Cycle.
+ */
+export const CreateAnAdmissionCycleBody = zod.object({
+  "intake_term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The intake year.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "opens_at": zod.string().describe('When the application window opens (ISO 8601).'),
+  "closes_at": zod.string().describe('When the application window closes (ISO 8601, after opens_at).')
+})
+
+export const CreateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show an Admission Cycle.
+ */
+export const ShowAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const ShowAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Update an Admission Cycle.
+ */
+export const UpdateAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const UpdateAnAdmissionCycleBody = zod.object({
+  "intake_term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The intake year.'),
+  "name_en": zod.string().describe('English name.'),
+  "name_ar": zod.string().describe('Arabic name.'),
+  "opens_at": zod.string().describe('When the application window opens (ISO 8601).'),
+  "closes_at": zod.string().describe('When the application window closes (ISO 8601, after opens_at).')
+})
+
+export const UpdateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Activate an Admission Cycle.
+ */
+export const ActivateAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const ActivateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Deactivating closes the Cycle regardless of its window — no new application
+ * can start against it — without deleting it or its Applications.
+ * @summary Deactivate an Admission Cycle.
+ */
+export const DeactivateAnAdmissionCycleParams = zod.object({
+  "admission_cycle_id": zod.number().describe('The ID of the admission cycle.')
+})
+
+export const DeactivateAnAdmissionCycleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "intake_term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "opens_at": zod.string().optional(),
+  "closes_at": zod.string().optional(),
+  "is_active": zod.boolean().optional(),
+  "is_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * Faculties are ordered by code; within each Program the three Categories are
  * always present in bylaw order (Preparatory, Program Core, Research Elective)
  * with their required credit hours, and Courses within a Category follow the
@@ -819,7 +2209,10 @@ export const LogOutResponse = zod.looseObject({
 
 /**
  * The authenticated user + roles (and, from ticket 05, effective
- * permissions); the SPA's authority source for route guards.
+ * permissions); the SPA's authority source for route guards. Once the user holds
+ * the Student role (R02), `student` carries their `Student` anchor — University ID,
+ * program, enrollment term, advisor — so a newly-admitted user sees their student
+ * identity on sign-in (ADR-0013); it is `null` for everyone who is not a Student.
  * @summary Current user.
  */
 export const CurrentUserResponse = zod.object({
@@ -832,7 +2225,15 @@ export const CurrentUserResponse = zod.object({
   "code": zod.string().optional(),
   "name": zod.string().optional()
 })).optional(),
-  "permissions": zod.array(zod.string()).optional()
+  "permissions": zod.array(zod.string()).optional(),
+  "student": zod.object({
+  "university_id": zod.string().optional(),
+  "program_id": zod.number().optional(),
+  "enrollment_term": zod.string().optional(),
+  "admission_cycle_id": zod.number().optional(),
+  "advisor_id": zod.number().optional(),
+  "admitted_at": zod.string().optional()
+}).optional()
 }).optional()
 })
 
@@ -857,4 +2258,70 @@ export const UpdateCurrentUserResponse = zod.object({
 })).optional(),
   "permissions": zod.array(zod.string()).optional()
 }).optional()
+})
+
+
+/**
+ * Paginated, newest-first. Scoped to the authenticated user.
+ * @summary List my notifications.
+ */
+export const ListMyNotificationsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "type": zod.string().optional(),
+  "data": zod.object({
+  "scheduled_at": zod.string().optional()
+}).optional(),
+  "read_at": zod.string().nullish(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * The number the bell badge shows. Scoped to the authenticated user.
+ * @summary My unread count.
+ */
+export const MyUnreadCountResponse = zod.object({
+  "data": zod.object({
+  "count": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * Clears the caller's unread count in one call; touches only their own rows.
+ * @summary Mark all my notifications read.
+ */
+export const MarkAllMyNotificationsReadResponse = zod.looseObject({
+
+})
+
+
+/**
+ * Idempotent. A notification that is not the caller's is not found (404), so
+ * it can never be read on someone else's behalf.
+ * @summary Mark one notification read.
+ */
+export const MarkOneNotificationReadParams = zod.object({
+  "notification": zod.number().describe('The ID of the notification.')
+})
+
+export const MarkOneNotificationReadResponse = zod.looseObject({
+
 })

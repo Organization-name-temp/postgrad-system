@@ -7,6 +7,10 @@
  * keys the UI actually gates on live here.
  */
 export const PERMISSION = {
+  screenApplications: 'application.screen',
+  scheduleInterview: 'interview.schedule',
+  decideApplicants: 'applicant.decide',
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
+  manageCalendar: 'calendar.manage',
 } as const

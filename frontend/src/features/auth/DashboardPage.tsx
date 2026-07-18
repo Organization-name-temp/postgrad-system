@@ -17,11 +17,36 @@ export function DashboardPage() {
     return null
   }
 
+  const student = user.student
+
   return (
     <>
       <Typography variant="h4" component="h1" gutterBottom>
         {t('dashboard.title')}
       </Typography>
+
+      {/* Once the user is an admitted Student (R02), their Student anchor surfaces here
+          so a newly-admitted user sees their University ID on sign-in (ADR-0013). */}
+      {student?.university_id && (
+        <Paper variant="outlined" sx={{ p: 3, mt: 2 }}>
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            {t('dashboard.studentSection')}
+          </Typography>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline', flexWrap: 'wrap' }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('dashboard.universityId')}
+            </Typography>
+            <Typography variant="h6" component="p">
+              {student.university_id}
+            </Typography>
+          </Stack>
+          {student.enrollment_term && (
+            <Typography variant="body2" color="text.secondary">
+              {t('dashboard.enrollmentTerm')}: {student.enrollment_term}
+            </Typography>
+          )}
+        </Paper>
+      )}
 
       <Paper variant="outlined" sx={{ p: 3, mt: 2 }}>
         <Typography variant="h6">{user.name}</Typography>

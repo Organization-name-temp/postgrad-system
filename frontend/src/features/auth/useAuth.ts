@@ -3,10 +3,14 @@ import {
   useCurrentUser,
   useLogIn,
   useLogOut,
+  useRegisterAndStartAnApplication,
   useUpdateCurrentUser,
   getCurrentUserQueryKey,
 } from '../../shared/api/generated/endpoints'
-import type { CurrentUser200Data } from '../../shared/api/generated/endpoints'
+import type {
+  CurrentUser200Data,
+  RegisterAndStartAnApplicationBody,
+} from '../../shared/api/generated/endpoints'
 import { usePermissions } from '../../shared/access/usePermissions'
 import { fetchCsrfCookie } from './csrf'
 
@@ -21,10 +25,23 @@ export interface UseAuth {
   permissions: string[]
   /** Whether the signed-in user holds a given permission key. */
   hasPermission: (permission: string) => boolean
+  /** The signed-in user's role codes from `/me`, mirrored for UX gating. */
+  roles: string[]
+  /** Whether the signed-in user holds a given role code. */
+  hasRole: (role: string) => boolean
+  /** Whether the user is a System/Super Administrator (R09/R10) — the admin gate. */
+  isAdmin: boolean
   isLoggingIn: boolean
   loginError: unknown
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  isRegistering: boolean
+  registerError: unknown
+  /**
+   * Self-register and start an application. Like login it establishes a Sanctum
+   * session server-side, so it primes CSRF then re-probes `/me` on success.
+   */
+  register: (body: RegisterAndStartAnApplicationBody) => Promise<void>
   /** Persist the UI language to the signed-in user's `preferred_locale`. */
   persistLocale: (locale: string) => Promise<void>
 }
@@ -39,11 +56,18 @@ export function useAuth(): UseAuth {
   const me = useCurrentUser()
   const loginMutation = useLogIn()
   const logoutMutation = useLogOut()
+  const registerMutation = useRegisterAndStartAnApplication()
   const updateLocaleMutation = useUpdateCurrentUser()
 
   const login = async (email: string, password: string): Promise<void> => {
     await fetchCsrfCookie()
     await loginMutation.mutateAsync({ data: { email, password } })
+    await queryClient.invalidateQueries({ queryKey: getCurrentUserQueryKey() })
+  }
+
+  const register = async (body: RegisterAndStartAnApplicationBody): Promise<void> => {
+    await fetchCsrfCookie()
+    await registerMutation.mutateAsync({ data: body })
     await queryClient.invalidateQueries({ queryKey: getCurrentUserQueryKey() })
   }
 
@@ -63,9 +87,9 @@ export function useAuth(): UseAuth {
     await queryClient.invalidateQueries({ queryKey: getCurrentUserQueryKey() })
   }
 
-  // Permission reading is cross-cutting, so it lives in shared/access; useAuth
-  // delegates rather than keeping its own copy (one source of the rule).
-  const { permissions, hasPermission } = usePermissions()
+  // Permission and role reading is cross-cutting, so it lives in shared/access;
+  // useAuth delegates rather than keeping its own copy (one source of the rule).
+  const { permissions, hasPermission, roles, hasRole, isAdmin } = usePermissions()
 
   return {
     user: me.data?.data,
@@ -73,10 +97,16 @@ export function useAuth(): UseAuth {
     isAuthenticated,
     permissions,
     hasPermission,
+    roles,
+    hasRole,
+    isAdmin,
     isLoggingIn: loginMutation.isPending,
     loginError: loginMutation.error,
     login,
     logout,
+    isRegistering: registerMutation.isPending,
+    registerError: registerMutation.error,
+    register,
     persistLocale,
   }
 }

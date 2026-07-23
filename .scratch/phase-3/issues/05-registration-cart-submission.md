@@ -1,0 +1,14 @@
+# 05 — Registration cart + submission → Pending
+
+**What to build:** A Student turns the eligible list into a **cart** and submits it. They add courses, set each line Regular or Audit, watch a live credit-hour total, and get inline validation that mirrors the server rules ([ADR-0014](../../../docs/adr/0014-client-validation-mirrors-server-rules.md)). Submitting creates a **RegistrationRequest** in status `Pending`, which the Student can then see with its per-line detail. This ticket introduces the RegistrationRequest aggregate and the batch CH validator; advisor approval and Enrollment minting are ticket 06.
+
+**Blocked by:** 04 (needs the eligible list + Classifier).
+
+**Status:** ready-for-agent
+
+- [ ] `RegistrationRequest` aggregate: student + semester + `kind` {Initial, LateAdd} (Initial here) + `status` {Pending, Approved, Rejected} + lines. Each line references a Course Offering and carries requested mode {Regular, Audit}. **No server-side Draft** — the cart lives in the SPA until submit. At most one Pending request per (student, semester).
+- [ ] A pure **CH validator** (`Internal\Support`) reading min 6 / max 12 from a new `config/enrollment.php` (env-overridable, the `config/admissions.php` pattern); counts Regular+Audit loads in the cart. Takes an **exceptions context** so Phase 5 can plug in Remaining CH without reshaping the seam. First-semester exception (target semester == the student's enrollment term) waives the 6-CH floor; approaching-graduation exception is **not** implemented (deferred to Phase 5).
+- [ ] Submission validates everything computable at cart time: CH floor (unless excepted) / ceiling; within-cart caps (≤1 External Elective, ≤1 Research Course, type-matched); within-cart + against-open-Semester time clashes (the ticket-03 overlap seam); Offering capacity; no duplicate course within the cart. External Electives are only legal inside a request (never a free add — that rule bites in ticket 07). Illegal submissions → 422 with the offending lines/reasons enumerated. (Retake/duplicate-against-existing-Enrollment are enforced at mint — ticket 06.)
+- [ ] `POST` submit + `GET` own-request(s) endpoints (`courses.register_self`). Scribe `@urlParam` examples; openapi + Orval regenerated, drift-clean.
+- [ ] `features/enrollment` cart: add/remove eligible courses, per-line Regular/Audit toggle, live CH total, RHF+Zod client mirror of the server rules (ADR-0014), submit; then a request view showing status Pending + per-line detail. A rejected request (from ticket 06) can be replaced by a new cart while the window is open. EN+AR, axe-clean.
+- [ ] **Tests:** targeted unit for the CH validator (floor, ceiling, first-semester waiver, exceptions-context shape) and within-cart caps; Pest API-feature for submit success + each rejection (CH, caps, clash, capacity, duplicate, window-closed, second-Pending-blocked) + own-request read + RBAC. Sparse Vitest for the cart CH mirror. Gates green.

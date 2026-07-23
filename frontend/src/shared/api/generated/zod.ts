@@ -2668,6 +2668,125 @@ export const ListTheActingStudentsEligibleCoursesForTheOpenSemesterResponse = zo
 
 
 /**
+ * Turns the Student's cart into a Pending {@see RegistrationRequest} for the currently-
+ * open Semester. Each line names an eligible Offering and a mode (Regular / Audit). The
+ * whole cart is validated as a batch — every course must be eligible; the credit-hour
+ * load must sit within the min/max window (the 6-hour floor is waived in the Student's
+ * first semester); at most one External Elective and one Research Course; no duplicate
+ * course; no time clash between chosen Offerings; and every capped Offering must have a
+ * seat. An illegal cart is a 422 enumerating the offending reasons; a second Pending
+ * request for the same Semester is a 409. Gated on `courses.register_self` (R02).
+ * @summary Submit a registration cart.
+ */
+export const SubmitARegistrationCartBody = zod.object({
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().describe('An eligible Course Offering\'s id.'),
+  "mode": zod.string().describe('How to take it — Regular or Audit.')
+})).describe('The cart lines — one per chosen offering.')
+})
+
+export const SubmitARegistrationCartResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().nullish(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Every request the Student has submitted for the currently-open Semester, newest
+ * first, each with its status (Pending / Approved / Rejected) and per-line detail — the
+ * request view (user story 30). A Rejected request stays visible so the Student sees it
+ * alongside any fresh Pending cart. When no window is open, `semester` is null and the
+ * list is empty. Gated on `courses.register_self` (R02).
+ * @summary The acting Student's registration requests for the open Semester.
+ */
+export const TheActingStudentsRegistrationRequestsForTheOpenSemesterResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "requests": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().nullish(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
  * Paginated, newest-first. Scoped to the authenticated user.
  * @summary List my notifications.
  */

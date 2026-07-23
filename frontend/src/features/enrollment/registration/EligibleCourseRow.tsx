@@ -1,23 +1,29 @@
-import { Stack, TableCell, TableRow, Typography } from '@mui/material'
+import { Button, Stack, TableCell, TableRow, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import type { EligibleCourse } from './classification'
 
 interface EligibleCourseRowProps {
   course: EligibleCourse
+  /** Whether this offering is already in the cart — set only in cart-builder mode. */
+  inCart?: boolean
+  /** Add/remove this offering from the cart. When omitted, the row is read-only. */
+  onToggle?: () => void
 }
 
 /**
  * One eligible-course line: the resolved course (code + locale name), its instructor,
  * the weekly meeting slots, the seats still available, and the credit hours the cart
- * will sum (ticket 05). Read-only in this ticket — no cart controls yet.
+ * sums. In cart-builder mode ({@link onToggle} set) a trailing action adds or removes the
+ * offering from the cart; the per-line Regular/Audit choice lives in the cart panel.
  */
-export function EligibleCourseRow({ course }: EligibleCourseRowProps) {
+export function EligibleCourseRow({ course, inCart, onToggle }: EligibleCourseRowProps) {
   const { t, i18n } = useTranslation('enrollment')
 
   const catalogCourse = course.course
   const courseName = catalogCourse ? pickLocaleName(catalogCourse, i18n.language) : ''
   const meetings = course.meetings ?? []
+  const full = course.seats_remaining != null && course.seats_remaining < 1
 
   return (
     <TableRow hover>
@@ -53,6 +59,21 @@ export function EligibleCourseRow({ course }: EligibleCourseRowProps) {
         )}
       </TableCell>
       <TableCell align="right">{course.total_ch}</TableCell>
+      {onToggle && (
+        <TableCell align="right">
+          <Button
+            size="small"
+            variant={inCart ? 'contained' : 'outlined'}
+            disabled={full && !inCart}
+            onClick={onToggle}
+            aria-label={t(inCart ? 'cart.removeCourse' : 'cart.addCourse', {
+              course: catalogCourse?.code ?? '',
+            })}
+          >
+            {t(inCart ? 'cart.inCart' : 'cart.add')}
+          </Button>
+        </TableCell>
+      )}
     </TableRow>
   )
 }

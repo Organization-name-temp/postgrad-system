@@ -53,4 +53,21 @@ class OfferingMeeting extends Model
     {
         return $this->belongsTo(CourseOffering::class, 'course_offering_id');
     }
+
+    /**
+     * This slot as the `{weekday, starts_at, ends_at}` array the SPA renders — the weekday
+     * as its integer value and the times trimmed to "HH:MM". The single home for the
+     * meeting's wire shape, shared by the eligible-list and registration-request-line
+     * resources so they cannot drift.
+     *
+     * @return array{weekday: int, starts_at: string, ends_at: string}
+     */
+    public function toSlotArray(): array
+    {
+        return [
+            'weekday' => $this->weekday->value,
+            'starts_at' => substr($this->starts_at, 0, 5),
+            'ends_at' => substr($this->ends_at, 0, 5),
+        ];
+    }
 }

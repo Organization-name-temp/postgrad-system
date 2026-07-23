@@ -1,25 +1,53 @@
 import { Alert, CircularProgress, Paper, Stack, Typography } from '@mui/material'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { useListTheActingStudentsEligibleCoursesForTheOpenSemester } from '../../../shared/api/generated/endpoints'
+import {
+  getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey,
+  useListTheActingStudentsEligibleCoursesForTheOpenSemester,
+  useTheActingStudentsRegistrationRequestsForTheOpenSemester,
+} from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
-import { ClassificationSection } from './ClassificationSection'
-import { groupByClassification } from './classification'
+import { useAuth } from '../../auth/useAuth'
+import { CartBuilder } from './CartBuilder'
+import { RequestView } from './RequestView'
 
 /**
- * The Student's course-registration screen (features/enrollment, ticket 04). It shows
- * the courses the acting Student may register for in the currently-open Semester,
- * grouped by their Enrollment Classification (Preparatory / Core / Internal Elective /
- * External Elective / Research Course). Read-only in this ticket — the cart and
- * submission arrive in ticket 05. The route is persona-guarded to R02 and the API
- * re-enforces `courses.register_self` on every request (ADR-0008).
+ * The Student's course-registration screen (features/enrollment). It shows either the
+ * cart builder — the eligible list (grouped by Enrollment Classification) plus a live,
+ * client-validated cart (ADR-0014) that submits a RegistrationRequest — or, once a request
+ * is Pending, the request view with its status and per-line detail (ticket 05). A Rejected
+ * request is shown above a fresh builder, so a rejection is recoverable while the window is
+ * open. The route is persona-guarded to R02 and the API re-enforces `courses.register_self`.
  */
 export function RegistrationPage() {
   const { t, i18n } = useTranslation('enrollment')
-  const { data, isPending, isError } = useListTheActingStudentsEligibleCoursesForTheOpenSemester()
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
 
-  const semester = data?.data?.semester
-  const courses = data?.data?.courses ?? []
-  const groups = groupByClassification(courses)
+  const eligibleQuery = useListTheActingStudentsEligibleCoursesForTheOpenSemester()
+  const requestsQuery = useTheActingStudentsRegistrationRequestsForTheOpenSemester()
+
+  const isLoading = eligibleQuery.isPending || requestsQuery.isPending
+  const isError = eligibleQuery.isError || requestsQuery.isError
+
+  const semester = requestsQuery.data?.data?.semester ?? eligibleQuery.data?.data?.semester
+  const courses = eligibleQuery.data?.data?.courses ?? []
+  const requests = requestsQuery.data?.data?.requests ?? []
+  const pending = requests.find((request) => request.status === 'Pending')
+  const priorRequests = requests.filter((request) => request.status !== 'Pending')
+
+  // Mirror the server's first-semester CH waiver: the open semester is the student's
+  // enrollment term (matched by natural key — the display name, ADR-0018).
+  const firstSemester = Boolean(
+    user?.student?.enrollment_term &&
+    semester?.name_en &&
+    user.student.enrollment_term === semester.name_en,
+  )
+
+  const onSubmitted = () =>
+    queryClient.invalidateQueries({
+      queryKey: getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey(),
+    })
 
   const semesterName = semester ? pickLocaleName(semester, i18n.language) : ''
   const closesAt = semester?.registration_closes_at
@@ -33,15 +61,21 @@ export function RegistrationPage() {
         {t('registration.title')}
       </Typography>
 
-      {isPending && <CircularProgress aria-label={t('registration.loading')} />}
+      {isLoading && <CircularProgress aria-label={t('registration.loading')} />}
       {isError && <Alert severity="error">{t('registration.loadError')}</Alert>}
 
-      {!isPending && !isError && !semester && (
+      {!isLoading && !isError && !semester && (
         <Alert severity="info">{t('registration.notOpen')}</Alert>
       )}
 
-      {!isPending && !isError && semester && (
+      {!isLoading && !isError && semester && pending && <RequestView request={pending} />}
+
+      {!isLoading && !isError && semester && !pending && (
         <>
+          {priorRequests.map((request) => (
+            <RequestView key={request.id} request={request} />
+          ))}
+
           <Paper variant="outlined" sx={{ borderRadius: 3, p: { xs: 2, sm: 3 }, mb: 3 }}>
             <Stack spacing={0.5}>
               <Typography variant="h6" component="p">
@@ -52,15 +86,22 @@ export function RegistrationPage() {
                   {t('registration.openUntil', { date: closesLabel })}
                 </Typography>
               )}
+              {priorRequests.length > 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  {t('request.rejectedHelp')}
+                </Typography>
+              )}
             </Stack>
           </Paper>
 
-          {groups.length === 0 ? (
+          {courses.length === 0 ? (
             <Typography color="text.secondary">{t('registration.empty')}</Typography>
           ) : (
-            groups.map((group) => (
-              <ClassificationSection key={group.classification} group={group} />
-            ))
+            <CartBuilder
+              courses={courses}
+              firstSemester={firstSemester}
+              onSubmitted={onSubmitted}
+            />
           )}
         </>
       )}

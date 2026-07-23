@@ -2909,6 +2909,161 @@ export type ListTheActingStudentsEligibleCoursesForTheOpenSemester403 = {
   message?: string;
 };
 
+export type SubmitARegistrationCartBodyLinesItem = {
+  /** An eligible Course Offering's id. */
+  offering_id: number;
+  /** How to take it — Regular or Audit. */
+  mode: string;
+};
+
+export type SubmitARegistrationCartBody = {
+  /** The cart lines — one per chosen offering. */
+  lines: SubmitARegistrationCartBodyLinesItem[];
+};
+
+export type SubmitARegistrationCart201DataLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type SubmitARegistrationCart201DataLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type SubmitARegistrationCart201DataLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type SubmitARegistrationCart201DataLinesItem = {
+  offering_id?: number;
+  mode?: string;
+  classification?: string;
+  total_ch?: number;
+  course?: SubmitARegistrationCart201DataLinesItemCourse;
+  instructor?: SubmitARegistrationCart201DataLinesItemInstructor;
+  meetings?: SubmitARegistrationCart201DataLinesItemMeetingsItem[];
+};
+
+export type SubmitARegistrationCart201Data = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  submitted_at?: string;
+  lines?: SubmitARegistrationCart201DataLinesItem[];
+};
+
+export type SubmitARegistrationCart201 = {
+  data?: SubmitARegistrationCart201Data;
+};
+
+export type SubmitARegistrationCart403 = {
+  message?: string;
+};
+
+export type SubmitARegistrationCart409 = {
+  message?: string;
+};
+
+export type SubmitARegistrationCart422 = {
+  message?: string;
+  errors?: {
+  registration?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  below_min_credit_hours?: string[];
+};
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItem = {
+  offering_id?: number;
+  mode?: string;
+  classification?: string;
+  total_ch?: number;
+  course?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemCourse;
+  instructor?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemInstructor;
+  meetings?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemMeetingsItem[];
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItem = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  submitted_at?: string;
+  lines?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItem[];
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200Data = {
+  semester?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataSemester;
+  requests?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItem[];
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200 = {
+  data?: TheActingStudentsRegistrationRequestsForTheOpenSemester200Data;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester403 = {
+  message?: string;
+};
+
 export type ListMyNotifications200DataItemData = {
   scheduled_at?: string;
 };
@@ -10373,6 +10528,177 @@ export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Turns the Student's cart into a Pending {@see RegistrationRequest} for the currently-
+ * open Semester. Each line names an eligible Offering and a mode (Regular / Audit). The
+ * whole cart is validated as a batch — every course must be eligible; the credit-hour
+ * load must sit within the min/max window (the 6-hour floor is waived in the Student's
+ * first semester); at most one External Elective and one Research Course; no duplicate
+ * course; no time clash between chosen Offerings; and every capped Offering must have a
+ * seat. An illegal cart is a 422 enumerating the offending reasons; a second Pending
+ * request for the same Semester is a 409. Gated on `courses.register_self` (R02).
+ * @summary Submit a registration cart.
+ */
+export const submitARegistrationCart = (
+    submitARegistrationCartBody: SubmitARegistrationCartBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitARegistrationCart201>(
+      {url: `/api/v1/registration/requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitARegistrationCartBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitARegistrationCartMutationOptions = <TError = SubmitARegistrationCart403 | SubmitARegistrationCart409 | SubmitARegistrationCart422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitARegistrationCart>>, TError,{data: SubmitARegistrationCartBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitARegistrationCart>>, TError,{data: SubmitARegistrationCartBody}, TContext> => {
+
+const mutationKey = ['submitARegistrationCart'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitARegistrationCart>>, {data: SubmitARegistrationCartBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitARegistrationCart(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitARegistrationCartMutationResult = NonNullable<Awaited<ReturnType<typeof submitARegistrationCart>>>
+    export type SubmitARegistrationCartMutationBody = SubmitARegistrationCartBody
+    export type SubmitARegistrationCartMutationError = SubmitARegistrationCart403 | SubmitARegistrationCart409 | SubmitARegistrationCart422
+
+    /**
+ * @summary Submit a registration cart.
+ */
+export const useSubmitARegistrationCart = <TError = SubmitARegistrationCart403 | SubmitARegistrationCart409 | SubmitARegistrationCart422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitARegistrationCart>>, TError,{data: SubmitARegistrationCartBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitARegistrationCart>>,
+        TError,
+        {data: SubmitARegistrationCartBody},
+        TContext
+      > => {
+      return useMutation(getSubmitARegistrationCartMutationOptions(options), queryClient);
+    }
+
+/**
+ * Every request the Student has submitted for the currently-open Semester, newest
+ * first, each with its status (Pending / Approved / Rejected) and per-line detail — the
+ * request view (user story 30). A Rejected request stays visible so the Student sees it
+ * alongside any fresh Pending cart. When no window is open, `semester` is null and the
+ * list is empty. Gated on `courses.register_self` (R02).
+ * @summary The acting Student's registration requests for the open Semester.
+ */
+export const theActingStudentsRegistrationRequestsForTheOpenSemester = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheActingStudentsRegistrationRequestsForTheOpenSemester200>(
+      {url: `/api/v1/registration/requests`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey = () => {
+    return [
+    `/api/v1/registration/requests`
+    ] as const;
+    }
+
+
+export const getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryOptions = <TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>> = ({ signal }) => theActingStudentsRegistrationRequestsForTheOpenSemester(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemesterQueryResult = NonNullable<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>>
+export type TheActingStudentsRegistrationRequestsForTheOpenSemesterQueryError = TheActingStudentsRegistrationRequestsForTheOpenSemester403
+
+
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The acting Student's registration requests for the open Semester.
+ */
+
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

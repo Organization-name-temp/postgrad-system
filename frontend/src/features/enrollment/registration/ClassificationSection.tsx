@@ -11,10 +11,20 @@ import {
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { EligibleCourseRow } from './EligibleCourseRow'
-import type { ClassificationGroup } from './classification'
+import type { ClassificationGroup, EligibleCourse } from './classification'
+
+/**
+ * Cart controls threaded down to each row in cart-builder mode: whether an offering is in
+ * the cart, and a toggle to add/remove it. Omitted for a read-only list.
+ */
+export interface CartControls {
+  has: (offeringId: number) => boolean
+  toggle: (course: EligibleCourse) => void
+}
 
 interface ClassificationSectionProps {
   group: ClassificationGroup
+  cart?: CartControls
 }
 
 // The two classifications that carry a caption explaining a rule the student should
@@ -25,9 +35,10 @@ const HINTED = new Set(['ExternalElective', 'ResearchCourse'])
  * One classification group on the registration page — a labelled section with a
  * heading, an optional rule caption, and a table of the eligible courses in that
  * class. The heading is a real `<h2>` tied to the section via `aria-labelledby`, so a
- * screen-reader user can navigate the five groups by landmark (axe-clean).
+ * screen-reader user can navigate the five groups by landmark (axe-clean). In cart-builder
+ * mode each row gains an add/remove action.
  */
-export function ClassificationSection({ group }: ClassificationSectionProps) {
+export function ClassificationSection({ group, cart }: ClassificationSectionProps) {
   const { t } = useTranslation('enrollment')
   const headingId = `enrollment-section-${group.classification}`
 
@@ -61,11 +72,17 @@ export function ClassificationSection({ group }: ClassificationSectionProps) {
               <TableCell>{t('columns.meetings')}</TableCell>
               <TableCell align="right">{t('columns.seats')}</TableCell>
               <TableCell align="right">{t('columns.creditHours')}</TableCell>
+              {cart && <TableCell align="right">{t('cart.columns.action')}</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
             {group.courses.map((course) => (
-              <EligibleCourseRow key={course.offering_id} course={course} />
+              <EligibleCourseRow
+                key={course.offering_id}
+                course={course}
+                inCart={cart ? cart.has(course.offering_id as number) : undefined}
+                onToggle={cart ? () => cart.toggle(course) : undefined}
+              />
             ))}
           </TableBody>
         </Table>

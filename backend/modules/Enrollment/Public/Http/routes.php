@@ -34,7 +34,12 @@ Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function () {
-    // The acting Student's eligible-course list for the currently-open Semester
-    // (ticket 04). Read-only; the cart and submission arrive in ticket 05.
+    // The acting Student's eligible-course list for the currently-open Semester (ticket 04).
     Route::get('/registration/eligible-courses', [RegistrationController::class, 'eligibleCourses']);
+
+    // The Student's cart submission → a Pending RegistrationRequest, and the request view
+    // (ticket 05). Both act on the acting Student and the currently-open Semester, so
+    // neither carries a model-bound route parameter.
+    Route::post('/registration/requests', [RegistrationController::class, 'submit']);
+    Route::get('/registration/requests', [RegistrationController::class, 'requests']);
 });

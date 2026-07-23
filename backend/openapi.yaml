@@ -9907,6 +9907,515 @@ paths:
       tags:
         - Enrollment
       security: []
+  /api/v1/registration/requests:
+    post:
+      summary: 'Submit a registration cart.'
+      operationId: submitARegistrationCart
+      description: "Turns the Student's cart into a Pending {@see RegistrationRequest} for the currently-\nopen Semester. Each line names an eligible Offering and a mode (Regular / Audit). The\nwhole cart is validated as a batch — every course must be eligible; the credit-hour\nload must sit within the min/max window (the 6-hour floor is waived in the Student's\nfirst semester); at most one External Elective and one Research Course; no duplicate\ncourse; no time clash between chosen Offerings; and every capped Offering must have a\nseat. An illegal cart is a 422 enumerating the offending reasons; a second Pending\nrequest for the same Semester is a 409. Gated on `courses.register_self` (R02)."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    semester_id: 1
+                    kind: Initial
+                    status: Pending
+                    advisor_note: null
+                    submitted_at: '2026-08-02T09:00:00+00:00'
+                    lines:
+                      -
+                        offering_id: 1
+                        mode: Regular
+                        classification: Core
+                        total_ch: 3
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                        meetings:
+                          -
+                            weekday: 1
+                            starts_at: '09:00'
+                            ends_at: '11:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      semester_id:
+                        type: integer
+                        example: 1
+                      kind:
+                        type: string
+                        example: Initial
+                      status:
+                        type: string
+                        example: Pending
+                      advisor_note:
+                        type: string
+                        example: null
+                        nullable: true
+                      submitted_at:
+                        type: string
+                        example: '2026-08-02T09:00:00+00:00'
+                      lines:
+                        type: array
+                        example:
+                          -
+                            offering_id: 1
+                            mode: Regular
+                            classification: Core
+                            total_ch: 3
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                            instructor:
+                              id: 4
+                              name: 'Dr. Instructor'
+                              email: instructor@ejust.test
+                            meetings:
+                              - weekday: 1
+                                starts_at: '09:00'
+                                ends_at: '11:00'
+                        items:
+                          type: object
+                          properties:
+                            offering_id:
+                              type: integer
+                              example: 1
+                            mode:
+                              type: string
+                              example: Regular
+                            classification:
+                              type: string
+                              example: Core
+                            total_ch:
+                              type: integer
+                              example: 3
+                            course:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                code:
+                                  type: string
+                                  example: DEP501
+                                name_en:
+                                  type: string
+                                  example: 'Advanced Algorithms'
+                                name_ar:
+                                  type: string
+                                  example: 'خوارزميات متقدمة'
+                                level:
+                                  type: integer
+                                  example: 500
+                                total_ch:
+                                  type: integer
+                                  example: 3
+                                research_type:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                is_active:
+                                  type: boolean
+                                  example: true
+                            instructor:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 4
+                                name:
+                                  type: string
+                                  example: 'Dr. Instructor'
+                                email:
+                                  type: string
+                                  example: instructor@ejust.test
+                            meetings:
+                              type: array
+                              example:
+                                - weekday: 1
+                                  starts_at: '09:00'
+                                  ends_at: '11:00'
+                              items:
+                                type: object
+                                properties:
+                                  weekday:
+                                    type: integer
+                                    example: 1
+                                  starts_at:
+                                    type: string
+                                    example: '09:00'
+                                  ends_at:
+                                    type: string
+                                    example: '11:00'
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record to register with.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record to register with.'
+        409:
+          description: 'a pending request already exists'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You already have a pending registration request for this semester.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You already have a pending registration request for this semester.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'registration closed'
+                    type: object
+                    example:
+                      message: 'Registration is not open right now.'
+                      errors:
+                        registration:
+                          - 'Registration is not open right now.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Registration is not open right now.'
+                      errors:
+                        type: object
+                        properties:
+                          registration:
+                            type: array
+                            example:
+                              - 'Registration is not open right now.'
+                            items:
+                              type: string
+                  -
+                    description: 'credit-hour floor'
+                    type: object
+                    example:
+                      message: 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                      errors:
+                        below_min_credit_hours:
+                          - 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                      errors:
+                        type: object
+                        properties:
+                          below_min_credit_hours:
+                            type: array
+                            example:
+                              - 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                            items:
+                              type: string
+      tags:
+        - Enrollment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lines:
+                  type: array
+                  description: 'The cart lines — one per chosen offering.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      offering_id:
+                        type: integer
+                        description: "An eligible Course Offering's id."
+                        example: 1
+                      mode:
+                        type: string
+                        description: 'How to take it — Regular or Audit.'
+                        example: Regular
+                    required:
+                      - offering_id
+                      - mode
+              required:
+                - lines
+      security: []
+    get:
+      summary: "The acting Student's registration requests for the open Semester."
+      operationId: theActingStudentsRegistrationRequestsForTheOpenSemester
+      description: "Every request the Student has submitted for the currently-open Semester, newest\nfirst, each with its status (Pending / Approved / Rejected) and per-line detail — the\nrequest view (user story 30). A Rejected request stays visible so the Student sees it\nalongside any fresh Pending cart. When no window is open, `semester` is null and the\nlist is empty. Gated on `courses.register_self` (R02)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    semester:
+                      id: 1
+                      term: Fall
+                      year: 2026
+                      name_en: 'Fall 2026'
+                      name_ar: 'خريف 2026'
+                      starts_at: '2026-09-01T00:00:00+00:00'
+                      ends_at: '2026-12-20T00:00:00+00:00'
+                      registration_opens_at: '2026-08-01T00:00:00+00:00'
+                      registration_closes_at: '2026-09-05T00:00:00+00:00'
+                      add_drop_ends_at: '2026-09-14T00:00:00+00:00'
+                      late_add_ends_at: '2026-09-21T00:00:00+00:00'
+                      withdrawal_deadline_at: '2026-11-15T00:00:00+00:00'
+                      is_registration_open: true
+                    requests:
+                      -
+                        id: 1
+                        semester_id: 1
+                        kind: Initial
+                        status: Pending
+                        advisor_note: null
+                        submitted_at: '2026-08-02T09:00:00+00:00'
+                        lines:
+                          -
+                            offering_id: 1
+                            mode: Regular
+                            classification: Core
+                            total_ch: 3
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                            instructor:
+                              id: 4
+                              name: 'Dr. Instructor'
+                              email: instructor@ejust.test
+                            meetings:
+                              -
+                                weekday: 1
+                                starts_at: '09:00'
+                                ends_at: '11:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      semester:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          term:
+                            type: string
+                            example: Fall
+                          year:
+                            type: integer
+                            example: 2026
+                          name_en:
+                            type: string
+                            example: 'Fall 2026'
+                          name_ar:
+                            type: string
+                            example: 'خريف 2026'
+                          starts_at:
+                            type: string
+                            example: '2026-09-01T00:00:00+00:00'
+                          ends_at:
+                            type: string
+                            example: '2026-12-20T00:00:00+00:00'
+                          registration_opens_at:
+                            type: string
+                            example: '2026-08-01T00:00:00+00:00'
+                          registration_closes_at:
+                            type: string
+                            example: '2026-09-05T00:00:00+00:00'
+                          add_drop_ends_at:
+                            type: string
+                            example: '2026-09-14T00:00:00+00:00'
+                          late_add_ends_at:
+                            type: string
+                            example: '2026-09-21T00:00:00+00:00'
+                          withdrawal_deadline_at:
+                            type: string
+                            example: '2026-11-15T00:00:00+00:00'
+                          is_registration_open:
+                            type: boolean
+                            example: true
+                      requests:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            semester_id: 1
+                            kind: Initial
+                            status: Pending
+                            advisor_note: null
+                            submitted_at: '2026-08-02T09:00:00+00:00'
+                            lines:
+                              -
+                                offering_id: 1
+                                mode: Regular
+                                classification: Core
+                                total_ch: 3
+                                course:
+                                  id: 1
+                                  code: DEP501
+                                  name_en: 'Advanced Algorithms'
+                                  name_ar: 'خوارزميات متقدمة'
+                                  level: 500
+                                  total_ch: 3
+                                  research_type: null
+                                  is_active: true
+                                instructor:
+                                  id: 4
+                                  name: 'Dr. Instructor'
+                                  email: instructor@ejust.test
+                                meetings:
+                                  - weekday: 1
+                                    starts_at: '09:00'
+                                    ends_at: '11:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            semester_id:
+                              type: integer
+                              example: 1
+                            kind:
+                              type: string
+                              example: Initial
+                            status:
+                              type: string
+                              example: Pending
+                            advisor_note:
+                              type: string
+                              example: null
+                              nullable: true
+                            submitted_at:
+                              type: string
+                              example: '2026-08-02T09:00:00+00:00'
+                            lines:
+                              type: array
+                              example:
+                                -
+                                  offering_id: 1
+                                  mode: Regular
+                                  classification: Core
+                                  total_ch: 3
+                                  course:
+                                    id: 1
+                                    code: DEP501
+                                    name_en: 'Advanced Algorithms'
+                                    name_ar: 'خوارزميات متقدمة'
+                                    level: 500
+                                    total_ch: 3
+                                    research_type: null
+                                    is_active: true
+                                  instructor:
+                                    id: 4
+                                    name: 'Dr. Instructor'
+                                    email: instructor@ejust.test
+                                  meetings:
+                                    - weekday: 1
+                                      starts_at: '09:00'
+                                      ends_at: '11:00'
+                              items:
+                                type: object
+                                properties:
+                                  offering_id:
+                                    type: integer
+                                    example: 1
+                                  mode:
+                                    type: string
+                                    example: Regular
+                                  classification:
+                                    type: string
+                                    example: Core
+                                  total_ch:
+                                    type: integer
+                                    example: 3
+                                  course:
+                                    type: object
+                                    properties:
+                                      id: { type: integer, example: 1 }
+                                      code: { type: string, example: DEP501 }
+                                      name_en: { type: string, example: 'Advanced Algorithms' }
+                                      name_ar: { type: string, example: 'خوارزميات متقدمة' }
+                                      level: { type: integer, example: 500 }
+                                      total_ch: { type: integer, example: 3 }
+                                      research_type: { type: string, example: null, nullable: true }
+                                      is_active: { type: boolean, example: true }
+                                  instructor:
+                                    type: object
+                                    properties:
+                                      id: { type: integer, example: 4 }
+                                      name: { type: string, example: 'Dr. Instructor' }
+                                      email: { type: string, example: instructor@ejust.test }
+                                  meetings:
+                                    type: array
+                                    example:
+                                      - { weekday: 1, starts_at: '09:00', ends_at: '11:00' }
+                                    items:
+                                      type: object
+                                      properties: { weekday: { type: integer, example: 1 }, starts_at: { type: string, example: '09:00' }, ends_at: { type: string, example: '11:00' } }
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record to register with.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record to register with.'
+      tags:
+        - Enrollment
+      security: []
   /api/v1/notifications:
     get:
       summary: 'List my notifications.'

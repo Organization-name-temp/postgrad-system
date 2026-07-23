@@ -9,13 +9,16 @@
  * opens the Administration surface (System / Super Administrator) — the first
  * role-gated (not permission-gated) surface, ticket 08.
  *
- * `applicant` and `instructor` gate the **persona** nav items — "My application" and
- * "My interviews" — on the user's actual Role, not on an inherited Permission, so an
- * admin (who holds every Permission, ADR-0008) does not see another role's home screen
- * (ADR-0015, ticket 11).
+ * `applicant`, `student` and `instructor` gate the **persona** nav items — "My
+ * application", "My registration", "My interviews" — on the user's actual Role, not on
+ * an inherited Permission, so an admin (who holds every Permission, ADR-0008) does not
+ * see another role's home screen (ADR-0015, ticket 11). A Student's registration screen
+ * is one such surface: an admin inherits `courses.register_self` but has no Student
+ * record, so it gates on the Role (Phase 3, ticket 04).
  */
 export const ROLE = {
   applicant: 'R01',
+  student: 'R02',
   instructor: 'R04',
   systemAdmin: 'R09',
   superAdmin: 'R10',

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
+use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 
 /*
 | Enrollment routes, mounted under /api/v1 by EnrollmentServiceProvider.
@@ -9,9 +10,9 @@ use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 | Course Offering management — "what runs this semester" — is entirely under
 | calendar.manage (Student Affairs / Dean; SysAdmin inherits): the same guard the
 | Semester itself uses (ADR-0017 — catalog.manage is what the university *can* teach;
-| calendar.manage is what actually *runs* this term). The eligible-list / roster read
-| surfaces students and instructors use arrive in later Phase-3 tickets under their
-| own gates.
+| calendar.manage is what actually *runs* this term). The student registration surface
+| is gated on courses.register_self (the acting Student, R02); the advisor/instructor
+| read surfaces arrive in later Phase-3 tickets under their own gates.
 |
 | `Enrollment\Public` ships empty beyond these route bindings (ADR-0017): the routes
 | live in Public but point at the Internal controller (a same-module Public → Internal
@@ -30,4 +31,10 @@ Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
     Route::get('/offerings/{offering}', [OfferingController::class, 'show'])->whereNumber('offering');
     Route::patch('/offerings/{offering}', [OfferingController::class, 'update'])->whereNumber('offering');
     Route::delete('/offerings/{offering}', [OfferingController::class, 'destroy'])->whereNumber('offering');
+});
+
+Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function () {
+    // The acting Student's eligible-course list for the currently-open Semester
+    // (ticket 04). Read-only; the cart and submission arrive in ticket 05.
+    Route::get('/registration/eligible-courses', [RegistrationController::class, 'eligibleCourses']);
 });

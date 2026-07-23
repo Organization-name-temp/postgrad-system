@@ -5,8 +5,10 @@ namespace Modules\Catalog;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Catalog\Internal\Support\EloquentCourseCatalog;
+use Modules\Catalog\Internal\Support\EloquentCurriculumCatalog;
 use Modules\Catalog\Internal\Support\EloquentProgramCatalog;
 use Modules\Catalog\Public\CourseCatalog;
+use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Catalog\Public\ProgramCatalog;
 
 class CatalogServiceProvider extends ServiceProvider
@@ -17,6 +19,7 @@ class CatalogServiceProvider extends ServiceProvider
         // Catalog\Public contracts; the Eloquent readers live in Catalog\Internal.
         $this->app->bind(ProgramCatalog::class, EloquentProgramCatalog::class);
         $this->app->bind(CourseCatalog::class, EloquentCourseCatalog::class);
+        $this->app->bind(CurriculumCatalog::class, EloquentCurriculumCatalog::class);
     }
 
     public function boot(): void

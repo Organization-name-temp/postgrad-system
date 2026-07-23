@@ -2610,6 +2610,64 @@ export const DeleteACourseOfferingResponse = zod.looseObject({
 
 
 /**
+ * The courses the Student may register for right now, grouped client-side by their
+ * Enrollment Classification (Preparatory / Core / Internal Elective / External
+ * Elective / Research Course). Each line carries the Offering's instructor, meeting
+ * times, seats remaining and the course's total CH. Courses in the Curriculum with
+ * no Offering this semester are absent (ADR-0017); a course that classifies for no
+ * class is omitted. When no registration window is open, `semester` is null and the
+ * list is empty. Gated on `courses.register_self` (the acting Student, R02).
+ * @summary List the acting Student's eligible courses for the open Semester.
+ */
+export const ListTheActingStudentsEligibleCoursesForTheOpenSemesterResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "courses": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "capacity": zod.number().optional(),
+  "seats_remaining": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
  * Paginated, newest-first. Scoped to the authenticated user.
  * @summary List my notifications.
  */

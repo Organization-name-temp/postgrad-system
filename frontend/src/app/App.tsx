@@ -26,6 +26,7 @@ import { CyclesPage } from '../features/admin/cycles/CyclesPage'
 import { SemestersPage } from '../features/admin/semesters/SemestersPage'
 import { OfferingsPage } from '../features/admin/offerings/OfferingsPage'
 import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
+import { RegistrationPage } from '../features/enrollment/registration/RegistrationPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE } from '../shared/access/roles'
@@ -65,6 +66,12 @@ export function App() {
                     admin who merely inherits application.submit is sent home (ticket 11). */}
                 <Route element={<RequireAuth roles={[ROLE.applicant]} />}>
                   <Route path="/apply" element={<ApplyPage />} />
+                </Route>
+                {/* Persona-guarded: only actual Students (R02) reach registration; an
+                    admin who merely inherits courses.register_self is sent home and
+                    the server would 403 the eligible list anyway (ticket 04). */}
+                <Route element={<RequireAuth roles={[ROLE.student]} />}>
+                  <Route path="/registration" element={<RegistrationPage />} />
                 </Route>
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />

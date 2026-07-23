@@ -14,6 +14,7 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -142,6 +143,18 @@ export const navItems: NavItem[] = [
     icon: <CalendarMonthIcon />,
     permission: PERMISSION.manageCalendar,
     section: 'calendar',
+  },
+  // Enrollment (Phase 3): the Student's own registration surface. A **persona** item
+  // gated on the Student role (R02), not on courses.register_self — an admin inherits
+  // that permission but has no Student record, so the server would 403 the eligible
+  // list (ADR-0015). The advisor/instructor enrollment surfaces join this section in
+  // later tickets.
+  {
+    key: 'registration',
+    to: '/registration',
+    icon: <AppRegistrationIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

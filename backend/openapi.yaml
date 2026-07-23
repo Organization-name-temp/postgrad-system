@@ -9690,6 +9690,223 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/registration/eligible-courses:
+    get:
+      summary: "List the acting Student's eligible courses for the open Semester."
+      operationId: listTheActingStudentsEligibleCoursesForTheOpenSemester
+      description: "The courses the Student may register for right now, grouped client-side by their\nEnrollment Classification (Preparatory / Core / Internal Elective / External\nElective / Research Course). Each line carries the Offering's instructor, meeting\ntimes, seats remaining and the course's total CH. Courses in the Curriculum with\nno Offering this semester are absent (ADR-0017); a course that classifies for no\nclass is omitted. When no registration window is open, `semester` is null and the\nlist is empty. Gated on `courses.register_self` (the acting Student, R02)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    semester:
+                      id: 1
+                      term: Fall
+                      year: 2026
+                      name_en: 'Fall 2026'
+                      name_ar: 'خريف 2026'
+                      starts_at: '2026-09-01T00:00:00+00:00'
+                      ends_at: '2026-12-20T00:00:00+00:00'
+                      registration_opens_at: '2026-08-01T00:00:00+00:00'
+                      registration_closes_at: '2026-09-05T00:00:00+00:00'
+                      add_drop_ends_at: '2026-09-14T00:00:00+00:00'
+                      late_add_ends_at: '2026-09-21T00:00:00+00:00'
+                      withdrawal_deadline_at: '2026-11-15T00:00:00+00:00'
+                      is_registration_open: true
+                    courses:
+                      -
+                        offering_id: 1
+                        classification: Core
+                        capacity: 30
+                        seats_remaining: 30
+                        total_ch: 3
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                        meetings:
+                          -
+                            weekday: 1
+                            starts_at: '09:00'
+                            ends_at: '11:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      semester:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          term:
+                            type: string
+                            example: Fall
+                          year:
+                            type: integer
+                            example: 2026
+                          name_en:
+                            type: string
+                            example: 'Fall 2026'
+                          name_ar:
+                            type: string
+                            example: 'خريف 2026'
+                          starts_at:
+                            type: string
+                            example: '2026-09-01T00:00:00+00:00'
+                          ends_at:
+                            type: string
+                            example: '2026-12-20T00:00:00+00:00'
+                          registration_opens_at:
+                            type: string
+                            example: '2026-08-01T00:00:00+00:00'
+                          registration_closes_at:
+                            type: string
+                            example: '2026-09-05T00:00:00+00:00'
+                          add_drop_ends_at:
+                            type: string
+                            example: '2026-09-14T00:00:00+00:00'
+                          late_add_ends_at:
+                            type: string
+                            example: '2026-09-21T00:00:00+00:00'
+                          withdrawal_deadline_at:
+                            type: string
+                            example: '2026-11-15T00:00:00+00:00'
+                          is_registration_open:
+                            type: boolean
+                            example: true
+                      courses:
+                        type: array
+                        example:
+                          -
+                            offering_id: 1
+                            classification: Core
+                            capacity: 30
+                            seats_remaining: 30
+                            total_ch: 3
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                            instructor:
+                              id: 4
+                              name: 'Dr. Instructor'
+                              email: instructor@ejust.test
+                            meetings:
+                              - weekday: 1
+                                starts_at: '09:00'
+                                ends_at: '11:00'
+                        items:
+                          type: object
+                          properties:
+                            offering_id:
+                              type: integer
+                              example: 1
+                            classification:
+                              type: string
+                              example: Core
+                            capacity:
+                              type: integer
+                              example: 30
+                            seats_remaining:
+                              type: integer
+                              example: 30
+                            total_ch:
+                              type: integer
+                              example: 3
+                            course:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                code:
+                                  type: string
+                                  example: DEP501
+                                name_en:
+                                  type: string
+                                  example: 'Advanced Algorithms'
+                                name_ar:
+                                  type: string
+                                  example: 'خوارزميات متقدمة'
+                                level:
+                                  type: integer
+                                  example: 500
+                                total_ch:
+                                  type: integer
+                                  example: 3
+                                research_type:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                is_active:
+                                  type: boolean
+                                  example: true
+                            instructor:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 4
+                                name:
+                                  type: string
+                                  example: 'Dr. Instructor'
+                                email:
+                                  type: string
+                                  example: instructor@ejust.test
+                            meetings:
+                              type: array
+                              example:
+                                - weekday: 1
+                                  starts_at: '09:00'
+                                  ends_at: '11:00'
+                              items:
+                                type: object
+                                properties:
+                                  weekday:
+                                    type: integer
+                                    example: 1
+                                  starts_at:
+                                    type: string
+                                    example: '09:00'
+                                  ends_at:
+                                    type: string
+                                    example: '11:00'
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record to register with.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record to register with.'
+      tags:
+        - Enrollment
+      security: []
   /api/v1/notifications:
     get:
       summary: 'List my notifications.'

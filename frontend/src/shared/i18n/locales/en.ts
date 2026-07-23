@@ -36,11 +36,13 @@ export const en = {
       interviewScheduling: 'Interview scheduling',
       interviewSlots: 'Interview slots',
       myInterviews: 'My interviews',
+      registration: 'My registration',
       assignments: 'Faculty deans',
       sections: {
         admissions: 'Admissions',
         catalog: 'Catalog',
         calendar: 'Calendar',
+        enrollment: 'Enrollment',
         administration: 'Administration',
       },
     },
@@ -815,6 +817,50 @@ export const en = {
       cancel: 'Cancel',
       saveError:
         'Could not save the assignment. Check that this Dean is not already assigned to that faculty.',
+    },
+  },
+  enrollment: {
+    registration: {
+      title: 'Course registration',
+      forSemester: 'Registering for {{semester}}',
+      openUntil: 'Registration is open until {{date}}.',
+      notOpen:
+        'Registration is not open right now. You will be able to build your schedule once the registration window opens.',
+      empty: 'There are no courses available for you to register in this semester yet.',
+      loading: 'Loading your eligible courses',
+      loadError: 'Could not load your eligible courses. Please try again.',
+    },
+    classifications: {
+      Preparatory: 'Preparatory courses',
+      Core: 'Program core',
+      InternalElective: 'Internal electives',
+      ExternalElective: 'External electives',
+      ResearchCourse: 'Research course',
+    },
+    hints: {
+      ExternalElective:
+        'From another program. You may use one external elective across your studies, and it needs your advisor’s approval.',
+      ResearchCourse: 'The level-700 option matched to your degree (PBL for MSc, Seminar for PhD).',
+    },
+    columns: {
+      course: 'Course',
+      instructor: 'Instructor',
+      meetings: 'Meeting times',
+      seats: 'Seats left',
+      creditHours: 'Credit hours',
+    },
+    uncapped: 'No limit',
+    noMeetings: 'To be scheduled',
+    countLabel: '{{count}} course',
+    countLabel_other: '{{count}} courses',
+    weekdays: {
+      0: 'Sunday',
+      1: 'Monday',
+      2: 'Tuesday',
+      3: 'Wednesday',
+      4: 'Thursday',
+      5: 'Friday',
+      6: 'Saturday',
     },
   },
 } as const

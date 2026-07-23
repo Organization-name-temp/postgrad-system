@@ -98,4 +98,17 @@ class CourseOffering extends Model
 
         return false;
     }
+
+    /**
+     * The seats still available, or `null` when the Offering is uncapped (a display fact
+     * on the eligible list, user story 15). Derived, never stored, so it cannot drift.
+     * No Enrollment consumes a seat until they are minted (tickets 05/06), so in this
+     * ticket a capped Offering reports its full capacity. Tickets 05/06 subtract the
+     * active-enrollment count here — resolved in one batched read keyed by offering id,
+     * not a per-row query — when the capacity validator lands (ADR-0017).
+     */
+    public function seatsRemaining(): ?int
+    {
+        return $this->capacity;
+    }
 }

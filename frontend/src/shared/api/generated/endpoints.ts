@@ -2845,6 +2845,70 @@ export type DeleteACourseOffering409 = {
   message?: string;
 };
 
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse;
+  instructor?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor;
+  meetings?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem[];
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200Data = {
+  semester?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataSemester;
+  courses?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem[];
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200 = {
+  data?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200Data;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester403 = {
+  message?: string;
+};
+
 export type ListMyNotifications200DataItemData = {
   scheduled_at?: string;
 };
@@ -10220,6 +10284,106 @@ export const useDeleteACourseOffering = <TError = DeleteACourseOffering403 | Del
       > => {
       return useMutation(getDeleteACourseOfferingMutationOptions(options), queryClient);
     }
+
+/**
+ * The courses the Student may register for right now, grouped client-side by their
+ * Enrollment Classification (Preparatory / Core / Internal Elective / External
+ * Elective / Research Course). Each line carries the Offering's instructor, meeting
+ * times, seats remaining and the course's total CH. Courses in the Curriculum with
+ * no Offering this semester are absent (ADR-0017); a course that classifies for no
+ * class is omitted. When no registration window is open, `semester` is null and the
+ * list is empty. Gated on `courses.register_self` (the acting Student, R02).
+ * @summary List the acting Student's eligible courses for the open Semester.
+ */
+export const listTheActingStudentsEligibleCoursesForTheOpenSemester = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListTheActingStudentsEligibleCoursesForTheOpenSemester200>(
+      {url: `/api/v1/registration/eligible-courses`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryKey = () => {
+    return [
+    `/api/v1/registration/eligible-courses`
+    ] as const;
+    }
+
+
+export const getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryOptions = <TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>> = ({ signal }) => listTheActingStudentsEligibleCoursesForTheOpenSemester(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryResult = NonNullable<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>>
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403
+
+
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the acting Student's eligible courses for the open Semester.
+ */
+
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Paginated, newest-first. Scoped to the authenticated user.

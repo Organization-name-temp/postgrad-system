@@ -6,6 +6,7 @@ import ApartmentIcon from '@mui/icons-material/Apartment'
 import SchoolIcon from '@mui/icons-material/School'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import EventNoteIcon from '@mui/icons-material/EventNote'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import FactCheckIcon from '@mui/icons-material/FactCheck'
 import GavelIcon from '@mui/icons-material/Gavel'
 import HowToRegIcon from '@mui/icons-material/HowToReg'
@@ -126,11 +127,19 @@ export const navItems: NavItem[] = [
     permission: PERMISSION.viewCatalog,
     section: 'catalog',
   },
-  // Calendar — the admission-cycle windows (Phase 2).
+  // Calendar — the admission-cycle windows (Phase 2) and the academic Semesters
+  // (Phase 3): both under calendar.manage, in the same section.
   {
     key: 'cycles',
     to: '/admin/cycles',
     icon: <EventNoteIcon />,
+    permission: PERMISSION.manageCalendar,
+    section: 'calendar',
+  },
+  {
+    key: 'semesters',
+    to: '/admin/semesters',
+    icon: <CalendarMonthIcon />,
     permission: PERMISSION.manageCalendar,
     section: 'calendar',
   },

@@ -1630,6 +1630,137 @@ export type DeactivateAnAdmissionCycle200 = {
   data?: DeactivateAnAdmissionCycle200Data;
 };
 
+export type ListSemesters200DataItem = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ListSemesters200 = {
+  data?: ListSemesters200DataItem[];
+};
+
+export type CreateASemesterBody = {
+  /** Fall or Spring. */
+  term: string;
+  /** The academic year. */
+  year: number;
+  /** When the semester starts (ISO 8601). */
+  starts_at: string;
+  /** When the semester ends (ISO 8601). */
+  ends_at: string;
+  /** When registration opens (ISO 8601). */
+  registration_opens_at: string;
+  /** When registration closes (ISO 8601). */
+  registration_closes_at: string;
+  /** End of the free add/drop period (ISO 8601). */
+  add_drop_ends_at: string;
+  /** End of the late-add period (ISO 8601). */
+  late_add_ends_at: string;
+  /** The withdrawal deadline (ISO 8601). */
+  withdrawal_deadline_at: string;
+};
+
+export type CreateASemester201Data = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type CreateASemester201 = {
+  data?: CreateASemester201Data;
+};
+
+export type CreateASemester422Errors = {
+  term?: string[];
+};
+
+export type CreateASemester422 = {
+  message?: string;
+  errors?: CreateASemester422Errors;
+};
+
+export type ShowASemester200Data = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ShowASemester200 = {
+  data?: ShowASemester200Data;
+};
+
+export type UpdateASemesterBody = {
+  /** Fall or Spring. */
+  term: string;
+  /** The academic year. */
+  year: number;
+  /** When the semester starts (ISO 8601). */
+  starts_at: string;
+  /** When the semester ends (ISO 8601). */
+  ends_at: string;
+  /** When registration opens (ISO 8601). */
+  registration_opens_at: string;
+  /** When registration closes (ISO 8601). */
+  registration_closes_at: string;
+  /** End of the free add/drop period (ISO 8601). */
+  add_drop_ends_at: string;
+  /** End of the late-add period (ISO 8601). */
+  late_add_ends_at: string;
+  /** The withdrawal deadline (ISO 8601). */
+  withdrawal_deadline_at: string;
+};
+
+export type UpdateASemester200Data = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type UpdateASemester200 = {
+  data?: UpdateASemester200Data;
+};
+
 export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem = {
   id?: number;
   code?: string;
@@ -6302,6 +6433,326 @@ export const useDeactivateAnAdmissionCycle = <TError = unknown,
         TContext
       > => {
       return useMutation(getDeactivateAnAdmissionCycleMutationOptions(options), queryClient);
+    }
+
+/**
+ * Newest term first. Available to any authenticated user who needs the calendar.
+ * @summary List Semesters.
+ */
+export const listSemesters = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListSemesters200>(
+      {url: `/api/v1/semesters`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListSemestersQueryKey = () => {
+    return [
+    `/api/v1/semesters`
+    ] as const;
+    }
+
+
+export const getListSemestersQueryOptions = <TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSemestersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSemesters>>> = ({ signal }) => listSemesters(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListSemestersQueryResult = NonNullable<Awaited<ReturnType<typeof listSemesters>>>
+export type ListSemestersQueryError = unknown
+
+
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSemesters>>,
+          TError,
+          Awaited<ReturnType<typeof listSemesters>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSemesters>>,
+          TError,
+          Awaited<ReturnType<typeof listSemesters>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Semesters.
+ */
+
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListSemestersQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create a Semester.
+ */
+export const createASemester = (
+    createASemesterBody: CreateASemesterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateASemester201>(
+      {url: `/api/v1/semesters`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createASemesterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateASemesterMutationOptions = <TError = CreateASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createASemester>>, TError,{data: CreateASemesterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createASemester>>, TError,{data: CreateASemesterBody}, TContext> => {
+
+const mutationKey = ['createASemester'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createASemester>>, {data: CreateASemesterBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createASemester(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateASemesterMutationResult = NonNullable<Awaited<ReturnType<typeof createASemester>>>
+    export type CreateASemesterMutationBody = CreateASemesterBody
+    export type CreateASemesterMutationError = CreateASemester422
+
+    /**
+ * @summary Create a Semester.
+ */
+export const useCreateASemester = <TError = CreateASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createASemester>>, TError,{data: CreateASemesterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createASemester>>,
+        TError,
+        {data: CreateASemesterBody},
+        TContext
+      > => {
+      return useMutation(getCreateASemesterMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Semester.
+ */
+export const showASemester = (
+    semesterId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowASemester200>(
+      {url: `/api/v1/semesters/${semesterId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowASemesterQueryKey = (semesterId: number,) => {
+    return [
+    `/api/v1/semesters/${semesterId}`
+    ] as const;
+    }
+
+
+export const getShowASemesterQueryOptions = <TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowASemesterQueryKey(semesterId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showASemester>>> = ({ signal }) => showASemester(semesterId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: semesterId !== null && semesterId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowASemesterQueryResult = NonNullable<Awaited<ReturnType<typeof showASemester>>>
+export type ShowASemesterQueryError = unknown
+
+
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showASemester>>,
+          TError,
+          Awaited<ReturnType<typeof showASemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showASemester>>,
+          TError,
+          Awaited<ReturnType<typeof showASemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Semester.
+ */
+
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowASemesterQueryOptions(semesterId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Edits the term, year, and period dates in place — the correction path that
+ * never orphans records (ADR-0018). Same invariants as creation.
+ * @summary Update a Semester.
+ */
+export const updateASemester = (
+    semesterId: number,
+    updateASemesterBody: UpdateASemesterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateASemester200>(
+      {url: `/api/v1/semesters/${semesterId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateASemesterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateASemesterMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateASemester>>, TError,{semesterId: number;data: UpdateASemesterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateASemester>>, TError,{semesterId: number;data: UpdateASemesterBody}, TContext> => {
+
+const mutationKey = ['updateASemester'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateASemester>>, {semesterId: number;data: UpdateASemesterBody}> = (props) => {
+          const {semesterId,data} = props ?? {};
+
+          return  updateASemester(semesterId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateASemesterMutationResult = NonNullable<Awaited<ReturnType<typeof updateASemester>>>
+    export type UpdateASemesterMutationBody = UpdateASemesterBody
+    export type UpdateASemesterMutationError = unknown
+
+    /**
+ * @summary Update a Semester.
+ */
+export const useUpdateASemester = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateASemester>>, TError,{semesterId: number;data: UpdateASemesterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateASemester>>,
+        TError,
+        {semesterId: number;data: UpdateASemesterBody},
+        TContext
+      > => {
+      return useMutation(getUpdateASemesterMutationOptions(options), queryClient);
     }
 
 /**

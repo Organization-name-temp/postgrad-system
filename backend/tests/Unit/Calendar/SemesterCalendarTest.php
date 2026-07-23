@@ -1,0 +1,153 @@
+<?php
+
+use Illuminate\Support\Carbon;
+use Modules\Calendar\Internal\Support\SemesterCalendar;
+
+/*
+| The pure Semester date logic (ticket 01): the cross-field ordering invariant the
+| CRUD enforces on write, and the period answers ("registration open", "running",
+| add/drop / late-add / withdrawal windows) every later Phase-3 ticket reads through
+| the Calendar\Public facade. A pure value — no clock of its own, the caller passes
+| `now` — so it is unit-tested directly rather than through an HTTP round-trip (the
+| CreditHours / BusinessDays precedent, spec §Testing Decisions).
+|
+| A well-ordered reference calendar the cases perturb one field at a time:
+|   reg opens  2026-08-01  →  reg closes 2026-09-05  →  starts 2026-09-01
+|   add/drop end 2026-09-14  →  late-add end 2026-09-21  →  withdrawal 2026-11-30
+|   ends 2026-12-20
+*/
+
+/**
+ * @param  array<string, string>  $overrides
+ */
+function calendar(array $overrides = []): SemesterCalendar
+{
+    $dates = array_merge([
+        'starts_at' => '2026-09-01 00:00',
+        'ends_at' => '2026-12-20 00:00',
+        'registration_opens_at' => '2026-08-01 00:00',
+        'registration_closes_at' => '2026-09-05 00:00',
+        'add_drop_ends_at' => '2026-09-14 00:00',
+        'late_add_ends_at' => '2026-09-21 00:00',
+        'withdrawal_deadline_at' => '2026-11-30 00:00',
+    ], $overrides);
+
+    return new SemesterCalendar(
+        startsAt: Carbon::parse($dates['starts_at']),
+        endsAt: Carbon::parse($dates['ends_at']),
+        registrationOpensAt: Carbon::parse($dates['registration_opens_at']),
+        registrationClosesAt: Carbon::parse($dates['registration_closes_at']),
+        addDropEndsAt: Carbon::parse($dates['add_drop_ends_at']),
+        lateAddEndsAt: Carbon::parse($dates['late_add_ends_at']),
+        withdrawalDeadlineAt: Carbon::parse($dates['withdrawal_deadline_at']),
+    );
+}
+
+it('accepts a well-ordered calendar with no violations', function () {
+    expect(calendar()->orderingViolations())->toBe([]);
+});
+
+it('rejects registration opening on or after the semester starts', function () {
+    $violations = calendar(['registration_opens_at' => '2026-09-02 00:00'])->orderingViolations();
+
+    expect($violations)->toHaveKey('registration_opens_at');
+});
+
+it('rejects registration opening on or after it closes', function () {
+    $violations = calendar([
+        'registration_opens_at' => '2026-09-06 00:00', // after closes; still before starts fails too
+        'starts_at' => '2026-09-10 00:00',
+    ])->orderingViolations();
+
+    expect($violations)->toHaveKey('registration_opens_at');
+});
+
+it('rejects registration closing after the add/drop deadline', function () {
+    $violations = calendar(['registration_closes_at' => '2026-09-15 00:00'])->orderingViolations();
+
+    expect($violations)->toHaveKey('registration_closes_at');
+});
+
+it('rejects add/drop ending on or after late-add ends', function () {
+    $violations = calendar(['add_drop_ends_at' => '2026-09-21 00:00'])->orderingViolations();
+
+    expect($violations)->toHaveKey('add_drop_ends_at');
+});
+
+it('rejects late-add ending on or after the withdrawal deadline', function () {
+    $violations = calendar(['late_add_ends_at' => '2026-11-30 00:00'])->orderingViolations();
+
+    expect($violations)->toHaveKey('late_add_ends_at');
+});
+
+it('rejects a withdrawal deadline after the semester ends', function () {
+    $violations = calendar(['withdrawal_deadline_at' => '2026-12-21 00:00'])->orderingViolations();
+
+    expect($violations)->toHaveKey('withdrawal_deadline_at');
+});
+
+it('accepts a withdrawal deadline exactly on the semester end (inclusive bound)', function () {
+    expect(calendar(['withdrawal_deadline_at' => '2026-12-20 00:00'])->orderingViolations())->toBe([]);
+});
+
+it('rejects a semester that ends on or before it starts', function () {
+    $violations = calendar([
+        'ends_at' => '2026-09-01 00:00',
+        'withdrawal_deadline_at' => '2026-08-31 00:00',
+    ])->orderingViolations();
+
+    expect($violations)->toHaveKey('ends_at');
+});
+
+it('derives registration-open only inside the registration window', function () {
+    $cal = calendar();
+
+    expect($cal->isRegistrationOpen(Carbon::parse('2026-07-31 23:00')))->toBeFalse()
+        ->and($cal->isRegistrationOpen(Carbon::parse('2026-08-15 00:00')))->toBeTrue()
+        ->and($cal->isRegistrationOpen(Carbon::parse('2026-08-01 00:00')))->toBeTrue()  // inclusive open
+        ->and($cal->isRegistrationOpen(Carbon::parse('2026-09-05 00:00')))->toBeTrue()  // inclusive close
+        ->and($cal->isRegistrationOpen(Carbon::parse('2026-09-06 00:00')))->toBeFalse();
+});
+
+it('derives running between the semester start and end inclusive', function () {
+    $cal = calendar();
+
+    expect($cal->isRunning(Carbon::parse('2026-08-31 23:00')))->toBeFalse()
+        ->and($cal->isRunning(Carbon::parse('2026-10-01 00:00')))->toBeTrue()
+        ->and($cal->isRunning(Carbon::parse('2026-12-20 00:00')))->toBeTrue()  // inclusive end
+        ->and($cal->isRunning(Carbon::parse('2026-12-21 00:00')))->toBeFalse();
+});
+
+it('derives the free add/drop period from semester start to the add/drop deadline', function () {
+    $cal = calendar();
+
+    expect($cal->isInAddDropPeriod(Carbon::parse('2026-08-31 23:00')))->toBeFalse()  // before start
+        ->and($cal->isInAddDropPeriod(Carbon::parse('2026-09-01 00:00')))->toBeTrue()   // start (inclusive)
+        ->and($cal->isInAddDropPeriod(Carbon::parse('2026-09-14 00:00')))->toBeTrue()   // deadline (inclusive)
+        ->and($cal->isInAddDropPeriod(Carbon::parse('2026-09-15 00:00')))->toBeFalse();
+});
+
+it('derives the late-add period strictly after add/drop up to the late-add deadline', function () {
+    $cal = calendar();
+
+    expect($cal->isInLateAddPeriod(Carbon::parse('2026-09-14 00:00')))->toBeFalse()  // add/drop deadline is not late-add
+        ->and($cal->isInLateAddPeriod(Carbon::parse('2026-09-18 00:00')))->toBeTrue()
+        ->and($cal->isInLateAddPeriod(Carbon::parse('2026-09-21 00:00')))->toBeTrue()   // deadline (inclusive)
+        ->and($cal->isInLateAddPeriod(Carbon::parse('2026-09-22 00:00')))->toBeFalse();
+});
+
+it('derives the withdrawal period strictly after late-add up to the withdrawal deadline', function () {
+    $cal = calendar();
+
+    expect($cal->isInWithdrawalPeriod(Carbon::parse('2026-09-21 00:00')))->toBeFalse()  // late-add deadline is not withdrawal
+        ->and($cal->isInWithdrawalPeriod(Carbon::parse('2026-10-15 00:00')))->toBeTrue()
+        ->and($cal->isInWithdrawalPeriod(Carbon::parse('2026-11-30 00:00')))->toBeTrue()   // deadline (inclusive)
+        ->and($cal->isInWithdrawalPeriod(Carbon::parse('2026-12-01 00:00')))->toBeFalse();
+});
+
+it('reports having ended only strictly after the semester end', function () {
+    $cal = calendar();
+
+    expect($cal->hasEnded(Carbon::parse('2026-12-20 00:00')))->toBeFalse()
+        ->and($cal->hasEnded(Carbon::parse('2026-12-21 00:00')))->toBeTrue();
+});

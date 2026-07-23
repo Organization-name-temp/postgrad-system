@@ -46,11 +46,20 @@ deptrac:
       collectors:
         - type: classLike
           value: '^Modules\\Notifications\\Internal\\.*'
+    - name: Calendar_Public
+      collectors:
+        - type: classLike
+          value: '^Modules\\Calendar\\Public\\.*'
+    - name: Calendar_Internal
+      collectors:
+        - type: classLike
+          value: '^Modules\\Calendar\\Internal\\.*'
   ruleset:
     # The app may orchestrate modules only through their Public facades.
     App:
       - Identity_Public
       - Catalog_Public
+      - Calendar_Public
     # A module's own Public facade may use its own Internal, and vice versa.
     Identity_Public:
       - Identity_Internal
@@ -87,4 +96,14 @@ deptrac:
     Notifications_Internal:
       - Notifications_Public
       - Identity_Public
+    # Calendar (Phase 3, ADR-0018) is a supporting module: it owns the Semester and
+    # its period windows and depends on no other domain module. Its Public read
+    # facade (AcademicCalendar + SemesterSummary) is the only seam consumers touch;
+    # the SemesterSummary DTO delegates its period answers to the pure Internal
+    # SemesterCalendar (a same-module Public → Internal reference, the Admissions
+    # precedent). Inbound edges from Enrollment arrive with that module.
+    Calendar_Public:
+      - Calendar_Internal
+    Calendar_Internal:
+      - Calendar_Public
     # No rule grants anyone access to another module's *_Internal — that is the seam.

@@ -1397,6 +1397,129 @@ export const DeactivateAnAdmissionCycleResponse = zod.object({
 
 
 /**
+ * Newest term first. Available to any authenticated user who needs the calendar.
+ * @summary List Semesters.
+ */
+export const ListSemestersResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create a Semester.
+ */
+export const CreateASemesterBody = zod.object({
+  "term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The academic year.'),
+  "starts_at": zod.string().describe('When the semester starts (ISO 8601).'),
+  "ends_at": zod.string().describe('When the semester ends (ISO 8601).'),
+  "registration_opens_at": zod.string().describe('When registration opens (ISO 8601).'),
+  "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
+  "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
+  "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+})
+
+export const CreateASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Semester.
+ */
+export const ShowASemesterParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const ShowASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Edits the term, year, and period dates in place — the correction path that
+ * never orphans records (ADR-0018). Same invariants as creation.
+ * @summary Update a Semester.
+ */
+export const UpdateASemesterParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const UpdateASemesterBody = zod.object({
+  "term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The academic year.'),
+  "starts_at": zod.string().describe('When the semester starts (ISO 8601).'),
+  "ends_at": zod.string().describe('When the semester ends (ISO 8601).'),
+  "registration_opens_at": zod.string().describe('When registration opens (ISO 8601).'),
+  "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
+  "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
+  "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+})
+
+export const UpdateASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * Faculties are ordered by code; within each Program the three Categories are
  * always present in bylaw order (Preparatory, Program Core, Research Elective)
  * with their required credit hours, and Courses within a Category follow the

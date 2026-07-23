@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator as ValidatorInstance;
 use Modules\Catalog\Internal\Enums\CourseLevel;
+use Modules\Catalog\Internal\Enums\ResearchType;
 use Modules\Catalog\Internal\Http\Resources\CourseResource;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Support\CreditHours;
@@ -34,7 +35,7 @@ class CourseController
     /**
      * List Courses.
      *
-     * @response 200 {"data": [{"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}]}
+     * @response 200 {"data": [{"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}]}
      */
     public function index(): AnonymousResourceCollection
     {
@@ -52,12 +53,13 @@ class CourseController
      * @bodyParam name_en string required English name. Example: Advanced Algorithms
      * @bodyParam name_ar string required Arabic name. Example: خوارزميات متقدمة
      * @bodyParam level integer required One of 400, 500, 600, 700. Example: 500
+     * @bodyParam research_type string The Research Type for a research course — one of PBL, Seminar; omit for a non-research course. Example: PBL
      * @bodyParam lecture_ch integer required Lecture credit hours. Example: 3
      * @bodyParam tutorial_ch integer required Tutorial credit hours. Example: 0
      * @bodyParam lab_ch integer required Lab credit hours. Example: 0
      * @bodyParam total_ch integer required Total credit hours; must equal lecture + tutorial + lab. Example: 3
      *
-     * @response 201 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}
+     * @response 201 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}
      * @response 422 {"message": "The lecture, tutorial and lab hours must add up to the total.", "errors": {"total_ch": ["The lecture, tutorial and lab hours must add up to the total."]}}
      */
     public function store(Request $request): JsonResponse
@@ -79,7 +81,7 @@ class CourseController
      *
      * @urlParam course_id integer required The ID of the course. Example: 1
      *
-     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true, "placements": [{"category": "ProgramCore", "program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير في هندسة الحاسوب"}}]}}
+     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true, "placements": [{"category": "ProgramCore", "program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير في هندسة الحاسوب"}}]}}
      */
     public function show(Course $course): CourseResource
     {
@@ -100,12 +102,13 @@ class CourseController
      * @bodyParam name_en string required English name. Example: Advanced Algorithms
      * @bodyParam name_ar string required Arabic name. Example: خوارزميات متقدمة
      * @bodyParam level integer required One of 400, 500, 600, 700. Example: 500
+     * @bodyParam research_type string The Research Type for a research course — one of PBL, Seminar; omit for a non-research course. Example: PBL
      * @bodyParam lecture_ch integer required Lecture credit hours. Example: 3
      * @bodyParam tutorial_ch integer required Tutorial credit hours. Example: 0
      * @bodyParam lab_ch integer required Lab credit hours. Example: 0
      * @bodyParam total_ch integer required Total credit hours; must equal lecture + tutorial + lab. Example: 3
      *
-     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}
+     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}
      */
     public function update(Request $request, Course $course): CourseResource
     {
@@ -122,7 +125,7 @@ class CourseController
      *
      * @urlParam course_id integer required The ID of the course. Example: 1
      *
-     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}
+     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}
      */
     public function activate(Course $course): CourseResource
     {
@@ -140,7 +143,7 @@ class CourseController
      *
      * @urlParam course_id integer required The ID of the course. Example: 1
      *
-     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": false}}
+     * @response 200 {"data": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": false}}
      */
     public function deactivate(Course $course): CourseResource
     {
@@ -185,12 +188,14 @@ class CourseController
 
         $validated = $validator->validate();
 
-        // Every other field is required, so a create/edit is a full replacement of
-        // the Course. department_id is the one nullable field, and Laravel drops an
-        // absent nullable key from the validated set — so pin it to null when
-        // omitted (university-wide), which also clears the owner on edit rather than
-        // silently keeping it (ADR-0010).
+        // Every required field aside, a create/edit is a full replacement of the
+        // Course. department_id and research_type are the nullable fields, and
+        // Laravel drops an absent nullable key from the validated set — so pin each
+        // to null when omitted, which also clears it on edit (department → university
+        // -wide, research_type → not a research course) rather than silently keeping
+        // the old value (ADR-0010).
         $validated['department_id'] ??= null;
+        $validated['research_type'] ??= null;
 
         return $validated;
     }
@@ -213,6 +218,10 @@ class CourseController
             'name_en' => ['required', 'string', 'max:255'],
             'name_ar' => ['required', 'string', 'max:255'],
             'level' => ['required', Rule::enum(CourseLevel::class)],
+            // Optional: only a research course carries one, and it is not coupled to
+            // level here — the Phase 3 registration classifier simply won't match a
+            // level-700 research slot without it (BR-25, the Phase 1 deferral).
+            'research_type' => ['nullable', Rule::enum(ResearchType::class)],
             // Credit hours are small non-negative integers; max:255 is a defensive
             // sanity bound that keeps an absurd input a 422 rather than a DB
             // overflow 500 (well within the unsignedSmallInteger column).

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Catalog\Internal\Enums\ResearchType;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
@@ -17,7 +18,7 @@ it('lets a viewer list courses, each carrying its full credit-hour breakdown', f
         ->assertOk()
         ->assertJsonCount(2, 'data')
         ->assertJsonStructure(['data' => [[
-            'id', 'department_id', 'code', 'name_en', 'name_ar', 'level',
+            'id', 'department_id', 'code', 'name_en', 'name_ar', 'level', 'research_type',
             'lecture_ch', 'tutorial_ch', 'lab_ch', 'total_ch', 'is_active',
         ]]]);
 });
@@ -320,4 +321,75 @@ it('does not allow hard-deleting a course', function () {
     actingAsRole(Role::DepartmentHead);
 
     $this->deleteJson("/api/v1/courses/{$course->id}")->assertStatus(405);
+});
+
+it('lets a manager set a research type on create and round-trips it (ticket 02, BR-25)', function () {
+    actingAsRole(Role::DepartmentHead);
+
+    $courseId = $this->postJson('/api/v1/courses', [
+        'code' => 'DEP701',
+        'name_en' => 'Problem-Based Research',
+        'name_ar' => 'بحث قائم على المشكلات',
+        'level' => 700,
+        'research_type' => 'PBL',
+        'lecture_ch' => 3, 'tutorial_ch' => 0, 'lab_ch' => 0, 'total_ch' => 3,
+    ])
+        ->assertCreated()
+        ->assertJsonPath('data.research_type', 'PBL')
+        ->json('data.id');
+
+    $this->assertDatabaseHas('courses', ['id' => $courseId, 'research_type' => 'PBL']);
+});
+
+it('returns a null research type for a course that has none — the value is optional', function () {
+    $course = Course::factory()->create(); // research_type null by default
+    actingAsRole(Role::Applicant);
+
+    $this->getJson("/api/v1/courses/{$course->id}")
+        ->assertOk()
+        ->assertJsonPath('data.research_type', null);
+});
+
+it('lets a manager change and clear a research type on edit (full-replacement, like department_id)', function () {
+    $course = Course::factory()->withResearchType(ResearchType::Seminar)->create();
+    actingAsRole(Role::Dean);
+
+    $base = [
+        'department_id' => $course->department_id,
+        'code' => $course->code,
+        'name_en' => $course->name_en,
+        'name_ar' => $course->name_ar,
+        'level' => $course->level->value,
+        'lecture_ch' => $course->lecture_ch,
+        'tutorial_ch' => $course->tutorial_ch,
+        'lab_ch' => $course->lab_ch,
+        'total_ch' => $course->total_ch,
+    ];
+
+    // Seminar → PBL.
+    $this->patchJson("/api/v1/courses/{$course->id}", [...$base, 'research_type' => 'PBL'])
+        ->assertOk()
+        ->assertJsonPath('data.research_type', 'PBL');
+    $this->assertDatabaseHas('courses', ['id' => $course->id, 'research_type' => 'PBL']);
+
+    // Omitting it clears it — a full-replace edit drops the Research Type, exactly
+    // like an absent department_id becomes university-wide.
+    $this->patchJson("/api/v1/courses/{$course->id}", $base)
+        ->assertOk()
+        ->assertJsonPath('data.research_type', null);
+    $this->assertDatabaseHas('courses', ['id' => $course->id, 'research_type' => null]);
+});
+
+it('rejects a research type outside the PBL/Seminar enum', function () {
+    $department = Department::factory()->create();
+    actingAsRole(Role::DepartmentHead);
+
+    $this->postJson('/api/v1/courses', [
+        'department_id' => $department->id, 'code' => 'DEP701',
+        'name_en' => 'A', 'name_ar' => 'أ', 'level' => 700,
+        'research_type' => 'Thesis', // not one of PBL / Seminar
+        'lecture_ch' => 3, 'tutorial_ch' => 0, 'lab_ch' => 0, 'total_ch' => 3,
+    ])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('research_type');
 });

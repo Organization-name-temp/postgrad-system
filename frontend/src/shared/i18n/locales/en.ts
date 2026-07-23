@@ -170,6 +170,13 @@ export const en = {
       appearsIn: 'Appears in',
       appearsInEmpty: 'Not part of any program yet.',
       level: 'Level',
+      researchType: 'Research type',
+      researchTypeHint: 'Only for research courses; leave as none otherwise.',
+      researchTypes: {
+        none: 'None',
+        PBL: 'PBL',
+        Seminar: 'Seminar',
+      },
       code: 'Code',
       name: 'Name',
       nameEn: 'Name (English)',

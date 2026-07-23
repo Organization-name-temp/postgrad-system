@@ -37,6 +37,9 @@ class CourseResource extends JsonResource
             'name_en' => $course->name_en,
             'name_ar' => $course->name_ar,
             'level' => $course->level->value,
+            // The optional Research Type (PBL / Seminar), or null when the Course is
+            // not a research course (ticket 02, BR-25).
+            'research_type' => $course->research_type?->value,
             'lecture_ch' => $course->lecture_ch,
             'tutorial_ch' => $course->tutorial_ch,
             'lab_ch' => $course->lab_ch,

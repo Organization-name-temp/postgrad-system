@@ -7813,6 +7813,7 @@ paths:
                       name_en: 'Advanced Algorithms'
                       name_ar: 'خوارزميات متقدمة'
                       level: 500
+                      research_type: PBL
                       lecture_ch: 3
                       tutorial_ch: 0
                       lab_ch: 0
@@ -7828,6 +7829,7 @@ paths:
                         name_en: 'Advanced Algorithms'
                         name_ar: 'خوارزميات متقدمة'
                         level: 500
+                        research_type: PBL
                         lecture_ch: 3
                         tutorial_ch: 0
                         lab_ch: 0
@@ -7854,6 +7856,9 @@ paths:
                         level:
                           type: integer
                           example: 500
+                        research_type:
+                          type: string
+                          example: PBL
                         lecture_ch:
                           type: integer
                           example: 3
@@ -7892,6 +7897,7 @@ paths:
                     name_en: 'Advanced Algorithms'
                     name_ar: 'خوارزميات متقدمة'
                     level: 500
+                    research_type: PBL
                     lecture_ch: 3
                     tutorial_ch: 0
                     lab_ch: 0
@@ -7919,6 +7925,9 @@ paths:
                       level:
                         type: integer
                         example: 500
+                      research_type:
+                        type: string
+                        example: PBL
                       lecture_ch:
                         type: integer
                         example: 3
@@ -7987,6 +7996,10 @@ paths:
                   type: integer
                   description: 'One of 400, 500, 600, 700.'
                   example: 500
+                research_type:
+                  type: string
+                  description: 'The Research Type for a research course — one of PBL, Seminar; omit for a non-research course.'
+                  example: PBL
                 lecture_ch:
                   type: integer
                   description: 'Lecture credit hours.'
@@ -8034,6 +8047,7 @@ paths:
                     name_en: 'Advanced Algorithms'
                     name_ar: 'خوارزميات متقدمة'
                     level: 500
+                    research_type: PBL
                     lecture_ch: 3
                     tutorial_ch: 0
                     lab_ch: 0
@@ -8069,6 +8083,9 @@ paths:
                       level:
                         type: integer
                         example: 500
+                      research_type:
+                        type: string
+                        example: PBL
                       lecture_ch:
                         type: integer
                         example: 3
@@ -8138,6 +8155,7 @@ paths:
                     name_en: 'Advanced Algorithms'
                     name_ar: 'خوارزميات متقدمة'
                     level: 500
+                    research_type: PBL
                     lecture_ch: 3
                     tutorial_ch: 0
                     lab_ch: 0
@@ -8165,6 +8183,9 @@ paths:
                       level:
                         type: integer
                         example: 500
+                      research_type:
+                        type: string
+                        example: PBL
                       lecture_ch:
                         type: integer
                         example: 3
@@ -8209,6 +8230,10 @@ paths:
                   type: integer
                   description: 'One of 400, 500, 600, 700.'
                   example: 500
+                research_type:
+                  type: string
+                  description: 'The Research Type for a research course — one of PBL, Seminar; omit for a non-research course.'
+                  example: PBL
                 lecture_ch:
                   type: integer
                   description: 'Lecture credit hours.'
@@ -8265,6 +8290,7 @@ paths:
                     name_en: 'Advanced Algorithms'
                     name_ar: 'خوارزميات متقدمة'
                     level: 500
+                    research_type: PBL
                     lecture_ch: 3
                     tutorial_ch: 0
                     lab_ch: 0
@@ -8292,6 +8318,9 @@ paths:
                       level:
                         type: integer
                         example: 500
+                      research_type:
+                        type: string
+                        example: PBL
                       lecture_ch:
                         type: integer
                         example: 3
@@ -8340,6 +8369,7 @@ paths:
                     name_en: 'Advanced Algorithms'
                     name_ar: 'خوارزميات متقدمة'
                     level: 500
+                    research_type: PBL
                     lecture_ch: 3
                     tutorial_ch: 0
                     lab_ch: 0
@@ -8367,6 +8397,9 @@ paths:
                       level:
                         type: integer
                         example: 500
+                      research_type:
+                        type: string
+                        example: PBL
                       lecture_ch:
                         type: integer
                         example: 3

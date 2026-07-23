@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Catalog\Internal\Enums\CourseLevel;
+use Modules\Catalog\Internal\Enums\ResearchType;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Department;
 
@@ -35,6 +36,9 @@ class CourseFactory extends Factory
             'name_en' => fake()->unique()->words(3, true),
             'name_ar' => 'مقرر '.fake()->unique()->word(),
             'level' => fake()->randomElement(CourseLevel::cases()),
+            // Most Courses are not research courses; the Research Type is opt-in
+            // (see the withResearchType() state).
+            'research_type' => null,
             'lecture_ch' => $lecture,
             'tutorial_ch' => $tutorial,
             'lab_ch' => $lab,
@@ -52,5 +56,11 @@ class CourseFactory extends Factory
     public function inactive(): static
     {
         return $this->state(fn (array $attributes): array => ['is_active' => false]);
+    }
+
+    /** A Research Course carrying a Research Type — PBL by default (the MSc match). */
+    public function withResearchType(ResearchType $type = ResearchType::Pbl): static
+    {
+        return $this->state(fn (array $attributes): array => ['research_type' => $type]);
     }
 }

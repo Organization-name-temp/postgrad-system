@@ -121,6 +121,32 @@ it('records and increments course versions on each mutation, capturing the cours
     expect($versions->json('data.0.snapshot.total_ch'))->toBe(3);
 });
 
+it('captures setting and later changing the research type across course version snapshots (ticket 02)', function () {
+    actingAsRole(Role::DepartmentHead);
+
+    $courseId = $this->postJson('/api/v1/courses', [
+        'code' => 'DEP701', 'name_en' => 'Problem-Based Research', 'name_ar' => 'بحث',
+        'level' => 700, 'research_type' => 'PBL',
+        'lecture_ch' => 3, 'tutorial_ch' => 0, 'lab_ch' => 0, 'total_ch' => 3,
+    ])->assertCreated()->json('data.id');
+
+    // Changing the research type is an ordinary Course edit — the full-aggregate
+    // snapshot records the new value in a fresh version (no separate path).
+    $this->patchJson("/api/v1/courses/{$courseId}", [
+        'code' => 'DEP701', 'name_en' => 'Problem-Based Research', 'name_ar' => 'بحث',
+        'level' => 700, 'research_type' => 'Seminar',
+        'lecture_ch' => 3, 'tutorial_ch' => 0, 'lab_ch' => 0, 'total_ch' => 3,
+    ])->assertOk();
+
+    $versions = $this->getJson("/api/v1/courses/{$courseId}/versions")->assertOk();
+    $versions->assertJsonCount(2, 'data');
+    // v1 (created) captured PBL; v2 (updated) captures the change to Seminar.
+    expect($versions->json('data.0.change_note'))->toBe('created');
+    expect($versions->json('data.0.snapshot.research_type'))->toBe('PBL');
+    expect($versions->json('data.1.change_note'))->toBe('updated');
+    expect($versions->json('data.1.snapshot.research_type'))->toBe('Seminar');
+});
+
 it('lets any catalog.view holder read version history (a read like other catalog reads)', function () {
     $program = Program::factory()->create();
     $course = Course::factory()->create();

@@ -167,6 +167,13 @@ export const ar = {
       appearsIn: 'يظهر في',
       appearsInEmpty: 'ليس ضمن أي برنامج بعد.',
       level: 'المستوى',
+      researchType: 'نوع البحث',
+      researchTypeHint: 'لمقررات البحث فقط؛ اتركه بلا نوع فيما عدا ذلك.',
+      researchTypes: {
+        none: 'بلا',
+        PBL: 'التعلّم القائم على المشكلات',
+        Seminar: 'حلقة بحث',
+      },
       code: 'الرمز',
       name: 'الاسم',
       nameEn: 'الاسم (بالإنجليزية)',

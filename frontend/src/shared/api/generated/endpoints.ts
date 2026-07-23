@@ -2295,6 +2295,7 @@ export type ListCourses200DataItem = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2317,6 +2318,8 @@ export type CreateACourseBody = {
   name_ar: string;
   /** One of 400, 500, 600, 700. */
   level: number;
+  /** The Research Type for a research course — one of PBL, Seminar; omit for a non-research course. */
+  research_type?: string;
   /** Lecture credit hours. */
   lecture_ch: number;
   /** Tutorial credit hours. */
@@ -2334,6 +2337,7 @@ export type CreateACourse201Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2373,6 +2377,7 @@ export type ShowACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2396,6 +2401,8 @@ export type UpdateACourseBody = {
   name_ar: string;
   /** One of 400, 500, 600, 700. */
   level: number;
+  /** The Research Type for a research course — one of PBL, Seminar; omit for a non-research course. */
+  research_type?: string;
   /** Lecture credit hours. */
   lecture_ch: number;
   /** Tutorial credit hours. */
@@ -2413,6 +2420,7 @@ export type UpdateACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2431,6 +2439,7 @@ export type ActivateACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2449,6 +2458,7 @@ export type DeactivateACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;

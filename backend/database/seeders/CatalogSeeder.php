@@ -3,13 +3,13 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Catalog\Internal\Enums\CourseCategory;
-use Modules\Catalog\Internal\Enums\CourseLevel;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\Enums\CourseCategory;
+use Modules\Catalog\Public\Enums\CourseLevel;
 use Modules\Catalog\Public\Enums\DegreeLevel;
 
 /**

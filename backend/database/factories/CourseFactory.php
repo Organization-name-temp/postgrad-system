@@ -3,10 +3,10 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Modules\Catalog\Internal\Enums\CourseLevel;
 use Modules\Catalog\Internal\Enums\ResearchType;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Department;
+use Modules\Catalog\Public\Enums\CourseLevel;
 
 /**
  * @extends Factory<Course>

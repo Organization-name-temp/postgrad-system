@@ -2578,6 +2578,273 @@ export type UpdateCurrentUser422 = {
   errors?: UpdateCurrentUser422Errors;
 };
 
+export type ListAssignableInstructors200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableInstructors200 = {
+  data?: ListAssignableInstructors200DataItem[];
+};
+
+export type ListAssignableInstructors403 = {
+  message?: string;
+};
+
+export type ListASemestersCourseOfferings200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ListASemestersCourseOfferings200DataItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListASemestersCourseOfferings200DataItemMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ListASemestersCourseOfferings200DataItem = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: ListASemestersCourseOfferings200DataItemCourse;
+  instructor?: ListASemestersCourseOfferings200DataItemInstructor;
+  meetings?: ListASemestersCourseOfferings200DataItemMeetingsItem[];
+};
+
+export type ListASemestersCourseOfferings200 = {
+  data?: ListASemestersCourseOfferings200DataItem[];
+};
+
+export type ListASemestersCourseOfferings403 = {
+  message?: string;
+};
+
+export type ListASemestersCourseOfferings404 = {
+  message?: string;
+};
+
+export type CreateACourseOfferingInASemesterBodyMeetingsItem = {
+  /** Day of week, 0 (Sunday) to 6 (Saturday). */
+  weekday: number;
+  /** Start time, 24h HH:MM. */
+  starts_at: string;
+  /** End time, 24h HH:MM, after the start. */
+  ends_at: string;
+};
+
+export type CreateACourseOfferingInASemesterBody = {
+  /** The Catalog Course to offer. */
+  course_id: number;
+  /** A faculty (Instructor) User to teach it. */
+  instructor_id: number;
+  /** The seat capacity; omit for uncapped. */
+  capacity?: number;
+  /** One or more weekly meeting slots. */
+  meetings: CreateACourseOfferingInASemesterBodyMeetingsItem[];
+};
+
+export type CreateACourseOfferingInASemester201DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type CreateACourseOfferingInASemester201DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type CreateACourseOfferingInASemester201DataMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type CreateACourseOfferingInASemester201Data = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: CreateACourseOfferingInASemester201DataCourse;
+  instructor?: CreateACourseOfferingInASemester201DataInstructor;
+  meetings?: CreateACourseOfferingInASemester201DataMeetingsItem[];
+};
+
+export type CreateACourseOfferingInASemester201 = {
+  data?: CreateACourseOfferingInASemester201Data;
+};
+
+export type CreateACourseOfferingInASemester403 = {
+  message?: string;
+};
+
+export type CreateACourseOfferingInASemester404 = {
+  message?: string;
+};
+
+export type CreateACourseOfferingInASemester422 = {
+  message?: string;
+  errors?: {
+  course_id?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  meetings?: string[];
+};
+};
+
+export type ShowACourseOffering200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ShowACourseOffering200DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ShowACourseOffering200DataMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ShowACourseOffering200Data = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: ShowACourseOffering200DataCourse;
+  instructor?: ShowACourseOffering200DataInstructor;
+  meetings?: ShowACourseOffering200DataMeetingsItem[];
+};
+
+export type ShowACourseOffering200 = {
+  data?: ShowACourseOffering200Data;
+};
+
+export type ShowACourseOffering403 = {
+  message?: string;
+};
+
+export type UpdateACourseOfferingBodyMeetingsItem = {
+  /** Day of week, 0 (Sunday) to 6 (Saturday). */
+  weekday: number;
+  /** Start time, 24h HH:MM. */
+  starts_at: string;
+  /** End time, 24h HH:MM, after the start. */
+  ends_at: string;
+};
+
+export type UpdateACourseOfferingBody = {
+  /** A faculty (Instructor) User to teach it. */
+  instructor_id: number;
+  /** The seat capacity; omit for uncapped. */
+  capacity?: number;
+  /** One or more weekly meeting slots. */
+  meetings: UpdateACourseOfferingBodyMeetingsItem[];
+};
+
+export type UpdateACourseOffering200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type UpdateACourseOffering200DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type UpdateACourseOffering200DataMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type UpdateACourseOffering200Data = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: UpdateACourseOffering200DataCourse;
+  instructor?: UpdateACourseOffering200DataInstructor;
+  meetings?: UpdateACourseOffering200DataMeetingsItem[];
+};
+
+export type UpdateACourseOffering200 = {
+  data?: UpdateACourseOffering200Data;
+};
+
+export type UpdateACourseOffering403 = {
+  message?: string;
+};
+
+export type UpdateACourseOffering422Errors = {
+  meetings?: string[];
+};
+
+export type UpdateACourseOffering422 = {
+  message?: string;
+  errors?: UpdateACourseOffering422Errors;
+};
+
+export type DeleteACourseOffering204 = { [key: string]: unknown };
+
+export type DeleteACourseOffering403 = {
+  message?: string;
+};
+
+export type DeleteACourseOffering409 = {
+  message?: string;
+};
+
 export type ListMyNotifications200DataItemData = {
   scheduled_at?: string;
 };
@@ -9462,6 +9729,496 @@ export const useUpdateCurrentUser = <TError = UpdateCurrentUser422,
         TContext
       > => {
       return useMutation(getUpdateCurrentUserMutationOptions(options), queryClient);
+    }
+
+/**
+ * The faculty Users (holding the Instructor role, R04) an Offering may be assigned
+ * to — the source for the offering form's instructor picker (the Phase-2
+ * interviewer-list precedent, via Identity\Public). Gated on `calendar.manage`.
+ * @summary List assignable instructors.
+ */
+export const listAssignableInstructors = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableInstructors200>(
+      {url: `/api/v1/instructors`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableInstructorsQueryKey = () => {
+    return [
+    `/api/v1/instructors`
+    ] as const;
+    }
+
+
+export const getListAssignableInstructorsQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableInstructorsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableInstructors>>> = ({ signal }) => listAssignableInstructors(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableInstructorsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableInstructors>>>
+export type ListAssignableInstructorsQueryError = ListAssignableInstructors403
+
+
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInstructors>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInstructors>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInstructors>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInstructors>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable instructors.
+ */
+
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableInstructorsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every Offering that runs in the given Semester, each with its resolved Course and
+ * Instructor summaries and its weekly meetings. Gated on `calendar.manage`.
+ * @summary List a Semester's Course Offerings.
+ */
+export const listASemestersCourseOfferings = (
+    semesterId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListASemestersCourseOfferings200>(
+      {url: `/api/v1/semesters/${semesterId}/offerings`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListASemestersCourseOfferingsQueryKey = (semesterId: number,) => {
+    return [
+    `/api/v1/semesters/${semesterId}/offerings`
+    ] as const;
+    }
+
+
+export const getListASemestersCourseOfferingsQueryOptions = <TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListASemestersCourseOfferingsQueryKey(semesterId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listASemestersCourseOfferings>>> = ({ signal }) => listASemestersCourseOfferings(semesterId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: semesterId !== null && semesterId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListASemestersCourseOfferingsQueryResult = NonNullable<Awaited<ReturnType<typeof listASemestersCourseOfferings>>>
+export type ListASemestersCourseOfferingsQueryError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404
+
+
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Semester's Course Offerings.
+ */
+
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListASemestersCourseOfferingsQueryOptions(semesterId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Records one Catalog Course as taught in the Semester: an Instructor, an optional
+ * seat capacity, and one or more weekly meeting times. The Course must exist and not
+ * already be offered in this Semester; the Instructor must be a faculty (R04) User;
+ * the meetings may not overlap one another. Gated on `calendar.manage`.
+ * @summary Create a Course Offering in a Semester.
+ */
+export const createACourseOfferingInASemester = (
+    semesterId: number,
+    createACourseOfferingInASemesterBody: CreateACourseOfferingInASemesterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateACourseOfferingInASemester201>(
+      {url: `/api/v1/semesters/${semesterId}/offerings`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createACourseOfferingInASemesterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateACourseOfferingInASemesterMutationOptions = <TError = CreateACourseOfferingInASemester403 | CreateACourseOfferingInASemester404 | CreateACourseOfferingInASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, TError,{semesterId: number;data: CreateACourseOfferingInASemesterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, TError,{semesterId: number;data: CreateACourseOfferingInASemesterBody}, TContext> => {
+
+const mutationKey = ['createACourseOfferingInASemester'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, {semesterId: number;data: CreateACourseOfferingInASemesterBody}> = (props) => {
+          const {semesterId,data} = props ?? {};
+
+          return  createACourseOfferingInASemester(semesterId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateACourseOfferingInASemesterMutationResult = NonNullable<Awaited<ReturnType<typeof createACourseOfferingInASemester>>>
+    export type CreateACourseOfferingInASemesterMutationBody = CreateACourseOfferingInASemesterBody
+    export type CreateACourseOfferingInASemesterMutationError = CreateACourseOfferingInASemester403 | CreateACourseOfferingInASemester404 | CreateACourseOfferingInASemester422
+
+    /**
+ * @summary Create a Course Offering in a Semester.
+ */
+export const useCreateACourseOfferingInASemester = <TError = CreateACourseOfferingInASemester403 | CreateACourseOfferingInASemester404 | CreateACourseOfferingInASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, TError,{semesterId: number;data: CreateACourseOfferingInASemesterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createACourseOfferingInASemester>>,
+        TError,
+        {semesterId: number;data: CreateACourseOfferingInASemesterBody},
+        TContext
+      > => {
+      return useMutation(getCreateACourseOfferingInASemesterMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Course Offering.
+ */
+export const showACourseOffering = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowACourseOffering200>(
+      {url: `/api/v1/offerings/${offeringId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowACourseOfferingQueryKey = (offeringId: number,) => {
+    return [
+    `/api/v1/offerings/${offeringId}`
+    ] as const;
+    }
+
+
+export const getShowACourseOfferingQueryOptions = <TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowACourseOfferingQueryKey(offeringId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showACourseOffering>>> = ({ signal }) => showACourseOffering(offeringId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: offeringId !== null && offeringId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowACourseOfferingQueryResult = NonNullable<Awaited<ReturnType<typeof showACourseOffering>>>
+export type ShowACourseOfferingQueryError = ShowACourseOffering403
+
+
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourseOffering>>,
+          TError,
+          Awaited<ReturnType<typeof showACourseOffering>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourseOffering>>,
+          TError,
+          Awaited<ReturnType<typeof showACourseOffering>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Course Offering.
+ */
+
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowACourseOfferingQueryOptions(offeringId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Changes the Instructor, capacity, and weekly meetings. The Semester and Course an
+ * Offering runs are its identity and are fixed at creation. Same instructor and
+ * meeting invariants as creation. Gated on `calendar.manage`.
+ * @summary Update a Course Offering.
+ */
+export const updateACourseOffering = (
+    offeringId: number,
+    updateACourseOfferingBody: UpdateACourseOfferingBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateACourseOffering200>(
+      {url: `/api/v1/offerings/${offeringId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateACourseOfferingBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateACourseOfferingMutationOptions = <TError = UpdateACourseOffering403 | UpdateACourseOffering422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourseOffering>>, TError,{offeringId: number;data: UpdateACourseOfferingBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateACourseOffering>>, TError,{offeringId: number;data: UpdateACourseOfferingBody}, TContext> => {
+
+const mutationKey = ['updateACourseOffering'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateACourseOffering>>, {offeringId: number;data: UpdateACourseOfferingBody}> = (props) => {
+          const {offeringId,data} = props ?? {};
+
+          return  updateACourseOffering(offeringId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateACourseOfferingMutationResult = NonNullable<Awaited<ReturnType<typeof updateACourseOffering>>>
+    export type UpdateACourseOfferingMutationBody = UpdateACourseOfferingBody
+    export type UpdateACourseOfferingMutationError = UpdateACourseOffering403 | UpdateACourseOffering422
+
+    /**
+ * @summary Update a Course Offering.
+ */
+export const useUpdateACourseOffering = <TError = UpdateACourseOffering403 | UpdateACourseOffering422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourseOffering>>, TError,{offeringId: number;data: UpdateACourseOfferingBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateACourseOffering>>,
+        TError,
+        {offeringId: number;data: UpdateACourseOfferingBody},
+        TContext
+      > => {
+      return useMutation(getUpdateACourseOfferingMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removes an Offering and its meeting rows. Allowed only while nothing references
+ * it — once an Enrollment is minted against it or a Class Session is generated from
+ * it (later Phase-3 tickets), the register and roster it anchors must survive, so a
+ * referenced Offering is refused with a 409. Gated on `calendar.manage`.
+ * @summary Delete a Course Offering.
+ */
+export const deleteACourseOffering = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeleteACourseOffering204>(
+      {url: `/api/v1/offerings/${offeringId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeleteACourseOfferingMutationOptions = <TError = DeleteACourseOffering403 | DeleteACourseOffering409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteACourseOffering>>, TError,{offeringId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteACourseOffering>>, TError,{offeringId: number}, TContext> => {
+
+const mutationKey = ['deleteACourseOffering'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteACourseOffering>>, {offeringId: number}> = (props) => {
+          const {offeringId} = props ?? {};
+
+          return  deleteACourseOffering(offeringId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteACourseOfferingMutationResult = NonNullable<Awaited<ReturnType<typeof deleteACourseOffering>>>
+
+    export type DeleteACourseOfferingMutationError = DeleteACourseOffering403 | DeleteACourseOffering409
+
+    /**
+ * @summary Delete a Course Offering.
+ */
+export const useDeleteACourseOffering = <TError = DeleteACourseOffering403 | DeleteACourseOffering409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteACourseOffering>>, TError,{offeringId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteACourseOffering>>,
+        TError,
+        {offeringId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteACourseOfferingMutationOptions(options), queryClient);
     }
 
 /**

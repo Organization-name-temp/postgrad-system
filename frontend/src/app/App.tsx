@@ -24,6 +24,7 @@ import { SchedulingPage } from '../features/admissions/interviews/SchedulingPage
 import { InterviewerPage } from '../features/admissions/interviews/InterviewerPage'
 import { CyclesPage } from '../features/admin/cycles/CyclesPage'
 import { SemestersPage } from '../features/admin/semesters/SemestersPage'
+import { OfferingsPage } from '../features/admin/offerings/OfferingsPage'
 import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
@@ -83,6 +84,7 @@ export function App() {
                 <Route path="/catalog/courses/:courseId" element={<CourseEditPage />} />
                 <Route path="/admin/cycles" element={<CyclesPage />} />
                 <Route path="/admin/semesters" element={<SemestersPage />} />
+                <Route path="/admin/semesters/:semesterId/offerings" element={<OfferingsPage />} />
                 <Route path="/admin/assignments" element={<AssignmentsPage />} />
               </Route>
             </Route>

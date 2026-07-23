@@ -4,16 +4,19 @@ namespace Modules\Catalog;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Catalog\Internal\Support\EloquentCourseCatalog;
 use Modules\Catalog\Internal\Support\EloquentProgramCatalog;
+use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\ProgramCatalog;
 
 class CatalogServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // The cross-module read facade (ADR-0012): consumers depend on the
-        // Catalog\Public contract; the Eloquent reader lives in Catalog\Internal.
+        // The cross-module read facades (ADR-0012): consumers depend on the
+        // Catalog\Public contracts; the Eloquent readers live in Catalog\Internal.
         $this->app->bind(ProgramCatalog::class, EloquentProgramCatalog::class);
+        $this->app->bind(CourseCatalog::class, EloquentCourseCatalog::class);
     }
 
     public function boot(): void

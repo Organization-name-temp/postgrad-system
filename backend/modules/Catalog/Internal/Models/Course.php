@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Modules\Catalog\Internal\Enums\CourseLevel;
 use Modules\Catalog\Internal\Enums\ResearchType;
+use Modules\Catalog\Public\Enums\CourseLevel;
 
 /**
  * A Course — a standalone teachable unit (ADR-0010, CONTEXT.md). It is owned by a

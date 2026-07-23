@@ -1,5 +1,7 @@
 import { IconButton, TableCell, TableRow, Tooltip } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
+import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { ListSemesters200DataItem } from '../../../shared/api/generated/endpoints'
 import { StatusChip } from '../../../shared/ui/StatusChip'
@@ -47,6 +49,16 @@ export function SemesterRow({ semester, canManage, onEdit }: SemesterRowProps) {
       </TableCell>
       {canManage && (
         <TableCell align="right">
+          <Tooltip title={t('semesters.offeringsAction')}>
+            <IconButton
+              size="small"
+              component={RouterLink}
+              to={`/admin/semesters/${semester.id}/offerings`}
+              aria-label={t('semesters.offeringsAction')}
+            >
+              <MenuBookIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
           <Tooltip title={t('semesters.editAction')}>
             <IconButton
               size="small"

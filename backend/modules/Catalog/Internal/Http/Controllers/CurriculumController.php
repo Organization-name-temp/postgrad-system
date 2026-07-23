@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
-use Modules\Catalog\Internal\Enums\CourseCategory;
 use Modules\Catalog\Internal\Http\Resources\CurriculumEntryResource;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
+use Modules\Catalog\Public\Enums\CourseCategory;
 
 /**
  * @group Catalog

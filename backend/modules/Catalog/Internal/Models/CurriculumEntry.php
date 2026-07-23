@@ -6,7 +6,7 @@ use Database\Factories\CurriculumEntryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\Catalog\Internal\Enums\CourseCategory;
+use Modules\Catalog\Public\Enums\CourseCategory;
 
 /**
  * A Curriculum Entry — the placement of one Course into one Program under one

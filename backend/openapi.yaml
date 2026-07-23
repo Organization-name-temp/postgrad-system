@@ -16,6 +16,8 @@ tags:
     description: "\nThe catalog browse tree — the whole academic hierarchy (Faculty → Department →\nProgram → Category → Course) in a single read-model payload so the front end can\nrender and search it client-side without chatty per-node requests (FR-PCM-002,\nspec §API). Every node carries both language names; Course nodes carry their\nactive status so retired courses read accessibly. Reading requires catalog.view —\nthe catalog is universally browsable (ADR-0008). \"University\" is a synthetic root\nthe SPA prepends; it is not an entity, so it is not in this payload."
   - name: Endpoints
     description: ''
+  - name: Enrollment
+    description: "\nCourse Offering management (ADR-0017, ticket 03) — \"what actually runs this\nsemester.\" An administrator holding `calendar.manage` (Student Affairs / Dean;\nSysAdmin inherits) populates a Semester with Offerings: one Catalog Course taught in\nthat Semester, carrying an assigned Instructor, an optional seat capacity, and one or\nmore weekly meeting times. This is the record Phase-4 grading's Instructor→Course\nlink is born from.\n\nThe Semester, Course and Instructor are referenced by opaque id (no cross-module\nforeign key, ADR-0012); each is validated through its module's Public facade — the\nCourse through {@see CourseCatalog}, the Instructor (a faculty R04 User) through the\nIdentity\\Public {@see Directory}, the Semester through\n{@see AcademicCalendar}. One Course runs at most once per\nSemester (unique), an Offering's own meetings may not overlap each other (the\ninterval-overlap seam), and an Offering is deletable only while nothing references it."
   - name: Notifications
     description: "\nA signed-in user's own in-app notifications — the data behind the shell's bell\n(ticket 02). Every endpoint is scoped to the authenticated user by\n{@see Notification::scopeForUser()}, so no request can list, count, or mutate\nanother user's notifications (a foreign id simply is not found → 404). Content\nis a type + payload; the SPA renders it bilingually, so nothing here is\nlocalised server-side."
 paths:
@@ -8825,6 +8827,869 @@ paths:
               required:
                 - preferred_locale
       security: []
+  /api/v1/instructors:
+    get:
+      summary: 'List assignable instructors.'
+      operationId: listAssignableInstructors
+      description: "The faculty Users (holding the Instructor role, R04) an Offering may be assigned\nto — the source for the offering form's instructor picker (the Phase-2\ninterviewer-list precedent, via Identity\\Public). Gated on `calendar.manage`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 4
+                      name: 'Dr. Instructor'
+                      email: instructor@ejust.test
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 4
+                        name:
+                          type: string
+                          example: 'Dr. Instructor'
+                        email:
+                          type: string
+                          example: instructor@ejust.test
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Enrollment
+      security: []
+  '/api/v1/semesters/{semester_id}/offerings':
+    get:
+      summary: "List a Semester's Course Offerings."
+      operationId: listASemestersCourseOfferings
+      description: "Every Offering that runs in the given Semester, each with its resolved Course and\nInstructor summaries and its weekly meetings. Gated on `calendar.manage`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      semester_id: 1
+                      course_id: 1
+                      instructor_id: 4
+                      capacity: 30
+                      course:
+                        id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        total_ch: 3
+                        research_type: null
+                        is_active: true
+                      instructor:
+                        id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                      meetings:
+                        -
+                          id: 1
+                          weekday: 1
+                          starts_at: '09:00'
+                          ends_at: '11:00'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        semester_id: 1
+                        course_id: 1
+                        instructor_id: 4
+                        capacity: 30
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                        meetings:
+                          - id: 1
+                            weekday: 1
+                            starts_at: '09:00'
+                            ends_at: '11:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        semester_id:
+                          type: integer
+                          example: 1
+                        course_id:
+                          type: integer
+                          example: 1
+                        instructor_id:
+                          type: integer
+                          example: 4
+                        capacity:
+                          type: integer
+                          example: 30
+                        course:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: DEP501
+                            name_en:
+                              type: string
+                              example: 'Advanced Algorithms'
+                            name_ar:
+                              type: string
+                              example: 'خوارزميات متقدمة'
+                            level:
+                              type: integer
+                              example: 500
+                            total_ch:
+                              type: integer
+                              example: 3
+                            research_type:
+                              type: string
+                              example: null
+                              nullable: true
+                            is_active:
+                              type: boolean
+                              example: true
+                        instructor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            name:
+                              type: string
+                              example: 'Dr. Instructor'
+                            email:
+                              type: string
+                              example: instructor@ejust.test
+                        meetings:
+                          type: array
+                          example:
+                            - id: 1
+                              weekday: 1
+                              starts_at: '09:00'
+                              ends_at: '11:00'
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              weekday:
+                                type: integer
+                                example: 1
+                              starts_at:
+                                type: string
+                                example: '09:00'
+                              ends_at:
+                                type: string
+                                example: '11:00'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No semester found for the given id.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No semester found for the given id.'
+      tags:
+        - Enrollment
+      security: []
+    post:
+      summary: 'Create a Course Offering in a Semester.'
+      operationId: createACourseOfferingInASemester
+      description: "Records one Catalog Course as taught in the Semester: an Instructor, an optional\nseat capacity, and one or more weekly meeting times. The Course must exist and not\nalready be offered in this Semester; the Instructor must be a faculty (R04) User;\nthe meetings may not overlap one another. Gated on `calendar.manage`."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    semester_id: 1
+                    course_id: 1
+                    instructor_id: 4
+                    capacity: 30
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                    instructor:
+                      id: 4
+                      name: 'Dr. Instructor'
+                      email: instructor@ejust.test
+                    meetings:
+                      -
+                        id: 1
+                        weekday: 1
+                        starts_at: '09:00'
+                        ends_at: '11:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      semester_id:
+                        type: integer
+                        example: 1
+                      course_id:
+                        type: integer
+                        example: 1
+                      instructor_id:
+                        type: integer
+                        example: 4
+                      capacity:
+                        type: integer
+                        example: 30
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                      instructor:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          name:
+                            type: string
+                            example: 'Dr. Instructor'
+                          email:
+                            type: string
+                            example: instructor@ejust.test
+                      meetings:
+                        type: array
+                        example:
+                          - id: 1
+                            weekday: 1
+                            starts_at: '09:00'
+                            ends_at: '11:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            weekday:
+                              type: integer
+                              example: 1
+                            starts_at:
+                              type: string
+                              example: '09:00'
+                            ends_at:
+                              type: string
+                              example: '11:00'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No semester found for the given id.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No semester found for the given id.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'course already offered'
+                    type: object
+                    example:
+                      message: 'This course is already offered in this semester.'
+                      errors:
+                        course_id:
+                          - 'This course is already offered in this semester.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'This course is already offered in this semester.'
+                      errors:
+                        type: object
+                        properties:
+                          course_id:
+                            type: array
+                            example:
+                              - 'This course is already offered in this semester.'
+                            items:
+                              type: string
+                  -
+                    description: 'meetings overlap'
+                    type: object
+                    example:
+                      message: 'These meeting times overlap each other.'
+                      errors:
+                        meetings:
+                          - 'These meeting times overlap each other.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'These meeting times overlap each other.'
+                      errors:
+                        type: object
+                        properties:
+                          meetings:
+                            type: array
+                            example:
+                              - 'These meeting times overlap each other.'
+                            items:
+                              type: string
+      tags:
+        - Enrollment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course_id:
+                  type: integer
+                  description: 'The Catalog Course to offer.'
+                  example: 1
+                instructor_id:
+                  type: integer
+                  description: 'A faculty (Instructor) User to teach it.'
+                  example: 4
+                capacity:
+                  type: integer
+                  description: 'The seat capacity; omit for uncapped.'
+                  example: 30
+                meetings:
+                  type: array
+                  description: 'One or more weekly meeting slots.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      weekday:
+                        type: integer
+                        description: 'Day of week, 0 (Sunday) to 6 (Saturday).'
+                        example: 1
+                      starts_at:
+                        type: string
+                        description: 'Start time, 24h HH:MM.'
+                        example: '09:00'
+                      ends_at:
+                        type: string
+                        description: 'End time, 24h HH:MM, after the start.'
+                        example: '11:00'
+                    required:
+                      - weekday
+                      - starts_at
+                      - ends_at
+              required:
+                - course_id
+                - instructor_id
+                - meetings
+      security: []
+    parameters:
+      -
+        in: path
+        name: semester_id
+        description: 'The ID of the semester.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/offerings/{offering_id}':
+    get:
+      summary: 'Show a Course Offering.'
+      operationId: showACourseOffering
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    semester_id: 1
+                    course_id: 1
+                    instructor_id: 4
+                    capacity: 30
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                    instructor:
+                      id: 4
+                      name: 'Dr. Instructor'
+                      email: instructor@ejust.test
+                    meetings:
+                      -
+                        id: 1
+                        weekday: 1
+                        starts_at: '09:00'
+                        ends_at: '11:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      semester_id:
+                        type: integer
+                        example: 1
+                      course_id:
+                        type: integer
+                        example: 1
+                      instructor_id:
+                        type: integer
+                        example: 4
+                      capacity:
+                        type: integer
+                        example: 30
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                      instructor:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          name:
+                            type: string
+                            example: 'Dr. Instructor'
+                          email:
+                            type: string
+                            example: instructor@ejust.test
+                      meetings:
+                        type: array
+                        example:
+                          - id: 1
+                            weekday: 1
+                            starts_at: '09:00'
+                            ends_at: '11:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            weekday:
+                              type: integer
+                              example: 1
+                            starts_at:
+                              type: string
+                              example: '09:00'
+                            ends_at:
+                              type: string
+                              example: '11:00'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Enrollment
+      security: []
+    patch:
+      summary: 'Update a Course Offering.'
+      operationId: updateACourseOffering
+      description: "Changes the Instructor, capacity, and weekly meetings. The Semester and Course an\nOffering runs are its identity and are fixed at creation. Same instructor and\nmeeting invariants as creation. Gated on `calendar.manage`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    semester_id: 1
+                    course_id: 1
+                    instructor_id: 4
+                    capacity: 25
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                    instructor:
+                      id: 4
+                      name: 'Dr. Instructor'
+                      email: instructor@ejust.test
+                    meetings:
+                      -
+                        id: 2
+                        weekday: 2
+                        starts_at: '13:00'
+                        ends_at: '15:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      semester_id:
+                        type: integer
+                        example: 1
+                      course_id:
+                        type: integer
+                        example: 1
+                      instructor_id:
+                        type: integer
+                        example: 4
+                      capacity:
+                        type: integer
+                        example: 25
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                      instructor:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          name:
+                            type: string
+                            example: 'Dr. Instructor'
+                          email:
+                            type: string
+                            example: instructor@ejust.test
+                      meetings:
+                        type: array
+                        example:
+                          - id: 2
+                            weekday: 2
+                            starts_at: '13:00'
+                            ends_at: '15:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            weekday:
+                              type: integer
+                              example: 2
+                            starts_at:
+                              type: string
+                              example: '13:00'
+                            ends_at:
+                              type: string
+                              example: '15:00'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        422:
+          description: 'meetings overlap'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'These meeting times overlap each other.'
+                  errors:
+                    meetings:
+                      - 'These meeting times overlap each other.'
+                properties:
+                  message:
+                    type: string
+                    example: 'These meeting times overlap each other.'
+                  errors:
+                    type: object
+                    properties:
+                      meetings:
+                        type: array
+                        example:
+                          - 'These meeting times overlap each other.'
+                        items:
+                          type: string
+      tags:
+        - Enrollment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                instructor_id:
+                  type: integer
+                  description: 'A faculty (Instructor) User to teach it.'
+                  example: 4
+                capacity:
+                  type: integer
+                  description: 'The seat capacity; omit for uncapped.'
+                  example: 25
+                meetings:
+                  type: array
+                  description: 'One or more weekly meeting slots.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      weekday:
+                        type: integer
+                        description: 'Day of week, 0 (Sunday) to 6 (Saturday).'
+                        example: 2
+                      starts_at:
+                        type: string
+                        description: 'Start time, 24h HH:MM.'
+                        example: '13:00'
+                      ends_at:
+                        type: string
+                        description: 'End time, 24h HH:MM, after the start.'
+                        example: '15:00'
+                    required:
+                      - weekday
+                      - starts_at
+                      - ends_at
+              required:
+                - instructor_id
+                - meetings
+      security: []
+    delete:
+      summary: 'Delete a Course Offering.'
+      operationId: deleteACourseOffering
+      description: "Removes an Offering and its meeting rows. Allowed only while nothing references\nit — once an Enrollment is minted against it or a Class Session is generated from\nit (later Phase-3 tickets), the register and roster it anchors must survive, so a\nreferenced Offering is refused with a 409. Gated on `calendar.manage`."
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+                properties: {}
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This offering has enrollments or sessions and cannot be deleted.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This offering has enrollments or sessions and cannot be deleted.'
+      tags:
+        - Enrollment
+      security: []
+    parameters:
+      -
+        in: path
+        name: offering_id
+        description: 'The ID of the offering.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/notifications:
     get:
       summary: 'List my notifications.'

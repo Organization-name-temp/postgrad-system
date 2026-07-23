@@ -2393,6 +2393,223 @@ export const UpdateCurrentUserResponse = zod.object({
 
 
 /**
+ * The faculty Users (holding the Instructor role, R04) an Offering may be assigned
+ * to — the source for the offering form's instructor picker (the Phase-2
+ * interviewer-list precedent, via Identity\Public). Gated on `calendar.manage`.
+ * @summary List assignable instructors.
+ */
+export const ListAssignableInstructorsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Every Offering that runs in the given Semester, each with its resolved Course and
+ * Instructor summaries and its weekly meetings. Gated on `calendar.manage`.
+ * @summary List a Semester's Course Offerings.
+ */
+export const ListASemestersCourseOfferingsParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const ListASemestersCourseOfferingsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+})
+
+
+/**
+ * Records one Catalog Course as taught in the Semester: an Instructor, an optional
+ * seat capacity, and one or more weekly meeting times. The Course must exist and not
+ * already be offered in this Semester; the Instructor must be a faculty (R04) User;
+ * the meetings may not overlap one another. Gated on `calendar.manage`.
+ * @summary Create a Course Offering in a Semester.
+ */
+export const CreateACourseOfferingInASemesterParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const CreateACourseOfferingInASemesterBody = zod.object({
+  "course_id": zod.number().describe('The Catalog Course to offer.'),
+  "instructor_id": zod.number().describe('A faculty (Instructor) User to teach it.'),
+  "capacity": zod.number().optional().describe('The seat capacity; omit for uncapped.'),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().describe('Day of week, 0 (Sunday) to 6 (Saturday).'),
+  "starts_at": zod.string().describe('Start time, 24h HH:MM.'),
+  "ends_at": zod.string().describe('End time, 24h HH:MM, after the start.')
+})).describe('One or more weekly meeting slots.')
+})
+
+export const CreateACourseOfferingInASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Course Offering.
+ */
+export const ShowACourseOfferingParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const ShowACourseOfferingResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Changes the Instructor, capacity, and weekly meetings. The Semester and Course an
+ * Offering runs are its identity and are fixed at creation. Same instructor and
+ * meeting invariants as creation. Gated on `calendar.manage`.
+ * @summary Update a Course Offering.
+ */
+export const UpdateACourseOfferingParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const UpdateACourseOfferingBody = zod.object({
+  "instructor_id": zod.number().describe('A faculty (Instructor) User to teach it.'),
+  "capacity": zod.number().optional().describe('The seat capacity; omit for uncapped.'),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().describe('Day of week, 0 (Sunday) to 6 (Saturday).'),
+  "starts_at": zod.string().describe('Start time, 24h HH:MM.'),
+  "ends_at": zod.string().describe('End time, 24h HH:MM, after the start.')
+})).describe('One or more weekly meeting slots.')
+})
+
+export const UpdateACourseOfferingResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Removes an Offering and its meeting rows. Allowed only while nothing references
+ * it — once an Enrollment is minted against it or a Class Session is generated from
+ * it (later Phase-3 tickets), the register and roster it anchors must survive, so a
+ * referenced Offering is refused with a 409. Gated on `calendar.manage`.
+ * @summary Delete a Course Offering.
+ */
+export const DeleteACourseOfferingParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const DeleteACourseOfferingResponse = zod.looseObject({
+
+})
+
+
+/**
  * Paginated, newest-first. Scoped to the authenticated user.
  * @summary List my notifications.
  */

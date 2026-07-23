@@ -8,12 +8,12 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator as ValidatorInstance;
-use Modules\Catalog\Internal\Enums\CourseLevel;
 use Modules\Catalog\Internal\Enums\ResearchType;
 use Modules\Catalog\Internal\Http\Resources\CourseResource;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Support\CreditHours;
 use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
+use Modules\Catalog\Public\Enums\CourseLevel;
 
 /**
  * @group Catalog

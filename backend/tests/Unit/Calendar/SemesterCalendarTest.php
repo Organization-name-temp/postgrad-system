@@ -151,3 +151,16 @@ it('reports having ended only strictly after the semester end', function () {
     expect($cal->hasEnded(Carbon::parse('2026-12-20 00:00')))->toBeFalse()
         ->and($cal->hasEnded(Carbon::parse('2026-12-21 00:00')))->toBeTrue();
 });
+
+it('names the current period, change windows taking precedence over the registration overlap', function () {
+    $cal = calendar();
+
+    expect($cal->currentPeriod(Carbon::parse('2026-07-15 00:00')))->toBe('upcoming')      // before reg opens
+        ->and($cal->currentPeriod(Carbon::parse('2026-08-15 00:00')))->toBe('registration') // reg open, before start
+        ->and($cal->currentPeriod(Carbon::parse('2026-09-03 00:00')))->toBe('add_drop')     // reg still open but term started
+        ->and($cal->currentPeriod(Carbon::parse('2026-09-10 00:00')))->toBe('add_drop')     // add/drop only
+        ->and($cal->currentPeriod(Carbon::parse('2026-09-18 00:00')))->toBe('late_add')     // late-add
+        ->and($cal->currentPeriod(Carbon::parse('2026-10-15 00:00')))->toBe('withdrawal')   // withdrawal
+        ->and($cal->currentPeriod(Carbon::parse('2026-12-10 00:00')))->toBe('closed')       // past withdrawal, still running
+        ->and($cal->currentPeriod(Carbon::parse('2026-12-21 00:00')))->toBe('closed');      // ended
+});

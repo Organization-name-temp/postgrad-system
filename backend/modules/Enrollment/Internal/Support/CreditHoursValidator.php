@@ -36,15 +36,23 @@ final readonly class CreditHoursValidator
 
     /**
      * Validate a cart's credit-hour load. Sums the per-line credit hours (each Regular or
-     * Audit line contributes its course's total CH) and reports the floor/ceiling
-     * outcome: the ceiling always bites; the floor is skipped when the exceptions waive it
-     * (a first-semester registration may carry a reduced load).
+     * Audit line contributes its course's total CH), adds the Student's `$existingLoad`
+     * already on their schedule for this Semester, and reports the floor/ceiling outcome:
+     * the ceiling always bites; the floor is skipped when the exceptions waive it (a
+     * first-semester registration may carry a reduced load).
+     *
+     * `$existingLoad` is 0 for an initial cart (nothing minted yet — the submission and
+     * initial-mint paths), so their behaviour is unchanged; it carries the current
+     * Semester load for a free add (ticket 07) and a late-add mint, so the ceiling counts
+     * the whole schedule, not just the new lines, and the floor is naturally satisfied by
+     * an already-valid schedule.
      *
      * @param  list<int>  $creditHours  one entry per counted cart line — the course's total CH
+     * @param  int  $existingLoad  the Student's active CH already on this Semester's schedule
      */
-    public function validate(array $creditHours, CreditHoursExceptions $exceptions): CreditHoursValidation
+    public function validate(array $creditHours, CreditHoursExceptions $exceptions, int $existingLoad = 0): CreditHoursValidation
     {
-        $total = array_sum($creditHours);
+        $total = array_sum($creditHours) + $existingLoad;
 
         return new CreditHoursValidation(
             total: $total,

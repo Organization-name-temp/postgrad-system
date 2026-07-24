@@ -46,7 +46,7 @@ final readonly class CartValidator
         $existing ??= ExistingEnrollments::none();
 
         return [
-            ...$this->creditHourViolations($lines, $exceptions),
+            ...$this->creditHourViolations($lines, $exceptions, $existing),
             ...$this->duplicateViolations($lines, $existing),
             ...$this->capViolations($lines, $existing),
             ...$this->capacityViolations($lines),
@@ -55,16 +55,20 @@ final readonly class CartValidator
     }
 
     /**
-     * The floor/ceiling outcome, delegated to the shared {@see CreditHoursValidator}.
+     * The floor/ceiling outcome, delegated to the shared {@see CreditHoursValidator}. The
+     * Student's existing active load for the Semester ({@see ExistingEnrollments::$activeCreditHours})
+     * is added in, so a free add or late-add is measured against the whole schedule, not
+     * just the new lines; it is 0 for an initial cart, leaving that path unchanged.
      *
      * @param  list<CartLine>  $lines
      * @return list<CartViolation>
      */
-    private function creditHourViolations(array $lines, CreditHoursExceptions $exceptions): array
+    private function creditHourViolations(array $lines, CreditHoursExceptions $exceptions, ExistingEnrollments $existing): array
     {
         $result = $this->creditHours->validate(
             array_map(static fn (CartLine $line): int => $line->totalCh, $lines),
             $exceptions,
+            $existing->activeCreditHours,
         );
 
         $offeringIds = $this->offeringIds($lines);

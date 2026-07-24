@@ -63,4 +63,41 @@ trait NotifiesRegistration
             ])->all(),
         ]);
     }
+
+    /**
+     * Notify the Student's live Advisor that an advisee free-added or free-dropped a course
+     * during the add/drop period (ticket 07, BR-70) — a change the Advisor is *told* of, not
+     * asked to approve. `$action` is `added` or `dropped`; the SPA renders it bilingually
+     * from the payload.
+     */
+    protected function notifyEnrollmentAdjusted(
+        Notifier $notifier,
+        int $advisorUserId,
+        string $action,
+        string $courseCode,
+        string $studentName,
+    ): void {
+        $notifier->notify($advisorUserId, NotificationType::EnrollmentAdjusted, [
+            'action' => $action,
+            'course_code' => $courseCode,
+            'student_name' => $studentName,
+        ]);
+    }
+
+    /**
+     * Notify the Student's live Advisor that an advisee withdrew from a course (Course
+     * Status → W) before the deadline (ticket 07) — self-serve, no approval step, the
+     * Advisor kept informed.
+     */
+    protected function notifyEnrollmentWithdrawn(
+        Notifier $notifier,
+        int $advisorUserId,
+        string $courseCode,
+        string $studentName,
+    ): void {
+        $notifier->notify($advisorUserId, NotificationType::EnrollmentWithdrawn, [
+            'course_code' => $courseCode,
+            'student_name' => $studentName,
+        ]);
+    }
 }

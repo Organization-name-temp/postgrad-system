@@ -74,6 +74,16 @@ final readonly class SemesterSummary
         return $this->calendar()->isInWithdrawalPeriod($now);
     }
 
+    /**
+     * The Semester's current period label — one of `upcoming` / `registration` /
+     * `add_drop` / `late_add` / `withdrawal` / `closed` (ticket 07). The single home for
+     * the phase vocabulary, so a consumer never re-derives the precedence (ADR-0018).
+     */
+    public function currentPeriod(CarbonInterface $now): string
+    {
+        return $this->calendar()->currentPeriod($now);
+    }
+
     private function calendar(): SemesterCalendar
     {
         return new SemesterCalendar(

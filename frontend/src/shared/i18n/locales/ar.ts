@@ -250,6 +250,9 @@ export const ar = {
       registrationSubmitted: 'أرسل {{student_name}} تسجيلًا ({{course_count}} مقررات) لمراجعتك.',
       registrationDecided:
         'اتخذ مرشدك قرارًا بشأن تسجيلك: قُبل {{approved_count}}، ولم يُقبل {{rejected_count}}.',
+      enrollmentAdjusted_added: 'أضاف {{student_name}} المقرر {{course_code}} إلى جدوله.',
+      enrollmentAdjusted_dropped: 'حذف {{student_name}} المقرر {{course_code}} من جدوله.',
+      enrollmentWithdrawn: 'انسحب {{student_name}} من المقرر {{course_code}}.',
       fallback: 'لديك إشعار جديد.',
     },
   },
@@ -930,6 +933,44 @@ export const ar = {
         classification: 'النوع',
         meetings: 'مواعيد اللقاءات',
         creditHours: 'الساعات المعتمدة',
+        actions: 'إجراءات',
+      },
+      period: {
+        label: 'الفترة الحالية',
+        upcoming: 'لم يُفتح التسجيل بعد — لا يمكن إجراء أي تغييرات.',
+        registration: 'التسجيل مفتوح.',
+        add_drop: 'فترة الإضافة والحذف — يمكنك إضافة المقررات أو حذفها مباشرة.',
+        late_add: 'فترة الإضافة المتأخرة — تحتاج المقررات الجديدة إلى طلب عبر المرشد.',
+        withdrawal: 'فترة الانسحاب — يمكنك الانسحاب من مقرر.',
+        closed: 'لا توجد تغييرات متاحة لهذا الفصل.',
+      },
+      actions: {
+        drop: 'حذف',
+        withdraw: 'انسحاب',
+        dropTitle: 'حذف {{course}}؟',
+        dropBody:
+          'يؤدي هذا إلى إزالة {{course}} من جدولك دون الاحتفاظ بأي سجل، ولا يمكن التراجع عنه. سيُبلَّغ مرشدك.',
+        withdrawTitle: 'الانسحاب من {{course}}؟',
+        withdrawBody:
+          'يسجّل هذا حرف W دائمًا للمقرر {{course}} في سجلك، ولا يمكن التراجع عنه. سيُبلَّغ مرشدك.',
+        confirm: 'تأكيد',
+        cancel: 'إلغاء',
+        error:
+          'تعذّر إتمام هذا التغيير — قد يكون خارج الفترة المسموح بها الآن. حدّث الصفحة وحاول مجددًا.',
+      },
+      add: {
+        title: 'إضافة مقرر',
+        intro: 'خلال فترة الإضافة والحذف يمكنك إضافة مقرر مؤهَّل مباشرة. سيُبلَّغ مرشدك.',
+        empty: 'لا توجد مقررات أخرى متاحة للإضافة.',
+        add: 'إضافة',
+        adding: 'جارٍ الإضافة…',
+        addCourse: 'إضافة {{course}}',
+        mode: {
+          label: 'طريقة دراسة {{course}}',
+          Regular: 'بالساعات',
+          Audit: 'استماع',
+        },
+        error: 'تعذّرت إضافة هذا المقرر — حدّث الصفحة وحاول مجددًا.',
       },
     },
     advising: {

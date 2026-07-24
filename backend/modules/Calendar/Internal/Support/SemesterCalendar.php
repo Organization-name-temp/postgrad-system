@@ -119,4 +119,27 @@ final class SemesterCalendar
         return $now->greaterThan($this->lateAddEndsAt)
             && $now->lessThanOrEqualTo($this->withdrawalDeadlineAt);
     }
+
+    /**
+     * The single label for "which period is this Semester in right now" — the authority
+     * the schedule view reads to phrase what a Student may do (ticket 07). One of
+     * `upcoming` / `registration` / `add_drop` / `late_add` / `withdrawal` / `closed`.
+     *
+     * The change periods take precedence over the registration window where they overlap
+     * (registration may still be open past the semester start), so a running term reads as
+     * its live change phase. Kept here — beside the predicates it composes — so the phase
+     * vocabulary lives with the rest of the Semester's period logic, never re-derived by a
+     * consumer (ADR-0018 §Consequences).
+     */
+    public function currentPeriod(CarbonInterface $now): string
+    {
+        return match (true) {
+            $this->isInWithdrawalPeriod($now) => 'withdrawal',
+            $this->isInLateAddPeriod($now) => 'late_add',
+            $this->isInAddDropPeriod($now) => 'add_drop',
+            $this->isRegistrationOpen($now) => 'registration',
+            $now->lessThan($this->registrationOpensAt) => 'upcoming',
+            default => 'closed',
+        };
+    }
 }

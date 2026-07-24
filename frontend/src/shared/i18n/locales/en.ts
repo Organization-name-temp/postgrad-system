@@ -258,6 +258,9 @@ export const en = {
         '{{student_name}} submitted a registration ({{course_count}} courses) for your review.',
       registrationDecided:
         'Your advisor decided your registration: {{approved_count}} approved, {{rejected_count}} not approved.',
+      enrollmentAdjusted_added: '{{student_name}} added {{course_code}} to their schedule.',
+      enrollmentAdjusted_dropped: '{{student_name}} dropped {{course_code}} from their schedule.',
+      enrollmentWithdrawn: '{{student_name}} withdrew from {{course_code}}.',
       fallback: 'You have a new notification.',
     },
   },
@@ -951,6 +954,45 @@ export const en = {
         classification: 'Type',
         meetings: 'Meeting times',
         creditHours: 'Credit hours',
+        actions: 'Actions',
+      },
+      period: {
+        label: 'Current period',
+        upcoming: 'Registration has not opened yet — no changes are possible.',
+        registration: 'Registration is open.',
+        add_drop: 'Add/drop period — you can add or drop courses directly.',
+        late_add: 'Late-add period — new courses need an advisor request.',
+        withdrawal: 'Withdrawal period — you can withdraw from a course.',
+        closed: 'No changes are open for this semester.',
+      },
+      actions: {
+        drop: 'Drop',
+        withdraw: 'Withdraw',
+        dropTitle: 'Drop {{course}}?',
+        dropBody:
+          'This removes {{course}} from your schedule with no record kept, and cannot be undone. Your advisor is notified.',
+        withdrawTitle: 'Withdraw from {{course}}?',
+        withdrawBody:
+          'This records a permanent W for {{course}} on your transcript, and cannot be undone. Your advisor is notified.',
+        confirm: 'Confirm',
+        cancel: 'Cancel',
+        error:
+          'That change could not be completed — it may be outside the allowed window now. Refresh and try again.',
+      },
+      add: {
+        title: 'Add a course',
+        intro:
+          'During the add/drop period you can add an eligible course directly. Your advisor is notified.',
+        empty: 'There are no more courses available for you to add.',
+        add: 'Add',
+        adding: 'Adding…',
+        addCourse: 'Add {{course}}',
+        mode: {
+          label: 'How to take {{course}}',
+          Regular: 'For credit',
+          Audit: 'Audit',
+        },
+        error: 'That course could not be added — refresh and try again.',
       },
     },
     advising: {

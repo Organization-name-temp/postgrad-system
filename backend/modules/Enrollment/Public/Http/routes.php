@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
+use Modules\Enrollment\Internal\Http\Controllers\ScheduleChangeController;
 
 /*
 | Enrollment routes, mounted under /api/v1 by EnrollmentServiceProvider.
@@ -44,8 +45,17 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
     Route::post('/registration/requests', [RegistrationController::class, 'submit']);
     Route::get('/registration/requests', [RegistrationController::class, 'requests']);
 
-    // The Student's own schedule — their minted Enrollments grouped by Semester (ticket 06).
+    // The Student's own schedule — their minted Enrollments grouped by Semester (ticket 06),
+    // carrying the period-gated change context (ticket 07).
     Route::get('/registration/schedule', [RegistrationController::class, 'schedule']);
+
+    // Period-gated direct schedule changes (ticket 07, FR-REG-004): free add/drop in the
+    // add/drop window and self-serve withdrawal until the deadline. Each is gated on the
+    // Semester's dates server-side and 409s outside its window. Late-add is not here — it is
+    // a RegistrationRequest of kind LateAdd through the submit + advisor flow above.
+    Route::post('/registration/enrollments', [ScheduleChangeController::class, 'add']);
+    Route::delete('/registration/enrollments/{enrollment}', [ScheduleChangeController::class, 'drop'])->whereNumber('enrollment');
+    Route::post('/registration/enrollments/{enrollment}/withdrawal', [ScheduleChangeController::class, 'withdraw'])->whereNumber('enrollment');
 });
 
 Route::middleware(['auth:sanctum', 'can:registration.approve'])->group(function () {

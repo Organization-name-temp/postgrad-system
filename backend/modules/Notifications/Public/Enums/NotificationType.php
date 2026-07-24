@@ -72,4 +72,20 @@ enum NotificationType: string
      * `rejected_count`.
      */
     case RegistrationDecided = 'registration.decided';
+
+    /**
+     * An advisee changed their own schedule during the free add/drop period (Phase 3,
+     * ticket 07) — a direct action the Advisor is *notified* of, not asked to approve
+     * (FR-REG-004, BR-70). Raised to the Student's live Advisor. Payload: `action`
+     * (`added`/`dropped`), `course_code`, `student_name`.
+     */
+    case EnrollmentAdjusted = 'enrollment.adjusted';
+
+    /**
+     * An advisee withdrew from a course (Course Status → W) before the withdrawal
+     * deadline (Phase 3, ticket 07) — self-serve, with no approval step, the Advisor kept
+     * informed. Raised to the Student's live Advisor. Payload: `course_code`,
+     * `student_name`.
+     */
+    case EnrollmentWithdrawn = 'enrollment.withdrawn';
 }

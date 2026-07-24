@@ -12,13 +12,16 @@ use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CourseSummary;
+use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\RegistrationKind;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
+use Modules\Enrollment\Internal\Http\Concerns\ReadsExistingEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesCartLines;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesOfferingRefs;
+use Modules\Enrollment\Internal\Http\Concerns\ResolvesStudent;
 use Modules\Enrollment\Internal\Http\Resources\EligibleCourseResource;
 use Modules\Enrollment\Internal\Http\Resources\EnrollmentResource;
 use Modules\Enrollment\Internal\Http\Resources\RegistrationRequestResource;
@@ -30,6 +33,8 @@ use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
+use Modules\Enrollment\Internal\Support\ExistingEnrollments;
+use Modules\Enrollment\Internal\Support\RegistrationTarget;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -58,8 +63,10 @@ class RegistrationController
 {
     use CountsEnrollments;
     use NotifiesRegistration;
+    use ReadsExistingEnrollments;
     use ResolvesCartLines;
     use ResolvesOfferingRefs;
+    use ResolvesStudent;
 
     /**
      * List the acting Student's eligible courses for the open Semester.
@@ -69,8 +76,11 @@ class RegistrationController
      * Elective / Research Course). Each line carries the Offering's instructor, meeting
      * times, seats remaining and the course's total CH. Courses in the Curriculum with
      * no Offering this semester are absent (ADR-0017); a course that classifies for no
-     * class is omitted. When no registration window is open, `semester` is null and the
-     * list is empty. Gated on `courses.register_self` (the acting Student, R02).
+     * class is omitted. The list also serves the **late-add** window (ticket 07): when
+     * registration has closed but the Semester is in its late-add period, the same list is
+     * returned minus the courses already on the Student's schedule (a late-add cart only
+     * adds). When neither a registration nor a late-add window is open, `semester` is null
+     * and the list is empty. Gated on `courses.register_self` (the acting Student, R02).
      *
      * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "courses": [{"offering_id": 1, "classification": "Core", "capacity": 30, "seats_remaining": 30, "total_ch": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
@@ -84,14 +94,28 @@ class RegistrationController
         EligibilityResolver $eligibility,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
-        $semester = $calendar->openForRegistration();
+        $target = $this->resolveRegistrationTarget($calendar);
 
-        // No open window — nothing to classify.
-        if ($semester === null) {
+        // No submittable window (neither registration nor late-add) — nothing to classify.
+        if ($target === null) {
             return $this->eligiblePayload(null, collect());
         }
 
+        $semester = $target->semester;
+
         $offerings = $this->semesterOfferings($semester->id);
+
+        // In the late-add window the cart adds to an already-approved schedule, so drop the
+        // courses the Student is already enrolled in this Semester — only genuine additions
+        // are offered (the mint would reject a duplicate anyway).
+        if ($target->kind === RegistrationKind::LateAdd) {
+            $enrolledOfferingIds = $this->enrolledOfferingIds($student->studentId);
+
+            $offerings = $offerings
+                ->reject(fn (CourseOffering $offering): bool => in_array((int) $offering->getKey(), $enrolledOfferingIds, true))
+                ->values();
+        }
+
         $this->attachOfferingRefs($offerings, $courses, $directory);
         $this->attachEnrollmentCounts($offerings);
         $classifications = $eligibility->classify($student, $offerings);
@@ -112,14 +136,18 @@ class RegistrationController
     /**
      * Submit a registration cart.
      *
-     * Turns the Student's cart into a Pending {@see RegistrationRequest} for the currently-
-     * open Semester. Each line names an eligible Offering and a mode (Regular / Audit). The
-     * whole cart is validated as a batch — every course must be eligible; the credit-hour
-     * load must sit within the min/max window (the 6-hour floor is waived in the Student's
-     * first semester); at most one External Elective and one Research Course; no duplicate
-     * course; no time clash between chosen Offerings; and every capped Offering must have a
-     * seat. An illegal cart is a 422 enumerating the offending reasons; a second Pending
-     * request for the same Semester is a 409. Gated on `courses.register_self` (R02).
+     * Turns the Student's cart into a Pending {@see RegistrationRequest}. Its kind is derived
+     * from the calendar: `Initial` while the registration window is open, or `LateAdd` when
+     * that window has closed and the Semester is in its late-add period (ticket 07) — the
+     * add-only week-3 request that still flows through the advisor. Each line names an
+     * eligible Offering and a mode (Regular / Audit). The whole cart is validated as a batch
+     * — every course must be eligible; the credit-hour load must sit within the min/max
+     * window (the 6-hour floor is waived in the Student's first semester); at most one
+     * External Elective and one Research Course; no duplicate course; no time clash between
+     * chosen Offerings; and every capped Offering must have a seat. A late-add cart is
+     * additionally measured against the Student's already-approved schedule. An illegal cart
+     * is a 422 enumerating the offending reasons; a second Pending request for the same
+     * Semester is a 409. Gated on `courses.register_self` (R02).
      *
      * @bodyParam lines object[] required The cart lines — one per chosen offering.
      * @bodyParam lines[].offering_id integer required An eligible Course Offering's id. Example: 1
@@ -142,12 +170,15 @@ class RegistrationController
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
-        $semester = $calendar->openForRegistration();
-        if ($semester === null) {
+        $target = $this->resolveRegistrationTarget($calendar);
+        if ($target === null) {
             throw ValidationException::withMessages([
                 'registration' => 'Registration is not open right now.',
             ]);
         }
+
+        $semester = $target->semester;
+        $kind = $target->kind;
 
         $validated = $request->validate([
             'lines' => ['required', 'array', 'min:1'],
@@ -156,7 +187,8 @@ class RegistrationController
         ]);
 
         // At most one Pending request per (student, semester) — a Rejected one may be
-        // replaced, but a second Pending is a conflict.
+        // replaced, but a second Pending is a conflict. (An approved Initial does not
+        // block a Pending LateAdd: the index is partial on Pending only.)
         $hasPending = RegistrationRequest::query()->pending()
             ->where('student_id', $student->studentId)
             ->where('semester_id', $semester->id)
@@ -168,19 +200,25 @@ class RegistrationController
 
         [$cartLines, $ineligible] = $this->resolveCart($student, $semester, $validated['lines'], $courses, $directory, $eligibility);
 
+        // A late-add cart is measured against the already-approved schedule (ceiling, caps,
+        // duplicate, clash all count the record); an initial cart has no record yet.
+        $existing = $kind === RegistrationKind::LateAdd
+            ? $this->existingEnrollments($student->studentId, $semester->id)
+            : ExistingEnrollments::none();
+
         $validator = new CartValidator(CreditHoursValidator::fromConfig());
-        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester));
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
 
         $errors = $this->errorsFrom($violations, $ineligible);
         if ($errors !== []) {
             throw ValidationException::withMessages($errors);
         }
 
-        $registration = DB::transaction(function () use ($student, $semester, $cartLines): RegistrationRequest {
+        $registration = DB::transaction(function () use ($student, $semester, $kind, $cartLines): RegistrationRequest {
             $registration = RegistrationRequest::create([
                 'student_id' => $student->studentId,
                 'semester_id' => $semester->id,
-                'kind' => RegistrationKind::Initial,
+                'kind' => $kind,
                 'status' => RegistrationStatus::Pending,
             ]);
 
@@ -232,11 +270,13 @@ class RegistrationController
         EligibilityResolver $eligibility,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
-        $semester = $calendar->openForRegistration();
+        $target = $this->resolveRegistrationTarget($calendar);
 
-        if ($semester === null) {
+        if ($target === null) {
             return response()->json(['data' => ['semester' => null, 'requests' => []]]);
         }
+
+        $semester = $target->semester;
 
         $requests = RegistrationRequest::query()
             ->where('student_id', $student->studentId)
@@ -262,11 +302,19 @@ class RegistrationController
      * advisor minted, grouped by Semester (most recent first), each carrying its Course
      * Status, Enrollment Classification, registration-time credit hours, and the live
      * display facts — course, instructor, weekly meeting times — read through the Catalog/
-     * Offering facades (ADR-0017). Attendance percentage and the period-gated action
-     * buttons land in tickets 08/07; this ticket renders the read-only schedule. Gated on
-     * `courses.register_self` (the acting Student, R02).
+     * Offering facades (ADR-0017).
      *
-     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}]}
+     * Each group also carries the **period-gated change context** (ticket 07, FR-REG-004),
+     * so the SPA can surface the right in-window actions while the server stays the sole
+     * authority: `current_period` (the derived phase — upcoming / registration / add_drop /
+     * late_add / withdrawal / closed), `can_free_change` (in the add/drop window *and* the
+     * Student has an approved Initial request — free add/drop is live), `can_withdraw` (in
+     * the withdrawal window), and — only when free change is live — `addable_courses`, the
+     * eligible Offerings not yet on the schedule and not External Electives (those need a
+     * request). Attendance percentage lands in ticket 08. Gated on `courses.register_self`
+     * (the acting Student, R02).
+     *
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": true, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}]}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
      */
     public function schedule(
@@ -275,6 +323,7 @@ class RegistrationController
         AcademicCalendar $calendar,
         CourseCatalog $courses,
         Directory $directory,
+        EligibilityResolver $eligibility,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
@@ -287,53 +336,46 @@ class RegistrationController
         $offerings = $enrollments->pluck('offering')->filter()->values();
         $this->attachOfferingRefs($offerings, $courses, $directory);
 
-        // Group by the Offering's Semester; render each group newest-first by start date.
+        // Group by the Offering's Semester; render each group newest-first by start date,
+        // enriched with the period-gated change context so the SPA can show in-window actions.
         $groups = $enrollments
             ->filter(fn (Enrollment $enrollment): bool => $enrollment->offering !== null)
             ->groupBy(fn (Enrollment $enrollment): int => (int) $enrollment->offering->semester_id)
-            ->map(function (Collection $group, int $semesterId) use ($calendar): ?array {
+            ->map(function (Collection $group, int $semesterId) use ($calendar, $student, $courses, $directory, $eligibility): ?array {
                 $semester = $calendar->find($semesterId);
                 if ($semester === null) {
                     return null; // a dangling Semester reference — omit the group
                 }
 
+                $now = now();
+                $canFreeChange = $semester->isInAddDropPeriod($now)
+                    && RegistrationRequest::hasApprovedInitialFor($student->studentId, $semester->id);
+
                 return [
                     'semester' => $this->semesterPayload($semester),
                     'starts_at' => $semester->startsAt,
+                    'current_period' => $semester->currentPeriod($now),
+                    'can_free_change' => $canFreeChange,
+                    'can_withdraw' => $semester->isInWithdrawalPeriod($now),
+                    'addable_courses' => $canFreeChange
+                        ? $this->addableCourses($student, $semester, $courses, $directory, $eligibility)
+                        : [],
                     'enrollments' => EnrollmentResource::collection($group->values())->resolve(),
                 ];
             })
             ->filter()
             ->sortByDesc('starts_at')
-            ->map(fn (array $group): array => ['semester' => $group['semester'], 'enrollments' => $group['enrollments']])
+            ->map(fn (array $group): array => [
+                'semester' => $group['semester'],
+                'current_period' => $group['current_period'],
+                'can_free_change' => $group['can_free_change'],
+                'can_withdraw' => $group['can_withdraw'],
+                'addable_courses' => $group['addable_courses'],
+                'enrollments' => $group['enrollments'],
+            ])
             ->values();
 
         return response()->json(['data' => $groups->all()]);
-    }
-
-    /**
-     * The Student's display name for a notification line — resolved through the Identity
-     * {@see Directory} (the Student anchor summary carries no name, ADR-0012). Falls back to
-     * the University ID when the owning user cannot be resolved.
-     */
-    private function studentDisplayName(StudentSummary $student, Directory $directory): string
-    {
-        $users = $directory->findMany([$student->userId]);
-
-        return isset($users[$student->userId]) ? $users[$student->userId]->name : $student->universityId;
-    }
-
-    /**
-     * The acting Student's anchor, or a 403 when the acting user holds no Student record —
-     * read through the Identity\Public {@see StudentDirectory} (ADR-0012).
-     */
-    private function actingStudent(Request $request, StudentDirectory $students): StudentSummary
-    {
-        $userId = (int) $request->user()?->getAuthIdentifier();
-        $student = $students->find($userId);
-        abort_if($student === null, 403, 'You do not have a student record to register with.');
-
-        return $student;
     }
 
     /**
@@ -348,6 +390,86 @@ class RegistrationController
             ->with('meetings')
             ->orderBy('id')
             ->get();
+    }
+
+    /**
+     * The Semester the acting Student may submit a cart for right now, and the kind of
+     * request it would be: the Semester whose registration window is open (an `Initial`
+     * cart), or — when none is — the running Semester inside its late-add window (an
+     * add-only `LateAdd` cart, ticket 07, FR-REG-004). Null when neither applies. Every
+     * period question reads from Calendar (ADR-0018), so time alone moves the answer.
+     */
+    private function resolveRegistrationTarget(AcademicCalendar $calendar): ?RegistrationTarget
+    {
+        $open = $calendar->openForRegistration();
+        if ($open !== null) {
+            return new RegistrationTarget($open, RegistrationKind::Initial);
+        }
+
+        $running = $calendar->running();
+        if ($running !== null && $running->isInLateAddPeriod(now())) {
+            return new RegistrationTarget($running, RegistrationKind::LateAdd);
+        }
+
+        return null;
+    }
+
+    /**
+     * The Offering ids the Student already has an Enrollment for (any status) — the "leave
+     * out what's already on the schedule" filter shared by the late-add eligible list and
+     * the free-add list (ticket 07).
+     *
+     * @return list<int>
+     */
+    private function enrolledOfferingIds(int $studentId): array
+    {
+        return Enrollment::query()
+            ->where('student_id', $studentId)
+            ->pluck('course_offering_id')
+            ->map(fn ($id): int => (int) $id)
+            ->all();
+    }
+
+    /**
+     * The courses the Student may **free-add** to this Semester right now (ticket 07): the
+     * eligible Offerings minus those already on their schedule and minus External Electives
+     * (an external elective is only legal inside a request, BR-24). The same
+     * {@see EligibleCourseResource} shape the registration list uses, so the SPA renders it
+     * with the existing row component.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function addableCourses(
+        StudentSummary $student,
+        SemesterSummary $semester,
+        CourseCatalog $courses,
+        Directory $directory,
+        EligibilityResolver $eligibility,
+    ): array {
+        $offerings = $this->semesterOfferings($semester->id);
+        $this->attachOfferingRefs($offerings, $courses, $directory);
+        $this->attachEnrollmentCounts($offerings);
+        $classifications = $eligibility->classify($student, $offerings);
+
+        $enrolledOfferingIds = $this->enrolledOfferingIds($student->studentId);
+
+        $addable = $offerings->filter(function (CourseOffering $offering) use ($classifications, $enrolledOfferingIds): bool {
+            $classification = $classifications[$offering->getKey()] ?? null;
+
+            // Not eligible, an external elective (needs a request), or already on the schedule.
+            if ($classification === null || $classification === EnrollmentClassification::ExternalElective) {
+                return false;
+            }
+            if (in_array((int) $offering->getKey(), $enrolledOfferingIds, true)) {
+                return false;
+            }
+
+            $offering->setAttribute('classification', $classification);
+
+            return true;
+        })->values();
+
+        return EligibleCourseResource::collection($addable)->resolve();
     }
 
     /**

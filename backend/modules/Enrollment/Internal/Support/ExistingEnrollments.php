@@ -25,6 +25,11 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
  * - {@see $meetings} — the weekly {@see MeetingTime} slots of the Student's active
  *   Enrollments in the **target Semester**, so an approved line that overlaps the existing
  *   schedule is rejected via the shared overlap seam.
+ * - {@see $activeCreditHours} — the Student's active credit-hour load already on the
+ *   **target Semester**'s schedule, so the credit-hour ceiling counts the whole schedule
+ *   (existing + new) for a free add or a late-add, not just the new lines (ticket 07). It
+ *   is 0 for an initial cart (nothing minted yet), so the submission/initial-mint paths
+ *   are unchanged.
  */
 final readonly class ExistingEnrollments
 {
@@ -39,6 +44,7 @@ final readonly class ExistingEnrollments
         public int $researchCourseCount,
         public array $priorForCreditCountByCourse,
         public array $meetings,
+        public int $activeCreditHours = 0,
     ) {}
 
     /** The empty record — nothing minted yet (the cart-submission path, ticket 05). */
@@ -50,6 +56,7 @@ final readonly class ExistingEnrollments
             researchCourseCount: 0,
             priorForCreditCountByCourse: [],
             meetings: [],
+            activeCreditHours: 0,
         );
     }
 

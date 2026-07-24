@@ -13,12 +13,11 @@ use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CourseSummary;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Catalog\Public\ProgramSummary;
-use Modules\Enrollment\Internal\Enums\CourseStatus;
-use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
+use Modules\Enrollment\Internal\Http\Concerns\ReadsExistingEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesCartLines;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesOfferingRefs;
 use Modules\Enrollment\Internal\Http\Concerns\ScopesToAdvisees;
@@ -32,7 +31,6 @@ use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
-use Modules\Enrollment\Internal\Support\ExistingEnrollments;
 use Modules\Enrollment\Internal\Support\MintPlanEntry;
 use Modules\Enrollment\Internal\Support\RetakeDeriver;
 use Modules\Identity\Public\Contracts\Directory;
@@ -65,6 +63,7 @@ class RegistrationReviewController
 {
     use CountsEnrollments;
     use NotifiesRegistration;
+    use ReadsExistingEnrollments;
     use ResolvesCartLines;
     use ResolvesOfferingRefs;
     use ScopesToAdvisees;
@@ -442,51 +441,6 @@ class RegistrationReviewController
         }
 
         return [$cartLines, $ineligible];
-    }
-
-    /**
-     * The Student's already-minted Enrollment facts for mint-time re-validation
-     * ({@see ExistingEnrollments}): every enrolled Offering (duplicate), active counts by
-     * classification (caps), prior for-credit attempts per course (retake), and the active
-     * schedule in the target Semester (clash). One read of the Student's Enrollments.
-     */
-    private function existingEnrollments(int $studentId, int $targetSemesterId): ExistingEnrollments
-    {
-        /** @var Collection<int, Enrollment> $enrollments */
-        $enrollments = Enrollment::query()
-            ->where('student_id', $studentId)
-            ->with('offering.meetings')
-            ->get();
-
-        $active = $enrollments->filter(
-            fn (Enrollment $enrollment): bool => $enrollment->course_status !== CourseStatus::Withdrawn,
-        );
-
-        $priorForCredit = [];
-        $meetings = [];
-        foreach ($active as $enrollment) {
-            $offering = $enrollment->offering;
-            if ($offering === null) {
-                continue;
-            }
-            if ($enrollment->course_status->burnsRetakeAllowance()) {
-                $courseId = (int) $offering->course_id;
-                $priorForCredit[$courseId] = ($priorForCredit[$courseId] ?? 0) + 1;
-            }
-            if ((int) $offering->semester_id === $targetSemesterId) {
-                foreach ($this->meetingSlots($offering) as $slot) {
-                    $meetings[] = $slot;
-                }
-            }
-        }
-
-        return new ExistingEnrollments(
-            enrolledOfferingIds: $enrollments->pluck('course_offering_id')->map(fn ($id): int => (int) $id)->all(),
-            externalElectiveCount: $active->filter(fn (Enrollment $e): bool => $e->classification === EnrollmentClassification::ExternalElective)->count(),
-            researchCourseCount: $active->filter(fn (Enrollment $e): bool => $e->classification === EnrollmentClassification::ResearchCourse)->count(),
-            priorForCreditCountByCourse: $priorForCredit,
-            meetings: $meetings,
-        );
     }
 
     /** The Student's current active credit-hour load in the given Semester. */

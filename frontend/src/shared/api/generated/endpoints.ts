@@ -3080,6 +3080,41 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
   is_registration_open?: boolean;
 };
 
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemCourse;
+  instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemInstructor;
+  meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemMeetingsItem[];
+};
+
 export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse = {
   id?: number;
   code?: string;
@@ -3117,6 +3152,10 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
 
 export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItem = {
   semester?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemSemester;
+  current_period?: string;
+  can_free_change?: boolean;
+  can_withdraw?: boolean;
+  addable_courses?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItem[];
   enrollments?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItem[];
 };
 
@@ -3125,6 +3164,129 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200 
 };
 
 export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403 = {
+  message?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriodBody = {
+  /** An eligible Course Offering's id. */
+  offering_id: number;
+  /** How to take it — Regular or Audit. */
+  mode: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201Data = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: FreeAddACourseToTheScheduleadddropPeriod201DataCourse;
+  instructor?: FreeAddACourseToTheScheduleadddropPeriod201DataInstructor;
+  meetings?: FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem[];
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201 = {
+  data?: FreeAddACourseToTheScheduleadddropPeriod201Data;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod403 = {
+  message?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod409 = {
+  message?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod422Errors = {
+  offering_id?: string[];
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod422 = {
+  message?: string;
+  errors?: FreeAddACourseToTheScheduleadddropPeriod422Errors;
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod403 = {
+  message?: string;
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod409 = {
+  message?: string;
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod422Errors = {
+  below_min_credit_hours?: string[];
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod422 = {
+  message?: string;
+  errors?: FreeDropACourseFromTheScheduleadddropPeriod422Errors;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200DataMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200Data = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: WithdrawFromACoursewithdrawalPeriod200DataCourse;
+  instructor?: WithdrawFromACoursewithdrawalPeriod200DataInstructor;
+  meetings?: WithdrawFromACoursewithdrawalPeriod200DataMeetingsItem[];
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200 = {
+  data?: WithdrawFromACoursewithdrawalPeriod200Data;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod409 = {
   message?: string;
 };
 
@@ -10715,8 +10877,11 @@ export const useDeleteACourseOffering = <TError = DeleteACourseOffering403 | Del
  * Elective / Research Course). Each line carries the Offering's instructor, meeting
  * times, seats remaining and the course's total CH. Courses in the Curriculum with
  * no Offering this semester are absent (ADR-0017); a course that classifies for no
- * class is omitted. When no registration window is open, `semester` is null and the
- * list is empty. Gated on `courses.register_self` (the acting Student, R02).
+ * class is omitted. The list also serves the **late-add** window (ticket 07): when
+ * registration has closed but the Semester is in its late-add period, the same list is
+ * returned minus the courses already on the Student's schedule (a late-add cart only
+ * adds). When neither a registration nor a late-add window is open, `semester` is null
+ * and the list is empty. Gated on `courses.register_self` (the acting Student, R02).
  * @summary List the acting Student's eligible courses for the open Semester.
  */
 export const listTheActingStudentsEligibleCoursesForTheOpenSemester = (
@@ -10810,14 +10975,18 @@ export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData 
 
 
 /**
- * Turns the Student's cart into a Pending {@see RegistrationRequest} for the currently-
- * open Semester. Each line names an eligible Offering and a mode (Regular / Audit). The
- * whole cart is validated as a batch — every course must be eligible; the credit-hour
- * load must sit within the min/max window (the 6-hour floor is waived in the Student's
- * first semester); at most one External Elective and one Research Course; no duplicate
- * course; no time clash between chosen Offerings; and every capped Offering must have a
- * seat. An illegal cart is a 422 enumerating the offending reasons; a second Pending
- * request for the same Semester is a 409. Gated on `courses.register_self` (R02).
+ * Turns the Student's cart into a Pending {@see RegistrationRequest}. Its kind is derived
+ * from the calendar: `Initial` while the registration window is open, or `LateAdd` when
+ * that window has closed and the Semester is in its late-add period (ticket 07) — the
+ * add-only week-3 request that still flows through the advisor. Each line names an
+ * eligible Offering and a mode (Regular / Audit). The whole cart is validated as a batch
+ * — every course must be eligible; the credit-hour load must sit within the min/max
+ * window (the 6-hour floor is waived in the Student's first semester); at most one
+ * External Elective and one Research Course; no duplicate course; no time clash between
+ * chosen Offerings; and every capped Offering must have a seat. A late-add cart is
+ * additionally measured against the Student's already-approved schedule. An illegal cart
+ * is a 422 enumerating the offending reasons; a second Pending request for the same
+ * Semester is a 409. Gated on `courses.register_self` (R02).
  * @summary Submit a registration cart.
  */
 export const submitARegistrationCart = (
@@ -10985,9 +11154,17 @@ export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData
  * advisor minted, grouped by Semester (most recent first), each carrying its Course
  * Status, Enrollment Classification, registration-time credit hours, and the live
  * display facts — course, instructor, weekly meeting times — read through the Catalog/
- * Offering facades (ADR-0017). Attendance percentage and the period-gated action
- * buttons land in tickets 08/07; this ticket renders the read-only schedule. Gated on
- * `courses.register_self` (the acting Student, R02).
+ * Offering facades (ADR-0017).
+ *
+ * Each group also carries the **period-gated change context** (ticket 07, FR-REG-004),
+ * so the SPA can surface the right in-window actions while the server stays the sole
+ * authority: `current_period` (the derived phase — upcoming / registration / add_drop /
+ * late_add / withdrawal / closed), `can_free_change` (in the add/drop window *and* the
+ * Student has an approved Initial request — free add/drop is live), `can_withdraw` (in
+ * the withdrawal window), and — only when free change is live — `addable_courses`, the
+ * eligible Offerings not yet on the schedule and not External Electives (those need a
+ * request). Attendance percentage lands in ticket 08. Gated on `courses.register_self`
+ * (the acting Student, R02).
  * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
  */
 export const theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester = (
@@ -11079,6 +11256,216 @@ export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemes
 
 
 
+
+/**
+ * A direct add during the add/drop window, no advisor approval — the Advisor is notified.
+ * The Offering must be eligible for the Student and **not** an External Elective (those
+ * need a registration request, BR-24); the whole schedule is re-validated (credit-hour
+ * ceiling counting the existing load, seat capacity, time clash, the composition caps,
+ * and the derived-Retake cap of one). Available only while the Semester is in its
+ * add/drop period (else 409) and only to a Student with an approved Initial request for
+ * that Semester (else 403). Gated on `courses.register_self`.
+ * @summary Free-add a course to the schedule (add/drop period).
+ */
+export const freeAddACourseToTheScheduleadddropPeriod = (
+    freeAddACourseToTheScheduleadddropPeriodBody: FreeAddACourseToTheScheduleadddropPeriodBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<FreeAddACourseToTheScheduleadddropPeriod201>(
+      {url: `/api/v1/registration/enrollments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: freeAddACourseToTheScheduleadddropPeriodBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getFreeAddACourseToTheScheduleadddropPeriodMutationOptions = <TError = FreeAddACourseToTheScheduleadddropPeriod403 | FreeAddACourseToTheScheduleadddropPeriod409 | FreeAddACourseToTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, TError,{data: FreeAddACourseToTheScheduleadddropPeriodBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, TError,{data: FreeAddACourseToTheScheduleadddropPeriodBody}, TContext> => {
+
+const mutationKey = ['freeAddACourseToTheScheduleadddropPeriod'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, {data: FreeAddACourseToTheScheduleadddropPeriodBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  freeAddACourseToTheScheduleadddropPeriod(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FreeAddACourseToTheScheduleadddropPeriodMutationResult = NonNullable<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>>
+    export type FreeAddACourseToTheScheduleadddropPeriodMutationBody = FreeAddACourseToTheScheduleadddropPeriodBody
+    export type FreeAddACourseToTheScheduleadddropPeriodMutationError = FreeAddACourseToTheScheduleadddropPeriod403 | FreeAddACourseToTheScheduleadddropPeriod409 | FreeAddACourseToTheScheduleadddropPeriod422
+
+    /**
+ * @summary Free-add a course to the schedule (add/drop period).
+ */
+export const useFreeAddACourseToTheScheduleadddropPeriod = <TError = FreeAddACourseToTheScheduleadddropPeriod403 | FreeAddACourseToTheScheduleadddropPeriod409 | FreeAddACourseToTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, TError,{data: FreeAddACourseToTheScheduleadddropPeriodBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>,
+        TError,
+        {data: FreeAddACourseToTheScheduleadddropPeriodBody},
+        TContext
+      > => {
+      return useMutation(getFreeAddACourseToTheScheduleadddropPeriodMutationOptions(options), queryClient);
+    }
+
+/**
+ * A direct drop during the add/drop window — the Enrollment is **hard-deleted**, leaving
+ * no trace (a drop is never a Course Status). Blocked when it would take the Student's
+ * credit-hour load below the floor, unless the first-semester exception applies; the
+ * Advisor is notified. Available only while the Semester is in its add/drop period (else
+ * 409) and only to a Student with an approved Initial request for that Semester (else
+ * 403); the Enrollment must be the acting Student's own (else 404). Gated on
+ * `courses.register_self`.
+ * @summary Free-drop a course from the schedule (add/drop period).
+ */
+export const freeDropACourseFromTheScheduleadddropPeriod = (
+    enrollmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<string>(
+      {url: `/api/v1/registration/enrollments/${enrollmentId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getFreeDropACourseFromTheScheduleadddropPeriodMutationOptions = <TError = FreeDropACourseFromTheScheduleadddropPeriod403 | FreeDropACourseFromTheScheduleadddropPeriod409 | FreeDropACourseFromTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, TError,{enrollmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, TError,{enrollmentId: number}, TContext> => {
+
+const mutationKey = ['freeDropACourseFromTheScheduleadddropPeriod'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, {enrollmentId: number}> = (props) => {
+          const {enrollmentId} = props ?? {};
+
+          return  freeDropACourseFromTheScheduleadddropPeriod(enrollmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FreeDropACourseFromTheScheduleadddropPeriodMutationResult = NonNullable<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>>
+
+    export type FreeDropACourseFromTheScheduleadddropPeriodMutationError = FreeDropACourseFromTheScheduleadddropPeriod403 | FreeDropACourseFromTheScheduleadddropPeriod409 | FreeDropACourseFromTheScheduleadddropPeriod422
+
+    /**
+ * @summary Free-drop a course from the schedule (add/drop period).
+ */
+export const useFreeDropACourseFromTheScheduleadddropPeriod = <TError = FreeDropACourseFromTheScheduleadddropPeriod403 | FreeDropACourseFromTheScheduleadddropPeriod409 | FreeDropACourseFromTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, TError,{enrollmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>,
+        TError,
+        {enrollmentId: number},
+        TContext
+      > => {
+      return useMutation(getFreeDropACourseFromTheScheduleadddropPeriodMutationOptions(options), queryClient);
+    }
+
+/**
+ * Self-serve withdrawal until the deadline: the Enrollment's Course Status becomes **W**
+ * — permanent and transcript-visible — with **no** credit-hour floor check (a Student is
+ * never trapped in a course to preserve a number), the Advisor notified. Available only
+ * while the Semester is in its withdrawal period (else 409); the Enrollment must be the
+ * acting Student's own and still active (else 404 / 409). Gated on `courses.register_self`.
+ * @summary Withdraw from a course (withdrawal period).
+ */
+export const withdrawFromACoursewithdrawalPeriod = (
+    enrollmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<WithdrawFromACoursewithdrawalPeriod200>(
+      {url: `/api/v1/registration/enrollments/${enrollmentId}/withdrawal`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getWithdrawFromACoursewithdrawalPeriodMutationOptions = <TError = WithdrawFromACoursewithdrawalPeriod409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, TError,{enrollmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, TError,{enrollmentId: number}, TContext> => {
+
+const mutationKey = ['withdrawFromACoursewithdrawalPeriod'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, {enrollmentId: number}> = (props) => {
+          const {enrollmentId} = props ?? {};
+
+          return  withdrawFromACoursewithdrawalPeriod(enrollmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type WithdrawFromACoursewithdrawalPeriodMutationResult = NonNullable<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>>
+
+    export type WithdrawFromACoursewithdrawalPeriodMutationError = WithdrawFromACoursewithdrawalPeriod409
+
+    /**
+ * @summary Withdraw from a course (withdrawal period).
+ */
+export const useWithdrawFromACoursewithdrawalPeriod = <TError = WithdrawFromACoursewithdrawalPeriod409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, TError,{enrollmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>,
+        TError,
+        {enrollmentId: number},
+        TContext
+      > => {
+      return useMutation(getWithdrawFromACoursewithdrawalPeriodMutationOptions(options), queryClient);
+    }
 
 /**
  * The Pending registration requests awaiting the signed-in reviewer, oldest-first — an

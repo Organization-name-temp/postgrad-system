@@ -97,6 +97,23 @@ class RegistrationRequest extends Model
     }
 
     /**
+     * Whether the Student has an **approved Initial** request for the Semester — the gate
+     * for free add/drop (ticket 07, FR-REG-004): the direct add/drop actions are available
+     * only after the Advisor has approved the Student's initial registration, so the
+     * Advisor is never bypassed on the first schedule. Read by both the schedule view and
+     * the add/drop actions, so the rule lives once.
+     */
+    public static function hasApprovedInitialFor(int $studentId, int $semesterId): bool
+    {
+        return static::query()
+            ->where('student_id', $studentId)
+            ->where('semester_id', $semesterId)
+            ->where('kind', RegistrationKind::Initial)
+            ->where('status', RegistrationStatus::Approved)
+            ->exists();
+    }
+
+    /**
      * Record the Advisor's decision on the request itself — the terminal status (Approved
      * when ≥1 line was kept, Rejected when all were trimmed), the optional note, and who
      * decided it when. The per-line outcomes and the Enrollment mint are driven by the

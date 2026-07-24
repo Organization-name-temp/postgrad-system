@@ -40,6 +40,7 @@ export const en = {
       schedule: 'My schedule',
       advising: 'Registration requests',
       registerForStudent: 'Register for a student',
+      studentSchedules: 'Student schedules',
       myOfferings: 'My teaching',
       assignments: 'Faculty deans',
       sections: {
@@ -1127,6 +1128,12 @@ export const en = {
       submitted: 'The registration for {{student}} was submitted to their advisor for review.',
       enrolled:
         '{{student}} was enrolled immediately — you are their advisor, so no further approval is needed.',
+    },
+    studentSchedule: {
+      title: 'Student schedules',
+      intro:
+        'Look up a student to review their schedule and attendance. Advisors see their advisees; Student Affairs and administrators can view any student.',
+      empty: 'This student has no enrollments yet.',
     },
   },
 } as const

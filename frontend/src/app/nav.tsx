@@ -19,6 +19,7 @@ import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek'
 import RuleIcon from '@mui/icons-material/Rule'
 import CoPresentIcon from '@mui/icons-material/CoPresent'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
+import PersonSearchIcon from '@mui/icons-material/PersonSearch'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -189,6 +190,17 @@ export const navItems: NavItem[] = [
     to: '/registration/on-behalf',
     icon: <PersonAddAlt1Icon />,
     permission: PERMISSION.registerCoursesForStudent,
+    section: 'enrollment',
+  },
+  // Student-schedule oversight (ticket 10): look up a student and view their schedule +
+  // attendance read-only. A capability item on registration.approve — Advisors see their
+  // advisees (an incidental start on user story 51), Student Affairs any student; admins
+  // inherit it for oversight (ADR-0015). The server re-enforces the advisee scope.
+  {
+    key: 'studentSchedules',
+    to: '/advising/schedule',
+    icon: <PersonSearchIcon />,
+    permission: PERMISSION.approveCourseRegistration,
     section: 'enrollment',
   },
   // The Instructor's teaching + attendance register (ticket 08). A **persona** item on the

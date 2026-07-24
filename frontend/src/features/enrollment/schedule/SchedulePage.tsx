@@ -37,6 +37,7 @@ import type { EligibleCourse } from '../registration/classification'
 import { courseStatusChip } from '../courseStatusChip'
 import { MeetingTimes } from '../MeetingTimes'
 import { AddCoursePanel } from './AddCoursePanel'
+import { AttendanceCell } from './AttendanceCell'
 
 /** A per-enrollment action awaiting confirmation. */
 type PendingAction = { enrollment: ScheduleEnrollment; kind: 'drop' | 'withdraw' }
@@ -266,36 +267,6 @@ function EnrollmentRow({
         </TableCell>
       )}
     </TableRow>
-  )
-}
-
-/**
- * A Student's derived attendance for one enrollment: the percentage plus an at-risk chip
- * when an Audit enrollment has fallen below the audit minimum (ticket 08). "No sessions
- * recorded yet" renders as a dash — the server sends `recorded: 0` for that, never null.
- */
-function AttendanceCell({ attendance }: { attendance: ScheduleEnrollment['attendance'] }) {
-  const { t } = useTranslation('enrollment')
-  const recorded = attendance?.recorded ?? 0
-  const atRisk = attendance?.at_risk ?? false
-
-  if (recorded === 0) {
-    return (
-      <Typography component="span" variant="body2" color="text.secondary">
-        {t('schedule.attendance.none')}
-      </Typography>
-    )
-  }
-
-  return (
-    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-      <Typography component="span" variant="body2">
-        {t('schedule.attendance.value', { percent: attendance?.percentage ?? 0 })}
-      </Typography>
-      {atRisk && (
-        <StatusChip tone="warning" variant="filled-soft" label={t('schedule.attendance.atRisk')} />
-      )}
-    </Stack>
   )
 }
 

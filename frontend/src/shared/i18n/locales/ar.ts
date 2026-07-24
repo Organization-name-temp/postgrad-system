@@ -39,6 +39,7 @@ export const ar = {
       schedule: 'جدولي',
       advising: 'طلبات التسجيل',
       registerForStudent: 'التسجيل نيابةً عن طالب',
+      studentSchedules: 'جداول الطلاب',
       myOfferings: 'تدريسي',
       assignments: 'عمداء الكليات',
       sections: {
@@ -1103,6 +1104,12 @@ export const ar = {
       submit: 'إرسال التسجيل',
       submitted: 'تم إرسال تسجيل {{student}} إلى مرشده الأكاديمي للمراجعة.',
       enrolled: 'تم تسجيل {{student}} فورًا — أنت مرشده الأكاديمي، فلا حاجة لموافقة إضافية.',
+    },
+    studentSchedule: {
+      title: 'جداول الطلاب',
+      intro:
+        'ابحث عن طالب لمراجعة جدوله وحضوره. يرى المرشدون طلابهم؛ ويستطيع شؤون الطلاب والمسؤولون عرض أي طالب.',
+      empty: 'لا يوجد لهذا الطالب أي تسجيلات بعد.',
     },
   },
 } as const

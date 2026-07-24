@@ -3344,15 +3344,17 @@ export const RecordTheAdvisorsLineItemDecisionResponse = zod.object({
 
 
 /**
- * A read-only view of a Student's minted Enrollments grouped by Semester — the advisor's
- * "monitor an advisee" surface (user story 51) and the administrator's cross-scope
- * oversight read (ADR-0015). Same shape as the Student's own My Schedule — each Enrollment
- * with its Course Status, classification, credit hours, meeting times and derived
- * attendance — but with the period-gated action affordances suppressed
- * (`can_free_change`/`can_withdraw` are always false, `addable_courses` always empty): an
- * overseer views, never acts, through this read. An **Advisor** may read only their own
- * advisee (else 403); **Student Affairs** and an **administrator** read any student,
- * unscoped and un-audited ({@see ScopesToAdvisees}). Gated on `registration.approve`.
+ * The administrative-override read of a specific Student's schedule (ticket 10, ADR-0015):
+ * the student-self "My Schedule" surface is bound to `actingStudent`, so an administrator
+ * — who holds no Student record — needs an id-addressable read to oversee "any student's
+ * schedule" unscoped. It reuses the same builder and wire shape as My Schedule — each
+ * Enrollment with its Course Status, classification, credit hours, meeting times and
+ * derived attendance — but with the period-gated action affordances suppressed
+ * (`can_free_change`/`can_withdraw` always false, `addable_courses` always empty): an
+ * overseer views, never acts. The advisee-scope guard applies, so an **Advisor** reading
+ * their own advisee is naturally permitted (an incidental start on user story 51 — the
+ * full advisor monitoring UI is its own work); **Student Affairs** and an **administrator**
+ * read any student. Unscoped reads are un-audited. Gated on `registration.approve`.
  * @summary View any student's schedule (oversight).
  */
 export const ViewAnyStudentsScheduleoversightParams = zod.object({

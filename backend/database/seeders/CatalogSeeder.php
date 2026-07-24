@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Catalog\Internal\Enums\ResearchType;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
@@ -84,7 +85,9 @@ class CatalogSeeder extends Seeder
         $this->place($msc, CourseCategory::ResearchElective, [
             $this->course('CSE531', 'Machine Learning', 'تعلّم الآلة', CourseLevel::Master, 3, department: $ce),
             $this->course('CSE532', 'Distributed Systems', 'الأنظمة الموزّعة', CourseLevel::Master, 3, department: $ce),
-            $this->course('CSE571', 'Project-Based Learning', 'التعلّم القائم على المشاريع', CourseLevel::Advanced, 3, department: $ce),
+            // The level-700 Research Course carries its Research Type (BR-25) so the Phase-3
+            // registration classifier type-matches it to the MSc's Research Course slot (PBL).
+            $this->course('CSE571', 'Project-Based Learning', 'التعلّم القائم على المشاريع', CourseLevel::Advanced, 3, department: $ce, researchType: ResearchType::Pbl),
         ]);
 
         // PhD — Core/Elective at level 600, the research course a 700-level Seminar.
@@ -97,7 +100,8 @@ class CatalogSeeder extends Seeder
         $this->place($phd, CourseCategory::ResearchElective, [
             $this->course('CSE631', 'Deep Learning', 'التعلّم العميق', CourseLevel::Doctoral, 3, department: $ce),
             $this->course('CSE632', 'Cloud Computing', 'الحوسبة السحابية', CourseLevel::Doctoral, 3, department: $ce),
-            $this->course('CSE671', 'Doctoral Seminar', 'الحلقة النقاشية للدكتوراه', CourseLevel::Advanced, 3, department: $ce),
+            // The PhD's level-700 Research Course is a Seminar (BR-25, the PhD match).
+            $this->course('CSE671', 'Doctoral Seminar', 'الحلقة النقاشية للدكتوراه', CourseLevel::Advanced, 3, department: $ce, researchType: ResearchType::Seminar),
         ]);
     }
 
@@ -145,16 +149,19 @@ class CatalogSeeder extends Seeder
      * A Course, keyed by its unique code. Credit hours default to a pure lecture
      * breakdown (tutorial/lab zero) so the L + T + Lab = Total invariant always holds;
      * omit $department for a university-wide Course (the shared Preparatory ones).
+     * A level-700 Research Course passes its {@see ResearchType} (BR-25); the type is
+     * reconciled even on an already-seeded row so re-running an older dev DB backfills it.
      */
-    private function course(string $code, string $nameEn, string $nameAr, CourseLevel $level, int $lecture, int $tutorial = 0, int $lab = 0, ?Department $department = null): Course
+    private function course(string $code, string $nameEn, string $nameAr, CourseLevel $level, int $lecture, int $tutorial = 0, int $lab = 0, ?Department $department = null, ?ResearchType $researchType = null): Course
     {
-        return Course::firstOrCreate(
+        $course = Course::firstOrCreate(
             ['code' => $code],
             [
                 'department_id' => $department?->getKey(),
                 'name_en' => $nameEn,
                 'name_ar' => $nameAr,
                 'level' => $level,
+                'research_type' => $researchType,
                 'lecture_ch' => $lecture,
                 'tutorial_ch' => $tutorial,
                 'lab_ch' => $lab,
@@ -162,6 +169,14 @@ class CatalogSeeder extends Seeder
                 'is_active' => true,
             ],
         );
+
+        // Reconcile the Research Type on a row seeded before ticket 02 added the column,
+        // so the classifier can type-match the Research Course without a fresh migrate.
+        if ($course->research_type !== $researchType) {
+            $course->update(['research_type' => $researchType]);
+        }
+
+        return $course;
     }
 
     /**

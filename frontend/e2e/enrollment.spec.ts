@@ -73,15 +73,16 @@ test('headline: an admin, a student, their advisor and an instructor run the enr
   await login(page, ADMIN)
   await page.getByRole('link', { name: 'Semesters' }).first().click()
   await expect(page).toHaveURL(/\/admin\/semesters$/)
-  await expectNoSeriousA11y(page)
 
-  // Open the Fall 2026 semester's offerings (its registration window is open now).
-  await page
-    .getByRole('row', { name: /Fall 2026/ })
-    .getByRole('link', { name: 'Offerings' })
-    .click()
+  // Open the Fall 2026 semester's offerings (its registration window is open now). Wait for
+  // the seeded row first, so the axe scan runs against the loaded table, not a loading spinner.
+  const fallRow = page.getByRole('row', { name: /Fall 2026/ })
+  await expect(fallRow).toBeVisible()
+  await expectNoSeriousA11y(page)
+  await fallRow.getByRole('link', { name: 'Offerings' }).click()
   await expect(page).toHaveURL(/\/admin\/semesters\/\d+\/offerings$/)
   await expect(page.getByRole('heading', { name: /^Offerings — / })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'New offering' })).toBeVisible()
   await expectNoSeriousA11y(page)
 
   // Create a Fall offering for CSE532 — the one anchor course the seeder deliberately
@@ -131,15 +132,18 @@ test('headline: an admin, a student, their advisor and an instructor run the enr
   await login(page, ADVISOR)
   await page.getByRole('link', { name: 'Registration requests' }).first().click()
   await expect(page).toHaveURL(/\/advising$/)
-  await expectNoSeriousA11y(page)
 
-  // Open the Student's request (the queue also holds the seeded Pending one).
-  await page
-    .getByRole('row', { name: /Layla Samir/ })
-    .getByRole('link', { name: 'Review' })
-    .click()
+  // Open the Student's request (the queue also holds the seeded Pending one). Wait for the
+  // row first, so axe scans the loaded queue rather than its loading spinner.
+  const reviewRow = page.getByRole('row', { name: /Layla Samir/ })
+  await expect(reviewRow).toBeVisible()
+  await expectNoSeriousA11y(page)
+  await reviewRow.getByRole('link', { name: 'Review' }).click()
   await expect(page).toHaveURL(/\/advising\/\d+$/)
   await expect(page.getByRole('heading', { name: 'Review registration' })).toBeVisible()
+  // The <h1> renders before the request loads; wait for the decision action (which appears
+  // only once the loaded request resolves) so axe scans the settled page, not a spinner.
+  await expect(page.getByRole('button', { name: 'Record decision' })).toBeVisible()
   await expectNoSeriousA11y(page)
 
   // Trim the internal-elective line (CSE531) to Reject; the two core lines stay approved
@@ -179,23 +183,25 @@ test('headline: an admin, a student, their advisor and an instructor run the enr
   await login(page, INSTRUCTOR)
   await page.getByRole('link', { name: 'My teaching' }).first().click()
   await expect(page).toHaveURL(/\/offerings\/mine$/)
-  await expectNoSeriousA11y(page)
 
-  // Open the register of the Spring offering the Student audits (CSE512, taught by r04).
-  await page
-    .getByRole('row', { name: /CSE512/ })
-    .getByRole('link', { name: 'Attendance register' })
-    .click()
+  // Open the register of the Spring offering the Student audits (CSE512, taught by r04). Wait
+  // for the row first, so axe scans the loaded teaching list.
+  const teachingRow = page.getByRole('row', { name: /CSE512/ })
+  await expect(teachingRow).toBeVisible()
+  await expectNoSeriousA11y(page)
+  await teachingRow.getByRole('link', { name: 'Attendance register' }).click()
   await expect(page).toHaveURL(/\/offerings\/\d+\/register$/)
   await expect(page.getByRole('heading', { name: 'Attendance register' })).toBeVisible()
+
+  // Mark the Student absent on the first two sessions (staged), then cancel a later session
+  // (a cancelled session counts in no denominator), then save the register. Wait for the
+  // grid's toggles before scanning, so axe sees the loaded register rather than a spinner.
+  const absentToggles = page.getByRole('button', { name: /^Mark .+ absent on / })
+  await expect(absentToggles.first()).toBeVisible()
   await expectNoSeriousA11y(page)
 
   // The audited Student starts with no attendance recorded (no chip yet).
   await expect(page.getByText('At risk')).toHaveCount(0)
-
-  // Mark the Student absent on the first two sessions (staged), then cancel a later
-  // session (a cancelled session counts in no denominator), then save the register.
-  const absentToggles = page.getByRole('button', { name: /^Mark .+ absent on / })
   await absentToggles.nth(0).click()
   await absentToggles.nth(1).click()
 

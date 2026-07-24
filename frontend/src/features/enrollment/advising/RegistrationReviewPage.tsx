@@ -264,9 +264,19 @@ function LineRow({
             size="small"
             value={choice}
             onChange={(event) => onChange(event.target.value as LineChoice)}
-            aria-label={t(choice === 'approved' ? 'review.approveLine' : 'review.rejectLine', {
-              course: course?.code ?? '',
-            })}
+            // The accessible name must land on the select's combobox, not the TextField root
+            // (a bare `aria-label` on the root FormControl is a prohibited-attr + leaves the
+            // combobox unnamed — WCAG 4.1.2). `slotProps.htmlInput` forwards it to the input.
+            slotProps={{
+              htmlInput: {
+                'aria-label': t(
+                  choice === 'approved' ? 'review.approveLine' : 'review.rejectLine',
+                  {
+                    course: course?.code ?? '',
+                  },
+                ),
+              },
+            }}
             sx={{ minWidth: 120 }}
           >
             <MenuItem value="approved">{t('review.lineDecision.approved')}</MenuItem>

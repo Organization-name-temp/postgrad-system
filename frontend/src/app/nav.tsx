@@ -193,13 +193,15 @@ export const navItems: NavItem[] = [
   },
   // The Instructor's teaching + attendance register (ticket 08). A **persona** item on the
   // Instructor role (R04) — attendance has no permission (authorisation is by assignment),
-  // so it gates on the role, not a permission. Admins reach it for oversight in ticket 10.
+  // so it gates on the role, not a permission. Administrators (R09/R10) reach it too for
+  // oversight: the register unscopes for them server-side and audits their writes (ADR-0015,
+  // ticket 10) — the myInterviews precedent for a role-gated admin oversight surface.
   {
     key: 'myOfferings',
     to: '/offerings/mine',
     icon: <CoPresentIcon />,
     section: 'enrollment',
-    roles: [ROLE.instructor],
+    roles: [ROLE.instructor, ...ADMIN_ROLES],
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

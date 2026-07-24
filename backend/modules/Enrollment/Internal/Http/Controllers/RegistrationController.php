@@ -309,6 +309,71 @@ class RegistrationController
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
+        return response()->json([
+            'data' => $this->scheduleGroups($student, withActions: true, calendar: $calendar, courses: $courses, directory: $directory, eligibility: $eligibility),
+        ]);
+    }
+
+    /**
+     * View any student's schedule (oversight).
+     *
+     * The administrative-override read of a specific Student's schedule (ticket 10, ADR-0015):
+     * the student-self "My Schedule" surface is bound to `actingStudent`, so an administrator
+     * — who holds no Student record — needs an id-addressable read to oversee "any student's
+     * schedule" unscoped. It reuses the same builder and wire shape as My Schedule — each
+     * Enrollment with its Course Status, classification, credit hours, meeting times and
+     * derived attendance — but with the period-gated action affordances suppressed
+     * (`can_free_change`/`can_withdraw` always false, `addable_courses` always empty): an
+     * overseer views, never acts. The advisee-scope guard applies, so an **Advisor** reading
+     * their own advisee is naturally permitted (an incidental start on user story 51 — the
+     * full advisor monitoring UI is its own work); **Student Affairs** and an **administrator**
+     * read any student. Unscoped reads are un-audited. Gated on `registration.approve`.
+     *
+     * @urlParam student_id integer required The target Student anchor's id. Example: 5
+     *
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": false, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
+     * @response 403 scenario="not this advisor's advisee" {"message": "This action is unauthorized."}
+     * @response 404 scenario="no such student" {"message": "No such student."}
+     */
+    public function studentSchedule(
+        Request $request,
+        StudentDirectory $students,
+        Directory $directory,
+        AcademicCalendar $calendar,
+        CourseCatalog $courses,
+        EligibilityResolver $eligibility,
+    ): JsonResponse {
+        $userId = (int) $request->user()?->getAuthIdentifier();
+
+        $student = $students->findByStudentId((int) $request->route('student_id'));
+        abort_if($student === null, 404, 'No such student.');
+
+        // An Advisor may view only their own advisee; Student Affairs / an administrator any.
+        $this->authorizeAdviseeScope($userId, $student->studentId, $directory, $students);
+
+        return response()->json([
+            'data' => $this->scheduleGroups($student, withActions: false, calendar: $calendar, courses: $courses, directory: $directory, eligibility: $eligibility),
+        ]);
+    }
+
+    /**
+     * The Student's minted Enrollments grouped by Semester (newest first by start date), each
+     * carrying its derived attendance (ticket 08). When `$withActions` is true (the Student's
+     * own My Schedule) each group also carries the period-gated change context so the SPA can
+     * surface in-window actions; for an oversight read (`$withActions` false) those
+     * affordances are suppressed — an overseer views, never acts — while `current_period`
+     * stays informative. The wire shape is identical either way (Orval-stable).
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function scheduleGroups(
+        StudentSummary $student,
+        bool $withActions,
+        AcademicCalendar $calendar,
+        CourseCatalog $courses,
+        Directory $directory,
+        EligibilityResolver $eligibility,
+    ): array {
         $enrollments = Enrollment::query()
             ->where('student_id', $student->studentId)
             ->with('offering.meetings')
@@ -324,17 +389,18 @@ class RegistrationController
 
         // Group by the Offering's Semester; render each group newest-first by start date,
         // enriched with the period-gated change context so the SPA can show in-window actions.
-        $groups = $enrollments
+        return $enrollments
             ->filter(fn (Enrollment $enrollment): bool => $enrollment->offering !== null)
             ->groupBy(fn (Enrollment $enrollment): int => (int) $enrollment->offering->semester_id)
-            ->map(function (Collection $group, int $semesterId) use ($calendar, $student, $courses, $directory, $eligibility): ?array {
+            ->map(function (Collection $group, int $semesterId) use ($calendar, $student, $courses, $directory, $eligibility, $withActions): ?array {
                 $semester = $calendar->find($semesterId);
                 if ($semester === null) {
                     return null; // a dangling Semester reference — omit the group
                 }
 
                 $now = now();
-                $canFreeChange = $semester->isInAddDropPeriod($now)
+                $canFreeChange = $withActions
+                    && $semester->isInAddDropPeriod($now)
                     && RegistrationRequest::hasApprovedInitialFor($student->studentId, $semester->id);
 
                 return [
@@ -342,7 +408,7 @@ class RegistrationController
                     'starts_at' => $semester->startsAt,
                     'current_period' => $semester->currentPeriod($now),
                     'can_free_change' => $canFreeChange,
-                    'can_withdraw' => $semester->isInWithdrawalPeriod($now),
+                    'can_withdraw' => $withActions && $semester->isInWithdrawalPeriod($now),
                     'addable_courses' => $canFreeChange
                         ? $this->addableCourses($student, $semester, $courses, $directory, $eligibility)
                         : [],
@@ -359,9 +425,8 @@ class RegistrationController
                 'addable_courses' => $group['addable_courses'],
                 'enrollments' => $group['enrollments'],
             ])
-            ->values();
-
-        return response()->json(['data' => $groups->all()]);
+            ->values()
+            ->all();
     }
 
     /**

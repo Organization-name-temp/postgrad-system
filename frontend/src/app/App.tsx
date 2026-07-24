@@ -35,7 +35,7 @@ import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPa
 import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
-import { ROLE } from '../shared/access/roles'
+import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
 
 // Dev-only design-system gallery. Gating the lazy import on `import.meta.env.DEV`
 // keeps both the route AND its chunk out of production builds.
@@ -80,9 +80,11 @@ export function App() {
                   <Route path="/registration" element={<RegistrationPage />} />
                   <Route path="/schedule" element={<SchedulePage />} />
                 </Route>
-                {/* Persona-guarded: only Instructors (R04) reach My Teaching + the register;
-                    attendance is authorised by assignment server-side (ticket 08). */}
-                <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
+                {/* Persona-guarded: Instructors (R04) reach My Teaching + the register;
+                    attendance is authorised by assignment server-side (ticket 08).
+                    Administrators (R09/R10) reach them for oversight — the register unscopes
+                    and audits their writes server-side (ADR-0015, ticket 10). */}
+                <Route element={<RequireAuth roles={[ROLE.instructor, ...ADMIN_ROLES]} />}>
                   <Route path="/offerings/mine" element={<MyOfferingsPage />} />
                   <Route
                     path="/offerings/:offeringId/register"

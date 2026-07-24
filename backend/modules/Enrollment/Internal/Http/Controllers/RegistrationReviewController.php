@@ -16,6 +16,7 @@ use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\DescribesStudentContext;
+use Modules\Enrollment\Internal\Http\Concerns\IdentifiesAdministrator;
 use Modules\Enrollment\Internal\Http\Concerns\MintsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
 use Modules\Enrollment\Internal\Http\Concerns\ReadsExistingEnrollments;
@@ -33,6 +34,7 @@ use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\MintPlanEntry;
+use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -47,7 +49,9 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * (Advisor R03 / Student Affairs R05). An Advisor sees a **live-scoped** queue of their
  * advisees' requests and decides one **line by line** — approving or trimming each line
  * with a note, never adding; Student Affairs (and administrators) review **unscoped** to
- * unblock any request ({@see ScopesToAdvisees}).
+ * unblock any request ({@see ScopesToAdvisees}). An administrator's decision is one an
+ * advisee scope would otherwise forbid, so it is attributed to them in the Audit Log
+ * (ADR-0015); a real Advisor's own decision is not.
  *
  * Approving **re-validates** the approved subset at decision time — the same batch rules the
  * cart enforced ({@see CartValidator}) plus the checks that need the Student's record: the
@@ -62,6 +66,7 @@ class RegistrationReviewController
 {
     use CountsEnrollments;
     use DescribesStudentContext;
+    use IdentifiesAdministrator;
     use MintsEnrollments;
     use NotifiesRegistration;
     use ReadsExistingEnrollments;
@@ -197,6 +202,11 @@ class RegistrationReviewController
      * (else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on
      * `registration.approve`.
      *
+     * A System/Super Administrator (R09/R10) may decide **any** advisor's advisee's request
+     * (the advisee-scope override, ADR-0015); that decision is attributed to the admin in the
+     * Audit Log, so an approval or rejection authored by someone other than the Student's
+     * Advisor is accountable. The real Advisor deciding their own advisee stays un-audited.
+     *
      * @urlParam registration_id integer required The registration request's id. Example: 1
      *
      * @bodyParam note string An optional note for the Student. Example: Trimmed one clashing course.
@@ -219,11 +229,18 @@ class RegistrationReviewController
         CourseCatalog $courses,
         EligibilityResolver $eligibility,
         Notifier $notifier,
+        AuditLogger $auditLogger,
     ): JsonResponse {
         $userId = (int) $request->user()?->getAuthIdentifier();
 
         // Scope before state: an Advisor may decide only their own advisee's request.
         $this->authorizeAdviseeScope($userId, (int) $registration->student_id, $directory, $students);
+
+        // Whether the acting user holds the administrative override at all (ADR-0015); the
+        // audit decision below narrows this to the case where they actually reached past the
+        // advisee scope (an admin who is genuinely this student's Advisor is legitimately
+        // scoped, like the assigned instructor in attendance, and is not audited).
+        $isAdmin = $this->actingAsAdministrator($request, $directory);
 
         if (! $registration->isPending()) {
             throw new ConflictHttpException('This registration request has already been decided.');
@@ -244,6 +261,11 @@ class RegistrationReviewController
         $student = $students->findByStudentId((int) $registration->student_id);
         abort_if($student === null, 404);
 
+        // The write is an administrative override — and so audited — only when an admin decides
+        // a request whose Student is not their own advisee. The Student's real Advisor (admin
+        // or not) is the legitimately-scoped party and stays un-audited.
+        $decidedViaOverride = $isAdmin && (int) $student->advisorId !== $userId;
+
         $approvedLines = $registration->lines->filter(
             fn (RegistrationRequestLine $line): bool => $decisions[$line->getKey()] === LineDecision::Approved,
         )->values();
@@ -251,6 +273,7 @@ class RegistrationReviewController
         // All rejected — no mint, request Rejected.
         if ($approvedLines->isEmpty()) {
             $this->persistDecision($registration, $decisions, RegistrationStatus::Rejected, $userId, $note, mintPlan: []);
+            $this->recordAdminDecision($decidedViaOverride, $auditLogger, $registration, $userId, RegistrationStatus::Rejected, approvedCount: 0);
             $this->afterDecision($notifier, $registration, $student, RegistrationStatus::Rejected, approvedCount: 0, rejectedCount: $registration->lines->count());
 
             return $this->decidedResponse($registration, $student, $courses, $directory, $eligibility);
@@ -278,9 +301,42 @@ class RegistrationReviewController
         }
 
         $this->persistDecision($registration, $decisions, RegistrationStatus::Approved, $userId, $note, $mintPlan);
+        $this->recordAdminDecision($decidedViaOverride, $auditLogger, $registration, $userId, RegistrationStatus::Approved, approvedCount: count($mintPlan));
         $this->afterDecision($notifier, $registration, $student, RegistrationStatus::Approved, approvedCount: count($mintPlan), rejectedCount: $registration->lines->count() - count($mintPlan));
 
         return $this->decidedResponse($registration, $student, $courses, $directory, $eligibility);
+    }
+
+    /**
+     * Attribute an administrative override to the Audit Log (ADR-0015): when an admin decides
+     * a request past the advisee scope, record who decided it, on which student's request, and
+     * the outcome — so a decision authored by someone other than the Student's Advisor is
+     * accountable. A no-op unless the decision was actually made via the override — the
+     * legitimately-scoped Advisor (their own advisee) is never audited.
+     */
+    private function recordAdminDecision(
+        bool $viaAdminOverride,
+        AuditLogger $auditLogger,
+        RegistrationRequest $registration,
+        int $adminUserId,
+        RegistrationStatus $outcome,
+        int $approvedCount,
+    ): void {
+        if (! $viaAdminOverride) {
+            return;
+        }
+
+        $auditLogger->record(
+            action: 'registration.decided_by_admin',
+            actorUserId: $adminUserId,
+            metadata: [
+                'student_id' => (int) $registration->student_id,
+                'outcome' => $outcome->value,
+                'approved_count' => $approvedCount,
+            ],
+            subjectType: 'registration_request',
+            subjectId: (string) $registration->getKey(),
+        );
     }
 
     /**

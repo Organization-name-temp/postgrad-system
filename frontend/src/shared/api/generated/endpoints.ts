@@ -3696,6 +3696,121 @@ export type RecordTheAdvisorsLineItemDecision422 = {
 };
 };
 
+export type ViewAnyStudentsScheduleoversight200DataItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemCourse;
+  instructor?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemInstructor;
+  meetings?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemMeetingsItem[];
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItem = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemCourse;
+  instructor?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemInstructor;
+  meetings?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemMeetingsItem[];
+  attendance?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemAttendance;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItem = {
+  semester?: ViewAnyStudentsScheduleoversight200DataItemSemester;
+  current_period?: string;
+  can_free_change?: boolean;
+  can_withdraw?: boolean;
+  addable_courses?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItem[];
+  enrollments?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItem[];
+};
+
+export type ViewAnyStudentsScheduleoversight200 = {
+  data?: ViewAnyStudentsScheduleoversight200DataItem[];
+};
+
+export type ViewAnyStudentsScheduleoversight403 = {
+  message?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight404 = {
+  message?: string;
+};
+
 export type TheSignedInInstructorsOfferingsMyOfferings200DataItemSemester = {
   id?: number;
   term?: string;
@@ -12342,6 +12457,11 @@ export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<ty
  * the request is Approved; all rejected ⇒ Rejected. The request must still be Pending
  * (else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on
  * `registration.approve`.
+ *
+ * A System/Super Administrator (R09/R10) may decide **any** advisor's advisee's request
+ * (the advisee-scope override, ADR-0015); that decision is attributed to the admin in the
+ * Audit Log, so an approval or rejection authored by someone other than the Student's
+ * Advisor is accountable. The real Advisor deciding their own advisee stays un-audited.
  * @summary Record the Advisor's line-item decision.
  */
 export const recordTheAdvisorsLineItemDecision = (
@@ -12408,11 +12528,115 @@ export const useRecordTheAdvisorsLineItemDecision = <TError = RecordTheAdvisorsL
     }
 
 /**
+ * A read-only view of a Student's minted Enrollments grouped by Semester — the advisor's
+ * "monitor an advisee" surface (user story 51) and the administrator's cross-scope
+ * oversight read (ADR-0015). Same shape as the Student's own My Schedule — each Enrollment
+ * with its Course Status, classification, credit hours, meeting times and derived
+ * attendance — but with the period-gated action affordances suppressed
+ * (`can_free_change`/`can_withdraw` are always false, `addable_courses` always empty): an
+ * overseer views, never acts, through this read. An **Advisor** may read only their own
+ * advisee (else 403); **Student Affairs** and an **administrator** read any student,
+ * unscoped and un-audited ({@see ScopesToAdvisees}). Gated on `registration.approve`.
+ * @summary View any student's schedule (oversight).
+ */
+export const viewAnyStudentsScheduleoversight = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ViewAnyStudentsScheduleoversight200>(
+      {url: `/api/v1/registration/students/${studentId}/schedule`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getViewAnyStudentsScheduleoversightQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/registration/students/${studentId}/schedule`
+    ] as const;
+    }
+
+
+export const getViewAnyStudentsScheduleoversightQueryOptions = <TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getViewAnyStudentsScheduleoversightQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>> = ({ signal }) => viewAnyStudentsScheduleoversight(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ViewAnyStudentsScheduleoversightQueryResult = NonNullable<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>>
+export type ViewAnyStudentsScheduleoversightQueryError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404
+
+
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>,
+          TError,
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>,
+          TError,
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary View any student's schedule (oversight).
+ */
+
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getViewAnyStudentsScheduleoversightQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
  * Every Course Offering the acting user teaches, across all Semesters — the Phase-4
  * grading link, born here. Each carries its Semester, resolved Course, weekly meeting
  * times, and its active roster size, so the instructor sees their teaching load at a
  * glance. A user who teaches nothing gets an empty list (no permission gate — teaching
- * is the scope). Requires only authentication.
+ * is the scope). An administrator (R09/R10) sees **every** offering instead (ADR-0015), so
+ * they can reach any offering's register for oversight through this same screen. Requires
+ * only authentication.
  * @summary The signed-in Instructor's offerings ("My Offerings").
  */
 export const theSignedInInstructorsOfferingsMyOfferings = (
@@ -12511,8 +12735,9 @@ export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<Re
  * re-opening never duplicates), and its roster of **active** Enrollments (withdrawn
  * students keep their history but leave the roster). Each roster row carries the student's
  * identity, their per-session marks, and their derived attendance percentage with the
- * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor (else
- * 403).
+ * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor, or an
+ * administrator reading unscoped for oversight (else 403; ADR-0015). This read is never
+ * audited.
  * @summary An Offering's attendance register — sessions + roster + derived percentages.
  */
 export const anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages = (
@@ -12608,8 +12833,9 @@ export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages
 /**
  * Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled
  * session counts in no attendance denominator; reinstating it counts it again. Correctable
- * either way. Authorised by assignment — only the session's Offering's Instructor (else
- * 403).
+ * either way. Authorised by assignment — only the session's Offering's Instructor, or an
+ * administrator (R09/R10) acting on an offering they don't teach, that write attributed to
+ * them in the Audit Log (else 403; ADR-0015).
  * @summary Cancel or reinstate a Class Session.
  */
 export const cancelOrReinstateAClassSession = (
@@ -12681,8 +12907,9 @@ export const useCancelOrReinstateAClassSession = <TError = CancelOrReinstateACla
  * a cancelled session cannot be marked. Around the save the percentages are recomputed:
  * any **Audit** Enrollment whose percentage crosses below the threshold on this save
  * raises one `attendance.audit_at_risk` notification (fired once on the downward crossing,
- * never on every mark). Authorised by assignment — only this Offering's Instructor (else
- * 403).
+ * never on every mark). Authorised by assignment — only this Offering's Instructor, or an
+ * administrator (R09/R10) recording/correcting attendance on an offering they don't teach,
+ * that write attributed to them in the Audit Log (else 403; ADR-0015).
  * @summary Record (or correct) a session's attendance register.
  */
 export const recordorCorrectASessionsAttendanceRegister = (

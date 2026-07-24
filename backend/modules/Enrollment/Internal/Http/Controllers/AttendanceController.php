@@ -13,6 +13,7 @@ use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CourseSummary;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Http\Concerns\ComputesAttendance;
+use Modules\Enrollment\Internal\Http\Concerns\IdentifiesAdministrator;
 use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesOfferingRefs;
 use Modules\Enrollment\Internal\Models\AttendanceMark;
@@ -22,6 +23,7 @@ use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\OfferingMeeting;
 use Modules\Enrollment\Internal\Support\AttendanceCalculator;
 use Modules\Enrollment\Internal\Support\SessionSchedule;
+use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -37,8 +39,10 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * interviewers: only an Offering's assigned Instructor (R04) may read/generate its sessions,
  * cancel them, and mark attendance; anyone else is forbidden. No new permission is added and
  * the §3.2 matrix is untouched, so every route is `auth:sanctum` and the controller enforces
- * the assignment itself. (ADR-0015's administrative override — R09/R10 reading unscoped and
- * writing with an Audit Log row — is hardened across every Phase-3 scope guard in ticket 10.)
+ * the assignment itself. ADR-0015's administrative override (ticket 10) is layered on here:
+ * a System/Super Administrator (R09/R10) reads every offering's register unscoped and may
+ * cancel a session or record attendance on an offering they don't teach, each such write
+ * attributed to them in the Audit Log — the assigned Instructor's own marks stay un-audited.
  *
  * Each Offering's weekly meeting times generate {@see ClassSession} rows across its Semester
  * (the pure {@see SessionSchedule} seam, materialised idempotently the first time the register
@@ -52,6 +56,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 class AttendanceController
 {
     use ComputesAttendance;
+    use IdentifiesAdministrator;
     use NotifiesRegistration;
     use ResolvesOfferingRefs;
 
@@ -62,7 +67,9 @@ class AttendanceController
      * grading link, born here. Each carries its Semester, resolved Course, weekly meeting
      * times, and its active roster size, so the instructor sees their teaching load at a
      * glance. A user who teaches nothing gets an empty list (no permission gate — teaching
-     * is the scope). Requires only authentication.
+     * is the scope). An administrator (R09/R10) sees **every** offering instead (ADR-0015), so
+     * they can reach any offering's register for oversight through this same screen. Requires
+     * only authentication.
      *
      * @response 200 {"data": [{"id": 1, "student_count": 12, "semester": {"id": 1, "term": "Spring", "year": 2026, "name_en": "Spring 2026", "name_ar": "ربيع 2026"}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}
      */
@@ -73,10 +80,11 @@ class AttendanceController
         AcademicCalendar $calendar,
     ): JsonResponse {
         $userId = (int) $request->user()?->getAuthIdentifier();
+        $isAdmin = $this->actingAsAdministrator($request, $directory);
 
         /** @var Collection<int, CourseOffering> $offerings */
         $offerings = CourseOffering::query()
-            ->where('instructor_id', $userId)
+            ->when(! $isAdmin, fn ($query) => $query->where('instructor_id', $userId))
             ->with('meetings')
             ->orderByDesc('semester_id')
             ->orderBy('id')
@@ -105,8 +113,9 @@ class AttendanceController
      * re-opening never duplicates), and its roster of **active** Enrollments (withdrawn
      * students keep their history but leave the roster). Each roster row carries the student's
      * identity, their per-session marks, and their derived attendance percentage with the
-     * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor (else
-     * 403).
+     * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor, or an
+     * administrator reading unscoped for oversight (else 403; ADR-0015). This read is never
+     * audited.
      *
      * @urlParam offering_id integer required The ID of the offering. Example: 1
      *
@@ -121,7 +130,7 @@ class AttendanceController
         AcademicCalendar $calendar,
         StudentDirectory $students,
     ): JsonResponse {
-        $this->assertAssigned($offering, $request);
+        $this->authorizeRegisterAccess($offering, $request, $directory);
 
         $offering->load('meetings');
         $semester = $calendar->find((int) $offering->semester_id);
@@ -164,8 +173,9 @@ class AttendanceController
      *
      * Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled
      * session counts in no attendance denominator; reinstating it counts it again. Correctable
-     * either way. Authorised by assignment — only the session's Offering's Instructor (else
-     * 403).
+     * either way. Authorised by assignment — only the session's Offering's Instructor, or an
+     * administrator (R09/R10) acting on an offering they don't teach, that write attributed to
+     * them in the Audit Log (else 403; ADR-0015).
      *
      * @urlParam class_session_id integer required The ID of the class session. Example: 10
      *
@@ -179,10 +189,12 @@ class AttendanceController
         ClassSession $classSession,
         StudentDirectory $students,
         CourseCatalog $courses,
+        Directory $directory,
         Notifier $notifier,
+        AuditLogger $auditLogger,
     ): JsonResponse {
         $offering = $this->offeringOf($classSession);
-        $this->assertAssigned($offering, $request);
+        $isAssigned = $this->authorizeRegisterAccess($offering, $request, $directory);
 
         $validated = $request->validate([
             'cancelled' => ['required', 'boolean'],
@@ -201,6 +213,8 @@ class AttendanceController
             'cancelled_at' => $validated['cancelled'] ? now() : null,
         ]);
 
+        $this->auditAdminRegisterWrite($isAssigned, $auditLogger, (int) $request->user()?->getAuthIdentifier(), $offering, 'attendance.session_updated_by_admin', $classSession->getKey());
+
         $this->notifyDownwardCrossings($auditIds, $before, $auditRoster, $offering, $students, $courses, $notifier);
 
         return response()->json(['data' => $classSession->toRegisterArray()]);
@@ -214,8 +228,9 @@ class AttendanceController
      * a cancelled session cannot be marked. Around the save the percentages are recomputed:
      * any **Audit** Enrollment whose percentage crosses below the threshold on this save
      * raises one `attendance.audit_at_risk` notification (fired once on the downward crossing,
-     * never on every mark). Authorised by assignment — only this Offering's Instructor (else
-     * 403).
+     * never on every mark). Authorised by assignment — only this Offering's Instructor, or an
+     * administrator (R09/R10) recording/correcting attendance on an offering they don't teach,
+     * that write attributed to them in the Audit Log (else 403; ADR-0015).
      *
      * @urlParam class_session_id integer required The ID of the class session. Example: 10
      *
@@ -233,10 +248,12 @@ class AttendanceController
         ClassSession $classSession,
         StudentDirectory $students,
         CourseCatalog $courses,
+        Directory $directory,
         Notifier $notifier,
+        AuditLogger $auditLogger,
     ): JsonResponse {
         $offering = $this->offeringOf($classSession);
-        $this->assertAssigned($offering, $request);
+        $isAssigned = $this->authorizeRegisterAccess($offering, $request, $directory);
 
         if ($classSession->isCancelled()) {
             throw new ConflictHttpException('A cancelled session cannot be marked.');
@@ -285,6 +302,8 @@ class AttendanceController
             }
         });
 
+        $this->auditAdminRegisterWrite($isAssigned, $auditLogger, (int) $request->user()?->getAuthIdentifier(), $offering, 'attendance.recorded_by_admin', $classSession->getKey());
+
         // Side effect after the write: one notification per fresh downward crossing (ADR-0019).
         $this->notifyDownwardCrossings($auditIds, $before, $roster, $offering, $students, $courses, $notifier);
 
@@ -313,14 +332,51 @@ class AttendanceController
     }
 
     /**
-     * The acting user is this Offering's assigned Instructor, or a 403 — authorisation by
-     * assignment (no permission gate; the Phase-2 interviewer precedent). ADR-0015's admin
-     * override is layered on in ticket 10.
+     * The acting user may work this Offering's register — its assigned Instructor
+     * (authorisation by assignment, the Phase-2 interviewer precedent) or a System/Super
+     * Administrator (the ADR-0015 override); anyone else is a 403. Returns whether the actor
+     * is the **assigned Instructor**, so a caller can tell a legitimately-scoped write (not
+     * audited) from an administrative override (audited).
      */
-    private function assertAssigned(CourseOffering $offering, Request $request): void
+    private function authorizeRegisterAccess(CourseOffering $offering, Request $request, Directory $directory): bool
     {
         $userId = (int) $request->user()?->getAuthIdentifier();
-        abort_if((int) $offering->instructor_id !== $userId, 403, 'You are not assigned to teach this offering.');
+        $isAssigned = (int) $offering->instructor_id === $userId;
+
+        abort_if(! $isAssigned && ! $this->actingAsAdministrator($request, $directory), 403, 'You are not assigned to teach this offering.');
+
+        return $isAssigned;
+    }
+
+    /**
+     * Attribute an administrative register write to the Audit Log (ADR-0015): a mark or a
+     * session cancel/reinstate on an offering the actor does not teach reaches here only via
+     * the admin override ({@see authorizeRegisterAccess} returned `false`), so record who wrote it and
+     * on which offering/session. The assigned Instructor's own write ($isAssigned true) is a
+     * no-op — attesting one's own register is never audited.
+     */
+    private function auditAdminRegisterWrite(
+        bool $isAssigned,
+        AuditLogger $auditLogger,
+        int $actorUserId,
+        CourseOffering $offering,
+        string $action,
+        int $classSessionId,
+    ): void {
+        if ($isAssigned) {
+            return;
+        }
+
+        $auditLogger->record(
+            action: $action,
+            actorUserId: $actorUserId,
+            metadata: [
+                'course_offering_id' => (int) $offering->getKey(),
+                'assigned_instructor_id' => (int) $offering->instructor_id,
+            ],
+            subjectType: 'class_session',
+            subjectId: (string) $classSessionId,
+        );
     }
 
     /** The session's Offering (with meetings), or a 404 when the reference dangles. */

@@ -3282,6 +3282,11 @@ export const ASingleRequestForLineItemReviewResponse = zod.object({
  * the request is Approved; all rejected ⇒ Rejected. The request must still be Pending
  * (else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on
  * `registration.approve`.
+ *
+ * A System/Super Administrator (R09/R10) may decide **any** advisor's advisee's request
+ * (the advisee-scope override, ADR-0015); that decision is attributed to the admin in the
+ * Audit Log, so an approval or rejection authored by someone other than the Student's
+ * Advisor is accountable. The real Advisor deciding their own advisee stays un-audited.
  * @summary Record the Advisor's line-item decision.
  */
 export const RecordTheAdvisorsLineItemDecisionParams = zod.object({
@@ -3339,11 +3344,113 @@ export const RecordTheAdvisorsLineItemDecisionResponse = zod.object({
 
 
 /**
+ * A read-only view of a Student's minted Enrollments grouped by Semester — the advisor's
+ * "monitor an advisee" surface (user story 51) and the administrator's cross-scope
+ * oversight read (ADR-0015). Same shape as the Student's own My Schedule — each Enrollment
+ * with its Course Status, classification, credit hours, meeting times and derived
+ * attendance — but with the period-gated action affordances suppressed
+ * (`can_free_change`/`can_withdraw` are always false, `addable_courses` always empty): an
+ * overseer views, never acts, through this read. An **Advisor** may read only their own
+ * advisee (else 403); **Student Affairs** and an **administrator** read any student,
+ * unscoped and un-audited ({@see ScopesToAdvisees}). Gated on `registration.approve`.
+ * @summary View any student's schedule (oversight).
+ */
+export const ViewAnyStudentsScheduleoversightParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const ViewAnyStudentsScheduleoversightResponse = zod.object({
+  "data": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "current_period": zod.string().optional(),
+  "can_free_change": zod.boolean().optional(),
+  "can_withdraw": zod.boolean().optional(),
+  "addable_courses": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "capacity": zod.number().optional(),
+  "seats_remaining": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional(),
+  "enrollments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
+})).optional()
+})).optional()
+})
+
+
+/**
  * Every Course Offering the acting user teaches, across all Semesters — the Phase-4
  * grading link, born here. Each carries its Semester, resolved Course, weekly meeting
  * times, and its active roster size, so the instructor sees their teaching load at a
  * glance. A user who teaches nothing gets an empty list (no permission gate — teaching
- * is the scope). Requires only authentication.
+ * is the scope). An administrator (R09/R10) sees **every** offering instead (ADR-0015), so
+ * they can reach any offering's register for oversight through this same screen. Requires
+ * only authentication.
  * @summary The signed-in Instructor's offerings ("My Offerings").
  */
 export const TheSignedInInstructorsOfferingsMyOfferingsResponse = zod.object({
@@ -3382,8 +3489,9 @@ export const TheSignedInInstructorsOfferingsMyOfferingsResponse = zod.object({
  * re-opening never duplicates), and its roster of **active** Enrollments (withdrawn
  * students keep their history but leave the roster). Each roster row carries the student's
  * identity, their per-session marks, and their derived attendance percentage with the
- * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor (else
- * 403).
+ * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor, or an
+ * administrator reading unscoped for oversight (else 403; ADR-0015). This read is never
+ * audited.
  * @summary An Offering's attendance register — sessions + roster + derived percentages.
  */
 export const AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesParams = zod.object({
@@ -3455,8 +3563,9 @@ export const AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesRespon
 /**
  * Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled
  * session counts in no attendance denominator; reinstating it counts it again. Correctable
- * either way. Authorised by assignment — only the session's Offering's Instructor (else
- * 403).
+ * either way. Authorised by assignment — only the session's Offering's Instructor, or an
+ * administrator (R09/R10) acting on an offering they don't teach, that write attributed to
+ * them in the Audit Log (else 403; ADR-0015).
  * @summary Cancel or reinstate a Class Session.
  */
 export const CancelOrReinstateAClassSessionParams = zod.object({
@@ -3485,8 +3594,9 @@ export const CancelOrReinstateAClassSessionResponse = zod.object({
  * a cancelled session cannot be marked. Around the save the percentages are recomputed:
  * any **Audit** Enrollment whose percentage crosses below the threshold on this save
  * raises one `attendance.audit_at_risk` notification (fired once on the downward crossing,
- * never on every mark). Authorised by assignment — only this Offering's Instructor (else
- * 403).
+ * never on every mark). Authorised by assignment — only this Offering's Instructor, or an
+ * administrator (R09/R10) recording/correcting attendance on an offering they don't teach,
+ * that write attributed to them in the Audit Log (else 403; ADR-0015).
  * @summary Record (or correct) a session's attendance register.
  */
 export const RecordorCorrectASessionsAttendanceRegisterParams = zod.object({

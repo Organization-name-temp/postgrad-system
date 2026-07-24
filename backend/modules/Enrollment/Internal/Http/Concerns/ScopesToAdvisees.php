@@ -19,9 +19,11 @@ use Modules\Identity\Public\Enums\Role;
  *   "their advisees" would show nothing (they have none) and their remit is to unblock any
  *   request (spec user stories 52; ADR-0015 for admins).
  *
- * The admin write-audit that ADR-0015 also requires is layered on in ticket 10 (the
- * dedicated override pass), once every Phase-3 scope guard exists; this concern only
- * decides visibility and the 403.
+ * This concern decides visibility and the 403 only. The admin write-audit that ADR-0015
+ * also requires (ticket 10) is layered on at each write site — a controller records an
+ * Audit Log row when {@see IdentifiesAdministrator} reports the actor reached the write via
+ * the admin override, so a Student Affairs reviewer's legitimate unscoped write stays
+ * un-audited while an administrator's is accountable.
  */
 trait ScopesToAdvisees
 {

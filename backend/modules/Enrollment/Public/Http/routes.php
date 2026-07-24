@@ -81,6 +81,14 @@ Route::middleware(['auth:sanctum', 'can:registration.approve'])->group(function 
     Route::get('/registration/queue', [RegistrationReviewController::class, 'queue']);
     Route::get('/registration/requests/{registration}', [RegistrationReviewController::class, 'show'])->whereNumber('registration');
     Route::post('/registration/requests/{registration}/decision', [RegistrationReviewController::class, 'decide'])->whereNumber('registration');
+
+    // Administrative-override read of a specific Student's schedule (ticket 10, ADR-0015):
+    // the student-self My Schedule is bound to the acting user, so an administrator needs an
+    // id-addressable read to oversee any Student unscoped. The advisee-scope guard applies, so
+    // an Advisor may read their own advisee too (Student Affairs / an administrator any).
+    // {student_id} is the Student anchor id (Identity-owned, resolved through the
+    // StudentDirectory facade, not model-bound), so snake_case for Scribe/Orval determinism.
+    Route::get('/registration/students/{student_id}/schedule', [RegistrationController::class, 'studentSchedule'])->whereNumber('student_id');
 });
 
 // The attendance register (ticket 08, ADR-0019) — the Instructor-facing surface, authorised

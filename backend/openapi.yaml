@@ -12321,7 +12321,7 @@ paths:
     post:
       summary: "Record the Advisor's line-item decision."
       operationId: recordTheAdvisorsLineItemDecision
-      description: "Approve or reject each line and attach an optional note. The approved subset is\nre-validated at decision time — credit-hour floor (waived in the Student's first\nsemester) and ceiling, composition caps and duplicate/clash against the Student's\nexisting Enrollments, seat capacity, and the derived-Retake cap of one — and, if\nclean, **one Enrollment is minted per approved line atomically**. ≥1 approved line ⇒\nthe request is Approved; all rejected ⇒ Rejected. The request must still be Pending\n(else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on\n`registration.approve`."
+      description: "Approve or reject each line and attach an optional note. The approved subset is\nre-validated at decision time — credit-hour floor (waived in the Student's first\nsemester) and ceiling, composition caps and duplicate/clash against the Student's\nexisting Enrollments, seat capacity, and the derived-Retake cap of one — and, if\nclean, **one Enrollment is minted per approved line atomically**. ≥1 approved line ⇒\nthe request is Approved; all rejected ⇒ Rejected. The request must still be Pending\n(else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on\n`registration.approve`.\n\nA System/Super Administrator (R09/R10) may decide **any** advisor's advisee's request\n(the advisee-scope override, ADR-0015); that decision is attributed to the admin in the\nAudit Log, so an approval or rejection authored by someone other than the Student's\nAdvisor is accountable. The real Advisor deciding their own advisee stays un-audited."
       parameters: []
       responses:
         200:
@@ -12618,11 +12618,488 @@ paths:
         required: true
         schema:
           type: integer
+  '/api/v1/registration/students/{student_id}/schedule':
+    get:
+      summary: "View any student's schedule (oversight)."
+      operationId: viewAnyStudentsScheduleoversight
+      description: "A read-only view of a Student's minted Enrollments grouped by Semester — the advisor's\n\"monitor an advisee\" surface (user story 51) and the administrator's cross-scope\noversight read (ADR-0015). Same shape as the Student's own My Schedule — each Enrollment\nwith its Course Status, classification, credit hours, meeting times and derived\nattendance — but with the period-gated action affordances suppressed\n(`can_free_change`/`can_withdraw` are always false, `addable_courses` always empty): an\noverseer views, never acts, through this read. An **Advisor** may read only their own\nadvisee (else 403); **Student Affairs** and an **administrator** read any student,\nunscoped and un-audited ({@see ScopesToAdvisees}). Gated on `registration.approve`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      semester:
+                        id: 1
+                        term: Fall
+                        year: 2026
+                        name_en: 'Fall 2026'
+                        name_ar: 'خريف 2026'
+                        starts_at: '2026-09-01T00:00:00+00:00'
+                        ends_at: '2026-12-20T00:00:00+00:00'
+                        registration_opens_at: '2026-08-01T00:00:00+00:00'
+                        registration_closes_at: '2026-09-05T00:00:00+00:00'
+                        add_drop_ends_at: '2026-09-14T00:00:00+00:00'
+                        late_add_ends_at: '2026-09-21T00:00:00+00:00'
+                        withdrawal_deadline_at: '2026-11-15T00:00:00+00:00'
+                        is_registration_open: true
+                      current_period: add_drop
+                      can_free_change: false
+                      can_withdraw: false
+                      addable_courses:
+                        -
+                          offering_id: 2
+                          classification: Core
+                          capacity: 30
+                          seats_remaining: 28
+                          total_ch: 3
+                          course:
+                            id: 2
+                            code: DEP502
+                            name_en: 'Distributed Systems'
+                            name_ar: 'الأنظمة الموزعة'
+                            level: 500
+                            total_ch: 3
+                            research_type: null
+                            is_active: true
+                          instructor:
+                            id: 4
+                            name: 'Dr. Instructor'
+                            email: instructor@ejust.test
+                          meetings:
+                            -
+                              weekday: 3
+                              starts_at: '13:00'
+                              ends_at: '15:00'
+                      enrollments:
+                        -
+                          id: 1
+                          offering_id: 1
+                          course_status: Regular
+                          classification: Core
+                          credit_hours: 3
+                          course:
+                            id: 1
+                            code: DEP501
+                            name_en: 'Advanced Algorithms'
+                            name_ar: 'خوارزميات متقدمة'
+                            level: 500
+                            total_ch: 3
+                            research_type: null
+                            is_active: true
+                          instructor:
+                            id: 4
+                            name: 'Dr. Instructor'
+                            email: instructor@ejust.test
+                          meetings:
+                            -
+                              weekday: 1
+                              starts_at: '09:00'
+                              ends_at: '11:00'
+                          attendance:
+                            present: 8
+                            recorded: 10
+                            percentage: 80
+                            at_risk: false
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        semester:
+                          id: 1
+                          term: Fall
+                          year: 2026
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                          starts_at: '2026-09-01T00:00:00+00:00'
+                          ends_at: '2026-12-20T00:00:00+00:00'
+                          registration_opens_at: '2026-08-01T00:00:00+00:00'
+                          registration_closes_at: '2026-09-05T00:00:00+00:00'
+                          add_drop_ends_at: '2026-09-14T00:00:00+00:00'
+                          late_add_ends_at: '2026-09-21T00:00:00+00:00'
+                          withdrawal_deadline_at: '2026-11-15T00:00:00+00:00'
+                          is_registration_open: true
+                        current_period: add_drop
+                        can_free_change: false
+                        can_withdraw: false
+                        addable_courses:
+                          -
+                            offering_id: 2
+                            classification: Core
+                            capacity: 30
+                            seats_remaining: 28
+                            total_ch: 3
+                            course:
+                              id: 2
+                              code: DEP502
+                              name_en: 'Distributed Systems'
+                              name_ar: 'الأنظمة الموزعة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                            instructor:
+                              id: 4
+                              name: 'Dr. Instructor'
+                              email: instructor@ejust.test
+                            meetings:
+                              - weekday: 3
+                                starts_at: '13:00'
+                                ends_at: '15:00'
+                        enrollments:
+                          -
+                            id: 1
+                            offering_id: 1
+                            course_status: Regular
+                            classification: Core
+                            credit_hours: 3
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                            instructor:
+                              id: 4
+                              name: 'Dr. Instructor'
+                              email: instructor@ejust.test
+                            meetings:
+                              - weekday: 1
+                                starts_at: '09:00'
+                                ends_at: '11:00'
+                            attendance:
+                              present: 8
+                              recorded: 10
+                              percentage: 80
+                              at_risk: false
+                    items:
+                      type: object
+                      properties:
+                        semester:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            term:
+                              type: string
+                              example: Fall
+                            year:
+                              type: integer
+                              example: 2026
+                            name_en:
+                              type: string
+                              example: 'Fall 2026'
+                            name_ar:
+                              type: string
+                              example: 'خريف 2026'
+                            starts_at:
+                              type: string
+                              example: '2026-09-01T00:00:00+00:00'
+                            ends_at:
+                              type: string
+                              example: '2026-12-20T00:00:00+00:00'
+                            registration_opens_at:
+                              type: string
+                              example: '2026-08-01T00:00:00+00:00'
+                            registration_closes_at:
+                              type: string
+                              example: '2026-09-05T00:00:00+00:00'
+                            add_drop_ends_at:
+                              type: string
+                              example: '2026-09-14T00:00:00+00:00'
+                            late_add_ends_at:
+                              type: string
+                              example: '2026-09-21T00:00:00+00:00'
+                            withdrawal_deadline_at:
+                              type: string
+                              example: '2026-11-15T00:00:00+00:00'
+                            is_registration_open:
+                              type: boolean
+                              example: true
+                        current_period:
+                          type: string
+                          example: add_drop
+                        can_free_change:
+                          type: boolean
+                          example: false
+                        can_withdraw:
+                          type: boolean
+                          example: false
+                        addable_courses:
+                          type: array
+                          example:
+                            -
+                              offering_id: 2
+                              classification: Core
+                              capacity: 30
+                              seats_remaining: 28
+                              total_ch: 3
+                              course:
+                                id: 2
+                                code: DEP502
+                                name_en: 'Distributed Systems'
+                                name_ar: 'الأنظمة الموزعة'
+                                level: 500
+                                total_ch: 3
+                                research_type: null
+                                is_active: true
+                              instructor:
+                                id: 4
+                                name: 'Dr. Instructor'
+                                email: instructor@ejust.test
+                              meetings:
+                                - weekday: 3
+                                  starts_at: '13:00'
+                                  ends_at: '15:00'
+                          items:
+                            type: object
+                            properties:
+                              offering_id:
+                                type: integer
+                                example: 2
+                              classification:
+                                type: string
+                                example: Core
+                              capacity:
+                                type: integer
+                                example: 30
+                              seats_remaining:
+                                type: integer
+                                example: 28
+                              total_ch:
+                                type: integer
+                                example: 3
+                              course:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 2
+                                  code:
+                                    type: string
+                                    example: DEP502
+                                  name_en:
+                                    type: string
+                                    example: 'Distributed Systems'
+                                  name_ar:
+                                    type: string
+                                    example: 'الأنظمة الموزعة'
+                                  level:
+                                    type: integer
+                                    example: 500
+                                  total_ch:
+                                    type: integer
+                                    example: 3
+                                  research_type:
+                                    type: string
+                                    example: null
+                                    nullable: true
+                                  is_active:
+                                    type: boolean
+                                    example: true
+                              instructor:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 4
+                                  name:
+                                    type: string
+                                    example: 'Dr. Instructor'
+                                  email:
+                                    type: string
+                                    example: instructor@ejust.test
+                              meetings:
+                                type: array
+                                example:
+                                  - weekday: 3
+                                    starts_at: '13:00'
+                                    ends_at: '15:00'
+                                items:
+                                  type: object
+                                  properties:
+                                    weekday:
+                                      type: integer
+                                      example: 3
+                                    starts_at:
+                                      type: string
+                                      example: '13:00'
+                                    ends_at:
+                                      type: string
+                                      example: '15:00'
+                        enrollments:
+                          type: array
+                          example:
+                            -
+                              id: 1
+                              offering_id: 1
+                              course_status: Regular
+                              classification: Core
+                              credit_hours: 3
+                              course:
+                                id: 1
+                                code: DEP501
+                                name_en: 'Advanced Algorithms'
+                                name_ar: 'خوارزميات متقدمة'
+                                level: 500
+                                total_ch: 3
+                                research_type: null
+                                is_active: true
+                              instructor:
+                                id: 4
+                                name: 'Dr. Instructor'
+                                email: instructor@ejust.test
+                              meetings:
+                                - weekday: 1
+                                  starts_at: '09:00'
+                                  ends_at: '11:00'
+                              attendance:
+                                present: 8
+                                recorded: 10
+                                percentage: 80
+                                at_risk: false
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              offering_id:
+                                type: integer
+                                example: 1
+                              course_status:
+                                type: string
+                                example: Regular
+                              classification:
+                                type: string
+                                example: Core
+                              credit_hours:
+                                type: integer
+                                example: 3
+                              course:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 1
+                                  code:
+                                    type: string
+                                    example: DEP501
+                                  name_en:
+                                    type: string
+                                    example: 'Advanced Algorithms'
+                                  name_ar:
+                                    type: string
+                                    example: 'خوارزميات متقدمة'
+                                  level:
+                                    type: integer
+                                    example: 500
+                                  total_ch:
+                                    type: integer
+                                    example: 3
+                                  research_type:
+                                    type: string
+                                    example: null
+                                    nullable: true
+                                  is_active:
+                                    type: boolean
+                                    example: true
+                              instructor:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 4
+                                  name:
+                                    type: string
+                                    example: 'Dr. Instructor'
+                                  email:
+                                    type: string
+                                    example: instructor@ejust.test
+                              meetings:
+                                type: array
+                                example:
+                                  - weekday: 1
+                                    starts_at: '09:00'
+                                    ends_at: '11:00'
+                                items:
+                                  type: object
+                                  properties:
+                                    weekday:
+                                      type: integer
+                                      example: 1
+                                    starts_at:
+                                      type: string
+                                      example: '09:00'
+                                    ends_at:
+                                      type: string
+                                      example: '11:00'
+                              attendance:
+                                type: object
+                                properties:
+                                  present:
+                                    type: integer
+                                    example: 8
+                                  recorded:
+                                    type: integer
+                                    example: 10
+                                  percentage:
+                                    type: integer
+                                    example: 80
+                                  at_risk:
+                                    type: boolean
+                                    example: false
+        403:
+          description: "not this advisor's advisee"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: 'no such student'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No such student.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No such student.'
+      tags:
+        - Enrollment
+      security: []
+    parameters:
+      -
+        in: path
+        name: student_id
+        description: "The target Student anchor's id."
+        example: 5
+        required: true
+        schema:
+          type: integer
   /api/v1/offerings/mine:
     get:
       summary: 'The signed-in Instructor''s offerings ("My Offerings").'
       operationId: theSignedInInstructorsOfferingsMyOfferings
-      description: "Every Course Offering the acting user teaches, across all Semesters — the Phase-4\ngrading link, born here. Each carries its Semester, resolved Course, weekly meeting\ntimes, and its active roster size, so the instructor sees their teaching load at a\nglance. A user who teaches nothing gets an empty list (no permission gate — teaching\nis the scope). Requires only authentication."
+      description: "Every Course Offering the acting user teaches, across all Semesters — the Phase-4\ngrading link, born here. Each carries its Semester, resolved Course, weekly meeting\ntimes, and its active roster size, so the instructor sees their teaching load at a\nglance. A user who teaches nothing gets an empty list (no permission gate — teaching\nis the scope). An administrator (R09/R10) sees **every** offering instead (ADR-0015), so\nthey can reach any offering's register for oversight through this same screen. Requires\nonly authentication."
       parameters: []
       responses:
         200:
@@ -12762,7 +13239,7 @@ paths:
     get:
       summary: "An Offering's attendance register — sessions + roster + derived percentages."
       operationId: anOfferingsAttendanceRegisterSessions+Roster+DerivedPercentages
-      description: "The assigned Instructor's register for one Offering: its Class Sessions (generated from\nthe meeting times across the Semester the first time this is opened — idempotent, so\nre-opening never duplicates), and its roster of **active** Enrollments (withdrawn\nstudents keep their history but leave the roster). Each roster row carries the student's\nidentity, their per-session marks, and their derived attendance percentage with the\naudit-at-risk flag. Authorised by assignment — only this Offering's Instructor (else\n403)."
+      description: "The assigned Instructor's register for one Offering: its Class Sessions (generated from\nthe meeting times across the Semester the first time this is opened — idempotent, so\nre-opening never duplicates), and its roster of **active** Enrollments (withdrawn\nstudents keep their history but leave the roster). Each roster row carries the student's\nidentity, their per-session marks, and their derived attendance percentage with the\naudit-at-risk flag. Authorised by assignment — only this Offering's Instructor, or an\nadministrator reading unscoped for oversight (else 403; ADR-0015). This read is never\naudited."
       parameters: []
       responses:
         200:
@@ -13025,7 +13502,7 @@ paths:
     patch:
       summary: 'Cancel or reinstate a Class Session.'
       operationId: cancelOrReinstateAClassSession
-      description: "Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled\nsession counts in no attendance denominator; reinstating it counts it again. Correctable\neither way. Authorised by assignment — only the session's Offering's Instructor (else\n403)."
+      description: "Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled\nsession counts in no attendance denominator; reinstating it counts it again. Correctable\neither way. Authorised by assignment — only the session's Offering's Instructor, or an\nadministrator (R09/R10) acting on an offering they don't teach, that write attributed to\nthem in the Audit Log (else 403; ADR-0015)."
       parameters: []
       responses:
         200:
@@ -13105,7 +13582,7 @@ paths:
     put:
       summary: "Record (or correct) a session's attendance register."
       operationId: recordorCorrectASessionsAttendanceRegister
-      description: "Saves a binary present/absent mark per active Enrollment for one Class Session; a save\nupserts, so a correction overwrites. Only the Offering's active roster may be marked;\na cancelled session cannot be marked. Around the save the percentages are recomputed:\nany **Audit** Enrollment whose percentage crosses below the threshold on this save\nraises one `attendance.audit_at_risk` notification (fired once on the downward crossing,\nnever on every mark). Authorised by assignment — only this Offering's Instructor (else\n403)."
+      description: "Saves a binary present/absent mark per active Enrollment for one Class Session; a save\nupserts, so a correction overwrites. Only the Offering's active roster may be marked;\na cancelled session cannot be marked. Around the save the percentages are recomputed:\nany **Audit** Enrollment whose percentage crosses below the threshold on this save\nraises one `attendance.audit_at_risk` notification (fired once on the downward crossing,\nnever on every mark). Authorised by assignment — only this Offering's Instructor, or an\nadministrator (R09/R10) recording/correcting attendance on an offering they don't teach,\nthat write attributed to them in the Audit Log (else 403; ADR-0015)."
       parameters: []
       responses:
         200:

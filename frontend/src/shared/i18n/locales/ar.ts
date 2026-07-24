@@ -39,6 +39,7 @@ export const ar = {
       schedule: 'جدولي',
       advising: 'طلبات التسجيل',
       registerForStudent: 'التسجيل نيابةً عن طالب',
+      myOfferings: 'تدريسي',
       assignments: 'عمداء الكليات',
       sections: {
         admissions: 'القبول',

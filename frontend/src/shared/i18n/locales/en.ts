@@ -40,6 +40,7 @@ export const en = {
       schedule: 'My schedule',
       advising: 'Registration requests',
       registerForStudent: 'Register for a student',
+      myOfferings: 'My teaching',
       assignments: 'Faculty deans',
       sections: {
         admissions: 'Admissions',

@@ -57,4 +57,19 @@ enum NotificationType: string
 
     /** The applicant was accepted and became a Student. Payload: `university_id`. */
     case ApplicationAccepted = 'application.accepted';
+
+    /**
+     * A Student (or staff on their behalf) submitted a registration for the advisor's
+     * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds
+     * them. Payload: `registration_request_id`, `student_name`, `course_count`.
+     */
+    case RegistrationSubmitted = 'registration.submitted';
+
+    /**
+     * The Advisor decided a registration request (Phase 3, ticket 06). Raised to the
+     * Student the moment their schedule exists (or the request is rejected). Payload:
+     * `registration_request_id`, `outcome` (Approved/Rejected), `approved_count`,
+     * `rejected_count`.
+     */
+    case RegistrationDecided = 'registration.decided';
 }

@@ -10416,6 +10416,952 @@ paths:
       tags:
         - Enrollment
       security: []
+  /api/v1/registration/schedule:
+    get:
+      summary: "The acting Student's schedule — their minted Enrollments, grouped by Semester."
+      operationId: theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester
+      description: "The Student's academic present (user story 32, FR-REG-005): every Enrollment the\nadvisor minted, grouped by Semester (most recent first), each carrying its Course\nStatus, Enrollment Classification, registration-time credit hours, and the live\ndisplay facts — course, instructor, weekly meeting times — read through the Catalog/\nOffering facades (ADR-0017). Attendance percentage and the period-gated action\nbuttons land in tickets 08/07; this ticket renders the read-only schedule. Gated on\n`courses.register_self` (the acting Student, R02)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      semester:
+                        id: 1
+                        term: Fall
+                        year: 2026
+                        name_en: 'Fall 2026'
+                        name_ar: 'خريف 2026'
+                        starts_at: '2026-09-01T00:00:00+00:00'
+                        ends_at: '2026-12-20T00:00:00+00:00'
+                        registration_opens_at: '2026-08-01T00:00:00+00:00'
+                        registration_closes_at: '2026-09-05T00:00:00+00:00'
+                        add_drop_ends_at: '2026-09-14T00:00:00+00:00'
+                        late_add_ends_at: '2026-09-21T00:00:00+00:00'
+                        withdrawal_deadline_at: '2026-11-15T00:00:00+00:00'
+                        is_registration_open: true
+                      enrollments:
+                        -
+                          id: 1
+                          offering_id: 1
+                          course_status: Regular
+                          classification: Core
+                          credit_hours: 3
+                          course:
+                            id: 1
+                            code: DEP501
+                            name_en: 'Advanced Algorithms'
+                            name_ar: 'خوارزميات متقدمة'
+                            level: 500
+                            total_ch: 3
+                            research_type: null
+                            is_active: true
+                          instructor:
+                            id: 4
+                            name: 'Dr. Instructor'
+                            email: instructor@ejust.test
+                          meetings:
+                            -
+                              weekday: 1
+                              starts_at: '09:00'
+                              ends_at: '11:00'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        semester:
+                          id: 1
+                          term: Fall
+                          year: 2026
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                          starts_at: '2026-09-01T00:00:00+00:00'
+                          ends_at: '2026-12-20T00:00:00+00:00'
+                          registration_opens_at: '2026-08-01T00:00:00+00:00'
+                          registration_closes_at: '2026-09-05T00:00:00+00:00'
+                          add_drop_ends_at: '2026-09-14T00:00:00+00:00'
+                          late_add_ends_at: '2026-09-21T00:00:00+00:00'
+                          withdrawal_deadline_at: '2026-11-15T00:00:00+00:00'
+                          is_registration_open: true
+                        enrollments:
+                          -
+                            id: 1
+                            offering_id: 1
+                            course_status: Regular
+                            classification: Core
+                            credit_hours: 3
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                            instructor:
+                              id: 4
+                              name: 'Dr. Instructor'
+                              email: instructor@ejust.test
+                            meetings:
+                              - weekday: 1
+                                starts_at: '09:00'
+                                ends_at: '11:00'
+                    items:
+                      type: object
+                      properties:
+                        semester:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            term:
+                              type: string
+                              example: Fall
+                            year:
+                              type: integer
+                              example: 2026
+                            name_en:
+                              type: string
+                              example: 'Fall 2026'
+                            name_ar:
+                              type: string
+                              example: 'خريف 2026'
+                            starts_at:
+                              type: string
+                              example: '2026-09-01T00:00:00+00:00'
+                            ends_at:
+                              type: string
+                              example: '2026-12-20T00:00:00+00:00'
+                            registration_opens_at:
+                              type: string
+                              example: '2026-08-01T00:00:00+00:00'
+                            registration_closes_at:
+                              type: string
+                              example: '2026-09-05T00:00:00+00:00'
+                            add_drop_ends_at:
+                              type: string
+                              example: '2026-09-14T00:00:00+00:00'
+                            late_add_ends_at:
+                              type: string
+                              example: '2026-09-21T00:00:00+00:00'
+                            withdrawal_deadline_at:
+                              type: string
+                              example: '2026-11-15T00:00:00+00:00'
+                            is_registration_open:
+                              type: boolean
+                              example: true
+                        enrollments:
+                          type: array
+                          example:
+                            -
+                              id: 1
+                              offering_id: 1
+                              course_status: Regular
+                              classification: Core
+                              credit_hours: 3
+                              course:
+                                id: 1
+                                code: DEP501
+                                name_en: 'Advanced Algorithms'
+                                name_ar: 'خوارزميات متقدمة'
+                                level: 500
+                                total_ch: 3
+                                research_type: null
+                                is_active: true
+                              instructor:
+                                id: 4
+                                name: 'Dr. Instructor'
+                                email: instructor@ejust.test
+                              meetings:
+                                - weekday: 1
+                                  starts_at: '09:00'
+                                  ends_at: '11:00'
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              offering_id:
+                                type: integer
+                                example: 1
+                              course_status:
+                                type: string
+                                example: Regular
+                              classification:
+                                type: string
+                                example: Core
+                              credit_hours:
+                                type: integer
+                                example: 3
+                              course:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 1
+                                  code:
+                                    type: string
+                                    example: DEP501
+                                  name_en:
+                                    type: string
+                                    example: 'Advanced Algorithms'
+                                  name_ar:
+                                    type: string
+                                    example: 'خوارزميات متقدمة'
+                                  level:
+                                    type: integer
+                                    example: 500
+                                  total_ch:
+                                    type: integer
+                                    example: 3
+                                  research_type:
+                                    type: string
+                                    example: null
+                                    nullable: true
+                                  is_active:
+                                    type: boolean
+                                    example: true
+                              instructor:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 4
+                                  name:
+                                    type: string
+                                    example: 'Dr. Instructor'
+                                  email:
+                                    type: string
+                                    example: instructor@ejust.test
+                              meetings:
+                                type: array
+                                example:
+                                  - weekday: 1
+                                    starts_at: '09:00'
+                                    ends_at: '11:00'
+                                items:
+                                  type: object
+                                  properties:
+                                    weekday:
+                                      type: integer
+                                      example: 1
+                                    starts_at:
+                                      type: string
+                                      example: '09:00'
+                                    ends_at:
+                                      type: string
+                                      example: '11:00'
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record to register with.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record to register with.'
+      tags:
+        - Enrollment
+      security: []
+  /api/v1/registration/queue:
+    get:
+      summary: "The advisor's registration queue."
+      operationId: theAdvisorsRegistrationQueue
+      description: "The Pending registration requests awaiting the signed-in reviewer, oldest-first — an\nAdvisor's own **live** advisee set (a request follows the Student when their advisor\nis reassigned), or, for Student Affairs / an administrator, every advisor's advisees\nunscoped (user story 52). Each row carries the Student's context — name, University\nID, degree, Program, enrollment term — and the number of courses requested, so the\nreviewer can triage. Gated on `registration.approve`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      semester_id: 1
+                      kind: Initial
+                      submitted_at: '2026-08-02T09:00:00+00:00'
+                      course_count: 2
+                      student:
+                        student_id: 5
+                        name: 'Sara Student'
+                        university_id: 2026-MSC-CE-0001
+                        enrollment_term: 'Fall 2026'
+                        degree_level: MSc
+                        program:
+                          id: 1
+                          code: MSC-CE
+                          name_en: 'MSc in Computer Engineering'
+                          name_ar: 'ماجستير هندسة الحاسوب'
+                          degree_level: MSc
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        semester_id: 1
+                        kind: Initial
+                        submitted_at: '2026-08-02T09:00:00+00:00'
+                        course_count: 2
+                        student:
+                          student_id: 5
+                          name: 'Sara Student'
+                          university_id: 2026-MSC-CE-0001
+                          enrollment_term: 'Fall 2026'
+                          degree_level: MSc
+                          program:
+                            id: 1
+                            code: MSC-CE
+                            name_en: 'MSc in Computer Engineering'
+                            name_ar: 'ماجستير هندسة الحاسوب'
+                            degree_level: MSc
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        semester_id:
+                          type: integer
+                          example: 1
+                        kind:
+                          type: string
+                          example: Initial
+                        submitted_at:
+                          type: string
+                          example: '2026-08-02T09:00:00+00:00'
+                        course_count:
+                          type: integer
+                          example: 2
+                        student:
+                          type: object
+                          properties:
+                            student_id:
+                              type: integer
+                              example: 5
+                            name:
+                              type: string
+                              example: 'Sara Student'
+                            university_id:
+                              type: string
+                              example: 2026-MSC-CE-0001
+                            enrollment_term:
+                              type: string
+                              example: 'Fall 2026'
+                            degree_level:
+                              type: string
+                              example: MSc
+                            program:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                code:
+                                  type: string
+                                  example: MSC-CE
+                                name_en:
+                                  type: string
+                                  example: 'MSc in Computer Engineering'
+                                name_ar:
+                                  type: string
+                                  example: 'ماجستير هندسة الحاسوب'
+                                degree_level:
+                                  type: string
+                                  example: MSc
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Enrollment
+      security: []
+  '/api/v1/registration/requests/{registration_id}':
+    get:
+      summary: 'A single request for line-item review.'
+      operationId: aSingleRequestForLineItemReview
+      description: "The full request for the review screen: the Student's context beside the lines —\nProgram, degree, enrollment term, and current semester load — and every line with its\nclassification, credit hours, meeting times and a **derived Retake** preview (whether\napproving it would mint a Retake from the Student's record). Same advisee scope as the\nqueue: an Advisor may open only their own advisee's request (else 403). Gated on\n`registration.approve`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    request:
+                      id: 1
+                      semester_id: 1
+                      kind: Initial
+                      status: Pending
+                      advisor_note: null
+                      decided_at: null
+                      submitted_at: '2026-08-02T09:00:00+00:00'
+                      lines:
+                        -
+                          id: 1
+                          offering_id: 1
+                          mode: Regular
+                          decision: null
+                          derived_retake: false
+                          classification: Core
+                          total_ch: 3
+                          course:
+                            id: 1
+                            code: DEP501
+                            name_en: 'Advanced Algorithms'
+                            name_ar: 'خوارزميات متقدمة'
+                            level: 500
+                            total_ch: 3
+                            research_type: null
+                            is_active: true
+                          instructor:
+                            id: 4
+                            name: 'Dr. Instructor'
+                            email: instructor@ejust.test
+                          meetings:
+                            -
+                              weekday: 1
+                              starts_at: '09:00'
+                              ends_at: '11:00'
+                    student:
+                      student_id: 5
+                      name: 'Sara Student'
+                      university_id: 2026-MSC-CE-0001
+                      enrollment_term: 'Fall 2026'
+                      degree_level: MSc
+                      current_load: 0
+                      program:
+                        id: 1
+                        code: MSC-CE
+                        name_en: 'MSc in Computer Engineering'
+                        name_ar: 'ماجستير هندسة الحاسوب'
+                        degree_level: MSc
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      request:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          semester_id:
+                            type: integer
+                            example: 1
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Pending
+                          advisor_note:
+                            type: string
+                            example: null
+                            nullable: true
+                          decided_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          submitted_at:
+                            type: string
+                            example: '2026-08-02T09:00:00+00:00'
+                          lines:
+                            type: array
+                            example:
+                              -
+                                id: 1
+                                offering_id: 1
+                                mode: Regular
+                                decision: null
+                                derived_retake: false
+                                classification: Core
+                                total_ch: 3
+                                course:
+                                  id: 1
+                                  code: DEP501
+                                  name_en: 'Advanced Algorithms'
+                                  name_ar: 'خوارزميات متقدمة'
+                                  level: 500
+                                  total_ch: 3
+                                  research_type: null
+                                  is_active: true
+                                instructor:
+                                  id: 4
+                                  name: 'Dr. Instructor'
+                                  email: instructor@ejust.test
+                                meetings:
+                                  - weekday: 1
+                                    starts_at: '09:00'
+                                    ends_at: '11:00'
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                offering_id:
+                                  type: integer
+                                  example: 1
+                                mode:
+                                  type: string
+                                  example: Regular
+                                decision:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                derived_retake:
+                                  type: boolean
+                                  example: false
+                                classification:
+                                  type: string
+                                  example: Core
+                                total_ch:
+                                  type: integer
+                                  example: 3
+                                course:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      example: 1
+                                    code:
+                                      type: string
+                                      example: DEP501
+                                    name_en:
+                                      type: string
+                                      example: 'Advanced Algorithms'
+                                    name_ar:
+                                      type: string
+                                      example: 'خوارزميات متقدمة'
+                                    level:
+                                      type: integer
+                                      example: 500
+                                    total_ch:
+                                      type: integer
+                                      example: 3
+                                    research_type:
+                                      type: string
+                                      example: null
+                                      nullable: true
+                                    is_active:
+                                      type: boolean
+                                      example: true
+                                instructor:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: integer
+                                      example: 4
+                                    name:
+                                      type: string
+                                      example: 'Dr. Instructor'
+                                    email:
+                                      type: string
+                                      example: instructor@ejust.test
+                                meetings:
+                                  type: array
+                                  example:
+                                    - weekday: 1
+                                      starts_at: '09:00'
+                                      ends_at: '11:00'
+                                  items:
+                                    type: object
+                                    properties:
+                                      weekday: { type: integer, example: 1 }
+                                      starts_at: { type: string, example: '09:00' }
+                                      ends_at: { type: string, example: '11:00' }
+                      student:
+                        type: object
+                        properties:
+                          student_id:
+                            type: integer
+                            example: 5
+                          name:
+                            type: string
+                            example: 'Sara Student'
+                          university_id:
+                            type: string
+                            example: 2026-MSC-CE-0001
+                          enrollment_term:
+                            type: string
+                            example: 'Fall 2026'
+                          degree_level:
+                            type: string
+                            example: MSc
+                          current_load:
+                            type: integer
+                            example: 0
+                          program:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              code:
+                                type: string
+                                example: MSC-CE
+                              name_en:
+                                type: string
+                                example: 'MSc in Computer Engineering'
+                              name_ar:
+                                type: string
+                                example: 'ماجستير هندسة الحاسوب'
+                              degree_level:
+                                type: string
+                                example: MSc
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Enrollment
+      security: []
+    parameters:
+      -
+        in: path
+        name: registration_id
+        description: "The registration request's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/registration/requests/{registration_id}/decision':
+    post:
+      summary: "Record the Advisor's line-item decision."
+      operationId: recordTheAdvisorsLineItemDecision
+      description: "Approve or reject each line and attach an optional note. The approved subset is\nre-validated at decision time — credit-hour floor (waived in the Student's first\nsemester) and ceiling, composition caps and duplicate/clash against the Student's\nexisting Enrollments, seat capacity, and the derived-Retake cap of one — and, if\nclean, **one Enrollment is minted per approved line atomically**. ≥1 approved line ⇒\nthe request is Approved; all rejected ⇒ Rejected. The request must still be Pending\n(else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on\n`registration.approve`."
+      parameters: []
+      responses:
+        200:
+          description: 'approved (Enrollments minted)'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    semester_id: 1
+                    kind: Initial
+                    status: Approved
+                    advisor_note: 'Looks good.'
+                    decided_at: '2026-08-03T09:00:00+00:00'
+                    submitted_at: '2026-08-02T09:00:00+00:00'
+                    lines:
+                      -
+                        id: 1
+                        offering_id: 1
+                        mode: Regular
+                        decision: approved
+                        derived_retake: false
+                        classification: Core
+                        total_ch: 3
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                        meetings:
+                          -
+                            weekday: 1
+                            starts_at: '09:00'
+                            ends_at: '11:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      semester_id:
+                        type: integer
+                        example: 1
+                      kind:
+                        type: string
+                        example: Initial
+                      status:
+                        type: string
+                        example: Approved
+                      advisor_note:
+                        type: string
+                        example: 'Looks good.'
+                      decided_at:
+                        type: string
+                        example: '2026-08-03T09:00:00+00:00'
+                      submitted_at:
+                        type: string
+                        example: '2026-08-02T09:00:00+00:00'
+                      lines:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            offering_id: 1
+                            mode: Regular
+                            decision: approved
+                            derived_retake: false
+                            classification: Core
+                            total_ch: 3
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                            instructor:
+                              id: 4
+                              name: 'Dr. Instructor'
+                              email: instructor@ejust.test
+                            meetings:
+                              - weekday: 1
+                                starts_at: '09:00'
+                                ends_at: '11:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            offering_id:
+                              type: integer
+                              example: 1
+                            mode:
+                              type: string
+                              example: Regular
+                            decision:
+                              type: string
+                              example: approved
+                            derived_retake:
+                              type: boolean
+                              example: false
+                            classification:
+                              type: string
+                              example: Core
+                            total_ch:
+                              type: integer
+                              example: 3
+                            course:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                code:
+                                  type: string
+                                  example: DEP501
+                                name_en:
+                                  type: string
+                                  example: 'Advanced Algorithms'
+                                name_ar:
+                                  type: string
+                                  example: 'خوارزميات متقدمة'
+                                level:
+                                  type: integer
+                                  example: 500
+                                total_ch:
+                                  type: integer
+                                  example: 3
+                                research_type:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                is_active:
+                                  type: boolean
+                                  example: true
+                            instructor:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 4
+                                name:
+                                  type: string
+                                  example: 'Dr. Instructor'
+                                email:
+                                  type: string
+                                  example: instructor@ejust.test
+                            meetings:
+                              type: array
+                              example:
+                                - weekday: 1
+                                  starts_at: '09:00'
+                                  ends_at: '11:00'
+                              items:
+                                type: object
+                                properties:
+                                  weekday:
+                                    type: integer
+                                    example: 1
+                                  starts_at:
+                                    type: string
+                                    example: '09:00'
+                                  ends_at:
+                                    type: string
+                                    example: '11:00'
+        403:
+          description: "not this advisor's advisee"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: 'already decided'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This registration request has already been decided.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This registration request has already been decided.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'line ids do not match the request'
+                    type: object
+                    example:
+                      message: 'Every line of the request must be decided.'
+                      errors:
+                        lines:
+                          - 'Every line of the request must be decided.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Every line of the request must be decided.'
+                      errors:
+                        type: object
+                        properties:
+                          lines:
+                            type: array
+                            example:
+                              - 'Every line of the request must be decided.'
+                            items:
+                              type: string
+                  -
+                    description: 'approved subset invalid'
+                    type: object
+                    example:
+                      message: 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                      errors:
+                        below_min_credit_hours:
+                          - 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                      errors:
+                        type: object
+                        properties:
+                          below_min_credit_hours:
+                            type: array
+                            example:
+                              - 'Your registration totals 3 credit hours, below the 6-hour minimum.'
+                            items:
+                              type: string
+      tags:
+        - Enrollment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  description: 'An optional note for the Student.'
+                  example: 'Trimmed one clashing course.'
+                  nullable: true
+                lines:
+                  type: array
+                  description: 'One entry per line of the request — every line must be addressed.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: "The request line's id."
+                        example: 1
+                      decision:
+                        type: string
+                        description: 'approved or rejected.'
+                        example: approved
+                    required:
+                      - id
+                      - decision
+              required:
+                - lines
+      security: []
+    parameters:
+      -
+        in: path
+        name: registration_id
+        description: "The registration request's id."
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/notifications:
     get:
       summary: 'List my notifications.'

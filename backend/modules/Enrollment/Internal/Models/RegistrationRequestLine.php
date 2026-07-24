@@ -6,6 +6,7 @@ use Database\Factories\RegistrationRequestLineFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 
 /**
@@ -22,6 +23,7 @@ use Modules\Enrollment\Internal\Enums\RegistrationMode;
  * @property int $registration_request_id
  * @property int $course_offering_id
  * @property RegistrationMode $mode
+ * @property LineDecision|null $decision
  */
 class RegistrationRequestLine extends Model
 {
@@ -32,6 +34,7 @@ class RegistrationRequestLine extends Model
     protected $fillable = [
         'course_offering_id',
         'mode',
+        'decision',
     ];
 
     /** @return array<string, string> */
@@ -40,6 +43,7 @@ class RegistrationRequestLine extends Model
         return [
             'course_offering_id' => 'integer',
             'mode' => RegistrationMode::class,
+            'decision' => LineDecision::class,
         ];
     }
 

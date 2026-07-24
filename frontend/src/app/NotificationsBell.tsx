@@ -47,6 +47,8 @@ const TYPE_ALIAS: Record<string, string> = {
   'decision.recorded': 'decisionRecorded',
   'application.accepted': 'applicationAccepted',
   'application.overdue': 'applicationOverdue',
+  'registration.submitted': 'registrationSubmitted',
+  'registration.decided': 'registrationDecided',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

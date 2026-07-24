@@ -27,8 +27,10 @@ class RegistrationRequestResource extends JsonResource
             'semester_id' => $registration->semester_id,
             'kind' => $registration->kind->value,
             'status' => $registration->status->value,
-            // The Advisor's note is attached at decision time (ticket 06); Pending has none.
-            'advisor_note' => null,
+            // The Advisor's note and decision timestamp are set at decision time (ticket 06);
+            // both are null while the request is still Pending.
+            'advisor_note' => $registration->advisor_note,
+            'decided_at' => $registration->decided_at?->toIso8601String(),
             'submitted_at' => $registration->created_at->toIso8601String(),
             'lines' => RegistrationRequestLineResource::collection($registration->lines)->resolve(),
         ];

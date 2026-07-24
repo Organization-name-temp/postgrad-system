@@ -40,8 +40,16 @@ class RegistrationRequestLineResource extends JsonResource
         $classification = $offering?->getAttribute('classification');
 
         return [
+            'id' => $line->getKey(),
             'offering_id' => $line->course_offering_id,
             'mode' => $line->mode->value,
+            // The Advisor's per-line outcome — null while Pending, set the moment the
+            // request is decided (ticket 06), so the Student's view shows what was kept.
+            'decision' => $line->decision?->value,
+            // Advisor review preview only: whether approving this line would mint a Retake
+            // (a prior for-credit attempt exists). Attached by the review controller; false
+            // where not computed (the Student's own request view).
+            'derived_retake' => (bool) $line->getAttribute('derived_retake'),
             'classification' => $classification instanceof EnrollmentClassification ? $classification->value : null,
             'total_ch' => $course instanceof CourseSummary ? $course->totalCh : null,
             'course' => $course instanceof CourseSummary ? $course->toArray() : null,

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
 
 /**
  * A Course Offering — one Catalog Course taught in one Calendar Semester (ADR-0017):
@@ -101,14 +102,21 @@ class CourseOffering extends Model
 
     /**
      * The seats still available, or `null` when the Offering is uncapped (a display fact
-     * on the eligible list, user story 15). Derived, never stored, so it cannot drift.
-     * No Enrollment consumes a seat until they are minted (tickets 05/06), so in this
-     * ticket a capped Offering reports its full capacity. Tickets 05/06 subtract the
-     * active-enrollment count here — resolved in one batched read keyed by offering id,
-     * not a per-row query — when the capacity validator lands (ADR-0017).
+     * on the eligible list, user story 15). Derived, never stored, so it cannot drift:
+     * capacity minus the count of **active** Enrollments (ADR-0017). That count is read in
+     * one batched query keyed by offering id and stashed as `enrolled_count`
+     * ({@see CountsEnrollments}); an Offering
+     * with no stash (before any mint — the eligibility list's first render) reports its
+     * full capacity, so tickets 04/05 behaviour is preserved. Never negative.
      */
     public function seatsRemaining(): ?int
     {
-        return $this->capacity;
+        if ($this->capacity === null) {
+            return null;
+        }
+
+        $enrolled = (int) ($this->getAttribute('enrolled_count') ?? 0);
+
+        return max(0, $this->capacity - $enrolled);
     }
 }

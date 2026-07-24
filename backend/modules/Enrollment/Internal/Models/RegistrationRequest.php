@@ -29,6 +29,9 @@ use Modules\Enrollment\Internal\Enums\RegistrationStatus;
  * @property int $semester_id
  * @property RegistrationKind $kind
  * @property RegistrationStatus $status
+ * @property string|null $advisor_note
+ * @property Carbon|null $decided_at
+ * @property int|null $decided_by
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -43,6 +46,9 @@ class RegistrationRequest extends Model
         'semester_id',
         'kind',
         'status',
+        'advisor_note',
+        'decided_at',
+        'decided_by',
     ];
 
     /** @return array<string, string> */
@@ -53,6 +59,8 @@ class RegistrationRequest extends Model
             'semester_id' => 'integer',
             'kind' => RegistrationKind::class,
             'status' => RegistrationStatus::class,
+            'decided_at' => 'datetime',
+            'decided_by' => 'integer',
         ];
     }
 
@@ -80,5 +88,28 @@ class RegistrationRequest extends Model
     public function scopePending(Builder $query): void
     {
         $query->where('status', RegistrationStatus::Pending);
+    }
+
+    /** Whether the request is still awaiting an Advisor's decision. */
+    public function isPending(): bool
+    {
+        return $this->status === RegistrationStatus::Pending;
+    }
+
+    /**
+     * Record the Advisor's decision on the request itself — the terminal status (Approved
+     * when ≥1 line was kept, Rejected when all were trimmed), the optional note, and who
+     * decided it when. The per-line outcomes and the Enrollment mint are driven by the
+     * caller inside the same transaction (the ADR-0013 accept→mint precedent); this only
+     * moves the aggregate's own state.
+     */
+    public function recordDecision(RegistrationStatus $outcome, int $decidedBy, ?string $note): void
+    {
+        $this->update([
+            'status' => $outcome,
+            'advisor_note' => $note,
+            'decided_at' => now(),
+            'decided_by' => $decidedBy,
+        ]);
     }
 }

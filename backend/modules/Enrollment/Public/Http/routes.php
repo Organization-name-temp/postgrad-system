@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
+use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
 
 /*
 | Enrollment routes, mounted under /api/v1 by EnrollmentServiceProvider.
@@ -42,4 +43,17 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
     // neither carries a model-bound route parameter.
     Route::post('/registration/requests', [RegistrationController::class, 'submit']);
     Route::get('/registration/requests', [RegistrationController::class, 'requests']);
+
+    // The Student's own schedule — their minted Enrollments grouped by Semester (ticket 06).
+    Route::get('/registration/schedule', [RegistrationController::class, 'schedule']);
+});
+
+Route::middleware(['auth:sanctum', 'can:registration.approve'])->group(function () {
+    // The Advisor's review of their advisees' Pending requests (ticket 06): a live-scoped
+    // queue, line-item review of one request, and the decision that mints Enrollments.
+    // Student Affairs (and administrators) review unscoped (ScopesToAdvisees). The single
+    // request is model-bound as {registration} → RegistrationRequest.
+    Route::get('/registration/queue', [RegistrationReviewController::class, 'queue']);
+    Route::get('/registration/requests/{registration}', [RegistrationReviewController::class, 'show'])->whereNumber('registration');
+    Route::post('/registration/requests/{registration}/decision', [RegistrationReviewController::class, 'decide'])->whereNumber('registration');
 });

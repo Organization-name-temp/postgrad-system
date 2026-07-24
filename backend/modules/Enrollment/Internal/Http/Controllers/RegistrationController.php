@@ -15,22 +15,25 @@ use Modules\Catalog\Public\CourseSummary;
 use Modules\Enrollment\Internal\Enums\RegistrationKind;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
+use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
+use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
+use Modules\Enrollment\Internal\Http\Concerns\ResolvesCartLines;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesOfferingRefs;
 use Modules\Enrollment\Internal\Http\Resources\EligibleCourseResource;
+use Modules\Enrollment\Internal\Http\Resources\EnrollmentResource;
 use Modules\Enrollment\Internal\Http\Resources\RegistrationRequestResource;
 use Modules\Enrollment\Internal\Models\CourseOffering;
-use Modules\Enrollment\Internal\Models\OfferingMeeting;
+use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
-use Modules\Enrollment\Internal\Support\CreditHoursExceptions;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
-use Modules\Enrollment\Internal\Support\MeetingTime;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
+use Modules\Notifications\Public\Contracts\Notifier;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -53,6 +56,9 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  */
 class RegistrationController
 {
+    use CountsEnrollments;
+    use NotifiesRegistration;
+    use ResolvesCartLines;
     use ResolvesOfferingRefs;
 
     /**
@@ -87,6 +93,7 @@ class RegistrationController
 
         $offerings = $this->semesterOfferings($semester->id);
         $this->attachOfferingRefs($offerings, $courses, $directory);
+        $this->attachEnrollmentCounts($offerings);
         $classifications = $eligibility->classify($student, $offerings);
 
         $eligible = $offerings->filter(function (CourseOffering $offering) use ($classifications): bool {
@@ -131,6 +138,7 @@ class RegistrationController
         CourseCatalog $courses,
         Directory $directory,
         EligibilityResolver $eligibility,
+        Notifier $notifier,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
@@ -186,8 +194,16 @@ class RegistrationController
             return $registration;
         });
 
-        // The advisor `registration.submitted` notification is wired onto this path in
-        // ticket 06, when the Notification types land.
+        // Side effect after the transaction commits: tell the Student's live Advisor a
+        // registration awaits their review (ticket 06). The advisee↔advisor link resolves
+        // live, so the notification follows the Student's current advisor.
+        $this->notifyRegistrationSubmitted(
+            $notifier,
+            $student->advisorId,
+            $registration,
+            $this->studentDisplayName($student, $directory),
+            count($cartLines),
+        );
 
         $registration->load('lines.offering.meetings');
         $this->hydrateRequests(collect([$registration]), $student, $courses, $directory, $eligibility);
@@ -237,6 +253,74 @@ class RegistrationController
                 'requests' => RegistrationRequestResource::collection($requests)->resolve(),
             ],
         ]);
+    }
+
+    /**
+     * The acting Student's schedule — their minted Enrollments, grouped by Semester.
+     *
+     * The Student's academic present (user story 32, FR-REG-005): every Enrollment the
+     * advisor minted, grouped by Semester (most recent first), each carrying its Course
+     * Status, Enrollment Classification, registration-time credit hours, and the live
+     * display facts — course, instructor, weekly meeting times — read through the Catalog/
+     * Offering facades (ADR-0017). Attendance percentage and the period-gated action
+     * buttons land in tickets 08/07; this ticket renders the read-only schedule. Gated on
+     * `courses.register_self` (the acting Student, R02).
+     *
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}]}
+     * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
+     */
+    public function schedule(
+        Request $request,
+        StudentDirectory $students,
+        AcademicCalendar $calendar,
+        CourseCatalog $courses,
+        Directory $directory,
+    ): JsonResponse {
+        $student = $this->actingStudent($request, $students);
+
+        $enrollments = Enrollment::query()
+            ->where('student_id', $student->studentId)
+            ->with('offering.meetings')
+            ->orderBy('id')
+            ->get();
+
+        $offerings = $enrollments->pluck('offering')->filter()->values();
+        $this->attachOfferingRefs($offerings, $courses, $directory);
+
+        // Group by the Offering's Semester; render each group newest-first by start date.
+        $groups = $enrollments
+            ->filter(fn (Enrollment $enrollment): bool => $enrollment->offering !== null)
+            ->groupBy(fn (Enrollment $enrollment): int => (int) $enrollment->offering->semester_id)
+            ->map(function (Collection $group, int $semesterId) use ($calendar): ?array {
+                $semester = $calendar->find($semesterId);
+                if ($semester === null) {
+                    return null; // a dangling Semester reference — omit the group
+                }
+
+                return [
+                    'semester' => $this->semesterPayload($semester),
+                    'starts_at' => $semester->startsAt,
+                    'enrollments' => EnrollmentResource::collection($group->values())->resolve(),
+                ];
+            })
+            ->filter()
+            ->sortByDesc('starts_at')
+            ->map(fn (array $group): array => ['semester' => $group['semester'], 'enrollments' => $group['enrollments']])
+            ->values();
+
+        return response()->json(['data' => $groups->all()]);
+    }
+
+    /**
+     * The Student's display name for a notification line — resolved through the Identity
+     * {@see Directory} (the Student anchor summary carries no name, ADR-0012). Falls back to
+     * the University ID when the owning user cannot be resolved.
+     */
+    private function studentDisplayName(StudentSummary $student, Directory $directory): string
+    {
+        $users = $directory->findMany([$student->userId]);
+
+        return isset($users[$student->userId]) ? $users[$student->userId]->name : $student->universityId;
     }
 
     /**
@@ -292,6 +376,7 @@ class RegistrationController
             ->keyBy('id');
 
         $this->attachOfferingRefs($offerings, $courses, $directory);
+        $this->attachEnrollmentCounts($offerings);
         $classifications = $eligibility->classify($student, $offerings);
 
         $cartLines = [];
@@ -322,19 +407,6 @@ class RegistrationController
         }
 
         return [$cartLines, $ineligible];
-    }
-
-    /**
-     * The credit-hour exceptions for this registration: the first-semester waiver applies
-     * when the target Semester is the Student's enrollment term (matched by natural key —
-     * the Semester's display name equals the stored term, ADR-0018). Phase 5 adds the
-     * approaching-graduation exception here.
-     */
-    private function exceptionsFor(StudentSummary $student, SemesterSummary $semester): CreditHoursExceptions
-    {
-        return new CreditHoursExceptions(
-            firstSemester: $student->enrollmentTerm === $semester->nameEn,
-        );
     }
 
     /**
@@ -388,21 +460,6 @@ class RegistrationController
             'classification',
             $classifications[$offering->getKey()] ?? null,
         ));
-    }
-
-    /**
-     * The Offering's weekly meetings as pure {@see MeetingTime} slots — the shape the cart
-     * clash check reads.
-     *
-     * @return list<MeetingTime>
-     */
-    private function meetingSlots(CourseOffering $offering): array
-    {
-        return $offering->meetings->map(fn (OfferingMeeting $meeting): MeetingTime => MeetingTime::fromClock(
-            $meeting->weekday->value,
-            $meeting->starts_at,
-            $meeting->ends_at,
-        ))->all();
     }
 
     /**

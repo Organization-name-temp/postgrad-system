@@ -20,7 +20,13 @@ final readonly class CartViolation
     /** The same course appears on more than one line (incl. Regular + Audit of it). */
     public const string DUPLICATE_COURSE = 'duplicate_course';
 
-    /** Two chosen Offerings meet at overlapping weekly times. */
+    /** An approved line is a course the Student is already enrolled in this semester (mint). */
+    public const string DUPLICATE_ENROLLMENT = 'duplicate_enrollment';
+
+    /** A second retake of a course whose one allowed retake is already used (mint, FR-REG-006). */
+    public const string RETAKE_LIMIT = 'retake_limit';
+
+    /** Two chosen Offerings meet at overlapping weekly times (or clash with the record). */
     public const string TIME_CLASH = 'time_clash';
 
     /** A chosen Offering has no seats remaining. */

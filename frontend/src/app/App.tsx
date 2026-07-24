@@ -27,6 +27,9 @@ import { SemestersPage } from '../features/admin/semesters/SemestersPage'
 import { OfferingsPage } from '../features/admin/offerings/OfferingsPage'
 import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
 import { RegistrationPage } from '../features/enrollment/registration/RegistrationPage'
+import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
+import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
+import { RegistrationReviewPage } from '../features/enrollment/advising/RegistrationReviewPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE } from '../shared/access/roles'
@@ -72,7 +75,13 @@ export function App() {
                     the server would 403 the eligible list anyway (ticket 04). */}
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
                   <Route path="/registration" element={<RegistrationPage />} />
+                  <Route path="/schedule" element={<SchedulePage />} />
                 </Route>
+                {/* Advisor / Student Affairs registration review (ticket 06): gated on the
+                    registration.approve permission (route + API). Advisors are scoped to
+                    their advisees server-side; SA + admins review unscoped. */}
+                <Route path="/advising" element={<AdvisingQueuePage />} />
+                <Route path="/advising/:requestId" element={<RegistrationReviewPage />} />
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
                 <Route path="/dean" element={<DeanQueuePage />} />

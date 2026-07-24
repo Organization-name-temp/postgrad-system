@@ -49,4 +49,16 @@ interface Directory
      * matrix does not cover. `false` for an unknown user id.
      */
     public function isAdministrator(int $userId): bool;
+
+    /**
+     * Whether the given user holds the given {@see Role}. Identity owns role membership, so
+     * a consumer reads it here rather than inspecting the user model itself (ADR-0012).
+     *
+     * Enrollment is the consumer: the advisor request queue and decision guard scope an
+     * *Advisor* (R03) to their own advisees, while an oversight viewer who also holds
+     * `registration.approve` — Student Affairs (R05) — reviews unscoped (ticket 06); the
+     * two are told apart by role, since the permission alone does not distinguish them.
+     * `false` for an unknown user id.
+     */
+    public function hasRole(int $userId, Role $role): bool;
 }

@@ -22,11 +22,14 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
  *   via the shared {@see MeetingTime} overlap seam.
  * - **Seat capacity** — a chosen Offering must have a seat remaining.
  *
- * Retake/duplicate-against-existing-Enrollment, and clashes against the Student's already
- * *minted* Enrollments, are *not* here — they need Enrollments, which do not exist until
- * the mint (ticket 06); the same {@see MeetingTime} seam extends to cover them there.
- * Eligibility (an Offering the Student may not take at all) is enforced by the controller
- * before a line is built.
+ * At the **cart submission** (ticket 05) the Student has no Enrollments yet, so the
+ * caller passes {@see ExistingEnrollments::none()} and only the within-cart rules apply.
+ * At the **advisor mint** (ticket 06) the caller passes the Student's record, and the same
+ * seam additionally checks the caps, the duplicate and the clash **against existing
+ * Enrollments** — the {@see MeetingTime} overlap primitive simply extends to the record.
+ * Retake derivation (and its cap of one) is the {@see RetakeDeriver}'s job, done by the
+ * caller alongside this. Eligibility (an Offering the Student may not take at all) is
+ * enforced by the controller before a line is built.
  */
 final readonly class CartValidator
 {
@@ -38,14 +41,16 @@ final readonly class CartValidator
      * @param  list<CartLine>  $lines
      * @return list<CartViolation>
      */
-    public function validate(array $lines, CreditHoursExceptions $exceptions): array
+    public function validate(array $lines, CreditHoursExceptions $exceptions, ?ExistingEnrollments $existing = null): array
     {
+        $existing ??= ExistingEnrollments::none();
+
         return [
             ...$this->creditHourViolations($lines, $exceptions),
-            ...$this->duplicateViolations($lines),
-            ...$this->capViolations($lines),
+            ...$this->duplicateViolations($lines, $existing),
+            ...$this->capViolations($lines, $existing),
             ...$this->capacityViolations($lines),
-            ...$this->clashViolations($lines),
+            ...$this->clashViolations($lines, $existing),
         ];
     }
 
@@ -85,13 +90,15 @@ final readonly class CartValidator
     }
 
     /**
-     * One violation per course that appears on more than one line — a course can be
-     * registered only once per semester, so Regular + Audit of it is a duplicate.
+     * Duplicate courses: one violation per course appearing on more than one line (a course
+     * can be registered only once per semester, so Regular + Audit of it is a duplicate),
+     * plus — at the mint — one per line for an Offering the Student is **already enrolled
+     * in** (the "one Enrollment per (student, course, semester)" rule against the record).
      *
      * @param  list<CartLine>  $lines
      * @return list<CartViolation>
      */
-    private function duplicateViolations(array $lines): array
+    private function duplicateViolations(array $lines, ExistingEnrollments $existing): array
     {
         $byCourse = [];
         foreach ($lines as $line) {
@@ -109,22 +116,36 @@ final readonly class CartValidator
             }
         }
 
+        foreach ($lines as $line) {
+            if (in_array($line->offeringId, $existing->enrolledOfferingIds, true)) {
+                $violations[] = new CartViolation(
+                    CartViolation::DUPLICATE_ENROLLMENT,
+                    "{$line->courseCode} is already on the student's schedule this semester.",
+                    [$line->offeringId],
+                );
+            }
+        }
+
         return $violations;
     }
 
     /**
-     * The composition caps: at most one External Elective (the one-allowance rule, BR-24)
-     * and at most one Research Course (exactly one, BR-25) in a single cart.
+     * The composition caps, counting the Student's **record plus this cart**: at most one
+     * External Elective ever (the one-allowance rule, BR-24) and at most one Research
+     * Course (BR-25). At submission the record is empty, so this is a pure within-cart
+     * cap; at the mint the existing active Enrollments in each classification are added in,
+     * so a second one is blocked even when the first is already on the record (user
+     * story 28).
      *
      * @param  list<CartLine>  $lines
      * @return list<CartViolation>
      */
-    private function capViolations(array $lines): array
+    private function capViolations(array $lines, ExistingEnrollments $existing): array
     {
         $violations = [];
 
         $external = $this->linesClassified($lines, EnrollmentClassification::ExternalElective);
-        if (count($external) > 1) {
+        if (count($external) + $existing->countFor(EnrollmentClassification::ExternalElective) > 1) {
             $violations[] = new CartViolation(
                 CartViolation::EXTERNAL_ELECTIVE_CAP,
                 'Only one external elective is allowed per registration.',
@@ -133,7 +154,7 @@ final readonly class CartValidator
         }
 
         $research = $this->linesClassified($lines, EnrollmentClassification::ResearchCourse);
-        if (count($research) > 1) {
+        if (count($research) + $existing->countFor(EnrollmentClassification::ResearchCourse) > 1) {
             $violations[] = new CartViolation(
                 CartViolation::RESEARCH_COURSE_CAP,
                 'Only one research course is allowed per registration.',
@@ -168,21 +189,23 @@ final readonly class CartValidator
     }
 
     /**
-     * One violation per clashing pair of Offerings — any meeting of one overlapping any
-     * meeting of the other on the same weekday, via the shared {@see MeetingTime} seam
-     * (the same primitive the offering self-overlap check uses).
+     * Time clashes: one violation per clashing pair of chosen Offerings — any meeting of
+     * one overlapping any meeting of the other on the same weekday — plus, at the mint,
+     * one per line clashing with the Student's **existing schedule** for the target
+     * Semester. All via the shared {@see MeetingTime} overlap seam (the same primitive the
+     * offering self-overlap check uses).
      *
      * @param  list<CartLine>  $lines
      * @return list<CartViolation>
      */
-    private function clashViolations(array $lines): array
+    private function clashViolations(array $lines, ExistingEnrollments $existing): array
     {
         $violations = [];
         $count = count($lines);
 
         for ($i = 0; $i < $count; $i++) {
             for ($j = $i + 1; $j < $count; $j++) {
-                if ($this->clash($lines[$i], $lines[$j])) {
+                if ($this->clash($lines[$i]->meetings, $lines[$j]->meetings)) {
                     $violations[] = new CartViolation(
                         CartViolation::TIME_CLASH,
                         "{$lines[$i]->courseCode} and {$lines[$j]->courseCode} meet at overlapping times.",
@@ -192,14 +215,29 @@ final readonly class CartValidator
             }
         }
 
+        foreach ($lines as $line) {
+            if ($this->clash($line->meetings, $existing->meetings)) {
+                $violations[] = new CartViolation(
+                    CartViolation::TIME_CLASH,
+                    "{$line->courseCode} clashes with the student's existing schedule this semester.",
+                    [$line->offeringId],
+                );
+            }
+        }
+
         return $violations;
     }
 
-    /** Whether any meeting of one line overlaps any meeting of the other. */
-    private function clash(CartLine $a, CartLine $b): bool
+    /**
+     * Whether any slot in one set overlaps any slot in the other.
+     *
+     * @param  list<MeetingTime>  $a
+     * @param  list<MeetingTime>  $b
+     */
+    private function clash(array $a, array $b): bool
     {
-        foreach ($a->meetings as $slotA) {
-            foreach ($b->meetings as $slotB) {
+        foreach ($a as $slotA) {
+            foreach ($b as $slotB) {
                 if ($slotA->overlaps($slotB)) {
                     return true;
                 }

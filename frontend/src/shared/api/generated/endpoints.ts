@@ -3064,6 +3064,275 @@ export type TheActingStudentsRegistrationRequestsForTheOpenSemester403 = {
   message?: string;
 };
 
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItem = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse;
+  instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemInstructor;
+  meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemMeetingsItem[];
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItem = {
+  semester?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemSemester;
+  enrollments?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItem[];
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200 = {
+  data?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItem[];
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403 = {
+  message?: string;
+};
+
+export type TheAdvisorsRegistrationQueue200DataItemStudentProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type TheAdvisorsRegistrationQueue200DataItemStudent = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  program?: TheAdvisorsRegistrationQueue200DataItemStudentProgram;
+};
+
+export type TheAdvisorsRegistrationQueue200DataItem = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  submitted_at?: string;
+  course_count?: number;
+  student?: TheAdvisorsRegistrationQueue200DataItemStudent;
+};
+
+export type TheAdvisorsRegistrationQueue200 = {
+  data?: TheAdvisorsRegistrationQueue200DataItem[];
+};
+
+export type TheAdvisorsRegistrationQueue403 = {
+  message?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItem = {
+  id?: number;
+  offering_id?: number;
+  mode?: string;
+  /** @nullable */
+  decision?: string | null;
+  derived_retake?: boolean;
+  classification?: string;
+  total_ch?: number;
+  course?: ASingleRequestForLineItemReview200DataRequestLinesItemCourse;
+  instructor?: ASingleRequestForLineItemReview200DataRequestLinesItemInstructor;
+  meetings?: ASingleRequestForLineItemReview200DataRequestLinesItemMeetingsItem[];
+};
+
+export type ASingleRequestForLineItemReview200DataRequest = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  /** @nullable */
+  decided_at?: string | null;
+  submitted_at?: string;
+  lines?: ASingleRequestForLineItemReview200DataRequestLinesItem[];
+};
+
+export type ASingleRequestForLineItemReview200DataStudentProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataStudent = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  current_load?: number;
+  program?: ASingleRequestForLineItemReview200DataStudentProgram;
+};
+
+export type ASingleRequestForLineItemReview200Data = {
+  request?: ASingleRequestForLineItemReview200DataRequest;
+  student?: ASingleRequestForLineItemReview200DataStudent;
+};
+
+export type ASingleRequestForLineItemReview200 = {
+  data?: ASingleRequestForLineItemReview200Data;
+};
+
+export type ASingleRequestForLineItemReview403 = {
+  message?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecisionBodyLinesItem = {
+  /** The request line's id. */
+  id: number;
+  /** approved or rejected. */
+  decision: string;
+};
+
+export type RecordTheAdvisorsLineItemDecisionBody = {
+  /**
+     * An optional note for the Student.
+     * @nullable
+     */
+  note?: string | null;
+  /** One entry per line of the request — every line must be addressed. */
+  lines: RecordTheAdvisorsLineItemDecisionBodyLinesItem[];
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItem = {
+  id?: number;
+  offering_id?: number;
+  mode?: string;
+  decision?: string;
+  derived_retake?: boolean;
+  classification?: string;
+  total_ch?: number;
+  course?: RecordTheAdvisorsLineItemDecision200DataLinesItemCourse;
+  instructor?: RecordTheAdvisorsLineItemDecision200DataLinesItemInstructor;
+  meetings?: RecordTheAdvisorsLineItemDecision200DataLinesItemMeetingsItem[];
+};
+
+export type RecordTheAdvisorsLineItemDecision200Data = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  advisor_note?: string;
+  decided_at?: string;
+  submitted_at?: string;
+  lines?: RecordTheAdvisorsLineItemDecision200DataLinesItem[];
+};
+
+export type RecordTheAdvisorsLineItemDecision200 = {
+  data?: RecordTheAdvisorsLineItemDecision200Data;
+};
+
+export type RecordTheAdvisorsLineItemDecision403 = {
+  message?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision409 = {
+  message?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision422 = {
+  message?: string;
+  errors?: {
+  lines?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  below_min_credit_hours?: string[];
+};
+};
+
 export type ListMyNotifications200DataItemData = {
   scheduled_at?: string;
 };
@@ -10710,6 +10979,378 @@ export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData
 
 
 
+
+/**
+ * The Student's academic present (user story 32, FR-REG-005): every Enrollment the
+ * advisor minted, grouped by Semester (most recent first), each carrying its Course
+ * Status, Enrollment Classification, registration-time credit hours, and the live
+ * display facts — course, instructor, weekly meeting times — read through the Catalog/
+ * Offering facades (ADR-0017). Attendance percentage and the period-gated action
+ * buttons land in tickets 08/07; this ticket renders the read-only schedule. Gated on
+ * `courses.register_self` (the acting Student, R02).
+ * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
+ */
+export const theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200>(
+      {url: `/api/v1/registration/schedule`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryKey = () => {
+    return [
+    `/api/v1/registration/schedule`
+    ] as const;
+    }
+
+
+export const getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryOptions = <TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>> = ({ signal }) => theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryResult = NonNullable<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>>
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403
+
+
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
+ */
+
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The Pending registration requests awaiting the signed-in reviewer, oldest-first — an
+ * Advisor's own **live** advisee set (a request follows the Student when their advisor
+ * is reassigned), or, for Student Affairs / an administrator, every advisor's advisees
+ * unscoped (user story 52). Each row carries the Student's context — name, University
+ * ID, degree, Program, enrollment term — and the number of courses requested, so the
+ * reviewer can triage. Gated on `registration.approve`.
+ * @summary The advisor's registration queue.
+ */
+export const theAdvisorsRegistrationQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheAdvisorsRegistrationQueue200>(
+      {url: `/api/v1/registration/queue`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheAdvisorsRegistrationQueueQueryKey = () => {
+    return [
+    `/api/v1/registration/queue`
+    ] as const;
+    }
+
+
+export const getTheAdvisorsRegistrationQueueQueryOptions = <TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheAdvisorsRegistrationQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>> = ({ signal }) => theAdvisorsRegistrationQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheAdvisorsRegistrationQueueQueryResult = NonNullable<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>>
+export type TheAdvisorsRegistrationQueueQueryError = TheAdvisorsRegistrationQueue403
+
+
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>,
+          TError,
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>,
+          TError,
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The advisor's registration queue.
+ */
+
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheAdvisorsRegistrationQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The full request for the review screen: the Student's context beside the lines —
+ * Program, degree, enrollment term, and current semester load — and every line with its
+ * classification, credit hours, meeting times and a **derived Retake** preview (whether
+ * approving it would mint a Retake from the Student's record). Same advisee scope as the
+ * queue: an Advisor may open only their own advisee's request (else 403). Gated on
+ * `registration.approve`.
+ * @summary A single request for line-item review.
+ */
+export const aSingleRequestForLineItemReview = (
+    registrationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ASingleRequestForLineItemReview200>(
+      {url: `/api/v1/registration/requests/${registrationId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getASingleRequestForLineItemReviewQueryKey = (registrationId: number,) => {
+    return [
+    `/api/v1/registration/requests/${registrationId}`
+    ] as const;
+    }
+
+
+export const getASingleRequestForLineItemReviewQueryOptions = <TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getASingleRequestForLineItemReviewQueryKey(registrationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>> = ({ signal }) => aSingleRequestForLineItemReview(registrationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: registrationId !== null && registrationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ASingleRequestForLineItemReviewQueryResult = NonNullable<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>>
+export type ASingleRequestForLineItemReviewQueryError = ASingleRequestForLineItemReview403
+
+
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>,
+          TError,
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>,
+          TError,
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary A single request for line-item review.
+ */
+
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getASingleRequestForLineItemReviewQueryOptions(registrationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Approve or reject each line and attach an optional note. The approved subset is
+ * re-validated at decision time — credit-hour floor (waived in the Student's first
+ * semester) and ceiling, composition caps and duplicate/clash against the Student's
+ * existing Enrollments, seat capacity, and the derived-Retake cap of one — and, if
+ * clean, **one Enrollment is minted per approved line atomically**. ≥1 approved line ⇒
+ * the request is Approved; all rejected ⇒ Rejected. The request must still be Pending
+ * (else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on
+ * `registration.approve`.
+ * @summary Record the Advisor's line-item decision.
+ */
+export const recordTheAdvisorsLineItemDecision = (
+    registrationId: number,
+    recordTheAdvisorsLineItemDecisionBody: RecordTheAdvisorsLineItemDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordTheAdvisorsLineItemDecision200>(
+      {url: `/api/v1/registration/requests/${registrationId}/decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: recordTheAdvisorsLineItemDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordTheAdvisorsLineItemDecisionMutationOptions = <TError = RecordTheAdvisorsLineItemDecision403 | RecordTheAdvisorsLineItemDecision409 | RecordTheAdvisorsLineItemDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, TError,{registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, TError,{registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}, TContext> => {
+
+const mutationKey = ['recordTheAdvisorsLineItemDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, {registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}> = (props) => {
+          const {registrationId,data} = props ?? {};
+
+          return  recordTheAdvisorsLineItemDecision(registrationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordTheAdvisorsLineItemDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>>
+    export type RecordTheAdvisorsLineItemDecisionMutationBody = RecordTheAdvisorsLineItemDecisionBody
+    export type RecordTheAdvisorsLineItemDecisionMutationError = RecordTheAdvisorsLineItemDecision403 | RecordTheAdvisorsLineItemDecision409 | RecordTheAdvisorsLineItemDecision422
+
+    /**
+ * @summary Record the Advisor's line-item decision.
+ */
+export const useRecordTheAdvisorsLineItemDecision = <TError = RecordTheAdvisorsLineItemDecision403 | RecordTheAdvisorsLineItemDecision409 | RecordTheAdvisorsLineItemDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, TError,{registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>,
+        TError,
+        {registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody},
+        TContext
+      > => {
+      return useMutation(getRecordTheAdvisorsLineItemDecisionMutationOptions(options), queryClient);
+    }
 
 /**
  * Paginated, newest-first. Scoped to the authenticated user.

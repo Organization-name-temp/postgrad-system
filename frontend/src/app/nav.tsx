@@ -15,6 +15,8 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
+import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek'
+import RuleIcon from '@mui/icons-material/Rule'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -155,6 +157,27 @@ export const navItems: NavItem[] = [
     icon: <AppRegistrationIcon />,
     section: 'enrollment',
     roles: [ROLE.student],
+  },
+  // My Schedule (ticket 06): the Student's minted Enrollments per semester. A persona
+  // item on the Student role (R02), beside registration — an admin inherits the
+  // permission but has no Student record, so it gates on the Role (ADR-0015).
+  {
+    key: 'schedule',
+    to: '/schedule',
+    icon: <CalendarViewWeekIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  // The Advisor's registration-review queue (ticket 06): approve/trim/reject a Pending
+  // request line-by-line. A capability item on registration.approve — held by Advisors
+  // (their own advisees, live-scoped) and Student Affairs (unscoped); admins inherit it
+  // for oversight (ADR-0015).
+  {
+    key: 'advising',
+    to: '/advising',
+    icon: <RuleIcon />,
+    permission: PERMISSION.approveCourseRegistration,
+    section: 'enrollment',
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

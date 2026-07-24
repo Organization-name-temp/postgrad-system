@@ -13,7 +13,7 @@ void i18n.use(initReactI18next).init({
   lng: 'en',
   fallbackLng: 'en',
   supportedLngs: SUPPORTED_LOCALES,
-  ns: ['common', 'auth', 'catalog', 'admin', 'notifications', 'admissions'],
+  ns: ['common', 'auth', 'catalog', 'admin', 'notifications', 'admissions', 'enrollment'],
   defaultNS: 'common',
   interpolation: { escapeValue: false }, // React already escapes.
 })

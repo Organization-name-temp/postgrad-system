@@ -1,0 +1,13 @@
+# 04 — Eligibility listing (Classifier + Curriculum facade)
+
+**What to build:** A Student opens registration for the currently-open Semester and sees the courses they may register for, **grouped by Enrollment Classification** — Preparatory, Program Core, Internal Elective, External Elective, Research Course (BR-14…26). Each line shows the Offering's instructor, meeting times, and seats remaining. Read-only: this ticket delivers the eligible view and the hard domain logic under it (the two Catalog facades + the pure Classifier); the cart and submission come in ticket 05.
+
+**Blocked by:** 03 (needs Course Offerings to list and the CourseCatalog facade).
+
+**Status:** ready-for-agent
+
+- [ ] Catalog grows a `CurriculumCatalog` reader (a Program's Curriculum Entries → DTOs, and a "which active graduate Programs' curricula contain course X" lookup for the External-Elective test). Opaque ids + DTOs, no FK (ADR-0012); `CourseCategory`/`CourseLevel` already Public from ticket 03.
+- [ ] A pure **Classifier** (`Internal\Support`, the `CreditHours`/`BusinessDays` precedent) maps a (student program, degree level, candidate course) to exactly one of: Preparatory / Core (own-curriculum ProgramCore) / Internal Elective (own-curriculum ResearchElective at 500 MSc / 600 PhD) / Research Course (own-curriculum, level 700, research type matching degree — PBL MSc / Seminar PhD) / External Elective (not in own curriculum; in another active graduate Program's curriculum; level per degree). Retake is **not** classified here (needs existing Enrollments — ticket 06).
+- [ ] `GET` eligible-courses endpoint (`courses.register_self`, the acting Student): own Curriculum ∩ the open Semester's Offerings, plus other Programs' curriculum courses offered this semester as External Electives. Courses with no Offering this semester are absent. Each entry carries its classification, the Offering's instructor + meeting times + seats-remaining, and the course's total CH. Scribe `@urlParam` examples; openapi + Orval regenerated.
+- [ ] `features/enrollment` Registration page (new "enrollment" nav section, `courses.register_self` / R02): the eligible list grouped by classification, External Electives clearly labeled, seats shown, Research Course slot showing only the degree-matched level-700 option. No cart interactions yet. EN+AR, axe-clean.
+- [ ] **Tests:** targeted unit for the Classifier across all five classes + the degree/level matrix + the external-vs-internal boundary; Pest API-feature for the eligible-list endpoint (grouping, offering-intersection, external inclusion, no-offering exclusion, RBAC). Sparse Vitest only if the grouped list is non-trivial. Gates green.

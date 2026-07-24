@@ -121,6 +121,23 @@ export function createAppTheme(lang: string): Theme {
       easing: { easeInOut: motion.easing },
     },
     components: {
+      MuiButton: {
+        styleOverrides: {
+          // Warning's `.main` is a fill colour, not a text colour (design-system.md §12 /
+          // the token contrast gate). A text or outlined warning button therefore needs the
+          // accessible shade for its label — `.dark` in light, `.light` in dark — the same
+          // rule StatusChip applies to soft/outlined tones. (Contained buttons already get
+          // readable text from the 4.5 contrastThreshold above.)
+          root: ({ ownerState, theme }) =>
+            ownerState.color === 'warning' &&
+            (ownerState.variant === 'text' || ownerState.variant === 'outlined')
+              ? {
+                  color: theme.vars.palette.warning.dark,
+                  ...theme.applyStyles('dark', { color: theme.vars.palette.warning.light }),
+                }
+              : {},
+        },
+      },
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
           // Visible keyboard focus everywhere — never removed without replacement.

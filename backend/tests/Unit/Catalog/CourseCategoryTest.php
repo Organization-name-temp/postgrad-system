@@ -1,6 +1,6 @@
 <?php
 
-use Modules\Catalog\Internal\Enums\CourseCategory;
+use Modules\Catalog\Public\Enums\CourseCategory;
 
 /**
  * The three Course Categories and their default credit-hour split are pure domain

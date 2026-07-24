@@ -1630,6 +1630,137 @@ export type DeactivateAnAdmissionCycle200 = {
   data?: DeactivateAnAdmissionCycle200Data;
 };
 
+export type ListSemesters200DataItem = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ListSemesters200 = {
+  data?: ListSemesters200DataItem[];
+};
+
+export type CreateASemesterBody = {
+  /** Fall or Spring. */
+  term: string;
+  /** The academic year. */
+  year: number;
+  /** When the semester starts (ISO 8601). */
+  starts_at: string;
+  /** When the semester ends (ISO 8601). */
+  ends_at: string;
+  /** When registration opens (ISO 8601). */
+  registration_opens_at: string;
+  /** When registration closes (ISO 8601). */
+  registration_closes_at: string;
+  /** End of the free add/drop period (ISO 8601). */
+  add_drop_ends_at: string;
+  /** End of the late-add period (ISO 8601). */
+  late_add_ends_at: string;
+  /** The withdrawal deadline (ISO 8601). */
+  withdrawal_deadline_at: string;
+};
+
+export type CreateASemester201Data = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type CreateASemester201 = {
+  data?: CreateASemester201Data;
+};
+
+export type CreateASemester422Errors = {
+  term?: string[];
+};
+
+export type CreateASemester422 = {
+  message?: string;
+  errors?: CreateASemester422Errors;
+};
+
+export type ShowASemester200Data = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ShowASemester200 = {
+  data?: ShowASemester200Data;
+};
+
+export type UpdateASemesterBody = {
+  /** Fall or Spring. */
+  term: string;
+  /** The academic year. */
+  year: number;
+  /** When the semester starts (ISO 8601). */
+  starts_at: string;
+  /** When the semester ends (ISO 8601). */
+  ends_at: string;
+  /** When registration opens (ISO 8601). */
+  registration_opens_at: string;
+  /** When registration closes (ISO 8601). */
+  registration_closes_at: string;
+  /** End of the free add/drop period (ISO 8601). */
+  add_drop_ends_at: string;
+  /** End of the late-add period (ISO 8601). */
+  late_add_ends_at: string;
+  /** The withdrawal deadline (ISO 8601). */
+  withdrawal_deadline_at: string;
+};
+
+export type UpdateASemester200Data = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type UpdateASemester200 = {
+  data?: UpdateASemester200Data;
+};
+
 export type TheCatalogBrowseTree200DataFacultiesItemDepartmentsItemProgramsItemCategoriesItemCoursesItem = {
   id?: number;
   code?: string;
@@ -2164,6 +2295,7 @@ export type ListCourses200DataItem = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2186,6 +2318,8 @@ export type CreateACourseBody = {
   name_ar: string;
   /** One of 400, 500, 600, 700. */
   level: number;
+  /** The Research Type for a research course — one of PBL, Seminar; omit for a non-research course. */
+  research_type?: string;
   /** Lecture credit hours. */
   lecture_ch: number;
   /** Tutorial credit hours. */
@@ -2203,6 +2337,7 @@ export type CreateACourse201Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2242,6 +2377,7 @@ export type ShowACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2265,6 +2401,8 @@ export type UpdateACourseBody = {
   name_ar: string;
   /** One of 400, 500, 600, 700. */
   level: number;
+  /** The Research Type for a research course — one of PBL, Seminar; omit for a non-research course. */
+  research_type?: string;
   /** Lecture credit hours. */
   lecture_ch: number;
   /** Tutorial credit hours. */
@@ -2282,6 +2420,7 @@ export type UpdateACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2300,6 +2439,7 @@ export type ActivateACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2318,6 +2458,7 @@ export type DeactivateACourse200Data = {
   name_en?: string;
   name_ar?: string;
   level?: number;
+  research_type?: string;
   lecture_ch?: number;
   tutorial_ch?: number;
   lab_ch?: number;
@@ -2435,6 +2576,1433 @@ export type UpdateCurrentUser422Errors = {
 export type UpdateCurrentUser422 = {
   message?: string;
   errors?: UpdateCurrentUser422Errors;
+};
+
+export type ListAssignableInstructors200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableInstructors200 = {
+  data?: ListAssignableInstructors200DataItem[];
+};
+
+export type ListAssignableInstructors403 = {
+  message?: string;
+};
+
+export type ListASemestersCourseOfferings200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ListASemestersCourseOfferings200DataItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListASemestersCourseOfferings200DataItemMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ListASemestersCourseOfferings200DataItem = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: ListASemestersCourseOfferings200DataItemCourse;
+  instructor?: ListASemestersCourseOfferings200DataItemInstructor;
+  meetings?: ListASemestersCourseOfferings200DataItemMeetingsItem[];
+};
+
+export type ListASemestersCourseOfferings200 = {
+  data?: ListASemestersCourseOfferings200DataItem[];
+};
+
+export type ListASemestersCourseOfferings403 = {
+  message?: string;
+};
+
+export type ListASemestersCourseOfferings404 = {
+  message?: string;
+};
+
+export type CreateACourseOfferingInASemesterBodyMeetingsItem = {
+  /** Day of week, 0 (Sunday) to 6 (Saturday). */
+  weekday: number;
+  /** Start time, 24h HH:MM. */
+  starts_at: string;
+  /** End time, 24h HH:MM, after the start. */
+  ends_at: string;
+};
+
+export type CreateACourseOfferingInASemesterBody = {
+  /** The Catalog Course to offer. */
+  course_id: number;
+  /** A faculty (Instructor) User to teach it. */
+  instructor_id: number;
+  /** The seat capacity; omit for uncapped. */
+  capacity?: number;
+  /** One or more weekly meeting slots. */
+  meetings: CreateACourseOfferingInASemesterBodyMeetingsItem[];
+};
+
+export type CreateACourseOfferingInASemester201DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type CreateACourseOfferingInASemester201DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type CreateACourseOfferingInASemester201DataMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type CreateACourseOfferingInASemester201Data = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: CreateACourseOfferingInASemester201DataCourse;
+  instructor?: CreateACourseOfferingInASemester201DataInstructor;
+  meetings?: CreateACourseOfferingInASemester201DataMeetingsItem[];
+};
+
+export type CreateACourseOfferingInASemester201 = {
+  data?: CreateACourseOfferingInASemester201Data;
+};
+
+export type CreateACourseOfferingInASemester403 = {
+  message?: string;
+};
+
+export type CreateACourseOfferingInASemester404 = {
+  message?: string;
+};
+
+export type CreateACourseOfferingInASemester422 = {
+  message?: string;
+  errors?: {
+  course_id?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  meetings?: string[];
+};
+};
+
+export type ShowACourseOffering200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ShowACourseOffering200DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ShowACourseOffering200DataMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ShowACourseOffering200Data = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: ShowACourseOffering200DataCourse;
+  instructor?: ShowACourseOffering200DataInstructor;
+  meetings?: ShowACourseOffering200DataMeetingsItem[];
+};
+
+export type ShowACourseOffering200 = {
+  data?: ShowACourseOffering200Data;
+};
+
+export type ShowACourseOffering403 = {
+  message?: string;
+};
+
+export type UpdateACourseOfferingBodyMeetingsItem = {
+  /** Day of week, 0 (Sunday) to 6 (Saturday). */
+  weekday: number;
+  /** Start time, 24h HH:MM. */
+  starts_at: string;
+  /** End time, 24h HH:MM, after the start. */
+  ends_at: string;
+};
+
+export type UpdateACourseOfferingBody = {
+  /** A faculty (Instructor) User to teach it. */
+  instructor_id: number;
+  /** The seat capacity; omit for uncapped. */
+  capacity?: number;
+  /** One or more weekly meeting slots. */
+  meetings: UpdateACourseOfferingBodyMeetingsItem[];
+};
+
+export type UpdateACourseOffering200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type UpdateACourseOffering200DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type UpdateACourseOffering200DataMeetingsItem = {
+  id?: number;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type UpdateACourseOffering200Data = {
+  id?: number;
+  semester_id?: number;
+  course_id?: number;
+  instructor_id?: number;
+  capacity?: number;
+  course?: UpdateACourseOffering200DataCourse;
+  instructor?: UpdateACourseOffering200DataInstructor;
+  meetings?: UpdateACourseOffering200DataMeetingsItem[];
+};
+
+export type UpdateACourseOffering200 = {
+  data?: UpdateACourseOffering200Data;
+};
+
+export type UpdateACourseOffering403 = {
+  message?: string;
+};
+
+export type UpdateACourseOffering422Errors = {
+  meetings?: string[];
+};
+
+export type UpdateACourseOffering422 = {
+  message?: string;
+  errors?: UpdateACourseOffering422Errors;
+};
+
+export type DeleteACourseOffering204 = { [key: string]: unknown };
+
+export type DeleteACourseOffering403 = {
+  message?: string;
+};
+
+export type DeleteACourseOffering409 = {
+  message?: string;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse;
+  instructor?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor;
+  meetings?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem[];
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200Data = {
+  semester?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataSemester;
+  courses?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem[];
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200 = {
+  data?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200Data;
+};
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemester403 = {
+  message?: string;
+};
+
+export type SubmitARegistrationCartBodyLinesItem = {
+  /** An eligible Course Offering's id. */
+  offering_id: number;
+  /** How to take it — Regular or Audit. */
+  mode: string;
+};
+
+export type SubmitARegistrationCartBody = {
+  /** The cart lines — one per chosen offering. */
+  lines: SubmitARegistrationCartBodyLinesItem[];
+};
+
+export type SubmitARegistrationCart201DataLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type SubmitARegistrationCart201DataLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type SubmitARegistrationCart201DataLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type SubmitARegistrationCart201DataLinesItem = {
+  offering_id?: number;
+  mode?: string;
+  classification?: string;
+  total_ch?: number;
+  course?: SubmitARegistrationCart201DataLinesItemCourse;
+  instructor?: SubmitARegistrationCart201DataLinesItemInstructor;
+  meetings?: SubmitARegistrationCart201DataLinesItemMeetingsItem[];
+};
+
+export type SubmitARegistrationCart201Data = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  submitted_at?: string;
+  lines?: SubmitARegistrationCart201DataLinesItem[];
+};
+
+export type SubmitARegistrationCart201 = {
+  data?: SubmitARegistrationCart201Data;
+};
+
+export type SubmitARegistrationCart403 = {
+  message?: string;
+};
+
+export type SubmitARegistrationCart409 = {
+  message?: string;
+};
+
+export type SubmitARegistrationCart422 = {
+  message?: string;
+  errors?: {
+  registration?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  below_min_credit_hours?: string[];
+};
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItem = {
+  offering_id?: number;
+  mode?: string;
+  classification?: string;
+  total_ch?: number;
+  course?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemCourse;
+  instructor?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemInstructor;
+  meetings?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItemMeetingsItem[];
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItem = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  submitted_at?: string;
+  lines?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItemLinesItem[];
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200Data = {
+  semester?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataSemester;
+  requests?: TheActingStudentsRegistrationRequestsForTheOpenSemester200DataRequestsItem[];
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester200 = {
+  data?: TheActingStudentsRegistrationRequestsForTheOpenSemester200Data;
+};
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemester403 = {
+  message?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemCourse;
+  instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemInstructor;
+  meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemMeetingsItem[];
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItem = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse;
+  instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemInstructor;
+  meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemMeetingsItem[];
+  attendance?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemAttendance;
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItem = {
+  semester?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemSemester;
+  current_period?: string;
+  can_free_change?: boolean;
+  can_withdraw?: boolean;
+  addable_courses?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItem[];
+  enrollments?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItem[];
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200 = {
+  data?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItem[];
+};
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403 = {
+  message?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriodBody = {
+  /** An eligible Course Offering's id. */
+  offering_id: number;
+  /** How to take it — Regular or Audit. */
+  mode: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201DataAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201Data = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: FreeAddACourseToTheScheduleadddropPeriod201DataCourse;
+  instructor?: FreeAddACourseToTheScheduleadddropPeriod201DataInstructor;
+  meetings?: FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem[];
+  attendance?: FreeAddACourseToTheScheduleadddropPeriod201DataAttendance;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod201 = {
+  data?: FreeAddACourseToTheScheduleadddropPeriod201Data;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod403 = {
+  message?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod409 = {
+  message?: string;
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod422Errors = {
+  offering_id?: string[];
+};
+
+export type FreeAddACourseToTheScheduleadddropPeriod422 = {
+  message?: string;
+  errors?: FreeAddACourseToTheScheduleadddropPeriod422Errors;
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod403 = {
+  message?: string;
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod409 = {
+  message?: string;
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod422Errors = {
+  below_min_credit_hours?: string[];
+};
+
+export type FreeDropACourseFromTheScheduleadddropPeriod422 = {
+  message?: string;
+  errors?: FreeDropACourseFromTheScheduleadddropPeriod422Errors;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200DataInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200DataMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200DataAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200Data = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: WithdrawFromACoursewithdrawalPeriod200DataCourse;
+  instructor?: WithdrawFromACoursewithdrawalPeriod200DataInstructor;
+  meetings?: WithdrawFromACoursewithdrawalPeriod200DataMeetingsItem[];
+  attendance?: WithdrawFromACoursewithdrawalPeriod200DataAttendance;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod200 = {
+  data?: WithdrawFromACoursewithdrawalPeriod200Data;
+};
+
+export type WithdrawFromACoursewithdrawalPeriod409 = {
+  message?: string;
+};
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOf200DataItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  /** @nullable */
+  current_load?: string | null;
+  program?: TheStudentsTheComposerMayRegisterOnBehalfOf200DataItemProgram;
+};
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOf200 = {
+  data?: TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem[];
+};
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOf403 = {
+  message?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse;
+  instructor?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor;
+  meetings?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem[];
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200Data = {
+  semester?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataSemester;
+  courses?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem[];
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200 = {
+  data?: ATargetStudentsEligibleCoursesForTheOpenSemester200Data;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester403 = {
+  message?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester404 = {
+  message?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfBodyLinesItem = {
+  /** An eligible Course Offering's id. */
+  offering_id: number;
+  /** How to take it — Regular or Audit. */
+  mode: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody = {
+  /** The cart lines — one per chosen offering. */
+  lines: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBodyLinesItem[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItem = {
+  id?: number;
+  offering_id?: number;
+  mode?: string;
+  decision?: string;
+  derived_retake?: boolean;
+  classification?: string;
+  total_ch?: number;
+  course?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemCourse;
+  instructor?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemInstructor;
+  meetings?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemMeetingsItem[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201Data = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  decided_at?: string;
+  submitted_at?: string;
+  lines?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItem[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201 = {
+  data?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201Data;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 = {
+  message?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 = {
+  message?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf422Errors = {
+  registration?: string[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf422 = {
+  message?: string;
+  errors?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf422Errors;
+};
+
+export type TheAdvisorsRegistrationQueue200DataItemStudentProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type TheAdvisorsRegistrationQueue200DataItemStudent = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  program?: TheAdvisorsRegistrationQueue200DataItemStudentProgram;
+};
+
+export type TheAdvisorsRegistrationQueue200DataItem = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  submitted_at?: string;
+  course_count?: number;
+  student?: TheAdvisorsRegistrationQueue200DataItemStudent;
+};
+
+export type TheAdvisorsRegistrationQueue200 = {
+  data?: TheAdvisorsRegistrationQueue200DataItem[];
+};
+
+export type TheAdvisorsRegistrationQueue403 = {
+  message?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataRequestLinesItem = {
+  id?: number;
+  offering_id?: number;
+  mode?: string;
+  /** @nullable */
+  decision?: string | null;
+  derived_retake?: boolean;
+  classification?: string;
+  total_ch?: number;
+  course?: ASingleRequestForLineItemReview200DataRequestLinesItemCourse;
+  instructor?: ASingleRequestForLineItemReview200DataRequestLinesItemInstructor;
+  meetings?: ASingleRequestForLineItemReview200DataRequestLinesItemMeetingsItem[];
+};
+
+export type ASingleRequestForLineItemReview200DataRequest = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  /** @nullable */
+  decided_at?: string | null;
+  submitted_at?: string;
+  lines?: ASingleRequestForLineItemReview200DataRequestLinesItem[];
+};
+
+export type ASingleRequestForLineItemReview200DataStudentProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type ASingleRequestForLineItemReview200DataStudent = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  current_load?: number;
+  program?: ASingleRequestForLineItemReview200DataStudentProgram;
+};
+
+export type ASingleRequestForLineItemReview200Data = {
+  request?: ASingleRequestForLineItemReview200DataRequest;
+  student?: ASingleRequestForLineItemReview200DataStudent;
+};
+
+export type ASingleRequestForLineItemReview200 = {
+  data?: ASingleRequestForLineItemReview200Data;
+};
+
+export type ASingleRequestForLineItemReview403 = {
+  message?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecisionBodyLinesItem = {
+  /** The request line's id. */
+  id: number;
+  /** approved or rejected. */
+  decision: string;
+};
+
+export type RecordTheAdvisorsLineItemDecisionBody = {
+  /**
+     * An optional note for the Student.
+     * @nullable
+     */
+  note?: string | null;
+  /** One entry per line of the request — every line must be addressed. */
+  lines: RecordTheAdvisorsLineItemDecisionBodyLinesItem[];
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision200DataLinesItem = {
+  id?: number;
+  offering_id?: number;
+  mode?: string;
+  decision?: string;
+  derived_retake?: boolean;
+  classification?: string;
+  total_ch?: number;
+  course?: RecordTheAdvisorsLineItemDecision200DataLinesItemCourse;
+  instructor?: RecordTheAdvisorsLineItemDecision200DataLinesItemInstructor;
+  meetings?: RecordTheAdvisorsLineItemDecision200DataLinesItemMeetingsItem[];
+};
+
+export type RecordTheAdvisorsLineItemDecision200Data = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  advisor_note?: string;
+  decided_at?: string;
+  submitted_at?: string;
+  lines?: RecordTheAdvisorsLineItemDecision200DataLinesItem[];
+};
+
+export type RecordTheAdvisorsLineItemDecision200 = {
+  data?: RecordTheAdvisorsLineItemDecision200Data;
+};
+
+export type RecordTheAdvisorsLineItemDecision403 = {
+  message?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision409 = {
+  message?: string;
+};
+
+export type RecordTheAdvisorsLineItemDecision422 = {
+  message?: string;
+  errors?: {
+  lines?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  below_min_credit_hours?: string[];
+};
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemCourse;
+  instructor?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemInstructor;
+  meetings?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemMeetingsItem[];
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItem = {
+  id?: number;
+  offering_id?: number;
+  course_status?: string;
+  classification?: string;
+  credit_hours?: number;
+  course?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemCourse;
+  instructor?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemInstructor;
+  meetings?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemMeetingsItem[];
+  attendance?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemAttendance;
+};
+
+export type ViewAnyStudentsScheduleoversight200DataItem = {
+  semester?: ViewAnyStudentsScheduleoversight200DataItemSemester;
+  current_period?: string;
+  can_free_change?: boolean;
+  can_withdraw?: boolean;
+  addable_courses?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItem[];
+  enrollments?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItem[];
+};
+
+export type ViewAnyStudentsScheduleoversight200 = {
+  data?: ViewAnyStudentsScheduleoversight200DataItem[];
+};
+
+export type ViewAnyStudentsScheduleoversight403 = {
+  message?: string;
+};
+
+export type ViewAnyStudentsScheduleoversight404 = {
+  message?: string;
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItem = {
+  id?: number;
+  student_count?: number;
+  semester?: TheSignedInInstructorsOfferingsMyOfferings200DataItemSemester;
+  course?: TheSignedInInstructorsOfferingsMyOfferings200DataItemCourse;
+  meetings?: TheSignedInInstructorsOfferingsMyOfferings200DataItemMeetingsItem[];
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200 = {
+  data?: TheSignedInInstructorsOfferingsMyOfferings200DataItem[];
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOffering = {
+  id?: number;
+  semester?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingSemester;
+  course?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingCourse;
+  instructor?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingInstructor;
+  meetings?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingMeetingsItem[];
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataSessionsItem = {
+  id?: number;
+  date?: string;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+  cancelled?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemMarks = {
+  '10'?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  student?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemStudent;
+  attendance?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemAttendance;
+  marks?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemMarks;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200Data = {
+  offering?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOffering;
+  sessions?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataSessionsItem[];
+  roster?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItem[];
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200 = {
+  data?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200Data;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403 = {
+  message?: string;
+};
+
+export type CancelOrReinstateAClassSessionBody = {
+  /** Whether the session is cancelled. */
+  cancelled: boolean;
+};
+
+export type CancelOrReinstateAClassSession200Data = {
+  id?: number;
+  date?: string;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+  cancelled?: boolean;
+};
+
+export type CancelOrReinstateAClassSession200 = {
+  data?: CancelOrReinstateAClassSession200Data;
+};
+
+export type CancelOrReinstateAClassSession403 = {
+  message?: string;
+};
+
+export type RecordorCorrectASessionsAttendanceRegisterBodyMarksItem = {
+  /** An active Enrollment on this offering. */
+  enrollment_id: number;
+  /** Whether the student was present. */
+  present: boolean;
+};
+
+export type RecordorCorrectASessionsAttendanceRegisterBody = {
+  /** One entry per student to mark. */
+  marks: RecordorCorrectASessionsAttendanceRegisterBodyMarksItem[];
+};
+
+export type RecordorCorrectASessionsAttendanceRegister200DataAttendanceItem = {
+  enrollment_id?: number;
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister200Data = {
+  session_id?: number;
+  attendance?: RecordorCorrectASessionsAttendanceRegister200DataAttendanceItem[];
+};
+
+export type RecordorCorrectASessionsAttendanceRegister200 = {
+  data?: RecordorCorrectASessionsAttendanceRegister200Data;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister403 = {
+  message?: string;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister409 = {
+  message?: string;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister422Errors = {
+  marks?: string[];
+};
+
+export type RecordorCorrectASessionsAttendanceRegister422 = {
+  message?: string;
+  errors?: RecordorCorrectASessionsAttendanceRegister422Errors;
 };
 
 export type ListMyNotifications200DataItemData = {
@@ -6305,6 +7873,326 @@ export const useDeactivateAnAdmissionCycle = <TError = unknown,
     }
 
 /**
+ * Newest term first. Available to any authenticated user who needs the calendar.
+ * @summary List Semesters.
+ */
+export const listSemesters = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListSemesters200>(
+      {url: `/api/v1/semesters`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListSemestersQueryKey = () => {
+    return [
+    `/api/v1/semesters`
+    ] as const;
+    }
+
+
+export const getListSemestersQueryOptions = <TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSemestersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSemesters>>> = ({ signal }) => listSemesters(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListSemestersQueryResult = NonNullable<Awaited<ReturnType<typeof listSemesters>>>
+export type ListSemestersQueryError = unknown
+
+
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSemesters>>,
+          TError,
+          Awaited<ReturnType<typeof listSemesters>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSemesters>>,
+          TError,
+          Awaited<ReturnType<typeof listSemesters>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Semesters.
+ */
+
+export function useListSemesters<TData = Awaited<ReturnType<typeof listSemesters>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listSemesters>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListSemestersQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create a Semester.
+ */
+export const createASemester = (
+    createASemesterBody: CreateASemesterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateASemester201>(
+      {url: `/api/v1/semesters`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createASemesterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateASemesterMutationOptions = <TError = CreateASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createASemester>>, TError,{data: CreateASemesterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createASemester>>, TError,{data: CreateASemesterBody}, TContext> => {
+
+const mutationKey = ['createASemester'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createASemester>>, {data: CreateASemesterBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createASemester(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateASemesterMutationResult = NonNullable<Awaited<ReturnType<typeof createASemester>>>
+    export type CreateASemesterMutationBody = CreateASemesterBody
+    export type CreateASemesterMutationError = CreateASemester422
+
+    /**
+ * @summary Create a Semester.
+ */
+export const useCreateASemester = <TError = CreateASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createASemester>>, TError,{data: CreateASemesterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createASemester>>,
+        TError,
+        {data: CreateASemesterBody},
+        TContext
+      > => {
+      return useMutation(getCreateASemesterMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Semester.
+ */
+export const showASemester = (
+    semesterId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowASemester200>(
+      {url: `/api/v1/semesters/${semesterId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowASemesterQueryKey = (semesterId: number,) => {
+    return [
+    `/api/v1/semesters/${semesterId}`
+    ] as const;
+    }
+
+
+export const getShowASemesterQueryOptions = <TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowASemesterQueryKey(semesterId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showASemester>>> = ({ signal }) => showASemester(semesterId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: semesterId !== null && semesterId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowASemesterQueryResult = NonNullable<Awaited<ReturnType<typeof showASemester>>>
+export type ShowASemesterQueryError = unknown
+
+
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showASemester>>,
+          TError,
+          Awaited<ReturnType<typeof showASemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showASemester>>,
+          TError,
+          Awaited<ReturnType<typeof showASemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Semester.
+ */
+
+export function useShowASemester<TData = Awaited<ReturnType<typeof showASemester>>, TError = unknown>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showASemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowASemesterQueryOptions(semesterId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Edits the term, year, and period dates in place — the correction path that
+ * never orphans records (ADR-0018). Same invariants as creation.
+ * @summary Update a Semester.
+ */
+export const updateASemester = (
+    semesterId: number,
+    updateASemesterBody: UpdateASemesterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateASemester200>(
+      {url: `/api/v1/semesters/${semesterId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateASemesterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateASemesterMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateASemester>>, TError,{semesterId: number;data: UpdateASemesterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateASemester>>, TError,{semesterId: number;data: UpdateASemesterBody}, TContext> => {
+
+const mutationKey = ['updateASemester'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateASemester>>, {semesterId: number;data: UpdateASemesterBody}> = (props) => {
+          const {semesterId,data} = props ?? {};
+
+          return  updateASemester(semesterId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateASemesterMutationResult = NonNullable<Awaited<ReturnType<typeof updateASemester>>>
+    export type UpdateASemesterMutationBody = UpdateASemesterBody
+    export type UpdateASemesterMutationError = unknown
+
+    /**
+ * @summary Update a Semester.
+ */
+export const useUpdateASemester = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateASemester>>, TError,{semesterId: number;data: UpdateASemesterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateASemester>>,
+        TError,
+        {semesterId: number;data: UpdateASemesterBody},
+        TContext
+      > => {
+      return useMutation(getUpdateASemesterMutationOptions(options), queryClient);
+    }
+
+/**
  * Faculties are ordered by code; within each Program the three Categories are
  * always present in bylaw order (Preparatory, Program Core, Research Elective)
  * with their required credit hours, and Courses within a Category follow the
@@ -9001,6 +10889,2092 @@ export const useUpdateCurrentUser = <TError = UpdateCurrentUser422,
         TContext
       > => {
       return useMutation(getUpdateCurrentUserMutationOptions(options), queryClient);
+    }
+
+/**
+ * The faculty Users (holding the Instructor role, R04) an Offering may be assigned
+ * to — the source for the offering form's instructor picker (the Phase-2
+ * interviewer-list precedent, via Identity\Public). Gated on `calendar.manage`.
+ * @summary List assignable instructors.
+ */
+export const listAssignableInstructors = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableInstructors200>(
+      {url: `/api/v1/instructors`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableInstructorsQueryKey = () => {
+    return [
+    `/api/v1/instructors`
+    ] as const;
+    }
+
+
+export const getListAssignableInstructorsQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableInstructorsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableInstructors>>> = ({ signal }) => listAssignableInstructors(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableInstructorsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableInstructors>>>
+export type ListAssignableInstructorsQueryError = ListAssignableInstructors403
+
+
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInstructors>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInstructors>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableInstructors>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableInstructors>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable instructors.
+ */
+
+export function useListAssignableInstructors<TData = Awaited<ReturnType<typeof listAssignableInstructors>>, TError = ListAssignableInstructors403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInstructors>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableInstructorsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every Offering that runs in the given Semester, each with its resolved Course and
+ * Instructor summaries and its weekly meetings. Gated on `calendar.manage`.
+ * @summary List a Semester's Course Offerings.
+ */
+export const listASemestersCourseOfferings = (
+    semesterId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListASemestersCourseOfferings200>(
+      {url: `/api/v1/semesters/${semesterId}/offerings`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListASemestersCourseOfferingsQueryKey = (semesterId: number,) => {
+    return [
+    `/api/v1/semesters/${semesterId}/offerings`
+    ] as const;
+    }
+
+
+export const getListASemestersCourseOfferingsQueryOptions = <TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListASemestersCourseOfferingsQueryKey(semesterId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listASemestersCourseOfferings>>> = ({ signal }) => listASemestersCourseOfferings(semesterId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: semesterId !== null && semesterId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListASemestersCourseOfferingsQueryResult = NonNullable<Awaited<ReturnType<typeof listASemestersCourseOfferings>>>
+export type ListASemestersCourseOfferingsQueryError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404
+
+
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof listASemestersCourseOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List a Semester's Course Offerings.
+ */
+
+export function useListASemestersCourseOfferings<TData = Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError = ListASemestersCourseOfferings403 | ListASemestersCourseOfferings404>(
+ semesterId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listASemestersCourseOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListASemestersCourseOfferingsQueryOptions(semesterId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Records one Catalog Course as taught in the Semester: an Instructor, an optional
+ * seat capacity, and one or more weekly meeting times. The Course must exist and not
+ * already be offered in this Semester; the Instructor must be a faculty (R04) User;
+ * the meetings may not overlap one another. Gated on `calendar.manage`.
+ * @summary Create a Course Offering in a Semester.
+ */
+export const createACourseOfferingInASemester = (
+    semesterId: number,
+    createACourseOfferingInASemesterBody: CreateACourseOfferingInASemesterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateACourseOfferingInASemester201>(
+      {url: `/api/v1/semesters/${semesterId}/offerings`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createACourseOfferingInASemesterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateACourseOfferingInASemesterMutationOptions = <TError = CreateACourseOfferingInASemester403 | CreateACourseOfferingInASemester404 | CreateACourseOfferingInASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, TError,{semesterId: number;data: CreateACourseOfferingInASemesterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, TError,{semesterId: number;data: CreateACourseOfferingInASemesterBody}, TContext> => {
+
+const mutationKey = ['createACourseOfferingInASemester'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, {semesterId: number;data: CreateACourseOfferingInASemesterBody}> = (props) => {
+          const {semesterId,data} = props ?? {};
+
+          return  createACourseOfferingInASemester(semesterId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateACourseOfferingInASemesterMutationResult = NonNullable<Awaited<ReturnType<typeof createACourseOfferingInASemester>>>
+    export type CreateACourseOfferingInASemesterMutationBody = CreateACourseOfferingInASemesterBody
+    export type CreateACourseOfferingInASemesterMutationError = CreateACourseOfferingInASemester403 | CreateACourseOfferingInASemester404 | CreateACourseOfferingInASemester422
+
+    /**
+ * @summary Create a Course Offering in a Semester.
+ */
+export const useCreateACourseOfferingInASemester = <TError = CreateACourseOfferingInASemester403 | CreateACourseOfferingInASemester404 | CreateACourseOfferingInASemester422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createACourseOfferingInASemester>>, TError,{semesterId: number;data: CreateACourseOfferingInASemesterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createACourseOfferingInASemester>>,
+        TError,
+        {semesterId: number;data: CreateACourseOfferingInASemesterBody},
+        TContext
+      > => {
+      return useMutation(getCreateACourseOfferingInASemesterMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Show a Course Offering.
+ */
+export const showACourseOffering = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ShowACourseOffering200>(
+      {url: `/api/v1/offerings/${offeringId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getShowACourseOfferingQueryKey = (offeringId: number,) => {
+    return [
+    `/api/v1/offerings/${offeringId}`
+    ] as const;
+    }
+
+
+export const getShowACourseOfferingQueryOptions = <TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getShowACourseOfferingQueryKey(offeringId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof showACourseOffering>>> = ({ signal }) => showACourseOffering(offeringId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: offeringId !== null && offeringId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ShowACourseOfferingQueryResult = NonNullable<Awaited<ReturnType<typeof showACourseOffering>>>
+export type ShowACourseOfferingQueryError = ShowACourseOffering403
+
+
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourseOffering>>,
+          TError,
+          Awaited<ReturnType<typeof showACourseOffering>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof showACourseOffering>>,
+          TError,
+          Awaited<ReturnType<typeof showACourseOffering>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Show a Course Offering.
+ */
+
+export function useShowACourseOffering<TData = Awaited<ReturnType<typeof showACourseOffering>>, TError = ShowACourseOffering403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof showACourseOffering>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getShowACourseOfferingQueryOptions(offeringId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Changes the Instructor, capacity, and weekly meetings. The Semester and Course an
+ * Offering runs are its identity and are fixed at creation. Same instructor and
+ * meeting invariants as creation. Gated on `calendar.manage`.
+ * @summary Update a Course Offering.
+ */
+export const updateACourseOffering = (
+    offeringId: number,
+    updateACourseOfferingBody: UpdateACourseOfferingBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UpdateACourseOffering200>(
+      {url: `/api/v1/offerings/${offeringId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: updateACourseOfferingBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getUpdateACourseOfferingMutationOptions = <TError = UpdateACourseOffering403 | UpdateACourseOffering422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourseOffering>>, TError,{offeringId: number;data: UpdateACourseOfferingBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateACourseOffering>>, TError,{offeringId: number;data: UpdateACourseOfferingBody}, TContext> => {
+
+const mutationKey = ['updateACourseOffering'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateACourseOffering>>, {offeringId: number;data: UpdateACourseOfferingBody}> = (props) => {
+          const {offeringId,data} = props ?? {};
+
+          return  updateACourseOffering(offeringId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateACourseOfferingMutationResult = NonNullable<Awaited<ReturnType<typeof updateACourseOffering>>>
+    export type UpdateACourseOfferingMutationBody = UpdateACourseOfferingBody
+    export type UpdateACourseOfferingMutationError = UpdateACourseOffering403 | UpdateACourseOffering422
+
+    /**
+ * @summary Update a Course Offering.
+ */
+export const useUpdateACourseOffering = <TError = UpdateACourseOffering403 | UpdateACourseOffering422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateACourseOffering>>, TError,{offeringId: number;data: UpdateACourseOfferingBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateACourseOffering>>,
+        TError,
+        {offeringId: number;data: UpdateACourseOfferingBody},
+        TContext
+      > => {
+      return useMutation(getUpdateACourseOfferingMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removes an Offering and its meeting rows. Allowed only while nothing references
+ * it — once an Enrollment is minted against it or a Class Session is generated from
+ * it (later Phase-3 tickets), the register and roster it anchors must survive, so a
+ * referenced Offering is refused with a 409. Gated on `calendar.manage`.
+ * @summary Delete a Course Offering.
+ */
+export const deleteACourseOffering = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DeleteACourseOffering204>(
+      {url: `/api/v1/offerings/${offeringId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getDeleteACourseOfferingMutationOptions = <TError = DeleteACourseOffering403 | DeleteACourseOffering409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteACourseOffering>>, TError,{offeringId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteACourseOffering>>, TError,{offeringId: number}, TContext> => {
+
+const mutationKey = ['deleteACourseOffering'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteACourseOffering>>, {offeringId: number}> = (props) => {
+          const {offeringId} = props ?? {};
+
+          return  deleteACourseOffering(offeringId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteACourseOfferingMutationResult = NonNullable<Awaited<ReturnType<typeof deleteACourseOffering>>>
+
+    export type DeleteACourseOfferingMutationError = DeleteACourseOffering403 | DeleteACourseOffering409
+
+    /**
+ * @summary Delete a Course Offering.
+ */
+export const useDeleteACourseOffering = <TError = DeleteACourseOffering403 | DeleteACourseOffering409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteACourseOffering>>, TError,{offeringId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteACourseOffering>>,
+        TError,
+        {offeringId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteACourseOfferingMutationOptions(options), queryClient);
+    }
+
+/**
+ * The courses the Student may register for right now, grouped client-side by their
+ * Enrollment Classification (Preparatory / Core / Internal Elective / External
+ * Elective / Research Course). Each line carries the Offering's instructor, meeting
+ * times, seats remaining and the course's total CH. Courses in the Curriculum with
+ * no Offering this semester are absent (ADR-0017); a course that classifies for no
+ * class is omitted. The list also serves the **late-add** window (ticket 07): when
+ * registration has closed but the Semester is in its late-add period, the same list is
+ * returned minus the courses already on the Student's schedule (a late-add cart only
+ * adds). When neither a registration nor a late-add window is open, `semester` is null
+ * and the list is empty. Gated on `courses.register_self` (the acting Student, R02).
+ * @summary List the acting Student's eligible courses for the open Semester.
+ */
+export const listTheActingStudentsEligibleCoursesForTheOpenSemester = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListTheActingStudentsEligibleCoursesForTheOpenSemester200>(
+      {url: `/api/v1/registration/eligible-courses`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryKey = () => {
+    return [
+    `/api/v1/registration/eligible-courses`
+    ] as const;
+    }
+
+
+export const getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryOptions = <TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>> = ({ signal }) => listTheActingStudentsEligibleCoursesForTheOpenSemester(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryResult = NonNullable<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>>
+export type ListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403
+
+
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the acting Student's eligible courses for the open Semester.
+ */
+
+export function useListTheActingStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError = ListTheActingStudentsEligibleCoursesForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listTheActingStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListTheActingStudentsEligibleCoursesForTheOpenSemesterQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Turns the Student's cart into a Pending {@see RegistrationRequest}. Its kind is derived
+ * from the calendar: `Initial` while the registration window is open, or `LateAdd` when
+ * that window has closed and the Semester is in its late-add period (ticket 07) — the
+ * add-only week-3 request that still flows through the advisor. Each line names an
+ * eligible Offering and a mode (Regular / Audit). The whole cart is validated as a batch
+ * — every course must be eligible; the credit-hour load must sit within the min/max
+ * window (the 6-hour floor is waived in the Student's first semester); at most one
+ * External Elective and one Research Course; no duplicate course; no time clash between
+ * chosen Offerings; and every capped Offering must have a seat. A late-add cart is
+ * additionally measured against the Student's already-approved schedule. An illegal cart
+ * is a 422 enumerating the offending reasons; a second Pending request for the same
+ * Semester is a 409. Gated on `courses.register_self` (R02).
+ * @summary Submit a registration cart.
+ */
+export const submitARegistrationCart = (
+    submitARegistrationCartBody: SubmitARegistrationCartBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitARegistrationCart201>(
+      {url: `/api/v1/registration/requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitARegistrationCartBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitARegistrationCartMutationOptions = <TError = SubmitARegistrationCart403 | SubmitARegistrationCart409 | SubmitARegistrationCart422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitARegistrationCart>>, TError,{data: SubmitARegistrationCartBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitARegistrationCart>>, TError,{data: SubmitARegistrationCartBody}, TContext> => {
+
+const mutationKey = ['submitARegistrationCart'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitARegistrationCart>>, {data: SubmitARegistrationCartBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitARegistrationCart(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitARegistrationCartMutationResult = NonNullable<Awaited<ReturnType<typeof submitARegistrationCart>>>
+    export type SubmitARegistrationCartMutationBody = SubmitARegistrationCartBody
+    export type SubmitARegistrationCartMutationError = SubmitARegistrationCart403 | SubmitARegistrationCart409 | SubmitARegistrationCart422
+
+    /**
+ * @summary Submit a registration cart.
+ */
+export const useSubmitARegistrationCart = <TError = SubmitARegistrationCart403 | SubmitARegistrationCart409 | SubmitARegistrationCart422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitARegistrationCart>>, TError,{data: SubmitARegistrationCartBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitARegistrationCart>>,
+        TError,
+        {data: SubmitARegistrationCartBody},
+        TContext
+      > => {
+      return useMutation(getSubmitARegistrationCartMutationOptions(options), queryClient);
+    }
+
+/**
+ * Every request the Student has submitted for the currently-open Semester, newest
+ * first, each with its status (Pending / Approved / Rejected) and per-line detail — the
+ * request view (user story 30). A Rejected request stays visible so the Student sees it
+ * alongside any fresh Pending cart. When no window is open, `semester` is null and the
+ * list is empty. Gated on `courses.register_self` (R02).
+ * @summary The acting Student's registration requests for the open Semester.
+ */
+export const theActingStudentsRegistrationRequestsForTheOpenSemester = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheActingStudentsRegistrationRequestsForTheOpenSemester200>(
+      {url: `/api/v1/registration/requests`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey = () => {
+    return [
+    `/api/v1/registration/requests`
+    ] as const;
+    }
+
+
+export const getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryOptions = <TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>> = ({ signal }) => theActingStudentsRegistrationRequestsForTheOpenSemester(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheActingStudentsRegistrationRequestsForTheOpenSemesterQueryResult = NonNullable<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>>
+export type TheActingStudentsRegistrationRequestsForTheOpenSemesterQueryError = TheActingStudentsRegistrationRequestsForTheOpenSemester403
+
+
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The acting Student's registration requests for the open Semester.
+ */
+
+export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData = Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError = TheActingStudentsRegistrationRequestsForTheOpenSemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsRegistrationRequestsForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The Student's academic present (user story 32, FR-REG-005): every Enrollment the
+ * advisor minted, grouped by Semester (most recent first), each carrying its Course
+ * Status, Enrollment Classification, registration-time credit hours, and the live
+ * display facts — course, instructor, weekly meeting times — read through the Catalog/
+ * Offering facades (ADR-0017).
+ *
+ * Each group also carries the **period-gated change context** (ticket 07, FR-REG-004),
+ * so the SPA can surface the right in-window actions while the server stays the sole
+ * authority: `current_period` (the derived phase — upcoming / registration / add_drop /
+ * late_add / withdrawal / closed), `can_free_change` (in the add/drop window *and* the
+ * Student has an approved Initial request — free add/drop is live), `can_withdraw` (in
+ * the withdrawal window), and — only when free change is live — `addable_courses`, the
+ * eligible Offerings not yet on the schedule and not External Electives (those need a
+ * request). Each enrollment also carries its derived `attendance` (ticket 08) — present/
+ * recorded counts, the display percentage, and the audit-at-risk flag. Gated on
+ * `courses.register_self` (the acting Student, R02).
+ * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
+ */
+export const theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200>(
+      {url: `/api/v1/registration/schedule`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryKey = () => {
+    return [
+    `/api/v1/registration/schedule`
+    ] as const;
+    }
+
+
+export const getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryOptions = <TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>> = ({ signal }) => theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryResult = NonNullable<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>>
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403
+
+
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>,
+          TError,
+          Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
+ */
+
+export function useTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester<TData = Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError = TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * A direct add during the add/drop window, no advisor approval — the Advisor is notified.
+ * The Offering must be eligible for the Student and **not** an External Elective (those
+ * need a registration request, BR-24); the whole schedule is re-validated (credit-hour
+ * ceiling counting the existing load, seat capacity, time clash, the composition caps,
+ * and the derived-Retake cap of one). Available only while the Semester is in its
+ * add/drop period (else 409) and only to a Student with an approved Initial request for
+ * that Semester (else 403). Gated on `courses.register_self`.
+ * @summary Free-add a course to the schedule (add/drop period).
+ */
+export const freeAddACourseToTheScheduleadddropPeriod = (
+    freeAddACourseToTheScheduleadddropPeriodBody: FreeAddACourseToTheScheduleadddropPeriodBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<FreeAddACourseToTheScheduleadddropPeriod201>(
+      {url: `/api/v1/registration/enrollments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: freeAddACourseToTheScheduleadddropPeriodBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getFreeAddACourseToTheScheduleadddropPeriodMutationOptions = <TError = FreeAddACourseToTheScheduleadddropPeriod403 | FreeAddACourseToTheScheduleadddropPeriod409 | FreeAddACourseToTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, TError,{data: FreeAddACourseToTheScheduleadddropPeriodBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, TError,{data: FreeAddACourseToTheScheduleadddropPeriodBody}, TContext> => {
+
+const mutationKey = ['freeAddACourseToTheScheduleadddropPeriod'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, {data: FreeAddACourseToTheScheduleadddropPeriodBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  freeAddACourseToTheScheduleadddropPeriod(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FreeAddACourseToTheScheduleadddropPeriodMutationResult = NonNullable<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>>
+    export type FreeAddACourseToTheScheduleadddropPeriodMutationBody = FreeAddACourseToTheScheduleadddropPeriodBody
+    export type FreeAddACourseToTheScheduleadddropPeriodMutationError = FreeAddACourseToTheScheduleadddropPeriod403 | FreeAddACourseToTheScheduleadddropPeriod409 | FreeAddACourseToTheScheduleadddropPeriod422
+
+    /**
+ * @summary Free-add a course to the schedule (add/drop period).
+ */
+export const useFreeAddACourseToTheScheduleadddropPeriod = <TError = FreeAddACourseToTheScheduleadddropPeriod403 | FreeAddACourseToTheScheduleadddropPeriod409 | FreeAddACourseToTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>, TError,{data: FreeAddACourseToTheScheduleadddropPeriodBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof freeAddACourseToTheScheduleadddropPeriod>>,
+        TError,
+        {data: FreeAddACourseToTheScheduleadddropPeriodBody},
+        TContext
+      > => {
+      return useMutation(getFreeAddACourseToTheScheduleadddropPeriodMutationOptions(options), queryClient);
+    }
+
+/**
+ * A direct drop during the add/drop window — the Enrollment is **hard-deleted**, leaving
+ * no trace (a drop is never a Course Status). Blocked when it would take the Student's
+ * credit-hour load below the floor, unless the first-semester exception applies; the
+ * Advisor is notified. Available only while the Semester is in its add/drop period (else
+ * 409) and only to a Student with an approved Initial request for that Semester (else
+ * 403); the Enrollment must be the acting Student's own (else 404). Gated on
+ * `courses.register_self`.
+ * @summary Free-drop a course from the schedule (add/drop period).
+ */
+export const freeDropACourseFromTheScheduleadddropPeriod = (
+    enrollmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<string>(
+      {url: `/api/v1/registration/enrollments/${enrollmentId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getFreeDropACourseFromTheScheduleadddropPeriodMutationOptions = <TError = FreeDropACourseFromTheScheduleadddropPeriod403 | FreeDropACourseFromTheScheduleadddropPeriod409 | FreeDropACourseFromTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, TError,{enrollmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, TError,{enrollmentId: number}, TContext> => {
+
+const mutationKey = ['freeDropACourseFromTheScheduleadddropPeriod'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, {enrollmentId: number}> = (props) => {
+          const {enrollmentId} = props ?? {};
+
+          return  freeDropACourseFromTheScheduleadddropPeriod(enrollmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FreeDropACourseFromTheScheduleadddropPeriodMutationResult = NonNullable<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>>
+
+    export type FreeDropACourseFromTheScheduleadddropPeriodMutationError = FreeDropACourseFromTheScheduleadddropPeriod403 | FreeDropACourseFromTheScheduleadddropPeriod409 | FreeDropACourseFromTheScheduleadddropPeriod422
+
+    /**
+ * @summary Free-drop a course from the schedule (add/drop period).
+ */
+export const useFreeDropACourseFromTheScheduleadddropPeriod = <TError = FreeDropACourseFromTheScheduleadddropPeriod403 | FreeDropACourseFromTheScheduleadddropPeriod409 | FreeDropACourseFromTheScheduleadddropPeriod422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>, TError,{enrollmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof freeDropACourseFromTheScheduleadddropPeriod>>,
+        TError,
+        {enrollmentId: number},
+        TContext
+      > => {
+      return useMutation(getFreeDropACourseFromTheScheduleadddropPeriodMutationOptions(options), queryClient);
+    }
+
+/**
+ * Self-serve withdrawal until the deadline: the Enrollment's Course Status becomes **W**
+ * — permanent and transcript-visible — with **no** credit-hour floor check (a Student is
+ * never trapped in a course to preserve a number), the Advisor notified. Available only
+ * while the Semester is in its withdrawal period (else 409); the Enrollment must be the
+ * acting Student's own and still active (else 404 / 409). Gated on `courses.register_self`.
+ * @summary Withdraw from a course (withdrawal period).
+ */
+export const withdrawFromACoursewithdrawalPeriod = (
+    enrollmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<WithdrawFromACoursewithdrawalPeriod200>(
+      {url: `/api/v1/registration/enrollments/${enrollmentId}/withdrawal`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getWithdrawFromACoursewithdrawalPeriodMutationOptions = <TError = WithdrawFromACoursewithdrawalPeriod409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, TError,{enrollmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, TError,{enrollmentId: number}, TContext> => {
+
+const mutationKey = ['withdrawFromACoursewithdrawalPeriod'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, {enrollmentId: number}> = (props) => {
+          const {enrollmentId} = props ?? {};
+
+          return  withdrawFromACoursewithdrawalPeriod(enrollmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type WithdrawFromACoursewithdrawalPeriodMutationResult = NonNullable<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>>
+
+    export type WithdrawFromACoursewithdrawalPeriodMutationError = WithdrawFromACoursewithdrawalPeriod409
+
+    /**
+ * @summary Withdraw from a course (withdrawal period).
+ */
+export const useWithdrawFromACoursewithdrawalPeriod = <TError = WithdrawFromACoursewithdrawalPeriod409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>, TError,{enrollmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof withdrawFromACoursewithdrawalPeriod>>,
+        TError,
+        {enrollmentId: number},
+        TContext
+      > => {
+      return useMutation(getWithdrawFromACoursewithdrawalPeriodMutationOptions(options), queryClient);
+    }
+
+/**
+ * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
+ * Student Affairs (or an administrator) sees **every** Student, unscoped — the same
+ * visibility rule the advisor queue uses ({@see ScopesToAdvisees}). Each row carries the
+ * Student's context (name, University ID, Program, degree, enrollment term) so the picker
+ * is legible. Gated on `courses.register_for_student` (Advisor R03 / Student Affairs R05).
+ * @summary The students the composer may register on behalf of.
+ */
+export const theStudentsTheComposerMayRegisterOnBehalfOf = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheStudentsTheComposerMayRegisterOnBehalfOf200>(
+      {url: `/api/v1/registration/on-behalf/students`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheStudentsTheComposerMayRegisterOnBehalfOfQueryKey = () => {
+    return [
+    `/api/v1/registration/on-behalf/students`
+    ] as const;
+    }
+
+
+export const getTheStudentsTheComposerMayRegisterOnBehalfOfQueryOptions = <TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheStudentsTheComposerMayRegisterOnBehalfOfQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>> = ({ signal }) => theStudentsTheComposerMayRegisterOnBehalfOf(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOfQueryResult = NonNullable<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>>
+export type TheStudentsTheComposerMayRegisterOnBehalfOfQueryError = TheStudentsTheComposerMayRegisterOnBehalfOf403
+
+
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The students the composer may register on behalf of.
+ */
+
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheStudentsTheComposerMayRegisterOnBehalfOfQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The cart's course list on the register-for-student surface (ticket 09) — the same shape
+ * as the self-serve eligible list, resolved for the target Student. An Advisor may read
+ * only their own advisee's list ({@see ScopesToAdvisees}); Student Affairs / an
+ * administrator any. Gated on `courses.register_for_student`.
+ * @summary A target student's eligible courses for the open Semester.
+ */
+export const aTargetStudentsEligibleCoursesForTheOpenSemester = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ATargetStudentsEligibleCoursesForTheOpenSemester200>(
+      {url: `/api/v1/registration/on-behalf/students/${studentId}/eligible-courses`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getATargetStudentsEligibleCoursesForTheOpenSemesterQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/registration/on-behalf/students/${studentId}/eligible-courses`
+    ] as const;
+    }
+
+
+export const getATargetStudentsEligibleCoursesForTheOpenSemesterQueryOptions = <TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getATargetStudentsEligibleCoursesForTheOpenSemesterQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>> = ({ signal }) => aTargetStudentsEligibleCoursesForTheOpenSemester(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemesterQueryResult = NonNullable<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>>
+export type ATargetStudentsEligibleCoursesForTheOpenSemesterQueryError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404
+
+
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary A target student's eligible courses for the open Semester.
+ */
+
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getATargetStudentsEligibleCoursesForTheOpenSemesterQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Register-for-student (ticket 09). Runs the identical eligibility / credit-hour / caps /
+ * clash / capacity validators the
+ * Student's own submit runs, against the **target** Student, then routes by who is
+ * composing (spec user stories 50, 53): the Student's own **Advisor** composes a request
+ * that is **born Approved** — it mints Enrollments immediately in the same transaction and
+ * notifies the Student (`registration.decided`), since the composer is the approver — while
+ * **Student Affairs** (or an administrator) composes a normal **Pending** request routed to
+ * the Student's live Advisor (`registration.submitted`), exactly as a self-submission. The
+ * kind (Initial / LateAdd) is derived from the calendar, as on self-submit. A second
+ * Pending request for the same Semester is a 409; an illegal cart is a 422 enumerating the
+ * offending lines/reasons. Gated on `courses.register_for_student` (R03 / R05).
+ * @summary Compose and submit a registration cart on a student's behalf.
+ */
+export const composeAndSubmitARegistrationCartOnAStudentsBehalf = (
+    studentId: number,
+    composeAndSubmitARegistrationCartOnAStudentsBehalfBody: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ComposeAndSubmitARegistrationCartOnAStudentsBehalf201>(
+      {url: `/api/v1/registration/on-behalf/students/${studentId}/requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: composeAndSubmitARegistrationCartOnAStudentsBehalfBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationOptions = <TError = ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, TError,{studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, TError,{studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}, TContext> => {
+
+const mutationKey = ['composeAndSubmitARegistrationCartOnAStudentsBehalf'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, {studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}> = (props) => {
+          const {studentId,data} = props ?? {};
+
+          return  composeAndSubmitARegistrationCartOnAStudentsBehalf(studentId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationResult = NonNullable<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>>
+    export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationBody = ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody
+    export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationError = ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf422
+
+    /**
+ * @summary Compose and submit a registration cart on a student's behalf.
+ */
+export const useComposeAndSubmitARegistrationCartOnAStudentsBehalf = <TError = ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, TError,{studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>,
+        TError,
+        {studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody},
+        TContext
+      > => {
+      return useMutation(getComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationOptions(options), queryClient);
+    }
+
+/**
+ * The Pending registration requests awaiting the signed-in reviewer, oldest-first — an
+ * Advisor's own **live** advisee set (a request follows the Student when their advisor
+ * is reassigned), or, for Student Affairs / an administrator, every advisor's advisees
+ * unscoped (user story 52). Each row carries the Student's context — name, University
+ * ID, degree, Program, enrollment term — and the number of courses requested, so the
+ * reviewer can triage. Gated on `registration.approve`.
+ * @summary The advisor's registration queue.
+ */
+export const theAdvisorsRegistrationQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheAdvisorsRegistrationQueue200>(
+      {url: `/api/v1/registration/queue`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheAdvisorsRegistrationQueueQueryKey = () => {
+    return [
+    `/api/v1/registration/queue`
+    ] as const;
+    }
+
+
+export const getTheAdvisorsRegistrationQueueQueryOptions = <TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheAdvisorsRegistrationQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>> = ({ signal }) => theAdvisorsRegistrationQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheAdvisorsRegistrationQueueQueryResult = NonNullable<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>>
+export type TheAdvisorsRegistrationQueueQueryError = TheAdvisorsRegistrationQueue403
+
+
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>,
+          TError,
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>,
+          TError,
+          Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The advisor's registration queue.
+ */
+
+export function useTheAdvisorsRegistrationQueue<TData = Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError = TheAdvisorsRegistrationQueue403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theAdvisorsRegistrationQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheAdvisorsRegistrationQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The full request for the review screen: the Student's context beside the lines —
+ * Program, degree, enrollment term, and current semester load — and every line with its
+ * classification, credit hours, meeting times and a **derived Retake** preview (whether
+ * approving it would mint a Retake from the Student's record). Same advisee scope as the
+ * queue: an Advisor may open only their own advisee's request (else 403). Gated on
+ * `registration.approve`.
+ * @summary A single request for line-item review.
+ */
+export const aSingleRequestForLineItemReview = (
+    registrationId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ASingleRequestForLineItemReview200>(
+      {url: `/api/v1/registration/requests/${registrationId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getASingleRequestForLineItemReviewQueryKey = (registrationId: number,) => {
+    return [
+    `/api/v1/registration/requests/${registrationId}`
+    ] as const;
+    }
+
+
+export const getASingleRequestForLineItemReviewQueryOptions = <TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getASingleRequestForLineItemReviewQueryKey(registrationId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>> = ({ signal }) => aSingleRequestForLineItemReview(registrationId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: registrationId !== null && registrationId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ASingleRequestForLineItemReviewQueryResult = NonNullable<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>>
+export type ASingleRequestForLineItemReviewQueryError = ASingleRequestForLineItemReview403
+
+
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>,
+          TError,
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>,
+          TError,
+          Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary A single request for line-item review.
+ */
+
+export function useASingleRequestForLineItemReview<TData = Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError = ASingleRequestForLineItemReview403>(
+ registrationId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aSingleRequestForLineItemReview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getASingleRequestForLineItemReviewQueryOptions(registrationId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Approve or reject each line and attach an optional note. The approved subset is
+ * re-validated at decision time — credit-hour floor (waived in the Student's first
+ * semester) and ceiling, composition caps and duplicate/clash against the Student's
+ * existing Enrollments, seat capacity, and the derived-Retake cap of one — and, if
+ * clean, **one Enrollment is minted per approved line atomically**. ≥1 approved line ⇒
+ * the request is Approved; all rejected ⇒ Rejected. The request must still be Pending
+ * (else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on
+ * `registration.approve`.
+ *
+ * A System/Super Administrator (R09/R10) may decide **any** advisor's advisee's request
+ * (the advisee-scope override, ADR-0015); that decision is attributed to the admin in the
+ * Audit Log, so an approval or rejection authored by someone other than the Student's
+ * Advisor is accountable. The real Advisor deciding their own advisee stays un-audited.
+ * @summary Record the Advisor's line-item decision.
+ */
+export const recordTheAdvisorsLineItemDecision = (
+    registrationId: number,
+    recordTheAdvisorsLineItemDecisionBody: RecordTheAdvisorsLineItemDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordTheAdvisorsLineItemDecision200>(
+      {url: `/api/v1/registration/requests/${registrationId}/decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: recordTheAdvisorsLineItemDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordTheAdvisorsLineItemDecisionMutationOptions = <TError = RecordTheAdvisorsLineItemDecision403 | RecordTheAdvisorsLineItemDecision409 | RecordTheAdvisorsLineItemDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, TError,{registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, TError,{registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}, TContext> => {
+
+const mutationKey = ['recordTheAdvisorsLineItemDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, {registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}> = (props) => {
+          const {registrationId,data} = props ?? {};
+
+          return  recordTheAdvisorsLineItemDecision(registrationId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordTheAdvisorsLineItemDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>>
+    export type RecordTheAdvisorsLineItemDecisionMutationBody = RecordTheAdvisorsLineItemDecisionBody
+    export type RecordTheAdvisorsLineItemDecisionMutationError = RecordTheAdvisorsLineItemDecision403 | RecordTheAdvisorsLineItemDecision409 | RecordTheAdvisorsLineItemDecision422
+
+    /**
+ * @summary Record the Advisor's line-item decision.
+ */
+export const useRecordTheAdvisorsLineItemDecision = <TError = RecordTheAdvisorsLineItemDecision403 | RecordTheAdvisorsLineItemDecision409 | RecordTheAdvisorsLineItemDecision422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>, TError,{registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordTheAdvisorsLineItemDecision>>,
+        TError,
+        {registrationId: number;data: RecordTheAdvisorsLineItemDecisionBody},
+        TContext
+      > => {
+      return useMutation(getRecordTheAdvisorsLineItemDecisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * The administrative-override read of a specific Student's schedule (ticket 10, ADR-0015):
+ * the student-self "My Schedule" surface is bound to `actingStudent`, so an administrator
+ * — who holds no Student record — needs an id-addressable read to oversee "any student's
+ * schedule" unscoped. It reuses the same builder and wire shape as My Schedule — each
+ * Enrollment with its Course Status, classification, credit hours, meeting times and
+ * derived attendance — but with the period-gated action affordances suppressed
+ * (`can_free_change`/`can_withdraw` always false, `addable_courses` always empty): an
+ * overseer views, never acts. The advisee-scope guard applies, so an **Advisor** reading
+ * their own advisee is naturally permitted (an incidental start on user story 51 — the
+ * full advisor monitoring UI is its own work); **Student Affairs** and an **administrator**
+ * read any student. Unscoped reads are un-audited. Gated on `registration.approve`.
+ * @summary View any student's schedule (oversight).
+ */
+export const viewAnyStudentsScheduleoversight = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ViewAnyStudentsScheduleoversight200>(
+      {url: `/api/v1/registration/students/${studentId}/schedule`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getViewAnyStudentsScheduleoversightQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/registration/students/${studentId}/schedule`
+    ] as const;
+    }
+
+
+export const getViewAnyStudentsScheduleoversightQueryOptions = <TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getViewAnyStudentsScheduleoversightQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>> = ({ signal }) => viewAnyStudentsScheduleoversight(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ViewAnyStudentsScheduleoversightQueryResult = NonNullable<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>>
+export type ViewAnyStudentsScheduleoversightQueryError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404
+
+
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>,
+          TError,
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>,
+          TError,
+          Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary View any student's schedule (oversight).
+ */
+
+export function useViewAnyStudentsScheduleoversight<TData = Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError = ViewAnyStudentsScheduleoversight403 | ViewAnyStudentsScheduleoversight404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewAnyStudentsScheduleoversight>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getViewAnyStudentsScheduleoversightQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every Course Offering the acting user teaches, across all Semesters — the Phase-4
+ * grading link, born here. Each carries its Semester, resolved Course, weekly meeting
+ * times, and its active roster size, so the instructor sees their teaching load at a
+ * glance. A user who teaches nothing gets an empty list (no permission gate — teaching
+ * is the scope). An administrator (R09/R10) sees **every** offering instead (ADR-0015), so
+ * they can reach any offering's register for oversight through this same screen. Requires
+ * only authentication.
+ * @summary The signed-in Instructor's offerings ("My Offerings").
+ */
+export const theSignedInInstructorsOfferingsMyOfferings = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheSignedInInstructorsOfferingsMyOfferings200>(
+      {url: `/api/v1/offerings/mine`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheSignedInInstructorsOfferingsMyOfferingsQueryKey = () => {
+    return [
+    `/api/v1/offerings/mine`
+    ] as const;
+    }
+
+
+export const getTheSignedInInstructorsOfferingsMyOfferingsQueryOptions = <TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheSignedInInstructorsOfferingsMyOfferingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>> = ({ signal }) => theSignedInInstructorsOfferingsMyOfferings(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheSignedInInstructorsOfferingsMyOfferingsQueryResult = NonNullable<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>>
+export type TheSignedInInstructorsOfferingsMyOfferingsQueryError = unknown
+
+
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The signed-in Instructor's offerings ("My Offerings").
+ */
+
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheSignedInInstructorsOfferingsMyOfferingsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The assigned Instructor's register for one Offering: its Class Sessions (generated from
+ * the meeting times across the Semester the first time this is opened — idempotent, so
+ * re-opening never duplicates), and its roster of **active** Enrollments (withdrawn
+ * students keep their history but leave the roster). Each roster row carries the student's
+ * identity, their per-session marks, and their derived attendance percentage with the
+ * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor, or an
+ * administrator reading unscoped for oversight (else 403; ADR-0015). This read is never
+ * audited.
+ * @summary An Offering's attendance register — sessions + roster + derived percentages.
+ */
+export const anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200>(
+      {url: `/api/v1/offerings/${offeringId}/register`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryKey = (offeringId: number,) => {
+    return [
+    `/api/v1/offerings/${offeringId}/register`
+    ] as const;
+    }
+
+
+export const getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryOptions = <TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryKey(offeringId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>> = ({ signal }) => anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages(offeringId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: offeringId !== null && offeringId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryResult = NonNullable<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>>
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403
+
+
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>,
+          TError,
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>,
+          TError,
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary An Offering's attendance register — sessions + roster + derived percentages.
+ */
+
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryOptions(offeringId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled
+ * session counts in no attendance denominator; reinstating it counts it again. Correctable
+ * either way. Authorised by assignment — only the session's Offering's Instructor, or an
+ * administrator (R09/R10) acting on an offering they don't teach, that write attributed to
+ * them in the Audit Log (else 403; ADR-0015).
+ * @summary Cancel or reinstate a Class Session.
+ */
+export const cancelOrReinstateAClassSession = (
+    classSessionId: number,
+    cancelOrReinstateAClassSessionBody: CancelOrReinstateAClassSessionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CancelOrReinstateAClassSession200>(
+      {url: `/api/v1/class-sessions/${classSessionId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: cancelOrReinstateAClassSessionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCancelOrReinstateAClassSessionMutationOptions = <TError = CancelOrReinstateAClassSession403,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, TError,{classSessionId: number;data: CancelOrReinstateAClassSessionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, TError,{classSessionId: number;data: CancelOrReinstateAClassSessionBody}, TContext> => {
+
+const mutationKey = ['cancelOrReinstateAClassSession'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, {classSessionId: number;data: CancelOrReinstateAClassSessionBody}> = (props) => {
+          const {classSessionId,data} = props ?? {};
+
+          return  cancelOrReinstateAClassSession(classSessionId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelOrReinstateAClassSessionMutationResult = NonNullable<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>>
+    export type CancelOrReinstateAClassSessionMutationBody = CancelOrReinstateAClassSessionBody
+    export type CancelOrReinstateAClassSessionMutationError = CancelOrReinstateAClassSession403
+
+    /**
+ * @summary Cancel or reinstate a Class Session.
+ */
+export const useCancelOrReinstateAClassSession = <TError = CancelOrReinstateAClassSession403,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, TError,{classSessionId: number;data: CancelOrReinstateAClassSessionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>,
+        TError,
+        {classSessionId: number;data: CancelOrReinstateAClassSessionBody},
+        TContext
+      > => {
+      return useMutation(getCancelOrReinstateAClassSessionMutationOptions(options), queryClient);
+    }
+
+/**
+ * Saves a binary present/absent mark per active Enrollment for one Class Session; a save
+ * upserts, so a correction overwrites. Only the Offering's active roster may be marked;
+ * a cancelled session cannot be marked. Around the save the percentages are recomputed:
+ * any **Audit** Enrollment whose percentage crosses below the threshold on this save
+ * raises one `attendance.audit_at_risk` notification (fired once on the downward crossing,
+ * never on every mark). Authorised by assignment — only this Offering's Instructor, or an
+ * administrator (R09/R10) recording/correcting attendance on an offering they don't teach,
+ * that write attributed to them in the Audit Log (else 403; ADR-0015).
+ * @summary Record (or correct) a session's attendance register.
+ */
+export const recordorCorrectASessionsAttendanceRegister = (
+    classSessionId: number,
+    recordorCorrectASessionsAttendanceRegisterBody: RecordorCorrectASessionsAttendanceRegisterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordorCorrectASessionsAttendanceRegister200>(
+      {url: `/api/v1/class-sessions/${classSessionId}/attendance`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: recordorCorrectASessionsAttendanceRegisterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordorCorrectASessionsAttendanceRegisterMutationOptions = <TError = RecordorCorrectASessionsAttendanceRegister403 | RecordorCorrectASessionsAttendanceRegister409 | RecordorCorrectASessionsAttendanceRegister422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, TError,{classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, TError,{classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}, TContext> => {
+
+const mutationKey = ['recordorCorrectASessionsAttendanceRegister'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, {classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}> = (props) => {
+          const {classSessionId,data} = props ?? {};
+
+          return  recordorCorrectASessionsAttendanceRegister(classSessionId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordorCorrectASessionsAttendanceRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>>
+    export type RecordorCorrectASessionsAttendanceRegisterMutationBody = RecordorCorrectASessionsAttendanceRegisterBody
+    export type RecordorCorrectASessionsAttendanceRegisterMutationError = RecordorCorrectASessionsAttendanceRegister403 | RecordorCorrectASessionsAttendanceRegister409 | RecordorCorrectASessionsAttendanceRegister422
+
+    /**
+ * @summary Record (or correct) a session's attendance register.
+ */
+export const useRecordorCorrectASessionsAttendanceRegister = <TError = RecordorCorrectASessionsAttendanceRegister403 | RecordorCorrectASessionsAttendanceRegister409 | RecordorCorrectASessionsAttendanceRegister422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, TError,{classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>,
+        TError,
+        {classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody},
+        TContext
+      > => {
+      return useMutation(getRecordorCorrectASessionsAttendanceRegisterMutationOptions(options), queryClient);
     }
 
 /**

@@ -4,12 +4,12 @@ namespace Modules\Catalog\Internal\Http\Controllers;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Modules\Catalog\Internal\Enums\CourseCategory;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\Enums\CourseCategory;
 
 /**
  * @group Catalog

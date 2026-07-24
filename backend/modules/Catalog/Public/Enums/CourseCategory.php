@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Catalog\Internal\Enums;
+namespace Modules\Catalog\Public\Enums;
 
 /**
  * The three roles a Course can play within a Program's Curriculum (ADR-0010,
@@ -9,9 +9,11 @@ namespace Modules\Catalog\Internal\Enums;
  * required credit hours per Category, defaulting to this {@see self::defaultRequiredCh()}
  * split (6/6/9, total 21 — BR-14, FR-PCM-002).
  *
- * Catalog-owned and the natural Public candidate for the Phase-3 Enrollment
- * facade, but nothing cross-module consumes it yet, so it stays Internal (spec
- * §Implementation Decisions).
+ * Catalog-owned. It lives in `Catalog\Public` (ticket 03): the Phase-3 Enrollment
+ * classifier reads a Curriculum Entry's Category across the module seam to place an
+ * eligible course into its Enrollment Classification (ADR-0012). It moved here from
+ * `Catalog\Internal` alongside {@see CourseLevel} when that first cross-module
+ * consumer arrived.
  */
 enum CourseCategory: string
 {

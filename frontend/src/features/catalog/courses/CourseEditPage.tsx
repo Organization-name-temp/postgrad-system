@@ -78,6 +78,11 @@ export function CourseEditPage() {
     lab: course.lab_ch ?? 0,
     total: course.total_ch ?? 0,
   })
+  // Only research courses carry a Research Type; when set, show it beside the level
+  // and credit split (ticket 02, BR-25).
+  const researchType = course.research_type
+    ? `${t('courses.researchType')}: ${t(`courses.researchTypes.${course.research_type}`, course.research_type)}`
+    : undefined
 
   return (
     <>
@@ -104,6 +109,7 @@ export function CourseEditPage() {
           <Typography color="text.secondary">
             {course.code} · {t('courses.level')} {course.level} · {credits}
             {owner ? ` · ${owner}` : ''}
+            {researchType ? ` · ${researchType}` : ''}
           </Typography>
         </Box>
         {canManage && (

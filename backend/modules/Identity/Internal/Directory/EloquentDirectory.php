@@ -51,6 +51,14 @@ class EloquentDirectory implements Directory
             && ($user->hasRole(Role::SystemAdmin) || $user->hasRole(Role::SuperAdmin));
     }
 
+    public function hasRole(int $userId, Role $role): bool
+    {
+        return User::query()
+            ->whereHas('userRoles', fn ($query) => $query->where('role', $role->value))
+            ->whereKey($userId)
+            ->exists();
+    }
+
     private function toSummary(User $user): UserSummary
     {
         return new UserSummary(

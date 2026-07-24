@@ -23,6 +23,51 @@ class EloquentStudentDirectory implements StudentDirectory
         return $this->toSummary(Student::query()->where('university_id', $universityId)->first());
     }
 
+    public function findByStudentId(int $studentId): ?StudentSummary
+    {
+        return $this->toSummary(Student::query()->whereKey($studentId)->first());
+    }
+
+    /**
+     * @param  list<int>  $studentIds
+     * @return array<int, StudentSummary>
+     */
+    public function findManyByStudentId(array $studentIds): array
+    {
+        if ($studentIds === []) {
+            return [];
+        }
+
+        return Student::query()
+            ->whereIn('id', $studentIds)
+            ->get()
+            ->mapWithKeys(fn (Student $student): array => [
+                (int) $student->getKey() => $this->toSummary($student),
+            ])
+            ->all();
+    }
+
+    /** @return list<int> */
+    public function studentIdsAdvisedBy(int $advisorUserId): array
+    {
+        return Student::query()
+            ->where('advisor_id', $advisorUserId)
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+    }
+
+    /** @return list<int> */
+    public function allStudentIds(): array
+    {
+        return Student::query()
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+    }
+
     private function toSummary(?Student $student): ?StudentSummary
     {
         if ($student === null) {

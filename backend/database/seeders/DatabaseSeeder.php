@@ -37,5 +37,11 @@ class DatabaseSeeder extends Seeder
         // Application resting in each status (the Accepted one a real minted Student),
         // interview slots, and sample documents. Runs after the catalog it references.
         $this->call(AdmissionsSeeder::class);
+
+        // The Enrollment demo (Phase 3): two out-of-phase Semesters (Spring 2026 running
+        // with attendance history incl. an audit-at-risk enrollment; Fall 2026 with
+        // registration open), Offerings over the anchor programs, and students resting in
+        // every interesting state. Runs after the Catalog + Admissions seeders it reads.
+        $this->call(EnrollmentSeeder::class);
     }
 }

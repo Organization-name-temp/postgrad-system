@@ -150,10 +150,11 @@ _Avoid_: track, major, course (a Program is not a Course).
 
 **Course**:
 A single teachable unit with a code, a credit-hour breakdown (Lecture + Tutorial + Lab =
-Total), and a level. Owned by a Department, or university-wide (the shared Preparatory
-language/culture courses belong to no Department). A Course carries no Category of its
-own — its Category is assigned per Program by a Curriculum Entry. Distinct from an
-Enrollment (a Student taking that Course).
+Total), a level, and — for level-700 research courses — a Research Type (PBL or Seminar).
+Owned by a Department, or university-wide (the shared Preparatory language/culture
+courses belong to no Department). A Course carries no Category of its own — its Category
+is assigned per Program by a Curriculum Entry. Distinct from an Enrollment (a Student
+taking that Course).
 
 **Curriculum**:
 A Program's set of Curriculum Entries — the Courses it comprises, grouped by Category.
@@ -171,18 +172,67 @@ The role a Course plays within a Program, assigned by a Curriculum Entry — one
 three: Preparatory (6 × 1 CH), Program Core (2 × 3 CH), Research Elective (3 × 3 CH). A
 Category is per-Program, never an intrinsic property of the Course.
 
+## Calendar
+
+**Semester**:
+One academic term the university actually runs — a Term (Fall or Spring) of one year,
+e.g. "Fall 2026" — carrying its start/end dates and the registration-flow deadlines
+(registration window, add/drop end, late-add end, withdrawal deadline). Course Offerings,
+Enrollments, and academic deadlines all belong to a Semester. Related to but distinct
+from an Admission Cycle: the Cycle is the *application* window run by Admissions; the
+Semester is the *academic* term the accepted Applicant enrolls into (they share the
+Term + year naming).
+_Avoid_: term alone (ambiguous with Intake Term), session, academic year.
+
 ## Enrollment & credit
 
+**Course Offering**:
+One Course actually being taught in one semester — carrying the Instructor teaching it,
+an optional seat capacity, and its weekly meeting times. A Course is curriculum (what a
+Program comprises); an Offering is operation (what runs this semester). Students register
+into Offerings, so the eligible list for a semester is the Student's Curriculum
+intersected with that semester's Offerings.
+_Avoid_: section, class, timetable slot ("Course Offering" is canonical; rooms and
+physical timetabling are out of scope per SRS §2.4).
+
 **Enrollment**:
-One Student taking one Course in one semester, carrying a Course Status. The unit of
-registration and the thing a Grade attaches to.
+One Student taking one Course Offering — and therefore one Course in one semester —
+carrying a Course Status. The unit of registration and the thing a Grade attaches to.
 _Avoid_: registration (that is the *act* of creating an Enrollment, not the record).
+
+**Class Session**:
+One planned meeting of a Course Offering on a specific date, generated from the
+Offering's weekly meeting times across the Semester and cancellable by the Instructor
+(a cancelled Session never counts). What attendance is recorded against, and where
+future course materials or assessments would attach.
+_Avoid_: lecture, class, period.
+
+**Attendance**:
+The per-Session present/absent record an Instructor keeps for each Enrollment in their
+Offering. A Student's attendance percentage is always derived (present ÷ non-cancelled
+recorded Sessions), never stored; in this build it informs visibility and the
+audit-at-risk flag (below 75% on an Audit Enrollment), never an automatic status change.
 
 **Course Status**:
 The accounting classification of a single Enrollment, governing how it counts toward the
 transcript, CGPA, and each credit-hour category: Regular, Retake, Audit (AU),
 Withdrawal (W), Fail Withdrawal (FW), Incomplete (I), CGPA Improvement, Transfer, Waive,
 Exempted. (See SRS Appendix D for the counting matrix.)
+
+**Enrollment Classification**:
+How one Enrollment counts for the Student's Program — Preparatory, Core, Internal
+Elective, External Elective, or Research Course — derived at registration time from the
+Student's Curriculum, the Course level, and the degree level, then kept as a snapshot on
+the Enrollment (later Curriculum edits never re-classify past registrations). Per-Student
+and per-Enrollment; distinct from Course Category, which is the Course's per-Program
+placement in a Curriculum. An External Elective is a course outside the Student's own
+Curriculum taken from another graduate Program's; a Research Course is the level-700
+course whose Research Type matches the degree (PBL for MSc, Seminar for PhD).
+
+**Research Type**:
+Whether a level-700 research course runs as PBL (project-based learning — taken by MSc
+students) or Seminar (taken by PhD students). An intrinsic property of the Course,
+recorded in the Catalog.
 
 **Exemption**:
 Release from a *required Preparatory Course* based on prior qualification (e.g.

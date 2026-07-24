@@ -23,10 +23,20 @@ import { SlotsPage } from '../features/admissions/interviews/SlotsPage'
 import { SchedulingPage } from '../features/admissions/interviews/SchedulingPage'
 import { InterviewerPage } from '../features/admissions/interviews/InterviewerPage'
 import { CyclesPage } from '../features/admin/cycles/CyclesPage'
+import { SemestersPage } from '../features/admin/semesters/SemestersPage'
+import { OfferingsPage } from '../features/admin/offerings/OfferingsPage'
 import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
+import { RegistrationPage } from '../features/enrollment/registration/RegistrationPage'
+import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
+import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
+import { RegistrationReviewPage } from '../features/enrollment/advising/RegistrationReviewPage'
+import { StudentSchedulePage } from '../features/enrollment/advising/StudentSchedulePage'
+import { ComposeForStudentPage } from '../features/enrollment/on-behalf/ComposeForStudentPage'
+import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPage'
+import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
-import { ROLE } from '../shared/access/roles'
+import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
 
 // Dev-only design-system gallery. Gating the lazy import on `import.meta.env.DEV`
 // keeps both the route AND its chunk out of production builds.
@@ -64,6 +74,36 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.applicant]} />}>
                   <Route path="/apply" element={<ApplyPage />} />
                 </Route>
+                {/* Persona-guarded: only actual Students (R02) reach registration; an
+                    admin who merely inherits courses.register_self is sent home and
+                    the server would 403 the eligible list anyway (ticket 04). */}
+                <Route element={<RequireAuth roles={[ROLE.student]} />}>
+                  <Route path="/registration" element={<RegistrationPage />} />
+                  <Route path="/schedule" element={<SchedulePage />} />
+                </Route>
+                {/* Persona-guarded: Instructors (R04) reach My Teaching + the register;
+                    attendance is authorised by assignment server-side (ticket 08).
+                    Administrators (R09/R10) reach them for oversight — the register unscopes
+                    and audits their writes server-side (ADR-0015, ticket 10). */}
+                <Route element={<RequireAuth roles={[ROLE.instructor, ...ADMIN_ROLES]} />}>
+                  <Route path="/offerings/mine" element={<MyOfferingsPage />} />
+                  <Route
+                    path="/offerings/:offeringId/register"
+                    element={<OfferingRegisterPage />}
+                  />
+                </Route>
+                {/* Advisor / Student Affairs registration review (ticket 06): gated on the
+                    registration.approve permission (route + API). Advisors are scoped to
+                    their advisees server-side; SA + admins review unscoped. The
+                    student-schedule oversight view (ticket 10) shares that gate — declared
+                    before the dynamic :requestId route so "schedule" isn't read as an id. */}
+                <Route path="/advising" element={<AdvisingQueuePage />} />
+                <Route path="/advising/schedule" element={<StudentSchedulePage />} />
+                <Route path="/advising/:requestId" element={<RegistrationReviewPage />} />
+                {/* Register-for-student (ticket 09): staff compose a cart on a student's
+                    behalf. Gated on courses.register_for_student (nav + API); an Advisor's
+                    picker is scoped to their advisees, Student Affairs sees all. */}
+                <Route path="/registration/on-behalf" element={<ComposeForStudentPage />} />
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
                 <Route path="/dean" element={<DeanQueuePage />} />
@@ -81,6 +121,8 @@ export function App() {
                 <Route path="/catalog/courses" element={<CoursesPage />} />
                 <Route path="/catalog/courses/:courseId" element={<CourseEditPage />} />
                 <Route path="/admin/cycles" element={<CyclesPage />} />
+                <Route path="/admin/semesters" element={<SemestersPage />} />
+                <Route path="/admin/semesters/:semesterId/offerings" element={<OfferingsPage />} />
                 <Route path="/admin/assignments" element={<AssignmentsPage />} />
               </Route>
             </Route>

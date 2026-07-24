@@ -263,16 +263,98 @@ no FK) and [ADR-0013](./adr/0013-acceptance-handoff-student-anchor.md) (acceptan
   approved by the faculty Dean, interviewed, and accepted → becomes a Student with a
   University ID, an advisor, and role R02.
 
-### Phase 3 — Enrollment (SRS §4.4, §4.5, §4.6 partial)
-- **Enrollment module:** `RegistrationRequest` → Advisor approval → `Enrollment`
-  (Pending/Approved/Rejected). CH limits (min 6 / max 12, config-driven) + approaching-
-  graduation and first-semester exceptions.
-- Category rules: internal vs external elective (external needs advisor approval),
-  PBL (MSc) vs Seminar (PhD) research course; level rules (500/600/700).
-- Add/Drop/Late-Add/Withdrawal periods (Calendar) and **Course Status** accounting
-  (Regular, Retake, Audit, W, FW, Incomplete, CGPA-Improvement, Transfer, Waive, Exempted).
-- Re-registration / retake caps (max 1) and the elective-vs-core retake distinction.
-- **Demo:** a Student registers courses, the Advisor approves, statuses are tracked.
+### Phase 3 — Enrollment (SRS §4.4; §4.5/§4.6 as accounting values only)
+The design below was sharpened in a `/grill-with-docs` session; the resolved glossary lives
+in [CONTEXT.md](../CONTEXT.md) (Course Offering, Semester, Enrollment Classification,
+Research Type, Class Session, Attendance) and the hard-to-reverse choices in
+[ADR-0017](./adr/0017-offering-based-registration.md) (offering-based registration +
+structural seeds), [ADR-0018](./adr/0018-calendar-module-semester.md) (Calendar module owns
+the Semester), and [ADR-0019](./adr/0019-attendance-session-register.md) (attendance
+register — a deliberate SRS extension).
+
+- **Two new modules.** A supporting **`Calendar`** module owning **`Semester`** (Term
+  Fall/Spring + year, unique, never deleted) with five typed, order-validated period dates
+  (start/end, registration window, add/drop end, late-add end, withdrawal deadline);
+  openness always derived; CRUD under `calendar.manage`; AdmissionCycle stays in Admissions,
+  linked by natural key (ADR-0018). And the **`Enrollment`** domain module. New deptrac
+  edges: `Enrollment_Internal → {Identity, Catalog, Calendar, Notifications}\Public`,
+  `App → {Enrollment, Calendar}\Public`.
+- **Course Offering** (ADR-0017): one Course taught in one Semester — Instructor, optional
+  capacity, weekly meeting rows; unique (semester, course) *now*, relaxable to sections
+  later; managed under `calendar.manage` beside Semesters. **Enrollments reference the
+  Offering, never the Course** — the structural seed for future timetabling/LMS (both
+  seeded structurally only; zero placeholder schema; rooms stay out per SRS §2.4).
+- **`CourseStatus` ships complete** (all 10 Appendix-D values + counting matrix encoded as
+  a static matrix), but only **Regular, Retake, Audit, W** are reachable in Phase 3; drop =
+  hard delete, no trace. FW/Incomplete/CGPA-Improvement arrive with Phase 4,
+  Transfer/Waive/Exempted with Phase 5.
+- **Registration workflow:** `RegistrationRequest` = a batch cart (min-6 CH is batch-level;
+  no server-side Draft), lines referencing Offerings and carrying requested mode
+  Regular/Audit (**Retake is always derived**). Advisor **"modify" = line-item trim, never
+  add**; request statuses Pending/Approved/Rejected; approval mints Enrollments atomically
+  (classification + registration-time total CH snapshotted per line, ADR-0017).
+- **Period mechanics** (FR-REG-004): weeks 1–2 free add/drop as direct actions — but only
+  *after* an approved initial request (advisor notified, no veto); week 3 = add-only via a
+  `LateAdd`-kind request through the advisor; withdrawal self-serve until the deadline
+  (sets W, no CH floor); after the deadline nothing (Phase 4's business). Refunds ignored
+  (§2.4). External electives can never be free-added (BR-24 demands advisor approval).
+- **Eligibility & classification** (BR-23–26): eligible list = own Curriculum ∩ this
+  semester's Offerings (+ other programs' curriculum courses as external electives).
+  Five-way **Enrollment Classification** (Prep / Core / Internal Elective / External
+  Elective / Research Course) with level rules per degree; **`research_type` {PBL, Seminar}
+  added to Catalog Course** (the Phase 1 deferral); composition enforced as registration
+  caps — **external ≤ 1 (allowance), research course = exactly 1, type-matched** — full
+  6/6/9 accounting stays Phase 5.
+- **CH limits:** min 6 / max 12 via `config/enrollment.php`, one validator everywhere the
+  schedule changes; Retakes + Audits count toward load. **First-semester exception**
+  proxied now by enrollment-term match (tightens to exempted-only in Phase 5);
+  **approaching-graduation exception strictly deferred to Phase 5** (needs Remaining CH);
+  no advisor override hatch.
+- **Retake rules:** one enrollment per (student, course, semester); a prior for-credit
+  attempt derives `Retake` (max 1); **W/AU attempts don't burn the retake**. Grade gates
+  (below-C+, prep/core same-course, CGPA-Improvement routing, the failed-external freeing
+  the external cap) are documented **Phase 4 hooks**, not built.
+- **Attendance** (ADR-0019, SRS extension): `ClassSession` rows generated from meeting
+  times, instructor-cancellable (the holiday answer); binary marks by the assigned
+  Instructor (authorization by assignment — matrix untouched); percentage always derived;
+  **flag + notify only** (audit-at-risk < 75%), never an automated status change.
+- **Cross-module seams:** Catalog finally grows the deferred facade — `CourseCatalog` +
+  `CurriculumCatalog` (+ `CourseCategory`/`CourseLevel` promoted to Public); opaque ids per
+  ADR-0012. Advisor queue reads **live advisees** via new
+  `Identity\Public::studentIdsAdvisedBy()` — open requests follow reassignment.
+  `Enrollment\Public` ships **empty** (Phase 4 builds the roster surface against grading).
+- **RBAC:** existing permissions only (`RegisterCoursesSelf` / `RegisterCoursesForStudent` /
+  `ApproveCourseRegistration` / `ManageAcademicCalendar` — all in the enum since Phase 0).
+  **Register-for-student ships minimally:** SA for any student → Pending as usual; an
+  Advisor for their advisee → **born Approved** (composer is the approver). ADR-0015 admin
+  override applies to the new scope guards; admin writes audited.
+- **Notifications:** five new types — `registration.submitted` (advisor),
+  `registration.decided` (student), `enrollment.adjusted` + `enrollment.withdrawn`
+  (advisor), `attendance.audit_at_risk` (student, fires on the crossing). No SLA/reminder
+  commands (no SRS registration SLA).
+- **Frontend:** new `features/enrollment` — student Registration cart (classification
+  groups, live CH total, ADR-0014 client mirror) + My Schedule (StatusChips, attendance %,
+  period-gated actions); advisor queue/review (line-item) + compose-for-advisee;
+  instructor My Offerings → roster + attendance register; admin Semesters + Offerings
+  screens (new instructor-list endpoint, the advisors-list precedent). New nav
+  **enrollment section**; no new frontend deps.
+- **DoD:** Pest feature-first + targeted units (CH validator + exceptions, 5-way
+  classifier + caps, retake derivation, meeting overlap, session generation, attendance %
+  + crossing, semester date ordering); **one multi-role Playwright smoke**
+  (admin → student → advisor → instructor, incl. withdraw + audit-at-risk) + axe; Scribe
+  `@urlParam` examples on all model-bound routes. Deterministic seeder: **two out-of-phase
+  semesters** (Spring 2026 running & in withdrawal window; Fall 2026 registration open —
+  windows relative to seed time), offerings over the Phase 1 anchor programs, students in
+  varied states (pending request, W, derived Retake, AU below 75%).
+- **Deferred:** grade-gated retake rules + CGPA-Improvement + external-cap freeing
+  (Phase 4); approaching-graduation exception, exemption/transfer/waiver workflows +
+  composition accounting (Phase 5); grade-submission-deadline/exam-period/holiday columns
+  (their consumers' phases); rooms/timetabling engine + LMS features (structural seeds
+  only, ADR-0017); registration SLAs (no requirement).
+- **Demo:** admin opens Fall 2026 offerings; a Student builds a cart, the Advisor trims a
+  line and approves; the Student free-drops one course, withdraws from a running Spring
+  course (W chip), and the Instructor cancels a session and marks a register until an
+  audit-at-risk flag appears.
 
 ### Phase 4 — Grading & GPA/CGPA (SRS §4.7)
 - **Grading module:** instructor mark entry → auto letter-grade mapping (Appendix A) →

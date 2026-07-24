@@ -10,6 +10,8 @@ export const PERMISSION = {
   screenApplications: 'application.screen',
   scheduleInterview: 'interview.schedule',
   decideApplicants: 'applicant.decide',
+  approveCourseRegistration: 'registration.approve',
+  registerCoursesForStudent: 'courses.register_for_student',
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
   manageCalendar: 'calendar.manage',

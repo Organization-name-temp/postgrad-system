@@ -100,6 +100,7 @@ class CatalogVersionRecorder
             'name_ar' => $course->name_ar,
             'department_id' => $course->department_id,
             'level' => $course->level->value,
+            'research_type' => $course->research_type?->value,
             'lecture_ch' => $course->lecture_ch,
             'tutorial_ch' => $course->tutorial_ch,
             'lab_ch' => $course->lab_ch,

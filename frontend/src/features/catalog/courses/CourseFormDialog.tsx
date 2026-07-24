@@ -27,6 +27,7 @@ import type {
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../localeName'
 import { COURSE_LEVELS } from './courseLevels'
+import { RESEARCH_TYPES } from './researchTypes'
 
 interface CourseFormDialogProps {
   open: boolean
@@ -39,6 +40,12 @@ interface CourseFormDialogProps {
 // string is never a valid Department id, so it cleanly distinguishes "no owner"
 // from a chosen Department.
 const UNIVERSITY_WIDE = ''
+
+// Sentinel for the "not a research course" Research Type option; the empty string
+// is never a valid ResearchType code, so it cleanly means "no Research Type" — the
+// value is then omitted from the payload (the server treats an absent nullable field
+// as null — ADR-0010, mirroring the university-wide handling above).
+const NO_RESEARCH_TYPE = ''
 
 /**
  * Create or edit a Course (code + English/Arabic names + level + the
@@ -62,6 +69,7 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
   const [nameEn, setNameEn] = useState('')
   const [nameAr, setNameAr] = useState('')
   const [level, setLevel] = useState('')
+  const [researchType, setResearchType] = useState<string>(NO_RESEARCH_TYPE)
   const [lectureCh, setLectureCh] = useState('')
   const [tutorialCh, setTutorialCh] = useState('')
   const [labCh, setLabCh] = useState('')
@@ -76,6 +84,7 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
       setNameEn(course?.name_en ?? '')
       setNameAr(course?.name_ar ?? '')
       setLevel(course?.level != null ? String(course.level) : '')
+      setResearchType(course?.research_type ?? NO_RESEARCH_TYPE)
       setLectureCh(course?.lecture_ch != null ? String(course.lecture_ch) : '')
       setTutorialCh(course?.tutorial_ch != null ? String(course.tutorial_ch) : '')
       setLabCh(course?.lab_ch != null ? String(course.lab_ch) : '')
@@ -117,6 +126,11 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
     // university-wide (the server treats an absent owner as null — ADR-0010).
     if (departmentId !== UNIVERSITY_WIDE) {
       data.department_id = Number(departmentId)
+    }
+    // Likewise the Research Type: attach it only when chosen; omitting it means the
+    // Course is not a research course (and, on edit, clears any prior value).
+    if (researchType !== NO_RESEARCH_TYPE) {
+      data.research_type = researchType
     }
 
     if (isEdit && course?.id !== undefined) {
@@ -196,6 +210,21 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
             {COURSE_LEVELS.map((value) => (
               <MenuItem key={value} value={String(value)}>
                 {value}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            select
+            label={t('courses.researchType')}
+            value={researchType}
+            onChange={(event) => setResearchType(event.target.value)}
+            helperText={t('courses.researchTypeHint')}
+            fullWidth
+          >
+            <MenuItem value={NO_RESEARCH_TYPE}>{t('courses.researchTypes.none')}</MenuItem>
+            {RESEARCH_TYPES.map((value) => (
+              <MenuItem key={value} value={value}>
+                {t(`courses.researchTypes.${value}`)}
               </MenuItem>
             ))}
           </TextField>

@@ -57,4 +57,43 @@ enum NotificationType: string
 
     /** The applicant was accepted and became a Student. Payload: `university_id`. */
     case ApplicationAccepted = 'application.accepted';
+
+    /**
+     * A Student (or staff on their behalf) submitted a registration for the advisor's
+     * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds
+     * them. Payload: `registration_request_id`, `student_name`, `course_count`.
+     */
+    case RegistrationSubmitted = 'registration.submitted';
+
+    /**
+     * The Advisor decided a registration request (Phase 3, ticket 06). Raised to the
+     * Student the moment their schedule exists (or the request is rejected). Payload:
+     * `registration_request_id`, `outcome` (Approved/Rejected), `approved_count`,
+     * `rejected_count`.
+     */
+    case RegistrationDecided = 'registration.decided';
+
+    /**
+     * An advisee changed their own schedule during the free add/drop period (Phase 3,
+     * ticket 07) — a direct action the Advisor is *notified* of, not asked to approve
+     * (FR-REG-004, BR-70). Raised to the Student's live Advisor. Payload: `action`
+     * (`added`/`dropped`), `course_code`, `student_name`.
+     */
+    case EnrollmentAdjusted = 'enrollment.adjusted';
+
+    /**
+     * An advisee withdrew from a course (Course Status → W) before the withdrawal
+     * deadline (Phase 3, ticket 07) — self-serve, with no approval step, the Advisor kept
+     * informed. Raised to the Student's live Advisor. Payload: `course_code`,
+     * `student_name`.
+     */
+    case EnrollmentWithdrawn = 'enrollment.withdrawn';
+
+    /**
+     * An Audit Enrollment's derived attendance percentage first crossed below the audit
+     * threshold (Appendix D's ≥75% rule; Phase 3, ticket 08, ADR-0019). Raised to the
+     * Student once on the downward crossing — never on every mark, and never accompanied by
+     * an automated status change. Payload: `course_code`, `percentage`.
+     */
+    case AttendanceAuditAtRisk = 'attendance.audit_at_risk';
 }

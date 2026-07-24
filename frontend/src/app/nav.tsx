@@ -6,6 +6,7 @@ import ApartmentIcon from '@mui/icons-material/Apartment'
 import SchoolIcon from '@mui/icons-material/School'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import EventNoteIcon from '@mui/icons-material/EventNote'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import FactCheckIcon from '@mui/icons-material/FactCheck'
 import GavelIcon from '@mui/icons-material/Gavel'
 import HowToRegIcon from '@mui/icons-material/HowToReg'
@@ -13,6 +14,12 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
+import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek'
+import RuleIcon from '@mui/icons-material/Rule'
+import CoPresentIcon from '@mui/icons-material/CoPresent'
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
+import PersonSearchIcon from '@mui/icons-material/PersonSearch'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -126,13 +133,87 @@ export const navItems: NavItem[] = [
     permission: PERMISSION.viewCatalog,
     section: 'catalog',
   },
-  // Calendar — the admission-cycle windows (Phase 2).
+  // Calendar — the admission-cycle windows (Phase 2) and the academic Semesters
+  // (Phase 3): both under calendar.manage, in the same section.
   {
     key: 'cycles',
     to: '/admin/cycles',
     icon: <EventNoteIcon />,
     permission: PERMISSION.manageCalendar,
     section: 'calendar',
+  },
+  {
+    key: 'semesters',
+    to: '/admin/semesters',
+    icon: <CalendarMonthIcon />,
+    permission: PERMISSION.manageCalendar,
+    section: 'calendar',
+  },
+  // Enrollment (Phase 3): the Student's own registration surface. A **persona** item
+  // gated on the Student role (R02), not on courses.register_self — an admin inherits
+  // that permission but has no Student record, so the server would 403 the eligible
+  // list (ADR-0015). The advisor/instructor enrollment surfaces join this section in
+  // later tickets.
+  {
+    key: 'registration',
+    to: '/registration',
+    icon: <AppRegistrationIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  // My Schedule (ticket 06): the Student's minted Enrollments per semester. A persona
+  // item on the Student role (R02), beside registration — an admin inherits the
+  // permission but has no Student record, so it gates on the Role (ADR-0015).
+  {
+    key: 'schedule',
+    to: '/schedule',
+    icon: <CalendarViewWeekIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  // The Advisor's registration-review queue (ticket 06): approve/trim/reject a Pending
+  // request line-by-line. A capability item on registration.approve — held by Advisors
+  // (their own advisees, live-scoped) and Student Affairs (unscoped); admins inherit it
+  // for oversight (ADR-0015).
+  {
+    key: 'advising',
+    to: '/advising',
+    icon: <RuleIcon />,
+    permission: PERMISSION.approveCourseRegistration,
+    section: 'enrollment',
+  },
+  // Register-for-student (ticket 09): staff compose a cart on a student's behalf. A
+  // capability item on courses.register_for_student — held by Advisors (their advisees) and
+  // Student Affairs (any student); admins inherit it for oversight (ADR-0015).
+  {
+    key: 'registerForStudent',
+    to: '/registration/on-behalf',
+    icon: <PersonAddAlt1Icon />,
+    permission: PERMISSION.registerCoursesForStudent,
+    section: 'enrollment',
+  },
+  // Student-schedule oversight (ticket 10): look up a student and view their schedule +
+  // attendance read-only. A capability item on registration.approve — Advisors see their
+  // advisees (an incidental start on user story 51), Student Affairs any student; admins
+  // inherit it for oversight (ADR-0015). The server re-enforces the advisee scope.
+  {
+    key: 'studentSchedules',
+    to: '/advising/schedule',
+    icon: <PersonSearchIcon />,
+    permission: PERMISSION.approveCourseRegistration,
+    section: 'enrollment',
+  },
+  // The Instructor's teaching + attendance register (ticket 08). A **persona** item on the
+  // Instructor role (R04) — attendance has no permission (authorisation is by assignment),
+  // so it gates on the role, not a permission. Administrators (R09/R10) reach it too for
+  // oversight: the register unscopes for them server-side and audits their writes (ADR-0015,
+  // ticket 10) — the myInterviews precedent for a role-gated admin oversight surface.
+  {
+    key: 'myOfferings',
+    to: '/offerings/mine',
+    icon: <CoPresentIcon />,
+    section: 'enrollment',
+    roles: [ROLE.instructor, ...ADMIN_ROLES],
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

@@ -1397,6 +1397,129 @@ export const DeactivateAnAdmissionCycleResponse = zod.object({
 
 
 /**
+ * Newest term first. Available to any authenticated user who needs the calendar.
+ * @summary List Semesters.
+ */
+export const ListSemestersResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Create a Semester.
+ */
+export const CreateASemesterBody = zod.object({
+  "term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The academic year.'),
+  "starts_at": zod.string().describe('When the semester starts (ISO 8601).'),
+  "ends_at": zod.string().describe('When the semester ends (ISO 8601).'),
+  "registration_opens_at": zod.string().describe('When registration opens (ISO 8601).'),
+  "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
+  "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
+  "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+})
+
+export const CreateASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Semester.
+ */
+export const ShowASemesterParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const ShowASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Edits the term, year, and period dates in place — the correction path that
+ * never orphans records (ADR-0018). Same invariants as creation.
+ * @summary Update a Semester.
+ */
+export const UpdateASemesterParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const UpdateASemesterBody = zod.object({
+  "term": zod.string().describe('Fall or Spring.'),
+  "year": zod.number().describe('The academic year.'),
+  "starts_at": zod.string().describe('When the semester starts (ISO 8601).'),
+  "ends_at": zod.string().describe('When the semester ends (ISO 8601).'),
+  "registration_opens_at": zod.string().describe('When registration opens (ISO 8601).'),
+  "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
+  "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
+  "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+})
+
+export const UpdateASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
  * Faculties are ordered by code; within each Program the three Categories are
  * always present in bylaw order (Preparatory, Program Core, Research Elective)
  * with their required credit hours, and Courses within a Category follow the
@@ -1996,6 +2119,7 @@ export const ListCoursesResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "level": zod.number().optional(),
+  "research_type": zod.string().optional(),
   "lecture_ch": zod.number().optional(),
   "tutorial_ch": zod.number().optional(),
   "lab_ch": zod.number().optional(),
@@ -2016,6 +2140,7 @@ export const CreateACourseBody = zod.object({
   "name_en": zod.string().describe('English name.'),
   "name_ar": zod.string().describe('Arabic name.'),
   "level": zod.number().describe('One of 400, 500, 600, 700.'),
+  "research_type": zod.string().optional().describe('The Research Type for a research course — one of PBL, Seminar; omit for a non-research course.'),
   "lecture_ch": zod.number().describe('Lecture credit hours.'),
   "tutorial_ch": zod.number().describe('Tutorial credit hours.'),
   "lab_ch": zod.number().describe('Lab credit hours.'),
@@ -2030,6 +2155,7 @@ export const CreateACourseResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "level": zod.number().optional(),
+  "research_type": zod.string().optional(),
   "lecture_ch": zod.number().optional(),
   "tutorial_ch": zod.number().optional(),
   "lab_ch": zod.number().optional(),
@@ -2057,6 +2183,7 @@ export const ShowACourseResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "level": zod.number().optional(),
+  "research_type": zod.string().optional(),
   "lecture_ch": zod.number().optional(),
   "tutorial_ch": zod.number().optional(),
   "lab_ch": zod.number().optional(),
@@ -2088,6 +2215,7 @@ export const UpdateACourseBody = zod.object({
   "name_en": zod.string().describe('English name.'),
   "name_ar": zod.string().describe('Arabic name.'),
   "level": zod.number().describe('One of 400, 500, 600, 700.'),
+  "research_type": zod.string().optional().describe('The Research Type for a research course — one of PBL, Seminar; omit for a non-research course.'),
   "lecture_ch": zod.number().describe('Lecture credit hours.'),
   "tutorial_ch": zod.number().describe('Tutorial credit hours.'),
   "lab_ch": zod.number().describe('Lab credit hours.'),
@@ -2102,6 +2230,7 @@ export const UpdateACourseResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "level": zod.number().optional(),
+  "research_type": zod.string().optional(),
   "lecture_ch": zod.number().optional(),
   "tutorial_ch": zod.number().optional(),
   "lab_ch": zod.number().optional(),
@@ -2126,6 +2255,7 @@ export const ActivateACourseResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "level": zod.number().optional(),
+  "research_type": zod.string().optional(),
   "lecture_ch": zod.number().optional(),
   "tutorial_ch": zod.number().optional(),
   "lab_ch": zod.number().optional(),
@@ -2152,6 +2282,7 @@ export const DeactivateACourseResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "level": zod.number().optional(),
+  "research_type": zod.string().optional(),
   "lecture_ch": zod.number().optional(),
   "tutorial_ch": zod.number().optional(),
   "lab_ch": zod.number().optional(),
@@ -2257,6 +2388,1240 @@ export const UpdateCurrentUserResponse = zod.object({
   "name": zod.string().optional()
 })).optional(),
   "permissions": zod.array(zod.string()).optional()
+}).optional()
+})
+
+
+/**
+ * The faculty Users (holding the Instructor role, R04) an Offering may be assigned
+ * to — the source for the offering form's instructor picker (the Phase-2
+ * interviewer-list precedent, via Identity\Public). Gated on `calendar.manage`.
+ * @summary List assignable instructors.
+ */
+export const ListAssignableInstructorsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Every Offering that runs in the given Semester, each with its resolved Course and
+ * Instructor summaries and its weekly meetings. Gated on `calendar.manage`.
+ * @summary List a Semester's Course Offerings.
+ */
+export const ListASemestersCourseOfferingsParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const ListASemestersCourseOfferingsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+})
+
+
+/**
+ * Records one Catalog Course as taught in the Semester: an Instructor, an optional
+ * seat capacity, and one or more weekly meeting times. The Course must exist and not
+ * already be offered in this Semester; the Instructor must be a faculty (R04) User;
+ * the meetings may not overlap one another. Gated on `calendar.manage`.
+ * @summary Create a Course Offering in a Semester.
+ */
+export const CreateACourseOfferingInASemesterParams = zod.object({
+  "semester_id": zod.number().describe('The ID of the semester.')
+})
+
+export const CreateACourseOfferingInASemesterBody = zod.object({
+  "course_id": zod.number().describe('The Catalog Course to offer.'),
+  "instructor_id": zod.number().describe('A faculty (Instructor) User to teach it.'),
+  "capacity": zod.number().optional().describe('The seat capacity; omit for uncapped.'),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().describe('Day of week, 0 (Sunday) to 6 (Saturday).'),
+  "starts_at": zod.string().describe('Start time, 24h HH:MM.'),
+  "ends_at": zod.string().describe('End time, 24h HH:MM, after the start.')
+})).describe('One or more weekly meeting slots.')
+})
+
+export const CreateACourseOfferingInASemesterResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Show a Course Offering.
+ */
+export const ShowACourseOfferingParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const ShowACourseOfferingResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Changes the Instructor, capacity, and weekly meetings. The Semester and Course an
+ * Offering runs are its identity and are fixed at creation. Same instructor and
+ * meeting invariants as creation. Gated on `calendar.manage`.
+ * @summary Update a Course Offering.
+ */
+export const UpdateACourseOfferingParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const UpdateACourseOfferingBody = zod.object({
+  "instructor_id": zod.number().describe('A faculty (Instructor) User to teach it.'),
+  "capacity": zod.number().optional().describe('The seat capacity; omit for uncapped.'),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().describe('Day of week, 0 (Sunday) to 6 (Saturday).'),
+  "starts_at": zod.string().describe('Start time, 24h HH:MM.'),
+  "ends_at": zod.string().describe('End time, 24h HH:MM, after the start.')
+})).describe('One or more weekly meeting slots.')
+})
+
+export const UpdateACourseOfferingResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "instructor_id": zod.number().optional(),
+  "capacity": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Removes an Offering and its meeting rows. Allowed only while nothing references
+ * it — once an Enrollment is minted against it or a Class Session is generated from
+ * it (later Phase-3 tickets), the register and roster it anchors must survive, so a
+ * referenced Offering is refused with a 409. Gated on `calendar.manage`.
+ * @summary Delete a Course Offering.
+ */
+export const DeleteACourseOfferingParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const DeleteACourseOfferingResponse = zod.looseObject({
+
+})
+
+
+/**
+ * The courses the Student may register for right now, grouped client-side by their
+ * Enrollment Classification (Preparatory / Core / Internal Elective / External
+ * Elective / Research Course). Each line carries the Offering's instructor, meeting
+ * times, seats remaining and the course's total CH. Courses in the Curriculum with
+ * no Offering this semester are absent (ADR-0017); a course that classifies for no
+ * class is omitted. The list also serves the **late-add** window (ticket 07): when
+ * registration has closed but the Semester is in its late-add period, the same list is
+ * returned minus the courses already on the Student's schedule (a late-add cart only
+ * adds). When neither a registration nor a late-add window is open, `semester` is null
+ * and the list is empty. Gated on `courses.register_self` (the acting Student, R02).
+ * @summary List the acting Student's eligible courses for the open Semester.
+ */
+export const ListTheActingStudentsEligibleCoursesForTheOpenSemesterResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "courses": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "capacity": zod.number().optional(),
+  "seats_remaining": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Turns the Student's cart into a Pending {@see RegistrationRequest}. Its kind is derived
+ * from the calendar: `Initial` while the registration window is open, or `LateAdd` when
+ * that window has closed and the Semester is in its late-add period (ticket 07) — the
+ * add-only week-3 request that still flows through the advisor. Each line names an
+ * eligible Offering and a mode (Regular / Audit). The whole cart is validated as a batch
+ * — every course must be eligible; the credit-hour load must sit within the min/max
+ * window (the 6-hour floor is waived in the Student's first semester); at most one
+ * External Elective and one Research Course; no duplicate course; no time clash between
+ * chosen Offerings; and every capped Offering must have a seat. A late-add cart is
+ * additionally measured against the Student's already-approved schedule. An illegal cart
+ * is a 422 enumerating the offending reasons; a second Pending request for the same
+ * Semester is a 409. Gated on `courses.register_self` (R02).
+ * @summary Submit a registration cart.
+ */
+export const SubmitARegistrationCartBody = zod.object({
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().describe('An eligible Course Offering\'s id.'),
+  "mode": zod.string().describe('How to take it — Regular or Audit.')
+})).describe('The cart lines — one per chosen offering.')
+})
+
+export const SubmitARegistrationCartResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().nullish(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Every request the Student has submitted for the currently-open Semester, newest
+ * first, each with its status (Pending / Approved / Rejected) and per-line detail — the
+ * request view (user story 30). A Rejected request stays visible so the Student sees it
+ * alongside any fresh Pending cart. When no window is open, `semester` is null and the
+ * list is empty. Gated on `courses.register_self` (R02).
+ * @summary The acting Student's registration requests for the open Semester.
+ */
+export const TheActingStudentsRegistrationRequestsForTheOpenSemesterResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "requests": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().nullish(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * The Student's academic present (user story 32, FR-REG-005): every Enrollment the
+ * advisor minted, grouped by Semester (most recent first), each carrying its Course
+ * Status, Enrollment Classification, registration-time credit hours, and the live
+ * display facts — course, instructor, weekly meeting times — read through the Catalog/
+ * Offering facades (ADR-0017).
+ *
+ * Each group also carries the **period-gated change context** (ticket 07, FR-REG-004),
+ * so the SPA can surface the right in-window actions while the server stays the sole
+ * authority: `current_period` (the derived phase — upcoming / registration / add_drop /
+ * late_add / withdrawal / closed), `can_free_change` (in the add/drop window *and* the
+ * Student has an approved Initial request — free add/drop is live), `can_withdraw` (in
+ * the withdrawal window), and — only when free change is live — `addable_courses`, the
+ * eligible Offerings not yet on the schedule and not External Electives (those need a
+ * request). Each enrollment also carries its derived `attendance` (ticket 08) — present/
+ * recorded counts, the display percentage, and the audit-at-risk flag. Gated on
+ * `courses.register_self` (the acting Student, R02).
+ * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
+ */
+export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterResponse = zod.object({
+  "data": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "current_period": zod.string().optional(),
+  "can_free_change": zod.boolean().optional(),
+  "can_withdraw": zod.boolean().optional(),
+  "addable_courses": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "capacity": zod.number().optional(),
+  "seats_remaining": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional(),
+  "enrollments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
+})).optional()
+})).optional()
+})
+
+
+/**
+ * A direct add during the add/drop window, no advisor approval — the Advisor is notified.
+ * The Offering must be eligible for the Student and **not** an External Elective (those
+ * need a registration request, BR-24); the whole schedule is re-validated (credit-hour
+ * ceiling counting the existing load, seat capacity, time clash, the composition caps,
+ * and the derived-Retake cap of one). Available only while the Semester is in its
+ * add/drop period (else 409) and only to a Student with an approved Initial request for
+ * that Semester (else 403). Gated on `courses.register_self`.
+ * @summary Free-add a course to the schedule (add/drop period).
+ */
+export const FreeAddACourseToTheScheduleadddropPeriodBody = zod.object({
+  "offering_id": zod.number().describe('An eligible Course Offering\'s id.'),
+  "mode": zod.string().describe('How to take it — Regular or Audit.')
+})
+
+export const FreeAddACourseToTheScheduleadddropPeriodResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * A direct drop during the add/drop window — the Enrollment is **hard-deleted**, leaving
+ * no trace (a drop is never a Course Status). Blocked when it would take the Student's
+ * credit-hour load below the floor, unless the first-semester exception applies; the
+ * Advisor is notified. Available only while the Semester is in its add/drop period (else
+ * 409) and only to a Student with an approved Initial request for that Semester (else
+ * 403); the Enrollment must be the acting Student's own (else 404). Gated on
+ * `courses.register_self`.
+ * @summary Free-drop a course from the schedule (add/drop period).
+ */
+export const FreeDropACourseFromTheScheduleadddropPeriodParams = zod.object({
+  "enrollment_id": zod.number().describe('The Enrollment\'s id.')
+})
+
+export const FreeDropACourseFromTheScheduleadddropPeriodResponse = zod.string()
+
+
+/**
+ * Self-serve withdrawal until the deadline: the Enrollment's Course Status becomes **W**
+ * — permanent and transcript-visible — with **no** credit-hour floor check (a Student is
+ * never trapped in a course to preserve a number), the Advisor notified. Available only
+ * while the Semester is in its withdrawal period (else 409); the Enrollment must be the
+ * acting Student's own and still active (else 404 / 409). Gated on `courses.register_self`.
+ * @summary Withdraw from a course (withdrawal period).
+ */
+export const WithdrawFromACoursewithdrawalPeriodParams = zod.object({
+  "enrollment_id": zod.number().describe('The Enrollment\'s id.')
+})
+
+export const WithdrawFromACoursewithdrawalPeriodResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
+ * Student Affairs (or an administrator) sees **every** Student, unscoped — the same
+ * visibility rule the advisor queue uses ({@see ScopesToAdvisees}). Each row carries the
+ * Student's context (name, University ID, Program, degree, enrollment term) so the picker
+ * is legible. Gated on `courses.register_for_student` (Advisor R03 / Student Affairs R05).
+ * @summary The students the composer may register on behalf of.
+ */
+export const TheStudentsTheComposerMayRegisterOnBehalfOfResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "university_id": zod.string().optional(),
+  "enrollment_term": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "current_load": zod.string().nullish(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The cart's course list on the register-for-student surface (ticket 09) — the same shape
+ * as the self-serve eligible list, resolved for the target Student. An Advisor may read
+ * only their own advisee's list ({@see ScopesToAdvisees}); Student Affairs / an
+ * administrator any. Gated on `courses.register_for_student`.
+ * @summary A target student's eligible courses for the open Semester.
+ */
+export const ATargetStudentsEligibleCoursesForTheOpenSemesterParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const ATargetStudentsEligibleCoursesForTheOpenSemesterResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "courses": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "capacity": zod.number().optional(),
+  "seats_remaining": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Register-for-student (ticket 09). Runs the identical eligibility / credit-hour / caps /
+ * clash / capacity validators the
+ * Student's own submit runs, against the **target** Student, then routes by who is
+ * composing (spec user stories 50, 53): the Student's own **Advisor** composes a request
+ * that is **born Approved** — it mints Enrollments immediately in the same transaction and
+ * notifies the Student (`registration.decided`), since the composer is the approver — while
+ * **Student Affairs** (or an administrator) composes a normal **Pending** request routed to
+ * the Student's live Advisor (`registration.submitted`), exactly as a self-submission. The
+ * kind (Initial / LateAdd) is derived from the calendar, as on self-submit. A second
+ * Pending request for the same Semester is a 409; an illegal cart is a 422 enumerating the
+ * offending lines/reasons. Gated on `courses.register_for_student` (R03 / R05).
+ * @summary Compose and submit a registration cart on a student's behalf.
+ */
+export const ComposeAndSubmitARegistrationCartOnAStudentsBehalfParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody = zod.object({
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().describe('An eligible Course Offering\'s id.'),
+  "mode": zod.string().describe('How to take it — Regular or Audit.')
+})).describe('The cart lines — one per chosen offering.')
+})
+
+export const ComposeAndSubmitARegistrationCartOnAStudentsBehalfResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().nullish(),
+  "decided_at": zod.string().optional(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "decision": zod.string().optional(),
+  "derived_retake": zod.boolean().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * The Pending registration requests awaiting the signed-in reviewer, oldest-first — an
+ * Advisor's own **live** advisee set (a request follows the Student when their advisor
+ * is reassigned), or, for Student Affairs / an administrator, every advisor's advisees
+ * unscoped (user story 52). Each row carries the Student's context — name, University
+ * ID, degree, Program, enrollment term — and the number of courses requested, so the
+ * reviewer can triage. Gated on `registration.approve`.
+ * @summary The advisor's registration queue.
+ */
+export const TheAdvisorsRegistrationQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "submitted_at": zod.string().optional(),
+  "course_count": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "university_id": zod.string().optional(),
+  "enrollment_term": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional()
+}).optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The full request for the review screen: the Student's context beside the lines —
+ * Program, degree, enrollment term, and current semester load — and every line with its
+ * classification, credit hours, meeting times and a **derived Retake** preview (whether
+ * approving it would mint a Retake from the Student's record). Same advisee scope as the
+ * queue: an Advisor may open only their own advisee's request (else 403). Gated on
+ * `registration.approve`.
+ * @summary A single request for line-item review.
+ */
+export const ASingleRequestForLineItemReviewParams = zod.object({
+  "registration_id": zod.number().describe('The registration request\'s id.')
+})
+
+export const ASingleRequestForLineItemReviewResponse = zod.object({
+  "data": zod.object({
+  "request": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().nullish(),
+  "decided_at": zod.string().nullish(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "decision": zod.string().nullish(),
+  "derived_retake": zod.boolean().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "university_id": zod.string().optional(),
+  "enrollment_term": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "current_load": zod.number().optional(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional()
+}).optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Approve or reject each line and attach an optional note. The approved subset is
+ * re-validated at decision time — credit-hour floor (waived in the Student's first
+ * semester) and ceiling, composition caps and duplicate/clash against the Student's
+ * existing Enrollments, seat capacity, and the derived-Retake cap of one — and, if
+ * clean, **one Enrollment is minted per approved line atomically**. ≥1 approved line ⇒
+ * the request is Approved; all rejected ⇒ Rejected. The request must still be Pending
+ * (else 409) and, for an Advisor, belong to one of their advisees (else 403). Gated on
+ * `registration.approve`.
+ *
+ * A System/Super Administrator (R09/R10) may decide **any** advisor's advisee's request
+ * (the advisee-scope override, ADR-0015); that decision is attributed to the admin in the
+ * Audit Log, so an approval or rejection authored by someone other than the Student's
+ * Advisor is accountable. The real Advisor deciding their own advisee stays un-audited.
+ * @summary Record the Advisor's line-item decision.
+ */
+export const RecordTheAdvisorsLineItemDecisionParams = zod.object({
+  "registration_id": zod.number().describe('The registration request\'s id.')
+})
+
+export const RecordTheAdvisorsLineItemDecisionBody = zod.object({
+  "note": zod.string().nullish().describe('An optional note for the Student.'),
+  "lines": zod.array(zod.object({
+  "id": zod.number().describe('The request line\'s id.'),
+  "decision": zod.string().describe('approved or rejected.')
+})).describe('One entry per line of the request — every line must be addressed.')
+})
+
+export const RecordTheAdvisorsLineItemDecisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().optional(),
+  "decided_at": zod.string().optional(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "decision": zod.string().optional(),
+  "derived_retake": zod.boolean().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * The administrative-override read of a specific Student's schedule (ticket 10, ADR-0015):
+ * the student-self "My Schedule" surface is bound to `actingStudent`, so an administrator
+ * — who holds no Student record — needs an id-addressable read to oversee "any student's
+ * schedule" unscoped. It reuses the same builder and wire shape as My Schedule — each
+ * Enrollment with its Course Status, classification, credit hours, meeting times and
+ * derived attendance — but with the period-gated action affordances suppressed
+ * (`can_free_change`/`can_withdraw` always false, `addable_courses` always empty): an
+ * overseer views, never acts. The advisee-scope guard applies, so an **Advisor** reading
+ * their own advisee is naturally permitted (an incidental start on user story 51 — the
+ * full advisor monitoring UI is its own work); **Student Affairs** and an **administrator**
+ * read any student. Unscoped reads are un-audited. Gated on `registration.approve`.
+ * @summary View any student's schedule (oversight).
+ */
+export const ViewAnyStudentsScheduleoversightParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const ViewAnyStudentsScheduleoversightResponse = zod.object({
+  "data": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "current_period": zod.string().optional(),
+  "can_free_change": zod.boolean().optional(),
+  "can_withdraw": zod.boolean().optional(),
+  "addable_courses": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "capacity": zod.number().optional(),
+  "seats_remaining": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional(),
+  "enrollments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "classification": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
+})).optional()
+})).optional()
+})
+
+
+/**
+ * Every Course Offering the acting user teaches, across all Semesters — the Phase-4
+ * grading link, born here. Each carries its Semester, resolved Course, weekly meeting
+ * times, and its active roster size, so the instructor sees their teaching load at a
+ * glance. A user who teaches nothing gets an empty list (no permission gate — teaching
+ * is the scope). An administrator (R09/R10) sees **every** offering instead (ADR-0015), so
+ * they can reach any offering's register for oversight through this same screen. Requires
+ * only authentication.
+ * @summary The signed-in Instructor's offerings ("My Offerings").
+ */
+export const TheSignedInInstructorsOfferingsMyOfferingsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_count": zod.number().optional(),
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+})
+
+
+/**
+ * The assigned Instructor's register for one Offering: its Class Sessions (generated from
+ * the meeting times across the Semester the first time this is opened — idempotent, so
+ * re-opening never duplicates), and its roster of **active** Enrollments (withdrawn
+ * students keep their history but leave the roster). Each roster row carries the student's
+ * identity, their per-session marks, and their derived attendance percentage with the
+ * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor, or an
+ * administrator reading unscoped for oversight (else 403; ADR-0015). This read is never
+ * audited.
+ * @summary An Offering's attendance register — sessions + roster + derived percentages.
+ */
+export const AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesResponse = zod.object({
+  "data": zod.object({
+  "offering": zod.object({
+  "id": zod.number().optional(),
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional(),
+  "sessions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "date": zod.string().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "cancelled": zod.boolean().optional()
+})).optional(),
+  "roster": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional(),
+  "marks": zod.object({
+  "10": zod.boolean().optional()
+}).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled
+ * session counts in no attendance denominator; reinstating it counts it again. Correctable
+ * either way. Authorised by assignment — only the session's Offering's Instructor, or an
+ * administrator (R09/R10) acting on an offering they don't teach, that write attributed to
+ * them in the Audit Log (else 403; ADR-0015).
+ * @summary Cancel or reinstate a Class Session.
+ */
+export const CancelOrReinstateAClassSessionParams = zod.object({
+  "class_session_id": zod.number().describe('The ID of the class session.')
+})
+
+export const CancelOrReinstateAClassSessionBody = zod.object({
+  "cancelled": zod.boolean().describe('Whether the session is cancelled.')
+})
+
+export const CancelOrReinstateAClassSessionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "date": zod.string().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "cancelled": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Saves a binary present/absent mark per active Enrollment for one Class Session; a save
+ * upserts, so a correction overwrites. Only the Offering's active roster may be marked;
+ * a cancelled session cannot be marked. Around the save the percentages are recomputed:
+ * any **Audit** Enrollment whose percentage crosses below the threshold on this save
+ * raises one `attendance.audit_at_risk` notification (fired once on the downward crossing,
+ * never on every mark). Authorised by assignment — only this Offering's Instructor, or an
+ * administrator (R09/R10) recording/correcting attendance on an offering they don't teach,
+ * that write attributed to them in the Audit Log (else 403; ADR-0015).
+ * @summary Record (or correct) a session's attendance register.
+ */
+export const RecordorCorrectASessionsAttendanceRegisterParams = zod.object({
+  "class_session_id": zod.number().describe('The ID of the class session.')
+})
+
+export const RecordorCorrectASessionsAttendanceRegisterBody = zod.object({
+  "marks": zod.array(zod.object({
+  "enrollment_id": zod.number().describe('An active Enrollment on this offering.'),
+  "present": zod.boolean().describe('Whether the student was present.')
+})).describe('One entry per student to mark.')
+})
+
+export const RecordorCorrectASessionsAttendanceRegisterResponse = zod.object({
+  "data": zod.object({
+  "session_id": zod.number().optional(),
+  "attendance": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+})).optional()
 }).optional()
 })
 

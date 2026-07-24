@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Modules\Catalog\Internal\Enums\CourseLevel;
+use Modules\Catalog\Internal\Enums\ResearchType;
+use Modules\Catalog\Public\Enums\CourseLevel;
 
 /**
  * A Course — a standalone teachable unit (ADR-0010, CONTEXT.md). It is owned by a
@@ -22,6 +23,7 @@ use Modules\Catalog\Internal\Enums\CourseLevel;
  * @property string $name_en
  * @property string $name_ar
  * @property CourseLevel $level
+ * @property ResearchType|null $research_type
  * @property int $lecture_ch
  * @property int $tutorial_ch
  * @property int $lab_ch
@@ -40,6 +42,7 @@ class Course extends Model
         'name_en',
         'name_ar',
         'level',
+        'research_type',
         'lecture_ch',
         'tutorial_ch',
         'lab_ch',
@@ -62,6 +65,7 @@ class Course extends Model
     {
         return [
             'level' => CourseLevel::class,
+            'research_type' => ResearchType::class,
             'lecture_ch' => 'integer',
             'tutorial_ch' => 'integer',
             'lab_ch' => 'integer',

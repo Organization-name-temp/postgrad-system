@@ -1,0 +1,17 @@
+# 06 — Advisor decision + atomic Enrollment mint
+
+**What to build:** The heart of the phase — the Advisor turns a Pending request into real Enrollments. The assigned Advisor sees a live-scoped queue of their advisees' requests, opens one for line-item review, and approves/trims/rejects with a note. Approving **mints Enrollments atomically** in the decision transaction, and the Student immediately sees their schedule. This is the first ticket where an Enrollment exists, so it introduces the `CourseStatus` enum + counting matrix and the retake/duplicate rules that read the student's record.
+
+**Blocked by:** 05 (needs a Pending RegistrationRequest to decide).
+
+**Status:** ready-for-agent
+
+- [ ] `Enrollment` model/table: student + Course Offering ref + `CourseStatus` + snapshotted **Enrollment Classification** and **registration-time total CH** (ADR-0017). Display facts read live via the Catalog facade, not stored.
+- [ ] Full `CourseStatus` enum ships — all 10 Appendix-D values — with the counting matrix (transcript / CGPA / required / attended / earned flags) encoded as a static matrix on the enum (the ADR-0008 pattern). Only Regular / Retake / Audit are set here (W arrives in ticket 07); the other six are values later phases set.
+- [ ] `Identity\Public` gains `studentIdsAdvisedBy(userId)`; the advisor queue and all advisee scoping resolve **live** — a request follows the student if the advisor is reassigned while it is Pending. SA (holding `registration.approve`) sees the queue **unscoped**.
+- [ ] Line-item decision (`registration.approve`, R03/R05): approve/reject each line + an optional note; the approved subset is **re-validated** at decision time (CH floor unless excepted, caps + retake + duplicate **against the student's existing Enrollments**, clash, capacity). Advisors never add lines. ≥1 approved line ⇒ request `Approved`; all rejected ⇒ `Rejected`. Approval **mints one Enrollment per approved line atomically in the decision transaction** (the ADR-0013 accept→mint precedent).
+- [ ] **Retake derivation** (a pure support seam): a prior for-credit Enrollment (Regular/Retake) for the same course ⇒ the new Enrollment is `Retake`, max 1 per course (a second retake blocked); prior W or AU attempts do **not** burn the retake (fresh Regular). One Enrollment per (student, course, semester) enforced.
+- [ ] Notifications: `registration.submitted` (to the advisor on submit, wired from ticket 05's submit path) and `registration.decided` (to the student, payload carrying outcome + per-line results). Bilingual SPA-rendered, dot-free i18n aliases (Phase 2 mechanics).
+- [ ] `/api/v1` decision endpoint + Scribe examples; openapi + Orval regenerated, drift-clean.
+- [ ] Frontend: advisor queue + line-item review page (student context: Program, degree, enrollment term, current load; per-line classification/CH/meeting/derived-Retake label; approve/trim/reject + note) in `features/enrollment`; a **My Schedule** view for the Student (per-semester Enrollments with `CourseStatus` StatusChips, classification, meeting times — attendance % lands in ticket 08). EN+AR, axe-clean.
+- [ ] **Tests:** targeted unit for retake derivation (for-credit burns, W/AU don't, cap of 1) and the CourseStatus counting matrix; Pest API-feature for the queue (live advisee scoping, SA unscoped), line-item approve/trim/reject, atomic mint (rows created, request status), mint-time re-validation failures, duplicate/retake enforcement, and both notification rows. Sparse Vitest for the review page if non-trivial. Gates green.

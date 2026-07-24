@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey,
   useListTheActingStudentsEligibleCoursesForTheOpenSemester,
+  useSubmitARegistrationCart,
   useTheActingStudentsRegistrationRequestsForTheOpenSemester,
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
@@ -26,6 +27,7 @@ export function RegistrationPage() {
 
   const eligibleQuery = useListTheActingStudentsEligibleCoursesForTheOpenSemester()
   const requestsQuery = useTheActingStudentsRegistrationRequestsForTheOpenSemester()
+  const submitMutation = useSubmitARegistrationCart()
 
   const isLoading = eligibleQuery.isPending || requestsQuery.isPending
   const isError = eligibleQuery.isError || requestsQuery.isError
@@ -100,7 +102,13 @@ export function RegistrationPage() {
             <CartBuilder
               courses={courses}
               firstSemester={firstSemester}
-              onSubmitted={onSubmitted}
+              submit={async (lines) => {
+                await submitMutation.mutateAsync({ data: { lines } })
+                // The page owns the requests query — re-read so the now-Pending request shows.
+                onSubmitted()
+              }}
+              isSubmitting={submitMutation.isPending}
+              submitError={submitMutation.error}
             />
           )}
         </>

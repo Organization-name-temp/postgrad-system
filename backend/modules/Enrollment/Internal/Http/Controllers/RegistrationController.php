@@ -12,17 +12,22 @@ use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CourseSummary;
+use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
+use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationKind;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Http\Concerns\ComputesAttendance;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
+use Modules\Enrollment\Internal\Http\Concerns\DescribesStudentContext;
+use Modules\Enrollment\Internal\Http\Concerns\MintsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
 use Modules\Enrollment\Internal\Http\Concerns\ReadsExistingEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesCartLines;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesOfferingRefs;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesStudent;
+use Modules\Enrollment\Internal\Http\Concerns\ScopesToAdvisees;
 use Modules\Enrollment\Internal\Http\Resources\EligibleCourseResource;
 use Modules\Enrollment\Internal\Http\Resources\EnrollmentResource;
 use Modules\Enrollment\Internal\Http\Resources\RegistrationRequestResource;
@@ -45,9 +50,12 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 /**
  * @group Enrollment
  *
- * Student course registration (ADR-0017) — the self-serve surface a Student (R02) uses
- * under `courses.register_self`. Ticket 04 delivers the read-only eligibility list; ticket
- * 05 grows the cart submission and the request view here.
+ * Course registration (ADR-0017) — the surface where a cart becomes a
+ * {@see RegistrationRequest}. Two audiences share it: a **Student (R02)** building their own
+ * cart under `courses.register_self` (tickets 04–05), and **staff** composing one on a
+ * Student's behalf under `courses.register_for_student` (ticket 09). The composing action is
+ * the same either way; only who the cart is for — and whether it needs advisor approval —
+ * differs, so the cart pipeline (resolve, validate, hydrate) is expressed once and reused.
  *
  * The eligible list is the Student's own Curriculum ∩ the currently-open Semester's
  * Offerings, plus other active graduate Programs' curriculum courses offered this semester
@@ -55,20 +63,27 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * {@see EligibilityResolver}. A submitted cart becomes a {@see RegistrationRequest} in
  * status Pending after passing the batch validators (credit-hour load, composition caps,
  * duplicates, clashes, capacity); the advisor decision and the Enrollment mint are ticket
- * 06. Every cross-module fact is read through a Public facade (no FK, ADR-0012): the acting
- * Student through Identity\Public {@see StudentDirectory}, the open Semester through
- * {@see AcademicCalendar}, and each Offering's Course/Instructor through
- * {@see CourseCatalog}/{@see Directory}.
+ * 06. **Register-for-student** (ticket 09) reuses that pipeline against a *target* Student:
+ * Student Affairs (or an administrator) compose a normal Pending request routed to the
+ * Student's Advisor, while the Student's own Advisor composes a request that is **born
+ * Approved** and mints immediately ({@see MintsEnrollments}) — the composer is the approver,
+ * so making them approve their own paperwork is ceremony. Every cross-module fact is read
+ * through a Public facade (no FK, ADR-0012): the Student through Identity\Public
+ * {@see StudentDirectory}, the open Semester through {@see AcademicCalendar}, and each
+ * Offering's Course/Instructor through {@see CourseCatalog}/{@see Directory}.
  */
 class RegistrationController
 {
     use ComputesAttendance;
     use CountsEnrollments;
+    use DescribesStudentContext;
+    use MintsEnrollments;
     use NotifiesRegistration;
     use ReadsExistingEnrollments;
     use ResolvesCartLines;
     use ResolvesOfferingRefs;
     use ResolvesStudent;
+    use ScopesToAdvisees;
 
     /**
      * List the acting Student's eligible courses for the open Semester.
@@ -103,36 +118,9 @@ class RegistrationController
             return $this->eligiblePayload(null, collect());
         }
 
-        $semester = $target->semester;
+        $eligible = $this->eligibleCoursesFor($student, $target, $courses, $directory, $eligibility);
 
-        $offerings = $this->semesterOfferings($semester->id);
-
-        // In the late-add window the cart adds to an already-approved schedule, so drop the
-        // courses the Student is already enrolled in this Semester — only genuine additions
-        // are offered (the mint would reject a duplicate anyway).
-        if ($target->kind === RegistrationKind::LateAdd) {
-            $enrolledOfferingIds = $this->enrolledOfferingIds($student->studentId);
-
-            $offerings = $offerings
-                ->reject(fn (CourseOffering $offering): bool => in_array((int) $offering->getKey(), $enrolledOfferingIds, true))
-                ->values();
-        }
-
-        $this->attachOfferingRefs($offerings, $courses, $directory);
-        $this->attachEnrollmentCounts($offerings);
-        $classifications = $eligibility->classify($student, $offerings);
-
-        $eligible = $offerings->filter(function (CourseOffering $offering) use ($classifications): bool {
-            $classification = $classifications[$offering->getKey()] ?? null;
-            if ($classification === null) {
-                return false;
-            }
-            $offering->setAttribute('classification', $classification);
-
-            return true;
-        })->values();
-
-        return $this->eligiblePayload($semester, $eligible);
+        return $this->eligiblePayload($target->semester, $eligible);
     }
 
     /**
@@ -182,21 +170,12 @@ class RegistrationController
         $semester = $target->semester;
         $kind = $target->kind;
 
-        $validated = $request->validate([
-            'lines' => ['required', 'array', 'min:1'],
-            'lines.*.offering_id' => ['required', 'integer'],
-            'lines.*.mode' => ['required', Rule::enum(RegistrationMode::class)],
-        ]);
+        $validated = $request->validate($this->cartLineRules());
 
         // At most one Pending request per (student, semester) — a Rejected one may be
         // replaced, but a second Pending is a conflict. (An approved Initial does not
         // block a Pending LateAdd: the index is partial on Pending only.)
-        $hasPending = RegistrationRequest::query()->pending()
-            ->where('student_id', $student->studentId)
-            ->where('semester_id', $semester->id)
-            ->exists();
-
-        if ($hasPending) {
+        if (RegistrationRequest::hasPendingFor($student->studentId, $semester->id)) {
             throw new ConflictHttpException('You already have a pending registration request for this semester.');
         }
 
@@ -383,6 +362,285 @@ class RegistrationController
             ->values();
 
         return response()->json(['data' => $groups->all()]);
+    }
+
+    /**
+     * The students the composer may register on behalf of.
+     *
+     * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
+     * Student Affairs (or an administrator) sees **every** Student, unscoped — the same
+     * visibility rule the advisor queue uses ({@see ScopesToAdvisees}). Each row carries the
+     * Student's context (name, University ID, Program, degree, enrollment term) so the picker
+     * is legible. Gated on `courses.register_for_student` (Advisor R03 / Student Affairs R05).
+     *
+     * @response 200 {"data": [{"student_id": 5, "name": "Sara Student", "university_id": "2026-MSC-CE-0001", "enrollment_term": "Fall 2026", "degree_level": "MSc", "current_load": null, "program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc"}}]}
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function composableStudents(
+        Request $request,
+        StudentDirectory $students,
+        Directory $directory,
+        ProgramCatalog $programs,
+    ): JsonResponse {
+        $userId = (int) $request->user()?->getAuthIdentifier();
+
+        // Unscoped (SA / admin) → every Student; an Advisor → their live advisees only.
+        $scope = $this->adviseeScope($userId, $directory, $students);
+        $studentIds = $scope ?? $students->allStudentIds();
+
+        $summaries = $students->findManyByStudentId($studentIds);
+        if ($summaries === []) {
+            return response()->json(['data' => []]);
+        }
+
+        [$users, $programSummaries] = $this->resolveStudentRefs($summaries, $directory, $programs);
+
+        // Preserve the id order the scope returned (advisees / all, both ordered by id).
+        $rows = [];
+        foreach ($studentIds as $studentId) {
+            $summary = $summaries[$studentId] ?? null;
+            if ($summary === null) {
+                continue;
+            }
+            $rows[] = $this->studentContext($summary, $programSummaries, $users, currentLoad: null);
+        }
+
+        return response()->json(['data' => $rows]);
+    }
+
+    /**
+     * A target student's eligible courses for the open Semester.
+     *
+     * The cart's course list on the register-for-student surface (ticket 09) — the same shape
+     * as the self-serve eligible list, resolved for the target Student. An Advisor may read
+     * only their own advisee's list ({@see ScopesToAdvisees}); Student Affairs / an
+     * administrator any. Gated on `courses.register_for_student`.
+     *
+     * @urlParam student_id integer required The target Student anchor's id. Example: 5
+     *
+     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "courses": [{"offering_id": 1, "classification": "Core", "capacity": 30, "seats_remaining": 30, "total_ch": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}}
+     * @response 403 {"message": "This action is unauthorized."}
+     * @response 404 scenario="no such student" {"message": "No such student to register for."}
+     */
+    public function eligibleCoursesForStudent(
+        Request $request,
+        StudentDirectory $students,
+        Directory $directory,
+        AcademicCalendar $calendar,
+        CourseCatalog $courses,
+        EligibilityResolver $eligibility,
+    ): JsonResponse {
+        $composerUserId = (int) $request->user()?->getAuthIdentifier();
+        $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
+
+        $target = $this->resolveRegistrationTarget($calendar);
+        if ($target === null) {
+            return $this->eligiblePayload(null, collect());
+        }
+
+        $eligible = $this->eligibleCoursesFor($student, $target, $courses, $directory, $eligibility);
+
+        return $this->eligiblePayload($target->semester, $eligible);
+    }
+
+    /**
+     * Compose and submit a registration cart on a student's behalf.
+     *
+     * Register-for-student (ticket 09). Runs the identical eligibility / credit-hour / caps /
+     * clash / capacity validators the
+     * Student's own submit runs, against the **target** Student, then routes by who is
+     * composing (spec user stories 50, 53): the Student's own **Advisor** composes a request
+     * that is **born Approved** — it mints Enrollments immediately in the same transaction and
+     * notifies the Student (`registration.decided`), since the composer is the approver — while
+     * **Student Affairs** (or an administrator) composes a normal **Pending** request routed to
+     * the Student's live Advisor (`registration.submitted`), exactly as a self-submission. The
+     * kind (Initial / LateAdd) is derived from the calendar, as on self-submit. A second
+     * Pending request for the same Semester is a 409; an illegal cart is a 422 enumerating the
+     * offending lines/reasons. Gated on `courses.register_for_student` (R03 / R05).
+     *
+     * @urlParam student_id integer required The target Student anchor's id. Example: 5
+     *
+     * @bodyParam lines object[] required The cart lines — one per chosen offering.
+     * @bodyParam lines[].offering_id integer required An eligible Course Offering's id. Example: 1
+     * @bodyParam lines[].mode string required How to take it — Regular or Audit. Example: Regular
+     *
+     * @response 201 {"data": {"id": 1, "semester_id": 1, "kind": "Initial", "status": "Approved", "advisor_note": null, "decided_at": "2026-08-02T09:00:00+00:00", "submitted_at": "2026-08-02T09:00:00+00:00", "lines": [{"id": 1, "offering_id": 1, "mode": "Regular", "decision": "approved", "derived_retake": false, "classification": "Core", "total_ch": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}}
+     * @response 403 scenario="not this advisor's advisee" {"message": "This action is unauthorized."}
+     * @response 409 scenario="a pending request already exists" {"message": "This student already has a pending registration request for this semester."}
+     * @response 422 scenario="registration closed" {"message": "Registration is not open right now.", "errors": {"registration": ["Registration is not open right now."]}}
+     */
+    public function composeForStudent(
+        Request $request,
+        StudentDirectory $students,
+        Directory $directory,
+        AcademicCalendar $calendar,
+        CourseCatalog $courses,
+        EligibilityResolver $eligibility,
+        Notifier $notifier,
+    ): JsonResponse {
+        $composerUserId = (int) $request->user()?->getAuthIdentifier();
+        $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
+
+        $target = $this->resolveRegistrationTarget($calendar);
+        if ($target === null) {
+            throw ValidationException::withMessages([
+                'registration' => 'Registration is not open right now.',
+            ]);
+        }
+
+        $semester = $target->semester;
+        $kind = $target->kind;
+
+        $validated = $request->validate($this->cartLineRules());
+
+        // A staff compose never stacks on an existing Pending — the Advisor should decide it.
+        if (RegistrationRequest::hasPendingFor($student->studentId, $semester->id)) {
+            throw new ConflictHttpException('This student already has a pending registration request for this semester.');
+        }
+
+        [$cartLines, $ineligible] = $this->resolveCart($student, $semester, $validated['lines'], $courses, $directory, $eligibility);
+
+        // The composer approves on the spot only when they are the Student's live Advisor
+        // (spec story 50); SA / an administrator route a Pending request to the Advisor.
+        $bornApproved = $composerUserId === $student->advisorId;
+
+        // Born-Approved mints, so the caps/duplicate/clash/retake are measured against the
+        // Student's record; a Pending compose mirrors self-submit (only a LateAdd measures
+        // against the already-approved schedule).
+        $existing = ($bornApproved || $kind === RegistrationKind::LateAdd)
+            ? $this->existingEnrollments($student->studentId, $semester->id)
+            : ExistingEnrollments::none();
+
+        $validator = new CartValidator(CreditHoursValidator::fromConfig());
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
+
+        $mintPlan = [];
+        if ($bornApproved) {
+            [$mintPlan, $retakeViolations] = $this->buildMintPlan($cartLines, $existing);
+            $violations = [...$violations, ...$retakeViolations];
+        }
+
+        $errors = $this->errorsFrom($violations, $ineligible);
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+
+        $registration = DB::transaction(function () use ($student, $semester, $kind, $cartLines, $bornApproved, $composerUserId, $mintPlan): RegistrationRequest {
+            $registration = RegistrationRequest::create([
+                'student_id' => $student->studentId,
+                'semester_id' => $semester->id,
+                'kind' => $kind,
+                'status' => $bornApproved ? RegistrationStatus::Approved : RegistrationStatus::Pending,
+                'decided_at' => $bornApproved ? now() : null,
+                'decided_by' => $bornApproved ? $composerUserId : null,
+            ]);
+
+            foreach ($cartLines as $line) {
+                $registration->lines()->create([
+                    'course_offering_id' => $line->offeringId,
+                    'mode' => $line->mode,
+                    'decision' => $bornApproved ? LineDecision::Approved : null,
+                ]);
+            }
+
+            if ($bornApproved) {
+                $this->mintEnrollments($student->studentId, $mintPlan);
+            }
+
+            return $registration;
+        });
+
+        $registration->load('lines.offering.meetings');
+
+        // Side effect after commit: a born-Approved compose tells the Student their schedule
+        // exists; a Pending compose tells the Student's live Advisor a request awaits review.
+        if ($bornApproved) {
+            $this->notifyRegistrationDecided($notifier, $student->userId, $registration, RegistrationStatus::Approved, count($mintPlan), 0);
+        } else {
+            $this->notifyRegistrationSubmitted(
+                $notifier,
+                $student->advisorId,
+                $registration,
+                $this->studentDisplayName($student, $directory),
+                count($cartLines),
+            );
+        }
+
+        $this->hydrateRequests(collect([$registration]), $student, $courses, $directory, $eligibility);
+
+        return (new RegistrationRequestResource($registration))->response()->setStatusCode(201);
+    }
+
+    /**
+     * Resolve the target Student for a register-for-student action from the route, 404ing an
+     * unknown id, and assert the acting composer's advisee scope ({@see ScopesToAdvisees}): an
+     * Advisor may act only for their own advisee, Student Affairs / an administrator for any.
+     */
+    private function resolveTargetStudent(Request $request, int $composerUserId, StudentDirectory $students, Directory $directory): StudentSummary
+    {
+        $student = $students->findByStudentId((int) $request->route('student_id'));
+        abort_if($student === null, 404, 'No such student to register for.');
+
+        $this->authorizeAdviseeScope($composerUserId, $student->studentId, $directory, $students);
+
+        return $student;
+    }
+
+    /**
+     * The cart-lines validation rules — one entry per chosen Offering with a mode — shared by
+     * the Student's own submit and a staff compose-on-behalf (ticket 09), so both accept the
+     * same cart shape.
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    private function cartLineRules(): array
+    {
+        return [
+            'lines' => ['required', 'array', 'min:1'],
+            'lines.*.offering_id' => ['required', 'integer'],
+            'lines.*.mode' => ['required', Rule::enum(RegistrationMode::class)],
+        ];
+    }
+
+    /**
+     * The Student's eligible Offerings for a submittable target (Initial / LateAdd), each with
+     * its Enrollment Classification set — the shared body behind both the self-serve eligible
+     * list and the register-for-student list (ticket 09). In the late-add window the cart only
+     * adds, so Offerings the Student is already enrolled in this Semester are dropped (the mint
+     * would reject a duplicate anyway).
+     *
+     * @return Collection<int, CourseOffering>
+     */
+    private function eligibleCoursesFor(
+        StudentSummary $student,
+        RegistrationTarget $target,
+        CourseCatalog $courses,
+        Directory $directory,
+        EligibilityResolver $eligibility,
+    ): Collection {
+        $offerings = $this->semesterOfferings($target->semester->id);
+
+        if ($target->kind === RegistrationKind::LateAdd) {
+            $enrolledOfferingIds = $this->enrolledOfferingIds($student->studentId);
+
+            $offerings = $offerings
+                ->reject(fn (CourseOffering $offering): bool => in_array((int) $offering->getKey(), $enrolledOfferingIds, true))
+                ->values();
+        }
+
+        $this->attachOfferingRefs($offerings, $courses, $directory);
+        $this->attachEnrollmentCounts($offerings);
+        $classifications = $eligibility->classify($student, $offerings);
+
+        return $offerings->filter(function (CourseOffering $offering) use ($classifications): bool {
+            $classification = $classifications[$offering->getKey()] ?? null;
+            if ($classification === null) {
+                return false;
+            }
+            $offering->setAttribute('classification', $classification);
+
+            return true;
+        })->values();
     }
 
     /**

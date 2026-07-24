@@ -58,6 +58,16 @@ class EloquentStudentDirectory implements StudentDirectory
             ->all();
     }
 
+    /** @return list<int> */
+    public function allStudentIds(): array
+    {
+        return Student::query()
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+    }
+
     private function toSummary(?Student $student): ?StudentSummary
     {
         if ($student === null) {

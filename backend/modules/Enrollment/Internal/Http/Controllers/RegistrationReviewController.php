@@ -12,10 +12,11 @@ use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CourseSummary;
 use Modules\Catalog\Public\ProgramCatalog;
-use Modules\Catalog\Public\ProgramSummary;
 use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
+use Modules\Enrollment\Internal\Http\Concerns\DescribesStudentContext;
+use Modules\Enrollment\Internal\Http\Concerns\MintsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
 use Modules\Enrollment\Internal\Http\Concerns\ReadsExistingEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesCartLines;
@@ -32,11 +33,9 @@ use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\MintPlanEntry;
-use Modules\Enrollment\Internal\Support\RetakeDeriver;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
-use Modules\Identity\Public\UserSummary;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -62,6 +61,8 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 class RegistrationReviewController
 {
     use CountsEnrollments;
+    use DescribesStudentContext;
+    use MintsEnrollments;
     use NotifiesRegistration;
     use ReadsExistingEnrollments;
     use ResolvesCartLines;
@@ -266,22 +267,10 @@ class RegistrationReviewController
         $validator = new CartValidator(CreditHoursValidator::fromConfig());
         $violations = $validator->validate(array_values($cartLines), $this->exceptionsFor($student, $semester), $existing);
 
-        // Derive each approved line's status (Regular/Retake/Audit); a second retake blocks.
-        $deriver = new RetakeDeriver;
-        $mintPlan = [];
-        foreach ($cartLines as $lineId => $cartLine) {
-            $derivation = $deriver->derive($cartLine->mode, $existing->priorForCreditFor($cartLine->courseId));
-            if ($derivation->blocked) {
-                $violations[] = new CartViolation(
-                    CartViolation::RETAKE_LIMIT,
-                    "{$cartLine->courseCode} has already used its one allowed retake.",
-                    [$cartLine->offeringId],
-                );
-
-                continue;
-            }
-            $mintPlan[$lineId] = new MintPlanEntry($cartLine, $derivation->status);
-        }
+        // Derive each approved line's status (Regular/Retake/Audit); a second retake blocks,
+        // surfacing as a violation rather than a plan entry (the shared mint seam).
+        [$mintPlan, $retakeViolations] = $this->buildMintPlan($cartLines, $existing);
+        $violations = [...$violations, ...$retakeViolations];
 
         $errors = $this->errorsFrom($violations, $ineligible);
         if ($errors !== []) {
@@ -346,15 +335,7 @@ class RegistrationReviewController
                 $line->update(['decision' => $decisions[$line->getKey()]]);
             });
 
-            foreach ($mintPlan as $plan) {
-                Enrollment::create([
-                    'student_id' => $registration->student_id,
-                    'course_offering_id' => $plan->cartLine->offeringId,
-                    'classification' => $plan->cartLine->classification,
-                    'course_status' => $plan->status,
-                    'credit_hours' => $plan->cartLine->totalCh,
-                ]);
-            }
+            $this->mintEnrollments((int) $registration->student_id, $mintPlan);
         });
     }
 
@@ -501,53 +482,5 @@ class RegistrationReviewController
         }
 
         return $errors;
-    }
-
-    /**
-     * Resolve the owning users and Programs for a set of Student summaries in one read each.
-     *
-     * @param  array<int, StudentSummary>  $students
-     * @return array{0: array<int, UserSummary>, 1: array<int, ProgramSummary>}
-     */
-    private function resolveStudentRefs(array $students, Directory $directory, ProgramCatalog $programs): array
-    {
-        $userIds = array_values(array_map(fn (StudentSummary $s): int => $s->userId, $students));
-        $programIds = array_values(array_unique(array_map(fn (StudentSummary $s): int => $s->programId, $students)));
-
-        return [$directory->findMany($userIds), $programs->findMany($programIds)];
-    }
-
-    /**
-     * The Student context beside a request — identity, degree, Program, enrollment term, and
-     * (on the review screen) current semester load. Names come from the Identity directory
-     * (the Student anchor carries none, ADR-0012); the degree/Program from the Catalog.
-     *
-     * @param  array<int, ProgramSummary>  $programs  keyed by program id
-     * @param  array<int, UserSummary>  $users  keyed by user id
-     * @return array<string, mixed>
-     */
-    private function studentContext(?StudentSummary $student, array $programs, array $users, ?int $currentLoad): array
-    {
-        if ($student === null) {
-            return [];
-        }
-
-        $program = $programs[$student->programId] ?? null;
-
-        return [
-            'student_id' => $student->studentId,
-            'name' => isset($users[$student->userId]) ? $users[$student->userId]->name : $student->universityId,
-            'university_id' => $student->universityId,
-            'enrollment_term' => $student->enrollmentTerm,
-            'degree_level' => $program?->degreeLevel->value,
-            'current_load' => $currentLoad,
-            'program' => $program === null ? null : [
-                'id' => $program->id,
-                'code' => $program->code,
-                'name_en' => $program->nameEn,
-                'name_ar' => $program->nameAr,
-                'degree_level' => $program->degreeLevel->value,
-            ],
-        ];
     }
 }

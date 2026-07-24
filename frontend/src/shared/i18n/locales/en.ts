@@ -39,6 +39,7 @@ export const en = {
       registration: 'My registration',
       schedule: 'My schedule',
       advising: 'Registration requests',
+      registerForStudent: 'Register for a student',
       assignments: 'Faculty deans',
       sections: {
         admissions: 'Admissions',
@@ -1108,6 +1109,23 @@ export const en = {
       saveError: 'The register could not be saved. Refresh and try again.',
       unsaved: '{{count}} unsaved mark',
       unsaved_other: '{{count}} unsaved marks',
+    },
+    onBehalf: {
+      title: 'Register courses for a student',
+      intro:
+        'Build and submit a registration on a student’s behalf. If you are the student’s advisor, it is approved and enrolled at once; otherwise it goes to their advisor for review.',
+      pickStudent: 'Choose a student',
+      loadingStudents: 'Loading students',
+      loadStudentsError: 'Could not load the list of students. Please try again.',
+      loadingCourses: 'Loading the student’s eligible courses',
+      loadCoursesError: 'Could not load this student’s eligible courses. Please try again.',
+      notOpen: 'Registration is not open right now, so a cart cannot be composed.',
+      forSemester: 'Registering for {{semester}}',
+      empty: 'There are no courses available for this student to register this semester.',
+      submit: 'Submit registration',
+      submitted: 'The registration for {{student}} was submitted to their advisor for review.',
+      enrolled:
+        '{{student}} was enrolled immediately — you are their advisor, so no further approval is needed.',
     },
   },
 } as const

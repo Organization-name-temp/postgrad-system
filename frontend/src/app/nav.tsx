@@ -18,6 +18,7 @@ import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek'
 import RuleIcon from '@mui/icons-material/Rule'
 import CoPresentIcon from '@mui/icons-material/CoPresent'
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -178,6 +179,16 @@ export const navItems: NavItem[] = [
     to: '/advising',
     icon: <RuleIcon />,
     permission: PERMISSION.approveCourseRegistration,
+    section: 'enrollment',
+  },
+  // Register-for-student (ticket 09): staff compose a cart on a student's behalf. A
+  // capability item on courses.register_for_student — held by Advisors (their advisees) and
+  // Student Affairs (any student); admins inherit it for oversight (ADR-0015).
+  {
+    key: 'registerForStudent',
+    to: '/registration/on-behalf',
+    icon: <PersonAddAlt1Icon />,
+    permission: PERMISSION.registerCoursesForStudent,
     section: 'enrollment',
   },
   // The Instructor's teaching + attendance register (ticket 08). A **persona** item on the

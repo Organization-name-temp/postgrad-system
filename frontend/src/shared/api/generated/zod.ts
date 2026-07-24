@@ -3015,6 +3015,159 @@ export const WithdrawFromACoursewithdrawalPeriodResponse = zod.object({
 
 
 /**
+ * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
+ * Student Affairs (or an administrator) sees **every** Student, unscoped — the same
+ * visibility rule the advisor queue uses ({@see ScopesToAdvisees}). Each row carries the
+ * Student's context (name, University ID, Program, degree, enrollment term) so the picker
+ * is legible. Gated on `courses.register_for_student` (Advisor R03 / Student Affairs R05).
+ * @summary The students the composer may register on behalf of.
+ */
+export const TheStudentsTheComposerMayRegisterOnBehalfOfResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "university_id": zod.string().optional(),
+  "enrollment_term": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "current_load": zod.string().nullish(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The cart's course list on the register-for-student surface (ticket 09) — the same shape
+ * as the self-serve eligible list, resolved for the target Student. An Advisor may read
+ * only their own advisee's list ({@see ScopesToAdvisees}); Student Affairs / an
+ * administrator any. Gated on `courses.register_for_student`.
+ * @summary A target student's eligible courses for the open Semester.
+ */
+export const ATargetStudentsEligibleCoursesForTheOpenSemesterParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const ATargetStudentsEligibleCoursesForTheOpenSemesterResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "registration_opens_at": zod.string().optional(),
+  "registration_closes_at": zod.string().optional(),
+  "add_drop_ends_at": zod.string().optional(),
+  "late_add_ends_at": zod.string().optional(),
+  "withdrawal_deadline_at": zod.string().optional(),
+  "is_registration_open": zod.boolean().optional()
+}).optional(),
+  "courses": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "capacity": zod.number().optional(),
+  "seats_remaining": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Register-for-student (ticket 09). Runs the identical eligibility / credit-hour / caps /
+ * clash / capacity validators the
+ * Student's own submit runs, against the **target** Student, then routes by who is
+ * composing (spec user stories 50, 53): the Student's own **Advisor** composes a request
+ * that is **born Approved** — it mints Enrollments immediately in the same transaction and
+ * notifies the Student (`registration.decided`), since the composer is the approver — while
+ * **Student Affairs** (or an administrator) composes a normal **Pending** request routed to
+ * the Student's live Advisor (`registration.submitted`), exactly as a self-submission. The
+ * kind (Initial / LateAdd) is derived from the calendar, as on self-submit. A second
+ * Pending request for the same Semester is a 409; an illegal cart is a 422 enumerating the
+ * offending lines/reasons. Gated on `courses.register_for_student` (R03 / R05).
+ * @summary Compose and submit a registration cart on a student's behalf.
+ */
+export const ComposeAndSubmitARegistrationCartOnAStudentsBehalfParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody = zod.object({
+  "lines": zod.array(zod.object({
+  "offering_id": zod.number().describe('An eligible Course Offering\'s id.'),
+  "mode": zod.string().describe('How to take it — Regular or Audit.')
+})).describe('The cart lines — one per chosen offering.')
+})
+
+export const ComposeAndSubmitARegistrationCartOnAStudentsBehalfResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "semester_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "advisor_note": zod.string().nullish(),
+  "decided_at": zod.string().optional(),
+  "submitted_at": zod.string().optional(),
+  "lines": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "offering_id": zod.number().optional(),
+  "mode": zod.string().optional(),
+  "decision": zod.string().optional(),
+  "derived_retake": zod.boolean().optional(),
+  "classification": zod.string().optional(),
+  "total_ch": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
  * The Pending registration requests awaiting the signed-in reviewer, oldest-first — an
  * Advisor's own **live** advisee set (a request follows the Student when their advisor
  * is reassigned), or, for Student Affairs / an administrator, every advisor's advisees

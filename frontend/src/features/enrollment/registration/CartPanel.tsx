@@ -34,6 +34,8 @@ interface CartPanelProps {
   onSubmit: () => void
   isSubmitting: boolean
   submitError: unknown
+  /** Overrides the submit button label (defaults to the self-serve "Submit to advisor"). */
+  submitLabel?: string
 }
 
 /**
@@ -53,6 +55,7 @@ export function CartPanel({
   onSubmit,
   isSubmitting,
   submitError,
+  submitLabel,
 }: CartPanelProps) {
   const { t, i18n } = useTranslation('enrollment')
 
@@ -173,7 +176,7 @@ export function CartPanel({
       )}
 
       <Button variant="contained" fullWidth sx={{ mt: 2 }} disabled={!canSubmit} onClick={onSubmit}>
-        {isSubmitting ? t('cart.submitting') : t('cart.submit')}
+        {isSubmitting ? t('cart.submitting') : (submitLabel ?? t('cart.submit'))}
       </Button>
     </Paper>
   )

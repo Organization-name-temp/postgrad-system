@@ -30,6 +30,7 @@ import { RegistrationPage } from '../features/enrollment/registration/Registrati
 import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
 import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
 import { RegistrationReviewPage } from '../features/enrollment/advising/RegistrationReviewPage'
+import { ComposeForStudentPage } from '../features/enrollment/on-behalf/ComposeForStudentPage'
 import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPage'
 import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
@@ -93,6 +94,10 @@ export function App() {
                     their advisees server-side; SA + admins review unscoped. */}
                 <Route path="/advising" element={<AdvisingQueuePage />} />
                 <Route path="/advising/:requestId" element={<RegistrationReviewPage />} />
+                {/* Register-for-student (ticket 09): staff compose a cart on a student's
+                    behalf. Gated on courses.register_for_student (nav + API); an Advisor's
+                    picker is scoped to their advisees, Student Affairs sees all. */}
+                <Route path="/registration/on-behalf" element={<ComposeForStudentPage />} />
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
                 <Route path="/dean" element={<DeanQueuePage />} />

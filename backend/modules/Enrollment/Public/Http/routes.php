@@ -59,6 +59,20 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
     Route::post('/registration/enrollments/{enrollment}/withdrawal', [ScheduleChangeController::class, 'withdraw'])->whereNumber('enrollment');
 });
 
+Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {
+    // Register-for-student (ticket 09, §3.2 courses.register_for_student): staff compose a
+    // cart on a Student's behalf, reusing the whole cart pipeline against the target Student.
+    // Student Affairs / an administrator compose for any Student → a normal Pending request to
+    // the Student's Advisor; the Student's own Advisor composes → a request born Approved that
+    // mints immediately (the composer is the approver). The picker's population is scoped in
+    // the controller (an Advisor's advisees / every Student). {student_id} is a plain id (the
+    // Student anchor lives in Identity — resolved through the StudentDirectory facade, not
+    // model-bound), so it is snake_case for Scribe/Orval determinism.
+    Route::get('/registration/on-behalf/students', [RegistrationController::class, 'composableStudents']);
+    Route::get('/registration/on-behalf/students/{student_id}/eligible-courses', [RegistrationController::class, 'eligibleCoursesForStudent'])->whereNumber('student_id');
+    Route::post('/registration/on-behalf/students/{student_id}/requests', [RegistrationController::class, 'composeForStudent'])->whereNumber('student_id');
+});
+
 Route::middleware(['auth:sanctum', 'can:registration.approve'])->group(function () {
     // The Advisor's review of their advisees' Pending requests (ticket 06): a live-scoped
     // queue, line-item review of one request, and the decision that mints Enrollments.

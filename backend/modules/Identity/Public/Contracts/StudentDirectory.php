@@ -55,4 +55,14 @@ interface StudentDirectory
      * @return list<int>
      */
     public function studentIdsAdvisedBy(int $advisorUserId): array;
+
+    /**
+     * The ids of every Student anchor, ordered by id — the unscoped population the
+     * register-for-student picker offers Student Affairs / an administrator (ticket 09),
+     * the mirror of {@see self::studentIdsAdvisedBy()} for a reviewer who is not scoped to
+     * advisees. Feeds {@see self::findManyByStudentId()}, so the picker resolves in one read.
+     *
+     * @return list<int>
+     */
+    public function allStudentIds(): array;
 }

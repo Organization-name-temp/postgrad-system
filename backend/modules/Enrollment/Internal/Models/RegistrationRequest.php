@@ -97,6 +97,20 @@ class RegistrationRequest extends Model
     }
 
     /**
+     * Whether the Student already has a Pending request for the Semester — the "at most one
+     * Pending per (student, semester)" guard both the Student's own submit and a staff
+     * compose-on-behalf (ticket 09) read before creating one, so the rule lives once (an
+     * approved Initial does not count; the partial unique index is on Pending only).
+     */
+    public static function hasPendingFor(int $studentId, int $semesterId): bool
+    {
+        return static::query()->pending()
+            ->where('student_id', $studentId)
+            ->where('semester_id', $semesterId)
+            ->exists();
+    }
+
+    /**
      * Whether the Student has an **approved Initial** request for the Semester — the gate
      * for free add/drop (ticket 07, FR-REG-004): the direct add/drop actions are available
      * only after the Advisor has approved the Student's initial registration, so the

@@ -3314,6 +3314,183 @@ export type WithdrawFromACoursewithdrawalPeriod409 = {
   message?: string;
 };
 
+export type TheStudentsTheComposerMayRegisterOnBehalfOf200DataItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  /** @nullable */
+  current_load?: string | null;
+  program?: TheStudentsTheComposerMayRegisterOnBehalfOf200DataItemProgram;
+};
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOf200 = {
+  data?: TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem[];
+};
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOf403 = {
+  message?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+  ends_at?: string;
+  registration_opens_at?: string;
+  registration_closes_at?: string;
+  add_drop_ends_at?: string;
+  late_add_ends_at?: string;
+  withdrawal_deadline_at?: string;
+  is_registration_open?: boolean;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem = {
+  offering_id?: number;
+  classification?: string;
+  capacity?: number;
+  seats_remaining?: number;
+  total_ch?: number;
+  course?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse;
+  instructor?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor;
+  meetings?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem[];
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200Data = {
+  semester?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataSemester;
+  courses?: ATargetStudentsEligibleCoursesForTheOpenSemester200DataCoursesItem[];
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester200 = {
+  data?: ATargetStudentsEligibleCoursesForTheOpenSemester200Data;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester403 = {
+  message?: string;
+};
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemester404 = {
+  message?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfBodyLinesItem = {
+  /** An eligible Course Offering's id. */
+  offering_id: number;
+  /** How to take it — Regular or Audit. */
+  mode: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody = {
+  /** The cart lines — one per chosen offering. */
+  lines: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBodyLinesItem[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItem = {
+  id?: number;
+  offering_id?: number;
+  mode?: string;
+  decision?: string;
+  derived_retake?: boolean;
+  classification?: string;
+  total_ch?: number;
+  course?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemCourse;
+  instructor?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemInstructor;
+  meetings?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItemMeetingsItem[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201Data = {
+  id?: number;
+  semester_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  advisor_note?: string | null;
+  decided_at?: string;
+  submitted_at?: string;
+  lines?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201DataLinesItem[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf201 = {
+  data?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf201Data;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 = {
+  message?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 = {
+  message?: string;
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf422Errors = {
+  registration?: string[];
+};
+
+export type ComposeAndSubmitARegistrationCartOnAStudentsBehalf422 = {
+  message?: string;
+  errors?: ComposeAndSubmitARegistrationCartOnAStudentsBehalf422Errors;
+};
+
 export type TheAdvisorsRegistrationQueue200DataItemStudentProgram = {
   id?: number;
   code?: string;
@@ -11684,6 +11861,278 @@ export const useWithdrawFromACoursewithdrawalPeriod = <TError = WithdrawFromACou
         TContext
       > => {
       return useMutation(getWithdrawFromACoursewithdrawalPeriodMutationOptions(options), queryClient);
+    }
+
+/**
+ * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
+ * Student Affairs (or an administrator) sees **every** Student, unscoped — the same
+ * visibility rule the advisor queue uses ({@see ScopesToAdvisees}). Each row carries the
+ * Student's context (name, University ID, Program, degree, enrollment term) so the picker
+ * is legible. Gated on `courses.register_for_student` (Advisor R03 / Student Affairs R05).
+ * @summary The students the composer may register on behalf of.
+ */
+export const theStudentsTheComposerMayRegisterOnBehalfOf = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheStudentsTheComposerMayRegisterOnBehalfOf200>(
+      {url: `/api/v1/registration/on-behalf/students`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheStudentsTheComposerMayRegisterOnBehalfOfQueryKey = () => {
+    return [
+    `/api/v1/registration/on-behalf/students`
+    ] as const;
+    }
+
+
+export const getTheStudentsTheComposerMayRegisterOnBehalfOfQueryOptions = <TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheStudentsTheComposerMayRegisterOnBehalfOfQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>> = ({ signal }) => theStudentsTheComposerMayRegisterOnBehalfOf(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheStudentsTheComposerMayRegisterOnBehalfOfQueryResult = NonNullable<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>>
+export type TheStudentsTheComposerMayRegisterOnBehalfOfQueryError = TheStudentsTheComposerMayRegisterOnBehalfOf403
+
+
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The students the composer may register on behalf of.
+ */
+
+export function useTheStudentsTheComposerMayRegisterOnBehalfOf<TData = Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError = TheStudentsTheComposerMayRegisterOnBehalfOf403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsTheComposerMayRegisterOnBehalfOf>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheStudentsTheComposerMayRegisterOnBehalfOfQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The cart's course list on the register-for-student surface (ticket 09) — the same shape
+ * as the self-serve eligible list, resolved for the target Student. An Advisor may read
+ * only their own advisee's list ({@see ScopesToAdvisees}); Student Affairs / an
+ * administrator any. Gated on `courses.register_for_student`.
+ * @summary A target student's eligible courses for the open Semester.
+ */
+export const aTargetStudentsEligibleCoursesForTheOpenSemester = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ATargetStudentsEligibleCoursesForTheOpenSemester200>(
+      {url: `/api/v1/registration/on-behalf/students/${studentId}/eligible-courses`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getATargetStudentsEligibleCoursesForTheOpenSemesterQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/registration/on-behalf/students/${studentId}/eligible-courses`
+    ] as const;
+    }
+
+
+export const getATargetStudentsEligibleCoursesForTheOpenSemesterQueryOptions = <TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getATargetStudentsEligibleCoursesForTheOpenSemesterQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>> = ({ signal }) => aTargetStudentsEligibleCoursesForTheOpenSemester(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ATargetStudentsEligibleCoursesForTheOpenSemesterQueryResult = NonNullable<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>>
+export type ATargetStudentsEligibleCoursesForTheOpenSemesterQueryError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404
+
+
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>,
+          TError,
+          Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary A target student's eligible courses for the open Semester.
+ */
+
+export function useATargetStudentsEligibleCoursesForTheOpenSemester<TData = Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError = ATargetStudentsEligibleCoursesForTheOpenSemester403 | ATargetStudentsEligibleCoursesForTheOpenSemester404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aTargetStudentsEligibleCoursesForTheOpenSemester>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getATargetStudentsEligibleCoursesForTheOpenSemesterQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Register-for-student (ticket 09). Runs the identical eligibility / credit-hour / caps /
+ * clash / capacity validators the
+ * Student's own submit runs, against the **target** Student, then routes by who is
+ * composing (spec user stories 50, 53): the Student's own **Advisor** composes a request
+ * that is **born Approved** — it mints Enrollments immediately in the same transaction and
+ * notifies the Student (`registration.decided`), since the composer is the approver — while
+ * **Student Affairs** (or an administrator) composes a normal **Pending** request routed to
+ * the Student's live Advisor (`registration.submitted`), exactly as a self-submission. The
+ * kind (Initial / LateAdd) is derived from the calendar, as on self-submit. A second
+ * Pending request for the same Semester is a 409; an illegal cart is a 422 enumerating the
+ * offending lines/reasons. Gated on `courses.register_for_student` (R03 / R05).
+ * @summary Compose and submit a registration cart on a student's behalf.
+ */
+export const composeAndSubmitARegistrationCartOnAStudentsBehalf = (
+    studentId: number,
+    composeAndSubmitARegistrationCartOnAStudentsBehalfBody: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ComposeAndSubmitARegistrationCartOnAStudentsBehalf201>(
+      {url: `/api/v1/registration/on-behalf/students/${studentId}/requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: composeAndSubmitARegistrationCartOnAStudentsBehalfBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationOptions = <TError = ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, TError,{studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, TError,{studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}, TContext> => {
+
+const mutationKey = ['composeAndSubmitARegistrationCartOnAStudentsBehalf'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, {studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}> = (props) => {
+          const {studentId,data} = props ?? {};
+
+          return  composeAndSubmitARegistrationCartOnAStudentsBehalf(studentId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationResult = NonNullable<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>>
+    export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationBody = ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody
+    export type ComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationError = ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf422
+
+    /**
+ * @summary Compose and submit a registration cart on a student's behalf.
+ */
+export const useComposeAndSubmitARegistrationCartOnAStudentsBehalf = <TError = ComposeAndSubmitARegistrationCartOnAStudentsBehalf403 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf409 | ComposeAndSubmitARegistrationCartOnAStudentsBehalf422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>, TError,{studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof composeAndSubmitARegistrationCartOnAStudentsBehalf>>,
+        TError,
+        {studentId: number;data: ComposeAndSubmitARegistrationCartOnAStudentsBehalfBody},
+        TContext
+      > => {
+      return useMutation(getComposeAndSubmitARegistrationCartOnAStudentsBehalfMutationOptions(options), queryClient);
     }
 
 /**

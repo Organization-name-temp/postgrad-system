@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { Box } from '@mui/material'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { useSubmitARegistrationCart } from '../../../shared/api/generated/endpoints'
 import { CartPanel } from './CartPanel'
 import { ClassificationSection, type CartControls } from './ClassificationSection'
 import { groupByClassification, type EligibleCourse } from './classification'
@@ -12,25 +11,43 @@ import {
   evaluateCart,
   indexOfferings,
   type CartFormValues,
+  type CartLineValue,
   type CartMode,
 } from './cartRules'
 
 interface CartBuilderProps {
   courses: EligibleCourse[]
-  /** Whether the open semester is the student's first — waives the CH floor (mirror). */
+  /** Whether the target semester is the student's first — waives the CH floor (mirror). */
   firstSemester: boolean
-  /** Called after a successful submit, so the page re-reads the now-Pending request. */
-  onSubmitted: () => void
+  /**
+   * Submit the built cart. The owning page holds the mutation (self-submit for the Student's
+   * own registration, compose-on-behalf for the register-for-student surface) and re-reads
+   * whatever it owns afterwards, so the builder stays agnostic to *whose* cart this is.
+   */
+  submit: (lines: CartLineValue[]) => Promise<void>
+  isSubmitting: boolean
+  submitError: unknown
+  /** Overrides the submit button label (defaults to the self-serve "Submit to advisor"). */
+  submitLabel?: string
 }
 
 /**
- * The cart-builder half of the registration page: the eligible list (grouped by
+ * The cart-builder half of the registration surface: the eligible list (grouped by
  * classification) with an add/remove action per row, and the cart panel beside it. The
  * cart is a React Hook Form field array validated by a Zod mirror of the server rules
  * (ADR-0014); the same pure {@link evaluateCart} drives both the submit gate and the live
  * issue messages, so they never disagree. The server re-validates and remains authoritative.
+ * Reused by the Student's own registration (ticket 05) and staff register-for-student
+ * (ticket 09) — the two differ only in the injected {@link CartBuilderProps.submit}.
  */
-export function CartBuilder({ courses, firstSemester, onSubmitted }: CartBuilderProps) {
+export function CartBuilder({
+  courses,
+  firstSemester,
+  submit,
+  isSubmitting,
+  submitError,
+  submitLabel,
+}: CartBuilderProps) {
   const offerings = useMemo(() => indexOfferings(courses), [courses])
   const schema = useMemo(
     () => buildCartSchema(offerings, { firstSemester }),
@@ -50,8 +67,6 @@ export function CartBuilder({ courses, firstSemester, onSubmitted }: CartBuilder
     [lines, offerings, firstSemester],
   )
   const total = creditHourTotal(lines, offerings)
-
-  const submit = useSubmitARegistrationCart()
 
   const indexOf = (offeringId: number) =>
     fields.findIndex((field) => field.offering_id === offeringId)
@@ -84,9 +99,7 @@ export function CartBuilder({ courses, firstSemester, onSubmitted }: CartBuilder
   }
 
   const onSubmit = handleSubmit(async (values) => {
-    await submit.mutateAsync({ data: { lines: values.lines } })
-    // The page owns the requests query — re-read it so the now-Pending request shows.
-    onSubmitted()
+    await submit(values.lines)
   })
 
   const groups = groupByClassification(courses)
@@ -108,8 +121,9 @@ export function CartBuilder({ courses, firstSemester, onSubmitted }: CartBuilder
         onSetMode={setMode}
         onRemove={removeOffering}
         onSubmit={onSubmit}
-        isSubmitting={submit.isPending}
-        submitError={submit.error}
+        isSubmitting={isSubmitting}
+        submitError={submitError}
+        submitLabel={submitLabel}
       />
     </Box>
   )

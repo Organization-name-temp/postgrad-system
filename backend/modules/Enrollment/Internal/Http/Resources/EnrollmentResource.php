@@ -6,9 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Catalog\Public\CourseSummary;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
+use Modules\Enrollment\Internal\Http\Concerns\ComputesAttendance;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesOfferingRefs;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\OfferingMeeting;
+use Modules\Enrollment\Internal\Support\AttendanceCalculator;
 use Modules\Identity\Public\UserSummary;
 
 /**
@@ -21,7 +23,11 @@ use Modules\Identity\Public\UserSummary;
  *
  * The Offering, Course and Instructor are resolved by the controller onto the Enrollment's
  * Offering ({@see ResolvesOfferingRefs}); a dropped reference renders as null facts rather
- * than erroring. Attendance percentage joins this shape in ticket 08.
+ * than erroring. The `attendance` block (ticket 08, ADR-0019) is the Student's derived
+ * attendance — present/recorded counts, the display percentage, and the audit-at-risk flag —
+ * stashed by {@see ComputesAttendance}; a surface
+ * that does not compute it (a just-added enrollment) renders a zeroed "no data" block, never
+ * null, so the typed client stays stable.
  *
  * @mixin Enrollment
  */
@@ -48,6 +54,9 @@ class EnrollmentResource extends JsonResource
             'meetings' => $offering === null
                 ? []
                 : $offering->meetings->map(fn (OfferingMeeting $meeting): array => $meeting->toSlotArray())->all(),
+            // The derived attendance block (ticket 08), stashed by ComputesAttendance on the
+            // surfaces that compute it (My Schedule); the shared "no data yet" block elsewhere.
+            'attendance' => $enrollment->getAttribute('attendance') ?? AttendanceCalculator::emptyBlock(),
         ];
     }
 }

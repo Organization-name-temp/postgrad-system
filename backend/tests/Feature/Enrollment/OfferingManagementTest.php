@@ -1,12 +1,10 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Enrollment\Internal\Enums\Weekday;
+use Modules\Enrollment\Internal\Models\ClassSession;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\OfferingMeeting;
 use Modules\Identity\Internal\Models\User;
@@ -291,19 +289,13 @@ it('refuses to delete an offering that is referenced by a session or enrollment'
     $offering = CourseOffering::factory()->create();
     actingAsRole(Role::StudentAffairs);
 
-    // Stand up a minimal referencing table (real class_sessions arrives in ticket 08)
-    // to exercise the delete guard's forward-compatible reference check.
-    Schema::create('class_sessions', function (Blueprint $table): void {
-        $table->id();
-        $table->unsignedBigInteger('course_offering_id');
-    });
-    DB::table('class_sessions')->insert(['course_offering_id' => $offering->id]);
+    // A generated Class Session references the Offering (ticket 08), so the delete guard
+    // must refuse it — a live register is never silently destroyed.
+    ClassSession::factory()->create(['course_offering_id' => $offering->id]);
 
     $this->deleteJson("/api/v1/offerings/{$offering->id}")->assertStatus(409);
 
     $this->assertDatabaseHas('course_offerings', ['id' => $offering->id]);
-
-    Schema::drop('class_sessions');
 });
 
 it('lists assignable instructors for the picker', function () {

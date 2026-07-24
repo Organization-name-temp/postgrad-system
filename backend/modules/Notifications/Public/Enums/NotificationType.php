@@ -88,4 +88,12 @@ enum NotificationType: string
      * `student_name`.
      */
     case EnrollmentWithdrawn = 'enrollment.withdrawn';
+
+    /**
+     * An Audit Enrollment's derived attendance percentage first crossed below the audit
+     * threshold (Appendix D's ≥75% rule; Phase 3, ticket 08, ADR-0019). Raised to the
+     * Student once on the downward crossing — never on every mark, and never accompanied by
+     * an automated status change. Payload: `course_code`, `percentage`.
+     */
+    case AttendanceAuditAtRisk = 'attendance.audit_at_risk';
 }

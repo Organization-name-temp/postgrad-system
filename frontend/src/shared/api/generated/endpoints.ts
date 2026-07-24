@@ -3139,6 +3139,13 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
   ends_at?: string;
 };
 
+export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
 export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItem = {
   id?: number;
   offering_id?: number;
@@ -3148,6 +3155,7 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
   course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse;
   instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemInstructor;
   meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemMeetingsItem[];
+  attendance?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemAttendance;
 };
 
 export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItem = {
@@ -3198,6 +3206,13 @@ export type FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem = {
   ends_at?: string;
 };
 
+export type FreeAddACourseToTheScheduleadddropPeriod201DataAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
 export type FreeAddACourseToTheScheduleadddropPeriod201Data = {
   id?: number;
   offering_id?: number;
@@ -3207,6 +3222,7 @@ export type FreeAddACourseToTheScheduleadddropPeriod201Data = {
   course?: FreeAddACourseToTheScheduleadddropPeriod201DataCourse;
   instructor?: FreeAddACourseToTheScheduleadddropPeriod201DataInstructor;
   meetings?: FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem[];
+  attendance?: FreeAddACourseToTheScheduleadddropPeriod201DataAttendance;
 };
 
 export type FreeAddACourseToTheScheduleadddropPeriod201 = {
@@ -3271,6 +3287,13 @@ export type WithdrawFromACoursewithdrawalPeriod200DataMeetingsItem = {
   ends_at?: string;
 };
 
+export type WithdrawFromACoursewithdrawalPeriod200DataAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
 export type WithdrawFromACoursewithdrawalPeriod200Data = {
   id?: number;
   offering_id?: number;
@@ -3280,6 +3303,7 @@ export type WithdrawFromACoursewithdrawalPeriod200Data = {
   course?: WithdrawFromACoursewithdrawalPeriod200DataCourse;
   instructor?: WithdrawFromACoursewithdrawalPeriod200DataInstructor;
   meetings?: WithdrawFromACoursewithdrawalPeriod200DataMeetingsItem[];
+  attendance?: WithdrawFromACoursewithdrawalPeriod200DataAttendance;
 };
 
 export type WithdrawFromACoursewithdrawalPeriod200 = {
@@ -3493,6 +3517,200 @@ export type RecordTheAdvisorsLineItemDecision422 = {
   errors?: {
   below_min_credit_hours?: string[];
 };
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItemMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200DataItem = {
+  id?: number;
+  student_count?: number;
+  semester?: TheSignedInInstructorsOfferingsMyOfferings200DataItemSemester;
+  course?: TheSignedInInstructorsOfferingsMyOfferings200DataItemCourse;
+  meetings?: TheSignedInInstructorsOfferingsMyOfferings200DataItemMeetingsItem[];
+};
+
+export type TheSignedInInstructorsOfferingsMyOfferings200 = {
+  data?: TheSignedInInstructorsOfferingsMyOfferings200DataItem[];
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingMeetingsItem = {
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOffering = {
+  id?: number;
+  semester?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingSemester;
+  course?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingCourse;
+  instructor?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingInstructor;
+  meetings?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOfferingMeetingsItem[];
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataSessionsItem = {
+  id?: number;
+  date?: string;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+  cancelled?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemAttendance = {
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemMarks = {
+  '10'?: boolean;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  student?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemStudent;
+  attendance?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemAttendance;
+  marks?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItemMarks;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200Data = {
+  offering?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataOffering;
+  sessions?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataSessionsItem[];
+  roster?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200DataRosterItem[];
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200 = {
+  data?: AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200Data;
+};
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403 = {
+  message?: string;
+};
+
+export type CancelOrReinstateAClassSessionBody = {
+  /** Whether the session is cancelled. */
+  cancelled: boolean;
+};
+
+export type CancelOrReinstateAClassSession200Data = {
+  id?: number;
+  date?: string;
+  weekday?: number;
+  starts_at?: string;
+  ends_at?: string;
+  cancelled?: boolean;
+};
+
+export type CancelOrReinstateAClassSession200 = {
+  data?: CancelOrReinstateAClassSession200Data;
+};
+
+export type CancelOrReinstateAClassSession403 = {
+  message?: string;
+};
+
+export type RecordorCorrectASessionsAttendanceRegisterBodyMarksItem = {
+  /** An active Enrollment on this offering. */
+  enrollment_id: number;
+  /** Whether the student was present. */
+  present: boolean;
+};
+
+export type RecordorCorrectASessionsAttendanceRegisterBody = {
+  /** One entry per student to mark. */
+  marks: RecordorCorrectASessionsAttendanceRegisterBodyMarksItem[];
+};
+
+export type RecordorCorrectASessionsAttendanceRegister200DataAttendanceItem = {
+  enrollment_id?: number;
+  present?: number;
+  recorded?: number;
+  percentage?: number;
+  at_risk?: boolean;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister200Data = {
+  session_id?: number;
+  attendance?: RecordorCorrectASessionsAttendanceRegister200DataAttendanceItem[];
+};
+
+export type RecordorCorrectASessionsAttendanceRegister200 = {
+  data?: RecordorCorrectASessionsAttendanceRegister200Data;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister403 = {
+  message?: string;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister409 = {
+  message?: string;
+};
+
+export type RecordorCorrectASessionsAttendanceRegister422Errors = {
+  marks?: string[];
+};
+
+export type RecordorCorrectASessionsAttendanceRegister422 = {
+  message?: string;
+  errors?: RecordorCorrectASessionsAttendanceRegister422Errors;
 };
 
 export type ListMyNotifications200DataItemData = {
@@ -11163,8 +11381,9 @@ export function useTheActingStudentsRegistrationRequestsForTheOpenSemester<TData
  * Student has an approved Initial request — free add/drop is live), `can_withdraw` (in
  * the withdrawal window), and — only when free change is live — `addable_courses`, the
  * eligible Offerings not yet on the schedule and not External Electives (those need a
- * request). Attendance percentage lands in ticket 08. Gated on `courses.register_self`
- * (the acting Student, R02).
+ * request). Each enrollment also carries its derived `attendance` (ticket 08) — present/
+ * recorded counts, the display percentage, and the audit-at-risk flag. Gated on
+ * `courses.register_self` (the acting Student, R02).
  * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
  */
 export const theActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester = (
@@ -11737,6 +11956,347 @@ export const useRecordTheAdvisorsLineItemDecision = <TError = RecordTheAdvisorsL
         TContext
       > => {
       return useMutation(getRecordTheAdvisorsLineItemDecisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * Every Course Offering the acting user teaches, across all Semesters — the Phase-4
+ * grading link, born here. Each carries its Semester, resolved Course, weekly meeting
+ * times, and its active roster size, so the instructor sees their teaching load at a
+ * glance. A user who teaches nothing gets an empty list (no permission gate — teaching
+ * is the scope). Requires only authentication.
+ * @summary The signed-in Instructor's offerings ("My Offerings").
+ */
+export const theSignedInInstructorsOfferingsMyOfferings = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheSignedInInstructorsOfferingsMyOfferings200>(
+      {url: `/api/v1/offerings/mine`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheSignedInInstructorsOfferingsMyOfferingsQueryKey = () => {
+    return [
+    `/api/v1/offerings/mine`
+    ] as const;
+    }
+
+
+export const getTheSignedInInstructorsOfferingsMyOfferingsQueryOptions = <TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheSignedInInstructorsOfferingsMyOfferingsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>> = ({ signal }) => theSignedInInstructorsOfferingsMyOfferings(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheSignedInInstructorsOfferingsMyOfferingsQueryResult = NonNullable<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>>
+export type TheSignedInInstructorsOfferingsMyOfferingsQueryError = unknown
+
+
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>,
+          TError,
+          Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The signed-in Instructor's offerings ("My Offerings").
+ */
+
+export function useTheSignedInInstructorsOfferingsMyOfferings<TData = Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theSignedInInstructorsOfferingsMyOfferings>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheSignedInInstructorsOfferingsMyOfferingsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The assigned Instructor's register for one Offering: its Class Sessions (generated from
+ * the meeting times across the Semester the first time this is opened — idempotent, so
+ * re-opening never duplicates), and its roster of **active** Enrollments (withdrawn
+ * students keep their history but leave the roster). Each roster row carries the student's
+ * identity, their per-session marks, and their derived attendance percentage with the
+ * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor (else
+ * 403).
+ * @summary An Offering's attendance register — sessions + roster + derived percentages.
+ */
+export const anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages200>(
+      {url: `/api/v1/offerings/${offeringId}/register`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryKey = (offeringId: number,) => {
+    return [
+    `/api/v1/offerings/${offeringId}/register`
+    ] as const;
+    }
+
+
+export const getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryOptions = <TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryKey(offeringId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>> = ({ signal }) => anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages(offeringId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: offeringId !== null && offeringId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryResult = NonNullable<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>>
+export type AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403
+
+
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>,
+          TError,
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>,
+          TError,
+          Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary An Offering's attendance register — sessions + roster + derived percentages.
+ */
+
+export function useAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages<TData = Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError = AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentages403>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof anOfferingsAttendanceRegisterSessionsRosterDerivedPercentages>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesQueryOptions(offeringId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled
+ * session counts in no attendance denominator; reinstating it counts it again. Correctable
+ * either way. Authorised by assignment — only the session's Offering's Instructor (else
+ * 403).
+ * @summary Cancel or reinstate a Class Session.
+ */
+export const cancelOrReinstateAClassSession = (
+    classSessionId: number,
+    cancelOrReinstateAClassSessionBody: CancelOrReinstateAClassSessionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CancelOrReinstateAClassSession200>(
+      {url: `/api/v1/class-sessions/${classSessionId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: cancelOrReinstateAClassSessionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCancelOrReinstateAClassSessionMutationOptions = <TError = CancelOrReinstateAClassSession403,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, TError,{classSessionId: number;data: CancelOrReinstateAClassSessionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, TError,{classSessionId: number;data: CancelOrReinstateAClassSessionBody}, TContext> => {
+
+const mutationKey = ['cancelOrReinstateAClassSession'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, {classSessionId: number;data: CancelOrReinstateAClassSessionBody}> = (props) => {
+          const {classSessionId,data} = props ?? {};
+
+          return  cancelOrReinstateAClassSession(classSessionId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelOrReinstateAClassSessionMutationResult = NonNullable<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>>
+    export type CancelOrReinstateAClassSessionMutationBody = CancelOrReinstateAClassSessionBody
+    export type CancelOrReinstateAClassSessionMutationError = CancelOrReinstateAClassSession403
+
+    /**
+ * @summary Cancel or reinstate a Class Session.
+ */
+export const useCancelOrReinstateAClassSession = <TError = CancelOrReinstateAClassSession403,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>, TError,{classSessionId: number;data: CancelOrReinstateAClassSessionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof cancelOrReinstateAClassSession>>,
+        TError,
+        {classSessionId: number;data: CancelOrReinstateAClassSessionBody},
+        TContext
+      > => {
+      return useMutation(getCancelOrReinstateAClassSessionMutationOptions(options), queryClient);
+    }
+
+/**
+ * Saves a binary present/absent mark per active Enrollment for one Class Session; a save
+ * upserts, so a correction overwrites. Only the Offering's active roster may be marked;
+ * a cancelled session cannot be marked. Around the save the percentages are recomputed:
+ * any **Audit** Enrollment whose percentage crosses below the threshold on this save
+ * raises one `attendance.audit_at_risk` notification (fired once on the downward crossing,
+ * never on every mark). Authorised by assignment — only this Offering's Instructor (else
+ * 403).
+ * @summary Record (or correct) a session's attendance register.
+ */
+export const recordorCorrectASessionsAttendanceRegister = (
+    classSessionId: number,
+    recordorCorrectASessionsAttendanceRegisterBody: RecordorCorrectASessionsAttendanceRegisterBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordorCorrectASessionsAttendanceRegister200>(
+      {url: `/api/v1/class-sessions/${classSessionId}/attendance`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: recordorCorrectASessionsAttendanceRegisterBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordorCorrectASessionsAttendanceRegisterMutationOptions = <TError = RecordorCorrectASessionsAttendanceRegister403 | RecordorCorrectASessionsAttendanceRegister409 | RecordorCorrectASessionsAttendanceRegister422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, TError,{classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, TError,{classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}, TContext> => {
+
+const mutationKey = ['recordorCorrectASessionsAttendanceRegister'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, {classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}> = (props) => {
+          const {classSessionId,data} = props ?? {};
+
+          return  recordorCorrectASessionsAttendanceRegister(classSessionId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordorCorrectASessionsAttendanceRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>>
+    export type RecordorCorrectASessionsAttendanceRegisterMutationBody = RecordorCorrectASessionsAttendanceRegisterBody
+    export type RecordorCorrectASessionsAttendanceRegisterMutationError = RecordorCorrectASessionsAttendanceRegister403 | RecordorCorrectASessionsAttendanceRegister409 | RecordorCorrectASessionsAttendanceRegister422
+
+    /**
+ * @summary Record (or correct) a session's attendance register.
+ */
+export const useRecordorCorrectASessionsAttendanceRegister = <TError = RecordorCorrectASessionsAttendanceRegister403 | RecordorCorrectASessionsAttendanceRegister409 | RecordorCorrectASessionsAttendanceRegister422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>, TError,{classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordorCorrectASessionsAttendanceRegister>>,
+        TError,
+        {classSessionId: number;data: RecordorCorrectASessionsAttendanceRegisterBody},
+        TContext
+      > => {
+      return useMutation(getRecordorCorrectASessionsAttendanceRegisterMutationOptions(options), queryClient);
     }
 
 /**

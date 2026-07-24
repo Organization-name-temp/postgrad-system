@@ -30,6 +30,8 @@ import { RegistrationPage } from '../features/enrollment/registration/Registrati
 import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
 import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
 import { RegistrationReviewPage } from '../features/enrollment/advising/RegistrationReviewPage'
+import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPage'
+import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE } from '../shared/access/roles'
@@ -76,6 +78,15 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
                   <Route path="/registration" element={<RegistrationPage />} />
                   <Route path="/schedule" element={<SchedulePage />} />
+                </Route>
+                {/* Persona-guarded: only Instructors (R04) reach My Teaching + the register;
+                    attendance is authorised by assignment server-side (ticket 08). */}
+                <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
+                  <Route path="/offerings/mine" element={<MyOfferingsPage />} />
+                  <Route
+                    path="/offerings/:offeringId/register"
+                    element={<OfferingRegisterPage />}
+                  />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to

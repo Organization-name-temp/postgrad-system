@@ -17,6 +17,7 @@ import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
 import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek'
 import RuleIcon from '@mui/icons-material/Rule'
+import CoPresentIcon from '@mui/icons-material/CoPresent'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -178,6 +179,16 @@ export const navItems: NavItem[] = [
     icon: <RuleIcon />,
     permission: PERMISSION.approveCourseRegistration,
     section: 'enrollment',
+  },
+  // The Instructor's teaching + attendance register (ticket 08). A **persona** item on the
+  // Instructor role (R04) — attendance has no permission (authorisation is by assignment),
+  // so it gates on the role, not a permission. Admins reach it for oversight in ticket 10.
+  {
+    key: 'myOfferings',
+    to: '/offerings/mine',
+    icon: <CoPresentIcon />,
+    section: 'enrollment',
+    roles: [ROLE.instructor],
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

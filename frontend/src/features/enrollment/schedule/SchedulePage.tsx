@@ -157,6 +157,7 @@ function SemesterCard({ group, onChanged }: { group: ScheduleGroup; onChanged: (
               <TableCell>{t('schedule.columns.classification')}</TableCell>
               <TableCell>{t('schedule.columns.meetings')}</TableCell>
               <TableCell align="right">{t('schedule.columns.creditHours')}</TableCell>
+              <TableCell>{t('schedule.columns.attendance')}</TableCell>
               {showActions && <TableCell align="right">{t('schedule.columns.actions')}</TableCell>}
             </TableRow>
           </TableHead>
@@ -235,6 +236,9 @@ function EnrollmentRow({
         <MeetingTimes meetings={meetings} />
       </TableCell>
       <TableCell align="right">{enrollment.credit_hours}</TableCell>
+      <TableCell>
+        <AttendanceCell attendance={enrollment.attendance} />
+      </TableCell>
       {showActions && (
         <TableCell align="right">
           {!isWithdrawn && canDrop && (
@@ -262,6 +266,36 @@ function EnrollmentRow({
         </TableCell>
       )}
     </TableRow>
+  )
+}
+
+/**
+ * A Student's derived attendance for one enrollment: the percentage plus an at-risk chip
+ * when an Audit enrollment has fallen below the audit minimum (ticket 08). "No sessions
+ * recorded yet" renders as a dash — the server sends `recorded: 0` for that, never null.
+ */
+function AttendanceCell({ attendance }: { attendance: ScheduleEnrollment['attendance'] }) {
+  const { t } = useTranslation('enrollment')
+  const recorded = attendance?.recorded ?? 0
+  const atRisk = attendance?.at_risk ?? false
+
+  if (recorded === 0) {
+    return (
+      <Typography component="span" variant="body2" color="text.secondary">
+        {t('schedule.attendance.none')}
+      </Typography>
+    )
+  }
+
+  return (
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+      <Typography component="span" variant="body2">
+        {t('schedule.attendance.value', { percent: attendance?.percentage ?? 0 })}
+      </Typography>
+      {atRisk && (
+        <StatusChip tone="warning" variant="filled-soft" label={t('schedule.attendance.atRisk')} />
+      )}
+    </Stack>
   )
 }
 

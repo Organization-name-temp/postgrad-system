@@ -100,4 +100,22 @@ trait NotifiesRegistration
             'student_name' => $studentName,
         ]);
     }
+
+    /**
+     * Notify the Student that their Audit Enrollment's attendance first crossed below the
+     * audit threshold (ticket 08, ADR-0019) — raised once on the downward crossing, never on
+     * every mark. `$studentUserId` is the owning user (resolved from the enrollment's Student
+     * anchor); `$percentage` is the rounded attendance percent the SPA renders in the line.
+     */
+    protected function notifyAuditAtRisk(
+        Notifier $notifier,
+        int $studentUserId,
+        string $courseCode,
+        int $percentage,
+    ): void {
+        $notifier->notify($studentUserId, NotificationType::AttendanceAuditAtRisk, [
+            'course_code' => $courseCode,
+            'percentage' => $percentage,
+        ]);
+    }
 }

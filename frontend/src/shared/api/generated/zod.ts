@@ -2807,8 +2807,9 @@ export const TheActingStudentsRegistrationRequestsForTheOpenSemesterResponse = z
  * Student has an approved Initial request — free add/drop is live), `can_withdraw` (in
  * the withdrawal window), and — only when free change is live — `addable_courses`, the
  * eligible Offerings not yet on the schedule and not External Electives (those need a
- * request). Attendance percentage lands in ticket 08. Gated on `courses.register_self`
- * (the acting Student, R02).
+ * request). Each enrollment also carries its derived `attendance` (ticket 08) — present/
+ * recorded counts, the display percentage, and the audit-at-risk flag. Gated on
+ * `courses.register_self` (the acting Student, R02).
  * @summary The acting Student's schedule — their minted Enrollments, grouped by Semester.
  */
 export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterResponse = zod.object({
@@ -2883,7 +2884,13 @@ export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterRes
   "weekday": zod.number().optional(),
   "starts_at": zod.string().optional(),
   "ends_at": zod.string().optional()
-})).optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
 })).optional()
 })).optional()
 })
@@ -2930,7 +2937,13 @@ export const FreeAddACourseToTheScheduleadddropPeriodResponse = zod.object({
   "weekday": zod.number().optional(),
   "starts_at": zod.string().optional(),
   "ends_at": zod.string().optional()
-})).optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
 }).optional()
 })
 
@@ -2990,7 +3003,13 @@ export const WithdrawFromACoursewithdrawalPeriodResponse = zod.object({
   "weekday": zod.number().optional(),
   "starts_at": zod.string().optional(),
   "ends_at": zod.string().optional()
-})).optional()
+})).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional()
 }).optional()
 })
 
@@ -3161,6 +3180,182 @@ export const RecordTheAdvisorsLineItemDecisionResponse = zod.object({
   "starts_at": zod.string().optional(),
   "ends_at": zod.string().optional()
 })).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Every Course Offering the acting user teaches, across all Semesters — the Phase-4
+ * grading link, born here. Each carries its Semester, resolved Course, weekly meeting
+ * times, and its active roster size, so the instructor sees their teaching load at a
+ * glance. A user who teaches nothing gets an empty list (no permission gate — teaching
+ * is the scope). Requires only authentication.
+ * @summary The signed-in Instructor's offerings ("My Offerings").
+ */
+export const TheSignedInInstructorsOfferingsMyOfferingsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_count": zod.number().optional(),
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+})).optional()
+})
+
+
+/**
+ * The assigned Instructor's register for one Offering: its Class Sessions (generated from
+ * the meeting times across the Semester the first time this is opened — idempotent, so
+ * re-opening never duplicates), and its roster of **active** Enrollments (withdrawn
+ * students keep their history but leave the roster). Each roster row carries the student's
+ * identity, their per-session marks, and their derived attendance percentage with the
+ * audit-at-risk flag. Authorised by assignment — only this Offering's Instructor (else
+ * 403).
+ * @summary An Offering's attendance register — sessions + roster + derived percentages.
+ */
+export const AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the offering.')
+})
+
+export const AnOfferingsAttendanceRegisterSessionsRosterDerivedPercentagesResponse = zod.object({
+  "data": zod.object({
+  "offering": zod.object({
+  "id": zod.number().optional(),
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional(),
+  "meetings": zod.array(zod.object({
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional()
+})).optional()
+}).optional(),
+  "sessions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "date": zod.string().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "cancelled": zod.boolean().optional()
+})).optional(),
+  "roster": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "attendance": zod.object({
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
+}).optional(),
+  "marks": zod.object({
+  "10": zod.boolean().optional()
+}).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Toggles a session's cancellation (Eid, illness — also the holiday answer). A cancelled
+ * session counts in no attendance denominator; reinstating it counts it again. Correctable
+ * either way. Authorised by assignment — only the session's Offering's Instructor (else
+ * 403).
+ * @summary Cancel or reinstate a Class Session.
+ */
+export const CancelOrReinstateAClassSessionParams = zod.object({
+  "class_session_id": zod.number().describe('The ID of the class session.')
+})
+
+export const CancelOrReinstateAClassSessionBody = zod.object({
+  "cancelled": zod.boolean().describe('Whether the session is cancelled.')
+})
+
+export const CancelOrReinstateAClassSessionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "date": zod.string().optional(),
+  "weekday": zod.number().optional(),
+  "starts_at": zod.string().optional(),
+  "ends_at": zod.string().optional(),
+  "cancelled": zod.boolean().optional()
+}).optional()
+})
+
+
+/**
+ * Saves a binary present/absent mark per active Enrollment for one Class Session; a save
+ * upserts, so a correction overwrites. Only the Offering's active roster may be marked;
+ * a cancelled session cannot be marked. Around the save the percentages are recomputed:
+ * any **Audit** Enrollment whose percentage crosses below the threshold on this save
+ * raises one `attendance.audit_at_risk` notification (fired once on the downward crossing,
+ * never on every mark). Authorised by assignment — only this Offering's Instructor (else
+ * 403).
+ * @summary Record (or correct) a session's attendance register.
+ */
+export const RecordorCorrectASessionsAttendanceRegisterParams = zod.object({
+  "class_session_id": zod.number().describe('The ID of the class session.')
+})
+
+export const RecordorCorrectASessionsAttendanceRegisterBody = zod.object({
+  "marks": zod.array(zod.object({
+  "enrollment_id": zod.number().describe('An active Enrollment on this offering.'),
+  "present": zod.boolean().describe('Whether the student was present.')
+})).describe('One entry per student to mark.')
+})
+
+export const RecordorCorrectASessionsAttendanceRegisterResponse = zod.object({
+  "data": zod.object({
+  "session_id": zod.number().optional(),
+  "attendance": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "present": zod.number().optional(),
+  "recorded": zod.number().optional(),
+  "percentage": zod.number().optional(),
+  "at_risk": zod.boolean().optional()
 })).optional()
 }).optional()
 })

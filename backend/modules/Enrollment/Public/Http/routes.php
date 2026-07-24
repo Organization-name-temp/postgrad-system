@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Enrollment\Internal\Http\Controllers\AttendanceController;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
@@ -66,4 +67,18 @@ Route::middleware(['auth:sanctum', 'can:registration.approve'])->group(function 
     Route::get('/registration/queue', [RegistrationReviewController::class, 'queue']);
     Route::get('/registration/requests/{registration}', [RegistrationReviewController::class, 'show'])->whereNumber('registration');
     Route::post('/registration/requests/{registration}/decision', [RegistrationReviewController::class, 'decide'])->whereNumber('registration');
+});
+
+// The attendance register (ticket 08, ADR-0019) — the Instructor-facing surface, authorised
+// **by assignment** (the Phase-2 interviewer precedent): attendance has no §3.2 permission,
+// so these routes are only `auth:sanctum` and the controller checks the Offering's assigned
+// Instructor itself. "My Offerings" is inherently scoped to the acting user; the register,
+// session cancel/reinstate, and mark all require being that Offering's Instructor (else 403).
+// The admin override (ADR-0015) is layered on in ticket 10. Nested model-bound params are
+// snake_case so Scribe/Orval stay deterministic (the [[scribe-urlparam-determinism]] rule).
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/offerings/mine', [AttendanceController::class, 'myOfferings']);
+    Route::get('/offerings/{offering}/register', [AttendanceController::class, 'register'])->whereNumber('offering');
+    Route::patch('/class-sessions/{class_session}', [AttendanceController::class, 'updateSession'])->whereNumber('class_session');
+    Route::put('/class-sessions/{class_session}/attendance', [AttendanceController::class, 'mark'])->whereNumber('class_session');
 });

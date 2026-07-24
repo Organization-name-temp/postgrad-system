@@ -15,4 +15,14 @@ return [
     'min_credit_hours' => (int) env('ENROLLMENT_MIN_CREDIT_HOURS', 6),
     'max_credit_hours' => (int) env('ENROLLMENT_MAX_CREDIT_HOURS', 12),
 
+    // Attendance (ADR-0019, ticket 08). The one attendance rule with SRS backing
+    // (Appendix D: an Audit "must attend ≥75%"). An Audit Enrollment whose derived
+    // attendance percentage first crosses below this threshold raises the audit-at-risk
+    // chip and one `attendance.audit_at_risk` notification — never any automated status
+    // change. The percentage itself is always derived (present ÷ non-cancelled recorded
+    // sessions), never stored. Config-driven so the bylaw figure can move without code.
+    'attendance' => [
+        'audit_min_percent' => (int) env('ENROLLMENT_AUDIT_MIN_ATTENDANCE_PERCENT', 75),
+    ],
+
 ];

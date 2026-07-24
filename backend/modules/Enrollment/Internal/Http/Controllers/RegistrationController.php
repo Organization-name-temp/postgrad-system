@@ -16,6 +16,7 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\RegistrationKind;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
+use Modules\Enrollment\Internal\Http\Concerns\ComputesAttendance;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\NotifiesRegistration;
 use Modules\Enrollment\Internal\Http\Concerns\ReadsExistingEnrollments;
@@ -61,6 +62,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  */
 class RegistrationController
 {
+    use ComputesAttendance;
     use CountsEnrollments;
     use NotifiesRegistration;
     use ReadsExistingEnrollments;
@@ -311,10 +313,11 @@ class RegistrationController
      * Student has an approved Initial request — free add/drop is live), `can_withdraw` (in
      * the withdrawal window), and — only when free change is live — `addable_courses`, the
      * eligible Offerings not yet on the schedule and not External Electives (those need a
-     * request). Attendance percentage lands in ticket 08. Gated on `courses.register_self`
-     * (the acting Student, R02).
+     * request). Each enrollment also carries its derived `attendance` (ticket 08) — present/
+     * recorded counts, the display percentage, and the audit-at-risk flag. Gated on
+     * `courses.register_self` (the acting Student, R02).
      *
-     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": true, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}]}
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": true, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
      */
     public function schedule(
@@ -335,6 +338,10 @@ class RegistrationController
 
         $offerings = $enrollments->pluck('offering')->filter()->values();
         $this->attachOfferingRefs($offerings, $courses, $directory);
+
+        // Attach each Enrollment's derived attendance (ticket 08) so My Schedule shows the
+        // percentage and audit-at-risk chip — one batched tally read across the schedule.
+        $this->attachAttendance($enrollments);
 
         // Group by the Offering's Semester; render each group newest-first by start date,
         // enriched with the period-gated change context so the SPA can show in-window actions.

@@ -83,7 +83,7 @@ class ScheduleChangeController
      * @bodyParam offering_id integer required An eligible Course Offering's id. Example: 1
      * @bodyParam mode string required How to take it — Regular or Audit. Example: Regular
      *
-     * @response 201 {"data": {"id": 5, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}}
+     * @response 201 {"data": {"id": 5, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 0, "recorded": 0, "percentage": 0, "at_risk": false}}}
      * @response 403 scenario="no approved initial registration" {"message": "Free add/drop needs an approved initial registration for this semester."}
      * @response 409 scenario="outside the add/drop window" {"message": "The add/drop period is not open for this course."}
      * @response 422 scenario="external elective" {"message": "An external elective can only be added through a registration request.", "errors": {"offering_id": ["An external elective can only be added through a registration request."]}}
@@ -254,7 +254,7 @@ class ScheduleChangeController
      *
      * @urlParam enrollment_id integer required The Enrollment's id. Example: 5
      *
-     * @response 200 {"data": {"id": 5, "offering_id": 1, "course_status": "Withdrawn", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}}
+     * @response 200 {"data": {"id": 5, "offering_id": 1, "course_status": "Withdrawn", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 0, "recorded": 0, "percentage": 0, "at_risk": false}}}
      * @response 409 scenario="outside the withdrawal window" {"message": "The withdrawal period is not open for this course."}
      * @response 409 scenario="already withdrawn" {"message": "You have already withdrawn from this course."}
      */

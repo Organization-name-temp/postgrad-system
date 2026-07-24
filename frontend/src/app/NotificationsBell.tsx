@@ -51,6 +51,7 @@ const TYPE_ALIAS: Record<string, string> = {
   'registration.decided': 'registrationDecided',
   'enrollment.adjusted': 'enrollmentAdjusted',
   'enrollment.withdrawn': 'enrollmentWithdrawn',
+  'attendance.audit_at_risk': 'attendanceAuditAtRisk',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

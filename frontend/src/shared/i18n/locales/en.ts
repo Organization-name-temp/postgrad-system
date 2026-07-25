@@ -42,12 +42,14 @@ export const en = {
       registerForStudent: 'Register for a student',
       studentSchedules: 'Student schedules',
       myOfferings: 'My teaching',
+      gradeSheets: 'Grade sheets',
       assignments: 'Faculty deans',
       sections: {
         admissions: 'Admissions',
         catalog: 'Catalog',
         calendar: 'Calendar',
         enrollment: 'Enrollment',
+        grading: 'Grading',
         administration: 'Administration',
       },
     },
@@ -1134,6 +1136,57 @@ export const en = {
       intro:
         'Look up a student to review their schedule and attendance. Advisors see their advisees; Student Affairs and administrators can view any student.',
       empty: 'This student has no enrollments yet.',
+    },
+  },
+  grading: {
+    offerings: {
+      title: 'Grade sheets',
+      intro:
+        'The courses you teach. Open a grade sheet to record what each student achieved; nothing is visible to students until it has been signed and finalized.',
+      loading: 'Loading the courses you teach',
+      loadError: 'Could not load the courses you teach. Please try again.',
+      empty: 'You are not teaching any courses yet.',
+      openSheet: 'Open grade sheet',
+      gradableCount: '{{count}} student',
+      gradableCount_other: '{{count}} students',
+      columns: {
+        course: 'Course',
+        students: 'To grade',
+        actions: 'Actions',
+      },
+    },
+    sheet: {
+      title: 'Grade sheet',
+      subtitle: 'Recording grades for {{course}}.',
+      back: 'Back to grade sheets',
+      loading: 'Loading the grade sheet',
+      loadError: 'Could not load this grade sheet. Please try again.',
+      saveError: 'Could not save this mark. Please try again.',
+      emptyRoster:
+        'No student on this course can be graded — audited and withdrawn students are never given a mark.',
+      help: 'Enter a final percentage between 0 and 100 for each student. The letter grade appears as you type, and each mark is saved on its own as you leave the field.',
+      tableLabel: 'Grade sheet lines',
+      markFor: 'Mark for {{student}}',
+      markInvalid: 'Enter a percentage between 0 and 100, with at most two decimals.',
+      noLetter: '—',
+      points: '{{points}} points',
+      columns: {
+        student: 'Student',
+        creditHours: 'Credit hours',
+        mark: 'Mark (%)',
+        letter: 'Letter grade',
+        state: 'State',
+      },
+      lineState: {
+        recorded: 'Recorded',
+        blank: 'Not yet graded',
+      },
+      status: {
+        Draft: 'Draft',
+        Submitted: 'Awaiting review',
+        Returned: 'Returned for correction',
+        Finalized: 'Finalized',
+      },
     },
   },
 } as const

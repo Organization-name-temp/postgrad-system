@@ -18,6 +18,8 @@ tags:
     description: ''
   - name: Enrollment
     description: "\nCourse Offering management (ADR-0017, ticket 03) — \"what actually runs this\nsemester.\" An administrator holding `calendar.manage` (Student Affairs / Dean;\nSysAdmin inherits) populates a Semester with Offerings: one Catalog Course taught in\nthat Semester, carrying an assigned Instructor, an optional seat capacity, and one or\nmore weekly meeting times. This is the record Phase-4 grading's Instructor→Course\nlink is born from.\n\nThe Semester, Course and Instructor are referenced by opaque id (no cross-module\nforeign key, ADR-0012); each is validated through its module's Public facade — the\nCourse through {@see CourseCatalog}, the Instructor (a faculty R04 User) through the\nIdentity\\Public {@see Directory}, the Semester through\n{@see AcademicCalendar}. One Course runs at most once per\nSemester (unique), an Offering's own meetings may not overlap each other (the\ninterval-overlap seam), and an Offering is deletable only while nothing references it."
+  - name: Grading
+    description: "\nThe **Grade Sheet** — the Instructor's mark-entry surface (ADR-0023, ticket 01). A Sheet is\none submission round for one Course Offering, created **lazily** the first time it is opened\nrather than eagerly at semester end, and it lists one line per **gradable** Enrollment:\nAudit and Withdrawn Enrollments are on the roster but never lines, so an Instructor is never\nasked for a mark that cannot exist.\n\nEntry is gated on `grades.enter`, but the permission is not authority over a *particular*\nSheet — that comes from the Offering assignment, checked here (the Phase-2 interviewer and\nPhase-3 attendance precedent for authorising by assignment). The §3.2 matrix is untouched.\n\nOne Mark, 0–100 with two decimals, is entered per line, and the Letter Grade and GPA points\nare **derived from the ADR-0021 scale and frozen onto the Grade** — so a later change to the\nscale never rewrites a grade already given, and there is no letter override to make\n`letter == scale(mark)` anything but an invariant. Each mark saves on its own, not as a\nbatch (the Phase-2 per-step-save precedent), so a long roster survives a closed tab.\n\nNothing here signs, reviews or finalizes: ticket 03 builds the Instructor signature and the\nDepartment-Head review that turn a Draft round into part of the academic record, and no\nStudent can see anything until it does."
   - name: Notifications
     description: "\nA signed-in user's own in-app notifications — the data behind the shell's bell\n(ticket 02). Every endpoint is scoped to the authenticated user by\n{@see Notification::scopeForUser()}, so no request can list, count, or mutate\nanother user's notifications (a foreign id simply is not found → 404). Content\nis a type + payload; the SPA renders it bilingually, so nothing here is\nlocalised server-side."
 paths:
@@ -13719,6 +13721,385 @@ paths:
         name: class_session_id
         description: 'The ID of the class session.'
         example: 10
+        required: true
+        schema:
+          type: integer
+  /api/v1/grading/offerings:
+    get:
+      summary: 'My Offerings to grade.'
+      operationId: myOfferingsToGrade
+      description: "Every Course Offering the acting user teaches, across all Semesters, each with its\nresolved Course and the number of gradable lines its Sheet would carry — the entry point\nto each Offering's Grade Sheet. Scoped to the acting user by the Offering assignment: a\nuser who teaches nothing gets an empty list rather than an error. Each Offering's Sheet\n*state* joins this list in ticket 03, with the signature loop that produces one."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      offering_id: 3
+                      gradable_count: 12
+                      course:
+                        id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        total_ch: 3
+                        research_type: null
+                        is_active: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        offering_id: 3
+                        gradable_count: 12
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                    items:
+                      type: object
+                      properties:
+                        offering_id:
+                          type: integer
+                          example: 3
+                        gradable_count:
+                          type: integer
+                          example: 12
+                        course:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: DEP501
+                            name_en:
+                              type: string
+                              example: 'Advanced Algorithms'
+                            name_ar:
+                              type: string
+                              example: 'خوارزميات متقدمة'
+                            level:
+                              type: integer
+                              example: 500
+                            total_ch:
+                              type: integer
+                              example: 3
+                            research_type:
+                              type: string
+                              example: null
+                              nullable: true
+                            is_active:
+                              type: boolean
+                              example: true
+      tags:
+        - Grading
+      security: []
+  '/api/v1/grading/offerings/{offering_id}/sheet':
+    get:
+      summary: "Open an Offering's Grade Sheet."
+      operationId: openAnOfferingsGradeSheet
+      description: "The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**\nEnrollment. The Initial round is created **lazily** on this first open (ADR-0023) —\nnever eagerly at semester end — and re-opening returns the same round rather than\nstarting another. Each line carries the Student's University ID and name, resolved\nthrough Identity\\Public, and the Grade already recorded for it, or `null` while the line\nis still blank. Audit and Withdrawn Enrollments are omitted.\nAuthorised by assignment: an Instructor opening an Offering they do not teach gets a 403."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Draft
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade:
+                          mark: 82.5
+                          letter_grade: B
+                          gpa_points: 3
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Draft
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade:
+                              mark: 82.5
+                              letter_grade: B
+                              gpa_points: 3
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: object
+                              properties:
+                                mark:
+                                  type: number
+                                  example: 82.5
+                                letter_grade:
+                                  type: string
+                                  example: B
+                                gpa_points:
+                                  type: integer
+                                  example: 3
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        404:
+          description: 'no such offering'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'That course offering no longer exists.'
+                properties:
+                  message:
+                    type: string
+                    example: 'That course offering no longer exists.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: offering_id
+        description: 'The ID of the course offering.'
+        example: 3
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/sheets/{grade_sheet_id}/lines/{enrollment_id}':
+    put:
+      summary: 'Save one Grade Sheet line.'
+      operationId: saveOneGradeSheetLine
+      description: "Records the final percentage for a single line and returns the Letter Grade and GPA\npoints the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale\nchange never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save\nprecedent); re-saving a line corrects it rather than adding a second Grade. A mark\noutside 0–100 is a 422 naming the field, and an Enrollment that is not a gradable line of\nthis Sheet's Offering is a 404. Authorised by assignment — only the Offering's Instructor\n(else 403)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    enrollment_id: 5
+                    grade:
+                      mark: 82.5
+                      letter_grade: B
+                      gpa_points: 3
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      enrollment_id:
+                        type: integer
+                        example: 5
+                      grade:
+                        type: object
+                        properties:
+                          mark:
+                            type: number
+                            example: 82.5
+                          letter_grade:
+                            type: string
+                            example: B
+                          gpa_points:
+                            type: integer
+                            example: 3
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        404:
+          description: 'not a gradable line'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'That enrollment is not a gradable line on this grade sheet.'
+                properties:
+                  message:
+                    type: string
+                    example: 'That enrollment is not a gradable line on this grade sheet.'
+        422:
+          description: 'mark out of range'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A mark must be a percentage between 0 and 100.'
+                  errors:
+                    mark:
+                      - 'A mark must be a percentage between 0 and 100.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A mark must be a percentage between 0 and 100.'
+                  errors:
+                    type: object
+                    properties:
+                      mark:
+                        type: array
+                        example:
+                          - 'A mark must be a percentage between 0 and 100.'
+                        items:
+                          type: string
+      tags:
+        - Grading
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mark:
+                  type: number
+                  description: 'The final percentage, 0–100 with at most two decimals.'
+                  example: 82.5
+              required:
+                - mark
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: enrollment_id
+        description: 'The ID of the gradable enrollment being marked.'
+        example: 5
         required: true
         schema:
           type: integer

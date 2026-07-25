@@ -3627,6 +3627,114 @@ export const RecordorCorrectASessionsAttendanceRegisterResponse = zod.object({
 
 
 /**
+ * Every Course Offering the acting user teaches, across all Semesters, each with its
+ * resolved Course and the number of gradable lines its Sheet would carry — the entry point
+ * to each Offering's Grade Sheet. Scoped to the acting user by the Offering assignment: a
+ * user who teaches nothing gets an empty list rather than an error. Each Offering's Sheet
+ * *state* joins this list in ticket 03, with the signature loop that produces one.
+ * @summary My Offerings to grade.
+ */
+export const MyOfferingsToGradeResponse = zod.object({
+  "data": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "gradable_count": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**
+ * Enrollment. The Initial round is created **lazily** on this first open (ADR-0023) —
+ * never eagerly at semester end — and re-opening returns the same round rather than
+ * starting another. Each line carries the Student's University ID and name, resolved
+ * through Identity\Public, and the Grade already recorded for it, or `null` while the line
+ * is still blank. Audit and Withdrawn Enrollments are omitted.
+ * Authorised by assignment: an Instructor opening an Offering they do not teach gets a 403.
+ * @summary Open an Offering's Grade Sheet.
+ */
+export const OpenAnOfferingsGradeSheetParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the course offering.')
+})
+
+export const OpenAnOfferingsGradeSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Records the final percentage for a single line and returns the Letter Grade and GPA
+ * points the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale
+ * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
+ * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
+ * outside 0–100 is a 422 naming the field, and an Enrollment that is not a gradable line of
+ * this Sheet's Offering is a 404. Authorised by assignment — only the Offering's Instructor
+ * (else 403).
+ * @summary Save one Grade Sheet line.
+ */
+export const SaveOneGradeSheetLineParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.'),
+  "enrollment_id": zod.number().describe('The ID of the gradable enrollment being marked.')
+})
+
+export const SaveOneGradeSheetLineBody = zod.object({
+  "mark": zod.number().describe('The final percentage, 0–100 with at most two decimals.')
+})
+
+export const SaveOneGradeSheetLineResponse = zod.object({
+  "data": zod.object({
+  "enrollment_id": zod.number().optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
  * Paginated, newest-first. Scoped to the authenticated user.
  * @summary List my notifications.
  */

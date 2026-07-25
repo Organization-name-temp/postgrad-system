@@ -20,6 +20,7 @@ import RuleIcon from '@mui/icons-material/Rule'
 import CoPresentIcon from '@mui/icons-material/CoPresent'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PersonSearchIcon from '@mui/icons-material/PersonSearch'
+import GradingIcon from '@mui/icons-material/Grading'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -214,6 +215,18 @@ export const navItems: NavItem[] = [
     icon: <CoPresentIcon />,
     section: 'enrollment',
     roles: [ROLE.instructor, ...ADMIN_ROLES],
+  },
+  // Grading (Phase 4, ticket 01): the Instructor's grade sheets, in their own nav section.
+  // A **persona** item on the Instructor role (R04) — grades.enter is also held by Student
+  // Affairs, but their central-entry path is its own ticket, and authority over a particular
+  // Sheet is the Offering assignment, which the server checks. The Department Head's review
+  // queue and the Student's My Grades join this section in later tickets.
+  {
+    key: 'gradeSheets',
+    to: '/grading',
+    icon: <GradingIcon />,
+    section: 'grading',
+    roles: [ROLE.instructor],
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

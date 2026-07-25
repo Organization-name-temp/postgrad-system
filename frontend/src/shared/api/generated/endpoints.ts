@@ -4005,6 +4005,122 @@ export type RecordorCorrectASessionsAttendanceRegister422 = {
   errors?: RecordorCorrectASessionsAttendanceRegister422Errors;
 };
 
+export type MyOfferingsToGrade200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type MyOfferingsToGrade200DataItem = {
+  offering_id?: number;
+  gradable_count?: number;
+  course?: MyOfferingsToGrade200DataItemCourse;
+};
+
+export type MyOfferingsToGrade200 = {
+  data?: MyOfferingsToGrade200DataItem[];
+};
+
+export type OpenAnOfferingsGradeSheet200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+};
+
+export type OpenAnOfferingsGradeSheet200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type OpenAnOfferingsGradeSheet200DataLinesItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type OpenAnOfferingsGradeSheet200DataLinesItemGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type OpenAnOfferingsGradeSheet200DataLinesItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: OpenAnOfferingsGradeSheet200DataLinesItemStudent;
+  grade?: OpenAnOfferingsGradeSheet200DataLinesItemGrade;
+};
+
+export type OpenAnOfferingsGradeSheet200Data = {
+  sheet?: OpenAnOfferingsGradeSheet200DataSheet;
+  course?: OpenAnOfferingsGradeSheet200DataCourse;
+  lines?: OpenAnOfferingsGradeSheet200DataLinesItem[];
+};
+
+export type OpenAnOfferingsGradeSheet200 = {
+  data?: OpenAnOfferingsGradeSheet200Data;
+};
+
+export type OpenAnOfferingsGradeSheet403 = {
+  message?: string;
+};
+
+export type OpenAnOfferingsGradeSheet404 = {
+  message?: string;
+};
+
+export type SaveOneGradeSheetLineBody = {
+  /** The final percentage, 0–100 with at most two decimals. */
+  mark: number;
+};
+
+export type SaveOneGradeSheetLine200DataGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type SaveOneGradeSheetLine200Data = {
+  enrollment_id?: number;
+  grade?: SaveOneGradeSheetLine200DataGrade;
+};
+
+export type SaveOneGradeSheetLine200 = {
+  data?: SaveOneGradeSheetLine200Data;
+};
+
+export type SaveOneGradeSheetLine403 = {
+  message?: string;
+};
+
+export type SaveOneGradeSheetLine404 = {
+  message?: string;
+};
+
+export type SaveOneGradeSheetLine422Errors = {
+  mark?: string[];
+};
+
+export type SaveOneGradeSheetLine422 = {
+  message?: string;
+  errors?: SaveOneGradeSheetLine422Errors;
+};
+
 export type ListMyNotifications200DataItemData = {
   scheduled_at?: string;
 };
@@ -12975,6 +13091,278 @@ export const useRecordorCorrectASessionsAttendanceRegister = <TError = RecordorC
         TContext
       > => {
       return useMutation(getRecordorCorrectASessionsAttendanceRegisterMutationOptions(options), queryClient);
+    }
+
+/**
+ * Every Course Offering the acting user teaches, across all Semesters, each with its
+ * resolved Course and the number of gradable lines its Sheet would carry — the entry point
+ * to each Offering's Grade Sheet. Scoped to the acting user by the Offering assignment: a
+ * user who teaches nothing gets an empty list rather than an error. Each Offering's Sheet
+ * *state* joins this list in ticket 03, with the signature loop that produces one.
+ * @summary My Offerings to grade.
+ */
+export const myOfferingsToGrade = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyOfferingsToGrade200>(
+      {url: `/api/v1/grading/offerings`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyOfferingsToGradeQueryKey = () => {
+    return [
+    `/api/v1/grading/offerings`
+    ] as const;
+    }
+
+
+export const getMyOfferingsToGradeQueryOptions = <TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyOfferingsToGradeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myOfferingsToGrade>>> = ({ signal }) => myOfferingsToGrade(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyOfferingsToGradeQueryResult = NonNullable<Awaited<ReturnType<typeof myOfferingsToGrade>>>
+export type MyOfferingsToGradeQueryError = unknown
+
+
+export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myOfferingsToGrade>>,
+          TError,
+          Awaited<ReturnType<typeof myOfferingsToGrade>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myOfferingsToGrade>>,
+          TError,
+          Awaited<ReturnType<typeof myOfferingsToGrade>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Offerings to grade.
+ */
+
+export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyOfferingsToGradeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**
+ * Enrollment. The Initial round is created **lazily** on this first open (ADR-0023) —
+ * never eagerly at semester end — and re-opening returns the same round rather than
+ * starting another. Each line carries the Student's University ID and name, resolved
+ * through Identity\Public, and the Grade already recorded for it, or `null` while the line
+ * is still blank. Audit and Withdrawn Enrollments are omitted.
+ * Authorised by assignment: an Instructor opening an Offering they do not teach gets a 403.
+ * @summary Open an Offering's Grade Sheet.
+ */
+export const openAnOfferingsGradeSheet = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenAnOfferingsGradeSheet200>(
+      {url: `/api/v1/grading/offerings/${offeringId}/sheet`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenAnOfferingsGradeSheetQueryKey = (offeringId: number,) => {
+    return [
+    `/api/v1/grading/offerings/${offeringId}/sheet`
+    ] as const;
+    }
+
+
+export const getOpenAnOfferingsGradeSheetQueryOptions = <TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenAnOfferingsGradeSheetQueryKey(offeringId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>> = ({ signal }) => openAnOfferingsGradeSheet(offeringId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: offeringId !== null && offeringId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenAnOfferingsGradeSheetQueryResult = NonNullable<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>>
+export type OpenAnOfferingsGradeSheetQueryError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404
+
+
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>,
+          TError,
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>,
+          TError,
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open an Offering's Grade Sheet.
+ */
+
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenAnOfferingsGradeSheetQueryOptions(offeringId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Records the final percentage for a single line and returns the Letter Grade and GPA
+ * points the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale
+ * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
+ * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
+ * outside 0–100 is a 422 naming the field, and an Enrollment that is not a gradable line of
+ * this Sheet's Offering is a 404. Authorised by assignment — only the Offering's Instructor
+ * (else 403).
+ * @summary Save one Grade Sheet line.
+ */
+export const saveOneGradeSheetLine = (
+    gradeSheetId: number,
+    enrollmentId: number,
+    saveOneGradeSheetLineBody: SaveOneGradeSheetLineBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SaveOneGradeSheetLine200>(
+      {url: `/api/v1/grading/sheets/${gradeSheetId}/lines/${enrollmentId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: saveOneGradeSheetLineBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSaveOneGradeSheetLineMutationOptions = <TError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}, TContext> => {
+
+const mutationKey = ['saveOneGradeSheetLine'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, {gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}> = (props) => {
+          const {gradeSheetId,enrollmentId,data} = props ?? {};
+
+          return  saveOneGradeSheetLine(gradeSheetId,enrollmentId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveOneGradeSheetLineMutationResult = NonNullable<Awaited<ReturnType<typeof saveOneGradeSheetLine>>>
+    export type SaveOneGradeSheetLineMutationBody = SaveOneGradeSheetLineBody
+    export type SaveOneGradeSheetLineMutationError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422
+
+    /**
+ * @summary Save one Grade Sheet line.
+ */
+export const useSaveOneGradeSheetLine = <TError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveOneGradeSheetLine>>,
+        TError,
+        {gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody},
+        TContext
+      > => {
+      return useMutation(getSaveOneGradeSheetLineMutationOptions(options), queryClient);
     }
 
 /**

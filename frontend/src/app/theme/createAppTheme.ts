@@ -31,7 +31,17 @@ function toPalette(
     // filled chips/buttons on mid-tone status colours (success/warning) get
     // readable text automatically.
     contrastThreshold: 4.5,
-    primary: { main: s.primary.main, dark: s.primary.dark, contrastText: s.primary.contrastText },
+    primary: {
+      main: s.primary.main,
+      dark: s.primary.dark,
+      contrastText: s.primary.contrastText,
+      // In dark, the accessible brand-red *text* shade is a lighter one — MUI's `.light`
+      // slot, which a text/outlined button reads there (`.dark` serves light mode, and
+      // brand 600 already clears AA on light surfaces). The vivid `.main` is a fill colour,
+      // only ~3.8:1 against the dark surface, so it can never be a label. This is the
+      // `primary.text` token the ramp has always named; until now nothing consumed it.
+      ...(mode === 'dark' ? { light: s.primary.text } : {}),
+    },
     secondary: { main: s.secondary.main },
     error: s.error,
     warning: s.warning,
@@ -123,17 +133,24 @@ export function createAppTheme(lang: string): Theme {
     components: {
       MuiButton: {
         styleOverrides: {
-          // Warning's `.main` is a fill colour, not a text colour (design-system.md §12 /
-          // the token contrast gate). A text or outlined warning button therefore needs the
+          // A tone's `.main` is a fill colour, not a text colour (design-system.md §12 /
+          // the token contrast gate). A text or outlined button therefore needs the
           // accessible shade for its label — `.dark` in light, `.light` in dark — the same
           // rule StatusChip applies to soft/outlined tones. (Contained buttons already get
           // readable text from the 4.5 contrastThreshold above.)
+          //
+          // `warning` came first (Phase 3, ticket 11); `primary` is the same defect and was
+          // simply never scanned in dark until Phase 4 — the vivid brand red is ~3.8:1 on
+          // the dark surface, so every text/outlined primary button (the table row actions
+          // all over the app) was failing AA there.
           root: ({ ownerState, theme }) =>
-            ownerState.color === 'warning' &&
+            (ownerState.color === 'warning' || ownerState.color === 'primary') &&
             (ownerState.variant === 'text' || ownerState.variant === 'outlined')
               ? {
-                  color: theme.vars.palette.warning.dark,
-                  ...theme.applyStyles('dark', { color: theme.vars.palette.warning.light }),
+                  color: theme.vars.palette[ownerState.color].dark,
+                  ...theme.applyStyles('dark', {
+                    color: theme.vars.palette[ownerState.color].light,
+                  }),
                 }
               : {},
         },

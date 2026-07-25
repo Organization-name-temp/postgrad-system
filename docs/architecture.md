@@ -152,7 +152,7 @@ modules/Enrollment/
 | **Admissions** | applications, documents, screening notes, interviews, decisions | Multi-step application, email verification, document upload, SA→Dean→interview→decision workflow, status tracking | Admission |
 | **Catalog** | faculties, departments, programs, courses, course-categories | Program/course CRUD + versioning, the interactive program tree, equivalencies | Program Management |
 | **Enrollment** | enrollments, registration requests, exemptions, transfers, waivers | Registration + advisor approval, add/drop/withdrawal, CH-limit rules, exemption/transfer/waiver processing | Course Registration, Exemption, Transfer & Waiver |
-| **Grading** | grades, grade signatures | Instructor mark entry, letter-grade mapping, sign/finalize/review, Incomplete handling | Grading & GPA |
+| **Grading** | grades, grade sheets | Instructor mark entry, letter-grade mapping, sign/finalize/review, Incomplete handling, **the GPA/CGPA read model** ([ADR-0020](adr/0020-grading-owns-gpa-read-model.md)) | Grading & GPA |
 | **Academic Standing** | standing snapshots, termination cases | Standing classification, termination criteria + workflow | Academic Standing |
 | **Records** | transcript issuances | Transcript generation (official/unofficial), Credit-Hour Summary composition, PDF export | Transcript & Records |
 
@@ -169,6 +169,8 @@ modules/Enrollment/
 `Enrollment` owns *enrollments* (a Student taking a Course in a semester, each with a **Course Status**). `Grading` owns *grades* attached to those enrollments. `Enrollment` also owns *exemptions / transfers / waivers*.
 
 The **Credit-Hour Summary** and **Academic Standing** are **read models** computed on demand from those authoritative records using the counting rules in SRS Appendix D. They are cached in Redis and invalidated by domain events (e.g. `GradeFinalized`, `WithdrawalRecorded`). This keeps a single source of truth and avoids the classic bug of a stored balance drifting from the transactions that produced it. It also satisfies the `GPA/CGPA recalculation ≤ 1s` NFR because a recompute touches one Student's rows only.
+
+> **Amended by [ADR-0020](adr/0020-grading-owns-gpa-read-model.md) (Phase 4).** The **GPA/CGPA** read model is owned by **`Grading`**, not `Records` — a GPA is grade arithmetic and belongs beside the Grades it is arithmetic over, and `Records` is a document-issuance context that is not born until Phase 6. `Records` composes a transcript *from* `Grading\Public`; it does not recompute the average. The Redis caching described above also remains a documented later optimization rather than the built design: this build has no Redis ([ADR-0005](adr/0005-localhost-learning-build.md)), so the values are computed on demand and cannot drift at all. §9's module map below carries the same amendment.
 
 ---
 
@@ -303,7 +305,7 @@ graph TB
 | Course Registration | Enrollment |
 | Exemption | Enrollment |
 | Transfer & Waiver | Enrollment |
-| Grading & GPA | Grading (+ Records for GPA/CGPA read model) |
+| Grading & GPA | Grading (incl. the GPA/CGPA read model — [ADR-0020](adr/0020-grading-owns-gpa-read-model.md), amending the original "+ Records") |
 | Academic Standing | Academic Standing |
 | Transcript & Records | Records |
 | Notification & Alerts | Notifications |

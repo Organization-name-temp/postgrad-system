@@ -86,6 +86,24 @@ enum CourseStatus: string
     }
 
     /**
+     * Whether an Enrollment in this status is a **gradable line** on a Grade Sheet — one an
+     * Instructor is asked for a mark for (ADR-0023, Phase 4). The three for-credit attempt
+     * kinds are; nothing else is, and each for a different reason: an **Audit** is sat without
+     * credit and a **Withdrawal** left the course, so neither ever earns a letter; a
+     * **Transfer**, **Waive** or **Exempted** was decided administratively and was never
+     * taught here; a **Fail-Withdrawal** is the terminal outcome of an expired Incomplete; and
+     * an **Incomplete** is deferred by definition — it is resolved through its own later Sheet
+     * round addressing that one Enrollment, never as a line on the Offering's initial Sheet.
+     *
+     * Gradability is Enrollment's judgement, read across the seam by Grading through
+     * `EnrollmentRecords::gradableEnrollmentsOf()`, so no consumer re-derives it.
+     */
+    public function isGradable(): bool
+    {
+        return $this === self::Regular || $this === self::Retake || $this === self::CgpaImprovement;
+    }
+
+    /**
      * Whether an Enrollment in this status is a **for-credit attempt** that consumes the
      * single retake allowance (FR-REG-006): a prior Regular or Retake burns it, while a
      * Withdrawn (W) or Audit (AU) attempt does not — those re-register as a fresh Regular.

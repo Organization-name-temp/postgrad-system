@@ -34,6 +34,8 @@ import { StudentSchedulePage } from '../features/enrollment/advising/StudentSche
 import { ComposeForStudentPage } from '../features/enrollment/on-behalf/ComposeForStudentPage'
 import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPage'
 import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
+import { GradeSheetsPage } from '../features/grading/instructor/GradeSheetsPage'
+import { GradeSheetPage } from '../features/grading/instructor/GradeSheetPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -91,6 +93,14 @@ export function App() {
                     path="/offerings/:offeringId/register"
                     element={<OfferingRegisterPage />}
                   />
+                </Route>
+                {/* Persona-guarded: Instructors (R04) reach their grade sheets (Phase 4,
+                    ticket 01). grades.enter is also held by Student Affairs, but their
+                    central-entry path is its own ticket; authority over a particular Sheet is
+                    the Offering assignment, re-enforced server-side. */}
+                <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
+                  <Route path="/grading" element={<GradeSheetsPage />} />
+                  <Route path="/grading/offerings/:offeringId" element={<GradeSheetPage />} />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to

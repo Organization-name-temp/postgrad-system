@@ -62,6 +62,14 @@ deptrac:
       collectors:
         - type: classLike
           value: '^Modules\\Enrollment\\Internal\\.*'
+    - name: Grading_Public
+      collectors:
+        - type: classLike
+          value: '^Modules\\Grading\\Public\\.*'
+    - name: Grading_Internal
+      collectors:
+        - type: classLike
+          value: '^Modules\\Grading\\Internal\\.*'
   ruleset:
     # The app may orchestrate modules only through their Public facades.
     App:
@@ -69,6 +77,7 @@ deptrac:
       - Catalog_Public
       - Calendar_Public
       - Enrollment_Public
+      - Grading_Public
     # A module's own Public facade may use its own Internal, and vice versa.
     Identity_Public:
       - Identity_Internal
@@ -131,4 +140,21 @@ deptrac:
       - Catalog_Public
       - Calendar_Public
       - Notifications_Public
+    # Grading (Phase 4, ADR-0020) owns the Grade, the Grade Sheet and — from ticket 04 —
+    # the GPA/CGPA read model. Ticket 01 opens its first edges: it reads the roster and the
+    # Offering's routing facts through the newly-shipped Enrollment\Public facade (ADR-0017's
+    # deferred surface, ADR-0012), the Course through Catalog\Public, and the Student's
+    # identity through Identity\Public. The dependency runs ONE WAY, Grading → Enrollment
+    # (ADR-0022): Enrollment never reads Grading, so there is no Public↔Public cycle to permit
+    # and Enrollment's registration gates stay pure functions over its own rows. The
+    # Calendar\Public and Notifications\Public edges arrive with the tickets that consume them.
+    # Grading\Public holds only the route bindings, which point at the Internal controller (a
+    # same-module Public → Internal reference, the Calendar precedent).
+    Grading_Public:
+      - Grading_Internal
+    Grading_Internal:
+      - Grading_Public
+      - Identity_Public
+      - Catalog_Public
+      - Enrollment_Public
     # No rule grants anyone access to another module's *_Internal — that is the seam.

@@ -72,6 +72,76 @@ export const UnassignADeanFromAFacultyResponse = zod.looseObject({
 
 
 /**
+ * The R06 (Department Head) users an administrator may assign to a scope — the
+ * source for the assignment screen's Head picker. Admin-only (R09/R10).
+ * @summary List assignable Department Heads.
+ */
+export const ListAssignableDepartmentHeadsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Every current assignment with the assigned Head's identity and the opaque
+ * Department id — `null` for the university-wide Preparatory scope. Admin-only
+ * (R09/R10).
+ * @summary List Department-Head↔Department assignments.
+ */
+export const ListDepartmentHeadDepartmentAssignmentsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "university_wide": zod.boolean().optional(),
+  "head_name": zod.string().optional(),
+  "head_email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Creates one Head↔Department routing row. `department_id` is required to be
+ * *present* but may be `null`, which assigns the university-wide Preparatory
+ * scope (the Courses that belong to no Department). The user must hold the
+ * Department Head role (R06) and the (Head, scope) pair must not already exist —
+ * either fails validation (422). Admin-only (R09/R10).
+ * @summary Assign a Department Head to a scope.
+ */
+export const AssignADepartmentHeadToAScopeBody = zod.object({
+  "user_id": zod.number().describe('The Department Head (R06 user) to assign.'),
+  "department_id": zod.number().nullable().describe('The opaque Catalog Department id, or null for the university-wide Preparatory scope.')
+})
+
+export const AssignADepartmentHeadToAScopeResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "university_wide": zod.boolean().optional(),
+  "head_name": zod.string().optional(),
+  "head_email": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Department Head from a scope.
+ */
+export const UnassignADepartmentHeadFromAScopeParams = zod.object({
+  "assignment_id": zod.number().describe('The assignment row id.')
+})
+
+export const UnassignADepartmentHeadFromAScopeResponse = zod.looseObject({
+
+})
+
+
+/**
  * Public, unauthenticated: the front door the registration screen reads to
  * know whether (and into which intake) a stranger may apply. Returns only
  * Cycles that are active and whose window contains the current moment.

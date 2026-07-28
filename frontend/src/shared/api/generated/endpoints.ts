@@ -99,6 +99,86 @@ export type UnassignADeanFromAFaculty404 = {
   message?: string;
 };
 
+export type ListAssignableDepartmentHeads200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableDepartmentHeads200 = {
+  data?: ListAssignableDepartmentHeads200DataItem[];
+};
+
+export type ListAssignableDepartmentHeads403 = {
+  message?: string;
+};
+
+export type ListDepartmentHeadDepartmentAssignments200DataItem = {
+  id?: number;
+  user_id?: number;
+  department_id?: number;
+  university_wide?: boolean;
+  head_name?: string;
+  head_email?: string;
+};
+
+export type ListDepartmentHeadDepartmentAssignments200 = {
+  data?: ListDepartmentHeadDepartmentAssignments200DataItem[];
+};
+
+export type ListDepartmentHeadDepartmentAssignments403 = {
+  message?: string;
+};
+
+export type AssignADepartmentHeadToAScopeBody = {
+  /** The Department Head (R06 user) to assign. */
+  user_id: number;
+  /**
+     * The opaque Catalog Department id, or null for the university-wide Preparatory scope.
+     * @nullable
+     */
+  department_id: number | null;
+};
+
+export type AssignADepartmentHeadToAScope201Data = {
+  id?: number;
+  user_id?: number;
+  department_id?: number;
+  university_wide?: boolean;
+  head_name?: string;
+  head_email?: string;
+};
+
+export type AssignADepartmentHeadToAScope201 = {
+  data?: AssignADepartmentHeadToAScope201Data;
+};
+
+export type AssignADepartmentHeadToAScope403 = {
+  message?: string;
+};
+
+export type AssignADepartmentHeadToAScope422 = {
+  message?: string;
+  errors?: {
+  user_id?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  department_id?: string[];
+};
+};
+
+export type UnassignADepartmentHeadFromAScope204 = { [key: string]: unknown };
+
+export type UnassignADepartmentHeadFromAScope403 = {
+  message?: string;
+};
+
+export type UnassignADepartmentHeadFromAScope404 = {
+  message?: string;
+};
+
 export type ListCurrentlyOpenAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -4510,6 +4590,331 @@ export const useUnassignADeanFromAFaculty = <TError = UnassignADeanFromAFaculty4
         TContext
       > => {
       return useMutation(getUnassignADeanFromAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * The R06 (Department Head) users an administrator may assign to a scope — the
+ * source for the assignment screen's Head picker. Admin-only (R09/R10).
+ * @summary List assignable Department Heads.
+ */
+export const listAssignableDepartmentHeads = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableDepartmentHeads200>(
+      {url: `/api/v1/admin/department-heads`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableDepartmentHeadsQueryKey = () => {
+    return [
+    `/api/v1/admin/department-heads`
+    ] as const;
+    }
+
+
+export const getListAssignableDepartmentHeadsQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableDepartmentHeadsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>> = ({ signal }) => listAssignableDepartmentHeads(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableDepartmentHeadsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>>
+export type ListAssignableDepartmentHeadsQueryError = ListAssignableDepartmentHeads403
+
+
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable Department Heads.
+ */
+
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableDepartmentHeadsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every current assignment with the assigned Head's identity and the opaque
+ * Department id — `null` for the university-wide Preparatory scope. Admin-only
+ * (R09/R10).
+ * @summary List Department-Head↔Department assignments.
+ */
+export const listDepartmentHeadDepartmentAssignments = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListDepartmentHeadDepartmentAssignments200>(
+      {url: `/api/v1/admin/department-head-assignments`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListDepartmentHeadDepartmentAssignmentsQueryKey = () => {
+    return [
+    `/api/v1/admin/department-head-assignments`
+    ] as const;
+    }
+
+
+export const getListDepartmentHeadDepartmentAssignmentsQueryOptions = <TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDepartmentHeadDepartmentAssignmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>> = ({ signal }) => listDepartmentHeadDepartmentAssignments(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListDepartmentHeadDepartmentAssignmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>>
+export type ListDepartmentHeadDepartmentAssignmentsQueryError = ListDepartmentHeadDepartmentAssignments403
+
+
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Department-Head↔Department assignments.
+ */
+
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListDepartmentHeadDepartmentAssignmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Creates one Head↔Department routing row. `department_id` is required to be
+ * *present* but may be `null`, which assigns the university-wide Preparatory
+ * scope (the Courses that belong to no Department). The user must hold the
+ * Department Head role (R06) and the (Head, scope) pair must not already exist —
+ * either fails validation (422). Admin-only (R09/R10).
+ * @summary Assign a Department Head to a scope.
+ */
+export const assignADepartmentHeadToAScope = (
+    assignADepartmentHeadToAScopeBody: AssignADepartmentHeadToAScopeBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AssignADepartmentHeadToAScope201>(
+      {url: `/api/v1/admin/department-head-assignments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: assignADepartmentHeadToAScopeBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAssignADepartmentHeadToAScopeMutationOptions = <TError = AssignADepartmentHeadToAScope403 | AssignADepartmentHeadToAScope422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, TError,{data: AssignADepartmentHeadToAScopeBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, TError,{data: AssignADepartmentHeadToAScopeBody}, TContext> => {
+
+const mutationKey = ['assignADepartmentHeadToAScope'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, {data: AssignADepartmentHeadToAScopeBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  assignADepartmentHeadToAScope(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignADepartmentHeadToAScopeMutationResult = NonNullable<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>>
+    export type AssignADepartmentHeadToAScopeMutationBody = AssignADepartmentHeadToAScopeBody
+    export type AssignADepartmentHeadToAScopeMutationError = AssignADepartmentHeadToAScope403 | AssignADepartmentHeadToAScope422
+
+    /**
+ * @summary Assign a Department Head to a scope.
+ */
+export const useAssignADepartmentHeadToAScope = <TError = AssignADepartmentHeadToAScope403 | AssignADepartmentHeadToAScope422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, TError,{data: AssignADepartmentHeadToAScopeBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>,
+        TError,
+        {data: AssignADepartmentHeadToAScopeBody},
+        TContext
+      > => {
+      return useMutation(getAssignADepartmentHeadToAScopeMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Department Head from a scope.
+ */
+export const unassignADepartmentHeadFromAScope = (
+    assignmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UnassignADepartmentHeadFromAScope204>(
+      {url: `/api/v1/admin/department-head-assignments/${assignmentId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getUnassignADepartmentHeadFromAScopeMutationOptions = <TError = UnassignADepartmentHeadFromAScope403 | UnassignADepartmentHeadFromAScope404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, TError,{assignmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, TError,{assignmentId: number}, TContext> => {
+
+const mutationKey = ['unassignADepartmentHeadFromAScope'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, {assignmentId: number}> = (props) => {
+          const {assignmentId} = props ?? {};
+
+          return  unassignADepartmentHeadFromAScope(assignmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnassignADepartmentHeadFromAScopeMutationResult = NonNullable<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>>
+
+    export type UnassignADepartmentHeadFromAScopeMutationError = UnassignADepartmentHeadFromAScope403 | UnassignADepartmentHeadFromAScope404
+
+    /**
+ * @summary Unassign a Department Head from a scope.
+ */
+export const useUnassignADepartmentHeadFromAScope = <TError = UnassignADepartmentHeadFromAScope403 | UnassignADepartmentHeadFromAScope404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, TError,{assignmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>,
+        TError,
+        {assignmentId: number},
+        TContext
+      > => {
+      return useMutation(getUnassignADepartmentHeadFromAScopeMutationOptions(options), queryClient);
     }
 
 /**

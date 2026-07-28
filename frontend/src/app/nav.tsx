@@ -11,6 +11,7 @@ import FactCheckIcon from '@mui/icons-material/FactCheck'
 import GavelIcon from '@mui/icons-material/Gavel'
 import HowToRegIcon from '@mui/icons-material/HowToReg'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
@@ -234,6 +235,15 @@ export const navItems: NavItem[] = [
     key: 'assignments',
     to: '/admin/assignments',
     icon: <SupervisorAccountIcon />,
+    section: 'administration',
+    adminOnly: true,
+  },
+  // Department-Head↔Department routing (phase 4, ticket 02), beside the Dean map and
+  // under the same role gate — it decides where a signed Grade Sheet goes for review.
+  {
+    key: 'departmentHeads',
+    to: '/admin/department-heads',
+    icon: <ManageAccountsIcon />,
     section: 'administration',
     adminOnly: true,
   },

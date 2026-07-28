@@ -309,6 +309,315 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/admin/department-heads:
+    get:
+      summary: 'List assignable Department Heads.'
+      operationId: listAssignableDepartmentHeads
+      description: "The R06 (Department Head) users an administrator may assign to a scope — the\nsource for the assignment screen's Head picker. Admin-only (R09/R10)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 6
+                      name: 'Dr. Head of Computer Engineering'
+                      email: head.ce@ejust.edu.eg
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 6
+                        name: 'Dr. Head of Computer Engineering'
+                        email: head.ce@ejust.edu.eg
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 6
+                        name:
+                          type: string
+                          example: 'Dr. Head of Computer Engineering'
+                        email:
+                          type: string
+                          example: head.ce@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
+  /api/v1/admin/department-head-assignments:
+    get:
+      summary: 'List Department-Head↔Department assignments.'
+      operationId: listDepartmentHeadDepartmentAssignments
+      description: "Every current assignment with the assigned Head's identity and the opaque\nDepartment id — `null` for the university-wide Preparatory scope. Admin-only\n(R09/R10)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      user_id: 6
+                      department_id: 3
+                      university_wide: false
+                      head_name: 'Dr. Head of Computer Engineering'
+                      head_email: head.ce@ejust.edu.eg
+                    -
+                      id: 2
+                      user_id: 8
+                      department_id: null
+                      university_wide: true
+                      head_name: 'Dr. Preparatory Coordinator'
+                      head_email: prep@ejust.edu.eg
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        user_id: 6
+                        department_id: 3
+                        university_wide: false
+                        head_name: 'Dr. Head of Computer Engineering'
+                        head_email: head.ce@ejust.edu.eg
+                      - id: 2
+                        user_id: 8
+                        department_id: null
+                        university_wide: true
+                        head_name: 'Dr. Preparatory Coordinator'
+                        head_email: prep@ejust.edu.eg
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: integer
+                          example: 6
+                        department_id:
+                          type: integer
+                          example: 3
+                        university_wide:
+                          type: boolean
+                          example: false
+                        head_name:
+                          type: string
+                          example: 'Dr. Head of Computer Engineering'
+                        head_email:
+                          type: string
+                          example: head.ce@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
+    post:
+      summary: 'Assign a Department Head to a scope.'
+      operationId: assignADepartmentHeadToAScope
+      description: "Creates one Head↔Department routing row. `department_id` is required to be\n*present* but may be `null`, which assigns the university-wide Preparatory\nscope (the Courses that belong to no Department). The user must hold the\nDepartment Head role (R06) and the (Head, scope) pair must not already exist —\neither fails validation (422). Admin-only (R09/R10)."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    user_id: 6
+                    department_id: 3
+                    university_wide: false
+                    head_name: 'Dr. Head of Computer Engineering'
+                    head_email: head.ce@ejust.edu.eg
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      user_id:
+                        type: integer
+                        example: 6
+                      department_id:
+                        type: integer
+                        example: 3
+                      university_wide:
+                        type: boolean
+                        example: false
+                      head_name:
+                        type: string
+                        example: 'Dr. Head of Computer Engineering'
+                      head_email:
+                        type: string
+                        example: head.ce@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'not a Department Head'
+                    type: object
+                    example:
+                      message: 'The selected user is not a Department Head.'
+                      errors:
+                        user_id:
+                          - 'The selected user is not a Department Head.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'The selected user is not a Department Head.'
+                      errors:
+                        type: object
+                        properties:
+                          user_id:
+                            type: array
+                            example:
+                              - 'The selected user is not a Department Head.'
+                            items:
+                              type: string
+                  -
+                    description: 'already assigned'
+                    type: object
+                    example:
+                      message: 'This Department Head is already assigned to that department.'
+                      errors:
+                        department_id:
+                          - 'This Department Head is already assigned to that department.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'This Department Head is already assigned to that department.'
+                      errors:
+                        type: object
+                        properties:
+                          department_id:
+                            type: array
+                            example:
+                              - 'This Department Head is already assigned to that department.'
+                            items:
+                              type: string
+      tags:
+        - Administration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  description: 'The Department Head (R06 user) to assign.'
+                  example: 6
+                department_id:
+                  type: integer
+                  description: 'The opaque Catalog Department id, or null for the university-wide Preparatory scope.'
+                  example: 3
+                  nullable: true
+              required:
+                - user_id
+                - department_id
+      security: []
+  '/api/v1/admin/department-head-assignments/{assignment_id}':
+    delete:
+      summary: 'Unassign a Department Head from a scope.'
+      operationId: unassignADepartmentHeadFromAScope
+      description: 'Removes one routing row. Admin-only (R09/R10).'
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+                properties: {}
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model.'
+      tags:
+        - Administration
+      security: []
+    parameters:
+      -
+        in: path
+        name: assignment_id
+        description: 'The assignment row id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/admission-cycles/open:
     get:
       summary: 'List currently-open Admission Cycles.'

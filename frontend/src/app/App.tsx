@@ -26,6 +26,7 @@ import { CyclesPage } from '../features/admin/cycles/CyclesPage'
 import { SemestersPage } from '../features/admin/semesters/SemestersPage'
 import { OfferingsPage } from '../features/admin/offerings/OfferingsPage'
 import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
+import { DepartmentHeadsPage } from '../features/admin/assignments/DepartmentHeadsPage'
 import { RegistrationPage } from '../features/enrollment/registration/RegistrationPage'
 import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
 import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
@@ -134,6 +135,7 @@ export function App() {
                 <Route path="/admin/semesters" element={<SemestersPage />} />
                 <Route path="/admin/semesters/:semesterId/offerings" element={<OfferingsPage />} />
                 <Route path="/admin/assignments" element={<AssignmentsPage />} />
+                <Route path="/admin/department-heads" element={<DepartmentHeadsPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

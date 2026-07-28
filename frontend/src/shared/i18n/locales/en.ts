@@ -44,6 +44,7 @@ export const en = {
       myOfferings: 'My teaching',
       gradeSheets: 'Grade sheets',
       assignments: 'Faculty deans',
+      departmentHeads: 'Department heads',
       sections: {
         admissions: 'Admissions',
         catalog: 'Catalog',
@@ -833,6 +834,43 @@ export const en = {
       cancel: 'Cancel',
       saveError:
         'Could not save the assignment. Check that this Dean is not already assigned to that faculty.',
+    },
+    departmentHeads: {
+      title: 'Department heads',
+      intro:
+        'Assign a Department Head to each department. A Head reviews the grade sheets signed for that department’s courses, and only those.',
+      new: 'Assign a Department Head',
+      empty: 'No Department Head assignments yet.',
+      loading: 'Loading assignments',
+      loadError: 'Could not load the assignments.',
+      head: 'Department Head',
+      scope: 'Reviews',
+      // Named, never a blank cell: the Preparatory courses (PRE401–404) belong to no
+      // department, so their reviewer is assigned to the university as a whole.
+      universityWide: 'University-wide (Preparatory courses)',
+      unknownDepartment: 'Department #{{id}}',
+      scopeHelp:
+        'Pick a department, or the university-wide scope for the Preparatory courses that belong to no department.',
+      uncoveredTitle: 'These have no Department Head',
+      uncoveredBody: 'Grade sheets signed for them will have nobody to review them.',
+      coverageUnknown:
+        'Could not load the departments, so this page cannot tell you which ones have no Head.',
+      actions: 'Actions',
+      unassign: 'Unassign',
+      unassignAria: 'Unassign {{head}} from {{scope}}',
+      unassignTitle: 'Unassign this Department Head?',
+      unassignBody:
+        'Unassign {{head}} from {{scope}}? They will no longer review its grade sheets. This does not affect grades already finalized.',
+      unassigning: 'Unassigning…',
+      unassignError: 'Could not remove that assignment. Please try again.',
+      dialogTitle: 'Assign a Department Head',
+      selectHead: 'Department Head',
+      selectScope: 'Reviews',
+      save: 'Assign',
+      saving: 'Assigning…',
+      cancel: 'Cancel',
+      saveError:
+        'Could not save the assignment. Check that this Head is not already assigned to that scope.',
     },
   },
   enrollment: {

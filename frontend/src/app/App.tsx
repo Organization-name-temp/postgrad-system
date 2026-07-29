@@ -37,6 +37,8 @@ import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPa
 import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
 import { GradeSheetsPage } from '../features/grading/instructor/GradeSheetsPage'
 import { GradeSheetPage } from '../features/grading/instructor/GradeSheetPage'
+import { DepartmentHeadQueuePage } from '../features/grading/department-head/DepartmentHeadQueuePage'
+import { DepartmentHeadSheetPage } from '../features/grading/department-head/DepartmentHeadSheetPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -102,6 +104,15 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
                   <Route path="/grading" element={<GradeSheetsPage />} />
                   <Route path="/grading/offerings/:offeringId" element={<GradeSheetPage />} />
+                </Route>
+                {/* The Department Head's review of a signed Grade Sheet (Phase 4, ticket 03):
+                    persona-guarded to R06 — both Instructor and Department Head hold
+                    grades.finalize, so the distinguishing gate is the role, not the permission,
+                    matching the myOfferings precedent. The Department scope is re-enforced
+                    server-side (ScopesToDepartmentHead). */}
+                <Route element={<RequireAuth roles={[ROLE.departmentHead]} />}>
+                  <Route path="/grading/review" element={<DepartmentHeadQueuePage />} />
+                  <Route path="/grading/review/:sheetId" element={<DepartmentHeadSheetPage />} />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to

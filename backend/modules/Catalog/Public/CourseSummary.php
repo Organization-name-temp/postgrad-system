@@ -24,6 +24,12 @@ use Modules\Identity\Public\UserSummary;
  * `'Seminar'`, or `null`) rather than the {@see ResearchType}
  * enum, which stays Catalog-internal — so reading it never drags an Internal type
  * across the seam. An immutable value object — the facade builds it, callers only read it.
+ *
+ * {@see $departmentId} is the opaque, nullable Department reference (ADR-0012):
+ * NULL is the shared, university-wide Preparatory scope (ADR-0010). Grading is the
+ * first consumer to read it (ticket 03) — routing a signed Grade Sheet to its
+ * Department Head is "the Sheet's Offering's Course's Department", matched against
+ * `Identity\Public`'s DepartmentHeadAssignments with no special case for NULL.
  */
 final readonly class CourseSummary
 {
@@ -36,6 +42,7 @@ final readonly class CourseSummary
         public int $totalCh,
         public ?string $researchType,
         public bool $isActive,
+        public ?int $departmentId,
     ) {}
 
     /**
@@ -44,7 +51,7 @@ final readonly class CourseSummary
      * so every screen that embeds a Course (the offerings list, later the eligible
      * list) renders it identically. The level is the numeric enum value.
      *
-     * @return array{id: int, code: string, name_en: string, name_ar: string, level: int, total_ch: int, research_type: string|null, is_active: bool}
+     * @return array{id: int, code: string, name_en: string, name_ar: string, level: int, total_ch: int, research_type: string|null, is_active: bool, department_id: int|null}
      */
     public function toArray(): array
     {
@@ -57,6 +64,7 @@ final readonly class CourseSummary
             'total_ch' => $this->totalCh,
             'research_type' => $this->researchType,
             'is_active' => $this->isActive,
+            'department_id' => $this->departmentId,
         ];
     }
 }

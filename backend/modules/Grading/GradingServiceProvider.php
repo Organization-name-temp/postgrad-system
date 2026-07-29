@@ -2,8 +2,11 @@
 
 namespace Modules\Grading;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Grading\Internal\Events\GradeFinalized;
+use Modules\Grading\Internal\Listeners\SendGradeFinalizedNotifications;
 
 /**
  * The Grading domain module (ADR-0020): it owns the Grade, the Grade Sheet, and — in later
@@ -35,9 +38,14 @@ class GradingServiceProvider extends ServiceProvider
 
         // The module owns its /api/v1 routes (ADR-0002). Authorization gates are already
         // registered from the §3.2 matrix by Identity (ADR-0008); Grading consumes
-        // grades.enter via `can:` middleware, adding no permissions of its own.
+        // grades.enter/grades.finalize via `can:` middleware, adding no permissions of its own.
         Route::middleware('api')
             ->prefix('api/v1')
             ->group(__DIR__.'/Public/Http/routes.php');
+
+        // GradeFinalized carries side-effects only (ticket 03: the Student notification);
+        // Phase 5's standing recompute hangs its own listener off this same event later
+        // without touching the finalize (the Admissions AdmissionAccepted precedent).
+        Event::listen(GradeFinalized::class, SendGradeFinalizedNotifications::class);
     }
 }

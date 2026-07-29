@@ -5,9 +5,11 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Link as RouterLink, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
+  getMyOfferingsToGradeQueryKey,
   getOpenAnOfferingsGradeSheetQueryKey as sheetQueryKey,
   useOpenAnOfferingsGradeSheet,
   useSaveOneGradeSheetLine,
+  useSignTheSheet,
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
@@ -35,6 +37,7 @@ export function GradeSheetPage() {
 
   const { data, isPending, isError, error } = useOpenAnOfferingsGradeSheet(offeringId)
   const saveLine = useSaveOneGradeSheetLine()
+  const sign = useSignTheSheet()
 
   // What is currently typed in each row, keyed by enrollment id. Seeded from the server's
   // recorded marks the first time the Sheet loads, then owned here — so a row the Instructor
@@ -42,6 +45,7 @@ export function GradeSheetPage() {
   const [drafts, setDrafts] = useState<Record<number, string> | null>(null)
   const [errors, setErrors] = useState<Record<number, string>>({})
   const [savingEnrollmentId, setSavingEnrollmentId] = useState<number | null>(null)
+  const [signError, setSignError] = useState<string | null>(null)
 
   const loaded = data?.data
   const course = loaded?.course
@@ -62,6 +66,12 @@ export function GradeSheetPage() {
     Object.fromEntries(
       lines.map((line) => [line.enrollment_id, line.grade?.mark?.toString() ?? '']),
     )
+
+  // The Sheet may be signed from Draft or Returned (ADR-0023); Submitted and Finalized are
+  // read-only. Blank lines are recorded Grades still missing, not the mid-typed draft — the
+  // same count the server's blank-line guard enforces.
+  const canSign = sheetStatus === 'Draft' || sheetStatus === 'Returned'
+  const blankCount = lines.filter((line) => line.grade === null).length
 
   const setDraft = (enrollmentId: number, value: string) => {
     setDrafts({ ...seeded, [enrollmentId]: value })
@@ -104,6 +114,29 @@ export function GradeSheetPage() {
     }
   }
 
+  /**
+   * Sign the Sheet as one act (SRS §4.7.1.4). The blank-line count already rendered below the
+   * button is the same guard the server enforces, so this is a defence against a stale client —
+   * not the Instructor's first signal that lines remain. A 422 here still surfaces the server's
+   * message, in case the roster changed since the page loaded.
+   */
+  const handleSign = async () => {
+    if (sheetId === undefined) return
+
+    setSignError(null)
+    try {
+      await sign.mutateAsync({ gradeSheetId: sheetId })
+      await queryClient.invalidateQueries({ queryKey: sheetQueryKey(offeringId) })
+      await queryClient.invalidateQueries({ queryKey: getMyOfferingsToGradeQueryKey() })
+    } catch (signingError) {
+      setSignError(
+        apiFieldErrors(signingError).lines?.[0] ??
+          apiErrorMessage(signingError) ??
+          t('sheet.signError'),
+      )
+    }
+  }
+
   return (
     <>
       <Button component={RouterLink} to="/grading" startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
@@ -128,6 +161,12 @@ export function GradeSheetPage() {
       {isPending && <CircularProgress aria-label={t('sheet.loading')} />}
       {isError && <Alert severity="error">{apiErrorMessage(error) ?? t('sheet.loadError')}</Alert>}
 
+      {sheet && sheetStatus === 'Returned' && sheet.review_note && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          {t('sheet.returnedNote', { note: sheet.review_note })}
+        </Alert>
+      )}
+
       {sheet && (
         <Paper variant="outlined" sx={{ borderRadius: 3, p: { xs: 1.5, sm: 2 } }}>
           {lines.length === 0 ? (
@@ -148,6 +187,24 @@ export function GradeSheetPage() {
                 onCommit={commit}
               />
             </>
+          )}
+
+          {canSign && (
+            <Stack spacing={1} sx={{ mt: 3, alignItems: 'flex-start' }}>
+              {signError && <Alert severity="error">{signError}</Alert>}
+              <Typography variant="body2" color="text.secondary">
+                {blankCount > 0
+                  ? t('sheet.blankCount', { count: blankCount })
+                  : t('sheet.allGraded')}
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={handleSign}
+                disabled={blankCount > 0 || sign.isPending}
+              >
+                {t('sheet.sign')}
+              </Button>
+            </Stack>
           )}
         </Paper>
       )}

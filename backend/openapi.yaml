@@ -14037,7 +14037,7 @@ paths:
     get:
       summary: 'My Offerings to grade.'
       operationId: myOfferingsToGrade
-      description: "Every Course Offering the acting user teaches, across all Semesters, each with its\nresolved Course and the number of gradable lines its Sheet would carry — the entry point\nto each Offering's Grade Sheet. Scoped to the acting user by the Offering assignment: a\nuser who teaches nothing gets an empty list rather than an error. Each Offering's Sheet\n*state* joins this list in ticket 03, with the signature loop that produces one."
+      description: "Every Course Offering the acting user teaches, across all Semesters, each with its\nresolved Course, the number of gradable lines its Sheet would carry, and the Initial\nround's state — `null` while unstarted, else Draft/Submitted/Returned/Finalized (ticket\n03) — the entry point to each Offering's Grade Sheet. Scoped to the acting user by the\nOffering assignment: a user who teaches nothing gets an empty list rather than an error."
       parameters: []
       responses:
         200:
@@ -14051,6 +14051,7 @@ paths:
                     -
                       offering_id: 3
                       gradable_count: 12
+                      sheet_status: Draft
                       course:
                         id: 1
                         code: DEP501
@@ -14067,6 +14068,7 @@ paths:
                       -
                         offering_id: 3
                         gradable_count: 12
+                        sheet_status: Draft
                         course:
                           id: 1
                           code: DEP501
@@ -14085,6 +14087,9 @@ paths:
                         gradable_count:
                           type: integer
                           example: 12
+                        sheet_status:
+                          type: string
+                          example: Draft
                         course:
                           type: object
                           properties:
@@ -14135,7 +14140,10 @@ paths:
                       id: 1
                       course_offering_id: 3
                       kind: Initial
-                      status: Draft
+                      status: Returned
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: '2026-08-11T09:00:00+00:00'
+                      review_note: 'Please recheck line 3.'
                     course:
                       id: 1
                       code: DEP501
@@ -14145,6 +14153,7 @@ paths:
                       total_ch: 3
                       research_type: null
                       is_active: true
+                      department_id: 1
                     lines:
                       -
                         enrollment_id: 5
@@ -14176,7 +14185,16 @@ paths:
                             example: Initial
                           status:
                             type: string
-                            example: Draft
+                            example: Returned
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: '2026-08-11T09:00:00+00:00'
+                          review_note:
+                            type: string
+                            example: 'Please recheck line 3.'
                       course:
                         type: object
                         properties:
@@ -14205,6 +14223,9 @@ paths:
                           is_active:
                             type: boolean
                             example: true
+                          department_id:
+                            type: integer
+                            example: 1
                       lines:
                         type: array
                         example:
@@ -14409,6 +14430,649 @@ paths:
         name: enrollment_id
         description: 'The ID of the gradable enrollment being marked.'
         example: 5
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/sheets/{grade_sheet_id}/sign':
+    post:
+      summary: 'Sign the Sheet.'
+      operationId: signTheSheet
+      description: "The Instructor's signature — one act that sends the whole round to the Department Head\n(SRS §4.7.1.4). Draft or Returned → Submitted (ADR-0023); any other current state is a\n409. Refused with a 422 naming how many lines are still blank — the UI already shows\nthat count from the Sheet's own lines, so this is a defence against a stale client, not\nthe Instructor's first signal. Once Submitted, the Sheet is read-only to everyone,\nincluding its own Instructor, and every configured Department Head (or the\nuniversity-wide Head for a department-less Preparatory Offering) is notified."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Submitted
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: null
+                      review_note: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Submitted
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        409:
+          description: 'already submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A grade sheet cannot move from Submitted to Submitted.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A grade sheet cannot move from Submitted to Submitted.'
+        422:
+          description: 'blank lines remain'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet still has 2 ungraded line(s) remaining.'
+                  errors:
+                    lines:
+                      - 'This grade sheet still has 2 ungraded line(s) remaining.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet still has 2 ungraded line(s) remaining.'
+                  errors:
+                    type: object
+                    properties:
+                      lines:
+                        type: array
+                        example:
+                          - 'This grade sheet still has 2 ungraded line(s) remaining.'
+                        items:
+                          type: string
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/grading/department-head/sheets:
+    get:
+      summary: "The Department Head's review queue."
+      operationId: theDepartmentHeadsReviewQueue
+      description: "Every Submitted Grade Sheet routed to the acting Head's Department(s) — including, for a\nHead assigned university-wide, the department-less Preparatory Offerings a\nDepartment-scoped Head never sees ({@see ScopesToDepartmentHead}). Oldest signature\nfirst."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 4
+                      course_offering_id: 3
+                      kind: Initial
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      course:
+                        id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        total_ch: 3
+                        research_type: null
+                        is_active: true
+                        department_id: 1
+                      instructor:
+                        id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 4
+                        course_offering_id: 3
+                        kind: Initial
+                        signed_at: '2026-08-10T09:00:00+00:00'
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                          department_id: 1
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 4
+                        course_offering_id:
+                          type: integer
+                          example: 3
+                        kind:
+                          type: string
+                          example: Initial
+                        signed_at:
+                          type: string
+                          example: '2026-08-10T09:00:00+00:00'
+                        course:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: DEP501
+                            name_en:
+                              type: string
+                              example: 'Advanced Algorithms'
+                            name_ar:
+                              type: string
+                              example: 'خوارزميات متقدمة'
+                            level:
+                              type: integer
+                              example: 500
+                            total_ch:
+                              type: integer
+                              example: 3
+                            research_type:
+                              type: string
+                              example: null
+                              nullable: true
+                            is_active:
+                              type: boolean
+                              example: true
+                            department_id:
+                              type: integer
+                              example: 1
+                        instructor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            name:
+                              type: string
+                              example: 'Dr. Instructor'
+                            email:
+                              type: string
+                              example: instructor@ejust.test
+      tags:
+        - Grading
+      security: []
+  '/api/v1/grading/department-head/sheets/{grade_sheet_id}':
+    get:
+      summary: 'Open one Sheet for review.'
+      operationId: openOneSheetForReview
+      description: "Every mark, letter and Incomplete on the round, the Student identity per line, and the\nOffering's grade distribution — a view, not a report (Phase 7 owns reporting). Scoped\nexactly as the queue: a Sheet outside the acting Head's Department is a 403, regardless\nof its status."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Submitted
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: null
+                      review_note: null
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                      department_id: 1
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade:
+                          mark: 82.5
+                          letter_grade: B
+                          gpa_points: 3
+                    distribution:
+                      -
+                        letter: A+
+                        count: 0
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Submitted
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                          department_id:
+                            type: integer
+                            example: 1
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade:
+                              mark: 82.5
+                              letter_grade: B
+                              gpa_points: 3
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: object
+                              properties:
+                                mark:
+                                  type: number
+                                  example: 82.5
+                                letter_grade:
+                                  type: string
+                                  example: B
+                                gpa_points:
+                                  type: integer
+                                  example: 3
+                      distribution:
+                        type: array
+                        example:
+                          - letter: A+
+                            count: 0
+                        items:
+                          type: object
+                          properties:
+                            letter:
+                              type: string
+                              example: A+
+                            count:
+                              type: integer
+                              example: 0
+        403:
+          description: "not this sheet's department head"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet does not belong to your department.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet does not belong to your department.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/department-head/sheets/{grade_sheet_id}/finalize':
+    post:
+      summary: 'Finalize the Sheet.'
+      operationId: finalizeTheSheet
+      description: "Submitted → Finalized (else a 409): the round's Grades become part of the academic\nrecord and the round is permanently closed (ADR-0023). In the same transaction, `earned`\n— \"this Attempt reached C+ and earned its credit hours\" — is written onto every graded\nEnrollment through `Enrollment\\Public` (ADR-0022), which remains the sole writer of its\nown column. After commit, `GradeFinalized` fires for its side effects only — today, one\nnotification per Student carrying their letter and whether it fell below C+."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Finalized
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: '2026-08-11T09:00:00+00:00'
+                      review_note: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Finalized
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: '2026-08-11T09:00:00+00:00'
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+        403:
+          description: "not this sheet's department head"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet does not belong to your department.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet does not belong to your department.'
+        409:
+          description: 'not submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A grade sheet cannot move from Draft to Finalized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A grade sheet cannot move from Draft to Finalized.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/department-head/sheets/{grade_sheet_id}/return':
+    post:
+      summary: 'Return the Sheet with a note.'
+      operationId: returnTheSheetWithANote
+      description: "Submitted → Returned (else a 409): the round becomes editable and re-signable again, and\nthe note reaches the Instructor as a notification. A note is required — a bilingual 422\nwhen it is missing."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Returned
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: '2026-08-11T09:00:00+00:00'
+                      review_note: 'Please recheck line 3.'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Returned
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: '2026-08-11T09:00:00+00:00'
+                          review_note:
+                            type: string
+                            example: 'Please recheck line 3.'
+        403:
+          description: "not this sheet's department head"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet does not belong to your department.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet does not belong to your department.'
+        409:
+          description: 'not submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A grade sheet cannot move from Draft to Returned.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A grade sheet cannot move from Draft to Returned.'
+        422:
+          description: 'missing note'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A note is required when returning a grade sheet to its instructor.'
+                  errors:
+                    note:
+                      - 'A note is required when returning a grade sheet to its instructor.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A note is required when returning a grade sheet to its instructor.'
+                  errors:
+                    type: object
+                    properties:
+                      note:
+                        type: array
+                        example:
+                          - 'A note is required when returning a grade sheet to its instructor.'
+                        items:
+                          type: string
+      tags:
+        - Grading
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  description: 'Why the sheet is being returned.'
+                  example: 'The distribution looks implausible — please recheck line 5.'
+              required:
+                - note
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
         required: true
         schema:
           type: integer

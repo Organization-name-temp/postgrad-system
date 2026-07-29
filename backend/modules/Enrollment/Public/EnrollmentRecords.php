@@ -67,4 +67,22 @@ interface EnrollmentRecords
      * @return array<int, int>
      */
     public function gradableCountsFor(array $offeringIds): array;
+
+    /**
+     * The summary of the Enrollment with the given id, or `null` when no such Enrollment
+     * exists — unlike {@see self::gradableEnrollmentsOf()}, this is **not** filtered by
+     * gradability, because a caller resolving a Grade's `enrollment_id` (ticket 03's
+     * finalize notification, ticket 05's Incomplete resolution) must reach it even while its
+     * Course Status is Incomplete or otherwise not a gradable line.
+     */
+    public function findEnrollment(int $enrollmentId): ?EnrollmentSummary;
+
+    /**
+     * Write the single `earned` bit onto an Enrollment — "this Attempt reached C+ and earned
+     * its credit hours" (ADR-0022). The **only** writer of this column: called by Grading from
+     * inside the same transaction as a Sheet's finalize, never on its own. `$earned` is
+     * nullable so a resolution or correction can restore it to `null` (pending) as well as set
+     * it true/false; Enrollment stores it verbatim and interprets nothing.
+     */
+    public function recordOutcome(int $enrollmentId, ?bool $earned): void;
 }

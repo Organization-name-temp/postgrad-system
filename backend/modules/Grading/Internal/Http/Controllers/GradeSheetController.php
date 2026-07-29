@@ -4,18 +4,22 @@ namespace Modules\Grading\Internal\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentSummary;
 use Modules\Enrollment\Public\OfferingSummary;
 use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
+use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
+use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
+use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
-use Modules\Identity\Public\StudentSummary;
-use Modules\Identity\Public\UserSummary;
+use Modules\Notifications\Public\Contracts\Notifier;
+use Modules\Notifications\Public\Enums\NotificationType;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -43,16 +47,19 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  */
 class GradeSheetController
 {
+    use BuildsSheetPayload;
+    use ScopesToDepartmentHead;
+
     /**
      * My Offerings to grade.
      *
      * Every Course Offering the acting user teaches, across all Semesters, each with its
-     * resolved Course and the number of gradable lines its Sheet would carry — the entry point
-     * to each Offering's Grade Sheet. Scoped to the acting user by the Offering assignment: a
-     * user who teaches nothing gets an empty list rather than an error. Each Offering's Sheet
-     * *state* joins this list in ticket 03, with the signature loop that produces one.
+     * resolved Course, the number of gradable lines its Sheet would carry, and the Initial
+     * round's state — `null` while unstarted, else Draft/Submitted/Returned/Finalized (ticket
+     * 03) — the entry point to each Offering's Grade Sheet. Scoped to the acting user by the
+     * Offering assignment: a user who teaches nothing gets an empty list rather than an error.
      *
-     * @response 200 {"data": [{"offering_id": 3, "gradable_count": 12, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}}]}
+     * @response 200 {"data": [{"offering_id": 3, "gradable_count": 12, "sheet_status": "Draft", "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}}]}
      */
     public function offerings(
         Request $request,
@@ -61,20 +68,25 @@ class GradeSheetController
     ): JsonResponse {
         $offerings = $enrollments->offeringsTaughtBy($this->actingUserId($request));
 
-        // Two batched reads for the whole list, never one per row: the Courses through the
-        // Catalog facade, the roster sizes through the Enrollment facade (ADR-0012).
+        // Three batched reads for the whole list, never one per row: the Courses through the
+        // Catalog facade, the roster sizes through the Enrollment facade, and each Offering's
+        // Initial-round state from Grading's own table (ADR-0012).
         $resolved = $courses->findMany(array_values(array_unique(array_map(
             fn (OfferingSummary $offering): int => $offering->courseId,
             $offerings,
         ))));
-        $counts = $enrollments->gradableCountsFor(array_map(
-            fn (OfferingSummary $offering): int => $offering->id,
-            $offerings,
-        ));
+        $offeringIds = array_map(fn (OfferingSummary $offering): int => $offering->id, $offerings);
+        $counts = $enrollments->gradableCountsFor($offeringIds);
+        $sheets = $offeringIds === [] ? collect() : GradeSheet::query()
+            ->where('kind', GradeSheetKind::Initial)
+            ->whereIn('course_offering_id', $offeringIds)
+            ->get()
+            ->keyBy(fn (GradeSheet $sheet): int => (int) $sheet->course_offering_id);
 
         $rows = array_map(fn (OfferingSummary $offering): array => [
             'offering_id' => $offering->id,
             'gradable_count' => $counts[$offering->id] ?? 0,
+            'sheet_status' => $sheets->get($offering->id)?->status->value,
             'course' => ($resolved[$offering->courseId] ?? null)?->toArray(),
         ], $offerings);
 
@@ -94,7 +106,7 @@ class GradeSheetController
      *
      * @urlParam offering_id integer required The ID of the course offering. Example: 3
      *
-     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Draft"}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}}]}}
+     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Returned", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": "2026-08-11T09:00:00+00:00", "review_note": "Please recheck line 3."}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}}]}}
      * @response 403 scenario="not the assigned instructor" {"message": "You are not assigned to teach this offering."}
      * @response 404 scenario="no such offering" {"message": "That course offering no longer exists."}
      */
@@ -181,6 +193,54 @@ class GradeSheetController
     }
 
     /**
+     * Sign the Sheet.
+     *
+     * The Instructor's signature — one act that sends the whole round to the Department Head
+     * (SRS §4.7.1.4). Draft or Returned → Submitted (ADR-0023); any other current state is a
+     * 409. Refused with a 422 naming how many lines are still blank — the UI already shows
+     * that count from the Sheet's own lines, so this is a defence against a stale client, not
+     * the Instructor's first signal. Once Submitted, the Sheet is read-only to everyone,
+     * including its own Instructor, and every configured Department Head (or the
+     * university-wide Head for a department-less Preparatory Offering) is notified.
+     *
+     * @urlParam grade_sheet_id integer required The ID of the grade sheet. Example: 1
+     *
+     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Submitted", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": null, "review_note": null}}}
+     * @response 403 scenario="not the assigned instructor" {"message": "You are not assigned to teach this offering."}
+     * @response 409 scenario="already submitted" {"message": "A grade sheet cannot move from Submitted to Submitted."}
+     * @response 422 scenario="blank lines remain" {"message": "This grade sheet still has 2 ungraded line(s) remaining.", "errors": {"lines": ["This grade sheet still has 2 ungraded line(s) remaining."]}}
+     */
+    public function sign(
+        Request $request,
+        GradeSheet $gradeSheet,
+        EnrollmentRecords $enrollments,
+        CourseCatalog $courses,
+        DepartmentHeadAssignments $heads,
+        Notifier $notifier,
+    ): JsonResponse {
+        $offering = $this->authorizeOffering($gradeSheet->course_offering_id, $request, $enrollments);
+
+        $blank = count($enrollments->gradableEnrollmentsOf($offering->id)) - $gradeSheet->grades()->count();
+        if ($blank > 0) {
+            throw ValidationException::withMessages([
+                'lines' => [__('grading.sheet.blank_lines_remain', ['count' => $blank])],
+            ]);
+        }
+
+        $gradeSheet->sign($this->actingUserId($request));
+
+        $departmentId = $this->departmentIdFor($offering, $courses);
+        foreach ($heads->headsForDepartment($departmentId) as $headUserId) {
+            $notifier->notify($headUserId, NotificationType::GradeSheetSubmitted, [
+                'course_offering_id' => $offering->id,
+                'grade_sheet_id' => $gradeSheet->getKey(),
+            ]);
+        }
+
+        return response()->json(['data' => ['sheet' => $this->sheetArray($gradeSheet)]]);
+    }
+
+    /**
      * The Offering the acting user is working, or an abort: a 404 when the reference dangles,
      * a 403 when they are not its assigned Instructor. Authority over a Sheet is the Offering
      * assignment, not the `grades.enter` permission the route already checked — Student
@@ -229,85 +289,6 @@ class GradeSheetController
         }
 
         abort(404, __('grading.line.not_gradable'));
-    }
-
-    /**
-     * One Sheet's wire shape — the round's identity and state, which the SPA renders as a
-     * StatusChip.
-     *
-     * @return array{id: int, course_offering_id: int, kind: string, status: string}
-     */
-    private function sheetArray(GradeSheet $sheet): array
-    {
-        return [
-            'id' => (int) $sheet->getKey(),
-            'course_offering_id' => (int) $sheet->course_offering_id,
-            'kind' => $sheet->kind->value,
-            'status' => $sheet->status->value,
-        ];
-    }
-
-    /**
-     * The Sheet's lines: one per gradable Enrollment, carrying the Student's identity and the
-     * Grade recorded so far (or `null` while blank). Student names and University IDs are
-     * resolved through Identity\Public in one batched read each (ADR-0012), and the Grades in
-     * one query keyed by Enrollment — so a roster of any size costs three reads, not 3N.
-     *
-     * @param  list<EnrollmentSummary>  $roster
-     * @return list<array<string, mixed>>
-     */
-    private function lineArrays(GradeSheet $sheet, array $roster, StudentDirectory $students, Directory $directory): array
-    {
-        if ($roster === []) {
-            return [];
-        }
-
-        $grades = Grade::query()
-            ->where('grade_sheet_id', $sheet->getKey())
-            ->get()
-            ->keyBy(fn (Grade $grade): int => (int) $grade->enrollment_id);
-
-        $summaries = $students->findManyByStudentId(array_values(array_unique(array_map(
-            fn (EnrollmentSummary $enrollment): int => $enrollment->studentId,
-            $roster,
-        ))));
-        $users = $directory->findMany(array_values(array_map(
-            fn (StudentSummary $summary): int => $summary->userId,
-            $summaries,
-        )));
-
-        return array_map(function (EnrollmentSummary $enrollment) use ($grades, $summaries, $users): array {
-            $summary = $summaries[$enrollment->studentId] ?? null;
-
-            return [
-                'enrollment_id' => $enrollment->id,
-                'course_status' => $enrollment->courseStatus,
-                'credit_hours' => $enrollment->creditHours,
-                'student' => [
-                    'student_id' => $enrollment->studentId,
-                    'university_id' => $summary?->universityId,
-                    'name' => $this->studentName($enrollment, $summary, $users),
-                ],
-                'grade' => $grades->get($enrollment->id)?->toLineArray(),
-            ];
-        }, $roster);
-    }
-
-    /**
-     * A line's Student display name: the Identity user's name, falling back to the University
-     * ID and then to the anchor id — the Student anchor carries no name of its own (ADR-0013),
-     * so the fallbacks keep a dangling reference legible instead of blank. The attendance
-     * register's roster resolves a name the same way.
-     *
-     * @param  array<int, UserSummary>  $users
-     */
-    private function studentName(EnrollmentSummary $enrollment, ?StudentSummary $summary, array $users): string
-    {
-        if ($summary === null) {
-            return "student #{$enrollment->studentId}";
-        }
-
-        return $users[$summary->userId]->name ?? $summary->universityId;
     }
 
     private function actingUserId(Request $request): int

@@ -89,6 +89,30 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
             ->all();
     }
 
+    public function findEnrollment(int $enrollmentId): ?EnrollmentSummary
+    {
+        $enrollment = Enrollment::query()->find($enrollmentId);
+
+        return $enrollment === null ? null : $this->toEnrollmentSummary($enrollment);
+    }
+
+    public function recordOutcome(int $enrollmentId, ?bool $earned): void
+    {
+        Enrollment::query()->whereKey($enrollmentId)->update(['earned' => $earned]);
+    }
+
+    private function toEnrollmentSummary(Enrollment $enrollment): EnrollmentSummary
+    {
+        return new EnrollmentSummary(
+            id: (int) $enrollment->getKey(),
+            studentId: (int) $enrollment->student_id,
+            courseOfferingId: (int) $enrollment->course_offering_id,
+            classification: $enrollment->classification->value,
+            courseStatus: $enrollment->course_status->value,
+            creditHours: (int) $enrollment->credit_hours,
+        );
+    }
+
     private function toOfferingSummary(CourseOffering $offering): OfferingSummary
     {
         return new OfferingSummary(

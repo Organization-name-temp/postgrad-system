@@ -3698,16 +3698,17 @@ export const RecordorCorrectASessionsAttendanceRegisterResponse = zod.object({
 
 /**
  * Every Course Offering the acting user teaches, across all Semesters, each with its
- * resolved Course and the number of gradable lines its Sheet would carry — the entry point
- * to each Offering's Grade Sheet. Scoped to the acting user by the Offering assignment: a
- * user who teaches nothing gets an empty list rather than an error. Each Offering's Sheet
- * *state* joins this list in ticket 03, with the signature loop that produces one.
+ * resolved Course, the number of gradable lines its Sheet would carry, and the Initial
+ * round's state — `null` while unstarted, else Draft/Submitted/Returned/Finalized (ticket
+ * 03) — the entry point to each Offering's Grade Sheet. Scoped to the acting user by the
+ * Offering assignment: a user who teaches nothing gets an empty list rather than an error.
  * @summary My Offerings to grade.
  */
 export const MyOfferingsToGradeResponse = zod.object({
   "data": zod.array(zod.object({
   "offering_id": zod.number().optional(),
   "gradable_count": zod.number().optional(),
+  "sheet_status": zod.string().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3742,7 +3743,10 @@ export const OpenAnOfferingsGradeSheetResponse = zod.object({
   "id": zod.number().optional(),
   "course_offering_id": zod.number().optional(),
   "kind": zod.string().optional(),
-  "status": zod.string().optional()
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().optional(),
+  "review_note": zod.string().optional()
 }).optional(),
   "course": zod.object({
   "id": zod.number().optional(),
@@ -3752,7 +3756,8 @@ export const OpenAnOfferingsGradeSheetResponse = zod.object({
   "level": zod.number().optional(),
   "total_ch": zod.number().optional(),
   "research_type": zod.string().nullish(),
-  "is_active": zod.boolean().optional()
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
 }).optional(),
   "lines": zod.array(zod.object({
   "enrollment_id": zod.number().optional(),
@@ -3799,6 +3804,181 @@ export const SaveOneGradeSheetLineResponse = zod.object({
   "mark": zod.number().optional(),
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * The Instructor's signature — one act that sends the whole round to the Department Head
+ * (SRS §4.7.1.4). Draft or Returned → Submitted (ADR-0023); any other current state is a
+ * 409. Refused with a 422 naming how many lines are still blank — the UI already shows
+ * that count from the Sheet's own lines, so this is a defence against a stale client, not
+ * the Instructor's first signal. Once Submitted, the Sheet is read-only to everyone,
+ * including its own Instructor, and every configured Department Head (or the
+ * university-wide Head for a department-less Preparatory Offering) is notified.
+ * @summary Sign the Sheet.
+ */
+export const SignTheSheetParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const SignTheSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Every Submitted Grade Sheet routed to the acting Head's Department(s) — including, for a
+ * Head assigned university-wide, the department-less Preparatory Offerings a
+ * Department-scoped Head never sees ({@see ScopesToDepartmentHead}). Oldest signature
+ * first.
+ * @summary The Department Head's review queue.
+ */
+export const TheDepartmentHeadsReviewQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Every mark, letter and Incomplete on the round, the Student identity per line, and the
+ * Offering's grade distribution — a view, not a report (Phase 7 owns reporting). Scoped
+ * exactly as the queue: a Sheet outside the acting Head's Department is a 403, regardless
+ * of its status.
+ * @summary Open one Sheet for review.
+ */
+export const OpenOneSheetForReviewParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const OpenOneSheetForReviewResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional()
+})).optional(),
+  "distribution": zod.array(zod.object({
+  "letter": zod.string().optional(),
+  "count": zod.number().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Submitted → Finalized (else a 409): the round's Grades become part of the academic
+ * record and the round is permanently closed (ADR-0023). In the same transaction, `earned`
+ * — "this Attempt reached C+ and earned its credit hours" — is written onto every graded
+ * Enrollment through `Enrollment\Public` (ADR-0022), which remains the sole writer of its
+ * own column. After commit, `GradeFinalized` fires for its side effects only — today, one
+ * notification per Student carrying their letter and whether it fell below C+.
+ * @summary Finalize the Sheet.
+ */
+export const FinalizeTheSheetParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const FinalizeTheSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().optional(),
+  "review_note": zod.string().nullish()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Submitted → Returned (else a 409): the round becomes editable and re-signable again, and
+ * the note reaches the Instructor as a notification. A note is required — a bilingual 422
+ * when it is missing.
+ * @summary Return the Sheet with a note.
+ */
+export const ReturnTheSheetWithANoteParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const ReturnTheSheetWithANoteBody = zod.object({
+  "note": zod.string().describe('Why the sheet is being returned.')
+})
+
+export const ReturnTheSheetWithANoteResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().optional(),
+  "review_note": zod.string().optional()
 }).optional()
 }).optional()
 })

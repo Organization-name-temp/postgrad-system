@@ -45,4 +45,28 @@ enum GradeSheetStatus: string
     {
         return $this === self::Draft || $this === self::Returned;
     }
+
+    /**
+     * The statuses this one may legally move to (ticket 03, the Admissions ApplicationStatus
+     * transition-map style, ADR-0008). `Finalized` is terminal — never reopened (ADR-0023) —
+     * so every transition out of it, and every jump that skips a step, is illegal and the
+     * model raises a 409 for it.
+     *
+     * @return list<self>
+     */
+    public function allowedTransitions(): array
+    {
+        return match ($this) {
+            self::Draft => [self::Submitted],
+            self::Submitted => [self::Finalized, self::Returned],
+            self::Returned => [self::Submitted],
+            self::Finalized => [],
+        };
+    }
+
+    /** Whether moving from this status to `$to` is a legal transition. */
+    public function canTransitionTo(self $to): bool
+    {
+        return in_array($to, $this->allowedTransitions(), true);
+    }
 }

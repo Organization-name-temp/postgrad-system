@@ -22,6 +22,7 @@ import CoPresentIcon from '@mui/icons-material/CoPresent'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PersonSearchIcon from '@mui/icons-material/PersonSearch'
 import GradingIcon from '@mui/icons-material/Grading'
+import RateReviewIcon from '@mui/icons-material/RateReview'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -228,6 +229,17 @@ export const navItems: NavItem[] = [
     icon: <GradingIcon />,
     section: 'grading',
     roles: [ROLE.instructor],
+  },
+  // The Department Head's review queue (ticket 03): a **persona** item on the
+  // Department-Head role (R06), beside the Instructor's own grade sheets — both share
+  // `grades.finalize`, but only a Head reviews a queue, so this gates on the role rather
+  // than the permission (the myOfferings precedent).
+  {
+    key: 'gradeReview',
+    to: '/grading/review',
+    icon: <RateReviewIcon />,
+    section: 'grading',
+    roles: [ROLE.departmentHead],
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

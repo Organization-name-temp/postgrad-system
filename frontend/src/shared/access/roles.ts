@@ -20,6 +20,7 @@ export const ROLE = {
   applicant: 'R01',
   student: 'R02',
   instructor: 'R04',
+  departmentHead: 'R06',
   systemAdmin: 'R09',
   superAdmin: 'R10',
 } as const

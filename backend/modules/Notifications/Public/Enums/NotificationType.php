@@ -96,4 +96,25 @@ enum NotificationType: string
      * an automated status change. Payload: `course_code`, `percentage`.
      */
     case AttendanceAuditAtRisk = 'attendance.audit_at_risk';
+
+    /**
+     * An Instructor signed a Grade Sheet round (Phase 4, ticket 03) — raised to every
+     * Department Head who reviews it (SRS §4.7.1.4). Payload: `course_offering_id`,
+     * `grade_sheet_id`.
+     */
+    case GradeSheetSubmitted = 'grade.sheet_submitted';
+
+    /**
+     * A Department Head returned a Grade Sheet round with a note instead of finalizing it
+     * (Phase 4, ticket 03) — raised to the Instructor. Payload: `grade_sheet_id`, `note`.
+     */
+    case GradeSheetReturned = 'grade.sheet_returned';
+
+    /**
+     * A Department Head finalized a Grade — it is now part of the academic record (Phase 4,
+     * ticket 03). Raised to the Student, carrying the letter and whether it earned its credit
+     * (< C+), so no second type is needed for the must-retake warning (ticket 07). Payload:
+     * `enrollment_id`, `letter_grade`, `below_c_plus`.
+     */
+    case GradeFinalized = 'grade.finalized';
 }

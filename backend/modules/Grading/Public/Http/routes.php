@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Grading\Internal\Http\Controllers\DepartmentHeadReviewController;
 use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
 
 /*
@@ -15,8 +16,9 @@ use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
 | Sheet, and the ADR-0015 administrative override, arrive in their own tickets; until
 | then holding the permission without the assignment is a 403.
 |
-| Signing and Department-Head review (`grades.finalize`) are ticket 03; nothing here
-| signs or reviews.
+| Signing and Department-Head review (ticket 03) share `grades.finalize` — held by both
+| Instructor and Department Head (§3.2) — with authority distinguished by assignment: the
+| Offering for a signature, the Department (via ScopesToDepartmentHead) for a review.
 |
 | `Grading\Public` ships empty beyond these route bindings: the routes live in Public but
 | point at the Internal controller (a same-module Public → Internal reference, the Calendar
@@ -40,4 +42,23 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
     Route::put('/grading/sheets/{grade_sheet}/lines/{enrollment_id}', [GradeSheetController::class, 'saveLine'])
         ->whereNumber('grade_sheet')
         ->whereNumber('enrollment_id');
+});
+
+Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
+    // The Instructor's signature — Draft/Returned -> Submitted (ADR-0023). Authority is the
+    // Offering assignment, checked in the controller.
+    Route::post('/grading/sheets/{grade_sheet}/sign', [GradeSheetController::class, 'sign'])
+        ->whereNumber('grade_sheet');
+
+    // The Department Head's review queue and one Sheet's review screen. Authority is the
+    // Department assignment (ScopesToDepartmentHead), checked in the controller — a Head
+    // assigned university-wide reaches the department-less Preparatory Sheets, and no
+    // Department-scoped Head does.
+    Route::get('/grading/department-head/sheets', [DepartmentHeadReviewController::class, 'queue']);
+    Route::get('/grading/department-head/sheets/{grade_sheet}', [DepartmentHeadReviewController::class, 'show'])
+        ->whereNumber('grade_sheet');
+    Route::post('/grading/department-head/sheets/{grade_sheet}/finalize', [DepartmentHeadReviewController::class, 'finalize'])
+        ->whereNumber('grade_sheet');
+    Route::post('/grading/department-head/sheets/{grade_sheet}/return', [DepartmentHeadReviewController::class, 'returnSheet'])
+        ->whereNumber('grade_sheet');
 });

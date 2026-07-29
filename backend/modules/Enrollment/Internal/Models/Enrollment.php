@@ -30,6 +30,7 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
  * @property EnrollmentClassification $classification
  * @property CourseStatus $course_status
  * @property int $credit_hours
+ * @property bool|null $earned
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -45,6 +46,7 @@ class Enrollment extends Model
         'classification',
         'course_status',
         'credit_hours',
+        'earned',
     ];
 
     /** @return array<string, string> */
@@ -56,6 +58,7 @@ class Enrollment extends Model
             'classification' => EnrollmentClassification::class,
             'course_status' => CourseStatus::class,
             'credit_hours' => 'integer',
+            'earned' => 'boolean',
         ];
     }
 

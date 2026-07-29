@@ -166,3 +166,36 @@ it('never leaks another offering\'s roster', function () {
     expect($roster)->toHaveCount(1)
         ->and($roster[0]->courseOfferingId)->toBe($mine->id);
 });
+
+// ---------------------------------------------------------------------------
+// findEnrollment / recordOutcome — the command surface ADR-0022 adds (ticket 03)
+// ---------------------------------------------------------------------------
+
+it('finds an enrollment by id regardless of gradability', function () {
+    $offering = erOffering(User::factory()->create()->id);
+    $incomplete = erEnroll($offering, CourseStatus::Incomplete);
+
+    $summary = enrollmentRecords()->findEnrollment($incomplete->id);
+
+    expect($summary)->toBeInstanceOf(EnrollmentSummary::class)
+        ->and($summary->id)->toBe($incomplete->id)
+        ->and($summary->courseStatus)->toBe('Incomplete');
+});
+
+it('returns null for an enrollment id that does not exist', function () {
+    expect(enrollmentRecords()->findEnrollment(999_999))->toBeNull();
+});
+
+it('writes the earned bit through recordOutcome, the sole writer of the column', function () {
+    $offering = erOffering(User::factory()->create()->id);
+    $enrollment = erEnroll($offering);
+
+    enrollmentRecords()->recordOutcome($enrollment->id, true);
+    expect($enrollment->fresh()->earned)->toBeTrue();
+
+    enrollmentRecords()->recordOutcome($enrollment->id, false);
+    expect($enrollment->fresh()->earned)->toBeFalse();
+
+    enrollmentRecords()->recordOutcome($enrollment->id, null);
+    expect($enrollment->fresh()->earned)->toBeNull();
+});

@@ -26,6 +26,11 @@ return [
     'sheet' => [
         // A Submitted sheet is under review and a Finalized one is closed forever (ADR-0023).
         'not_editable' => 'This grade sheet is no longer open for marks.',
+        // Raised as a 409, naming both ends of the refused move (GradeSheet::transitionTo()).
+        'illegal_transition' => 'A grade sheet cannot move from :from to :to.',
+        'blank_lines_remain' => 'This grade sheet still has :count ungraded line(s) remaining.',
+        'return_note_required' => 'A note is required when returning a grade sheet to its instructor.',
+        'not_your_department' => 'This grade sheet does not belong to your department.',
     ],
 
 ];

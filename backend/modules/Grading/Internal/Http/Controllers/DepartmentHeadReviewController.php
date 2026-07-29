@@ -9,12 +9,14 @@ use Illuminate\Support\Facades\Event;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\OfferingSummary;
+use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
 use Modules\Grading\Internal\Events\GradeFinalized;
 use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
 use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
+use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -132,7 +134,7 @@ class DepartmentHeadReviewController
      *
      * @urlParam grade_sheet_id integer required The ID of the grade sheet. Example: 1
      *
-     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Submitted", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": null, "review_note": null}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}}], "distribution": [{"letter": "A+", "count": 0}]}}
+     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Submitted", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": null, "review_note": null}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}, "incomplete": null}, {"enrollment_id": 6, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 8, "university_id": "2026-MSC-CE-0002", "name": "Omar Student"}, "grade": null, "incomplete": {"completion_percentage": 80, "reason": "Hospitalised before the final project was due."}}], "distribution": [{"letter": "A+", "count": 0}]}}
      * @response 403 scenario="not this sheet's department head" {"message": "This grade sheet does not belong to your department."}
      */
     public function show(
@@ -145,7 +147,7 @@ class DepartmentHeadReviewController
         Directory $directory,
     ): JsonResponse {
         $offering = $this->authorizeReview($request, $gradeSheet, $enrollments, $courses, $heads);
-        $roster = $enrollments->gradableEnrollmentsOf($offering->id);
+        $roster = $this->rosterFor($gradeSheet, $offering, $enrollments);
 
         return response()->json([
             'data' => [
@@ -161,11 +163,19 @@ class DepartmentHeadReviewController
      * Finalize the Sheet.
      *
      * Submitted → Finalized (else a 409): the round's Grades become part of the academic
-     * record and the round is permanently closed (ADR-0023). In the same transaction, `earned`
-     * — "this Attempt reached C+ and earned its credit hours" — is written onto every graded
-     * Enrollment through `Enrollment\Public` (ADR-0022), which remains the sole writer of its
-     * own column. After commit, `GradeFinalized` fires for its side effects only — today, one
-     * notification per Student carrying their letter and whether it fell below C+.
+     * record and the round is permanently closed (ADR-0023). In the same transaction, for each
+     * Grade, `earned` — "this Attempt reached C+ and earned its credit hours" — is written onto
+     * its Enrollment through `Enrollment\Public` (ADR-0022): a plain
+     * {@see EnrollmentRecords::recordOutcome()} normally, or, when the Grade resolves an
+     * outstanding Incomplete (this round is an `IncompleteResolution`, ticket 05),
+     * {@see EnrollmentRecords::resolveIncomplete()} instead — which also restores the Course
+     * Status the Enrollment held before it became Incomplete. On an **Initial** round, every
+     * line declared Incomplete instead of graded (no Grade row) becomes one through
+     * {@see EnrollmentRecords::markIncomplete()}, in the same transaction — no grade, and no
+     * Incomplete, enters the record on one signature. After commit, `GradeFinalized` fires for
+     * its side effects only: one notification per graded Student (their letter and whether it
+     * fell below C+), and one per newly-declared Incomplete (the reason and its derived
+     * deadline).
      *
      * @urlParam grade_sheet_id integer required The ID of the grade sheet. Example: 1
      *
@@ -188,9 +198,29 @@ class DepartmentHeadReviewController
         DB::transaction(function () use ($gradeSheet, $enrollments, $threshold, $actorId): void {
             $gradeSheet->finalize($actorId);
 
+            $resolving = Incomplete::query()
+                ->where('resolution_grade_sheet_id', $gradeSheet->getKey())
+                ->get()
+                ->keyBy(fn (Incomplete $incomplete): int => (int) $incomplete->enrollment_id);
+
             /** @var Grade $grade */
             foreach ($gradeSheet->grades as $grade) {
-                $enrollments->recordOutcome((int) $grade->enrollment_id, (float) $grade->gpa_points >= $threshold);
+                $earned = (float) $grade->gpa_points >= $threshold;
+                $incomplete = $resolving->get((int) $grade->enrollment_id);
+
+                if ($incomplete !== null) {
+                    $enrollments->resolveIncomplete((int) $grade->enrollment_id, $earned);
+                    $incomplete->update(['resolved_grade_id' => $grade->getKey()]);
+                } else {
+                    $enrollments->recordOutcome((int) $grade->enrollment_id, $earned);
+                }
+            }
+
+            if ($gradeSheet->kind === GradeSheetKind::Initial) {
+                $declared = Incomplete::query()->where('declared_on_grade_sheet_id', $gradeSheet->getKey())->get();
+                foreach ($declared as $incomplete) {
+                    $enrollments->markIncomplete((int) $incomplete->enrollment_id);
+                }
             }
         });
 

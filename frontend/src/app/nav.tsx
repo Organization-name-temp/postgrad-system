@@ -24,6 +24,7 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch'
 import GradingIcon from '@mui/icons-material/Grading'
 import RateReviewIcon from '@mui/icons-material/RateReview'
 import GradeIcon from '@mui/icons-material/Grade'
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -228,6 +229,17 @@ export const navItems: NavItem[] = [
     key: 'gradeSheets',
     to: '/grading',
     icon: <GradingIcon />,
+    section: 'grading',
+    roles: [ROLE.instructor],
+  },
+  // The Instructor's outstanding Incompletes (ticket 05): declared on their own Sheets,
+  // resolved through the same signature + Department-Head review as any other grade. A
+  // **persona** item beside "Grade sheets" — the Offering assignment is re-enforced
+  // server-side exactly as the Sheet routes are.
+  {
+    key: 'outstandingIncompletes',
+    to: '/grading/incompletes',
+    icon: <HourglassBottomIcon />,
     section: 'grading',
     roles: [ROLE.instructor],
   },

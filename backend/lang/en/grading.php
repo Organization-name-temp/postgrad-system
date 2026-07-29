@@ -20,7 +20,10 @@ return [
     ],
 
     'line' => [
-        'not_gradable' => 'That enrollment is not a gradable line on this grade sheet.',
+        // Shared by every Sheet kind (ticket 05): an Initial round's roster is its gradable
+        // Enrollments, an IncompleteResolution round's is the one Enrollment its Incomplete
+        // named — "not a line of this Sheet" covers both without naming either.
+        'not_found' => 'That enrollment is not a line of this grade sheet.',
     ],
 
     'student' => [
@@ -35,6 +38,17 @@ return [
         'blank_lines_remain' => 'This grade sheet still has :count ungraded line(s) remaining.',
         'return_note_required' => 'A note is required when returning a grade sheet to its instructor.',
         'not_your_department' => 'This grade sheet does not belong to your department.',
+    ],
+
+    'incomplete' => [
+        // The SRS §4.7.3.1 attestation threshold — config-driven, not a literal.
+        'completion_too_low' => 'An Incomplete requires at least :threshold% of the coursework completed.',
+        'reason_required' => 'A reason is required when declaring an Incomplete.',
+        // Declaring is only meaningful on the Offering's Initial round — a resolution round
+        // enters the outstanding mark instead (ADR-0023).
+        'only_on_initial_sheet' => 'An Incomplete can only be declared on the offering\'s initial grade sheet.',
+        'not_yours' => 'You are not assigned to teach this offering.',
+        'not_outstanding' => 'That incomplete has already been resolved or converted.',
     ],
 
 ];

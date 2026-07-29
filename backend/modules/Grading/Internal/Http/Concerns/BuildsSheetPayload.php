@@ -2,10 +2,15 @@
 
 namespace Modules\Grading\Internal\Http\Concerns;
 
+use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentSummary;
+use Modules\Enrollment\Public\OfferingSummary;
+use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\LetterGrade;
+use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
+use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -38,10 +43,60 @@ trait BuildsSheetPayload
     }
 
     /**
-     * The Sheet's lines: one per gradable Enrollment, carrying the Student's identity and the
-     * Grade recorded so far (or `null` while blank). Student names and University IDs are
-     * resolved through Identity\Public in one batched read each (ADR-0012), and the Grades in
-     * one query keyed by Enrollment — so a roster of any size costs three reads, not 3N.
+     * The roster a Sheet's lines are drawn from — kind-aware (ticket 05), since only an
+     * **Initial** round's lines are the Offering's *gradable* Enrollments (ADR-0023). An
+     * **IncompleteResolution** round's lines are exactly the Enrollment(s) whose Incomplete it
+     * was opened to resolve, resolved through {@see EnrollmentRecords::findEnrollment()} rather
+     * than {@see EnrollmentRecords::gradableEnrollmentsOf()} — the Enrollment is `Incomplete`
+     * by the time the round exists, so Enrollment's own gradability judgement would exclude it.
+     * `Correction` rounds are ticket 06's; unreachable today.
+     *
+     * @return list<EnrollmentSummary>
+     */
+    private function rosterFor(GradeSheet $sheet, OfferingSummary $offering, EnrollmentRecords $enrollments): array
+    {
+        if ($sheet->kind === GradeSheetKind::IncompleteResolution) {
+            $enrollmentIds = Incomplete::query()
+                ->where('resolution_grade_sheet_id', $sheet->getKey())
+                ->pluck('enrollment_id');
+
+            return array_values(array_filter(array_map(
+                fn (int|string $id): ?EnrollmentSummary => $enrollments->findEnrollment((int) $id),
+                $enrollmentIds->all(),
+            )));
+        }
+
+        return $enrollments->gradableEnrollmentsOf($offering->id);
+    }
+
+    /**
+     * How many of the Sheet's lines already carry a decision: a Grade, or — on an **Initial**
+     * round only — an Incomplete declaration in its place. The count
+     * {@see GradeSheetController::sign()}'s
+     * blank-line guard subtracts from the roster size (user story 9). An IncompleteResolution
+     * round never carries an Incomplete declaration of its own, so only its Grade counts.
+     */
+    private function decidedCount(GradeSheet $sheet): int
+    {
+        $count = $sheet->grades()->count();
+
+        if ($sheet->kind === GradeSheetKind::Initial) {
+            $count += Incomplete::query()->where('declared_on_grade_sheet_id', $sheet->getKey())->count();
+        }
+
+        return $count;
+    }
+
+    /**
+     * The Sheet's lines: one per roster Enrollment, carrying the Student's identity, the Grade
+     * recorded so far (or `null` while blank), and the Incomplete declared for it, if any
+     * (`null` otherwise) — visible to both the Instructor's editor and the Department Head's
+     * review (ticket 05). A line's Incomplete is looked up by Enrollment id regardless of which
+     * Sheet is open, so an IncompleteResolution round's one line still carries the original
+     * reason and completion percentage entered on the Initial round. Student names and
+     * University IDs are resolved through Identity\Public in one batched read each (ADR-0012),
+     * and the Grades/Incompletes in one query each keyed by Enrollment — so a roster of any
+     * size costs a fixed number of reads, not one per row.
      *
      * @param  list<EnrollmentSummary>  $roster
      * @return list<array<string, mixed>>
@@ -57,6 +112,14 @@ trait BuildsSheetPayload
             ->get()
             ->keyBy(fn (Grade $grade): int => (int) $grade->enrollment_id);
 
+        $enrollmentIds = array_map(fn (EnrollmentSummary $enrollment): int => $enrollment->id, $roster);
+        $incompletes = Incomplete::query()
+            ->whereIn('enrollment_id', $enrollmentIds)
+            ->orderByDesc('id')
+            ->get()
+            ->unique('enrollment_id')
+            ->keyBy(fn (Incomplete $incomplete): int => (int) $incomplete->enrollment_id);
+
         $summaries = $students->findManyByStudentId(array_values(array_unique(array_map(
             fn (EnrollmentSummary $enrollment): int => $enrollment->studentId,
             $roster,
@@ -66,7 +129,7 @@ trait BuildsSheetPayload
             $summaries,
         )));
 
-        return array_map(function (EnrollmentSummary $enrollment) use ($grades, $summaries, $users): array {
+        return array_map(function (EnrollmentSummary $enrollment) use ($grades, $incompletes, $summaries, $users): array {
             $summary = $summaries[$enrollment->studentId] ?? null;
 
             return [
@@ -79,6 +142,7 @@ trait BuildsSheetPayload
                     'name' => $this->studentName($enrollment, $summary, $users),
                 ],
                 'grade' => $grades->get($enrollment->id)?->toLineArray(),
+                'incomplete' => $incompletes->get($enrollment->id)?->toLineArray(),
             ];
         }, $roster);
     }

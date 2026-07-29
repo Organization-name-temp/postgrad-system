@@ -40,4 +40,14 @@ interface AcademicCalendar
      * The most recent by year is returned if more than one qualifies.
      */
     public function running(): ?SemesterSummary;
+
+    /**
+     * The Semester whose `starts_at` is the earliest one **after** the given Semester's own —
+     * never by (year, term), since Fall precedes the following Spring (the same ordering rule
+     * Grading's CGPA supersession follows). `null` when `$semesterId` does not exist, or when
+     * it is the last Semester on the Calendar so far (an admin has not entered the next one
+     * yet). Ticket 05's Incomplete deadline is derived from this Semester's `starts_at`, so a
+     * later correction to it moves every outstanding deadline with it — nothing is frozen.
+     */
+    public function nextAfter(int $semesterId): ?SemesterSummary;
 }

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Grading\Internal\Http\Controllers\DepartmentHeadReviewController;
 use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
+use Modules\Grading\Internal\Http\Controllers\IncompleteController;
 use Modules\Grading\Internal\Http\Controllers\MyGradesController;
 
 /*
@@ -47,6 +48,14 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
     Route::put('/grading/sheets/{grade_sheet}/lines/{enrollment_id}', [GradeSheetController::class, 'saveLine'])
         ->whereNumber('grade_sheet')
         ->whereNumber('enrollment_id');
+
+    // The Instructor's outstanding Incompletes (ticket 05), and lazily opening one's
+    // resolution round — a Sheet id that then flows through the same saveLine/sign/
+    // department-head routes above and below, unchanged. {incomplete} is Grading's own model
+    // and is bound.
+    Route::get('/grading/incompletes', [IncompleteController::class, 'outstanding']);
+    Route::get('/grading/incompletes/{incomplete}/resolution', [IncompleteController::class, 'resolution'])
+        ->whereNumber('incomplete');
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {

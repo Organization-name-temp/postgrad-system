@@ -37,6 +37,8 @@ import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPa
 import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
 import { GradeSheetsPage } from '../features/grading/instructor/GradeSheetsPage'
 import { GradeSheetPage } from '../features/grading/instructor/GradeSheetPage'
+import { OutstandingIncompletesPage } from '../features/grading/instructor/OutstandingIncompletesPage'
+import { IncompleteResolutionPage } from '../features/grading/instructor/IncompleteResolutionPage'
 import { DepartmentHeadQueuePage } from '../features/grading/department-head/DepartmentHeadQueuePage'
 import { DepartmentHeadSheetPage } from '../features/grading/department-head/DepartmentHeadSheetPage'
 import { MyGradesPage } from '../features/grading/student/MyGradesPage'
@@ -111,6 +113,14 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
                   <Route path="/grading" element={<GradeSheetsPage />} />
                   <Route path="/grading/offerings/:offeringId" element={<GradeSheetPage />} />
+                  {/* The Instructor's outstanding Incompletes and their resolution round
+                      (ticket 05): declared "mine" is the Offering assignment, re-enforced
+                      server-side exactly as the Sheet routes above. */}
+                  <Route path="/grading/incompletes" element={<OutstandingIncompletesPage />} />
+                  <Route
+                    path="/grading/incompletes/:incompleteId"
+                    element={<IncompleteResolutionPage />}
+                  />
                 </Route>
                 {/* The Department Head's review of a signed Grade Sheet (Phase 4, ticket 03):
                     persona-guarded to R06 — both Instructor and Department Head hold

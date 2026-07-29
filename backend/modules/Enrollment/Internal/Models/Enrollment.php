@@ -21,7 +21,10 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
  * recomputed: the five-way {@see EnrollmentClassification} and the course's total
  * credit hours ({@see $credit_hours}). Its {@see CourseStatus} carries the Appendix-D
  * counting semantics; in Phase 3 only Regular / Retake / Audit are set here (W from
- * ticket 07). Display facts (course code/names, meeting times, instructor) are read live
+ * ticket 07). {@see $pre_incomplete_status} is private bookkeeping (phase 4 ticket 05): the
+ * status held immediately before an Incomplete declaration, remembered so resolution can
+ * restore it — never exposed across `Enrollment\Public` (ADR-0012), so `CourseStatus` stays
+ * Internal. Display facts (course code/names, meeting times, instructor) are read live
  * through the Catalog/Offering facades, never stored.
  *
  * @property int $id
@@ -29,6 +32,7 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
  * @property int $course_offering_id
  * @property EnrollmentClassification $classification
  * @property CourseStatus $course_status
+ * @property CourseStatus|null $pre_incomplete_status
  * @property int $credit_hours
  * @property bool|null $earned
  * @property Carbon $created_at
@@ -45,6 +49,7 @@ class Enrollment extends Model
         'course_offering_id',
         'classification',
         'course_status',
+        'pre_incomplete_status',
         'credit_hours',
         'earned',
     ];
@@ -57,6 +62,7 @@ class Enrollment extends Model
             'course_offering_id' => 'integer',
             'classification' => EnrollmentClassification::class,
             'course_status' => CourseStatus::class,
+            'pre_incomplete_status' => CourseStatus::class,
             'credit_hours' => 'integer',
             'earned' => 'boolean',
         ];

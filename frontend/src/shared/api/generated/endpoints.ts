@@ -4149,6 +4149,8 @@ export type OpenAnOfferingsGradeSheet200DataLinesItem = {
   credit_hours?: number;
   student?: OpenAnOfferingsGradeSheet200DataLinesItemStudent;
   grade?: OpenAnOfferingsGradeSheet200DataLinesItemGrade;
+  /** @nullable */
+  incomplete?: string | null;
 };
 
 export type OpenAnOfferingsGradeSheet200Data = {
@@ -4170,23 +4172,35 @@ export type OpenAnOfferingsGradeSheet404 = {
 };
 
 export type SaveOneGradeSheetLineBody = {
-  /** The final percentage, 0–100 with at most two decimals. */
-  mark: number;
+  /** The final percentage, 0–100 with at most two decimals. Required unless declaring an Incomplete. */
+  mark?: number;
+  /** The coursework percentage completed, 0–100. Declares an Incomplete in place of a mark; requires `reason`. */
+  completion_percentage?: number;
+  /** The reason for the Incomplete. Required alongside `completion_percentage`. */
+  reason?: string;
 };
 
-export type SaveOneGradeSheetLine200DataGrade = {
+export type SaveOneGradeSheetLine200 = {
+  data?: {
+  enrollment_id?: number;
+  grade?: {
   mark?: number;
   letter_grade?: string;
   gpa_points?: number;
 };
-
-export type SaveOneGradeSheetLine200Data = {
-  enrollment_id?: number;
-  grade?: SaveOneGradeSheetLine200DataGrade;
+  /** @nullable */
+  incomplete?: string | null;
 };
-
-export type SaveOneGradeSheetLine200 = {
-  data?: SaveOneGradeSheetLine200Data;
+} | {
+  data?: {
+  enrollment_id?: number;
+  /** @nullable */
+  grade?: string | null;
+  incomplete?: {
+  completion_percentage?: number;
+  reason?: string;
+};
+};
 };
 
 export type SaveOneGradeSheetLine403 = {
@@ -4197,13 +4211,146 @@ export type SaveOneGradeSheetLine404 = {
   message?: string;
 };
 
-export type SaveOneGradeSheetLine422Errors = {
-  mark?: string[];
-};
-
 export type SaveOneGradeSheetLine422 = {
   message?: string;
-  errors?: SaveOneGradeSheetLine422Errors;
+  errors?: {
+  mark?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  completion_percentage?: string[];
+};
+};
+
+export type MyOutstandingIncompletes200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type MyOutstandingIncompletes200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type MyOutstandingIncompletes200DataItem = {
+  incomplete_id?: number;
+  enrollment_id?: number;
+  course_offering_id?: number;
+  course?: MyOutstandingIncompletes200DataItemCourse;
+  student?: MyOutstandingIncompletes200DataItemStudent;
+  completion_percentage?: number;
+  reason?: string;
+  deadline?: string;
+};
+
+export type MyOutstandingIncompletes200 = {
+  data?: MyOutstandingIncompletes200DataItem[];
+};
+
+export type OpenorResumeTheIncompletesResolutionRound200 = {
+  data?: {
+  sheet?: {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+  course?: {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+  lines?: ({
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+  /** @nullable */
+  grade?: string | null;
+  incomplete?: {
+  completion_percentage?: number;
+  reason?: string;
+};
+})[];
+};
+} | {
+  data?: {
+  sheet?: {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+  course?: {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+  lines?: {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+  grade?: {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+  incomplete?: {
+  completion_percentage?: number;
+  reason?: string;
+};
+}[];
+};
+};
+
+export type OpenorResumeTheIncompletesResolutionRound403 = {
+  message?: string;
+};
+
+export type OpenorResumeTheIncompletesResolutionRound409 = {
+  message?: string;
 };
 
 export type SignTheSheet200DataSheet = {
@@ -4318,6 +4465,8 @@ export type OpenOneSheetForReview200DataLinesItem = {
   credit_hours?: number;
   student?: OpenOneSheetForReview200DataLinesItemStudent;
   grade?: OpenOneSheetForReview200DataLinesItemGrade;
+  /** @nullable */
+  incomplete?: string | null;
 };
 
 export type OpenOneSheetForReview200DataDistributionItem = {
@@ -4438,9 +4587,12 @@ export type MyGrades200DataSemestersItemCoursesItem = {
   enrollment_id?: number;
   course?: MyGrades200DataSemestersItemCoursesItemCourse;
   credit_hours?: number;
+  course_status?: string;
   grade?: MyGrades200DataSemestersItemCoursesItemGrade;
   earned?: boolean;
   superseded?: boolean;
+  /** @nullable */
+  incomplete_deadline?: string | null;
 };
 
 export type MyGrades200DataSemestersItem = {
@@ -13962,15 +14114,20 @@ export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof o
  * points the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale
  * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
  * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
- * outside 0–100 is a 422 naming the field, and an Enrollment that is not a gradable line of
- * this Sheet's Offering is a 404. Authorised by assignment — only the Offering's Instructor
- * (else 403).
+ * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
+ * Sheet is a 404. Authorised by assignment — only the Offering's Instructor (else 403).
+ *
+ * On an **Initial** round, a line may be marked Incomplete instead — send
+ * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
+ * figure below the configured threshold is a 422 naming the field. Entering one supersedes
+ * the other on the same line: a mark clears an earlier Incomplete declaration and an
+ * Incomplete declaration clears an earlier mark.
  * @summary Save one Grade Sheet line.
  */
 export const saveOneGradeSheetLine = (
     gradeSheetId: number,
     enrollmentId: number,
-    saveOneGradeSheetLineBody: SaveOneGradeSheetLineBody,
+    saveOneGradeSheetLineBody?: SaveOneGradeSheetLineBody,
  signal?: AbortSignal
 ) => {
 
@@ -13987,8 +14144,8 @@ export const saveOneGradeSheetLine = (
 
 
 export const getSaveOneGradeSheetLineMutationOptions = <TError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}, TContext> => {
 
 const mutationKey = ['saveOneGradeSheetLine'];
 const {mutation: mutationOptions} = options ?
@@ -14000,7 +14157,7 @@ const {mutation: mutationOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, {gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, {gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}> = (props) => {
           const {gradeSheetId,enrollmentId,data} = props ?? {};
 
           return  saveOneGradeSheetLine(gradeSheetId,enrollmentId,data,)
@@ -14014,22 +14171,219 @@ const {mutation: mutationOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type SaveOneGradeSheetLineMutationResult = NonNullable<Awaited<ReturnType<typeof saveOneGradeSheetLine>>>
-    export type SaveOneGradeSheetLineMutationBody = SaveOneGradeSheetLineBody
+    export type SaveOneGradeSheetLineMutationBody = SaveOneGradeSheetLineBody | undefined
     export type SaveOneGradeSheetLineMutationError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422
 
     /**
  * @summary Save one Grade Sheet line.
  */
 export const useSaveOneGradeSheetLine = <TError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}, TContext>, }
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof saveOneGradeSheetLine>>,
         TError,
-        {gradeSheetId: number;enrollmentId: number;data: SaveOneGradeSheetLineBody},
+        {gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody},
         TContext
       > => {
       return useMutation(getSaveOneGradeSheetLineMutationOptions(options), queryClient);
     }
+
+/**
+ * Every unresolved, unconverted Incomplete declared on an Offering the acting user
+ * teaches, each with the Student it names and its derived resolution deadline — `null`
+ * while the next Semester does not exist in the Calendar yet (declaring, and viewing, are
+ * never blocked for an admin's omission).
+ * @summary My outstanding Incompletes.
+ */
+export const myOutstandingIncompletes = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyOutstandingIncompletes200>(
+      {url: `/api/v1/grading/incompletes`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyOutstandingIncompletesQueryKey = () => {
+    return [
+    `/api/v1/grading/incompletes`
+    ] as const;
+    }
+
+
+export const getMyOutstandingIncompletesQueryOptions = <TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyOutstandingIncompletesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myOutstandingIncompletes>>> = ({ signal }) => myOutstandingIncompletes(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyOutstandingIncompletesQueryResult = NonNullable<Awaited<ReturnType<typeof myOutstandingIncompletes>>>
+export type MyOutstandingIncompletesQueryError = unknown
+
+
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>,
+          TError,
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>,
+          TError,
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My outstanding Incompletes.
+ */
+
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyOutstandingIncompletesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Lazily opens the `IncompleteResolution` Sheet round for one outstanding Incomplete — a
+ * single line, the Incomplete's own Enrollment — or returns the round already open for it
+ * (the Initial round's lazy-open precedent). From here, entering the mark, signing and
+ * Department-Head finalization all behave exactly as ticket 03 established: the returned
+ * Sheet id is used with {@see GradeSheetController::saveLine()}/{@see GradeSheetController::sign()}
+ * and the Department Head's queue/show/finalize/return, all unchanged. A 409 when the
+ * Incomplete has already been resolved or converted.
+ * @summary Open (or resume) the Incomplete's resolution round.
+ */
+export const openorResumeTheIncompletesResolutionRound = (
+    incompleteId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenorResumeTheIncompletesResolutionRound200>(
+      {url: `/api/v1/grading/incompletes/${incompleteId}/resolution`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenorResumeTheIncompletesResolutionRoundQueryKey = (incompleteId: number,) => {
+    return [
+    `/api/v1/grading/incompletes/${incompleteId}/resolution`
+    ] as const;
+    }
+
+
+export const getOpenorResumeTheIncompletesResolutionRoundQueryOptions = <TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenorResumeTheIncompletesResolutionRoundQueryKey(incompleteId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>> = ({ signal }) => openorResumeTheIncompletesResolutionRound(incompleteId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: incompleteId !== null && incompleteId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenorResumeTheIncompletesResolutionRoundQueryResult = NonNullable<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>>
+export type OpenorResumeTheIncompletesResolutionRoundQueryError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409
+
+
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open (or resume) the Incomplete's resolution round.
+ */
+
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenorResumeTheIncompletesResolutionRoundQueryOptions(incompleteId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * The Instructor's signature — one act that sends the whole round to the Department Head
@@ -14297,11 +14651,19 @@ export function useOpenOneSheetForReview<TData = Awaited<ReturnType<typeof openO
 
 /**
  * Submitted → Finalized (else a 409): the round's Grades become part of the academic
- * record and the round is permanently closed (ADR-0023). In the same transaction, `earned`
- * — "this Attempt reached C+ and earned its credit hours" — is written onto every graded
- * Enrollment through `Enrollment\Public` (ADR-0022), which remains the sole writer of its
- * own column. After commit, `GradeFinalized` fires for its side effects only — today, one
- * notification per Student carrying their letter and whether it fell below C+.
+ * record and the round is permanently closed (ADR-0023). In the same transaction, for each
+ * Grade, `earned` — "this Attempt reached C+ and earned its credit hours" — is written onto
+ * its Enrollment through `Enrollment\Public` (ADR-0022): a plain
+ * {@see EnrollmentRecords::recordOutcome()} normally, or, when the Grade resolves an
+ * outstanding Incomplete (this round is an `IncompleteResolution`, ticket 05),
+ * {@see EnrollmentRecords::resolveIncomplete()} instead — which also restores the Course
+ * Status the Enrollment held before it became Incomplete. On an **Initial** round, every
+ * line declared Incomplete instead of graded (no Grade row) becomes one through
+ * {@see EnrollmentRecords::markIncomplete()}, in the same transaction — no grade, and no
+ * Incomplete, enters the record on one signature. After commit, `GradeFinalized` fires for
+ * its side effects only: one notification per graded Student (their letter and whether it
+ * fell below C+), and one per newly-declared Incomplete (the reason and its derived
+ * deadline).
  * @summary Finalize the Sheet.
  */
 export const finalizeTheSheet = (

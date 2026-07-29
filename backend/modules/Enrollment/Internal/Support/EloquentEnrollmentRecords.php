@@ -114,6 +114,38 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
         Enrollment::query()->whereKey($enrollmentId)->update(['earned' => $earned]);
     }
 
+    public function markIncomplete(int $enrollmentId): void
+    {
+        $enrollment = Enrollment::query()->findOrFail($enrollmentId);
+
+        $enrollment->update([
+            'pre_incomplete_status' => $enrollment->course_status,
+            'course_status' => CourseStatus::Incomplete,
+        ]);
+    }
+
+    public function resolveIncomplete(int $enrollmentId, bool $earned): void
+    {
+        $enrollment = Enrollment::query()->findOrFail($enrollmentId);
+
+        // The invariant markIncomplete() establishes: an Enrollment only ever reaches this
+        // method while Incomplete, and markIncomplete() always set this column the moment it
+        // did — so it is never null here.
+        $enrollment->update([
+            'course_status' => $enrollment->pre_incomplete_status,
+            'pre_incomplete_status' => null,
+            'earned' => $earned,
+        ]);
+    }
+
+    public function convertIncompleteToFailWithdrawal(int $enrollmentId): void
+    {
+        Enrollment::query()->whereKey($enrollmentId)->update([
+            'course_status' => CourseStatus::FailWithdrawal,
+            'pre_incomplete_status' => null,
+        ]);
+    }
+
     /**
      * The DTO for one Enrollment, resolving its Offering's Course/Semester ids in the same
      * read (eager-loaded by every caller above, so this never triggers a fresh query) —

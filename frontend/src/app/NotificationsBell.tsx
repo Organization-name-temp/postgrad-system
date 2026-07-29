@@ -55,6 +55,9 @@ const TYPE_ALIAS: Record<string, string> = {
   'grade.sheet_submitted': 'gradeSheetSubmitted',
   'grade.sheet_returned': 'gradeSheetReturned',
   'grade.finalized': 'gradeFinalized',
+  'incomplete.declared': 'incompleteDeclared',
+  'incomplete.reminder': 'incompleteReminder',
+  'incomplete.converted': 'incompleteConverted',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

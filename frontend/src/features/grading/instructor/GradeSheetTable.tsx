@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import {
+  Button,
   Stack,
   Table,
   TableBody,
@@ -14,18 +16,19 @@ import { StatusChip } from '../../../shared/ui/StatusChip'
 import { GRADE_EMPHASIS_SX, gradeEmphasisFor, gradeLineChip } from '../gradeSheetChip'
 import { isInvalidMarkInput, letterGradeFor, parseMark } from '../letterGrade'
 
-/** One line of the Sheet — a gradable Enrollment and the Grade recorded for it, if any. */
+/** One line of the Sheet — a gradable Enrollment, its Grade if any, and its Incomplete if any. */
 export interface GradeSheetLine {
   enrollment_id: number
   course_status: string
   credit_hours: number
   student: { name?: string; university_id?: string }
   grade: { mark?: number; letter_grade?: string; gpa_points?: number } | null
+  incomplete?: { completion_percentage?: number; reason?: string } | null
 }
 
 interface GradeSheetTableProps {
   lines: GradeSheetLine[]
-  /** What is currently in each row's input, keyed by enrollment id — the page owns it. */
+  /** What is currently in each row's mark input, keyed by enrollment id — the page owns it. */
   drafts: Record<number, string>
   /** The row currently being saved, if any — its input is locked while the write is in flight. */
   savingEnrollmentId: number | null
@@ -33,12 +36,23 @@ interface GradeSheetTableProps {
   errors: Record<number, string>
   onChange: (enrollmentId: number, value: string) => void
   onCommit: (enrollmentId: number) => void
+  /**
+   * Whether a line may be marked Incomplete instead of graded (ticket 05) — true on the
+   * Offering's Initial round, `false`/omitted on an IncompleteResolution round, where only the
+   * outstanding mark is ever entered.
+   */
+  allowIncomplete?: boolean
+  /** Declares (or corrects) the Incomplete for one line — the row's own explicit Save action. */
+  onDeclareIncomplete?: (enrollmentId: number, percentage: string, reason: string) => void
 }
 
 /**
- * The Grade Sheet editor (ticket 01): one row per gradable Enrollment, with a single numeric
- * input for the final percentage and a **live letter preview** beside it, so a mistyped figure
- * is obvious before anything is committed (ADR-0014's client mirror of the ADR-0021 scale).
+ * The Grade Sheet editor (ticket 01, ticket 05): one row per gradable Enrollment, with a single
+ * numeric input for the final percentage and a **live letter preview** beside it, so a mistyped
+ * figure is obvious before anything is committed (ADR-0014's client mirror of the ADR-0021
+ * scale). On the Initial round, a row may switch to declaring an Incomplete instead — a
+ * completion percentage and a reason, saved as one explicit act rather than on blur, since
+ * either field alone means nothing.
  *
  * Built on MUI `Table` with one labelled input per row, deliberately — `@mui/x-data-grid`
  * stays deferred to Phase 7: rosters are tens of rows, so virtualization and column tooling
@@ -47,7 +61,9 @@ interface GradeSheetTableProps {
  *
  * Each mark commits on blur, one line at a time (the server saves per line, never as a batch),
  * so a long roster survives a closed tab. Presentational and controlled — the page owns the
- * drafts and the mutation — so it is unit-testable in isolation.
+ * mark drafts and the mutations — so it is unit-testable in isolation. A row's own
+ * Incomplete-declare mode is local UI state (not lifted): switching it is pure navigation, and
+ * the two fields commit together on an explicit Save, never on blur.
  */
 export function GradeSheetTable({
   lines,
@@ -56,6 +72,8 @@ export function GradeSheetTable({
   errors,
   onChange,
   onCommit,
+  allowIncomplete = false,
+  onDeclareIncomplete,
 }: GradeSheetTableProps) {
   const { t } = useTranslation('grading')
 
@@ -72,83 +90,204 @@ export function GradeSheetTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {lines.map((line) => {
-            const studentName = line.student.name ?? ''
-            const draft = drafts[line.enrollment_id] ?? ''
-            const invalid = isInvalidMarkInput(draft)
-            const saveError = errors[line.enrollment_id]
-            // The letter column answers "what would this mark be worth", and falls back to
-            // "what is on the record". While a valid mark is typed the preview follows the
-            // input; while it is blank or invalid nothing has been saved, so the column shows
-            // the Grade actually recorded — which the row's state chip agrees with. Clearing a
-            // field is not a delete (ticket 01 has no way to unrecord a Grade), so the letter
-            // and the chip both keep saying so rather than pretending the line went blank.
-            const preview = letterGradeFor(parseMark(draft))
-            const recorded = line.grade != null
-
-            return (
-              <TableRow key={line.enrollment_id}>
-                <TableCell>
-                  <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
-                    <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
-                      {studentName}
-                    </Typography>
-                    {line.student.university_id && (
-                      <Typography variant="caption" component="span" color="text.secondary">
-                        {line.student.university_id}
-                      </Typography>
-                    )}
-                  </Stack>
-                </TableCell>
-                <TableCell align="right">{line.credit_hours}</TableCell>
-                <TableCell>
-                  <TextField
-                    size="small"
-                    value={draft}
-                    disabled={savingEnrollmentId === line.enrollment_id}
-                    error={invalid || saveError !== undefined}
-                    helperText={invalid ? t('sheet.markInvalid') : saveError}
-                    onChange={(event) => onChange(line.enrollment_id, event.target.value)}
-                    onBlur={() => onCommit(line.enrollment_id)}
-                    slotProps={{
-                      htmlInput: {
-                        // Every input is individually named with the student it belongs to —
-                        // the column header alone would leave a screen-reader user with N
-                        // identically named fields. No visible label: the header already says
-                        // "Mark", and repeating it per row would be noise on screen.
-                        'aria-label': t('sheet.markFor', { student: studentName }),
-                        inputMode: 'decimal',
-                        // A native numeric range so the browser and assistive tech know the
-                        // bounds too, mirroring the server's between:0,100.
-                        type: 'number',
-                        min: 0,
-                        max: 100,
-                        step: 0.01,
-                      },
-                    }}
-                    sx={{ width: 120 }}
-                  />
-                </TableCell>
-                <TableCell>
-                  <LetterPreview
-                    letter={preview?.letter ?? line.grade?.letter_grade}
-                    points={preview?.points ?? line.grade?.gpa_points}
-                  />
-                </TableCell>
-                <TableCell>
-                  <StatusChip
-                    {...gradeLineChip(
-                      recorded,
-                      t(recorded ? 'sheet.lineState.recorded' : 'sheet.lineState.blank'),
-                    )}
-                  />
-                </TableCell>
-              </TableRow>
-            )
-          })}
+          {lines.map((line) => (
+            <GradeSheetTableRow
+              key={line.enrollment_id}
+              line={line}
+              draft={drafts[line.enrollment_id] ?? ''}
+              saving={savingEnrollmentId === line.enrollment_id}
+              error={errors[line.enrollment_id]}
+              onChange={onChange}
+              onCommit={onCommit}
+              allowIncomplete={allowIncomplete}
+              onDeclareIncomplete={onDeclareIncomplete}
+            />
+          ))}
         </TableBody>
       </Table>
     </TableContainer>
+  )
+}
+
+interface GradeSheetTableRowProps {
+  line: GradeSheetLine
+  draft: string
+  saving: boolean
+  error?: string
+  onChange: (enrollmentId: number, value: string) => void
+  onCommit: (enrollmentId: number) => void
+  allowIncomplete: boolean
+  onDeclareIncomplete?: (enrollmentId: number, percentage: string, reason: string) => void
+}
+
+function GradeSheetTableRow({
+  line,
+  draft,
+  saving,
+  error,
+  onChange,
+  onCommit,
+  allowIncomplete,
+  onDeclareIncomplete,
+}: GradeSheetTableRowProps) {
+  const { t } = useTranslation('grading')
+  // Incomplete-declare mode defaults from whatever the server already has on the line — so a
+  // reload of an already-Incomplete-declared line reopens in the same mode — then becomes pure
+  // local UI state the Instructor toggles freely.
+  const [declaring, setDeclaring] = useState(line.incomplete != null)
+
+  const studentName = line.student.name ?? ''
+  const invalid = isInvalidMarkInput(draft)
+  // The letter column answers "what would this mark be worth", and falls back to "what is on
+  // the record". While a valid mark is typed the preview follows the input; while it is blank
+  // or invalid nothing has been saved, so the column shows the Grade actually recorded — which
+  // the row's state chip agrees with. Clearing a field is not a delete (ticket 01 has no way to
+  // unrecord a Grade), so the letter and the chip both keep saying so rather than pretending
+  // the line went blank.
+  const preview = letterGradeFor(parseMark(draft))
+  const recorded = line.grade != null
+
+  const lineState = line.incomplete != null ? 'incomplete' : recorded ? 'recorded' : 'blank'
+
+  return (
+    <TableRow>
+      <TableCell>
+        <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
+          <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
+            {studentName}
+          </Typography>
+          {line.student.university_id && (
+            <Typography variant="caption" component="span" color="text.secondary">
+              {line.student.university_id}
+            </Typography>
+          )}
+        </Stack>
+      </TableCell>
+      <TableCell align="right">{line.credit_hours}</TableCell>
+      <TableCell>
+        {declaring ? (
+          <IncompleteFields
+            enrollmentId={line.enrollment_id}
+            initialIncomplete={line.incomplete}
+            saving={saving}
+            error={error}
+            onSave={onDeclareIncomplete}
+            onCancel={() => setDeclaring(false)}
+          />
+        ) : (
+          <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
+            <TextField
+              size="small"
+              value={draft}
+              disabled={saving}
+              error={invalid || error !== undefined}
+              helperText={invalid ? t('sheet.markInvalid') : error}
+              onChange={(event) => onChange(line.enrollment_id, event.target.value)}
+              onBlur={() => onCommit(line.enrollment_id)}
+              slotProps={{
+                htmlInput: {
+                  // Every input is individually named with the student it belongs to — the
+                  // column header alone would leave a screen-reader user with N identically
+                  // named fields. No visible label: the header already says "Mark", and
+                  // repeating it per row would be noise on screen.
+                  'aria-label': t('sheet.markFor', { student: studentName }),
+                  inputMode: 'decimal',
+                  // A native numeric range so the browser and assistive tech know the bounds
+                  // too, mirroring the server's between:0,100.
+                  type: 'number',
+                  min: 0,
+                  max: 100,
+                  step: 0.01,
+                },
+              }}
+              sx={{ width: 120 }}
+            />
+            {allowIncomplete && (
+              <Button size="small" onClick={() => setDeclaring(true)} disabled={saving}>
+                {t('sheet.incomplete.declare')}
+              </Button>
+            )}
+          </Stack>
+        )}
+      </TableCell>
+      <TableCell>
+        <LetterPreview
+          letter={preview?.letter ?? line.grade?.letter_grade}
+          points={preview?.points ?? line.grade?.gpa_points}
+        />
+      </TableCell>
+      <TableCell>
+        <StatusChip {...gradeLineChip(lineState, t(`sheet.lineState.${lineState}`))} />
+      </TableCell>
+    </TableRow>
+  )
+}
+
+/**
+ * The Incomplete-declare fields (ticket 05): a completion percentage and a reason, saved
+ * together as one explicit act — unlike the mark, neither field alone means anything, so there
+ * is no per-field commit-on-blur here. Local state seeded from what the server already has, so
+ * a reload never loses a declaration already on the record.
+ */
+function IncompleteFields({
+  enrollmentId,
+  initialIncomplete,
+  saving,
+  error,
+  onSave,
+  onCancel,
+}: {
+  enrollmentId: number
+  initialIncomplete: GradeSheetLine['incomplete']
+  saving: boolean
+  error?: string
+  onSave?: (enrollmentId: number, percentage: string, reason: string) => void
+  onCancel: () => void
+}) {
+  const { t } = useTranslation('grading')
+  const [percentage, setPercentage] = useState(
+    initialIncomplete?.completion_percentage?.toString() ?? '',
+  )
+  const [reason, setReason] = useState(initialIncomplete?.reason ?? '')
+
+  return (
+    <Stack spacing={1} sx={{ minWidth: 240, py: 0.5 }}>
+      <TextField
+        size="small"
+        label={t('sheet.incomplete.completionLabel')}
+        value={percentage}
+        disabled={saving}
+        onChange={(event) => setPercentage(event.target.value)}
+        slotProps={{ htmlInput: { inputMode: 'numeric', type: 'number', min: 0, max: 100 } }}
+      />
+      <TextField
+        size="small"
+        label={t('sheet.incomplete.reasonLabel')}
+        value={reason}
+        disabled={saving}
+        onChange={(event) => setReason(event.target.value)}
+        multiline
+        minRows={2}
+      />
+      {error && (
+        <Typography color="error" variant="caption">
+          {error}
+        </Typography>
+      )}
+      <Stack direction="row" spacing={1}>
+        <Button
+          size="small"
+          variant="contained"
+          disabled={saving}
+          onClick={() => onSave?.(enrollmentId, percentage, reason)}
+        >
+          {t('sheet.incomplete.save')}
+        </Button>
+        <Button size="small" disabled={saving} onClick={onCancel}>
+          {t('sheet.incomplete.enterMarkInstead')}
+        </Button>
+      </Stack>
+    </Stack>
   )
 }
 

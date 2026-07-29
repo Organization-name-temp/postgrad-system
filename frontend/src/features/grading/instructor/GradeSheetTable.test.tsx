@@ -29,6 +29,7 @@ const lines: GradeSheetLine[] = [
 function renderTable(overrides: Partial<Parameters<typeof GradeSheetTable>[0]> = {}) {
   const onChange = vi.fn()
   const onCommit = vi.fn()
+  const onDeclareIncomplete = vi.fn()
   render(
     <ThemeProvider theme={theme}>
       <GradeSheetTable
@@ -38,11 +39,12 @@ function renderTable(overrides: Partial<Parameters<typeof GradeSheetTable>[0]> =
         errors={{}}
         onChange={onChange}
         onCommit={onCommit}
+        onDeclareIncomplete={onDeclareIncomplete}
         {...overrides}
       />
     </ThemeProvider>,
   )
-  return { onChange, onCommit }
+  return { onChange, onCommit, onDeclareIncomplete }
 }
 
 describe('GradeSheetTable', () => {
@@ -149,5 +151,85 @@ describe('GradeSheetTable', () => {
       'aria-invalid',
       'true',
     )
+  })
+
+  describe('declaring an Incomplete (ticket 05)', () => {
+    it('offers no "Mark Incomplete instead" toggle unless allowIncomplete is set', () => {
+      renderTable()
+
+      expect(
+        screen.queryByRole('button', { name: /mark incomplete instead/i }),
+      ).not.toBeInTheDocument()
+    })
+
+    it('switches a row to the Incomplete fields and back to the mark field', () => {
+      renderTable({ allowIncomplete: true })
+
+      const toggles = screen.getAllByRole('button', { name: /mark incomplete instead/i })
+      fireEvent.click(toggles[1]) // Omar's row
+
+      expect(screen.getByRole('spinbutton', { name: /coursework completed/i })).toBeInTheDocument()
+      expect(screen.getByRole('textbox', { name: /reason/i })).toBeInTheDocument()
+      // Sara's row is untouched — still a mark field.
+      expect(screen.getByRole('spinbutton', { name: /mark for sara student/i })).toBeInTheDocument()
+
+      fireEvent.click(screen.getByRole('button', { name: /enter a mark instead/i }))
+      expect(screen.getByRole('spinbutton', { name: /mark for omar student/i })).toBeInTheDocument()
+    })
+
+    it('reopens in Incomplete mode for a line the server already declared one on', () => {
+      renderTable({
+        lines: [
+          {
+            ...lines[1],
+            incomplete: { completion_percentage: 80, reason: 'Needed more time.' },
+          },
+        ],
+        drafts: { 6: '' },
+      })
+
+      expect(screen.getByDisplayValue('80')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Needed more time.')).toBeInTheDocument()
+    })
+
+    it('saves the typed percentage and reason together on click', () => {
+      const { onDeclareIncomplete } = renderTable({ allowIncomplete: true })
+
+      fireEvent.click(screen.getAllByRole('button', { name: /mark incomplete instead/i })[1])
+      fireEvent.change(screen.getByRole('spinbutton', { name: /coursework completed/i }), {
+        target: { value: '80' },
+      })
+      fireEvent.change(screen.getByRole('textbox', { name: /reason/i }), {
+        target: { value: 'Hospitalised before the deadline.' },
+      })
+      fireEvent.click(screen.getByRole('button', { name: /^save$/i }))
+
+      expect(onDeclareIncomplete).toHaveBeenCalledWith(6, '80', 'Hospitalised before the deadline.')
+    })
+
+    it('locks the Incomplete fields while that row is saving', () => {
+      // Already in declaring mode (seeded from the server), rather than toggled via the click
+      // path — the toggle button is itself disabled while saving, so it cannot be the way in.
+      renderTable({
+        allowIncomplete: true,
+        savingEnrollmentId: 6,
+        lines: [{ ...lines[1], incomplete: { completion_percentage: 80, reason: 'x' } }],
+        drafts: { 6: '' },
+      })
+
+      expect(screen.getByRole('spinbutton', { name: /coursework completed/i })).toBeDisabled()
+      expect(screen.getByRole('textbox', { name: /reason/i })).toBeDisabled()
+    })
+
+    it("surfaces an Incomplete row's save failure beside its own fields", () => {
+      renderTable({
+        allowIncomplete: true,
+        lines: [{ ...lines[1], incomplete: { completion_percentage: 80, reason: 'x' } }],
+        drafts: { 6: '' },
+        errors: { 6: 'An Incomplete requires at least 70% of the coursework completed.' },
+      })
+
+      expect(screen.getByText(/at least 70%/i)).toBeInTheDocument()
+    })
   })
 })

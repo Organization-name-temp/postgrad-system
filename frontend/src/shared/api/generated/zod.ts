@@ -3772,7 +3772,8 @@ export const OpenAnOfferingsGradeSheetResponse = zod.object({
   "mark": zod.number().optional(),
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
-}).optional()
+}).optional(),
+  "incomplete": zod.string().nullish()
 })).optional()
 }).optional()
 })
@@ -3783,30 +3784,176 @@ export const OpenAnOfferingsGradeSheetResponse = zod.object({
  * points the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale
  * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
  * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
- * outside 0–100 is a 422 naming the field, and an Enrollment that is not a gradable line of
- * this Sheet's Offering is a 404. Authorised by assignment — only the Offering's Instructor
- * (else 403).
+ * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
+ * Sheet is a 404. Authorised by assignment — only the Offering's Instructor (else 403).
+ *
+ * On an **Initial** round, a line may be marked Incomplete instead — send
+ * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
+ * figure below the configured threshold is a 422 naming the field. Entering one supersedes
+ * the other on the same line: a mark clears an earlier Incomplete declaration and an
+ * Incomplete declaration clears an earlier mark.
  * @summary Save one Grade Sheet line.
  */
 export const SaveOneGradeSheetLineParams = zod.object({
   "grade_sheet_id": zod.number().describe('The ID of the grade sheet.'),
-  "enrollment_id": zod.number().describe('The ID of the gradable enrollment being marked.')
+  "enrollment_id": zod.number().describe('The ID of the enrollment being marked.')
 })
 
 export const SaveOneGradeSheetLineBody = zod.object({
-  "mark": zod.number().describe('The final percentage, 0–100 with at most two decimals.')
+  "mark": zod.number().optional().describe('The final percentage, 0–100 with at most two decimals. Required unless declaring an Incomplete.'),
+  "completion_percentage": zod.number().optional().describe('The coursework percentage completed, 0–100. Declares an Incomplete in place of a mark; requires `reason`.'),
+  "reason": zod.string().optional().describe('The reason for the Incomplete. Required alongside `completion_percentage`.')
 })
 
-export const SaveOneGradeSheetLineResponse = zod.object({
+export const SaveOneGradeSheetLineResponse = zod.union([zod.object({
   "data": zod.object({
   "enrollment_id": zod.number().optional(),
   "grade": zod.object({
   "mark": zod.number().optional(),
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
+}).optional(),
+  "incomplete": zod.string().nullish()
+}).optional()
+}).describe('a mark'),zod.object({
+  "data": zod.object({
+  "enrollment_id": zod.number().optional(),
+  "grade": zod.string().nullish(),
+  "incomplete": zod.object({
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional()
 }).optional()
 }).optional()
+}).describe('an incomplete declaration')])
+
+
+/**
+ * Every unresolved, unconverted Incomplete declared on an Offering the acting user
+ * teaches, each with the Student it names and its derived resolution deadline — `null`
+ * while the next Semester does not exist in the Calendar yet (declaring, and viewing, are
+ * never blocked for an admin's omission).
+ * @summary My outstanding Incompletes.
+ */
+export const MyOutstandingIncompletesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "incomplete_id": zod.number().optional(),
+  "enrollment_id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional(),
+  "deadline": zod.string().optional()
+})).optional()
 })
+
+
+/**
+ * Lazily opens the `IncompleteResolution` Sheet round for one outstanding Incomplete — a
+ * single line, the Incomplete's own Enrollment — or returns the round already open for it
+ * (the Initial round's lazy-open precedent). From here, entering the mark, signing and
+ * Department-Head finalization all behave exactly as ticket 03 established: the returned
+ * Sheet id is used with {@see GradeSheetController::saveLine()}/{@see GradeSheetController::sign()}
+ * and the Department Head's queue/show/finalize/return, all unchanged. A 409 when the
+ * Incomplete has already been resolved or converted.
+ * @summary Open (or resume) the Incomplete's resolution round.
+ */
+export const OpenorResumeTheIncompletesResolutionRoundParams = zod.object({
+  "incomplete_id": zod.number().describe('The ID of the incomplete.')
+})
+
+export const OpenorResumeTheIncompletesResolutionRoundResponse = zod.union([zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.string().nullish(),
+  "incomplete": zod.object({
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional()
+}).optional()
+})).optional()
+}).optional()
+}).describe('freshly opened, no mark entered yet'),zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "incomplete": zod.object({
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional()
+}).optional()
+})).optional()
+}).optional()
+}).describe('the outstanding mark already entered')])
 
 
 /**
@@ -3917,7 +4064,8 @@ export const OpenOneSheetForReviewResponse = zod.object({
   "mark": zod.number().optional(),
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
-}).optional()
+}).optional(),
+  "incomplete": zod.string().nullish()
 })).optional(),
   "distribution": zod.array(zod.object({
   "letter": zod.string().optional(),
@@ -3929,11 +4077,19 @@ export const OpenOneSheetForReviewResponse = zod.object({
 
 /**
  * Submitted → Finalized (else a 409): the round's Grades become part of the academic
- * record and the round is permanently closed (ADR-0023). In the same transaction, `earned`
- * — "this Attempt reached C+ and earned its credit hours" — is written onto every graded
- * Enrollment through `Enrollment\Public` (ADR-0022), which remains the sole writer of its
- * own column. After commit, `GradeFinalized` fires for its side effects only — today, one
- * notification per Student carrying their letter and whether it fell below C+.
+ * record and the round is permanently closed (ADR-0023). In the same transaction, for each
+ * Grade, `earned` — "this Attempt reached C+ and earned its credit hours" — is written onto
+ * its Enrollment through `Enrollment\Public` (ADR-0022): a plain
+ * {@see EnrollmentRecords::recordOutcome()} normally, or, when the Grade resolves an
+ * outstanding Incomplete (this round is an `IncompleteResolution`, ticket 05),
+ * {@see EnrollmentRecords::resolveIncomplete()} instead — which also restores the Course
+ * Status the Enrollment held before it became Incomplete. On an **Initial** round, every
+ * line declared Incomplete instead of graded (no Grade row) becomes one through
+ * {@see EnrollmentRecords::markIncomplete()}, in the same transaction — no grade, and no
+ * Incomplete, enters the record on one signature. After commit, `GradeFinalized` fires for
+ * its side effects only: one notification per graded Student (their letter and whether it
+ * fell below C+), and one per newly-declared Incomplete (the reason and its derived
+ * deadline).
  * @summary Finalize the Sheet.
  */
 export const FinalizeTheSheetParams = zod.object({
@@ -4013,13 +4169,15 @@ export const MyGradesResponse = zod.object({
   "department_id": zod.number().optional()
 }).optional(),
   "credit_hours": zod.number().optional(),
+  "course_status": zod.string().optional(),
   "grade": zod.object({
   "mark": zod.number().optional(),
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
 }).optional(),
   "earned": zod.boolean().optional(),
-  "superseded": zod.boolean().optional()
+  "superseded": zod.boolean().optional(),
+  "incomplete_deadline": zod.string().nullish()
 })).optional()
 })).optional()
 }).optional()

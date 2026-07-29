@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { Alert, CircularProgress, Paper, Stack, Typography, Button } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
@@ -9,15 +8,15 @@ import {
   getOpenAnOfferingsGradeSheetQueryKey as sheetQueryKey,
   useOpenAnOfferingsGradeSheet,
   useSaveOneGradeSheetLine,
-  useSignTheSheet,
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { gradeSheetChip } from '../gradeSheetChip'
-import { parseMark } from '../letterGrade'
+import { coerceNullableObject } from '../incompleteLine'
 import { GradeSheetTable } from './GradeSheetTable'
 import type { GradeSheetLine } from './GradeSheetTable'
+import { useGradeSheetEditor } from './useGradeSheetEditor'
 
 /**
  * One Offering's Grade Sheet (features/grading, ticket 01): the assigned Instructor's mark
@@ -25,9 +24,10 @@ import type { GradeSheetLine } from './GradeSheetTable'
  * that first read — and each mark is committed **on blur, one line at a time**, matching the
  * server's per-line save so a long roster is never lost to a closed tab.
  *
- * The page owns the drafts and the mutation; the table is presentational. The server stays
- * authoritative: it re-derives the letter from the mark and returns the frozen Grade, so the
- * client mirror is only ever a preview.
+ * The page owns the drafts and the mutation (through {@see useGradeSheetEditor}, shared with
+ * {@see IncompleteResolutionPage}); the table is presentational. The server stays authoritative:
+ * it re-derives the letter from the mark and returns the frozen Grade, so the client mirror is
+ * only ever a preview.
  */
 export function GradeSheetPage() {
   const { t, i18n } = useTranslation('grading')
@@ -36,16 +36,10 @@ export function GradeSheetPage() {
   const queryClient = useQueryClient()
 
   const { data, isPending, isError, error } = useOpenAnOfferingsGradeSheet(offeringId)
+  // A separate mutation instance from the shared hook's — declaring an Incomplete is this
+  // page's own act, never shared with IncompleteResolutionPage (a resolution round only ever
+  // enters a mark).
   const saveLine = useSaveOneGradeSheetLine()
-  const sign = useSignTheSheet()
-
-  // What is currently typed in each row, keyed by enrollment id. Seeded from the server's
-  // recorded marks the first time the Sheet loads, then owned here — so a row the Instructor
-  // is mid-edit is never overwritten by a refetch.
-  const [drafts, setDrafts] = useState<Record<number, string> | null>(null)
-  const [errors, setErrors] = useState<Record<number, string>>({})
-  const [savingEnrollmentId, setSavingEnrollmentId] = useState<number | null>(null)
-  const [signError, setSignError] = useState<string | null>(null)
 
   const loaded = data?.data
   const course = loaded?.course
@@ -59,81 +53,85 @@ export function GradeSheetPage() {
     credit_hours: line.credit_hours ?? 0,
     student: { name: line.student?.name, university_id: line.student?.university_id },
     grade: line.grade ?? null,
+    incomplete: coerceNullableObject<GradeSheetLine['incomplete']>(line.incomplete),
   }))
 
-  const seeded =
-    drafts ??
-    Object.fromEntries(
-      lines.map((line) => [line.enrollment_id, line.grade?.mark?.toString() ?? '']),
-    )
+  const {
+    seeded,
+    errors,
+    setErrors,
+    savingEnrollmentId,
+    setSavingEnrollmentId,
+    signError,
+    blankCount,
+    setDraft,
+    commit,
+    handleSign,
+    signPending,
+  } = useGradeSheetEditor({
+    sheetId,
+    lines,
+    // A declared Incomplete is decided, not blank (ticket 05) — only a genuinely ungraded
+    // line, with neither a mark nor an Incomplete, blocks signing.
+    isLineBlank: (line) => line.grade === null && line.incomplete == null,
+    onSaved: () => queryClient.invalidateQueries({ queryKey: sheetQueryKey(offeringId) }),
+    onSigned: async () => {
+      await queryClient.invalidateQueries({ queryKey: sheetQueryKey(offeringId) })
+      await queryClient.invalidateQueries({ queryKey: getMyOfferingsToGradeQueryKey() })
+    },
+    saveErrorFallback: t('sheet.saveError'),
+    signErrorFallback: t('sheet.signError'),
+  })
 
   // The Sheet may be signed from Draft or Returned (ADR-0023); Submitted and Finalized are
-  // read-only. Blank lines are recorded Grades still missing, not the mid-typed draft — the
-  // same count the server's blank-line guard enforces.
+  // read-only.
   const canSign = sheetStatus === 'Draft' || sheetStatus === 'Returned'
-  const blankCount = lines.filter((line) => line.grade === null).length
-
-  const setDraft = (enrollmentId: number, value: string) => {
-    setDrafts({ ...seeded, [enrollmentId]: value })
-    // A fresh keystroke clears the row's stale server error — the message described the
-    // previous value, not this one.
-    setErrors((prev) => {
-      if (prev[enrollmentId] === undefined) return prev
-      const next = { ...prev }
-      delete next[enrollmentId]
-      return next
-    })
-  }
 
   /**
-   * Commit one row on blur. A row is only sent when the typed value is a mark the server would
-   * accept and it actually differs from what is recorded — so tabbing through an already-graded
-   * roster writes nothing, and a half-typed or cleared field is left alone rather than sent to
-   * be rejected. (Clearing a recorded mark is not a delete: ticket 01 has no way to unrecord a
-   * Grade, and inventing one here would be scope the Sheet's lifecycle has not settled.)
+   * Declare (or correct) an Incomplete on one line (ticket 05, SRS §4.7.3.1) — one explicit
+   * Save, not a commit-on-blur, since a percentage or a reason alone means nothing. The client
+   * checks only that both fields are present; the 70% threshold is enforced server-side, and
+   * its 422 surfaces here exactly like a mark's. Shares the hook's `errors`/`savingEnrollmentId`
+   * state — a row is never "saving" on two fronts at once.
    */
-  const commit = async (enrollmentId: number) => {
+  const declareIncomplete = async (enrollmentId: number, percentage: string, reason: string) => {
     if (sheetId === undefined) return
 
-    const line = lines.find((candidate) => candidate.enrollment_id === enrollmentId)
-    const mark = parseMark(seeded[enrollmentId] ?? '')
-    if (line === undefined || mark === null || mark === line.grade?.mark) return
+    const trimmedReason = reason.trim()
+    const parsedPercentage = Number(percentage)
+    if (percentage.trim() === '' || !Number.isFinite(parsedPercentage)) {
+      setErrors((prev) => ({ ...prev, [enrollmentId]: t('sheet.incomplete.percentageInvalid') }))
+      return
+    }
+    if (trimmedReason === '') {
+      setErrors((prev) => ({ ...prev, [enrollmentId]: t('sheet.incomplete.reasonRequired') }))
+      return
+    }
 
     setSavingEnrollmentId(enrollmentId)
     try {
-      await saveLine.mutateAsync({ gradeSheetId: sheetId, enrollmentId, data: { mark } })
+      await saveLine.mutateAsync({
+        gradeSheetId: sheetId,
+        enrollmentId,
+        data: { completion_percentage: parsedPercentage, reason: trimmedReason },
+      })
       await queryClient.invalidateQueries({ queryKey: sheetQueryKey(offeringId) })
-    } catch (saveError) {
-      // The server's own message, already localised by Accept-Language — the field message
-      // when it is a 422 on `mark`, the envelope message otherwise (403 / 404 / 409).
+      setErrors((prev) => {
+        if (prev[enrollmentId] === undefined) return prev
+        const next = { ...prev }
+        delete next[enrollmentId]
+        return next
+      })
+    } catch (declareError) {
+      const fieldErrors = apiFieldErrors(declareError)
       const message =
-        apiFieldErrors(saveError).mark?.[0] ?? apiErrorMessage(saveError) ?? t('sheet.saveError')
+        fieldErrors.completion_percentage?.[0] ??
+        fieldErrors.reason?.[0] ??
+        apiErrorMessage(declareError) ??
+        t('sheet.incomplete.saveError')
       setErrors((prev) => ({ ...prev, [enrollmentId]: message }))
     } finally {
       setSavingEnrollmentId(null)
-    }
-  }
-
-  /**
-   * Sign the Sheet as one act (SRS §4.7.1.4). The blank-line count already rendered below the
-   * button is the same guard the server enforces, so this is a defence against a stale client —
-   * not the Instructor's first signal that lines remain. A 422 here still surfaces the server's
-   * message, in case the roster changed since the page loaded.
-   */
-  const handleSign = async () => {
-    if (sheetId === undefined) return
-
-    setSignError(null)
-    try {
-      await sign.mutateAsync({ gradeSheetId: sheetId })
-      await queryClient.invalidateQueries({ queryKey: sheetQueryKey(offeringId) })
-      await queryClient.invalidateQueries({ queryKey: getMyOfferingsToGradeQueryKey() })
-    } catch (signingError) {
-      setSignError(
-        apiFieldErrors(signingError).lines?.[0] ??
-          apiErrorMessage(signingError) ??
-          t('sheet.signError'),
-      )
     }
   }
 
@@ -185,6 +183,8 @@ export function GradeSheetPage() {
                 errors={errors}
                 onChange={setDraft}
                 onCommit={commit}
+                allowIncomplete
+                onDeclareIncomplete={declareIncomplete}
               />
             </>
           )}
@@ -200,7 +200,7 @@ export function GradeSheetPage() {
               <Button
                 variant="contained"
                 onClick={handleSign}
-                disabled={blankCount > 0 || sign.isPending}
+                disabled={blankCount > 0 || signPending}
               >
                 {t('sheet.sign')}
               </Button>

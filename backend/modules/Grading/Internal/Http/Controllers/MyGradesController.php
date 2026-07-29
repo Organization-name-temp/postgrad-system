@@ -10,6 +10,7 @@ use Modules\Enrollment\Public\EnrollmentSummary;
 use Modules\Grading\Internal\Support\CurrentGradeLookup;
 use Modules\Grading\Internal\Support\GpaAttempt;
 use Modules\Grading\Internal\Support\GpaCalculator;
+use Modules\Grading\Internal\Support\IncompleteDeadlineResolver;
 use Modules\Grading\Internal\Support\StudentGpaTally;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -23,9 +24,11 @@ use Modules\Identity\Public\StudentSummary;
  *
  * Nothing is visible until the Department Head has finalized the Sheet
  * ({@see CurrentGradeLookup}): a Student never sees a provisional grade that later changes, so
- * only Enrollments with a **Finalized** Grade appear at all. A superseded earlier Attempt of a
- * retaken Course still appears — its credit hours and letter are never hidden — but is flagged
- * `superseded` and excluded from every average it no longer counts toward
+ * only Enrollments with a **Finalized** Grade appear — **plus** any Incomplete (ticket 05,
+ * SRS §4.7.3.2) with its derived deadline, and, once converted, the Fail Withdrawal itself,
+ * neither of which ever carries a Grade. A superseded earlier Attempt of a retaken Course still
+ * appears — its credit hours and letter are never hidden — but is flagged `superseded` and
+ * excluded from every average it no longer counts toward
  * ({@see GpaCalculator::nonSuperseded()}), so the rule is legible rather than leaving the
  * numbers looking wrong. Two different electives never compete for the same row; both simply
  * appear (FR-REG-006.4).
@@ -39,7 +42,7 @@ class MyGradesController
     /**
      * My Grades.
      *
-     * @response 200 {"data": {"cgpa": 3.42, "semesters": [{"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "gpa": 3.42, "courses": [{"enrollment_id": 5, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3.0}, "earned": true, "superseded": false}]}]}}
+     * @response 200 {"data": {"cgpa": 3.42, "semesters": [{"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "gpa": 3.42, "courses": [{"enrollment_id": 5, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Regular", "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3.0}, "earned": true, "superseded": false, "incomplete_deadline": null}, {"enrollment_id": 9, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Incomplete", "grade": null, "earned": null, "superseded": false, "incomplete_deadline": "2026-11-03T00:00:00+00:00"}]}]}}
      * @response 403 scenario="no student record" {"message": "You do not have a student record."}
      */
     public function index(
@@ -47,6 +50,7 @@ class MyGradesController
         StudentDirectory $students,
         CourseCatalog $courses,
         StudentGpaTally $tally,
+        IncompleteDeadlineResolver $deadlines,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
         $record = $tally->recordFor($student->studentId);
@@ -55,21 +59,24 @@ class MyGradesController
         $eligibleIds = array_flip(array_map(fn (GpaAttempt $a): int => $a->enrollmentId, $eligible));
         $cgpa = GpaCalculator::average($eligible);
 
-        $graded = array_values(array_filter(
+        // Visible rows: a Finalized Grade, or (never graded) an Incomplete/Fail-Withdrawal
+        // Course Status — StudentGpaTally's own membership test, read rather than re-derived.
+        $visible = array_values(array_filter(
             $record->enrollments,
-            fn (EnrollmentSummary $e): bool => isset($record->grades[$e->id]),
+            fn (EnrollmentSummary $e): bool => isset($record->grades[$e->id])
+                || StudentGpaTally::isUngradedVisible($e->courseStatus),
         ));
 
-        if ($graded === []) {
+        if ($visible === []) {
             return response()->json(['data' => ['cgpa' => $cgpa, 'semesters' => []]]);
         }
 
         $coursesById = $courses->findMany(array_values(array_unique(
-            array_map(fn (EnrollmentSummary $e): int => $e->courseId, $graded),
+            array_map(fn (EnrollmentSummary $e): int => $e->courseId, $visible),
         )));
 
         $rowsBySemester = [];
-        foreach ($graded as $enrollment) {
+        foreach ($visible as $enrollment) {
             // A Semester reference cannot dangle in practice (ADR-0018), but a caller must
             // still handle it rather than crash on a stale one — the same guard that keeps
             // this Enrollment out of $eligible/$record->attempts in the first place.
@@ -77,13 +84,19 @@ class MyGradesController
                 continue;
             }
 
+            $grade = $record->grades[$enrollment->id] ?? null;
+
             $rowsBySemester[$enrollment->semesterId][] = [
                 'enrollment_id' => $enrollment->id,
                 'course' => ($coursesById[$enrollment->courseId] ?? null)?->toArray(),
                 'credit_hours' => $enrollment->creditHours,
-                'grade' => $record->grades[$enrollment->id]->toLineArray(),
+                'course_status' => $enrollment->courseStatus,
+                'grade' => $grade?->toLineArray(),
                 'earned' => $enrollment->earned,
-                'superseded' => ! isset($eligibleIds[$enrollment->id]),
+                'superseded' => $grade !== null && ! isset($eligibleIds[$enrollment->id]),
+                'incomplete_deadline' => $enrollment->courseStatus === 'Incomplete'
+                    ? $deadlines->forEnrollmentSemester($enrollment->semesterId)?->toIso8601String()
+                    : null,
             ];
         }
 

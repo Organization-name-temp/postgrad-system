@@ -117,4 +117,28 @@ enum NotificationType: string
      * `enrollment_id`, `letter_grade`, `below_c_plus`.
      */
     case GradeFinalized = 'grade.finalized';
+
+    /**
+     * An Instructor's Incomplete declaration was finalized (Phase 4, ticket 05, SRS §4.7.3.2) —
+     * raised to the Student the moment the Course Status actually becomes Incomplete (at the
+     * Sheet's finalize, not the declaration), carrying the reason and the derived deadline so
+     * it is never a silent decision. Payload: `enrollment_id`, `reason`, `deadline` (nullable —
+     * absent exactly when the conversion command would also skip it).
+     */
+    case IncompleteDeclared = 'incomplete.declared';
+
+    /**
+     * A reminder that an outstanding Incomplete's resolution deadline is approaching (SRS
+     * §4.7.3.4), raised by the manual `grading:send-incomplete-reminders` command on the exact
+     * day the days-remaining figure matches one of the configured offsets. Payload:
+     * `enrollment_id`, `deadline`, `days_remaining`.
+     */
+    case IncompleteReminder = 'incomplete.reminder';
+
+    /**
+     * An unresolved Incomplete passed its deadline and became a Fail Withdrawal (SRS §4.7.3.3)
+     * — the one automated Course Status change in the system, raised by the manual
+     * `grading:convert-expired-incompletes` command. Payload: `enrollment_id`.
+     */
+    case IncompleteConverted = 'incomplete.converted';
 }

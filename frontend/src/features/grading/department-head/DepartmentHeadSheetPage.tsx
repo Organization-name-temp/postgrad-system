@@ -28,6 +28,7 @@ import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { gradeSheetChip } from '../gradeSheetChip'
+import { coerceNullableObject } from '../incompleteLine'
 
 /**
  * The Department Head's review of one signed Grade Sheet (features/grading, ticket 03): every
@@ -140,25 +141,44 @@ export function DepartmentHeadSheetPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {lines.map((line) => (
-                    <TableRow key={line.enrollment_id}>
-                      <TableCell>
-                        <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
-                          <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
-                            {line.student?.name}
-                          </Typography>
-                          {line.student?.university_id && (
-                            <Typography variant="caption" component="span" color="text.secondary">
-                              {line.student.university_id}
+                  {lines.map((line) => {
+                    const incomplete = coerceNullableObject<{
+                      completion_percentage?: number
+                      reason?: string
+                    }>(line.incomplete)
+                    return (
+                      <TableRow key={line.enrollment_id}>
+                        <TableCell>
+                          <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
+                            <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
+                              {line.student?.name}
                             </Typography>
-                          )}
-                        </Stack>
-                      </TableCell>
-                      <TableCell align="right">{line.credit_hours}</TableCell>
-                      <TableCell>{line.grade?.mark ?? t('sheet.noLetter')}</TableCell>
-                      <TableCell>{line.grade?.letter_grade ?? t('sheet.noLetter')}</TableCell>
-                    </TableRow>
-                  ))}
+                            {line.student?.university_id && (
+                              <Typography variant="caption" component="span" color="text.secondary">
+                                {line.student.university_id}
+                              </Typography>
+                            )}
+                          </Stack>
+                        </TableCell>
+                        <TableCell align="right">{line.credit_hours}</TableCell>
+                        {incomplete ? (
+                          <TableCell colSpan={2}>
+                            <Typography variant="body2" color="text.secondary">
+                              {t('departmentHead.review.incompleteNote', {
+                                percentage: incomplete.completion_percentage,
+                                reason: incomplete.reason,
+                              })}
+                            </Typography>
+                          </TableCell>
+                        ) : (
+                          <>
+                            <TableCell>{line.grade?.mark ?? t('sheet.noLetter')}</TableCell>
+                            <TableCell>{line.grade?.letter_grade ?? t('sheet.noLetter')}</TableCell>
+                          </>
+                        )}
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             </TableContainer>

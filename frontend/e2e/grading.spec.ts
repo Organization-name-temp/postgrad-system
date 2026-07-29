@@ -7,6 +7,15 @@ import AxeBuilder from '@axe-core/playwright'
 // the grade-sheet list and the sheet editor — are scanned with `@axe-core/playwright` in all
 // four combos (light/dark × EN/AR), the style-gallery precedent, because a table of numeric
 // inputs and a live letter preview is exactly where a labelling or contrast regression hides.
+// Ticket 05 adds the sheet editor's Incomplete-declare fields (still the same table, a second
+// control state worth its own scan) and the Instructor's outstanding-Incompletes list, in its
+// only reachable state today — empty, since no Incomplete exists in the seed data yet.
+//
+// IncompleteResolutionPage has no axe coverage here: reaching it needs a live outstanding
+// Incomplete, which needs a Department Head actually routed to CSE511's department to finalize
+// one — no such assignment exists in today's seed data (ticket 02/03 shipped no seeder either).
+// It joins this file once ticket 10's seeder provides both, the same reason My Grades' populated
+// state waits below.
 //
 // The phase's multi-role headline smoke (enter marks → sign → finalize → the Student sees
 // their GPA) joins this file with ticket 10, once there is a Phase-4 seeder to drive it.
@@ -29,6 +38,23 @@ const COMBOS = [
   { scheme: 'light', lang: 'ar', dir: 'rtl' },
   { scheme: 'dark', lang: 'ar', dir: 'rtl' },
 ] as const
+
+// Bilingual copy the ticket-05 assertions below need to match — the rest of this file avoids
+// the problem entirely by only asserting language-invariant content (course codes, letters).
+const COPY = {
+  en: {
+    declareIncomplete: /mark incomplete instead/i,
+    enterMarkInstead: /enter a mark instead/i,
+    coursework: /coursework completed/i,
+    noOutstanding: /no outstanding incompletes/i,
+  },
+  ar: {
+    declareIncomplete: /تسجيل "غير مكتمل"/,
+    enterMarkInstead: /إدخال درجة بدلًا من ذلك/,
+    coursework: /نسبة إنجاز المقرر/,
+    noOutstanding: /ليس لديك أي حالة/,
+  },
+} as const
 
 async function login(page: Page, email: string) {
   await page.goto('/login')
@@ -101,6 +127,38 @@ test.describe('grading screens', () => {
         body: await page.screenshot({ fullPage: true }),
         contentType: 'image/png',
       })
+
+      // ── Declaring an Incomplete (ticket 05) ─────────────────────────────────────────
+      // Toggled open and scanned, then toggled back closed without ever saving — this row
+      // is shared with the invalid-mark state just scanned above, and nothing here should
+      // write to the dev database.
+      const copy = COPY[lang]
+      await page.getByRole('button', { name: copy.declareIncomplete }).first().click()
+      await expect(page.getByRole('spinbutton', { name: copy.coursework })).toBeVisible()
+      await expectNoSeriousA11y(page, `grade sheet editor, incomplete fields — ${scheme}/${lang}`)
+      await page.getByRole('button', { name: copy.enterMarkInstead }).click()
+    })
+  }
+})
+
+test.describe('outstanding incompletes (ticket 05)', () => {
+  for (const { scheme, lang, dir } of COMBOS) {
+    test(`the outstanding-incompletes list passes axe in ${scheme} / ${lang}`, async ({
+      page,
+    }) => {
+      page.setDefaultTimeout(20_000)
+
+      await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
+      await login(page, INSTRUCTOR)
+      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await expect(page.locator('html')).toHaveAttribute('dir', dir)
+      await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
+
+      await page.goto('/grading/incompletes')
+      // No Incomplete exists in today's seed data — the only reachable state until ticket
+      // 10's seeder declares one (spec §Testing Decisions: "an already-overdue Incomplete").
+      await expect(page.getByText(COPY[lang].noOutstanding)).toBeVisible()
+      await expectNoSeriousA11y(page, `outstanding incompletes — ${scheme}/${lang}`)
     })
   }
 })

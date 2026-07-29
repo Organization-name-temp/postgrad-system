@@ -5,8 +5,11 @@ namespace Modules\Grading;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Grading\Internal\Console\Commands\ConvertExpiredIncompletes;
+use Modules\Grading\Internal\Console\Commands\SendIncompleteReminders;
 use Modules\Grading\Internal\Events\GradeFinalized;
 use Modules\Grading\Internal\Listeners\SendGradeFinalizedNotifications;
+use Modules\Grading\Internal\Listeners\SendIncompleteDeclaredNotifications;
 use Modules\Grading\Internal\Support\EloquentGradingRecords;
 use Modules\Grading\Public\GradingRecords;
 
@@ -37,6 +40,7 @@ class GradingServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
+        $this->registerConsoleCommands();
 
         // The module owns its /api/v1 routes (ADR-0002). Authorization gates are already
         // registered from the §3.2 matrix by Identity (ADR-0008); Grading consumes
@@ -45,9 +49,28 @@ class GradingServiceProvider extends ServiceProvider
             ->prefix('api/v1')
             ->group(__DIR__.'/Public/Http/routes.php');
 
-        // GradeFinalized carries side-effects only (ticket 03: the Student notification);
-        // Phase 5's standing recompute hangs its own listener off this same event later
-        // without touching the finalize (the Admissions AdmissionAccepted precedent).
+        // GradeFinalized carries side-effects only: the Student notification (ticket 03), and —
+        // registered alongside it, reacting to the same event — the Incomplete-declared
+        // notification an Initial round's finalize also produces (ticket 05). Phase 5's
+        // standing recompute hangs its own listener off this same event later without touching
+        // the finalize (the Admissions AdmissionAccepted precedent).
         Event::listen(GradeFinalized::class, SendGradeFinalizedNotifications::class);
+        Event::listen(GradeFinalized::class, SendIncompleteDeclaredNotifications::class);
+    }
+
+    /**
+     * The module's manually-run console commands (ticket 05): the Incomplete reminder nudge
+     * and the deadline-expiry converter — the one automated Course Status change in the system
+     * (SRS §4.7.3.3). Registered only when running in the console, the Admissions
+     * FlagOverdueApplications/SendInterviewReminders precedent.
+     */
+    private function registerConsoleCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                SendIncompleteReminders::class,
+                ConvertExpiredIncompletes::class,
+            ]);
+        }
     }
 }

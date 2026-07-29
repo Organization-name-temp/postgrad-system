@@ -125,6 +125,97 @@ describe('MyGradesPage (ticket 04)', () => {
     expect(screen.getByText(/semester gpa: —/i)).toBeInTheDocument()
   })
 
+  it('shows an Incomplete with its derived deadline, never a letter or an earned/not-earned label', async () => {
+    payload = {
+      data: {
+        cgpa: null,
+        semesters: [
+          semester({
+            gpa: null,
+            courses: [
+              {
+                enrollment_id: 9,
+                course,
+                credit_hours: 3,
+                course_status: 'Incomplete',
+                grade: null,
+                earned: null,
+                superseded: false,
+                incomplete_deadline: '2026-11-03T00:00:00+00:00',
+              },
+            ],
+          }),
+        ],
+      },
+    }
+    renderPage()
+
+    expect(await screen.findByText('Incomplete')).toBeInTheDocument()
+    expect(screen.getByText(/resolve by/i)).toBeInTheDocument()
+    // The "Earned credit" column header is always present; the row itself carries neither an
+    // earned nor a not-earned cell — an Incomplete is undecided, not a graded outcome.
+    expect(
+      screen.queryByRole('cell', { name: /^(earned credit|did not earn credit)$/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('shows "no deadline yet" for an Incomplete whose next semester does not exist', async () => {
+    payload = {
+      data: {
+        cgpa: null,
+        semesters: [
+          semester({
+            gpa: null,
+            courses: [
+              {
+                enrollment_id: 9,
+                course,
+                credit_hours: 3,
+                course_status: 'Incomplete',
+                grade: null,
+                earned: null,
+                superseded: false,
+                incomplete_deadline: null,
+              },
+            ],
+          }),
+        ],
+      },
+    }
+    renderPage()
+
+    expect(await screen.findByText(/resolution deadline not yet set/i)).toBeInTheDocument()
+  })
+
+  it('shows a Fail Withdrawal with no letter and no deadline caption', async () => {
+    payload = {
+      data: {
+        cgpa: null,
+        semesters: [
+          semester({
+            gpa: null,
+            courses: [
+              {
+                enrollment_id: 9,
+                course,
+                credit_hours: 3,
+                course_status: 'FailWithdrawal',
+                grade: null,
+                earned: null,
+                superseded: false,
+                incomplete_deadline: null,
+              },
+            ],
+          }),
+        ],
+      },
+    }
+    renderPage()
+
+    expect(await screen.findByText('Fail Withdrawal')).toBeInTheDocument()
+    expect(screen.queryByText(/deadline/i)).not.toBeInTheDocument()
+  })
+
   it('shows a below-C+ letter with the sub-earn emphasis and "did not earn credit"', async () => {
     payload = {
       data: {

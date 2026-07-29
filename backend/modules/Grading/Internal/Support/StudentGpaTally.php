@@ -5,6 +5,7 @@ namespace Modules\Grading\Internal\Support;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentSummary;
+use Modules\Grading\Internal\Http\Controllers\MyGradesController;
 
 /**
  * A Student's whole CGPA/GPA input, assembled from `Enrollment\Public`'s roster,
@@ -18,47 +19,74 @@ use Modules\Enrollment\Public\EnrollmentSummary;
  * are CGPA-counting and graded".
  *
  * Filters to `Enrollment\Public`'s own {@see EnrollmentSummary::$countsTowardCgpa} judgement
- * (Appendix D, read never reimplemented) and to Enrollments with a **Finalized** Grade
- * ({@see CurrentGradeLookup}) for `attempts` — every gradable Course Status counts toward the
- * CGPA (spec), so this is exactly the roster
- * `Modules\Grading\Internal\Http\Controllers\GradeSheetController` would have graded.
- * `attempts` is **unfiltered by supersession**: {@see GpaCalculator::nonSuperseded()} derives
- * that at read time, never here.
+ * (Appendix D, read never reimplemented) — **plus** any `Incomplete` or `FailWithdrawal`
+ * Enrollment (ticket 05), neither of which counts toward the CGPA but both of which must still
+ * reach the Student's own My Grades view with their Course Status (an Incomplete's derived
+ * deadline, and — after conversion — the Fail Withdrawal itself). Comparing against those two
+ * statuses' plain string values rather than `Enrollment\Internal\Enums\CourseStatus` is
+ * deliberate: that enum stays Internal (ADR-0012), so Grading names only the two values it
+ * cares about, never the type. `attempts` for the arithmetic still comes from Enrollments with
+ * a **Finalized** Grade ({@see CurrentGradeLookup}) only — an Incomplete/FailWithdrawal
+ * Enrollment never has one, so it can never contaminate the CGPA. `attempts` is **unfiltered
+ * by supersession**: {@see GpaCalculator::nonSuperseded()} derives that at read time, never
+ * here.
  */
 final readonly class StudentGpaTally
 {
+    /** Course Statuses shown on My Grades though they never count toward the CGPA (ticket 05). */
+    private const UNGRADED_VISIBLE_STATUSES = ['Incomplete', 'FailWithdrawal'];
+
     public function __construct(
         private EnrollmentRecords $enrollments,
         private AcademicCalendar $calendar,
     ) {}
 
+    /**
+     * Whether an Enrollment in this Course Status belongs on My Grades despite never carrying
+     * a Grade — the one membership test {@see self::recordFor()} and
+     * {@see MyGradesController} both need, so the
+     * two-value set lives in exactly one place.
+     */
+    public static function isUngradedVisible(string $courseStatus): bool
+    {
+        return in_array($courseStatus, self::UNGRADED_VISIBLE_STATUSES, true);
+    }
+
     public function recordFor(int $studentId): StudentGpaRecord
     {
-        $counting = array_values(array_filter(
+        $relevant = array_values(array_filter(
             $this->enrollments->enrollmentsForStudent($studentId),
-            fn (EnrollmentSummary $enrollment): bool => $enrollment->countsTowardCgpa,
+            fn (EnrollmentSummary $enrollment): bool => $enrollment->countsTowardCgpa
+                || self::isUngradedVisible($enrollment->courseStatus),
         ));
 
-        if ($counting === []) {
+        if ($relevant === []) {
             return new StudentGpaRecord(enrollments: [], grades: [], semesters: [], attempts: []);
         }
 
         $grades = CurrentGradeLookup::forEnrollments(array_map(
             fn (EnrollmentSummary $enrollment): int => $enrollment->id,
-            $counting,
+            $relevant,
         ));
 
-        // Only the graded subset ever needs a Semester resolved — an ungraded (not yet
-        // finalized) counting Enrollment is invisible everywhere until it is.
-        $graded = array_values(array_filter($counting, fn (EnrollmentSummary $e): bool => isset($grades[$e->id])));
-
+        // Every Semester among the relevant set, not only the graded subset — an Incomplete or
+        // Fail Withdrawal never carries a Grade but still needs its Semester resolved for My
+        // Grades' section grouping and (for an Incomplete) the deadline calculation.
         $semesters = [];
-        foreach (array_unique(array_map(fn (EnrollmentSummary $e): int => $e->semesterId, $graded)) as $semesterId) {
+        foreach (array_unique(array_map(fn (EnrollmentSummary $e): int => $e->semesterId, $relevant)) as $semesterId) {
             $semester = $this->calendar->find($semesterId);
             if ($semester !== null) {
                 $semesters[$semesterId] = $semester;
             }
         }
+
+        // The arithmetic input stays exactly what it always was — CGPA-counting AND graded —
+        // so an Incomplete/Fail-Withdrawal row (never graded) can never reach it even though it
+        // now rides along in $relevant/$semesters for My Grades' display.
+        $graded = array_values(array_filter(
+            $relevant,
+            fn (EnrollmentSummary $e): bool => $e->countsTowardCgpa && isset($grades[$e->id]),
+        ));
 
         $attempts = [];
         foreach ($graded as $enrollment) {
@@ -77,6 +105,6 @@ final readonly class StudentGpaTally
             );
         }
 
-        return new StudentGpaRecord(enrollments: $counting, grades: $grades, semesters: $semesters, attempts: $attempts);
+        return new StudentGpaRecord(enrollments: $relevant, grades: $grades, semesters: $semesters, attempts: $attempts);
     }
 }

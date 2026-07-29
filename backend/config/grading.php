@@ -13,4 +13,17 @@ return [
     // must-retake marker on a prep/core Course below it.
     'min_grade_per_course' => (float) env('GRADING_MIN_GRADE_PER_COURSE', 2.5),
 
+    // SRS §4.7.3.1's Incomplete threshold: the minimum completion percentage an Instructor may
+    // attest to when declaring an Incomplete (ticket 05). An attestation, not a measurement
+    // (ADR-0019) — the API simply refuses a lower figure with a bilingual 422.
+    'incomplete_min_completion' => (int) env('GRADING_INCOMPLETE_MIN_COMPLETION', 70),
+
+    // SRS §4.7.3.4's reminder cadence, in days remaining before the derived deadline. Running
+    // `grading:send-incomplete-reminders` daily produces exactly these four reminders, each
+    // once — the manual command fires only on an exact match, never a range.
+    'incomplete_reminder_offsets_days' => array_map(
+        'intval',
+        explode(',', (string) env('GRADING_INCOMPLETE_REMINDER_OFFSETS_DAYS', '28,14,7,1')),
+    ),
+
 ];

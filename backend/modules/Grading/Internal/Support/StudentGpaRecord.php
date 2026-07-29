@@ -17,14 +17,17 @@ use Modules\Grading\Internal\Models\Grade;
 final readonly class StudentGpaRecord
 {
     /**
-     * @param  list<EnrollmentSummary>  $enrollments  the Student's CGPA-counting Enrollments,
-     *                                                graded or not yet
+     * @param  list<EnrollmentSummary>  $enrollments  the Student's CGPA-counting Enrollments
+     *                                                (graded or not yet), plus any Incomplete
+     *                                                or Fail-Withdrawal Enrollment — neither
+     *                                                CGPA-counting nor ever graded, but both
+     *                                                visible on My Grades (ticket 05)
      * @param  array<int, Grade>  $grades  the current Grade per Enrollment id (ADR-0023's latest
      *                                     Finalized Sheet), keyed by id; ids with none are absent
-     * @param  array<int, SemesterSummary>  $semesters  every Semester among the *graded* subset
-     *                                                  of $enrollments, keyed by id
-     * @param  list<GpaAttempt>  $attempts  the graded subset of $enrollments as arithmetic
-     *                                      input, unfiltered by supersession
+     * @param  array<int, SemesterSummary>  $semesters  every Semester among $enrollments, keyed
+     *                                                  by id
+     * @param  list<GpaAttempt>  $attempts  the CGPA-counting, graded subset of $enrollments as
+     *                                      arithmetic input, unfiltered by supersession
      */
     public function __construct(
         public array $enrollments,

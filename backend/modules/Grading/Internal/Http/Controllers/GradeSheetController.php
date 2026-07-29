@@ -15,6 +15,7 @@ use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
 use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
+use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -106,7 +107,7 @@ class GradeSheetController
      *
      * @urlParam offering_id integer required The ID of the course offering. Example: 3
      *
-     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Returned", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": "2026-08-11T09:00:00+00:00", "review_note": "Please recheck line 3."}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}}]}}
+     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Returned", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": "2026-08-11T09:00:00+00:00", "review_note": "Please recheck line 3."}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}, "incomplete": null}, {"enrollment_id": 6, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 8, "university_id": "2026-MSC-CE-0002", "name": "Omar Student"}, "grade": null, "incomplete": {"completion_percentage": 80, "reason": "Hospitalised before the final project was due."}}]}}
      * @response 403 scenario="not the assigned instructor" {"message": "You are not assigned to teach this offering."}
      * @response 404 scenario="no such offering" {"message": "That course offering no longer exists."}
      */
@@ -138,19 +139,28 @@ class GradeSheetController
      * points the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale
      * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
      * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
-     * outside 0–100 is a 422 naming the field, and an Enrollment that is not a gradable line of
-     * this Sheet's Offering is a 404. Authorised by assignment — only the Offering's Instructor
-     * (else 403).
+     * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
+     * Sheet is a 404. Authorised by assignment — only the Offering's Instructor (else 403).
+     *
+     * On an **Initial** round, a line may be marked Incomplete instead — send
+     * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
+     * figure below the configured threshold is a 422 naming the field. Entering one supersedes
+     * the other on the same line: a mark clears an earlier Incomplete declaration and an
+     * Incomplete declaration clears an earlier mark.
      *
      * @urlParam grade_sheet_id integer required The ID of the grade sheet. Example: 1
-     * @urlParam enrollment_id integer required The ID of the gradable enrollment being marked. Example: 5
+     * @urlParam enrollment_id integer required The ID of the enrollment being marked. Example: 5
      *
-     * @bodyParam mark number required The final percentage, 0–100 with at most two decimals. Example: 82.5
+     * @bodyParam mark number The final percentage, 0–100 with at most two decimals. Required unless declaring an Incomplete. Example: 82.5
+     * @bodyParam completion_percentage integer The coursework percentage completed, 0–100. Declares an Incomplete in place of a mark; requires `reason`. Example: 80
+     * @bodyParam reason string The reason for the Incomplete. Required alongside `completion_percentage`. Example: Hospitalised before the final project was due.
      *
-     * @response 200 {"data": {"enrollment_id": 5, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}}}
+     * @response 200 scenario="a mark" {"data": {"enrollment_id": 5, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}, "incomplete": null}}
+     * @response 200 scenario="an incomplete declaration" {"data": {"enrollment_id": 5, "grade": null, "incomplete": {"completion_percentage": 80, "reason": "Hospitalised before the final project was due."}}}
      * @response 403 scenario="not the assigned instructor" {"message": "You are not assigned to teach this offering."}
-     * @response 404 scenario="not a gradable line" {"message": "That enrollment is not a gradable line on this grade sheet."}
+     * @response 404 scenario="not a line of this sheet" {"message": "That enrollment is not a line of this grade sheet."}
      * @response 422 scenario="mark out of range" {"message": "A mark must be a percentage between 0 and 100.", "errors": {"mark": ["A mark must be a percentage between 0 and 100."]}}
+     * @response 422 scenario="completion below threshold" {"message": "An Incomplete requires at least 70% of the coursework completed.", "errors": {"completion_percentage": ["An Incomplete requires at least 70% of the coursework completed."]}}
      */
     public function saveLine(
         Request $request,
@@ -168,8 +178,18 @@ class GradeSheetController
             throw new ConflictHttpException(__('grading.sheet.not_editable'));
         }
 
-        $line = $this->requireGradableLine($offering, $enrollment_id, $enrollments);
+        $line = $this->requireLine($gradeSheet, $offering, $enrollment_id, $enrollments);
 
+        if ($request->has('completion_percentage') || $request->has('reason')) {
+            return $this->saveIncompleteDeclaration($request, $gradeSheet, $line);
+        }
+
+        return $this->saveMark($request, $gradeSheet, $line);
+    }
+
+    /** The ordinary mark-entry path — supersedes any earlier Incomplete declaration on the line. */
+    private function saveMark(Request $request, GradeSheet $gradeSheet, EnrollmentSummary $line): JsonResponse
+    {
         $validated = $request->validate(
             ['mark' => ['required', 'numeric', 'decimal:0,2', 'between:0,100']],
             [
@@ -184,10 +204,69 @@ class GradeSheetController
             Grade::derivedFrom((float) $validated['mark']),
         );
 
+        Incomplete::query()
+            ->where('declared_on_grade_sheet_id', $gradeSheet->getKey())
+            ->where('enrollment_id', $line->id)
+            ->delete();
+
         return response()->json([
             'data' => [
                 'enrollment_id' => $line->id,
                 'grade' => $grade->toLineArray(),
+                'incomplete' => null,
+            ],
+        ]);
+    }
+
+    /**
+     * The Incomplete-declaration path (ticket 05, SRS §4.7.3.1) — only meaningful on the
+     * Offering's Initial round; a resolution round enters the outstanding mark instead. The
+     * completion figure is an Instructor **attestation**, not a measurement (ADR-0019), refused
+     * below the configured threshold. Declaring supersedes any earlier mark on the same line;
+     * re-declaring corrects the percentage/reason rather than adding a second row (the Grade
+     * `updateOrCreate` precedent). The Enrollment's Course Status does not change here — that
+     * happens at the Sheet's finalize, in the same transaction as every other outcome
+     * (ADR-0022/0023): no grade, and no Incomplete, enters the record on one signature.
+     */
+    private function saveIncompleteDeclaration(Request $request, GradeSheet $gradeSheet, EnrollmentSummary $line): JsonResponse
+    {
+        abort_if($gradeSheet->kind !== GradeSheetKind::Initial, 422, __('grading.incomplete.only_on_initial_sheet'));
+
+        $threshold = (int) config('grading.incomplete_min_completion');
+
+        $validated = $request->validate(
+            [
+                'completion_percentage' => ['required', 'integer', 'between:0,100'],
+                'reason' => ['required', 'string', 'max:2000'],
+            ],
+            ['reason.required' => __('grading.incomplete.reason_required')],
+        );
+
+        if ($validated['completion_percentage'] < $threshold) {
+            throw ValidationException::withMessages([
+                'completion_percentage' => [__('grading.incomplete.completion_too_low', ['threshold' => $threshold])],
+            ]);
+        }
+
+        $incomplete = Incomplete::updateOrCreate(
+            ['declared_on_grade_sheet_id' => $gradeSheet->getKey(), 'enrollment_id' => $line->id],
+            [
+                'declared_by' => $this->actingUserId($request),
+                'completion_percentage' => $validated['completion_percentage'],
+                'reason' => $validated['reason'],
+            ],
+        );
+
+        Grade::query()
+            ->where('grade_sheet_id', $gradeSheet->getKey())
+            ->where('enrollment_id', $line->id)
+            ->delete();
+
+        return response()->json([
+            'data' => [
+                'enrollment_id' => $line->id,
+                'grade' => null,
+                'incomplete' => $incomplete->toLineArray(),
             ],
         ]);
     }
@@ -220,7 +299,7 @@ class GradeSheetController
     ): JsonResponse {
         $offering = $this->authorizeOffering($gradeSheet->course_offering_id, $request, $enrollments);
 
-        $blank = count($enrollments->gradableEnrollmentsOf($offering->id)) - $gradeSheet->grades()->count();
+        $blank = count($this->rosterFor($gradeSheet, $offering, $enrollments)) - $this->decidedCount($gradeSheet);
         if ($blank > 0) {
             throw ValidationException::withMessages([
                 'lines' => [__('grading.sheet.blank_lines_remain', ['count' => $blank])],
@@ -275,20 +354,20 @@ class GradeSheetController
     }
 
     /**
-     * The gradable Enrollment being marked, or a 404. Membership is re-checked against
-     * Enrollment's own judgement on every save rather than trusted from the client, so a stale
-     * Sheet — or a hostile request naming a stranger's Enrollment, or an Audit line — cannot
-     * write a Grade that should not exist.
+     * The Enrollment being marked, or a 404 — checked against this Sheet's own kind-aware
+     * roster ({@see self::rosterFor()}) on every save rather than trusted from the client, so a
+     * stale Sheet — or a hostile request naming a stranger's Enrollment, or an Audit line —
+     * cannot write a Grade (or an Incomplete declaration) that should not exist.
      */
-    private function requireGradableLine(OfferingSummary $offering, int $enrollmentId, EnrollmentRecords $enrollments): EnrollmentSummary
+    private function requireLine(GradeSheet $sheet, OfferingSummary $offering, int $enrollmentId, EnrollmentRecords $enrollments): EnrollmentSummary
     {
-        foreach ($enrollments->gradableEnrollmentsOf($offering->id) as $enrollment) {
+        foreach ($this->rosterFor($sheet, $offering, $enrollments) as $enrollment) {
             if ($enrollment->id === $enrollmentId) {
                 return $enrollment;
             }
         }
 
-        abort(404, __('grading.line.not_gradable'));
+        abort(404, __('grading.line.not_found'));
     }
 
     private function actingUserId(Request $request): int

@@ -30,15 +30,23 @@ export function gradeSheetChip(status: string, label: string): StatusChipProps {
 }
 
 /**
- * A line's own state: recorded, or still blank. This is the smallest possible state machine
- * and deliberately so — the Sheet, never the individual Grade, carries the workflow
- * (ADR-0023). The blank chip is what makes an unfinished roster scannable, and ticket 03's
- * blank-line guard on signing counts exactly these.
+ * A line's own state: recorded, declared Incomplete (ticket 05), or still blank — deliberately
+ * the smallest state machine that fits, since the Sheet, never the individual Grade, carries
+ * the workflow (ADR-0023). The blank chip is what makes an unfinished roster scannable, and
+ * ticket 03's blank-line guard on signing counts a declared Incomplete as decided too, never
+ * blank.
  */
-export function gradeLineChip(hasGrade: boolean, label: string): StatusChipProps {
-  return hasGrade
-    ? { tone: 'success', variant: 'outlined', label }
-    : { tone: 'neutral', variant: 'outlined', label }
+export type GradeLineState = 'recorded' | 'incomplete' | 'blank'
+
+const GRADE_LINE_TONE: Record<GradeLineState, ChipStyle> = {
+  recorded: { tone: 'success', variant: 'outlined' },
+  incomplete: { tone: 'warning', variant: 'filled-soft' },
+  blank: { tone: 'neutral', variant: 'outlined' },
+}
+
+export function gradeLineChip(state: GradeLineState, label: string): StatusChipProps {
+  const { tone, variant } = GRADE_LINE_TONE[state]
+  return { tone, variant, label }
 }
 
 /**

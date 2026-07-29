@@ -98,4 +98,30 @@ interface EnrollmentRecords
      * it true/false; Enrollment stores it verbatim and interprets nothing.
      */
     public function recordOutcome(int $enrollmentId, ?bool $earned): void;
+
+    /**
+     * Declare an Enrollment Incomplete (ticket 05, spec §Incomplete and Fail Withdrawal):
+     * privately remembers the Course Status the Enrollment held before — a Retake or CGPA
+     * Improvement, never assumed to be Regular — so {@see self::resolveIncomplete()} can
+     * restore it, then sets the status to `Incomplete`. Called by Grading from inside the same
+     * transaction as an **Initial** Sheet's finalize, never on its own; `CourseStatus` stays
+     * `Enrollment\Internal`, so this is the only way another module reaches it.
+     */
+    public function markIncomplete(int $enrollmentId): void;
+
+    /**
+     * Resolve an Incomplete: restores the Course Status the Enrollment held before it became
+     * Incomplete — a Retake comes back a Retake, never a Regular — and writes the `earned` bit
+     * for the resolving Grade, atomically with the restore. Called by Grading from inside the
+     * same transaction as an **IncompleteResolution** Sheet's finalize.
+     */
+    public function resolveIncomplete(int $enrollmentId, bool $earned): void;
+
+    /**
+     * Convert an unresolved Incomplete to Fail Withdrawal (SRS §4.7.3.3) — the **only** way an
+     * Enrollment reaches `FailWithdrawal`: there is no administrative late-withdrawal path and
+     * no Instructor-assigned FW. Called by the manually-run `grading:convert-expired-incompletes`
+     * command, never anywhere else.
+     */
+    public function convertIncompleteToFailWithdrawal(int $enrollmentId): void;
 }

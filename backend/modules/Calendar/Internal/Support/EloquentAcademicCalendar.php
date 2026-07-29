@@ -38,6 +38,21 @@ final class EloquentAcademicCalendar implements AcademicCalendar
         return $semester === null ? null : $this->toSummary($semester);
     }
 
+    public function nextAfter(int $semesterId): ?SemesterSummary
+    {
+        $semester = Semester::query()->find($semesterId);
+        if ($semester === null) {
+            return null;
+        }
+
+        $next = Semester::query()
+            ->where('starts_at', '>', $semester->starts_at)
+            ->orderBy('starts_at')
+            ->first();
+
+        return $next === null ? null : $this->toSummary($next);
+    }
+
     private function toSummary(Semester $semester): SemesterSummary
     {
         return new SemesterSummary(

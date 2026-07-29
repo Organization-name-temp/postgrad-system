@@ -21,11 +21,17 @@ import type {
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
+import { courseStatusChip, isUngradedVisibleStatus } from '../courseStatusChip'
 import { GRADE_EMPHASIS_SX, gradeEmphasisFor } from '../gradeSheetChip'
 
 /** A GPA/CGPA figure formatted to two decimals, or the dash before any graded course exists. */
 function gpaDisplay(value: number | null | undefined, dash: string): string {
   return typeof value === 'number' ? value.toFixed(2) : dash
+}
+
+/** A locale-formatted calendar date for an Incomplete's derived resolution deadline. */
+function deadlineDisplay(iso: string, locale: string): string {
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(new Date(iso))
 }
 
 /**
@@ -141,6 +147,11 @@ function CourseRowLine({ course }: { course: CourseRow }) {
   // A superseded earlier Attempt stays visible — muted, never hidden — with an explicit label
   // rather than leaving a Student to wonder why the numbers do not add up (spec, user story 43).
   const mutedSx = superseded ? { color: 'text.secondary' } : {}
+  // An Incomplete or (once converted) a Fail Withdrawal never carries a Grade (ticket 05) —
+  // the letter column becomes the Course Status chip instead, and Incomplete additionally
+  // shows its derived resolution deadline.
+  const status = course.course_status
+  const ungraded = course.grade == null && isUngradedVisibleStatus(status)
 
   return (
     <TableRow>
@@ -160,30 +171,54 @@ function CourseRowLine({ course }: { course: CourseRow }) {
       <TableCell align="right" sx={{ ...tabularNums, ...mutedSx }}>
         {course.credit_hours}
       </TableCell>
-      <TableCell>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
-          <Typography
-            component="span"
-            variant="body2"
-            sx={[
-              { fontWeight: 600 },
-              superseded
-                ? { color: 'text.secondary' }
-                : GRADE_EMPHASIS_SX[gradeEmphasisFor(gpaPoints)],
-            ].flat()}
-          >
-            {course.grade?.letter_grade}
-          </Typography>
-          {gpaPoints !== undefined && (
-            <Typography component="span" variant="caption" color="text.secondary" sx={tabularNums}>
-              {t('sheet.points', { points: gpaPoints.toFixed(2) })}
-            </Typography>
-          )}
-        </Stack>
-      </TableCell>
-      <TableCell sx={mutedSx}>
-        {course.earned ? t('myGrades.earned.yes') : t('myGrades.earned.no')}
-      </TableCell>
+      {ungraded ? (
+        <TableCell colSpan={2}>
+          <Stack spacing={0.5} sx={{ alignItems: 'flex-start' }}>
+            <StatusChip {...courseStatusChip(status ?? '', t(`myGrades.courseStatus.${status}`))} />
+            {status === 'Incomplete' && (
+              <Typography variant="caption" color="text.secondary">
+                {course.incomplete_deadline
+                  ? t('myGrades.incompleteDeadline', {
+                      date: deadlineDisplay(course.incomplete_deadline, i18n.language),
+                    })
+                  : t('myGrades.incompleteNoDeadline')}
+              </Typography>
+            )}
+          </Stack>
+        </TableCell>
+      ) : (
+        <>
+          <TableCell>
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'baseline' }}>
+              <Typography
+                component="span"
+                variant="body2"
+                sx={[
+                  { fontWeight: 600 },
+                  superseded
+                    ? { color: 'text.secondary' }
+                    : GRADE_EMPHASIS_SX[gradeEmphasisFor(gpaPoints)],
+                ].flat()}
+              >
+                {course.grade?.letter_grade}
+              </Typography>
+              {gpaPoints !== undefined && (
+                <Typography
+                  component="span"
+                  variant="caption"
+                  color="text.secondary"
+                  sx={tabularNums}
+                >
+                  {t('sheet.points', { points: gpaPoints.toFixed(2) })}
+                </Typography>
+              )}
+            </Stack>
+          </TableCell>
+          <TableCell sx={mutedSx}>
+            {course.earned ? t('myGrades.earned.yes') : t('myGrades.earned.no')}
+          </TableCell>
+        </>
+      )}
     </TableRow>
   )
 }

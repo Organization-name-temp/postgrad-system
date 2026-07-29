@@ -3985,6 +3985,48 @@ export const ReturnTheSheetWithANoteResponse = zod.object({
 
 
 /**
+ * @summary My Grades.
+ */
+export const MyGradesResponse = zod.object({
+  "data": zod.object({
+  "cgpa": zod.number().optional(),
+  "semesters": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "gpa": zod.number().optional(),
+  "courses": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "credit_hours": zod.number().optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "earned": zod.boolean().optional(),
+  "superseded": zod.boolean().optional()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
  * Paginated, newest-first. Scoped to the authenticated user.
  * @summary List my notifications.
  */

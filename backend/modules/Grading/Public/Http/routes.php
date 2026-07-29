@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Grading\Internal\Http\Controllers\DepartmentHeadReviewController;
 use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
+use Modules\Grading\Internal\Http\Controllers\MyGradesController;
 
 /*
 | Grading routes, mounted under /api/v1 by GradingServiceProvider.
@@ -24,6 +25,10 @@ use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
 | point at the Internal controller (a same-module Public → Internal reference, the Calendar
 | precedent). Id params are constrained to integers, and the nested ones are snake_case so
 | Scribe/Orval stay deterministic (the [[scribe-urlparam-determinism]] rule).
+|
+| My Grades (ticket 04) is gated on `grades.view_own` — Student only (§3.2) — and carries no
+| id param: it always reads the acting user's own Student anchor, so another Student's record
+| is unreachable from it (the scoped Advisor/Student-Affairs read is ticket 08's own surface).
 */
 
 Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
@@ -61,4 +66,10 @@ Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
         ->whereNumber('grade_sheet');
     Route::post('/grading/department-head/sheets/{grade_sheet}/return', [DepartmentHeadReviewController::class, 'returnSheet'])
         ->whereNumber('grade_sheet');
+});
+
+Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {
+    // The acting Student's own academic record — Semester GPAs and the CGPA prominently
+    // (ticket 04). No id param: always the acting user's own Student anchor.
+    Route::get('/grading/my-grades', [MyGradesController::class, 'index']);
 });

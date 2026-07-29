@@ -54,19 +54,32 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
     {
         /** @var Collection<int, Enrollment> $enrollments */
         $enrollments = Enrollment::query()
+            ->with('offering')
             ->where('course_offering_id', $offeringId)
             ->whereIn('course_status', self::gradableStatuses())
             ->orderBy('id')
             ->get();
 
-        return $enrollments->map(fn (Enrollment $e): EnrollmentSummary => new EnrollmentSummary(
-            id: (int) $e->getKey(),
-            studentId: (int) $e->student_id,
-            courseOfferingId: (int) $e->course_offering_id,
-            classification: $e->classification->value,
-            courseStatus: $e->course_status->value,
-            creditHours: (int) $e->credit_hours,
-        ))->values()->all();
+        return $enrollments->map(fn (Enrollment $e): EnrollmentSummary => $this->toEnrollmentSummary($e))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return list<EnrollmentSummary>
+     */
+    public function enrollmentsForStudent(int $studentId): array
+    {
+        /** @var Collection<int, Enrollment> $enrollments */
+        $enrollments = Enrollment::query()
+            ->with('offering')
+            ->where('student_id', $studentId)
+            ->orderBy('id')
+            ->get();
+
+        return $enrollments->map(fn (Enrollment $e): EnrollmentSummary => $this->toEnrollmentSummary($e))
+            ->values()
+            ->all();
     }
 
     /**
@@ -91,7 +104,7 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
 
     public function findEnrollment(int $enrollmentId): ?EnrollmentSummary
     {
-        $enrollment = Enrollment::query()->find($enrollmentId);
+        $enrollment = Enrollment::query()->with('offering')->find($enrollmentId);
 
         return $enrollment === null ? null : $this->toEnrollmentSummary($enrollment);
     }
@@ -101,8 +114,19 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
         Enrollment::query()->whereKey($enrollmentId)->update(['earned' => $earned]);
     }
 
+    /**
+     * The DTO for one Enrollment, resolving its Offering's Course/Semester ids in the same
+     * read (eager-loaded by every caller above, so this never triggers a fresh query) —
+     * ticket 04's grouping keys, alongside Enrollment's own counting judgement so Grading
+     * reads Appendix D rather than re-deriving it. `course_offering_id` carries a real FK
+     * (an intra-module reference) and an Offering referenced by an Enrollment can never be
+     * deleted (`OfferingController::destroy()`'s guard), so `$enrollment->offering` is never
+     * null here — read directly, the same as every other guaranteed-present field below.
+     */
     private function toEnrollmentSummary(Enrollment $enrollment): EnrollmentSummary
     {
+        $offering = $enrollment->offering;
+
         return new EnrollmentSummary(
             id: (int) $enrollment->getKey(),
             studentId: (int) $enrollment->student_id,
@@ -110,6 +134,10 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
             classification: $enrollment->classification->value,
             courseStatus: $enrollment->course_status->value,
             creditHours: (int) $enrollment->credit_hours,
+            courseId: (int) $offering->course_id,
+            semesterId: (int) $offering->semester_id,
+            countsTowardCgpa: $enrollment->course_status->counting()->cgpa,
+            earned: $enrollment->earned,
         );
     }
 

@@ -23,6 +23,15 @@ use Modules\Enrollment\Internal\Models\Enrollment;
  * Course's current total — which is exactly what the credit-weighted GPA must multiply by, so
  * a later Catalog edit never rewrites a past term's arithmetic.
  *
+ * {@see $courseId} and {@see $semesterId} are resolved from the Enrollment's Offering (opaque
+ * references, no FK) — the CGPA tally's grouping keys (ticket 04): a Course to group an
+ * Attempt's supersession by, a Semester to group a term's GPA by. {@see $countsTowardCgpa} is
+ * `CourseStatus::counting()->cgpa` (Enrollment's own Appendix-D matrix), read rather than
+ * reimplemented — Grading never re-derives what a status counts toward. {@see $earned} is the
+ * ADR-0022 bit Grading itself pushed at a Sheet's finalize: `null` until graded (or for a
+ * status that is never graded), then whether the Attempt reached C+ and earned its credit
+ * hours.
+ *
  * An immutable value object — the facade builds it, callers only read it.
  */
 final readonly class EnrollmentSummary
@@ -34,5 +43,9 @@ final readonly class EnrollmentSummary
         public string $classification,
         public string $courseStatus,
         public int $creditHours,
+        public int $courseId,
+        public int $semesterId,
+        public bool $countsTowardCgpa,
+        public ?bool $earned,
     ) {}
 }

@@ -23,6 +23,7 @@ import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PersonSearchIcon from '@mui/icons-material/PersonSearch'
 import GradingIcon from '@mui/icons-material/Grading'
 import RateReviewIcon from '@mui/icons-material/RateReview'
+import GradeIcon from '@mui/icons-material/Grade'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -240,6 +241,16 @@ export const navItems: NavItem[] = [
     icon: <RateReviewIcon />,
     section: 'grading',
     roles: [ROLE.departmentHead],
+  },
+  // My Grades (ticket 04): the Student's own Semester GPAs and CGPA. A **persona** item on
+  // the Student role (R02) — the SchedulePage precedent — since an admin inheriting
+  // grades.view_own has no Student record for the page to read.
+  {
+    key: 'myGrades',
+    to: '/grading/my-grades',
+    icon: <GradeIcon />,
+    section: 'grading',
+    roles: [ROLE.student],
   },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.

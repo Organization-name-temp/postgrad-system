@@ -39,6 +39,7 @@ import { GradeSheetsPage } from '../features/grading/instructor/GradeSheetsPage'
 import { GradeSheetPage } from '../features/grading/instructor/GradeSheetPage'
 import { DepartmentHeadQueuePage } from '../features/grading/department-head/DepartmentHeadQueuePage'
 import { DepartmentHeadSheetPage } from '../features/grading/department-head/DepartmentHeadSheetPage'
+import { MyGradesPage } from '../features/grading/student/MyGradesPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -85,6 +86,12 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
                   <Route path="/registration" element={<RegistrationPage />} />
                   <Route path="/schedule" element={<SchedulePage />} />
+                </Route>
+                {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
+                    Persona-guarded to R02 — an admin inheriting grades.view_own has no Student
+                    record to read (the server 403s it), so the nav/route gate on the role. */}
+                <Route element={<RequireAuth roles={[ROLE.student]} />}>
+                  <Route path="/grading/my-grades" element={<MyGradesPage />} />
                 </Route>
                 {/* Persona-guarded: Instructors (R04) reach My Teaching + the register;
                     attendance is authorised by assignment server-side (ticket 08).

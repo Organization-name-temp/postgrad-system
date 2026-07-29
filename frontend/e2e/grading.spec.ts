@@ -16,6 +16,12 @@ import AxeBuilder from '@axe-core/playwright'
 // which is the one with a line to mark.
 const INSTRUCTOR = 'r04@ejust.test'
 const GRADABLE_COURSE = /CSE511/
+// The enrollment.spec.ts seeded Student — no Grade Sheet has been finalized for them yet
+// (ticket 04 ships no seeder of its own; ticket 10's extends this one with a completed
+// Semester, so My Grades' *populated* Semester-section state joins this scan then). Today
+// this only reaches the null-CGPA "no grades yet" state — still the exact state the ticket
+// requires never look catastrophic, so it is worth scanning now rather than waiting.
+const STUDENT = 'student.smoke@seed.ejust.test'
 
 const COMBOS = [
   { scheme: 'light', lang: 'en', dir: 'ltr' },
@@ -95,6 +101,26 @@ test.describe('grading screens', () => {
         body: await page.screenshot({ fullPage: true }),
         contentType: 'image/png',
       })
+    })
+  }
+})
+
+test.describe('my grades screen (ticket 04)', () => {
+  for (const { scheme, lang, dir } of COMBOS) {
+    test(`My Grades passes axe in ${scheme} / ${lang}`, async ({ page }) => {
+      page.setDefaultTimeout(20_000)
+
+      await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
+      await login(page, STUDENT)
+      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await expect(page.locator('html')).toHaveAttribute('dir', dir)
+      await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
+
+      await page.goto('/grading/my-grades')
+      // The null-CGPA "no grades yet" state (spec: never render 0.00 for a fresh record) —
+      // the only state reachable until ticket 10's seeder finalizes a Sheet for this Student.
+      await expect(page.getByText('—')).toBeVisible()
+      await expectNoSeriousA11y(page, `my grades — ${scheme}/${lang}`)
     })
   }
 })

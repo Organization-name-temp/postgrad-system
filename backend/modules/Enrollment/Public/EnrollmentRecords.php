@@ -78,6 +78,19 @@ interface EnrollmentRecords
     public function findEnrollment(int $enrollmentId): ?EnrollmentSummary;
 
     /**
+     * Every Enrollment the given Student has, in every Course Status, ordered by id — the
+     * CGPA tally's whole input (ticket 04, spec §GPA and CGPA): Grading groups these by
+     * {@see EnrollmentSummary::$courseId} for supersession and by
+     * {@see EnrollmentSummary::$semesterId} for a Semester's GPA, and reads
+     * {@see EnrollmentSummary::$countsTowardCgpa} rather than re-deriving Appendix D. Empty for
+     * a Student with no Enrollments at all (the null-CGPA case) and for a student id that does
+     * not exist.
+     *
+     * @return list<EnrollmentSummary>
+     */
+    public function enrollmentsForStudent(int $studentId): array;
+
+    /**
      * Write the single `earned` bit onto an Enrollment — "this Attempt reached C+ and earned
      * its credit hours" (ADR-0022). The **only** writer of this column: called by Grading from
      * inside the same transaction as a Sheet's finalize, never on its own. `$earned` is

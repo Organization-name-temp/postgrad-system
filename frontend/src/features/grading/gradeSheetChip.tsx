@@ -1,3 +1,4 @@
+import type { SxProps, Theme } from '@mui/material/styles'
 import type { StatusChipProps, StatusTone, StatusChipVariant } from '../../shared/ui/StatusChip'
 
 /**
@@ -63,4 +64,24 @@ const MINIMUM_EARNING_POINTS = 2.5
 export function gradeEmphasisFor(points: number | undefined): GradeEmphasis {
   if (points === undefined || points >= MINIMUM_EARNING_POINTS) return 'earned'
   return points > 0 ? 'subEarn' : 'fail'
+}
+
+/**
+ * Per design-system.md §10 ("Grade display"), the text-colour override each emphasis group
+ * carries — ordinary text at or above C+, the sub-earn warning below it, error for an F.
+ * `.main` is a fill colour, so a *label* takes the accessible shade — `.dark` in light,
+ * `.light` in dark — the same rule StatusChip and the button overrides follow. Shared by the
+ * Instructor's Grade Sheet table and the Student's My Grades page (both features/grading), so
+ * a letter reads with the same emphasis wherever it appears.
+ */
+export const GRADE_EMPHASIS_SX: Record<GradeEmphasis, SxProps<Theme>> = {
+  earned: { color: 'text.primary' },
+  subEarn: [
+    (theme: Theme) => ({ color: theme.vars.palette.warning.dark }),
+    (theme: Theme) => theme.applyStyles('dark', { color: theme.vars.palette.warning.light }),
+  ],
+  fail: [
+    (theme: Theme) => ({ color: theme.vars.palette.error.dark }),
+    (theme: Theme) => theme.applyStyles('dark', { color: theme.vars.palette.error.light }),
+  ],
 }

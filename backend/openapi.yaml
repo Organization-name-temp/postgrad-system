@@ -15076,6 +15076,183 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/grading/my-grades:
+    get:
+      summary: 'My Grades.'
+      operationId: myGrades
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    cgpa: 3.42
+                    semesters:
+                      -
+                        semester:
+                          id: 2
+                          term: Fall
+                          year: 2026
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                        gpa: 3.42
+                        courses:
+                          -
+                            enrollment_id: 5
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                              department_id: 1
+                            credit_hours: 3
+                            grade:
+                              mark: 82.5
+                              letter_grade: B
+                              gpa_points: 3.0
+                            earned: true
+                            superseded: false
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      cgpa:
+                        type: number
+                        example: 3.42
+                      semesters:
+                        type: array
+                        example:
+                          -
+                            semester:
+                              id: 2
+                              term: Fall
+                              year: 2026
+                              name_en: 'Fall 2026'
+                              name_ar: 'خريف 2026'
+                            gpa: 3.42
+                            courses:
+                              -
+                                enrollment_id: 5
+                                course:
+                                  id: 1
+                                  code: DEP501
+                                  name_en: 'Advanced Algorithms'
+                                  name_ar: 'خوارزميات متقدمة'
+                                  level: 500
+                                  total_ch: 3
+                                  research_type: null
+                                  is_active: true
+                                  department_id: 1
+                                credit_hours: 3
+                                grade:
+                                  mark: 82.5
+                                  letter_grade: B
+                                  gpa_points: 3
+                                earned: true
+                                superseded: false
+                        items:
+                          type: object
+                          properties:
+                            semester:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                term:
+                                  type: string
+                                  example: Fall
+                                year:
+                                  type: integer
+                                  example: 2026
+                                name_en:
+                                  type: string
+                                  example: 'Fall 2026'
+                                name_ar:
+                                  type: string
+                                  example: 'خريف 2026'
+                            gpa:
+                              type: number
+                              example: 3.42
+                            courses:
+                              type: array
+                              example:
+                                -
+                                  enrollment_id: 5
+                                  course:
+                                    id: 1
+                                    code: DEP501
+                                    name_en: 'Advanced Algorithms'
+                                    name_ar: 'خوارزميات متقدمة'
+                                    level: 500
+                                    total_ch: 3
+                                    research_type: null
+                                    is_active: true
+                                    department_id: 1
+                                  credit_hours: 3
+                                  grade:
+                                    mark: 82.5
+                                    letter_grade: B
+                                    gpa_points: 3
+                                  earned: true
+                                  superseded: false
+                              items:
+                                type: object
+                                properties:
+                                  enrollment_id:
+                                    type: integer
+                                    example: 5
+                                  course:
+                                    type: object
+                                    properties:
+                                      id: { type: integer, example: 1 }
+                                      code: { type: string, example: DEP501 }
+                                      name_en: { type: string, example: 'Advanced Algorithms' }
+                                      name_ar: { type: string, example: 'خوارزميات متقدمة' }
+                                      level: { type: integer, example: 500 }
+                                      total_ch: { type: integer, example: 3 }
+                                      research_type: { type: string, example: null, nullable: true }
+                                      is_active: { type: boolean, example: true }
+                                      department_id: { type: integer, example: 1 }
+                                  credit_hours:
+                                    type: integer
+                                    example: 3
+                                  grade:
+                                    type: object
+                                    properties:
+                                      mark: { type: number, example: 82.5 }
+                                      letter_grade: { type: string, example: B }
+                                      gpa_points: { type: number, example: 3.0 }
+                                  earned:
+                                    type: boolean
+                                    example: true
+                                  superseded:
+                                    type: boolean
+                                    example: false
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record.'
+      tags:
+        - Grading
+      security: []
   /api/v1/notifications:
     get:
       summary: 'List my notifications.'

@@ -4407,6 +4407,61 @@ export type ReturnTheSheetWithANote422 = {
   errors?: ReturnTheSheetWithANote422Errors;
 };
 
+export type MyGrades200DataSemestersItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type MyGrades200DataSemestersItemCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type MyGrades200DataSemestersItemCoursesItemGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type MyGrades200DataSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: MyGrades200DataSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  grade?: MyGrades200DataSemestersItemCoursesItemGrade;
+  earned?: boolean;
+  superseded?: boolean;
+};
+
+export type MyGrades200DataSemestersItem = {
+  semester?: MyGrades200DataSemestersItemSemester;
+  gpa?: number;
+  courses?: MyGrades200DataSemestersItemCoursesItem[];
+};
+
+export type MyGrades200Data = {
+  cgpa?: number;
+  semesters?: MyGrades200DataSemestersItem[];
+};
+
+export type MyGrades200 = {
+  data?: MyGrades200Data;
+};
+
+export type MyGrades403 = {
+  message?: string;
+};
+
 export type ListMyNotifications200DataItemData = {
   scheduled_at?: string;
 };
@@ -14377,6 +14432,99 @@ export const useReturnTheSheetWithANote = <TError = ReturnTheSheetWithANote403 |
       > => {
       return useMutation(getReturnTheSheetWithANoteMutationOptions(options), queryClient);
     }
+
+/**
+ * @summary My Grades.
+ */
+export const myGrades = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyGrades200>(
+      {url: `/api/v1/grading/my-grades`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyGradesQueryKey = () => {
+    return [
+    `/api/v1/grading/my-grades`
+    ] as const;
+    }
+
+
+export const getMyGradesQueryOptions = <TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyGradesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myGrades>>> = ({ signal }) => myGrades(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyGradesQueryResult = NonNullable<Awaited<ReturnType<typeof myGrades>>>
+export type MyGradesQueryError = MyGrades403
+
+
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myGrades>>,
+          TError,
+          Awaited<ReturnType<typeof myGrades>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myGrades>>,
+          TError,
+          Awaited<ReturnType<typeof myGrades>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Grades.
+ */
+
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyGradesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Paginated, newest-first. Scoped to the authenticated user.

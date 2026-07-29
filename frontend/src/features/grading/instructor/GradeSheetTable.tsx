@@ -9,11 +9,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import type { SxProps, Theme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { StatusChip } from '../../../shared/ui/StatusChip'
-import { gradeEmphasisFor, gradeLineChip } from '../gradeSheetChip'
-import type { GradeEmphasis } from '../gradeSheetChip'
+import { GRADE_EMPHASIS_SX, gradeEmphasisFor, gradeLineChip } from '../gradeSheetChip'
 import { isInvalidMarkInput, letterGradeFor, parseMark } from '../letterGrade'
 
 /** One line of the Sheet — a gradable Enrollment and the Grade recorded for it, if any. */
@@ -155,23 +153,6 @@ export function GradeSheetTable({
 }
 
 /**
- * Per design-system.md §10 ("Grade display"), the emphasis each grade group carries. `.main`
- * is a fill colour, so a *label* takes the accessible shade — `.dark` in light, `.light` in
- * dark — the same rule StatusChip and the button overrides follow.
- */
-const EMPHASIS_SX: Record<GradeEmphasis, SxProps<Theme>> = {
-  earned: { color: 'text.primary' },
-  subEarn: [
-    (theme: Theme) => ({ color: theme.vars.palette.warning.dark }),
-    (theme: Theme) => theme.applyStyles('dark', { color: theme.vars.palette.warning.light }),
-  ],
-  fail: [
-    (theme: Theme) => ({ color: theme.vars.palette.error.dark }),
-    (theme: Theme) => theme.applyStyles('dark', { color: theme.vars.palette.error.light }),
-  ],
-}
-
-/**
  * The letter and its GPA points for one row — a dash while the line has neither a typed mark
  * nor a recorded one, so a blank line never reads as an F. The letter carries its §10 grade
  * colour: ordinary text at or above C+, the sub-earn warning below it, error for an F. Colour
@@ -193,7 +174,7 @@ function LetterPreview({ letter, points }: { letter?: string; points?: number })
       <Typography
         component="span"
         variant="body2"
-        sx={[{ fontWeight: 600 }, EMPHASIS_SX[gradeEmphasisFor(points)]].flat()}
+        sx={[{ fontWeight: 600 }, GRADE_EMPHASIS_SX[gradeEmphasisFor(points)]].flat()}
       >
         {letter}
       </Typography>

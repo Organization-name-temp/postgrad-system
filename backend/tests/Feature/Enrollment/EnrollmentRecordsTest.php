@@ -186,6 +186,70 @@ it('returns null for an enrollment id that does not exist', function () {
     expect(enrollmentRecords()->findEnrollment(999_999))->toBeNull();
 });
 
+// ---------------------------------------------------------------------------
+// enrollmentsForStudent — the CGPA tally's whole input (ticket 04)
+// ---------------------------------------------------------------------------
+
+it('returns every enrollment a student has, in every course status, with the CGPA grouping keys', function () {
+    $offering = erOffering(User::factory()->create()->id);
+    $enrollment = erEnroll($offering, CourseStatus::Regular, creditHours: 3);
+
+    $summary = enrollmentRecords()->enrollmentsForStudent($enrollment->student_id)[0];
+
+    expect($summary)->toBeInstanceOf(EnrollmentSummary::class)
+        ->and($summary->id)->toBe($enrollment->id)
+        ->and($summary->courseId)->toBe($offering->course_id)
+        ->and($summary->semesterId)->toBe($offering->semester_id)
+        ->and($summary->countsTowardCgpa)->toBeTrue()
+        ->and($summary->earned)->toBeNull();
+});
+
+it('reads countsTowardCgpa from the course status counting matrix, never re-deriving it', function () {
+    $offering = erOffering(User::factory()->create()->id);
+    $regular = erEnroll($offering, CourseStatus::Regular);
+    $audit = erEnroll($offering, CourseStatus::Audit);
+
+    $byId = collect(enrollmentRecords()->enrollmentsForStudent($regular->student_id))
+        ->keyBy(fn (EnrollmentSummary $e): int => $e->id);
+
+    expect($byId[$regular->id]->countsTowardCgpa)->toBeTrue();
+
+    $auditSummary = collect(enrollmentRecords()->enrollmentsForStudent($audit->student_id))
+        ->keyBy(fn (EnrollmentSummary $e): int => $e->id);
+    expect($auditSummary[$audit->id]->countsTowardCgpa)->toBeFalse();
+});
+
+it('carries the earned bit once recordOutcome has written it', function () {
+    $offering = erOffering(User::factory()->create()->id);
+    $enrollment = erEnroll($offering);
+    enrollmentRecords()->recordOutcome($enrollment->id, true);
+
+    $summary = enrollmentRecords()->enrollmentsForStudent($enrollment->student_id)[0];
+
+    expect($summary->earned)->toBeTrue();
+});
+
+it('returns an empty list for a student with no enrollments at all — the null-CGPA case', function () {
+    $student = Student::factory()->create(['user_id' => User::factory()->create()->id]);
+
+    expect(enrollmentRecords()->enrollmentsForStudent($student->id))->toBe([]);
+});
+
+it('returns an empty list for a student id that does not exist', function () {
+    expect(enrollmentRecords()->enrollmentsForStudent(999_999))->toBe([]);
+});
+
+it('never leaks another student\'s enrollments', function () {
+    $offering = erOffering(User::factory()->create()->id);
+    $mine = erEnroll($offering);
+    erEnroll($offering);
+
+    $summaries = enrollmentRecords()->enrollmentsForStudent($mine->student_id);
+
+    expect($summaries)->toHaveCount(1)
+        ->and($summaries[0]->id)->toBe($mine->id);
+});
+
 it('writes the earned bit through recordOutcome, the sole writer of the column', function () {
     $offering = erOffering(User::factory()->create()->id);
     $enrollment = erEnroll($offering);

@@ -63,7 +63,8 @@ export function CorrectionSheetPage() {
     sheetId,
     lines,
     isLineBlank: (line) => line.grade === null,
-    onSaved: () => queryClient.invalidateQueries({ queryKey: correctionQueryKey(correctionSheetId) }),
+    onSaved: () =>
+      queryClient.invalidateQueries({ queryKey: correctionQueryKey(correctionSheetId) }),
     onSigned: async () => {
       await queryClient.invalidateQueries({ queryKey: correctionQueryKey(correctionSheetId) })
       await queryClient.invalidateQueries({ queryKey: offeringSheetQueryKey(offeringId) })
@@ -101,7 +102,9 @@ export function CorrectionSheetPage() {
       )}
 
       {isPending && <CircularProgress aria-label={t('correction.loading')} />}
-      {isError && <Alert severity="error">{apiErrorMessage(error) ?? t('correction.loadError')}</Alert>}
+      {isError && (
+        <Alert severity="error">{apiErrorMessage(error) ?? t('correction.loadError')}</Alert>
+      )}
 
       {sheet && lines.length > 0 && (
         <Paper variant="outlined" sx={{ borderRadius: 3, p: { xs: 1.5, sm: 2 } }}>

@@ -276,7 +276,12 @@ export function GradeSheetPage() {
         </Paper>
       )}
 
-      <Dialog open={correctionOpen} onClose={() => setCorrectionOpen(false)} fullWidth maxWidth="sm">
+      <Dialog
+        open={correctionOpen}
+        onClose={() => setCorrectionOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
         <DialogTitle>{t('correction.dialogTitle')}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={1.5}>
@@ -302,7 +307,11 @@ export function GradeSheetPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCorrectionOpen(false)}>{t('correction.cancel')}</Button>
-          <Button variant="contained" onClick={startCorrection} disabled={createCorrection.isPending}>
+          <Button
+            variant="contained"
+            onClick={startCorrection}
+            disabled={createCorrection.isPending}
+          >
             {t('correction.start')}
           </Button>
         </DialogActions>

@@ -167,7 +167,9 @@ describe('GradeSheetPage — signing (ticket 03)', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: /start correction round/i }))
     fireEvent.click(screen.getByRole('checkbox'))
-    fireEvent.click((await screen.findAllByRole('button', { name: /start correction round/i })).at(-1)!)
+    fireEvent.click(
+      (await screen.findAllByRole('button', { name: /start correction round/i })).at(-1)!,
+    )
 
     await waitFor(() => expect(srv.correctionOpened).toBe(true))
   })

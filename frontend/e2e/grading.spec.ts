@@ -143,9 +143,7 @@ test.describe('grading screens', () => {
 
 test.describe('outstanding incompletes (ticket 05)', () => {
   for (const { scheme, lang, dir } of COMBOS) {
-    test(`the outstanding-incompletes list passes axe in ${scheme} / ${lang}`, async ({
-      page,
-    }) => {
+    test(`the outstanding-incompletes list passes axe in ${scheme} / ${lang}`, async ({ page }) => {
       page.setDefaultTimeout(20_000)
 
       await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)

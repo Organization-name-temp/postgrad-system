@@ -269,6 +269,8 @@ describe('MyGradesPage (ticket 04)', () => {
     }
     renderPage()
 
-    expect(await screen.findByText(/earlier grades: b \(82\.50%, superseded\)/i)).toBeInTheDocument()
+    expect(
+      await screen.findByText(/earlier grades: b \(82\.50%, superseded\)/i),
+    ).toBeInTheDocument()
   })
 })

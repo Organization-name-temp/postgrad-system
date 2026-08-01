@@ -92,7 +92,9 @@ describe('DepartmentHeadSheetPage', () => {
 
     expect(await screen.findByText('Sara Student')).toBeInTheDocument()
     expect(screen.getByText('82.5')).toBeInTheDocument()
-    expect(screen.getByText(/earlier finalized grades: c \(71\.00%, superseded\)/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/earlier finalized grades: c \(71\.00%, superseded\)/i),
+    ).toBeInTheDocument()
     // The letter appears twice — once on Sara's line, once in the distribution.
     expect(screen.getAllByText('B')).toHaveLength(2)
     // No mark input exists anywhere — a Department Head can never write a mark.

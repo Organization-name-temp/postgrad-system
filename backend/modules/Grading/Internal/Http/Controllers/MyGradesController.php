@@ -75,10 +75,10 @@ class MyGradesController
         $coursesById = $courses->findMany(array_values(array_unique(
             array_map(fn (EnrollmentSummary $e): int => $e->courseId, $visible),
         )));
-        $history = FinalizedGradeHistoryLookup::forEnrollments(array_values(array_map(
+        $history = FinalizedGradeHistoryLookup::forEnrollments(array_map(
             fn (EnrollmentSummary $e): int => $e->id,
             $visible,
-        )));
+        ));
 
         $rowsBySemester = [];
         foreach ($visible as $enrollment) {
@@ -99,7 +99,7 @@ class MyGradesController
                 'grade' => $grade?->toLineArray(),
                 'grade_history' => $grade === null
                     ? []
-                    : array_values(array_map(
+                    : array_map(
                         fn ($historyGrade): array => [
                             ...$historyGrade->toLineArray(),
                             'finalized_at' => $historyGrade->sheet->reviewed_at?->toIso8601String(),
@@ -109,7 +109,7 @@ class MyGradesController
                             $history[$enrollment->id] ?? [],
                             fn ($historyGrade): bool => $historyGrade->getKey() !== $grade->getKey(),
                         )),
-                    )),
+                    ),
                 'earned' => $enrollment->earned,
                 'superseded' => $grade !== null && ! isset($eligibleIds[$enrollment->id]),
                 'incomplete_deadline' => $enrollment->courseStatus === 'Incomplete'

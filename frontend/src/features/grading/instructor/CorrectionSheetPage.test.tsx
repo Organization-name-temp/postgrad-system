@@ -74,7 +74,9 @@ describe('CorrectionSheetPage', () => {
     renderPage()
 
     expect(await screen.findByText('Sara Student')).toBeInTheDocument()
-    expect(screen.getByText(/earlier finalized grades: b \(82\.50%, superseded\)/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/earlier finalized grades: b \(82\.50%, superseded\)/i),
+    ).toBeInTheDocument()
   })
 
   it('signs the correction round', async () => {

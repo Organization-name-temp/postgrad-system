@@ -1266,7 +1266,8 @@ export const en = {
       help: 'Enter only the corrected marks. The earlier finalized grades stay visible as history until this round is signed and finalized.',
       sign: 'Sign correction for review',
       start: 'Start correction round',
-      startHelp: 'A finalized sheet is never reopened. Start a correction round and pick only the lines you need to change.',
+      startHelp:
+        'A finalized sheet is never reopened. Start a correction round and pick only the lines you need to change.',
       startError: 'Could not open a correction round. Please try again.',
       pickAtLeastOne: 'Pick at least one line to correct.',
       dialogTitle: 'Start correction round',

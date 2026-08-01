@@ -67,6 +67,7 @@ const scheduleGroup = {
       course_status: 'Regular',
       classification: 'Core',
       credit_hours: 3,
+      must_retake: false,
       course: {
         id: 1,
         code: 'DEP501',
@@ -113,5 +114,24 @@ describe('StudentSchedulePage', () => {
     await user.click(await screen.findByRole('option', { name: /Sara Student/i }))
 
     expect(await screen.findByText(/no enrollments yet/i)).toBeInTheDocument()
+  }, 20000)
+
+  it('shows the must-retake marker on oversight schedule rows', async () => {
+    srv.schedule = {
+      data: [
+        {
+          ...scheduleGroup,
+          enrollments: [{ ...scheduleGroup.enrollments[0], must_retake: true }],
+        },
+      ],
+    }
+    const user = userEvent.setup()
+    renderPage()
+
+    const picker = await screen.findByRole('combobox', { name: /choose a student/i })
+    await user.click(picker)
+    await user.click(await screen.findByRole('option', { name: /Sara Student/i }))
+
+    expect(await screen.findByText(/must retake/i)).toBeInTheDocument()
   }, 20000)
 })

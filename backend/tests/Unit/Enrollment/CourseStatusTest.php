@@ -44,11 +44,11 @@ it('marks every status as appearing on the transcript', function () {
     }
 });
 
-it('counts only Regular and Retake as burning the retake allowance', function () {
+it('counts every for-credit re-registration status toward the one combined allowance', function () {
     $burns = array_filter(CourseStatus::cases(), fn (CourseStatus $s): bool => $s->burnsRetakeAllowance());
 
     expect(array_map(fn (CourseStatus $s): string => $s->value, $burns))
-        ->toEqualCanonicalizing(['Regular', 'Retake']);
+        ->toEqualCanonicalizing(['Regular', 'Retake', 'CgpaImprovement']);
 });
 
 it('does not burn the retake allowance for withdrawal or audit', function () {

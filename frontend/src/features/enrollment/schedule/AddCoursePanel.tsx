@@ -15,6 +15,8 @@ import { useTranslation } from 'react-i18next'
 import { useFreeAddACourseToTheScheduleadddropPeriod } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
+import { StatusChip } from '../../../shared/ui/StatusChip'
+import { mustRetakeChip } from '../mustRetakeChip'
 import type { EligibleCourse } from '../registration/classification'
 import type { CartMode } from '../registration/cartRules'
 import { MeetingTimes } from '../MeetingTimes'
@@ -94,14 +96,18 @@ export function AddCoursePanel({ courses, onAdded }: AddCoursePanelProps) {
                     </Typography>{' '}
                     {name}
                   </Typography>
-                  {course.classification && (
-                    <Chip
-                      size="small"
-                      variant="outlined"
-                      sx={{ mt: 0.5 }}
-                      label={t(`classifications.${course.classification}`)}
-                    />
-                  )}
+                  <Stack direction="row" spacing={0.75} sx={{ mt: 0.5, flexWrap: 'wrap' }}>
+                    {course.classification && (
+                      <Chip
+                        size="small"
+                        variant="outlined"
+                        label={t(`classifications.${course.classification}`)}
+                      />
+                    )}
+                    {course.must_retake && (
+                      <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />
+                    )}
+                  </Stack>
                   <Box sx={{ mt: 0.5 }}>
                     <MeetingTimes meetings={course.meetings ?? []} />
                   </Box>

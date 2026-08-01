@@ -859,6 +859,9 @@ export const ar = {
     },
   },
   enrollment: {
+    mustRetake: {
+      label: 'إلزامي الإعادة',
+    },
     registration: {
       title: 'تسجيل المقررات',
       forSemester: 'التسجيل في {{semester}}',

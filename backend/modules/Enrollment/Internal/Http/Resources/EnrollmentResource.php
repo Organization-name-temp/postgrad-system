@@ -49,6 +49,7 @@ class EnrollmentResource extends JsonResource
             'course_status' => $enrollment->course_status->value,
             'classification' => $enrollment->classification->value,
             'credit_hours' => $enrollment->credit_hours,
+            'must_retake' => (bool) $enrollment->getAttribute('must_retake'),
             'course' => $course instanceof CourseSummary ? $course->toArray() : null,
             'instructor' => $instructor instanceof UserSummary ? $instructor->toArray() : null,
             'meetings' => $offering === null

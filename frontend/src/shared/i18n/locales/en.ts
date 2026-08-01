@@ -883,6 +883,9 @@ export const en = {
     },
   },
   enrollment: {
+    mustRetake: {
+      label: 'Must retake',
+    },
     registration: {
       title: 'Course registration',
       forSemester: 'Registering for {{semester}}',

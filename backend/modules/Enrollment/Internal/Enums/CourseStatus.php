@@ -2,8 +2,8 @@
 
 namespace Modules\Enrollment\Internal\Enums;
 
+use Modules\Enrollment\Internal\Support\AttemptDeriver;
 use Modules\Enrollment\Internal\Support\CourseStatusCounting;
-use Modules\Enrollment\Internal\Support\RetakeDeriver;
 
 /**
  * The accounting status of one Enrollment — the complete closed set of ten values from
@@ -17,7 +17,7 @@ use Modules\Enrollment\Internal\Support\RetakeDeriver;
  * but only a subset is *reachable* through Phase-3 flows:
  *
  * - **Regular / Retake / Audit** are set at the mint (ticket 06). Retake is always
- *   *derived* from the Student's record ({@see RetakeDeriver}),
+ *   *derived* from the Student's record ({@see AttemptDeriver}),
  *   never requested.
  * - **Withdrawn** becomes reachable in ticket 07 (self-serve withdrawal → W).
  * - The remaining six — CGPA-Improvement, Transfer, Waive, Fail-Withdrawal, Incomplete,
@@ -107,11 +107,12 @@ enum CourseStatus: string
      * Whether an Enrollment in this status is a **for-credit attempt** that consumes the
      * single retake allowance (FR-REG-006): a prior Regular or Retake burns it, while a
      * Withdrawn (W) or Audit (AU) attempt does not — those re-register as a fresh Regular.
-     * Read by {@see RetakeDeriver}. (CGPA-Improvement
-     * routing of passed-course re-registrations is a Phase-4 hook, deliberately unbuilt.)
+     * CGPA Improvement consumes that same single allowance too: "max 1 Retake" and
+     * "max 1 CGPA Improve" are two descriptions of one combined re-registration rule, not two
+     * separate allowances. Read by {@see AttemptDeriver}.
      */
     public function burnsRetakeAllowance(): bool
     {
-        return $this === self::Regular || $this === self::Retake;
+        return $this === self::Regular || $this === self::Retake || $this === self::CgpaImprovement;
     }
 }

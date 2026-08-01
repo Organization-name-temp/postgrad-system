@@ -60,6 +60,7 @@ function eligibleLine(overrides: Record<string, unknown>) {
     capacity: 30,
     seats_remaining: 30,
     total_ch: 3,
+    must_retake: false,
     course: {
       id: 1,
       code: 'DEP501',
@@ -204,5 +205,12 @@ describe('RegistrationPage', () => {
     expect(screen.getByText('DEP501')).toBeInTheDocument()
     // The cart builder is not shown while a request is pending.
     expect(screen.queryByRole('button', { name: /submit to advisor/i })).not.toBeInTheDocument()
+  })
+
+  it('shows the must-retake marker on eligible courses', async () => {
+    srv.eligible = { data: { semester, courses: [eligibleLine({ must_retake: true })] } }
+    renderPage()
+
+    expect(await screen.findByText(/must retake/i)).toBeInTheDocument()
   })
 })

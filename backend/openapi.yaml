@@ -10037,6 +10037,7 @@ paths:
                         capacity: 30
                         seats_remaining: 30
                         total_ch: 3
+                        must_retake: false
                         course:
                           id: 1
                           code: DEP501
@@ -10110,6 +10111,7 @@ paths:
                             capacity: 30
                             seats_remaining: 30
                             total_ch: 3
+                            must_retake: false
                             course:
                               id: 1
                               code: DEP501
@@ -10145,6 +10147,9 @@ paths:
                             total_ch:
                               type: integer
                               example: 3
+                            must_retake:
+                              type: boolean
+                              example: false
                             course:
                               type: object
                               properties:
@@ -10767,6 +10772,7 @@ paths:
                           capacity: 30
                           seats_remaining: 28
                           total_ch: 3
+                          must_retake: false
                           course:
                             id: 2
                             code: DEP502
@@ -10792,6 +10798,7 @@ paths:
                           course_status: Regular
                           classification: Core
                           credit_hours: 3
+                          must_retake: false
                           course:
                             id: 1
                             code: DEP501
@@ -10844,6 +10851,7 @@ paths:
                             capacity: 30
                             seats_remaining: 28
                             total_ch: 3
+                            must_retake: false
                             course:
                               id: 2
                               code: DEP502
@@ -10868,6 +10876,7 @@ paths:
                             course_status: Regular
                             classification: Core
                             credit_hours: 3
+                            must_retake: false
                             course:
                               id: 1
                               code: DEP501
@@ -10953,6 +10962,7 @@ paths:
                               capacity: 30
                               seats_remaining: 28
                               total_ch: 3
+                              must_retake: false
                               course:
                                 id: 2
                                 code: DEP502
@@ -10988,6 +10998,9 @@ paths:
                               total_ch:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:
@@ -11055,6 +11068,7 @@ paths:
                               course_status: Regular
                               classification: Core
                               credit_hours: 3
+                              must_retake: false
                               course:
                                 id: 1
                                 code: DEP501
@@ -11095,6 +11109,9 @@ paths:
                               credit_hours:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:
@@ -11203,6 +11220,7 @@ paths:
                     course_status: Regular
                     classification: Core
                     credit_hours: 3
+                    must_retake: false
                     course:
                       id: 1
                       code: DEP501
@@ -11245,6 +11263,9 @@ paths:
                       credit_hours:
                         type: integer
                         example: 3
+                      must_retake:
+                        type: boolean
+                        example: false
                       course:
                         type: object
                         properties:
@@ -12969,6 +12990,7 @@ paths:
                           capacity: 30
                           seats_remaining: 28
                           total_ch: 3
+                          must_retake: false
                           course:
                             id: 2
                             code: DEP502
@@ -12994,6 +13016,7 @@ paths:
                           course_status: Regular
                           classification: Core
                           credit_hours: 3
+                          must_retake: false
                           course:
                             id: 1
                             code: DEP501
@@ -13046,6 +13069,7 @@ paths:
                             capacity: 30
                             seats_remaining: 28
                             total_ch: 3
+                            must_retake: false
                             course:
                               id: 2
                               code: DEP502
@@ -13070,6 +13094,7 @@ paths:
                             course_status: Regular
                             classification: Core
                             credit_hours: 3
+                            must_retake: false
                             course:
                               id: 1
                               code: DEP501
@@ -13155,6 +13180,7 @@ paths:
                               capacity: 30
                               seats_remaining: 28
                               total_ch: 3
+                              must_retake: false
                               course:
                                 id: 2
                                 code: DEP502
@@ -13190,6 +13216,9 @@ paths:
                               total_ch:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:
@@ -13257,6 +13286,7 @@ paths:
                               course_status: Regular
                               classification: Core
                               credit_hours: 3
+                              must_retake: false
                               course:
                                 id: 1
                                 code: DEP501
@@ -13297,6 +13327,9 @@ paths:
                               credit_hours:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:

@@ -2971,6 +2971,7 @@ export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCourses
   capacity?: number;
   seats_remaining?: number;
   total_ch?: number;
+  must_retake?: boolean;
   course?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse;
   instructor?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor;
   meetings?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem[];
@@ -3190,6 +3191,7 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
   capacity?: number;
   seats_remaining?: number;
   total_ch?: number;
+  must_retake?: boolean;
   course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemCourse;
   instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemInstructor;
   meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemMeetingsItem[];
@@ -3232,6 +3234,7 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
   course_status?: string;
   classification?: string;
   credit_hours?: number;
+  must_retake?: boolean;
   course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse;
   instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemInstructor;
   meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemMeetingsItem[];
@@ -3299,6 +3302,7 @@ export type FreeAddACourseToTheScheduleadddropPeriod201Data = {
   course_status?: string;
   classification?: string;
   credit_hours?: number;
+  must_retake?: boolean;
   course?: FreeAddACourseToTheScheduleadddropPeriod201DataCourse;
   instructor?: FreeAddACourseToTheScheduleadddropPeriod201DataInstructor;
   meetings?: FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem[];
@@ -3822,6 +3826,7 @@ export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItem = {
   capacity?: number;
   seats_remaining?: number;
   total_ch?: number;
+  must_retake?: boolean;
   course?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemCourse;
   instructor?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemInstructor;
   meetings?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemMeetingsItem[];
@@ -3864,6 +3869,7 @@ export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItem = {
   course_status?: string;
   classification?: string;
   credit_hours?: number;
+  must_retake?: boolean;
   course?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemCourse;
   instructor?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemInstructor;
   meetings?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemMeetingsItem[];

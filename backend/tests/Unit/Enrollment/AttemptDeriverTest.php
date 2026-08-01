@@ -2,17 +2,18 @@
 
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
-use Modules\Enrollment\Internal\Support\RetakeDeriver;
+use Modules\Enrollment\Internal\Support\AttemptDeriver;
 
 /**
- * Retake derivation (FR-REG-006), unit-tested directly (spec §Testing Decisions). A Student
- * never chooses Retake; the deriver reads how many prior *for-credit* attempts of a course
- * the Student holds and returns the status the minted Enrollment carries — Regular, Retake,
- * or blocked (a second retake). Withdrawal/Audit attempts don't count toward the prior
- * total, so re-registering after them is a fresh Regular (that filtering is the caller's;
- * here the count is the input).
+ * Attempt derivation (FR-REG-006), unit-tested directly (spec §Testing Decisions). A Student
+ * never chooses Retake or CGPA Improvement; the deriver reads how many prior *for-credit*
+ * attempts of a course the Student holds, and whether the first one earned its credit, then
+ * returns the status the minted Enrollment carries — Regular, Retake, CGPA Improvement, or
+ * blocked (a third for-credit attempt). Withdrawal/Audit attempts don't count toward the
+ * prior total, so re-registering after them is a fresh Regular (that filtering is the
+ * caller's; here the count is the input).
  */
-$deriver = new RetakeDeriver;
+$deriver = new AttemptDeriver;
 
 it('mints a fresh Regular with no prior for-credit attempts', function () use ($deriver) {
     $result = $deriver->derive(RegistrationMode::Regular, priorForCreditAttempts: 0);
@@ -22,13 +23,20 @@ it('mints a fresh Regular with no prior for-credit attempts', function () use ($
 });
 
 it('derives a Retake when one prior for-credit attempt exists', function () use ($deriver) {
-    $result = $deriver->derive(RegistrationMode::Regular, priorForCreditAttempts: 1);
+    $result = $deriver->derive(RegistrationMode::Regular, priorForCreditAttempts: 1, priorEarned: false);
 
     expect($result->status)->toBe(CourseStatus::Retake)
         ->and($result->blocked)->toBeFalse();
 });
 
-it('blocks a second retake (two prior for-credit attempts)', function () use ($deriver) {
+it('derives a CGPA improvement when one prior for-credit attempt earned its credit', function () use ($deriver) {
+    $result = $deriver->derive(RegistrationMode::Regular, priorForCreditAttempts: 1, priorEarned: true);
+
+    expect($result->status)->toBe(CourseStatus::CgpaImprovement)
+        ->and($result->blocked)->toBeFalse();
+});
+
+it('blocks a third for-credit attempt regardless of whether the second was a Retake or a CGPA improvement', function () use ($deriver) {
     $result = $deriver->derive(RegistrationMode::Regular, priorForCreditAttempts: 2);
 
     expect($result->status)->toBe(CourseStatus::Retake)

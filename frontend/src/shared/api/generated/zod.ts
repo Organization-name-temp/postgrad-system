@@ -2715,6 +2715,7 @@ export const ListTheActingStudentsEligibleCoursesForTheOpenSemesterResponse = zo
   "capacity": zod.number().optional(),
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -2908,6 +2909,7 @@ export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterRes
   "capacity": zod.number().optional(),
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -2935,6 +2937,7 @@ export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterRes
   "course_status": zod.string().optional(),
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -2988,6 +2991,7 @@ export const FreeAddACourseToTheScheduleadddropPeriodResponse = zod.object({
   "course_status": zod.string().optional(),
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3457,6 +3461,7 @@ export const ViewAnyStudentsScheduleoversightResponse = zod.object({
   "capacity": zod.number().optional(),
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3484,6 +3489,7 @@ export const ViewAnyStudentsScheduleoversightResponse = zod.object({
   "course_status": zod.string().optional(),
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),

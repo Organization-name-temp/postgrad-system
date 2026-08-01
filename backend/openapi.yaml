@@ -16703,7 +16703,13 @@ paths:
                               mark: 62
                               letter_grade: D
                               gpa_points: 1.0
-                            grade_history: []
+                            grade_history:
+                              -
+                                mark: 45
+                                letter_grade: F
+                                gpa_points: 0.0
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
                             earned: false
                             superseded: false
                             must_retake: true
@@ -16745,7 +16751,12 @@ paths:
                                   mark: 62
                                   letter_grade: D
                                   gpa_points: 1
-                                grade_history: []
+                                grade_history:
+                                  - mark: 45
+                                    letter_grade: F
+                                    gpa_points: 0
+                                    finalized_at: '2026-06-01T09:00:00+00:00'
+                                    superseded: true
                                 earned: false
                                 superseded: false
                                 must_retake: true
@@ -16795,7 +16806,12 @@ paths:
                                     mark: 62
                                     letter_grade: D
                                     gpa_points: 1
-                                  grade_history: []
+                                  grade_history:
+                                    - mark: 45
+                                      letter_grade: F
+                                      gpa_points: 0
+                                      finalized_at: '2026-06-01T09:00:00+00:00'
+                                      superseded: true
                                   earned: false
                                   superseded: false
                                   must_retake: true
@@ -16832,7 +16848,11 @@ paths:
                                       gpa_points: { type: number, example: 1.0 }
                                   grade_history:
                                     type: array
-                                    example: []
+                                    example:
+                                      - { mark: 45, letter_grade: F, gpa_points: 0, finalized_at: '2026-06-01T09:00:00+00:00', superseded: true }
+                                    items:
+                                      type: object
+                                      properties: { mark: { type: integer, example: 45 }, letter_grade: { type: string, example: F }, gpa_points: { type: number, example: 0.0 }, finalized_at: { type: string, example: '2026-06-01T09:00:00+00:00' }, superseded: { type: boolean, example: true } }
                                   earned:
                                     type: boolean
                                     example: false

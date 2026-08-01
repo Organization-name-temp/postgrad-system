@@ -78,7 +78,7 @@ class StudentGradesController
      *
      * @urlParam student_id integer required The target Student anchor's id. Example: 5
      *
-     * @response 200 {"data": {"cgpa": 3.42, "semesters": [{"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "gpa": 3.42, "courses": [{"enrollment_id": 5, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Retake", "grade": {"mark": 62, "letter_grade": "D", "gpa_points": 1.0}, "grade_history": [], "earned": false, "superseded": false, "must_retake": true, "incomplete_deadline": null}]}]}}
+     * @response 200 {"data": {"cgpa": 3.42, "semesters": [{"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "gpa": 3.42, "courses": [{"enrollment_id": 5, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Retake", "grade": {"mark": 62, "letter_grade": "D", "gpa_points": 1.0}, "grade_history": [{"mark": 45, "letter_grade": "F", "gpa_points": 0.0, "finalized_at": "2026-06-01T09:00:00+00:00", "superseded": true}], "earned": false, "superseded": false, "must_retake": true, "incomplete_deadline": null}]}]}}
      * @response 403 {"message": "This action is unauthorized."}
      * @response 404 scenario="no such student" {"message": "No such student."}
      */

@@ -4321,6 +4321,93 @@ export const MyGradesResponse = zod.object({
 })).optional(),
   "earned": zod.boolean().optional(),
   "superseded": zod.boolean().optional(),
+  "must_retake": zod.boolean().optional(),
+  "incomplete_deadline": zod.string().nullish()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * A searchable picker population for the grade-oversight screen: Advisors see their live
+ * advisees; Department Heads the Students in Programs under their Departments; Deans the
+ * Students in their Faculties; Instructors the Students on Offerings they teach; Student
+ * Affairs, Council and administrators every Student. Each row carries the same lightweight
+ * Student context the existing register-for-student picker renders.
+ * @summary The students whose grades the reviewer may inspect.
+ */
+export const TheStudentsWhoseGradesTheReviewerMayInspectResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "university_id": zod.string().optional(),
+  "enrollment_term": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "current_load": zod.string().nullish(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The exact academic-record payload the Student's own My Grades page reads — CGPA,
+ * Semester GPAs, superseded attempts, Incomplete deadlines and must-retake markers — but
+ * for a reviewer whose role legitimately covers the target Student.
+ * @summary One Student's grade record for a scoped reviewer.
+ */
+export const OneStudentsGradeRecordForAScopedReviewerParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const OneStudentsGradeRecordForAScopedReviewerResponse = zod.object({
+  "data": zod.object({
+  "cgpa": zod.number().optional(),
+  "semesters": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "gpa": zod.number().optional(),
+  "courses": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "credit_hours": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "earned": zod.boolean().optional(),
+  "superseded": zod.boolean().optional(),
+  "must_retake": zod.boolean().optional(),
   "incomplete_deadline": zod.string().nullish()
 })).optional()
 })).optional()

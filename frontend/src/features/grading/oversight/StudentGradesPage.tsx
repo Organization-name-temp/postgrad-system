@@ -1,12 +1,15 @@
 import { Alert, CircularProgress, Paper, Stack, Typography } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import type { TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem as ScopedStudent } from '../../../shared/api/generated/endpoints'
+import {
+  type TheStudentsWhoseGradesTheReviewerMayInspect200DataItem as ScopedStudent,
+  useOneStudentsGradeRecordForAScopedReviewer,
+  useTheStudentsWhoseGradesTheReviewerMayInspect,
+} from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StudentPicker } from '../../../shared/ui/StudentPicker'
 import { StudentGradesRecord } from '../StudentGradesRecord'
-import { useReviewerGradeStudents, useStudentGradeRecord } from './studentGradesApi'
 
 /**
  * The scoped grade-oversight screen (ticket 08): a reviewer picks a Student and reads the
@@ -20,14 +23,14 @@ export function StudentGradesPage() {
   const { studentId: studentIdParam } = useParams()
   const selectedStudentId = Number(studentIdParam)
 
-  const studentsQuery = useReviewerGradeStudents()
+  const studentsQuery = useTheStudentsWhoseGradesTheReviewerMayInspect()
   const students = studentsQuery.data?.data ?? []
   const student =
     Number.isFinite(selectedStudentId) && selectedStudentId > 0
       ? (students.find((row) => row.student_id === selectedStudentId) ?? null)
       : null
 
-  const gradesQuery = useStudentGradeRecord(selectedStudentId || 0, {
+  const gradesQuery = useOneStudentsGradeRecordForAScopedReviewer(selectedStudentId || 0, {
     query: { enabled: Number.isFinite(selectedStudentId) && selectedStudentId > 0 },
   })
 

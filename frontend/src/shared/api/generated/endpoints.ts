@@ -4774,6 +4774,7 @@ export type MyGrades200DataSemestersItemCoursesItem = {
   grade_history?: MyGrades200DataSemestersItemCoursesItemGradeHistoryItem[];
   earned?: boolean;
   superseded?: boolean;
+  must_retake?: boolean;
   /** @nullable */
   incomplete_deadline?: string | null;
 };
@@ -4794,6 +4795,105 @@ export type MyGrades200 = {
 };
 
 export type MyGrades403 = {
+  message?: string;
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect200DataItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect200DataItem = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  /** @nullable */
+  current_load?: string | null;
+  program?: TheStudentsWhoseGradesTheReviewerMayInspect200DataItemProgram;
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect200 = {
+  data?: TheStudentsWhoseGradesTheReviewerMayInspect200DataItem[];
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect403 = {
+  message?: string;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  course_status?: string;
+  grade?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGrade;
+  grade_history?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGradeHistoryItem[];
+  earned?: boolean;
+  superseded?: boolean;
+  must_retake?: boolean;
+  /** @nullable */
+  incomplete_deadline?: string | null;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItem = {
+  semester?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemSemester;
+  gpa?: number;
+  courses?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItem[];
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200Data = {
+  cgpa?: number;
+  semesters?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItem[];
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200 = {
+  data?: OneStudentsGradeRecordForAScopedReviewer200Data;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer403 = {
+  message?: string;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer404 = {
   message?: string;
 };
 
@@ -15227,6 +15327,200 @@ export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMyGradesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * A searchable picker population for the grade-oversight screen: Advisors see their live
+ * advisees; Department Heads the Students in Programs under their Departments; Deans the
+ * Students in their Faculties; Instructors the Students on Offerings they teach; Student
+ * Affairs, Council and administrators every Student. Each row carries the same lightweight
+ * Student context the existing register-for-student picker renders.
+ * @summary The students whose grades the reviewer may inspect.
+ */
+export const theStudentsWhoseGradesTheReviewerMayInspect = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheStudentsWhoseGradesTheReviewerMayInspect200>(
+      {url: `/api/v1/grading/students`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheStudentsWhoseGradesTheReviewerMayInspectQueryKey = () => {
+    return [
+    `/api/v1/grading/students`
+    ] as const;
+    }
+
+
+export const getTheStudentsWhoseGradesTheReviewerMayInspectQueryOptions = <TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheStudentsWhoseGradesTheReviewerMayInspectQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>> = ({ signal }) => theStudentsWhoseGradesTheReviewerMayInspect(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheStudentsWhoseGradesTheReviewerMayInspectQueryResult = NonNullable<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>>
+export type TheStudentsWhoseGradesTheReviewerMayInspectQueryError = TheStudentsWhoseGradesTheReviewerMayInspect403
+
+
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The students whose grades the reviewer may inspect.
+ */
+
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheStudentsWhoseGradesTheReviewerMayInspectQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The exact academic-record payload the Student's own My Grades page reads — CGPA,
+ * Semester GPAs, superseded attempts, Incomplete deadlines and must-retake markers — but
+ * for a reviewer whose role legitimately covers the target Student.
+ * @summary One Student's grade record for a scoped reviewer.
+ */
+export const oneStudentsGradeRecordForAScopedReviewer = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OneStudentsGradeRecordForAScopedReviewer200>(
+      {url: `/api/v1/grading/students/${studentId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOneStudentsGradeRecordForAScopedReviewerQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/grading/students/${studentId}`
+    ] as const;
+    }
+
+
+export const getOneStudentsGradeRecordForAScopedReviewerQueryOptions = <TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOneStudentsGradeRecordForAScopedReviewerQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>> = ({ signal }) => oneStudentsGradeRecordForAScopedReviewer(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OneStudentsGradeRecordForAScopedReviewerQueryResult = NonNullable<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>>
+export type OneStudentsGradeRecordForAScopedReviewerQueryError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404
+
+
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>,
+          TError,
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>,
+          TError,
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary One Student's grade record for a scoped reviewer.
+ */
+
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOneStudentsGradeRecordForAScopedReviewerQueryOptions(studentId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

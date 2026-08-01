@@ -11,22 +11,52 @@ import {
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { tabularNums } from '../../app/theme/fonts'
-import type {
-  MyGrades200Data,
-  MyGrades200DataSemestersItem as SemesterGroup,
-  MyGrades200DataSemestersItemCoursesItem as CourseRow,
-} from '../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../shared/i18n/localeName'
 import { StatusChip } from '../../shared/ui/StatusChip'
 import { courseStatusChip, isUngradedVisibleStatus } from './courseStatusChip'
 import { formatGradeHistory, readGradeHistory } from './gradeHistory'
 import { GRADE_EMPHASIS_SX, gradeEmphasisFor } from './gradeSheetChip'
 
-export type StudentGradesCourseRow = CourseRow & { must_retake?: boolean }
-export type StudentGradesSemesterGroup = Omit<SemesterGroup, 'courses'> & {
+type StudentGradesCourse = {
+  code?: string
+  name_en?: string
+  name_ar?: string
+}
+
+type StudentGradesGrade = {
+  letter_grade?: string
+  gpa_points?: number
+}
+
+export type StudentGradesCourseRow = {
+  enrollment_id?: number
+  course?: StudentGradesCourse
+  credit_hours?: number
+  course_status?: string
+  grade?: StudentGradesGrade
+  grade_history?: unknown[]
+  earned?: boolean | null
+  superseded?: boolean
+  must_retake?: boolean
+  incomplete_deadline?: string | null
+}
+
+type StudentGradesSemester = {
+  id?: number
+  term?: string
+  year?: number
+  name_en?: string
+  name_ar?: string
+}
+
+export type StudentGradesSemesterGroup = {
+  semester?: StudentGradesSemester
+  gpa?: number
   courses?: StudentGradesCourseRow[]
 }
-export type StudentGradesRecordData = Omit<MyGrades200Data, 'semesters'> & {
+
+export type StudentGradesRecordData = {
+  cgpa?: number
   semesters?: StudentGradesSemesterGroup[]
 }
 

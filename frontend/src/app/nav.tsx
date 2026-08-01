@@ -264,6 +264,16 @@ export const navItems: NavItem[] = [
     section: 'grading',
     roles: [ROLE.student],
   },
+  // Student-grade oversight (ticket 08): the scoped reviewer read of a Student's academic
+  // record. A capability item on grades.view_student — Advisors, Instructors, Student
+  // Affairs, Department Heads, Deans, Council, plus admins inheriting everything.
+  {
+    key: 'studentGrades',
+    to: '/grading/students',
+    icon: <GradeIcon />,
+    section: 'grading',
+    permission: PERMISSION.viewStudentGrades,
+  },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.
   {

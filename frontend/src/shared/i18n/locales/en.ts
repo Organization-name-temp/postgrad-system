@@ -41,6 +41,7 @@ export const en = {
       advising: 'Registration requests',
       registerForStudent: 'Register for a student',
       studentSchedules: 'Student schedules',
+      studentGrades: 'Student grades',
       myOfferings: 'My teaching',
       gradeSheets: 'Grade sheets',
       outstandingIncompletes: 'Outstanding Incompletes',
@@ -1338,6 +1339,20 @@ export const en = {
       },
       incompleteDeadline: 'Resolve by {{date}}',
       incompleteNoDeadline: 'Resolution deadline not yet set',
+    },
+    oversight: {
+      title: 'Student Grades',
+      intro:
+        'Review a student’s academic record within your scope: semester grades, CGPA, superseded attempts, Incomplete deadlines, and must-retake obligations.',
+      loadingStudents: 'Loading the students you may review',
+      loadStudentsError: 'Could not load the student list. Please try again.',
+      pickStudent: 'Choose a student to review their grades.',
+      loadingRecord: 'Loading the student record',
+      loadRecordError: 'Could not load this student record. Please try again.',
+      empty: 'No finalized grades are visible for this student yet.',
+    },
+    record: {
+      mustRetake: 'Must retake',
     },
     outstandingIncompletes: {
       title: 'Outstanding Incompletes',

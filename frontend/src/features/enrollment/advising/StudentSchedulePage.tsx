@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Alert,
+  Button,
   CircularProgress,
   Paper,
   Stack,
@@ -12,6 +13,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useTheStudentsTheComposerMayRegisterOnBehalfOf,
@@ -27,7 +29,7 @@ import { courseStatusChip } from '../courseStatusChip'
 import { MeetingTimes } from '../MeetingTimes'
 import { mustRetakeChip } from '../mustRetakeChip'
 import { AttendanceCell } from '../schedule/AttendanceCell'
-import { StudentPicker } from '../on-behalf/StudentPicker'
+import { StudentPicker } from '../../../shared/ui/StudentPicker'
 
 /**
  * The student-schedule oversight view (features/enrollment, ticket 10, ADR-0015). A reviewer
@@ -73,11 +75,25 @@ export function StudentSchedulePage() {
               <Typography variant="h6" component="p">
                 {student.name}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {student.university_id}
-                {student.program &&
-                  ` · ${pickLocaleName(student.program, i18n.language, student.program.code ?? '')}`}
-              </Typography>
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {student.university_id}
+                  {student.program &&
+                    ` · ${pickLocaleName(student.program, i18n.language, student.program.code ?? '')}`}
+                </Typography>
+                <Button
+                  component={RouterLink}
+                  to={`/grading/students/${student.student_id}`}
+                  size="small"
+                  variant="outlined"
+                >
+                  {t('grading:oversight.title')}
+                </Button>
+              </Stack>
             </Paper>
           )}
 

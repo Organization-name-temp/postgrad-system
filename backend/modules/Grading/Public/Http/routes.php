@@ -5,6 +5,7 @@ use Modules\Grading\Internal\Http\Controllers\DepartmentHeadReviewController;
 use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
 use Modules\Grading\Internal\Http\Controllers\IncompleteController;
 use Modules\Grading\Internal\Http\Controllers\MyGradesController;
+use Modules\Grading\Internal\Http\Controllers\StudentGradesController;
 
 /*
 | Grading routes, mounted under /api/v1 by GradingServiceProvider.
@@ -89,4 +90,13 @@ Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {
     // The acting Student's own academic record — Semester GPAs and the CGPA prominently
     // (ticket 04). No id param: always the acting user's own Student anchor.
     Route::get('/grading/my-grades', [MyGradesController::class, 'index']);
+});
+
+Route::middleware(['auth:sanctum', 'can:grades.view_student'])->group(function () {
+    // Scoped grade oversight (ticket 08): the reviewer-facing Student picker and one
+    // Student's academic record. {student_id} is Identity-owned (resolved through the
+    // StudentDirectory facade, not model-bound), so it stays snake_case for Scribe/Orval.
+    Route::get('/grading/students', [StudentGradesController::class, 'index']);
+    Route::get('/grading/students/{student_id}', [StudentGradesController::class, 'show'])
+        ->whereNumber('student_id');
 });

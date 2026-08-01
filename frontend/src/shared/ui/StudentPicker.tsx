@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem as ComposableStudent } from '../../../shared/api/generated/endpoints'
-import { pickLocaleName } from '../../../shared/i18n/localeName'
+import type { TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem as ComposableStudent } from '../api/generated/endpoints'
+import { pickLocaleName } from '../i18n/localeName'
 
 interface StudentPickerProps {
   students: ComposableStudent[]

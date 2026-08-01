@@ -12,6 +12,7 @@ export const PERMISSION = {
   decideApplicants: 'applicant.decide',
   approveCourseRegistration: 'registration.approve',
   registerCoursesForStudent: 'courses.register_for_student',
+  viewStudentGrades: 'grades.view_student',
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
   manageCalendar: 'calendar.manage',

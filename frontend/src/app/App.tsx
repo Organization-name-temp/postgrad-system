@@ -43,9 +43,11 @@ import { IncompleteResolutionPage } from '../features/grading/instructor/Incompl
 import { DepartmentHeadQueuePage } from '../features/grading/department-head/DepartmentHeadQueuePage'
 import { DepartmentHeadSheetPage } from '../features/grading/department-head/DepartmentHeadSheetPage'
 import { MyGradesPage } from '../features/grading/student/MyGradesPage'
+import { StudentGradesPage } from '../features/grading/oversight/StudentGradesPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
+import { PERMISSION } from '../shared/access/permissions'
 
 // Dev-only design-system gallery. Gating the lazy import on `import.meta.env.DEV`
 // keeps both the route AND its chunk out of production builds.
@@ -95,6 +97,10 @@ export function App() {
                     record to read (the server 403s it), so the nav/route gate on the role. */}
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
                   <Route path="/grading/my-grades" element={<MyGradesPage />} />
+                </Route>
+                <Route element={<RequireAuth permission={PERMISSION.viewStudentGrades} />}>
+                  <Route path="/grading/students" element={<StudentGradesPage />} />
+                  <Route path="/grading/students/:studentId" element={<StudentGradesPage />} />
                 </Route>
                 {/* Persona-guarded: Instructors (R04) reach My Teaching + the register;
                     attendance is authorised by assignment server-side (ticket 08).

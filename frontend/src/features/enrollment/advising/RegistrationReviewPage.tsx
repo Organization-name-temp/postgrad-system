@@ -202,6 +202,17 @@ function StudentContext({ student }: { student: ReviewStudent }) {
           value={t('review.currentLoadValue', { count: student?.current_load ?? 0 })}
         />
       </Stack>
+      {student?.student_id && (
+        <Button
+          component={RouterLink}
+          to={`/grading/students/${student.student_id}`}
+          size="small"
+          variant="outlined"
+          sx={{ mt: 2 }}
+        >
+          {t('grading:oversight.title')}
+        </Button>
+      )}
     </Paper>
   )
 }

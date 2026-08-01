@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router-dom'
 import type { AxiosRequestConfig } from 'axios'
 import '../../../shared/i18n/config' // initialise i18next so useTranslation works
 import { StudentSchedulePage } from './StudentSchedulePage'
@@ -34,7 +35,9 @@ function renderPage() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
-      <StudentSchedulePage />
+      <MemoryRouter>
+        <StudentSchedulePage />
+      </MemoryRouter>
     </QueryClientProvider>,
   )
 }
@@ -100,6 +103,10 @@ describe('StudentSchedulePage', () => {
     expect(await screen.findByText('DEP501')).toBeInTheDocument()
     expect(screen.getByText('Fall 2026')).toBeInTheDocument()
     expect(screen.getByText('80%')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /student grades/i })).toHaveAttribute(
+      'href',
+      '/grading/students/5',
+    )
     // Read-only: no drop / withdraw actions on the oversight view.
     expect(screen.queryByRole('button', { name: /drop|withdraw/i })).not.toBeInTheDocument()
   }, 20000)

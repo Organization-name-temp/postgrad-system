@@ -40,6 +40,7 @@ export const ar = {
       advising: 'طلبات التسجيل',
       registerForStudent: 'التسجيل نيابةً عن طالب',
       studentSchedules: 'جداول الطلاب',
+      studentGrades: 'درجات الطلاب',
       myOfferings: 'تدريسي',
       gradeSheets: 'كشوف الدرجات',
       outstandingIncompletes: 'حالات "غير مكتمل" المعلّقة',
@@ -1308,6 +1309,20 @@ export const ar = {
       },
       incompleteDeadline: 'التسوية بحلول {{date}}',
       incompleteNoDeadline: 'لم يُحدَّد الموعد النهائي بعد',
+    },
+    oversight: {
+      title: 'درجات الطلاب',
+      intro:
+        'راجع السجل الأكاديمي للطالب ضمن نطاقك: درجات الفصول، المعدل التراكمي، المحاولات المستبدلة، مواعيد غير المكتمل، والتزامات إعادة المقرر.',
+      loadingStudents: 'جارٍ تحميل الطلاب الذين يمكنك مراجعتهم',
+      loadStudentsError: 'تعذّر تحميل قائمة الطلاب. حاول مرة أخرى.',
+      pickStudent: 'اختر طالبًا لمراجعة درجاته.',
+      loadingRecord: 'جارٍ تحميل السجل الدراسي',
+      loadRecordError: 'تعذّر تحميل هذا السجل الدراسي. حاول مرة أخرى.',
+      empty: 'لا توجد درجات معتمدة ظاهرة لهذا الطالب بعد.',
+    },
+    record: {
+      mustRetake: 'إعادة المقرر إلزامية',
     },
     outstandingIncompletes: {
       title: 'حالات "غير مكتمل" المعلّقة',

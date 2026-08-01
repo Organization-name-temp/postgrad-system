@@ -16330,6 +16330,7 @@ paths:
                                 superseded: true
                             earned: true
                             superseded: false
+                            must_retake: false
                             incomplete_deadline: null
                           -
                             enrollment_id: 9
@@ -16349,6 +16350,7 @@ paths:
                             grade_history: []
                             earned: null
                             superseded: false
+                            must_retake: false
                             incomplete_deadline: '2026-11-03T00:00:00+00:00'
                 properties:
                   data:
@@ -16395,6 +16397,7 @@ paths:
                                     superseded: true
                                 earned: true
                                 superseded: false
+                                must_retake: false
                                 incomplete_deadline: null
                               -
                                 enrollment_id: 9
@@ -16414,6 +16417,7 @@ paths:
                                 grade_history: []
                                 earned: null
                                 superseded: false
+                                must_retake: false
                                 incomplete_deadline: '2026-11-03T00:00:00+00:00'
                         items:
                           type: object
@@ -16468,6 +16472,7 @@ paths:
                                       superseded: true
                                   earned: true
                                   superseded: false
+                                  must_retake: false
                                   incomplete_deadline: null
                                 -
                                   enrollment_id: 9
@@ -16487,6 +16492,7 @@ paths:
                                   grade_history: []
                                   earned: null
                                   superseded: false
+                                  must_retake: false
                                   incomplete_deadline: '2026-11-03T00:00:00+00:00'
                               items:
                                 type: object
@@ -16531,6 +16537,9 @@ paths:
                                   superseded:
                                     type: boolean
                                     example: false
+                                  must_retake:
+                                    type: boolean
+                                    example: false
                                   incomplete_deadline:
                                     type: string
                                     example: null
@@ -16550,6 +16559,329 @@ paths:
       tags:
         - Grading
       security: []
+  /api/v1/grading/students:
+    get:
+      summary: 'The students whose grades the reviewer may inspect.'
+      operationId: theStudentsWhoseGradesTheReviewerMayInspect
+      description: "A searchable picker population for the grade-oversight screen: Advisors see their live\nadvisees; Department Heads the Students in Programs under their Departments; Deans the\nStudents in their Faculties; Instructors the Students on Offerings they teach; Student\nAffairs, Council and administrators every Student. Each row carries the same lightweight\nStudent context the existing register-for-student picker renders."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      student_id: 5
+                      name: 'Sara Student'
+                      university_id: 2026-MSC-CE-0001
+                      enrollment_term: 'Fall 2026'
+                      degree_level: MSc
+                      current_load: null
+                      program:
+                        id: 1
+                        code: MSC-CE
+                        name_en: 'MSc in Computer Engineering'
+                        name_ar: 'ماجستير هندسة الحاسوب'
+                        degree_level: MSc
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        student_id: 5
+                        name: 'Sara Student'
+                        university_id: 2026-MSC-CE-0001
+                        enrollment_term: 'Fall 2026'
+                        degree_level: MSc
+                        current_load: null
+                        program:
+                          id: 1
+                          code: MSC-CE
+                          name_en: 'MSc in Computer Engineering'
+                          name_ar: 'ماجستير هندسة الحاسوب'
+                          degree_level: MSc
+                    items:
+                      type: object
+                      properties:
+                        student_id:
+                          type: integer
+                          example: 5
+                        name:
+                          type: string
+                          example: 'Sara Student'
+                        university_id:
+                          type: string
+                          example: 2026-MSC-CE-0001
+                        enrollment_term:
+                          type: string
+                          example: 'Fall 2026'
+                        degree_level:
+                          type: string
+                          example: MSc
+                        current_load:
+                          type: string
+                          example: null
+                          nullable: true
+                        program:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: MSC-CE
+                            name_en:
+                              type: string
+                              example: 'MSc in Computer Engineering'
+                            name_ar:
+                              type: string
+                              example: 'ماجستير هندسة الحاسوب'
+                            degree_level:
+                              type: string
+                              example: MSc
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Grading
+      security: []
+  '/api/v1/grading/students/{student_id}':
+    get:
+      summary: "One Student's grade record for a scoped reviewer."
+      operationId: oneStudentsGradeRecordForAScopedReviewer
+      description: "The exact academic-record payload the Student's own My Grades page reads — CGPA,\nSemester GPAs, superseded attempts, Incomplete deadlines and must-retake markers — but\nfor a reviewer whose role legitimately covers the target Student."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    cgpa: 3.42
+                    semesters:
+                      -
+                        semester:
+                          id: 2
+                          term: Fall
+                          year: 2026
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                        gpa: 3.42
+                        courses:
+                          -
+                            enrollment_id: 5
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                              department_id: 1
+                            credit_hours: 3
+                            course_status: Retake
+                            grade:
+                              mark: 62
+                              letter_grade: D
+                              gpa_points: 1.0
+                            grade_history: []
+                            earned: false
+                            superseded: false
+                            must_retake: true
+                            incomplete_deadline: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      cgpa:
+                        type: number
+                        example: 3.42
+                      semesters:
+                        type: array
+                        example:
+                          -
+                            semester:
+                              id: 2
+                              term: Fall
+                              year: 2026
+                              name_en: 'Fall 2026'
+                              name_ar: 'خريف 2026'
+                            gpa: 3.42
+                            courses:
+                              -
+                                enrollment_id: 5
+                                course:
+                                  id: 1
+                                  code: DEP501
+                                  name_en: 'Advanced Algorithms'
+                                  name_ar: 'خوارزميات متقدمة'
+                                  level: 500
+                                  total_ch: 3
+                                  research_type: null
+                                  is_active: true
+                                  department_id: 1
+                                credit_hours: 3
+                                course_status: Retake
+                                grade:
+                                  mark: 62
+                                  letter_grade: D
+                                  gpa_points: 1
+                                grade_history: []
+                                earned: false
+                                superseded: false
+                                must_retake: true
+                                incomplete_deadline: null
+                        items:
+                          type: object
+                          properties:
+                            semester:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                term:
+                                  type: string
+                                  example: Fall
+                                year:
+                                  type: integer
+                                  example: 2026
+                                name_en:
+                                  type: string
+                                  example: 'Fall 2026'
+                                name_ar:
+                                  type: string
+                                  example: 'خريف 2026'
+                            gpa:
+                              type: number
+                              example: 3.42
+                            courses:
+                              type: array
+                              example:
+                                -
+                                  enrollment_id: 5
+                                  course:
+                                    id: 1
+                                    code: DEP501
+                                    name_en: 'Advanced Algorithms'
+                                    name_ar: 'خوارزميات متقدمة'
+                                    level: 500
+                                    total_ch: 3
+                                    research_type: null
+                                    is_active: true
+                                    department_id: 1
+                                  credit_hours: 3
+                                  course_status: Retake
+                                  grade:
+                                    mark: 62
+                                    letter_grade: D
+                                    gpa_points: 1
+                                  grade_history: []
+                                  earned: false
+                                  superseded: false
+                                  must_retake: true
+                                  incomplete_deadline: null
+                              items:
+                                type: object
+                                properties:
+                                  enrollment_id:
+                                    type: integer
+                                    example: 5
+                                  course:
+                                    type: object
+                                    properties:
+                                      id: { type: integer, example: 1 }
+                                      code: { type: string, example: DEP501 }
+                                      name_en: { type: string, example: 'Advanced Algorithms' }
+                                      name_ar: { type: string, example: 'خوارزميات متقدمة' }
+                                      level: { type: integer, example: 500 }
+                                      total_ch: { type: integer, example: 3 }
+                                      research_type: { type: string, example: null, nullable: true }
+                                      is_active: { type: boolean, example: true }
+                                      department_id: { type: integer, example: 1 }
+                                  credit_hours:
+                                    type: integer
+                                    example: 3
+                                  course_status:
+                                    type: string
+                                    example: Retake
+                                  grade:
+                                    type: object
+                                    properties:
+                                      mark: { type: integer, example: 62 }
+                                      letter_grade: { type: string, example: D }
+                                      gpa_points: { type: number, example: 1.0 }
+                                  grade_history:
+                                    type: array
+                                    example: []
+                                  earned:
+                                    type: boolean
+                                    example: false
+                                  superseded:
+                                    type: boolean
+                                    example: false
+                                  must_retake:
+                                    type: boolean
+                                    example: true
+                                  incomplete_deadline:
+                                    type: string
+                                    example: null
+                                    nullable: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: 'no such student'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No such student.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No such student.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: student_id
+        description: "The target Student anchor's id."
+        example: 5
+        required: true
+        schema:
+          type: integer
   /api/v1/notifications:
     get:
       summary: 'List my notifications.'

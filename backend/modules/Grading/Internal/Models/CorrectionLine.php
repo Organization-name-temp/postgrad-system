@@ -17,6 +17,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class CorrectionLine extends Model
 {
+    /**
+     * The table is named for the Grade Sheet it belongs to, not for this class, so the
+     * convention-derived `correction_lines` would not exist.
+     *
+     * @var string
+     */
+    protected $table = 'grade_sheet_correction_lines';
+
     /** @var list<string> */
     protected $fillable = [
         'grade_sheet_id',

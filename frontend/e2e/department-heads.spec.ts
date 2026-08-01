@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import type { Page } from '@playwright/test'
+import type { Locator, Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
 // The Department-Heads admin screen against the real stack (needs Postgres + the
@@ -31,6 +31,19 @@ async function login(page: Page, email: string) {
   await page.getByLabel('Password').fill('password')
   await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page).toHaveURL(/\/$/)
+}
+
+/**
+ * Wait for an animating surface — a Dialog's or a Menu's Paper — to finish fading in.
+ *
+ * axe measures **rendered** colour, so a surface caught mid-fade has every label on it
+ * measured blended with whatever is behind it. `text.secondary` (ink-500 on paper white) is
+ * 4.83:1 at rest, 0.33 above the AA bar, so a Paper still at ~0.9 opacity puts it at 4.07 and
+ * the scan reports a serious `color-contrast` violation for a screen that is compliant at
+ * rest. Being visible and populated is not enough to scan: it must also have stopped moving.
+ */
+async function settled(surface: Locator) {
+  await expect(surface).toHaveCSS('opacity', '1')
 }
 
 // WCAG AA gate (design-system.md §12): axe on the real screens, no serious/critical.
@@ -82,6 +95,7 @@ test.describe('department head assignments', () => {
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByRole('combobox')).toHaveCount(2)
+      await settled(dialog)
       await expectNoSeriousA11y(page, `department heads dialog — ${scheme}/${lang}`)
 
       // Then the scope listbox **open**. This is the ticket's genuinely new widget — the
@@ -92,6 +106,8 @@ test.describe('department head assignments', () => {
       await dialog.getByRole('combobox').last().click()
       const options = page.getByRole('option')
       await expect(options.first()).toBeVisible()
+      // The listbox's parent is the Menu's Paper, the element the Grow transition animates.
+      await settled(page.getByRole('listbox').locator('..'))
       await expectNoSeriousA11y(page, `department heads scope listbox — ${scheme}/${lang}`)
     })
   }

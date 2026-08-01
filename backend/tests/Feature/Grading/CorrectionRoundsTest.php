@@ -159,7 +159,7 @@ it('runs a correction through the same sign and finalize path, making the correc
     crSave($sheetA, $enrollmentA, 82.5)->assertOk(); // B, 3.0
     crSign($sheetA)->assertOk();
     $sheetB = crOpenInitial($offeringB);
-    crSave($sheetB, $enrollmentB, 91)->assertOk(); // A, 3.7
+    crSave($sheetB, $enrollmentB, 91)->assertOk(); // A, 4.0
     crSign($sheetB)->assertOk();
 
     Sanctum::actingAs($head);
@@ -168,7 +168,7 @@ it('runs a correction through the same sign and finalize path, making the correc
 
     Sanctum::actingAs($student->user);
     crMyGrades()->assertOk()
-        ->assertJsonPath('data.cgpa', 3.35)
+        ->assertJsonPath('data.cgpa', 3.5) // (3.0 + 4.0) over two equal-weight 3 CH courses
         ->assertJsonPath('data.semesters.1.gpa', 3)
         ->assertJsonPath('data.semesters.1.courses.0.grade.letter_grade', 'B')
         ->assertJsonPath('data.semesters.1.courses.0.grade_history', []);
@@ -185,7 +185,7 @@ it('runs a correction through the same sign and finalize path, making the correc
     Sanctum::actingAs($student->user);
     $response = crMyGrades()->assertOk();
 
-    $response->assertJsonPath('data.cgpa', 1.85)
+    $response->assertJsonPath('data.cgpa', 2) // the corrected F replaces the B in the CGPA
         ->assertJsonPath('data.semesters.1.gpa', 0)
         ->assertJsonPath('data.semesters.1.courses.0.grade.letter_grade', 'F')
         ->assertJsonPath('data.semesters.1.courses.0.grade_history.0.letter_grade', 'B')

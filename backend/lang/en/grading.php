@@ -38,6 +38,8 @@ return [
         'blank_lines_remain' => 'This grade sheet still has :count ungraded line(s) remaining.',
         'return_note_required' => 'A note is required when returning a grade sheet to its instructor.',
         'not_your_department' => 'This grade sheet does not belong to your department.',
+        'correction_requires_finalized' => 'Only a finalized grade sheet can start a correction round.',
+        'correction_lines_invalid' => 'A correction round can only include lines from that finalized grade sheet.',
     ],
 
     'incomplete' => [

@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { StatusChip } from '../../../shared/ui/StatusChip'
+import { formatGradeHistory, type GradeHistoryEntry } from '../gradeHistory'
 import { GRADE_EMPHASIS_SX, gradeEmphasisFor, gradeLineChip } from '../gradeSheetChip'
 import { isInvalidMarkInput, letterGradeFor, parseMark } from '../letterGrade'
 
@@ -23,6 +24,7 @@ export interface GradeSheetLine {
   credit_hours: number
   student: { name?: string; university_id?: string }
   grade: { mark?: number; letter_grade?: string; gpa_points?: number } | null
+  grade_history?: GradeHistoryEntry[]
   incomplete?: { completion_percentage?: number; reason?: string } | null
 }
 
@@ -146,6 +148,7 @@ function GradeSheetTableRow({
   // the line went blank.
   const preview = letterGradeFor(parseMark(draft))
   const recorded = line.grade != null
+  const historySummary = formatGradeHistory(line.grade_history ?? [], t)
 
   const lineState = line.incomplete != null ? 'incomplete' : recorded ? 'recorded' : 'blank'
 
@@ -159,6 +162,11 @@ function GradeSheetTableRow({
           {line.student.university_id && (
             <Typography variant="caption" component="span" color="text.secondary">
               {line.student.university_id}
+            </Typography>
+          )}
+          {historySummary && (
+            <Typography variant="caption" component="span" color="text.secondary">
+              {t('sheet.history', { grades: historySummary })}
             </Typography>
           )}
         </Stack>

@@ -14167,6 +14167,13 @@ paths:
                           mark: 82.5
                           letter_grade: B
                           gpa_points: 3
+                        grade_history:
+                          -
+                            mark: 71
+                            letter_grade: C
+                            gpa_points: 2.0
+                            finalized_at: '2026-06-01T09:00:00+00:00'
+                            superseded: true
                         incomplete: null
                       -
                         enrollment_id: 6
@@ -14177,6 +14184,7 @@ paths:
                           university_id: 2026-MSC-CE-0002
                           name: 'Omar Student'
                         grade: null
+                        grade_history: []
                         incomplete:
                           completion_percentage: 80
                           reason: 'Hospitalised before the final project was due.'
@@ -14254,6 +14262,12 @@ paths:
                               mark: 82.5
                               letter_grade: B
                               gpa_points: 3
+                            grade_history:
+                              - mark: 71
+                                letter_grade: C
+                                gpa_points: 2
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
                             incomplete: null
                           -
                             enrollment_id: 6
@@ -14264,6 +14278,7 @@ paths:
                               university_id: 2026-MSC-CE-0002
                               name: 'Omar Student'
                             grade: null
+                            grade_history: []
                             incomplete:
                               completion_percentage: 80
                               reason: 'Hospitalised before the final project was due.'
@@ -14303,6 +14318,32 @@ paths:
                                 gpa_points:
                                   type: integer
                                   example: 3
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 71
+                                  letter_grade: C
+                                  gpa_points: 2
+                                  finalized_at: '2026-06-01T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: integer
+                                    example: 71
+                                  letter_grade:
+                                    type: string
+                                    example: C
+                                  gpa_points:
+                                    type: number
+                                    example: 2.0
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-06-01T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
                             incomplete:
                               type: string
                               example: null
@@ -14528,6 +14569,486 @@ paths:
         name: enrollment_id
         description: 'The ID of the enrollment being marked.'
         example: 5
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/sheets/{grade_sheet_id}/correction':
+    post:
+      summary: 'Open a Correction round against a finalized Sheet.'
+      operationId: openACorrectionRoundAgainstAFinalizedSheet
+      description: "Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only\nthe selected lines (ADR-0023): the original round is untouched and remains finalized\nthroughout. The returned round is then edited, signed and Department-Head-reviewed\nthrough the existing Sheet endpoints. Authorised by the Offering assignment — only the\nInstructor who teaches this Offering may start a correction on it."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 7
+                      course_offering_id: 3
+                      kind: Correction
+                      status: Draft
+                      signed_at: null
+                      reviewed_at: null
+                      review_note: null
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                      department_id: 1
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade: null
+                        grade_history:
+                          -
+                            mark: 82.5
+                            letter_grade: B
+                            gpa_points: 3.0
+                            finalized_at: '2026-08-11T09:00:00+00:00'
+                            superseded: true
+                        incomplete: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 7
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Correction
+                          status:
+                            type: string
+                            example: Draft
+                          signed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                          department_id:
+                            type: integer
+                            example: 1
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade: null
+                            grade_history:
+                              - mark: 82.5
+                                letter_grade: B
+                                gpa_points: 3
+                                finalized_at: '2026-08-11T09:00:00+00:00'
+                                superseded: true
+                            incomplete: null
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: string
+                              example: null
+                              nullable: true
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 82.5
+                                  letter_grade: B
+                                  gpa_points: 3
+                                  finalized_at: '2026-08-11T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: number
+                                    example: 82.5
+                                  letter_grade:
+                                    type: string
+                                    example: B
+                                  gpa_points:
+                                    type: number
+                                    example: 3.0
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-08-11T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
+                            incomplete:
+                              type: string
+                              example: null
+                              nullable: true
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        409:
+          description: 'sheet not finalized'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Only a finalized grade sheet can start a correction round.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Only a finalized grade sheet can start a correction round.'
+        422:
+          description: 'selected line not on that finalized sheet'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A correction round can only include lines from that finalized grade sheet.'
+                  errors:
+                    enrollment_ids:
+                      - 'A correction round can only include lines from that finalized grade sheet.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A correction round can only include lines from that finalized grade sheet.'
+                  errors:
+                    type: object
+                    properties:
+                      enrollment_ids:
+                        type: array
+                        example:
+                          - 'A correction round can only include lines from that finalized grade sheet.'
+                        items:
+                          type: string
+      tags:
+        - Grading
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enrollment_ids:
+                  type: array
+                  description: 'The enrollment ids to correct from that finalized sheet.'
+                  example:
+                    - 5
+                  items:
+                    type: integer
+              required:
+                - enrollment_ids
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the finalized sheet being corrected.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/corrections/{grade_sheet_id}':
+    get:
+      summary: 'Open one Correction round.'
+      operationId: openOneCorrectionRound
+      description: "A previously-opened Correction round, read by its own Sheet id so the SPA can return to\nit directly. The round contains only the selected lines persisted on it at creation time;\nthe original finalized Sheet it corrects is untouched. Authorised by the same Offering\nassignment as every other Instructor Sheet."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 7
+                      course_offering_id: 3
+                      kind: Correction
+                      status: Draft
+                      signed_at: null
+                      reviewed_at: null
+                      review_note: null
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                      department_id: 1
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade: null
+                        grade_history:
+                          -
+                            mark: 82.5
+                            letter_grade: B
+                            gpa_points: 3.0
+                            finalized_at: '2026-08-11T09:00:00+00:00'
+                            superseded: true
+                        incomplete: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 7
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Correction
+                          status:
+                            type: string
+                            example: Draft
+                          signed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                          department_id:
+                            type: integer
+                            example: 1
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade: null
+                            grade_history:
+                              - mark: 82.5
+                                letter_grade: B
+                                gpa_points: 3
+                                finalized_at: '2026-08-11T09:00:00+00:00'
+                                superseded: true
+                            incomplete: null
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: string
+                              example: null
+                              nullable: true
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 82.5
+                                  letter_grade: B
+                                  gpa_points: 3
+                                  finalized_at: '2026-08-11T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: number
+                                    example: 82.5
+                                  letter_grade:
+                                    type: string
+                                    example: B
+                                  gpa_points:
+                                    type: number
+                                    example: 3.0
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-08-11T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
+                            incomplete:
+                              type: string
+                              example: null
+                              nullable: true
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the correction round.'
+        example: 7
         required: true
         schema:
           type: integer
@@ -15286,6 +15807,13 @@ paths:
                           mark: 82.5
                           letter_grade: B
                           gpa_points: 3
+                        grade_history:
+                          -
+                            mark: 71
+                            letter_grade: C
+                            gpa_points: 2
+                            finalized_at: '2026-06-01T09:00:00+00:00'
+                            superseded: true
                         incomplete: null
                       -
                         enrollment_id: 6
@@ -15296,6 +15824,7 @@ paths:
                           university_id: 2026-MSC-CE-0002
                           name: 'Omar Student'
                         grade: null
+                        grade_history: []
                         incomplete:
                           completion_percentage: 80
                           reason: 'Hospitalised before the final project was due.'
@@ -15379,6 +15908,12 @@ paths:
                               mark: 82.5
                               letter_grade: B
                               gpa_points: 3
+                            grade_history:
+                              - mark: 71
+                                letter_grade: C
+                                gpa_points: 2
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
                             incomplete: null
                           -
                             enrollment_id: 6
@@ -15389,6 +15924,7 @@ paths:
                               university_id: 2026-MSC-CE-0002
                               name: 'Omar Student'
                             grade: null
+                            grade_history: []
                             incomplete:
                               completion_percentage: 80
                               reason: 'Hospitalised before the final project was due.'
@@ -15428,6 +15964,32 @@ paths:
                                 gpa_points:
                                   type: integer
                                   example: 3
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 71
+                                  letter_grade: C
+                                  gpa_points: 2
+                                  finalized_at: '2026-06-01T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: integer
+                                    example: 71
+                                  letter_grade:
+                                    type: string
+                                    example: C
+                                  gpa_points:
+                                    type: integer
+                                    example: 2
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-06-01T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
                             incomplete:
                               type: string
                               example: null
@@ -15726,6 +16288,13 @@ paths:
                               mark: 82.5
                               letter_grade: B
                               gpa_points: 3.0
+                            grade_history:
+                              -
+                                mark: 71
+                                letter_grade: C
+                                gpa_points: 2.0
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
                             earned: true
                             superseded: false
                             incomplete_deadline: null
@@ -15744,6 +16313,7 @@ paths:
                             credit_hours: 3
                             course_status: Incomplete
                             grade: null
+                            grade_history: []
                             earned: null
                             superseded: false
                             incomplete_deadline: '2026-11-03T00:00:00+00:00'
@@ -15784,6 +16354,12 @@ paths:
                                   mark: 82.5
                                   letter_grade: B
                                   gpa_points: 3
+                                grade_history:
+                                  - mark: 71
+                                    letter_grade: C
+                                    gpa_points: 2
+                                    finalized_at: '2026-06-01T09:00:00+00:00'
+                                    superseded: true
                                 earned: true
                                 superseded: false
                                 incomplete_deadline: null
@@ -15802,6 +16378,7 @@ paths:
                                 credit_hours: 3
                                 course_status: Incomplete
                                 grade: null
+                                grade_history: []
                                 earned: null
                                 superseded: false
                                 incomplete_deadline: '2026-11-03T00:00:00+00:00'
@@ -15850,6 +16427,12 @@ paths:
                                     mark: 82.5
                                     letter_grade: B
                                     gpa_points: 3
+                                  grade_history:
+                                    - mark: 71
+                                      letter_grade: C
+                                      gpa_points: 2
+                                      finalized_at: '2026-06-01T09:00:00+00:00'
+                                      superseded: true
                                   earned: true
                                   superseded: false
                                   incomplete_deadline: null
@@ -15868,6 +16451,7 @@ paths:
                                   credit_hours: 3
                                   course_status: Incomplete
                                   grade: null
+                                  grade_history: []
                                   earned: null
                                   superseded: false
                                   incomplete_deadline: '2026-11-03T00:00:00+00:00'
@@ -15901,6 +16485,13 @@ paths:
                                       mark: { type: number, example: 82.5 }
                                       letter_grade: { type: string, example: B }
                                       gpa_points: { type: number, example: 3.0 }
+                                  grade_history:
+                                    type: array
+                                    example:
+                                      - { mark: 71, letter_grade: C, gpa_points: 2, finalized_at: '2026-06-01T09:00:00+00:00', superseded: true }
+                                    items:
+                                      type: object
+                                      properties: { mark: { type: integer, example: 71 }, letter_grade: { type: string, example: C }, gpa_points: { type: number, example: 2.0 }, finalized_at: { type: string, example: '2026-06-01T09:00:00+00:00' }, superseded: { type: boolean, example: true } }
                                   earned:
                                     type: boolean
                                     example: true

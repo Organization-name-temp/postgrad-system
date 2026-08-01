@@ -4,6 +4,7 @@ namespace Modules\Grading\Internal\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentRecords;
@@ -13,6 +14,7 @@ use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
 use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
 use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
+use Modules\Grading\Internal\Models\CorrectionLine;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
@@ -107,7 +109,7 @@ class GradeSheetController
      *
      * @urlParam offering_id integer required The ID of the course offering. Example: 3
      *
-     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Returned", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": "2026-08-11T09:00:00+00:00", "review_note": "Please recheck line 3."}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}, "incomplete": null}, {"enrollment_id": 6, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 8, "university_id": "2026-MSC-CE-0002", "name": "Omar Student"}, "grade": null, "incomplete": {"completion_percentage": 80, "reason": "Hospitalised before the final project was due."}}]}}
+     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Returned", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": "2026-08-11T09:00:00+00:00", "review_note": "Please recheck line 3."}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}, "grade_history": [{"mark": 71, "letter_grade": "C", "gpa_points": 2.0, "finalized_at": "2026-06-01T09:00:00+00:00", "superseded": true}], "incomplete": null}, {"enrollment_id": 6, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 8, "university_id": "2026-MSC-CE-0002", "name": "Omar Student"}, "grade": null, "grade_history": [], "incomplete": {"completion_percentage": 80, "reason": "Hospitalised before the final project was due."}}]}}
      * @response 403 scenario="not the assigned instructor" {"message": "You are not assigned to teach this offering."}
      * @response 404 scenario="no such offering" {"message": "That course offering no longer exists."}
      */
@@ -130,6 +132,99 @@ class GradeSheetController
                 'lines' => $this->lineArrays($sheet, $roster, $students, $directory),
             ],
         ]);
+    }
+
+    /**
+     * Open one Correction round.
+     *
+     * A previously-opened Correction round, read by its own Sheet id so the SPA can return to
+     * it directly. The round contains only the selected lines persisted on it at creation time;
+     * the original finalized Sheet it corrects is untouched. Authorised by the same Offering
+     * assignment as every other Instructor Sheet.
+     *
+     * @urlParam grade_sheet_id integer required The ID of the correction round. Example: 7
+     *
+     * @response 200 {"data": {"sheet": {"id": 7, "course_offering_id": 3, "kind": "Correction", "status": "Draft", "signed_at": null, "reviewed_at": null, "review_note": null}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": null, "grade_history": [{"mark": 82.5, "letter_grade": "B", "gpa_points": 3.0, "finalized_at": "2026-08-11T09:00:00+00:00", "superseded": true}], "incomplete": null}]}}
+     * @response 403 scenario="not the assigned instructor" {"message": "You are not assigned to teach this offering."}
+     */
+    public function correction(
+        Request $request,
+        GradeSheet $gradeSheet,
+        EnrollmentRecords $enrollments,
+        CourseCatalog $courses,
+        StudentDirectory $students,
+        Directory $directory,
+    ): JsonResponse {
+        abort_if($gradeSheet->kind !== GradeSheetKind::Correction, 404);
+
+        $offering = $this->authorizeOffering($gradeSheet->course_offering_id, $request, $enrollments);
+        $roster = $this->rosterFor($gradeSheet, $offering, $enrollments);
+
+        return response()->json([
+            'data' => [
+                'sheet' => $this->sheetArray($gradeSheet),
+                'course' => $courses->find($offering->courseId)?->toArray(),
+                'lines' => $this->lineArrays($gradeSheet, $roster, $students, $directory),
+            ],
+        ]);
+    }
+
+    /**
+     * Open a Correction round against a finalized Sheet.
+     *
+     * Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only
+     * the selected lines (ADR-0023): the original round is untouched and remains finalized
+     * throughout. The returned round is then edited, signed and Department-Head-reviewed
+     * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
+     * Instructor who teaches this Offering may start a correction on it.
+     *
+     * @urlParam grade_sheet_id integer required The ID of the finalized sheet being corrected. Example: 1
+     *
+     * @bodyParam enrollment_ids integer[] required The enrollment ids to correct from that finalized sheet. Example: [5]
+     *
+     * @response 201 {"data": {"sheet": {"id": 7, "course_offering_id": 3, "kind": "Correction", "status": "Draft", "signed_at": null, "reviewed_at": null, "review_note": null}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": null, "grade_history": [{"mark": 82.5, "letter_grade": "B", "gpa_points": 3.0, "finalized_at": "2026-08-11T09:00:00+00:00", "superseded": true}], "incomplete": null}]}}
+     * @response 403 scenario="not the assigned instructor" {"message": "You are not assigned to teach this offering."}
+     * @response 409 scenario="sheet not finalized" {"message": "Only a finalized grade sheet can start a correction round."}
+     * @response 422 scenario="selected line not on that finalized sheet" {"message": "A correction round can only include lines from that finalized grade sheet.", "errors": {"enrollment_ids": ["A correction round can only include lines from that finalized grade sheet."]}}
+     */
+    public function createCorrection(
+        Request $request,
+        GradeSheet $gradeSheet,
+        EnrollmentRecords $enrollments,
+        CourseCatalog $courses,
+        StudentDirectory $students,
+        Directory $directory,
+    ): JsonResponse {
+        $offering = $this->authorizeOffering($gradeSheet->course_offering_id, $request, $enrollments);
+
+        if ($gradeSheet->status !== GradeSheetStatus::Finalized) {
+            throw new ConflictHttpException(__('grading.sheet.correction_requires_finalized'));
+        }
+
+        $validated = $request->validate([
+            'enrollment_ids' => ['required', 'array', 'min:1'],
+            'enrollment_ids.*' => ['integer', 'distinct'],
+        ]);
+
+        $selectedIds = array_values(array_map('intval', $validated['enrollment_ids']));
+        $allowedIds = $gradeSheet->grades()->pluck('enrollment_id')->map(fn ($id): int => (int) $id)->all();
+
+        if (array_values(array_intersect($selectedIds, $allowedIds)) !== $selectedIds) {
+            throw ValidationException::withMessages([
+                'enrollment_ids' => [__('grading.sheet.correction_lines_invalid')],
+            ]);
+        }
+
+        $correction = $this->openCorrectionSheet($offering, $selectedIds);
+        $roster = $this->rosterFor($correction, $offering, $enrollments);
+
+        return response()->json([
+            'data' => [
+                'sheet' => $this->sheetArray($correction),
+                'course' => $courses->find($offering->courseId)?->toArray(),
+                'lines' => $this->lineArrays($correction, $roster, $students, $directory),
+            ],
+        ], 201);
     }
 
     /**
@@ -351,6 +446,34 @@ class GradeSheetController
             ['course_offering_id' => $offering->id, 'kind' => GradeSheetKind::Initial],
             ['status' => GradeSheetStatus::Draft],
         );
+    }
+
+    /**
+     * A fresh Correction round for exactly the selected lines — a new round every time, never
+     * reopening the finalized source Sheet (ADR-0023). The selected-line rows are written in
+     * the same transaction as the round itself so a Correction can never exist with an empty or
+     * partial roster.
+     *
+     * @param  list<int>  $enrollmentIds
+     */
+    private function openCorrectionSheet(OfferingSummary $offering, array $enrollmentIds): GradeSheet
+    {
+        return DB::transaction(function () use ($offering, $enrollmentIds): GradeSheet {
+            $sheet = GradeSheet::create([
+                'course_offering_id' => $offering->id,
+                'kind' => GradeSheetKind::Correction,
+                'status' => GradeSheetStatus::Draft,
+            ]);
+
+            CorrectionLine::insert(array_map(fn (int $enrollmentId): array => [
+                'grade_sheet_id' => $sheet->getKey(),
+                'enrollment_id' => $enrollmentId,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ], $enrollmentIds));
+
+            return $sheet;
+        });
     }
 
     /**

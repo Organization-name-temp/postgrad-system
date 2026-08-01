@@ -22,6 +22,7 @@ import { apiErrorMessage } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { courseStatusChip, isUngradedVisibleStatus } from '../courseStatusChip'
+import { formatGradeHistory, readGradeHistory } from '../gradeHistory'
 import { GRADE_EMPHASIS_SX, gradeEmphasisFor } from '../gradeSheetChip'
 
 /** A GPA/CGPA figure formatted to two decimals, or the dash before any graded course exists. */
@@ -144,6 +145,7 @@ function CourseRowLine({ course }: { course: CourseRow }) {
   const name = course.course ? pickLocaleName(course.course, i18n.language) : ''
   const superseded = course.superseded ?? false
   const gpaPoints = course.grade?.gpa_points
+  const historySummary = formatGradeHistory(readGradeHistory(course), t)
   // A superseded earlier Attempt stays visible — muted, never hidden — with an explicit label
   // rather than leaving a Student to wonder why the numbers do not add up (spec, user story 43).
   const mutedSx = superseded ? { color: 'text.secondary' } : {}
@@ -167,6 +169,11 @@ function CourseRowLine({ course }: { course: CourseRow }) {
             <StatusChip tone="neutral" variant="outlined" label={t('myGrades.superseded')} />
           )}
         </Stack>
+        {historySummary && (
+          <Typography variant="caption" color="text.secondary">
+            {t('myGrades.history', { grades: historySummary })}
+          </Typography>
+        )}
       </TableCell>
       <TableCell align="right" sx={{ ...tabularNums, ...mutedSx }}>
         {course.credit_hours}

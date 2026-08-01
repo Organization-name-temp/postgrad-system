@@ -8,9 +8,11 @@ use Modules\Enrollment\Public\OfferingSummary;
 use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\LetterGrade;
 use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
+use Modules\Grading\Internal\Models\CorrectionLine;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
+use Modules\Grading\Internal\Support\FinalizedGradeHistoryLookup;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -49,7 +51,9 @@ trait BuildsSheetPayload
      * was opened to resolve, resolved through {@see EnrollmentRecords::findEnrollment()} rather
      * than {@see EnrollmentRecords::gradableEnrollmentsOf()} — the Enrollment is `Incomplete`
      * by the time the round exists, so Enrollment's own gradability judgement would exclude it.
-     * `Correction` rounds are ticket 06's; unreachable today.
+     * A **Correction** round's lines are the selected Enrollment ids persisted on the round
+     * itself, again resolved through {@see EnrollmentRecords::findEnrollment()} because the
+     * latest finalized Grade already exists and this round begins blank.
      *
      * @return list<EnrollmentSummary>
      */
@@ -58,6 +62,17 @@ trait BuildsSheetPayload
         if ($sheet->kind === GradeSheetKind::IncompleteResolution) {
             $enrollmentIds = Incomplete::query()
                 ->where('resolution_grade_sheet_id', $sheet->getKey())
+                ->pluck('enrollment_id');
+
+            return array_values(array_filter(array_map(
+                fn (int|string $id): ?EnrollmentSummary => $enrollments->findEnrollment((int) $id),
+                $enrollmentIds->all(),
+            )));
+        }
+
+        if ($sheet->kind === GradeSheetKind::Correction) {
+            $enrollmentIds = CorrectionLine::query()
+                ->where('grade_sheet_id', $sheet->getKey())
                 ->pluck('enrollment_id');
 
             return array_values(array_filter(array_map(
@@ -113,6 +128,7 @@ trait BuildsSheetPayload
             ->keyBy(fn (Grade $grade): int => (int) $grade->enrollment_id);
 
         $enrollmentIds = array_map(fn (EnrollmentSummary $enrollment): int => $enrollment->id, $roster);
+        $history = FinalizedGradeHistoryLookup::forEnrollments($enrollmentIds);
         $incompletes = Incomplete::query()
             ->whereIn('enrollment_id', $enrollmentIds)
             ->orderByDesc('id')
@@ -129,8 +145,17 @@ trait BuildsSheetPayload
             $summaries,
         )));
 
-        return array_map(function (EnrollmentSummary $enrollment) use ($grades, $incompletes, $summaries, $users): array {
+        return array_map(function (EnrollmentSummary $enrollment) use ($grades, $history, $incompletes, $summaries, $users): array {
             $summary = $summaries[$enrollment->studentId] ?? null;
+            $grade = $grades->get($enrollment->id);
+            $historyRows = array_values(array_filter(
+                array_map(
+                    fn (Grade $historyGrade): ?array => $grade !== null && $historyGrade->getKey() === $grade->getKey()
+                        ? null
+                        : $this->historyGradeArray($historyGrade),
+                    $history[$enrollment->id] ?? [],
+                ),
+            ));
 
             return [
                 'enrollment_id' => $enrollment->id,
@@ -141,7 +166,8 @@ trait BuildsSheetPayload
                     'university_id' => $summary?->universityId,
                     'name' => $this->studentName($enrollment, $summary, $users),
                 ],
-                'grade' => $grades->get($enrollment->id)?->toLineArray(),
+                'grade' => $grade?->toLineArray(),
+                'grade_history' => $historyRows,
                 'incomplete' => $incompletes->get($enrollment->id)?->toLineArray(),
             ];
         }, $roster);
@@ -184,5 +210,20 @@ trait BuildsSheetPayload
             'letter' => $letter->value,
             'count' => (int) ($counts[$letter->value] ?? 0),
         ], LetterGrade::cases());
+    }
+
+    /**
+     * One finalized Grade's history shape — readable and explicitly superseded rather than
+     * silently hidden or deleted (phase 4 ticket 06).
+     *
+     * @return array{mark: float, letter_grade: string, gpa_points: float, finalized_at: string|null, superseded: true}
+     */
+    private function historyGradeArray(Grade $grade): array
+    {
+        return [
+            ...$grade->toLineArray(),
+            'finalized_at' => $grade->sheet->reviewed_at?->toIso8601String(),
+            'superseded' => true,
+        ];
     }
 }

@@ -3773,6 +3773,13 @@ export const OpenAnOfferingsGradeSheetResponse = zod.object({
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
 }).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
   "incomplete": zod.string().nullish()
 })).optional()
 }).optional()
@@ -3825,6 +3832,123 @@ export const SaveOneGradeSheetLineResponse = zod.union([zod.object({
 }).optional()
 }).optional()
 }).describe('an incomplete declaration')])
+
+
+/**
+ * Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only
+ * the selected lines (ADR-0023): the original round is untouched and remains finalized
+ * throughout. The returned round is then edited, signed and Department-Head-reviewed
+ * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
+ * Instructor who teaches this Offering may start a correction on it.
+ * @summary Open a Correction round against a finalized Sheet.
+ */
+export const OpenACorrectionRoundAgainstAFinalizedSheetParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the finalized sheet being corrected.')
+})
+
+export const OpenACorrectionRoundAgainstAFinalizedSheetBody = zod.object({
+  "enrollment_ids": zod.array(zod.number()).describe('The enrollment ids to correct from that finalized sheet.')
+})
+
+export const OpenACorrectionRoundAgainstAFinalizedSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.string().nullish(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "incomplete": zod.string().nullish()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * A previously-opened Correction round, read by its own Sheet id so the SPA can return to
+ * it directly. The round contains only the selected lines persisted on it at creation time;
+ * the original finalized Sheet it corrects is untouched. Authorised by the same Offering
+ * assignment as every other Instructor Sheet.
+ * @summary Open one Correction round.
+ */
+export const OpenOneCorrectionRoundParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the correction round.')
+})
+
+export const OpenOneCorrectionRoundResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.string().nullish(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "incomplete": zod.string().nullish()
+})).optional()
+}).optional()
+})
 
 
 /**
@@ -4065,6 +4189,13 @@ export const OpenOneSheetForReviewResponse = zod.object({
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
 }).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
   "incomplete": zod.string().nullish()
 })).optional(),
   "distribution": zod.array(zod.object({
@@ -4175,6 +4306,13 @@ export const MyGradesResponse = zod.object({
   "letter_grade": zod.string().optional(),
   "gpa_points": zod.number().optional()
 }).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
   "earned": zod.boolean().optional(),
   "superseded": zod.boolean().optional(),
   "incomplete_deadline": zod.string().nullish()

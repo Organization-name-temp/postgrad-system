@@ -17,6 +17,7 @@ const theme = createTheme({ cssVariables: true, colorSchemes: { light: true, dar
 const srv = vi.hoisted(() => ({
   sheet: undefined as unknown,
   signed: false,
+  correctionOpened: false,
 }))
 
 vi.mock('../../../shared/api/http', () => ({
@@ -30,6 +31,10 @@ vi.mock('../../../shared/api/http', () => ({
       srv.signed = true
       const current = (srv.sheet as { data: { sheet: Record<string, unknown> } }).data.sheet
       return Promise.resolve({ data: { sheet: { ...current, status: 'Submitted' } } })
+    }
+    if (url.endsWith('/correction')) {
+      srv.correctionOpened = true
+      return Promise.resolve({ data: { sheet: { id: 7, status: 'Draft' } } })
     }
     if (url.includes('/grading/offerings/3/sheet')) {
       return Promise.resolve(srv.sheet)
@@ -57,6 +62,7 @@ function renderPage() {
           <Routes>
             <Route path="/grading/offerings/:offeringId" element={<GradeSheetPage />} />
             <Route path="/grading" element={<div>grade sheets</div>} />
+            <Route path="/grading/corrections/:sheetId" element={<div>correction round</div>} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -66,6 +72,7 @@ function renderPage() {
 
 beforeEach(() => {
   srv.signed = false
+  srv.correctionOpened = false
 })
 
 describe('GradeSheetPage — signing (ticket 03)', () => {
@@ -144,5 +151,24 @@ describe('GradeSheetPage — signing (ticket 03)', () => {
 
     await screen.findByText('Sara Student')
     expect(screen.queryByRole('button', { name: /sign and submit/i })).not.toBeInTheDocument()
+  })
+
+  it('offers a correction round from a finalized sheet', async () => {
+    srv.sheet = sheetPayload('Finalized', [
+      {
+        enrollment_id: 5,
+        course_status: 'Regular',
+        credit_hours: 3,
+        student: { name: 'Sara Student', university_id: '2026-MSC-CE-0001' },
+        grade: { mark: 82.5, letter_grade: 'B', gpa_points: 3 },
+      },
+    ])
+    renderPage()
+
+    fireEvent.click(await screen.findByRole('button', { name: /start correction round/i }))
+    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click((await screen.findAllByRole('button', { name: /start correction round/i })).at(-1)!)
+
+    await waitFor(() => expect(srv.correctionOpened).toBe(true))
   })
 })

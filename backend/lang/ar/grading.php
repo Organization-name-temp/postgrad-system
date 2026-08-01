@@ -28,6 +28,8 @@ return [
         'blank_lines_remain' => 'لا يزال في كشف الدرجات هذا :count سطر (أسطر) غير مُقدَّر.',
         'return_note_required' => 'يجب كتابة ملاحظة عند إعادة كشف الدرجات إلى أستاذ المقرر.',
         'not_your_department' => 'كشف الدرجات هذا لا يتبع قسمك.',
+        'correction_requires_finalized' => 'لا يمكن بدء جولة تصحيح إلا من كشف درجات نهائي.',
+        'correction_lines_invalid' => 'لا يمكن أن تضم جولة التصحيح إلا سطورًا من كشف الدرجات النهائي هذا.',
     ],
 
     'incomplete' => [

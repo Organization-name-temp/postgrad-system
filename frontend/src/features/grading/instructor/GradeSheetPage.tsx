@@ -1,17 +1,33 @@
+import { useState } from 'react'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { Alert, CircularProgress, Paper, Stack, Typography, Button } from '@mui/material'
+import {
+  Alert,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
-import { Link as RouterLink, useParams } from 'react-router-dom'
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   getMyOfferingsToGradeQueryKey,
   getOpenAnOfferingsGradeSheetQueryKey as sheetQueryKey,
+  useOpenACorrectionRoundAgainstAFinalizedSheet,
   useOpenAnOfferingsGradeSheet,
   useSaveOneGradeSheetLine,
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
+import { readGradeHistory } from '../gradeHistory'
 import { gradeSheetChip } from '../gradeSheetChip'
 import { coerceNullableObject } from '../incompleteLine'
 import { GradeSheetTable } from './GradeSheetTable'
@@ -33,6 +49,7 @@ export function GradeSheetPage() {
   const { t, i18n } = useTranslation('grading')
   const { offeringId: offeringIdParam } = useParams<{ offeringId: string }>()
   const offeringId = Number(offeringIdParam)
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data, isPending, isError, error } = useOpenAnOfferingsGradeSheet(offeringId)
@@ -40,12 +57,16 @@ export function GradeSheetPage() {
   // page's own act, never shared with IncompleteResolutionPage (a resolution round only ever
   // enters a mark).
   const saveLine = useSaveOneGradeSheetLine()
+  const createCorrection = useOpenACorrectionRoundAgainstAFinalizedSheet()
 
   const loaded = data?.data
   const course = loaded?.course
   const sheet = loaded?.sheet
   const sheetId = sheet?.id
   const sheetStatus = sheet?.status ?? 'Draft'
+  const [correctionOpen, setCorrectionOpen] = useState(false)
+  const [selectedForCorrection, setSelectedForCorrection] = useState<number[]>([])
+  const [correctionError, setCorrectionError] = useState<string | null>(null)
 
   const lines: GradeSheetLine[] = (loaded?.lines ?? []).map((line) => ({
     enrollment_id: line.enrollment_id ?? 0,
@@ -53,6 +74,7 @@ export function GradeSheetPage() {
     credit_hours: line.credit_hours ?? 0,
     student: { name: line.student?.name, university_id: line.student?.university_id },
     grade: line.grade ?? null,
+    grade_history: readGradeHistory(line),
     incomplete: coerceNullableObject<GradeSheetLine['incomplete']>(line.incomplete),
   }))
 
@@ -86,6 +108,40 @@ export function GradeSheetPage() {
   // The Sheet may be signed from Draft or Returned (ADR-0023); Submitted and Finalized are
   // read-only.
   const canSign = sheetStatus === 'Draft' || sheetStatus === 'Returned'
+
+  const toggleCorrectionLine = (enrollmentId: number, checked: boolean) => {
+    setSelectedForCorrection((current) =>
+      checked ? [...current, enrollmentId] : current.filter((id) => id !== enrollmentId),
+    )
+  }
+
+  const openCorrectionDialog = () => {
+    setCorrectionError(null)
+    setSelectedForCorrection([])
+    setCorrectionOpen(true)
+  }
+
+  const startCorrection = async () => {
+    if (sheetId === undefined) return
+    if (selectedForCorrection.length === 0) {
+      setCorrectionError(t('correction.pickAtLeastOne'))
+      return
+    }
+
+    setCorrectionError(null)
+    try {
+      const response = await createCorrection.mutateAsync({
+        gradeSheetId: sheetId,
+        data: { enrollment_ids: selectedForCorrection },
+      })
+      const correctionSheetId = response.data?.sheet?.id
+      if (typeof correctionSheetId === 'number') {
+        navigate(`/grading/corrections/${correctionSheetId}`)
+      }
+    } catch (startError) {
+      setCorrectionError(apiErrorMessage(startError) ?? t('correction.startError'))
+    }
+  }
 
   /**
    * Declare (or correct) an Incomplete on one line (ticket 05, SRS §4.7.3.1) — one explicit
@@ -206,8 +262,51 @@ export function GradeSheetPage() {
               </Button>
             </Stack>
           )}
+
+          {sheetStatus === 'Finalized' && lines.length > 0 && (
+            <Stack spacing={1} sx={{ mt: 3, alignItems: 'flex-start' }}>
+              <Typography variant="body2" color="text.secondary">
+                {t('correction.startHelp')}
+              </Typography>
+              <Button variant="outlined" onClick={openCorrectionDialog}>
+                {t('correction.start')}
+              </Button>
+            </Stack>
+          )}
         </Paper>
       )}
+
+      <Dialog open={correctionOpen} onClose={() => setCorrectionOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>{t('correction.dialogTitle')}</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={1.5}>
+            <Typography variant="body2" color="text.secondary">
+              {t('correction.dialogHelp')}
+            </Typography>
+            {lines.map((line) => (
+              <FormControlLabel
+                key={line.enrollment_id}
+                control={
+                  <Checkbox
+                    checked={selectedForCorrection.includes(line.enrollment_id)}
+                    onChange={(event) =>
+                      toggleCorrectionLine(line.enrollment_id, event.target.checked)
+                    }
+                  />
+                }
+                label={`${line.student.name ?? ''} (${line.student.university_id ?? ''})`}
+              />
+            ))}
+            {correctionError && <Alert severity="error">{correctionError}</Alert>}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCorrectionOpen(false)}>{t('correction.cancel')}</Button>
+          <Button variant="contained" onClick={startCorrection} disabled={createCorrection.isPending}>
+            {t('correction.start')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

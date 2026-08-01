@@ -17,6 +17,8 @@ use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
+use Modules\Grading\Internal\Support\CurrentGradeLookup;
+use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -134,7 +136,7 @@ class DepartmentHeadReviewController
      *
      * @urlParam grade_sheet_id integer required The ID of the grade sheet. Example: 1
      *
-     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Submitted", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": null, "review_note": null}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}, "incomplete": null}, {"enrollment_id": 6, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 8, "university_id": "2026-MSC-CE-0002", "name": "Omar Student"}, "grade": null, "incomplete": {"completion_percentage": 80, "reason": "Hospitalised before the final project was due."}}], "distribution": [{"letter": "A+", "count": 0}]}}
+     * @response 200 {"data": {"sheet": {"id": 1, "course_offering_id": 3, "kind": "Initial", "status": "Submitted", "signed_at": "2026-08-10T09:00:00+00:00", "reviewed_at": null, "review_note": null}, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "lines": [{"enrollment_id": 5, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 7, "university_id": "2026-MSC-CE-0001", "name": "Sara Student"}, "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3}, "grade_history": [{"mark": 71, "letter_grade": "C", "gpa_points": 2, "finalized_at": "2026-06-01T09:00:00+00:00", "superseded": true}], "incomplete": null}, {"enrollment_id": 6, "course_status": "Regular", "credit_hours": 3, "student": {"student_id": 8, "university_id": "2026-MSC-CE-0002", "name": "Omar Student"}, "grade": null, "grade_history": [], "incomplete": {"completion_percentage": 80, "reason": "Hospitalised before the final project was due."}}], "distribution": [{"letter": "A+", "count": 0}]}}
      * @response 403 scenario="not this sheet's department head" {"message": "This grade sheet does not belong to your department."}
      */
     public function show(
@@ -189,13 +191,21 @@ class DepartmentHeadReviewController
         EnrollmentRecords $enrollments,
         CourseCatalog $courses,
         DepartmentHeadAssignments $heads,
+        AuditLogger $audit,
     ): JsonResponse {
         $this->authorizeReview($request, $gradeSheet, $enrollments, $courses, $heads);
 
         $threshold = (float) config('grading.min_grade_per_course');
         $actorId = $this->actingUserId($request);
+        $auditChanges = [];
 
-        DB::transaction(function () use ($gradeSheet, $enrollments, $threshold, $actorId): void {
+        DB::transaction(function () use ($gradeSheet, $enrollments, $threshold, $actorId, &$auditChanges, $audit): void {
+            $before = $gradeSheet->kind === GradeSheetKind::Correction
+                ? CurrentGradeLookup::forEnrollments(
+                    $gradeSheet->grades->pluck('enrollment_id')->map(fn ($id): int => (int) $id)->all(),
+                )
+                : [];
+
             $gradeSheet->finalize($actorId);
 
             $resolving = Incomplete::query()
@@ -214,6 +224,17 @@ class DepartmentHeadReviewController
                 } else {
                     $enrollments->recordOutcome((int) $grade->enrollment_id, $earned);
                 }
+
+                if ($gradeSheet->kind === GradeSheetKind::Correction) {
+                    $prior = $before[(int) $grade->enrollment_id] ?? null;
+                    if ($prior !== null) {
+                        $auditChanges[] = [
+                            'enrollment_id' => (int) $grade->enrollment_id,
+                            'from' => $prior->toLineArray(),
+                            'to' => $grade->toLineArray(),
+                        ];
+                    }
+                }
             }
 
             if ($gradeSheet->kind === GradeSheetKind::Initial) {
@@ -221,6 +242,22 @@ class DepartmentHeadReviewController
                 foreach ($declared as $incomplete) {
                     $enrollments->markIncomplete((int) $incomplete->enrollment_id);
                 }
+            }
+
+            if ($gradeSheet->kind === GradeSheetKind::Correction && $auditChanges !== []) {
+                $audit->record(
+                    action: 'grade.correction_finalized',
+                    actorUserId: $actorId,
+                    metadata: [
+                        'grade_sheet_id' => (int) $gradeSheet->getKey(),
+                        'course_offering_id' => (int) $gradeSheet->course_offering_id,
+                        'corrected_by_user_id' => (int) $gradeSheet->signed_by,
+                        'reviewed_by_user_id' => $actorId,
+                        'changes' => $auditChanges,
+                    ],
+                    subjectType: 'grade_sheet',
+                    subjectId: (string) $gradeSheet->getKey(),
+                );
             }
         });
 

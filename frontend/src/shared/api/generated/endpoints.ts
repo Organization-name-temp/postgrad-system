@@ -4143,12 +4143,21 @@ export type OpenAnOfferingsGradeSheet200DataLinesItemGrade = {
   gpa_points?: number;
 };
 
+export type OpenAnOfferingsGradeSheet200DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
 export type OpenAnOfferingsGradeSheet200DataLinesItem = {
   enrollment_id?: number;
   course_status?: string;
   credit_hours?: number;
   student?: OpenAnOfferingsGradeSheet200DataLinesItemStudent;
   grade?: OpenAnOfferingsGradeSheet200DataLinesItemGrade;
+  grade_history?: OpenAnOfferingsGradeSheet200DataLinesItemGradeHistoryItem[];
   /** @nullable */
   incomplete?: string | null;
 };
@@ -4221,6 +4230,156 @@ export type SaveOneGradeSheetLine422 = {
   errors?: {
   completion_percentage?: string[];
 };
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheetBody = {
+  /** The enrollment ids to correct from that finalized sheet. */
+  enrollment_ids: number[];
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemStudent;
+  /** @nullable */
+  grade?: string | null;
+  grade_history?: OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemGradeHistoryItem[];
+  /** @nullable */
+  incomplete?: string | null;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201Data = {
+  sheet?: OpenACorrectionRoundAgainstAFinalizedSheet201DataSheet;
+  course?: OpenACorrectionRoundAgainstAFinalizedSheet201DataCourse;
+  lines?: OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItem[];
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201 = {
+  data?: OpenACorrectionRoundAgainstAFinalizedSheet201Data;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet403 = {
+  message?: string;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet409 = {
+  message?: string;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet422Errors = {
+  enrollment_ids?: string[];
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet422 = {
+  message?: string;
+  errors?: OpenACorrectionRoundAgainstAFinalizedSheet422Errors;
+};
+
+export type OpenOneCorrectionRound200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+
+export type OpenOneCorrectionRound200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OpenOneCorrectionRound200DataLinesItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type OpenOneCorrectionRound200DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OpenOneCorrectionRound200DataLinesItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: OpenOneCorrectionRound200DataLinesItemStudent;
+  /** @nullable */
+  grade?: string | null;
+  grade_history?: OpenOneCorrectionRound200DataLinesItemGradeHistoryItem[];
+  /** @nullable */
+  incomplete?: string | null;
+};
+
+export type OpenOneCorrectionRound200Data = {
+  sheet?: OpenOneCorrectionRound200DataSheet;
+  course?: OpenOneCorrectionRound200DataCourse;
+  lines?: OpenOneCorrectionRound200DataLinesItem[];
+};
+
+export type OpenOneCorrectionRound200 = {
+  data?: OpenOneCorrectionRound200Data;
+};
+
+export type OpenOneCorrectionRound403 = {
+  message?: string;
 };
 
 export type MyOutstandingIncompletes200DataItemCourse = {
@@ -4459,12 +4618,21 @@ export type OpenOneSheetForReview200DataLinesItemGrade = {
   gpa_points?: number;
 };
 
+export type OpenOneSheetForReview200DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
 export type OpenOneSheetForReview200DataLinesItem = {
   enrollment_id?: number;
   course_status?: string;
   credit_hours?: number;
   student?: OpenOneSheetForReview200DataLinesItemStudent;
   grade?: OpenOneSheetForReview200DataLinesItemGrade;
+  grade_history?: OpenOneSheetForReview200DataLinesItemGradeHistoryItem[];
   /** @nullable */
   incomplete?: string | null;
 };
@@ -4583,12 +4751,21 @@ export type MyGrades200DataSemestersItemCoursesItemGrade = {
   gpa_points?: number;
 };
 
+export type MyGrades200DataSemestersItemCoursesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
 export type MyGrades200DataSemestersItemCoursesItem = {
   enrollment_id?: number;
   course?: MyGrades200DataSemestersItemCoursesItemCourse;
   credit_hours?: number;
   course_status?: string;
   grade?: MyGrades200DataSemestersItemCoursesItemGrade;
+  grade_history?: MyGrades200DataSemestersItemCoursesItemGradeHistoryItem[];
   earned?: boolean;
   superseded?: boolean;
   /** @nullable */
@@ -14187,6 +14364,174 @@ export const useSaveOneGradeSheetLine = <TError = SaveOneGradeSheetLine403 | Sav
       > => {
       return useMutation(getSaveOneGradeSheetLineMutationOptions(options), queryClient);
     }
+
+/**
+ * Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only
+ * the selected lines (ADR-0023): the original round is untouched and remains finalized
+ * throughout. The returned round is then edited, signed and Department-Head-reviewed
+ * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
+ * Instructor who teaches this Offering may start a correction on it.
+ * @summary Open a Correction round against a finalized Sheet.
+ */
+export const openACorrectionRoundAgainstAFinalizedSheet = (
+    gradeSheetId: number,
+    openACorrectionRoundAgainstAFinalizedSheetBody: OpenACorrectionRoundAgainstAFinalizedSheetBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenACorrectionRoundAgainstAFinalizedSheet201>(
+      {url: `/api/v1/grading/sheets/${gradeSheetId}/correction`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: openACorrectionRoundAgainstAFinalizedSheetBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenACorrectionRoundAgainstAFinalizedSheetMutationOptions = <TError = OpenACorrectionRoundAgainstAFinalizedSheet403 | OpenACorrectionRoundAgainstAFinalizedSheet409 | OpenACorrectionRoundAgainstAFinalizedSheet422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, TError,{gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, TError,{gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}, TContext> => {
+
+const mutationKey = ['openACorrectionRoundAgainstAFinalizedSheet'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, {gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}> = (props) => {
+          const {gradeSheetId,data} = props ?? {};
+
+          return  openACorrectionRoundAgainstAFinalizedSheet(gradeSheetId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OpenACorrectionRoundAgainstAFinalizedSheetMutationResult = NonNullable<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>>
+    export type OpenACorrectionRoundAgainstAFinalizedSheetMutationBody = OpenACorrectionRoundAgainstAFinalizedSheetBody
+    export type OpenACorrectionRoundAgainstAFinalizedSheetMutationError = OpenACorrectionRoundAgainstAFinalizedSheet403 | OpenACorrectionRoundAgainstAFinalizedSheet409 | OpenACorrectionRoundAgainstAFinalizedSheet422
+
+    /**
+ * @summary Open a Correction round against a finalized Sheet.
+ */
+export const useOpenACorrectionRoundAgainstAFinalizedSheet = <TError = OpenACorrectionRoundAgainstAFinalizedSheet403 | OpenACorrectionRoundAgainstAFinalizedSheet409 | OpenACorrectionRoundAgainstAFinalizedSheet422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, TError,{gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>,
+        TError,
+        {gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody},
+        TContext
+      > => {
+      return useMutation(getOpenACorrectionRoundAgainstAFinalizedSheetMutationOptions(options), queryClient);
+    }
+
+/**
+ * A previously-opened Correction round, read by its own Sheet id so the SPA can return to
+ * it directly. The round contains only the selected lines persisted on it at creation time;
+ * the original finalized Sheet it corrects is untouched. Authorised by the same Offering
+ * assignment as every other Instructor Sheet.
+ * @summary Open one Correction round.
+ */
+export const openOneCorrectionRound = (
+    gradeSheetId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenOneCorrectionRound200>(
+      {url: `/api/v1/grading/corrections/${gradeSheetId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenOneCorrectionRoundQueryKey = (gradeSheetId: number,) => {
+    return [
+    `/api/v1/grading/corrections/${gradeSheetId}`
+    ] as const;
+    }
+
+
+export const getOpenOneCorrectionRoundQueryOptions = <TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenOneCorrectionRoundQueryKey(gradeSheetId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openOneCorrectionRound>>> = ({ signal }) => openOneCorrectionRound(gradeSheetId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: gradeSheetId !== null && gradeSheetId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenOneCorrectionRoundQueryResult = NonNullable<Awaited<ReturnType<typeof openOneCorrectionRound>>>
+export type OpenOneCorrectionRoundQueryError = OpenOneCorrectionRound403
+
+
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openOneCorrectionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openOneCorrectionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openOneCorrectionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openOneCorrectionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open one Correction round.
+ */
+
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenOneCorrectionRoundQueryOptions(gradeSheetId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Every unresolved, unconverted Incomplete declared on an Offering the acting user

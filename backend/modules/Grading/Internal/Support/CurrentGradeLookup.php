@@ -37,7 +37,11 @@ final class CurrentGradeLookup
             ->whereHas('sheet', fn ($query) => $query->where('status', GradeSheetStatus::Finalized))
             ->with('sheet')
             ->get()
-            ->sortByDesc(fn (Grade $grade) => $grade->sheet->reviewed_at)
+            ->sortByDesc(fn (Grade $grade): array => [
+                $grade->sheet->reviewed_at?->getTimestamp() ?? 0,
+                (int) $grade->sheet->getKey(),
+                (int) $grade->getKey(),
+            ])
             ->unique('enrollment_id')
             ->keyBy(fn (Grade $grade): int => (int) $grade->enrollment_id)
             ->all();

@@ -53,6 +53,7 @@ function reviewPayload() {
           credit_hours: 3,
           student: { name: 'Sara Student', university_id: '2026-MSC-CE-0001' },
           grade: { mark: 82.5, letter_grade: 'B', gpa_points: 3 },
+          grade_history: [{ mark: 71, letter_grade: 'C', gpa_points: 2.0, superseded: true }],
         },
       ],
       distribution: [
@@ -91,6 +92,7 @@ describe('DepartmentHeadSheetPage', () => {
 
     expect(await screen.findByText('Sara Student')).toBeInTheDocument()
     expect(screen.getByText('82.5')).toBeInTheDocument()
+    expect(screen.getByText(/earlier finalized grades: c \(71\.00%, superseded\)/i)).toBeInTheDocument()
     // The letter appears twice — once on Sara's line, once in the distribution.
     expect(screen.getAllByText('B')).toHaveLength(2)
     // No mark input exists anywhere — a Department Head can never write a mark.

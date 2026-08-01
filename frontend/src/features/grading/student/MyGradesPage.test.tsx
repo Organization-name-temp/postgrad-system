@@ -242,4 +242,33 @@ describe('MyGradesPage (ticket 04)', () => {
     expect(await screen.findByText('D')).toBeInTheDocument()
     expect(screen.getByText(/did not earn credit/i)).toBeInTheDocument()
   })
+
+  it('shows earlier corrected grades as visible history beside the current grade', async () => {
+    payload = {
+      data: {
+        cgpa: 4.0,
+        semesters: [
+          semester({
+            gpa: 4.0,
+            courses: [
+              {
+                enrollment_id: 5,
+                course,
+                credit_hours: 3,
+                grade: { mark: 95, letter_grade: 'A+', gpa_points: 4.0 },
+                grade_history: [
+                  { mark: 82.5, letter_grade: 'B', gpa_points: 3.0, superseded: true },
+                ],
+                earned: true,
+                superseded: false,
+              },
+            ],
+          }),
+        ],
+      },
+    }
+    renderPage()
+
+    expect(await screen.findByText(/earlier grades: b \(82\.50%, superseded\)/i)).toBeInTheDocument()
+  })
 })

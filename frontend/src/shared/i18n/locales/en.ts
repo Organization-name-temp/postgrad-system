@@ -1219,6 +1219,8 @@ export const en = {
       markInvalid: 'Enter a percentage between 0 and 100, with at most two decimals.',
       noLetter: '—',
       points: '{{points}} points',
+      history: 'Earlier finalized grades: {{grades}}',
+      historySuperseded: 'superseded',
       sign: 'Sign and submit for review',
       signError: 'Could not sign this grade sheet. Please try again.',
       allGraded: 'Every line is graded — ready to sign.',
@@ -1255,6 +1257,22 @@ export const en = {
         onlyOnInitial: 'An Incomplete can only be declared on the initial round.',
       },
     },
+    correction: {
+      title: 'Correction round',
+      subtitle: 'Correcting finalized grades for {{course}}.',
+      back: 'Back to finalized sheet',
+      loading: 'Loading the correction round',
+      loadError: 'Could not load this correction round. Please try again.',
+      help: 'Enter only the corrected marks. The earlier finalized grades stay visible as history until this round is signed and finalized.',
+      sign: 'Sign correction for review',
+      start: 'Start correction round',
+      startHelp: 'A finalized sheet is never reopened. Start a correction round and pick only the lines you need to change.',
+      startError: 'Could not open a correction round. Please try again.',
+      pickAtLeastOne: 'Pick at least one line to correct.',
+      dialogTitle: 'Start correction round',
+      dialogHelp: 'Choose the finalized lines you want this correction round to contain.',
+      cancel: 'Cancel',
+    },
     departmentHead: {
       queue: {
         title: 'Grade sheets awaiting review',
@@ -1286,6 +1304,7 @@ export const en = {
         cancel: 'Cancel',
         finalized: 'This grade sheet has been finalized and is part of the academic record.',
         incompleteNote: 'Incomplete — {{percentage}}% completed: {{reason}}',
+        history: 'Earlier finalized grades: {{grades}}',
       },
     },
     myGrades: {
@@ -1298,6 +1317,7 @@ export const en = {
       semesterGpa: 'Semester GPA: {{gpa}}',
       tableLabel: 'Grades for {{semester}}',
       superseded: 'Superseded — excluded from CGPA',
+      history: 'Earlier grades: {{grades}}',
       columns: {
         course: 'Course',
         creditHours: 'Credit hours',

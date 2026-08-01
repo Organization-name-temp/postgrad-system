@@ -49,6 +49,14 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
         ->whereNumber('grade_sheet')
         ->whereNumber('enrollment_id');
 
+    // A finalized round is never reopened (ADR-0023), so correcting it means opening a fresh
+    // Correction round containing only the selected lines (ticket 06). The returned Sheet then
+    // reuses the same saveLine/sign/review flow as every other round.
+    Route::post('/grading/sheets/{grade_sheet}/correction', [GradeSheetController::class, 'createCorrection'])
+        ->whereNumber('grade_sheet');
+    Route::get('/grading/corrections/{grade_sheet}', [GradeSheetController::class, 'correction'])
+        ->whereNumber('grade_sheet');
+
     // The Instructor's outstanding Incompletes (ticket 05), and lazily opening one's
     // resolution round — a Sheet id that then flows through the same saveLine/sign/
     // department-head routes above and below, unchanged. {incomplete} is Grading's own model

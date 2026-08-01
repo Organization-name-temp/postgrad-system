@@ -8,6 +8,7 @@ use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentSummary;
 use Modules\Grading\Internal\Support\CurrentGradeLookup;
+use Modules\Grading\Internal\Support\FinalizedGradeHistoryLookup;
 use Modules\Grading\Internal\Support\GpaAttempt;
 use Modules\Grading\Internal\Support\GpaCalculator;
 use Modules\Grading\Internal\Support\IncompleteDeadlineResolver;
@@ -42,7 +43,7 @@ class MyGradesController
     /**
      * My Grades.
      *
-     * @response 200 {"data": {"cgpa": 3.42, "semesters": [{"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "gpa": 3.42, "courses": [{"enrollment_id": 5, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Regular", "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3.0}, "earned": true, "superseded": false, "incomplete_deadline": null}, {"enrollment_id": 9, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Incomplete", "grade": null, "earned": null, "superseded": false, "incomplete_deadline": "2026-11-03T00:00:00+00:00"}]}]}}
+     * @response 200 {"data": {"cgpa": 3.42, "semesters": [{"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "gpa": 3.42, "courses": [{"enrollment_id": 5, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Regular", "grade": {"mark": 82.5, "letter_grade": "B", "gpa_points": 3.0}, "grade_history": [{"mark": 71, "letter_grade": "C", "gpa_points": 2.0, "finalized_at": "2026-06-01T09:00:00+00:00", "superseded": true}], "earned": true, "superseded": false, "incomplete_deadline": null}, {"enrollment_id": 9, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}, "credit_hours": 3, "course_status": "Incomplete", "grade": null, "grade_history": [], "earned": null, "superseded": false, "incomplete_deadline": "2026-11-03T00:00:00+00:00"}]}]}}
      * @response 403 scenario="no student record" {"message": "You do not have a student record."}
      */
     public function index(
@@ -74,6 +75,10 @@ class MyGradesController
         $coursesById = $courses->findMany(array_values(array_unique(
             array_map(fn (EnrollmentSummary $e): int => $e->courseId, $visible),
         )));
+        $history = FinalizedGradeHistoryLookup::forEnrollments(array_values(array_map(
+            fn (EnrollmentSummary $e): int => $e->id,
+            $visible,
+        )));
 
         $rowsBySemester = [];
         foreach ($visible as $enrollment) {
@@ -92,6 +97,19 @@ class MyGradesController
                 'credit_hours' => $enrollment->creditHours,
                 'course_status' => $enrollment->courseStatus,
                 'grade' => $grade?->toLineArray(),
+                'grade_history' => $grade === null
+                    ? []
+                    : array_values(array_map(
+                        fn ($historyGrade): array => [
+                            ...$historyGrade->toLineArray(),
+                            'finalized_at' => $historyGrade->sheet->reviewed_at?->toIso8601String(),
+                            'superseded' => true,
+                        ],
+                        array_values(array_filter(
+                            $history[$enrollment->id] ?? [],
+                            fn ($historyGrade): bool => $historyGrade->getKey() !== $grade->getKey(),
+                        )),
+                    )),
                 'earned' => $enrollment->earned,
                 'superseded' => $grade !== null && ! isset($eligibleIds[$enrollment->id]),
                 'incomplete_deadline' => $enrollment->courseStatus === 'Incomplete'

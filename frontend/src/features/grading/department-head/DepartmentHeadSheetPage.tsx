@@ -27,6 +27,7 @@ import {
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
+import { formatGradeHistory, readGradeHistory } from '../gradeHistory'
 import { gradeSheetChip } from '../gradeSheetChip'
 import { coerceNullableObject } from '../incompleteLine'
 
@@ -146,6 +147,7 @@ export function DepartmentHeadSheetPage() {
                       completion_percentage?: number
                       reason?: string
                     }>(line.incomplete)
+                    const historySummary = formatGradeHistory(readGradeHistory(line), t)
                     return (
                       <TableRow key={line.enrollment_id}>
                         <TableCell>
@@ -156,6 +158,11 @@ export function DepartmentHeadSheetPage() {
                             {line.student?.university_id && (
                               <Typography variant="caption" component="span" color="text.secondary">
                                 {line.student.university_id}
+                              </Typography>
+                            )}
+                            {historySummary && (
+                              <Typography variant="caption" component="span" color="text.secondary">
+                                {t('departmentHead.review.history', { grades: historySummary })}
                               </Typography>
                             )}
                           </Stack>

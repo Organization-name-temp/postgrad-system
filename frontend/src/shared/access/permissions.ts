@@ -13,6 +13,10 @@ export const PERMISSION = {
   approveCourseRegistration: 'registration.approve',
   registerCoursesForStudent: 'courses.register_for_student',
   viewStudentGrades: 'grades.view_student',
+  // Held by Instructors and Department Heads, never by Student Affairs (§3.2) — which is
+  // exactly what tells the sheet editor whether the signed-in user could ever sign the sheet
+  // they are keying marks into (phase 4 ticket 09).
+  finalizeGrades: 'grades.finalize',
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
   manageCalendar: 'calendar.manage',

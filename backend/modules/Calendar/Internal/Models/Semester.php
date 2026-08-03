@@ -14,9 +14,10 @@ use Modules\Calendar\Public\SemesterSummary;
 
 /**
  * A Semester — the academic term the university runs (ADR-0018, FR-CAL-001): a
- * {@see Term} (Fall/Spring) of one year, unique together, carrying its five period
- * windows. It is the single authority every later Phase-3 record reads from
- * (offerings, registration, attendance).
+ * {@see Term} (Fall/Spring) of one year, unique together, carrying its period
+ * windows and — from phase 4 ticket 09 — its grade-submission deadline. It is the single
+ * authority every later Phase-3/4 record reads from (offerings, registration, attendance,
+ * grading).
  *
  * Whether registration is open, the term is running, or a given period is active is
  * always **derived** from the dates through {@see self::calendar()} — never a stored
@@ -34,6 +35,7 @@ use Modules\Calendar\Public\SemesterSummary;
  * @property Carbon $add_drop_ends_at
  * @property Carbon $late_add_ends_at
  * @property Carbon $withdrawal_deadline_at
+ * @property Carbon $grade_submission_deadline_at
  * @property-read string $name_en
  * @property-read string $name_ar
  * @property-read bool $is_registration_open
@@ -54,6 +56,7 @@ class Semester extends Model
         'add_drop_ends_at',
         'late_add_ends_at',
         'withdrawal_deadline_at',
+        'grade_submission_deadline_at',
     ];
 
     /** @return array<string, string> */
@@ -69,6 +72,7 @@ class Semester extends Model
             'add_drop_ends_at' => 'datetime',
             'late_add_ends_at' => 'datetime',
             'withdrawal_deadline_at' => 'datetime',
+            'grade_submission_deadline_at' => 'datetime',
         ];
     }
 
@@ -93,6 +97,7 @@ class Semester extends Model
             addDropEndsAt: $this->add_drop_ends_at,
             lateAddEndsAt: $this->late_add_ends_at,
             withdrawalDeadlineAt: $this->withdrawal_deadline_at,
+            gradeSubmissionDeadlineAt: $this->grade_submission_deadline_at,
         );
     }
 

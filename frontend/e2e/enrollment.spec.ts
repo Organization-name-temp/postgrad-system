@@ -25,6 +25,11 @@ async function login(page: Page, email: string) {
   await page.getByLabel('Password').fill('password')
   await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page).toHaveURL(/\/$/)
+  // Pin English. The locale is persisted per user (`preferred_locale` on /me), and the bilingual
+  // axe specs sign in as these same seeded accounts and leave Arabic behind — so a flow that
+  // asserts English copy must state that rather than inherit whatever ran before it.
+  await page.getByRole('button', { name: 'English' }).click()
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
 }
 
 async function logout(page: Page) {
@@ -79,6 +84,16 @@ test('headline: an admin, a student, their advisor and an instructor run the enr
   const fallRow = page.getByRole('row', { name: /Fall 2026/ })
   await expect(fallRow).toBeVisible()
   await expectNoSeriousA11y(page)
+
+  // The semester form itself, opened and cancelled without saving: it gained the
+  // grade-submission deadline in phase 4 ticket 09, and a dialog of eight datetime inputs is
+  // exactly where a missing label hides. Scanned here rather than in its own spec because this
+  // is already the signed-in Student Affairs journey through the semesters screen.
+  await page.getByRole('button', { name: 'New semester' }).click()
+  await expect(page.getByLabel('Grade-submission deadline')).toBeVisible()
+  await expectNoSeriousA11y(page)
+  await page.getByRole('button', { name: 'Cancel' }).click()
+
   await fallRow.getByRole('link', { name: 'Offerings' }).click()
   await expect(page).toHaveURL(/\/admin\/semesters\/\d+\/offerings$/)
   await expect(page.getByRole('heading', { name: /^Offerings — / })).toBeVisible()

@@ -176,13 +176,20 @@ Category is per-Program, never an intrinsic property of the Course.
 
 **Semester**:
 One academic term the university actually runs — a Term (Fall or Spring) of one year,
-e.g. "Fall 2026" — carrying its start/end dates and the registration-flow deadlines
-(registration window, add/drop end, late-add end, withdrawal deadline). Course Offerings,
-Enrollments, and academic deadlines all belong to a Semester. Related to but distinct
-from an Admission Cycle: the Cycle is the *application* window run by Admissions; the
-Semester is the *academic* term the accepted Applicant enrolls into (they share the
-Term + year naming).
+e.g. "Fall 2026" — carrying its start/end dates, the registration-flow deadlines
+(registration window, add/drop end, late-add end, withdrawal deadline), and the
+Grade-Submission Deadline that closes it. Course Offerings, Enrollments, and academic
+deadlines all belong to a Semester. Related to but distinct from an Admission Cycle: the
+Cycle is the *application* window run by Admissions; the Semester is the *academic* term
+the accepted Applicant enrolls into (they share the Term + year naming).
 _Avoid_: term alone (ambiguous with Intake Term), session, academic year.
+
+**Grade-Submission Deadline**:
+The date by which an Instructor is expected to have delivered a Semester's grades — the
+one Semester date that falls on or after the term ends. It is a *nudge, not a gate*: past
+it, an Offering with no Finalized Grade Sheet is flagged to its Instructor and Department
+Head, and nothing is blocked or changed. Distinct from the Incomplete resolution
+deadline, which is derived from the following Semester's start and is per-Enrollment.
 
 ## Enrollment & credit
 
@@ -292,6 +299,14 @@ accumulates Sheets: one Initial round covering every gradable Enrollment, then a
 follow-up round for each batch of Incomplete resolutions or Corrections. Audit and
 Withdrawal Enrollments appear on the roster but are never lines on a Sheet.
 _Avoid_: gradebook, grade roster, grade batch (the Sheet is the reviewable document).
+
+**Central Grade Entry**:
+Student Affairs keying marks into any Instructor's Draft Grade Sheet — the path for
+grades that arrive on paper. It is the plain reading of the SRS §3.2 matrix rather than
+a new power: Student Affairs holds "Enter Grades" and not "Finalize Grades", so they may
+key and never sign, the Instructor remains the author of their own grades, and every such
+write to someone else's Sheet is recorded in the Audit Log.
+_Avoid_: bulk entry, grade import (nothing is imported; a Sheet is keyed line by line).
 
 **Attempt**:
 One of the at most two for-credit Enrollments a Student may hold in a single Course. The

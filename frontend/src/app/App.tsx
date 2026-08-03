@@ -114,16 +114,19 @@ export function App() {
                   />
                 </Route>
                 {/* Persona-guarded: Instructors (R04) reach their grade sheets (Phase 4,
-                    ticket 01). grades.enter is also held by Student Affairs, but their
-                    central-entry path is its own ticket; authority over a particular Sheet is
-                    the Offering assignment, re-enforced server-side. */}
-                <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
+                    ticket 01), and Student Affairs (R05) the same screens as their central
+                    entry path (ticket 09) — the list becomes a picker over every Offering, and
+                    the sheet editor is reused rather than duplicated. Which Sheets either may
+                    reach, and that only an Instructor may sign, is re-enforced server-side. */}
+                <Route element={<RequireAuth roles={[ROLE.instructor, ROLE.studentAffairs]} />}>
                   <Route path="/grading" element={<GradeSheetsPage />} />
                   <Route path="/grading/offerings/:offeringId" element={<GradeSheetPage />} />
                   <Route path="/grading/corrections/:sheetId" element={<CorrectionSheetPage />} />
-                  {/* The Instructor's outstanding Incompletes and their resolution round
-                      (ticket 05): declared "mine" is the Offering assignment, re-enforced
-                      server-side exactly as the Sheet routes above. */}
+                </Route>
+                {/* The Instructor's outstanding Incompletes and their resolution round
+                    (ticket 05): declared "mine" is the Offering assignment, re-enforced
+                    server-side, and there is no central list of them — so this stays R04. */}
+                <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
                   <Route path="/grading/incompletes" element={<OutstandingIncompletesPage />} />
                   <Route
                     path="/grading/incompletes/:incompleteId"

@@ -13,37 +13,50 @@ import {
 } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useMyOfferingsToGrade } from '../../../shared/api/generated/endpoints'
+import { useOfferingsToGrade } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { gradeSheetChip } from '../gradeSheetChip'
 
 /**
- * The Instructor's grading home (features/grading, ticket 01): every Course Offering the
- * signed-in user teaches, with the number of gradable lines each one's Sheet carries, its
- * current state (ticket 03 — unstarted, in progress, awaiting review, returned, finalized),
- * and a link into it. Persona-guarded to the Instructor role (R04); the API scopes the list to
- * the acting user, and each Sheet is separately authorised by the Offering assignment.
+ * The grading home (features/grading, ticket 01) — one screen serving two personas, because the
+ * API serves them one list:
+ *
+ * - an **Instructor** sees every Course Offering they teach, with the number of gradable lines
+ *   each one's Sheet carries and its current state (ticket 03 — unstarted, in progress, awaiting
+ *   review, returned, finalized);
+ * - a **central-entry** user (ticket 09 — Student Affairs, holding `grades.enter` without
+ *   `grades.finalize`) sees the picker over *every* Offering, so grades arriving on paper can be
+ *   keyed in for courses they do not teach, and reaches the same Sheet editor from it rather than
+ *   a second screen.
+ *
+ * Which list came back is the server's own `meta.scope`, never re-derived here from the user's
+ * permissions: the API applied the rule, so it is the API that says which rule it applied. The
+ * Instructor column only appears on the central list — on an Instructor's own it would repeat
+ * their name on every row.
  */
 export function GradeSheetsPage() {
   const { t, i18n } = useTranslation('grading')
-  const { data, isPending, isError } = useMyOfferingsToGrade()
+  const { data, isPending, isError } = useOfferingsToGrade()
   const offerings = data?.data ?? []
+  const isCentral = data?.meta?.scope === 'central'
 
   return (
     <>
       <Typography variant="h4" component="h1" sx={{ mb: 1 }}>
-        {t('offerings.title')}
+        {isCentral ? t('offerings.centralTitle') : t('offerings.title')}
       </Typography>
       <Typography color="text.secondary" sx={{ mb: 3 }}>
-        {t('offerings.intro')}
+        {isCentral ? t('offerings.centralIntro') : t('offerings.intro')}
       </Typography>
 
       {isPending && <CircularProgress aria-label={t('offerings.loading')} />}
       {isError && <Alert severity="error">{t('offerings.loadError')}</Alert>}
 
       {!isPending && !isError && offerings.length === 0 && (
-        <Typography color="text.secondary">{t('offerings.empty')}</Typography>
+        <Typography color="text.secondary">
+          {isCentral ? t('offerings.centralEmpty') : t('offerings.empty')}
+        </Typography>
       )}
 
       {offerings.length > 0 && (
@@ -52,6 +65,8 @@ export function GradeSheetsPage() {
             <TableHead>
               <TableRow>
                 <TableCell>{t('offerings.columns.course')}</TableCell>
+                <TableCell>{t('offerings.columns.semester')}</TableCell>
+                {isCentral && <TableCell>{t('offerings.columns.instructor')}</TableCell>}
                 <TableCell align="right">{t('offerings.columns.students')}</TableCell>
                 <TableCell>{t('offerings.columns.state')}</TableCell>
                 <TableCell align="right">{t('offerings.columns.actions')}</TableCell>
@@ -69,6 +84,10 @@ export function GradeSheetsPage() {
                       </Typography>{' '}
                       {course ? pickLocaleName(course, i18n.language) : ''}
                     </TableCell>
+                    <TableCell>
+                      {offering.semester ? pickLocaleName(offering.semester, i18n.language) : ''}
+                    </TableCell>
+                    {isCentral && <TableCell>{offering.instructor?.name ?? ''}</TableCell>}
                     <TableCell align="right">
                       {t('offerings.gradableCount', { count: offering.gradable_count ?? 0 })}
                     </TableCell>

@@ -18,13 +18,15 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  getMyOfferingsToGradeQueryKey,
+  getOfferingsToGradeQueryKey,
   getOpenAnOfferingsGradeSheetQueryKey as sheetQueryKey,
   useOpenACorrectionRoundAgainstAFinalizedSheet,
   useOpenAnOfferingsGradeSheet,
   useSaveOneGradeSheetLine,
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
+import { PERMISSION } from '../../../shared/access/permissions'
+import { usePermissions } from '../../../shared/access/usePermissions'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { readGradeHistory } from '../gradeHistory'
@@ -44,6 +46,13 @@ import { useGradeSheetEditor } from './useGradeSheetEditor'
  * {@see IncompleteResolutionPage}); the table is presentational. The server stays authoritative:
  * it re-derives the letter from the mark and returns the frozen Grade, so the client mirror is
  * only ever a preview.
+ *
+ * Student Affairs reaches this same editor for central entry (ticket 09) and may key in every
+ * mark here, but never sign, and never start a correction round: both are the Instructor's own
+ * acts, so the two buttons are replaced by a line saying whose signature the sheet is waiting
+ * on. That mirror is display only — the API refuses each with a 403 regardless (ADR-0014). The
+ * one permission distinguishes both, because `grades.finalize` is what a central-entry user
+ * lacks and an Instructor holds.
  */
 export function GradeSheetPage() {
   const { t, i18n } = useTranslation('grading')
@@ -99,15 +108,18 @@ export function GradeSheetPage() {
     onSaved: () => queryClient.invalidateQueries({ queryKey: sheetQueryKey(offeringId) }),
     onSigned: async () => {
       await queryClient.invalidateQueries({ queryKey: sheetQueryKey(offeringId) })
-      await queryClient.invalidateQueries({ queryKey: getMyOfferingsToGradeQueryKey() })
+      await queryClient.invalidateQueries({ queryKey: getOfferingsToGradeQueryKey() })
     },
     saveErrorFallback: t('sheet.saveError'),
     signErrorFallback: t('sheet.signError'),
   })
 
   // The Sheet may be signed from Draft or Returned (ADR-0023); Submitted and Finalized are
-  // read-only.
-  const canSign = sheetStatus === 'Draft' || sheetStatus === 'Returned'
+  // read-only. A central-entry user holds no `grades.finalize`, so they see the sheet's
+  // outstanding-lines state without a button the API would refuse them.
+  const { hasPermission } = usePermissions()
+  const maySign = hasPermission(PERMISSION.finalizeGrades)
+  const isOpenForSigning = sheetStatus === 'Draft' || sheetStatus === 'Returned'
 
   const toggleCorrectionLine = (enrollmentId: number, checked: boolean) => {
     setSelectedForCorrection((current) =>
@@ -245,7 +257,7 @@ export function GradeSheetPage() {
             </>
           )}
 
-          {canSign && (
+          {isOpenForSigning && (
             <Stack spacing={1} sx={{ mt: 3, alignItems: 'flex-start' }}>
               {signError && <Alert severity="error">{signError}</Alert>}
               <Typography variant="body2" color="text.secondary">
@@ -253,17 +265,23 @@ export function GradeSheetPage() {
                   ? t('sheet.blankCount', { count: blankCount })
                   : t('sheet.allGraded')}
               </Typography>
-              <Button
-                variant="contained"
-                onClick={handleSign}
-                disabled={blankCount > 0 || signPending}
-              >
-                {t('sheet.sign')}
-              </Button>
+              {maySign ? (
+                <Button
+                  variant="contained"
+                  onClick={handleSign}
+                  disabled={blankCount > 0 || signPending}
+                >
+                  {t('sheet.sign')}
+                </Button>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  {t('sheet.signIsInstructors')}
+                </Typography>
+              )}
             </Stack>
           )}
 
-          {sheetStatus === 'Finalized' && lines.length > 0 && (
+          {maySign && sheetStatus === 'Finalized' && lines.length > 0 && (
             <Stack spacing={1} sx={{ mt: 3, alignItems: 'flex-start' }}>
               <Typography variant="body2" color="text.secondary">
                 {t('correction.startHelp')}

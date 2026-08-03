@@ -11,6 +11,9 @@ import AxeBuilder from '@axe-core/playwright'
 // control state worth its own scan) and the Instructor's outstanding-Incompletes list, in its
 // only reachable state today — empty, since no Incomplete exists in the seed data yet.
 //
+// Ticket 09 adds Student Affairs' central entry: the *same* two screens reached by a user who
+// teaches nothing, so the picker is the all-offerings list and the editor carries no signature.
+//
 // IncompleteResolutionPage has no axe coverage here: reaching it needs a live outstanding
 // Incomplete, which needs a Department Head actually routed to CSE511's department to finalize
 // one — no such assignment exists in today's seed data (ticket 02/03 shipped no seeder either).
@@ -31,6 +34,9 @@ const GRADABLE_COURSE = /CSE511/
 // this only reaches the null-CGPA "no grades yet" state — still the exact state the ticket
 // requires never look catastrophic, so it is worth scanning now rather than waiting.
 const STUDENT = 'student.smoke@seed.ejust.test'
+// Student Affairs — holds grades.enter without grades.finalize, so /grading is their central
+// entry picker over every offering rather than "the courses you teach" (ticket 09).
+const STUDENT_AFFAIRS = 'r05@ejust.test'
 
 const COMBOS = [
   { scheme: 'light', lang: 'en', dir: 'ltr' },
@@ -47,12 +53,14 @@ const COPY = {
     enterMarkInstead: /enter a mark instead/i,
     coursework: /coursework completed/i,
     noOutstanding: /no outstanding incompletes/i,
+    sign: /sign and submit for review/i,
   },
   ar: {
     declareIncomplete: /تسجيل "غير مكتمل"/,
     enterMarkInstead: /إدخال درجة بدلًا من ذلك/,
     coursework: /نسبة إنجاز المقرر/,
     noOutstanding: /ليس لديك أي حالة/,
+    sign: /توقيع وإرسال للمراجعة/,
   },
 } as const
 
@@ -157,6 +165,42 @@ test.describe('outstanding incompletes (ticket 05)', () => {
       // 10's seeder declares one (spec §Testing Decisions: "an already-overdue Incomplete").
       await expect(page.getByText(COPY[lang].noOutstanding)).toBeVisible()
       await expectNoSeriousA11y(page, `outstanding incompletes — ${scheme}/${lang}`)
+    })
+  }
+})
+
+test.describe('central grade entry (ticket 09)', () => {
+  for (const { scheme, lang, dir } of COMBOS) {
+    test(`the central entry picker and sheet editor pass axe in ${scheme} / ${lang}`, async ({
+      page,
+    }) => {
+      // Two page loads and two axe scans behind a sign-in, as the instructor scan above.
+      test.setTimeout(120_000)
+      page.setDefaultTimeout(20_000)
+
+      await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
+      await login(page, STUDENT_AFFAIRS)
+      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await expect(page.locator('html')).toHaveAttribute('dir', dir)
+      await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
+
+      // ── The picker over every offering ──────────────────────────────────────────────
+      await page.goto('/grading')
+      // r05 teaches nothing, so a row at all is proof the list is the *central* one — the
+      // instructor-scoped list would be empty for this user. Both seeded CSE511 offerings
+      // (Spring and Fall) appear here, which is the point; either has a gradable line, so the
+      // scan takes the first.
+      const row = page.getByRole('row', { name: GRADABLE_COURSE }).first()
+      await expect(row).toBeVisible()
+      await expectNoSeriousA11y(page, `central entry picker — ${scheme}/${lang}`)
+
+      // ── The same sheet editor, without a signature ──────────────────────────────────
+      await row.getByRole('link').click()
+      await expect(page).toHaveURL(/\/grading\/offerings\/\d+$/)
+      const marks = page.getByRole('spinbutton')
+      await expect(marks.first()).toBeVisible()
+      await expect(page.getByRole('button', { name: COPY[lang].sign })).toHaveCount(0)
+      await expectNoSeriousA11y(page, `central entry sheet editor — ${scheme}/${lang}`)
     })
   }
 })

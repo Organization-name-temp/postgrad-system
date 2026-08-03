@@ -9,7 +9,8 @@ use Modules\Calendar\Internal\Models\Semester;
 /**
  * A Semester in the { data: ... } envelope. Both language names are always returned
  * (derived from term + year — never stored, ADR-0018) so the SPA picks by locale,
- * along with all five period windows. `is_registration_open` is the derived
+ * along with every period date, including the grade-submission deadline (phase 4 ticket
+ * 09). `is_registration_open` is the derived
  * functional predicate (never a stored column, the `AdmissionCycle::isOpen()`
  * precedent); the SPA derives the display state (upcoming / registration / running /
  * ended) from the dates, keeping the server the authority on the raw facts.
@@ -37,6 +38,7 @@ class SemesterResource extends JsonResource
             'add_drop_ends_at' => $semester->add_drop_ends_at->toIso8601String(),
             'late_add_ends_at' => $semester->late_add_ends_at->toIso8601String(),
             'withdrawal_deadline_at' => $semester->withdrawal_deadline_at->toIso8601String(),
+            'grade_submission_deadline_at' => $semester->grade_submission_deadline_at->toIso8601String(),
             'is_registration_open' => $semester->is_registration_open,
         ];
     }

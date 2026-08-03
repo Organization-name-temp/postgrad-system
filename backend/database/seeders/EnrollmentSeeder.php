@@ -180,6 +180,7 @@ class EnrollmentSeeder extends Seeder
             'late_add_ends_at' => '-3 weeks',
             'withdrawal_deadline_at' => '+2 weeks',
             'ends_at' => '+6 weeks',
+            'grade_submission_deadline_at' => '+8 weeks',
         ]);
     }
 
@@ -194,12 +195,13 @@ class EnrollmentSeeder extends Seeder
             'late_add_ends_at' => '+8 weeks',
             'withdrawal_deadline_at' => '+13 weeks',
             'ends_at' => '+18 weeks',
+            'grade_submission_deadline_at' => '+20 weeks',
         ]);
     }
 
     /**
      * A Semester keyed by (term, year) so re-seeding never trips the unique constraint; the
-     * five period windows are relative offsets from `now()` so the demo stays evergreen.
+     * period windows are relative offsets from `now()` so the demo stays evergreen.
      *
      * @param  array<string, string>  $offsets  column => relative modifier
      */

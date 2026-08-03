@@ -10,9 +10,10 @@ uses(RefreshDatabase::class);
 
 /*
 | Semester management — the academic term the university runs (ADR-0018, ticket 01),
-| the single authority every later Phase-3 record reads from. Create/edit is gated on
+| the single authority every later Phase-3/4 record reads from. Create/edit is gated on
 | calendar.manage (Student Affairs / Dean; SysAdmin inherits); reading is open to any
-| authenticated user. The five period windows are order-validated, (term, year) is
+| authenticated user. The period dates — the five registration windows plus phase 4
+| ticket 09's grade-submission deadline — are order-validated, (term, year) is
 | unique, and period state (registration open, running, …) is derived from the dates,
 | never stored. Semesters are edited in place, never hard-deleted. Written test-first
 | against the /api/v1 HTTP seam (observable behaviour only).
@@ -37,6 +38,7 @@ function semesterPayload(array $overrides = []): array
         'add_drop_ends_at' => '2026-09-14T00:00:00+00:00',
         'late_add_ends_at' => '2026-09-21T00:00:00+00:00',
         'withdrawal_deadline_at' => '2026-11-30T00:00:00+00:00',
+        'grade_submission_deadline_at' => '2027-01-10T00:00:00+00:00',
     ], $overrides);
 }
 
@@ -54,7 +56,7 @@ it('lets any authenticated user list semesters newest first', function () {
                 'id', 'term', 'year', 'name_en', 'name_ar',
                 'starts_at', 'ends_at', 'registration_opens_at', 'registration_closes_at',
                 'add_drop_ends_at', 'late_add_ends_at', 'withdrawal_deadline_at',
-                'is_registration_open',
+                'grade_submission_deadline_at', 'is_registration_open',
             ]],
         ]);
 });
@@ -110,7 +112,7 @@ it('reports registration open when the window contains the current moment', func
     });
 });
 
-it('requires the term, year and all five period dates', function () {
+it('requires the term, year and every period date', function () {
     actingAsRole(Role::StudentAffairs);
 
     $this->postJson('/api/v1/semesters', ['name_en' => 'Nameless'])
@@ -118,7 +120,7 @@ it('requires the term, year and all five period dates', function () {
         ->assertJsonValidationErrors([
             'term', 'year', 'starts_at', 'ends_at', 'registration_opens_at',
             'registration_closes_at', 'add_drop_ends_at', 'late_add_ends_at',
-            'withdrawal_deadline_at',
+            'withdrawal_deadline_at', 'grade_submission_deadline_at',
         ]);
 });
 
@@ -178,6 +180,44 @@ it('rejects a withdrawal deadline after the semester ends', function () {
     ]))
         ->assertStatus(422)
         ->assertJsonValidationErrors('withdrawal_deadline_at');
+});
+
+it('rejects a grade-submission deadline before the semester ends', function () {
+    actingAsRole(Role::StudentAffairs);
+
+    $this->postJson('/api/v1/semesters', semesterPayload([
+        'grade_submission_deadline_at' => '2026-12-19T00:00:00+00:00',
+    ]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('grade_submission_deadline_at');
+});
+
+it('accepts a grade-submission deadline exactly on the semester end', function () {
+    actingAsRole(Role::StudentAffairs);
+
+    $this->postJson('/api/v1/semesters', semesterPayload([
+        'grade_submission_deadline_at' => '2026-12-20T00:00:00+00:00',
+    ]))
+        ->assertCreated()
+        ->assertJsonPath('data.grade_submission_deadline_at', '2026-12-20T00:00:00+00:00');
+});
+
+it('localises an out-of-order date message into Arabic', function () {
+    actingAsRole(Role::StudentAffairs);
+    $payload = semesterPayload(['grade_submission_deadline_at' => '2026-12-19T00:00:00+00:00']);
+
+    $english = $this->postJson('/api/v1/semesters', $payload)
+        ->assertStatus(422)
+        ->json('errors.grade_submission_deadline_at.0');
+
+    $arabic = $this->withHeader('Accept-Language', 'ar')
+        ->postJson('/api/v1/semesters', $payload)
+        ->assertStatus(422)
+        ->json('errors.grade_submission_deadline_at.0');
+
+    expect($english)->toBe(__('calendar.ordering.grade_submission_deadline_at', [], 'en'))
+        ->and($arabic)->toBe(__('calendar.ordering.grade_submission_deadline_at', [], 'ar'))
+        ->and($arabic)->not->toBe($english);
 });
 
 it('rejects a semester that ends before it starts', function () {
@@ -294,4 +334,36 @@ it('returns null from the facade when no semester is registration-open', functio
     Semester::factory()->upcoming()->create();
 
     expect(app(AcademicCalendar::class)->openForRegistration())->toBeNull();
+});
+
+it('exposes the grade-submission deadline and its passed answer through the read facade', function () {
+    // Phase 4 ticket 09: Grading's late-Sheet flagging reads the deadline here, never from
+    // Calendar's model.
+    $semester = Semester::factory()->create([
+        'ends_at' => now()->subWeeks(2),
+        'grade_submission_deadline_at' => now()->subWeek(),
+    ]);
+    $upcoming = Semester::factory()->create([
+        'ends_at' => now()->addWeek(),
+        'grade_submission_deadline_at' => now()->addWeeks(2),
+    ]);
+
+    $summary = app(AcademicCalendar::class)->find($semester->id);
+
+    expect($summary?->gradeSubmissionDeadlineAt->toDateString())
+        ->toBe($semester->grade_submission_deadline_at->toDateString())
+        ->and($summary?->hasGradeSubmissionDeadlinePassed(now()))->toBeTrue()
+        ->and(app(AcademicCalendar::class)->find($upcoming->id)?->hasGradeSubmissionDeadlinePassed(now()))->toBeFalse();
+});
+
+it('resolves several semesters at once through the read facade, skipping ids that do not exist', function () {
+    $fall = Semester::factory()->create(['term' => Term::Fall, 'year' => 2026]);
+    $spring = Semester::factory()->create(['term' => Term::Spring, 'year' => 2027]);
+
+    $summaries = app(AcademicCalendar::class)->findMany([$fall->id, $spring->id, 999999]);
+
+    expect($summaries)->toHaveCount(2)
+        ->and($summaries[$fall->id]->nameEn)->toBe('Fall 2026')
+        ->and($summaries[$spring->id]->nameEn)->toBe('Spring 2027')
+        ->and(app(AcademicCalendar::class)->findMany([]))->toBe([]);
 });

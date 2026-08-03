@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Grading\Internal\Console\Commands\ConvertExpiredIncompletes;
+use Modules\Grading\Internal\Console\Commands\FlagLateSheets;
 use Modules\Grading\Internal\Console\Commands\SendIncompleteReminders;
 use Modules\Grading\Internal\Events\GradeFinalized;
 use Modules\Grading\Internal\Listeners\SendGradeFinalizedNotifications;
@@ -59,9 +60,10 @@ class GradingServiceProvider extends ServiceProvider
     }
 
     /**
-     * The module's manually-run console commands (ticket 05): the Incomplete reminder nudge
-     * and the deadline-expiry converter — the one automated Course Status change in the system
-     * (SRS §4.7.3.3). Registered only when running in the console, the Admissions
+     * The module's manually-run console commands: the Incomplete reminder nudge and the
+     * deadline-expiry converter — the one automated Course Status change in the system (ticket
+     * 05, SRS §4.7.3.3) — and the late-Sheet flag (ticket 09), which like the reminder changes
+     * nothing at all. Registered only when running in the console, the Admissions
      * FlagOverdueApplications/SendInterviewReminders precedent.
      */
     private function registerConsoleCommands(): void
@@ -70,6 +72,7 @@ class GradingServiceProvider extends ServiceProvider
             $this->commands([
                 SendIncompleteReminders::class,
                 ConvertExpiredIncompletes::class,
+                FlagLateSheets::class,
             ]);
         }
     }

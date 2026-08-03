@@ -11,7 +11,7 @@ tags:
   - name: Admissions
     description: "\nManage Admission Cycles — the windowed Fall/Spring intake (e.g. \"Fall 2026\")\nevery Application hangs off. Listing/creating/editing/activating requires the\ncalendar.manage permission (Student Affairs or a Dean). A Cycle is \"open\" when\nit is active and the current moment falls inside its window — derived, never a\nstored status column (ADR-0012, ticket 01). Cycles are deactivated, never\ndeleted. The {@see self::open()} lookup is public — it feeds the\nunauthenticated registration screen."
   - name: Calendar
-    description: "\nManage Semesters — the academic term (Fall/Spring + year) the university runs\n(ADR-0018, FR-CAL-001), the single authority every later Phase-3 record reads\nfrom. Creating and editing require the calendar.manage permission (Student\nAffairs / Dean / SysAdmin); reading is open to any authenticated user who needs\nthe calendar. A Semester's period state (registration open, running, …) is\nderived from its dates, never a stored flag; the five windows must be ordered\n(ADR-0018) and (term, year) is unique. Semesters are edited in place, never\nhard-deleted (no delete verb → 405)."
+    description: "\nManage Semesters — the academic term (Fall/Spring + year) the university runs\n(ADR-0018, FR-CAL-001), the single authority every later Phase-3/4 record reads\nfrom. Creating and editing require the calendar.manage permission (Student\nAffairs / Dean / SysAdmin); reading is open to any authenticated user who needs\nthe calendar. A Semester's period state (registration open, running, …) is\nderived from its dates, never a stored flag; the period dates — the five\nregistration windows plus the grade-submission deadline that closes them (phase 4\nticket 09) — must be ordered (ADR-0018) and (term, year) is unique. Semesters are\nedited in place, never hard-deleted (no delete verb → 405)."
   - name: Catalog
     description: "\nThe catalog browse tree — the whole academic hierarchy (Faculty → Department →\nProgram → Category → Course) in a single read-model payload so the front end can\nrender and search it client-side without chatty per-node requests (FR-PCM-002,\nspec §API). Every node carries both language names; Course nodes carry their\nactive status so retired courses read accessibly. Reading requires catalog.view —\nthe catalog is universally browsable (ADR-0008). \"University\" is a synthetic root\nthe SPA prepends; it is not an entity, so it is not in this payload."
   - name: Endpoints
@@ -19,7 +19,7 @@ tags:
   - name: Enrollment
     description: "\nCourse Offering management (ADR-0017, ticket 03) — \"what actually runs this\nsemester.\" An administrator holding `calendar.manage` (Student Affairs / Dean;\nSysAdmin inherits) populates a Semester with Offerings: one Catalog Course taught in\nthat Semester, carrying an assigned Instructor, an optional seat capacity, and one or\nmore weekly meeting times. This is the record Phase-4 grading's Instructor→Course\nlink is born from.\n\nThe Semester, Course and Instructor are referenced by opaque id (no cross-module\nforeign key, ADR-0012); each is validated through its module's Public facade — the\nCourse through {@see CourseCatalog}, the Instructor (a faculty R04 User) through the\nIdentity\\Public {@see Directory}, the Semester through\n{@see AcademicCalendar}. One Course runs at most once per\nSemester (unique), an Offering's own meetings may not overlap each other (the\ninterval-overlap seam), and an Offering is deletable only while nothing references it."
   - name: Grading
-    description: "\nThe **Grade Sheet** — the Instructor's mark-entry surface (ADR-0023, ticket 01). A Sheet is\none submission round for one Course Offering, created **lazily** the first time it is opened\nrather than eagerly at semester end, and it lists one line per **gradable** Enrollment:\nAudit and Withdrawn Enrollments are on the roster but never lines, so an Instructor is never\nasked for a mark that cannot exist.\n\nEntry is gated on `grades.enter`, but the permission is not authority over a *particular*\nSheet — that comes from the Offering assignment, checked here (the Phase-2 interviewer and\nPhase-3 attendance precedent for authorising by assignment). The §3.2 matrix is untouched.\n\nOne Mark, 0–100 with two decimals, is entered per line, and the Letter Grade and GPA points\nare **derived from the ADR-0021 scale and frozen onto the Grade** — so a later change to the\nscale never rewrites a grade already given, and there is no letter override to make\n`letter == scale(mark)` anything but an invariant. Each mark saves on its own, not as a\nbatch (the Phase-2 per-step-save precedent), so a long roster survives a closed tab.\n\nNothing here signs, reviews or finalizes: ticket 03 builds the Instructor signature and the\nDepartment-Head review that turn a Draft round into part of the academic record, and no\nStudent can see anything until it does."
+    description: "\nThe **Grade Sheet** — the Instructor's mark-entry surface (ADR-0023, ticket 01). A Sheet is\none submission round for one Course Offering, created **lazily** the first time it is opened\nrather than eagerly at semester end, and it lists one line per **gradable** Enrollment:\nAudit and Withdrawn Enrollments are on the roster but never lines, so an Instructor is never\nasked for a mark that cannot exist.\n\nEntry is gated on `grades.enter`, but the permission is not authority over a *particular*\nSheet — that comes from the Offering assignment, or from being a central-entry user (ticket\n09: `grades.enter` without `grades.finalize`, which by §3.2 is Student Affairs), both checked\nby {@see AuthorizesGradeEntry}. Every central write to someone else's Sheet is audited; an\nInstructor's own is not. The §3.2 matrix itself is untouched throughout.\n\nOne Mark, 0–100 with two decimals, is entered per line, and the Letter Grade and GPA points\nare **derived from the ADR-0021 scale and frozen onto the Grade** — so a later change to the\nscale never rewrites a grade already given, and there is no letter override to make\n`letter == scale(mark)` anything but an invariant. Each mark saves on its own, not as a\nbatch (the Phase-2 per-step-save precedent), so a long roster survives a closed tab.\n\nNothing here signs, reviews or finalizes: ticket 03 builds the Instructor signature and the\nDepartment-Head review that turn a Draft round into part of the academic record, and no\nStudent can see anything until it does."
   - name: Notifications
     description: "\nA signed-in user's own in-app notifications — the data behind the shell's bell\n(ticket 02). Every endpoint is scoped to the authenticated user by\n{@see Notification::scopeForUser()}, so no request can list, count, or mutate\nanother user's notifications (a foreign id simply is not found → 404). Content\nis a type + payload; the SPA renders it bilingually, so nothing here is\nlocalised server-side."
 paths:
@@ -5790,6 +5790,7 @@ paths:
                       add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                       late_add_ends_at: '2026-09-21T00:00:00+00:00'
                       withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                       is_registration_open: true
                 properties:
                   data:
@@ -5807,6 +5808,7 @@ paths:
                         add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                         late_add_ends_at: '2026-09-21T00:00:00+00:00'
                         withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                        grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                         is_registration_open: true
                     items:
                       type: object
@@ -5847,6 +5849,9 @@ paths:
                         withdrawal_deadline_at:
                           type: string
                           example: '2026-11-30T00:00:00+00:00'
+                        grade_submission_deadline_at:
+                          type: string
+                          example: '2027-01-10T00:00:00+00:00'
                         is_registration_open:
                           type: boolean
                           example: true
@@ -5879,6 +5884,7 @@ paths:
                     add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                     late_add_ends_at: '2026-09-21T00:00:00+00:00'
                     withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                    grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                     is_registration_open: true
                 properties:
                   data:
@@ -5920,6 +5926,9 @@ paths:
                       withdrawal_deadline_at:
                         type: string
                         example: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at:
+                        type: string
+                        example: '2027-01-10T00:00:00+00:00'
                       is_registration_open:
                         type: boolean
                         example: true
@@ -5992,6 +6001,10 @@ paths:
                   type: string
                   description: 'The withdrawal deadline (ISO 8601).'
                   example: '2026-11-30T00:00:00+00:00'
+                grade_submission_deadline_at:
+                  type: string
+                  description: 'When instructors must have submitted grades — on or after the semester ends (ISO 8601).'
+                  example: '2027-01-10T00:00:00+00:00'
               required:
                 - term
                 - year
@@ -6002,6 +6015,7 @@ paths:
                 - add_drop_ends_at
                 - late_add_ends_at
                 - withdrawal_deadline_at
+                - grade_submission_deadline_at
       security: []
   '/api/v1/semesters/{semester_id}':
     get:
@@ -6030,6 +6044,7 @@ paths:
                     add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                     late_add_ends_at: '2026-09-21T00:00:00+00:00'
                     withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                    grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                     is_registration_open: true
                 properties:
                   data:
@@ -6071,6 +6086,9 @@ paths:
                       withdrawal_deadline_at:
                         type: string
                         example: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at:
+                        type: string
+                        example: '2027-01-10T00:00:00+00:00'
                       is_registration_open:
                         type: boolean
                         example: true
@@ -6103,6 +6121,7 @@ paths:
                     add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                     late_add_ends_at: '2026-09-21T00:00:00+00:00'
                     withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                    grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                     is_registration_open: true
                 properties:
                   data:
@@ -6144,6 +6163,9 @@ paths:
                       withdrawal_deadline_at:
                         type: string
                         example: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at:
+                        type: string
+                        example: '2027-01-10T00:00:00+00:00'
                       is_registration_open:
                         type: boolean
                         example: true
@@ -6192,6 +6214,10 @@ paths:
                   type: string
                   description: 'The withdrawal deadline (ISO 8601).'
                   example: '2026-11-30T00:00:00+00:00'
+                grade_submission_deadline_at:
+                  type: string
+                  description: 'When instructors must have submitted grades — on or after the semester ends (ISO 8601).'
+                  example: '2027-01-10T00:00:00+00:00'
               required:
                 - term
                 - year
@@ -6202,6 +6228,7 @@ paths:
                 - add_drop_ends_at
                 - late_add_ends_at
                 - withdrawal_deadline_at
+                - grade_submission_deadline_at
       security: []
     parameters:
       -
@@ -14068,9 +14095,9 @@ paths:
           type: integer
   /api/v1/grading/offerings:
     get:
-      summary: 'My Offerings to grade.'
-      operationId: myOfferingsToGrade
-      description: "Every Course Offering the acting user teaches, across all Semesters, each with its\nresolved Course, the number of gradable lines its Sheet would carry, and the Initial\nround's state — `null` while unstarted, else Draft/Submitted/Returned/Finalized (ticket\n03) — the entry point to each Offering's Grade Sheet. Scoped to the acting user by the\nOffering assignment: a user who teaches nothing gets an empty list rather than an error."
+      summary: 'Offerings to grade.'
+      operationId: offeringsToGrade
+      description: "Every Course Offering the acting user teaches, across all Semesters, each with its\nresolved Course and Semester, the Instructor it is assigned to, the number of gradable\nlines its Sheet would carry, and the Initial round's state — `null` while unstarted, else\nDraft/Submitted/Returned/Finalized (ticket 03) — the entry point to each Offering's Grade\nSheet. A user who teaches nothing gets an empty list rather than an error.\n\nFor a **central-entry** user — `grades.enter` without `grades.finalize`, which by §3.2 is\nStudent Affairs — this is instead the picker over **every** Offering (ticket 09), because\ngrades arriving on paper belong to Offerings the records office does not teach. Which of\nthe two lists was returned is stated in `meta.scope` (`own` / `central`), so the SPA never\nhas to re-derive the rule the server applied."
       parameters: []
       responses:
         200:
@@ -14094,6 +14121,16 @@ paths:
                         total_ch: 3
                         research_type: null
                         is_active: true
+                      semester:
+                        id: 2
+                        name_en: 'Fall 2026'
+                        name_ar: 'خريف 2026'
+                      instructor:
+                        id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                  meta:
+                    scope: own
                 properties:
                   data:
                     type: array
@@ -14111,6 +14148,14 @@ paths:
                           total_ch: 3
                           research_type: null
                           is_active: true
+                        semester:
+                          id: 2
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
                     items:
                       type: object
                       properties:
@@ -14151,6 +14196,36 @@ paths:
                             is_active:
                               type: boolean
                               example: true
+                        semester:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            name_en:
+                              type: string
+                              example: 'Fall 2026'
+                            name_ar:
+                              type: string
+                              example: 'خريف 2026'
+                        instructor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            name:
+                              type: string
+                              example: 'Dr. Instructor'
+                            email:
+                              type: string
+                              example: instructor@ejust.test
+                  meta:
+                    type: object
+                    properties:
+                      scope:
+                        type: string
+                        example: own
       tags:
         - Grading
       security: []
@@ -14158,7 +14233,7 @@ paths:
     get:
       summary: "Open an Offering's Grade Sheet."
       operationId: openAnOfferingsGradeSheet
-      description: "The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**\nEnrollment. The Initial round is created **lazily** on this first open (ADR-0023) —\nnever eagerly at semester end — and re-opening returns the same round rather than\nstarting another. Each line carries the Student's University ID and name, resolved\nthrough Identity\\Public, and the Grade already recorded for it, or `null` while the line\nis still blank. Audit and Withdrawn Enrollments are omitted.\nAuthorised by assignment: an Instructor opening an Offering they do not teach gets a 403."
+      description: "The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**\nEnrollment. The Initial round is created **lazily** on this first open (ADR-0023) —\nnever eagerly at semester end — and re-opening returns the same round rather than\nstarting another. Each line carries the Student's University ID and name, resolved\nthrough Identity\\Public, and the Grade already recorded for it, or `null` while the line\nis still blank. Audit and Withdrawn Enrollments are omitted.\nAuthorised by assignment: an Instructor opening an Offering they do not teach gets a 403.\nA central-entry user (ticket 09) reaches any Offering's Sheet here, and opening one — a\nread — is not audited; their line writes are."
       parameters: []
       responses:
         200:
@@ -14421,7 +14496,7 @@ paths:
     put:
       summary: 'Save one Grade Sheet line.'
       operationId: saveOneGradeSheetLine
-      description: "Records the final percentage for a single line and returns the Letter Grade and GPA\npoints the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale\nchange never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save\nprecedent); re-saving a line corrects it rather than adding a second Grade. A mark\noutside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this\nSheet is a 404. Authorised by assignment — only the Offering's Instructor (else 403).\n\nOn an **Initial** round, a line may be marked Incomplete instead — send\n`completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a\nfigure below the configured threshold is a 422 naming the field. Entering one supersedes\nthe other on the same line: a mark clears an earlier Incomplete declaration and an\nIncomplete declaration clears an earlier mark."
+      description: "Records the final percentage for a single line and returns the Letter Grade and GPA\npoints the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale\nchange never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save\nprecedent); re-saving a line corrects it rather than adding a second Grade. A mark\noutside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this\nSheet is a 404. Authorised by assignment — the Offering's Instructor, or a central-entry\nuser keying grades in for someone else's Offering (ticket 09), whose write is recorded in\nthe Audit Log; anyone else is a 403.\n\nOn an **Initial** round, a line may be marked Incomplete instead — send\n`completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a\nfigure below the configured threshold is a 422 naming the field. Entering one supersedes\nthe other on the same line: a mark clears an earlier Incomplete declaration and an\nIncomplete declaration clears an earlier mark."
       parameters: []
       responses:
         200:
@@ -14609,7 +14684,7 @@ paths:
     post:
       summary: 'Open a Correction round against a finalized Sheet.'
       operationId: openACorrectionRoundAgainstAFinalizedSheet
-      description: "Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only\nthe selected lines (ADR-0023): the original round is untouched and remains finalized\nthroughout. The returned round is then edited, signed and Department-Head-reviewed\nthrough the existing Sheet endpoints. Authorised by the Offering assignment — only the\nInstructor who teaches this Offering may start a correction on it."
+      description: "Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only\nthe selected lines (ADR-0023): the original round is untouched and remains finalized\nthroughout. The returned round is then edited, signed and Department-Head-reviewed\nthrough the existing Sheet endpoints. Authorised by the Offering assignment — only the\nInstructor who teaches this Offering may start a correction on it. Central entry (ticket\n09) does **not** reach here: keying marks into a Draft round is data entry, reopening the\nfinalized record is the Instructor's own judgement. Once they have started one, its lines\nare an ordinary Draft Sheet that central entry may key like any other."
       parameters: []
       responses:
         201:

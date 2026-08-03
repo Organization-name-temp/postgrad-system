@@ -15,9 +15,11 @@ use Modules\Grading\Internal\Http\Controllers\StudentGradesController;
 | mapping (ADR-0023). The permission alone is not authority over a *particular* Sheet,
 | though: an Instructor's authority comes from the Offering assignment, which the
 | controller checks itself (the Phase-2 interviewer / Phase-3 attendance precedent for
-| authorising by assignment). Student Affairs' central-entry path onto another user's
-| Sheet, and the ADR-0015 administrative override, arrive in their own tickets; until
-| then holding the permission without the assignment is a 403.
+| authorising by assignment). Ticket 09 adds the one exception, read straight off the
+| matrix: a user holding `grades.enter` but **not** `grades.finalize` — Student Affairs —
+| keys marks into any Offering's Sheet centrally, and every such write to someone else's
+| Sheet is audited (AuthorizesGradeEntry). The grading write-side ADR-0015 administrative
+| override is still its own future decision.
 |
 | Signing and Department-Head review (ticket 03) share `grades.finalize` — held by both
 | Instructor and Department Head (§3.2) — with authority distinguished by assignment: the
@@ -34,7 +36,10 @@ use Modules\Grading\Internal\Http\Controllers\StudentGradesController;
 */
 
 Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
-    // The acting Instructor's own Offerings — the entry point to each one's Grade Sheet.
+    // The acting Instructor's own Offerings — the entry point to each one's Grade Sheet — or,
+    // for a central-entry user, the picker over every Offering (ticket 09). One endpoint and one
+    // payload for both, so the SPA reuses the same screen and Sheet editor rather than growing a
+    // second one; `meta.scope` says which list came back.
     Route::get('/grading/offerings', [GradeSheetController::class, 'offerings']);
 
     // Open one Offering's Grade Sheet, creating the Initial round lazily on first open
@@ -69,7 +74,9 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
 
 Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
     // The Instructor's signature — Draft/Returned -> Submitted (ADR-0023). Authority is the
-    // Offering assignment, checked in the controller.
+    // Offering assignment, checked in the controller. This gate is also what refuses a
+    // central-entry user the signature (ticket 09): Student Affairs holds no `grades.finalize`,
+    // so the Instructor stays the author of their own grades without a check in the controller.
     Route::post('/grading/sheets/{grade_sheet}/sign', [GradeSheetController::class, 'sign'])
         ->whereNumber('grade_sheet');
 

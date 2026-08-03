@@ -13,11 +13,14 @@ const theme = createTheme({ cssVariables: true, colorSchemes: { light: true, dar
 
 // The sheet GET and the sign POST behind the shared Axios mutator, so the page drives the real
 // generated hooks. `srv.sheet` is the payload; the sign POST is recorded so a test can assert
-// whether it was ever sent.
+// whether it was ever sent. `srv.permissions` backs the /me read the page's display-only
+// permission mirror uses — an Instructor holds grades.finalize, Student Affairs does not
+// (ticket 09).
 const srv = vi.hoisted(() => ({
   sheet: undefined as unknown,
   signed: false,
   correctionOpened: false,
+  permissions: ['grades.enter', 'grades.finalize'] as string[],
 }))
 
 vi.mock('../../../shared/api/http', () => ({
@@ -27,6 +30,9 @@ vi.mock('../../../shared/api/http', () => ({
   },
   customInstance: (config: AxiosRequestConfig) => {
     const url = config.url ?? ''
+    if (url.endsWith('/me')) {
+      return Promise.resolve({ data: { id: 1, permissions: srv.permissions, roles: [] } })
+    }
     if (url.endsWith('/sign')) {
       srv.signed = true
       const current = (srv.sheet as { data: { sheet: Record<string, unknown> } }).data.sheet
@@ -73,6 +79,7 @@ function renderPage() {
 beforeEach(() => {
   srv.signed = false
   srv.correctionOpened = false
+  srv.permissions = ['grades.enter', 'grades.finalize']
 })
 
 describe('GradeSheetPage — signing (ticket 03)', () => {
@@ -172,5 +179,30 @@ describe('GradeSheetPage — signing (ticket 03)', () => {
     )
 
     await waitFor(() => expect(srv.correctionOpened).toBe(true))
+  })
+})
+
+describe('GradeSheetPage — central entry (ticket 09)', () => {
+  it('lets a user without grades.finalize key marks in, but offers no signature', async () => {
+    // Student Affairs holds grades.enter and not grades.finalize (§3.2), so the editor is fully
+    // usable and the sign button is replaced by whose signature the sheet waits on. The API
+    // refuses the signature anyway — this only keeps the UI honest (ADR-0014).
+    srv.permissions = ['grades.enter']
+    srv.sheet = sheetPayload('Draft', [
+      {
+        enrollment_id: 5,
+        course_status: 'Regular',
+        credit_hours: 3,
+        student: { name: 'Sara Student', university_id: '2026-MSC-CE-0001' },
+        grade: { mark: 82.5, letter_grade: 'B', gpa_points: 3 },
+      },
+    ])
+    renderPage()
+
+    expect(
+      await screen.findByText(/only the instructor who teaches this course/i),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /sign and submit/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: /mark for sara student/i })).toBeEnabled()
   })
 })

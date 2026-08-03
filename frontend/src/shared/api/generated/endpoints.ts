@@ -1723,6 +1723,7 @@ export type ListSemesters200DataItem = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -1749,6 +1750,8 @@ export type CreateASemesterBody = {
   late_add_ends_at: string;
   /** The withdrawal deadline (ISO 8601). */
   withdrawal_deadline_at: string;
+  /** When instructors must have submitted grades — on or after the semester ends (ISO 8601). */
+  grade_submission_deadline_at: string;
 };
 
 export type CreateASemester201Data = {
@@ -1764,6 +1767,7 @@ export type CreateASemester201Data = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -1793,6 +1797,7 @@ export type ShowASemester200Data = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -1819,6 +1824,8 @@ export type UpdateASemesterBody = {
   late_add_ends_at: string;
   /** The withdrawal deadline (ISO 8601). */
   withdrawal_deadline_at: string;
+  /** When instructors must have submitted grades — on or after the semester ends (ISO 8601). */
+  grade_submission_deadline_at: string;
 };
 
 export type UpdateASemester200Data = {
@@ -1834,6 +1841,7 @@ export type UpdateASemester200Data = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -4091,7 +4099,7 @@ export type RecordorCorrectASessionsAttendanceRegister422 = {
   errors?: RecordorCorrectASessionsAttendanceRegister422Errors;
 };
 
-export type MyOfferingsToGrade200DataItemCourse = {
+export type OfferingsToGrade200DataItemCourse = {
   id?: number;
   code?: string;
   name_en?: string;
@@ -4103,15 +4111,34 @@ export type MyOfferingsToGrade200DataItemCourse = {
   is_active?: boolean;
 };
 
-export type MyOfferingsToGrade200DataItem = {
+export type OfferingsToGrade200DataItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type OfferingsToGrade200DataItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type OfferingsToGrade200DataItem = {
   offering_id?: number;
   gradable_count?: number;
   sheet_status?: string;
-  course?: MyOfferingsToGrade200DataItemCourse;
+  course?: OfferingsToGrade200DataItemCourse;
+  semester?: OfferingsToGrade200DataItemSemester;
+  instructor?: OfferingsToGrade200DataItemInstructor;
 };
 
-export type MyOfferingsToGrade200 = {
-  data?: MyOfferingsToGrade200DataItem[];
+export type OfferingsToGrade200Meta = {
+  scope?: string;
+};
+
+export type OfferingsToGrade200 = {
+  data?: OfferingsToGrade200DataItem[];
+  meta?: OfferingsToGrade200Meta;
 };
 
 export type OpenAnOfferingsGradeSheet200DataSheet = {
@@ -14196,19 +14223,25 @@ export const useRecordorCorrectASessionsAttendanceRegister = <TError = RecordorC
 
 /**
  * Every Course Offering the acting user teaches, across all Semesters, each with its
- * resolved Course, the number of gradable lines its Sheet would carry, and the Initial
- * round's state — `null` while unstarted, else Draft/Submitted/Returned/Finalized (ticket
- * 03) — the entry point to each Offering's Grade Sheet. Scoped to the acting user by the
- * Offering assignment: a user who teaches nothing gets an empty list rather than an error.
- * @summary My Offerings to grade.
+ * resolved Course and Semester, the Instructor it is assigned to, the number of gradable
+ * lines its Sheet would carry, and the Initial round's state — `null` while unstarted, else
+ * Draft/Submitted/Returned/Finalized (ticket 03) — the entry point to each Offering's Grade
+ * Sheet. A user who teaches nothing gets an empty list rather than an error.
+ *
+ * For a **central-entry** user — `grades.enter` without `grades.finalize`, which by §3.2 is
+ * Student Affairs — this is instead the picker over **every** Offering (ticket 09), because
+ * grades arriving on paper belong to Offerings the records office does not teach. Which of
+ * the two lists was returned is stated in `meta.scope` (`own` / `central`), so the SPA never
+ * has to re-derive the rule the server applied.
+ * @summary Offerings to grade.
  */
-export const myOfferingsToGrade = (
+export const offeringsToGrade = (
 
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<MyOfferingsToGrade200>(
+      return customInstance<OfferingsToGrade200>(
       {url: `/api/v1/grading/offerings`, method: 'GET', signal
     },
       );
@@ -14217,69 +14250,69 @@ export const myOfferingsToGrade = (
 
 
 
-export const getMyOfferingsToGradeQueryKey = () => {
+export const getOfferingsToGradeQueryKey = () => {
     return [
     `/api/v1/grading/offerings`
     ] as const;
     }
 
 
-export const getMyOfferingsToGradeQueryOptions = <TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>>, }
+export const getOfferingsToGradeQueryOptions = <TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getMyOfferingsToGradeQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getOfferingsToGradeQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof myOfferingsToGrade>>> = ({ signal }) => myOfferingsToGrade(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof offeringsToGrade>>> = ({ signal }) => offeringsToGrade(signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type MyOfferingsToGradeQueryResult = NonNullable<Awaited<ReturnType<typeof myOfferingsToGrade>>>
-export type MyOfferingsToGradeQueryError = unknown
+export type OfferingsToGradeQueryResult = NonNullable<Awaited<ReturnType<typeof offeringsToGrade>>>
+export type OfferingsToGradeQueryError = unknown
 
 
-export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>> & Pick<
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof myOfferingsToGrade>>,
+          Awaited<ReturnType<typeof offeringsToGrade>>,
           TError,
-          Awaited<ReturnType<typeof myOfferingsToGrade>>
+          Awaited<ReturnType<typeof offeringsToGrade>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>> & Pick<
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof myOfferingsToGrade>>,
+          Awaited<ReturnType<typeof offeringsToGrade>>,
           TError,
-          Awaited<ReturnType<typeof myOfferingsToGrade>>
+          Awaited<ReturnType<typeof offeringsToGrade>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>>, }
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary My Offerings to grade.
+ * @summary Offerings to grade.
  */
 
-export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferingsToGrade>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOfferingsToGrade>>, TError, TData>>, }
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getMyOfferingsToGradeQueryOptions(options)
+  const queryOptions = getOfferingsToGradeQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -14300,6 +14333,8 @@ export function useMyOfferingsToGrade<TData = Awaited<ReturnType<typeof myOfferi
  * through Identity\Public, and the Grade already recorded for it, or `null` while the line
  * is still blank. Audit and Withdrawn Enrollments are omitted.
  * Authorised by assignment: an Instructor opening an Offering they do not teach gets a 403.
+ * A central-entry user (ticket 09) reaches any Offering's Sheet here, and opening one — a
+ * read — is not audited; their line writes are.
  * @summary Open an Offering's Grade Sheet.
  */
 export const openAnOfferingsGradeSheet = (
@@ -14398,7 +14433,9 @@ export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof o
  * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
  * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
  * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
- * Sheet is a 404. Authorised by assignment — only the Offering's Instructor (else 403).
+ * Sheet is a 404. Authorised by assignment — the Offering's Instructor, or a central-entry
+ * user keying grades in for someone else's Offering (ticket 09), whose write is recorded in
+ * the Audit Log; anyone else is a 403.
  *
  * On an **Initial** round, a line may be marked Incomplete instead — send
  * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
@@ -14476,7 +14513,10 @@ export const useSaveOneGradeSheetLine = <TError = SaveOneGradeSheetLine403 | Sav
  * the selected lines (ADR-0023): the original round is untouched and remains finalized
  * throughout. The returned round is then edited, signed and Department-Head-reviewed
  * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
- * Instructor who teaches this Offering may start a correction on it.
+ * Instructor who teaches this Offering may start a correction on it. Central entry (ticket
+ * 09) does **not** reach here: keying marks into a Draft round is data entry, reopening the
+ * finalized record is the Instructor's own judgement. Once they have started one, its lines
+ * are an ordinary Draft Sheet that central entry may key like any other.
  * @summary Open a Correction round against a finalized Sheet.
  */
 export const openACorrectionRoundAgainstAFinalizedSheet = (

@@ -2,6 +2,7 @@
 
 namespace Modules\Enrollment\Internal\Support;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Enrollment\EnrollmentServiceProvider;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
@@ -35,12 +36,31 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
      */
     public function offeringsTaughtBy(int $instructorUserId): array
     {
+        return $this->offerings(fn (Builder $query): Builder => $query->where('instructor_id', $instructorUserId));
+    }
+
+    /**
+     * @return list<OfferingSummary>
+     */
+    public function allOfferings(): array
+    {
+        return $this->offerings();
+    }
+
+    /**
+     * Offerings as DTOs, most recent Semester first — the one ordering both Offering lists share,
+     * because they populate the same screen (the Instructor's own, and ticket 09's central
+     * picker). The optional constraint is the only thing that differs between them.
+     *
+     * @param  (callable(Builder<CourseOffering>): Builder<CourseOffering>)|null  $constrain
+     * @return list<OfferingSummary>
+     */
+    private function offerings(?callable $constrain = null): array
+    {
+        $query = CourseOffering::query()->orderByDesc('semester_id')->orderBy('id');
+
         /** @var Collection<int, CourseOffering> $offerings */
-        $offerings = CourseOffering::query()
-            ->where('instructor_id', $instructorUserId)
-            ->orderByDesc('semester_id')
-            ->orderBy('id')
-            ->get();
+        $offerings = ($constrain === null ? $query : $constrain($query))->get();
 
         return $offerings->map(fn (CourseOffering $o): OfferingSummary => $this->toOfferingSummary($o))
             ->values()

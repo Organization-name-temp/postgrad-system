@@ -45,6 +45,18 @@ interface EnrollmentRecords
     public function offeringsTaughtBy(int $instructorUserId): array;
 
     /**
+     * Every Course Offering that has ever run, most recent Semester first — the same ordering
+     * {@see self::offeringsTaughtBy()} returns, because they populate the same screen. This is
+     * the *central* "which Offerings exist" question, not a scoped one: Grading's Student
+     * Affairs entry path (phase 4 ticket 09) needs an Offering picker over all of them, since a
+     * records office keys grades in for Offerings it does not teach. Callers must therefore do
+     * their own authorising — this contract answers what exists, never who may see it.
+     *
+     * @return list<OfferingSummary>
+     */
+    public function allOfferings(): array;
+
+    /**
      * The **gradable** Enrollments on one Offering's roster, ordered by id. Gradability is
      * Enrollment's own judgement ({@see CourseStatus}), so
      * a consumer never re-derives it: an Audit or Withdrawn Enrollment is on the roster but is

@@ -141,4 +141,13 @@ enum NotificationType: string
      * `grading:convert-expired-incompletes` command. Payload: `enrollment_id`.
      */
     case IncompleteConverted = 'incomplete.converted';
+
+    /**
+     * A Course Offering is past its Semester's grade-submission deadline with no Finalized Grade
+     * Sheet (Phase 4, ticket 09) — raised by the manual `grading:flag-late-sheets` command to
+     * the Instructor and the routed Department Head. Purely a nudge, the Phase-2 SLA-aging
+     * pattern: the command changes no state and nothing is blocked by the deadline. Payload:
+     * `course_offering_id`, `course_code`, `deadline`.
+     */
+    case GradesOverdue = 'grades.overdue';
 }

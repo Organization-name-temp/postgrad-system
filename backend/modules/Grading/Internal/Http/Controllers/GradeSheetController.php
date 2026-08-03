@@ -6,18 +6,21 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentSummary;
 use Modules\Enrollment\Public\OfferingSummary;
 use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
+use Modules\Grading\Internal\Http\Concerns\AuthorizesGradeEntry;
 use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
 use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
 use Modules\Grading\Internal\Models\CorrectionLine;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
+use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -35,8 +38,10 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * asked for a mark that cannot exist.
  *
  * Entry is gated on `grades.enter`, but the permission is not authority over a *particular*
- * Sheet — that comes from the Offering assignment, checked here (the Phase-2 interviewer and
- * Phase-3 attendance precedent for authorising by assignment). The §3.2 matrix is untouched.
+ * Sheet — that comes from the Offering assignment, or from being a central-entry user (ticket
+ * 09: `grades.enter` without `grades.finalize`, which by §3.2 is Student Affairs), both checked
+ * by {@see AuthorizesGradeEntry}. Every central write to someone else's Sheet is audited; an
+ * Instructor's own is not. The §3.2 matrix itself is untouched throughout.
  *
  * One Mark, 0–100 with two decimals, is entered per line, and the Letter Grade and GPA points
  * are **derived from the ADR-0021 scale and frozen onto the Grade** — so a later change to the
@@ -50,32 +55,52 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  */
 class GradeSheetController
 {
+    use AuthorizesGradeEntry;
     use BuildsSheetPayload;
     use ScopesToDepartmentHead;
 
     /**
-     * My Offerings to grade.
+     * Offerings to grade.
      *
      * Every Course Offering the acting user teaches, across all Semesters, each with its
-     * resolved Course, the number of gradable lines its Sheet would carry, and the Initial
-     * round's state — `null` while unstarted, else Draft/Submitted/Returned/Finalized (ticket
-     * 03) — the entry point to each Offering's Grade Sheet. Scoped to the acting user by the
-     * Offering assignment: a user who teaches nothing gets an empty list rather than an error.
+     * resolved Course and Semester, the Instructor it is assigned to, the number of gradable
+     * lines its Sheet would carry, and the Initial round's state — `null` while unstarted, else
+     * Draft/Submitted/Returned/Finalized (ticket 03) — the entry point to each Offering's Grade
+     * Sheet. A user who teaches nothing gets an empty list rather than an error.
      *
-     * @response 200 {"data": [{"offering_id": 3, "gradable_count": 12, "sheet_status": "Draft", "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}}]}
+     * For a **central-entry** user — `grades.enter` without `grades.finalize`, which by §3.2 is
+     * Student Affairs — this is instead the picker over **every** Offering (ticket 09), because
+     * grades arriving on paper belong to Offerings the records office does not teach. Which of
+     * the two lists was returned is stated in `meta.scope` (`own` / `central`), so the SPA never
+     * has to re-derive the rule the server applied.
+     *
+     * @response 200 {"data": [{"offering_id": 3, "gradable_count": 12, "sheet_status": "Draft", "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "semester": {"id": 2, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}}], "meta": {"scope": "own"}}
      */
     public function offerings(
         Request $request,
         EnrollmentRecords $enrollments,
         CourseCatalog $courses,
+        AcademicCalendar $calendar,
+        Directory $directory,
     ): JsonResponse {
-        $offerings = $enrollments->offeringsTaughtBy($this->actingUserId($request));
+        $central = $this->actingAsCentralEntry($request);
+        $offerings = $central
+            ? $enrollments->allOfferings()
+            : $enrollments->offeringsTaughtBy($this->actingUserId($request));
 
-        // Three batched reads for the whole list, never one per row: the Courses through the
-        // Catalog facade, the roster sizes through the Enrollment facade, and each Offering's
-        // Initial-round state from Grading's own table (ADR-0012).
+        // Batched reads for the whole list, never one per row: the Courses, Semesters and
+        // Instructors through their owning modules' facades (ADR-0012), the roster sizes through
+        // the Enrollment facade, and each Offering's Initial-round state from Grading's own table.
         $resolved = $courses->findMany(array_values(array_unique(array_map(
             fn (OfferingSummary $offering): int => $offering->courseId,
+            $offerings,
+        ))));
+        $semesters = $calendar->findMany(array_values(array_unique(array_map(
+            fn (OfferingSummary $offering): int => $offering->semesterId,
+            $offerings,
+        ))));
+        $instructors = $directory->findMany(array_values(array_unique(array_map(
+            fn (OfferingSummary $offering): int => $offering->instructorId,
             $offerings,
         ))));
         $offeringIds = array_map(fn (OfferingSummary $offering): int => $offering->id, $offerings);
@@ -86,14 +111,28 @@ class GradeSheetController
             ->get()
             ->keyBy(fn (GradeSheet $sheet): int => (int) $sheet->course_offering_id);
 
-        $rows = array_map(fn (OfferingSummary $offering): array => [
-            'offering_id' => $offering->id,
-            'gradable_count' => $counts[$offering->id] ?? 0,
-            'sheet_status' => $sheets->get($offering->id)?->status->value,
-            'course' => ($resolved[$offering->courseId] ?? null)?->toArray(),
-        ], $offerings);
+        $rows = array_map(function (OfferingSummary $offering) use ($resolved, $semesters, $instructors, $counts, $sheets): array {
+            $semester = $semesters[$offering->semesterId] ?? null;
+            $instructor = $instructors[$offering->instructorId] ?? null;
 
-        return response()->json(['data' => $rows]);
+            return [
+                'offering_id' => $offering->id,
+                'gradable_count' => $counts[$offering->id] ?? 0,
+                'sheet_status' => $sheets->get($offering->id)?->status->value,
+                'course' => ($resolved[$offering->courseId] ?? null)?->toArray(),
+                'semester' => $semester === null ? null : [
+                    'id' => $semester->id,
+                    'name_en' => $semester->nameEn,
+                    'name_ar' => $semester->nameAr,
+                ],
+                'instructor' => $instructor?->toArray(),
+            ];
+        }, $offerings);
+
+        return response()->json([
+            'data' => $rows,
+            'meta' => ['scope' => $central ? 'central' : 'own'],
+        ]);
     }
 
     /**
@@ -106,6 +145,8 @@ class GradeSheetController
      * through Identity\Public, and the Grade already recorded for it, or `null` while the line
      * is still blank. Audit and Withdrawn Enrollments are omitted.
      * Authorised by assignment: an Instructor opening an Offering they do not teach gets a 403.
+     * A central-entry user (ticket 09) reaches any Offering's Sheet here, and opening one — a
+     * read — is not audited; their line writes are.
      *
      * @urlParam offering_id integer required The ID of the course offering. Example: 3
      *
@@ -120,9 +161,29 @@ class GradeSheetController
         CourseCatalog $courses,
         StudentDirectory $students,
         Directory $directory,
+        AuditLogger $audit,
     ): JsonResponse {
         $offering = $this->authorizeOffering($offering_id, $request, $enrollments);
+
+        // Re-opening is a pure read, but the *first* open writes the round into existence, so a
+        // central-entry user starting someone else's Sheet is audited like any other write of
+        // theirs — the Instructor is entitled to know their round was opened for them.
+        $existing = GradeSheet::query()
+            ->where('course_offering_id', $offering->id)
+            ->where('kind', GradeSheetKind::Initial)
+            ->exists();
         $sheet = $this->openInitialSheet($offering);
+
+        if (! $existing) {
+            $this->auditCentralEntry(
+                actorUserId: $this->actingUserId($request),
+                offering: $offering,
+                audit: $audit,
+                action: 'grade.sheet_opened_centrally',
+                gradeSheetId: (int) $sheet->getKey(),
+            );
+        }
+
         $roster = $enrollments->gradableEnrollmentsOf($offering->id);
 
         return response()->json([
@@ -176,7 +237,10 @@ class GradeSheetController
      * the selected lines (ADR-0023): the original round is untouched and remains finalized
      * throughout. The returned round is then edited, signed and Department-Head-reviewed
      * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
-     * Instructor who teaches this Offering may start a correction on it.
+     * Instructor who teaches this Offering may start a correction on it. Central entry (ticket
+     * 09) does **not** reach here: keying marks into a Draft round is data entry, reopening the
+     * finalized record is the Instructor's own judgement. Once they have started one, its lines
+     * are an ordinary Draft Sheet that central entry may key like any other.
      *
      * @urlParam grade_sheet_id integer required The ID of the finalized sheet being corrected. Example: 1
      *
@@ -195,7 +259,7 @@ class GradeSheetController
         StudentDirectory $students,
         Directory $directory,
     ): JsonResponse {
-        $offering = $this->authorizeOffering($gradeSheet->course_offering_id, $request, $enrollments);
+        $offering = $this->authorizeOwnOffering($gradeSheet->course_offering_id, $request, $enrollments);
 
         if ($gradeSheet->status !== GradeSheetStatus::Finalized) {
             throw new ConflictHttpException(__('grading.sheet.correction_requires_finalized'));
@@ -235,7 +299,9 @@ class GradeSheetController
      * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
      * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
      * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
-     * Sheet is a 404. Authorised by assignment — only the Offering's Instructor (else 403).
+     * Sheet is a 404. Authorised by assignment — the Offering's Instructor, or a central-entry
+     * user keying grades in for someone else's Offering (ticket 09), whose write is recorded in
+     * the Audit Log; anyone else is a 403.
      *
      * On an **Initial** round, a line may be marked Incomplete instead — send
      * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
@@ -262,6 +328,7 @@ class GradeSheetController
         GradeSheet $gradeSheet,
         int $enrollment_id,
         EnrollmentRecords $enrollments,
+        AuditLogger $audit,
     ): JsonResponse {
         $offering = $this->authorizeOffering($gradeSheet->course_offering_id, $request, $enrollments);
 
@@ -276,15 +343,20 @@ class GradeSheetController
         $line = $this->requireLine($gradeSheet, $offering, $enrollment_id, $enrollments);
 
         if ($request->has('completion_percentage') || $request->has('reason')) {
-            return $this->saveIncompleteDeclaration($request, $gradeSheet, $line);
+            return $this->saveIncompleteDeclaration($request, $gradeSheet, $line, $offering, $audit);
         }
 
-        return $this->saveMark($request, $gradeSheet, $line);
+        return $this->saveMark($request, $gradeSheet, $line, $offering, $audit);
     }
 
     /** The ordinary mark-entry path — supersedes any earlier Incomplete declaration on the line. */
-    private function saveMark(Request $request, GradeSheet $gradeSheet, EnrollmentSummary $line): JsonResponse
-    {
+    private function saveMark(
+        Request $request,
+        GradeSheet $gradeSheet,
+        EnrollmentSummary $line,
+        OfferingSummary $offering,
+        AuditLogger $audit,
+    ): JsonResponse {
         $validated = $request->validate(
             ['mark' => ['required', 'numeric', 'decimal:0,2', 'between:0,100']],
             [
@@ -303,6 +375,15 @@ class GradeSheetController
             ->where('declared_on_grade_sheet_id', $gradeSheet->getKey())
             ->where('enrollment_id', $line->id)
             ->delete();
+
+        $this->auditCentralEntry(
+            actorUserId: $this->actingUserId($request),
+            offering: $offering,
+            audit: $audit,
+            action: 'grade.entered_centrally',
+            gradeSheetId: (int) $gradeSheet->getKey(),
+            metadata: ['enrollment_id' => $line->id, 'mark' => (float) $grade->mark],
+        );
 
         return response()->json([
             'data' => [
@@ -323,8 +404,13 @@ class GradeSheetController
      * happens at the Sheet's finalize, in the same transaction as every other outcome
      * (ADR-0022/0023): no grade, and no Incomplete, enters the record on one signature.
      */
-    private function saveIncompleteDeclaration(Request $request, GradeSheet $gradeSheet, EnrollmentSummary $line): JsonResponse
-    {
+    private function saveIncompleteDeclaration(
+        Request $request,
+        GradeSheet $gradeSheet,
+        EnrollmentSummary $line,
+        OfferingSummary $offering,
+        AuditLogger $audit,
+    ): JsonResponse {
         abort_if($gradeSheet->kind !== GradeSheetKind::Initial, 422, __('grading.incomplete.only_on_initial_sheet'));
 
         $threshold = (int) config('grading.incomplete_min_completion');
@@ -356,6 +442,18 @@ class GradeSheetController
             ->where('grade_sheet_id', $gradeSheet->getKey())
             ->where('enrollment_id', $line->id)
             ->delete();
+
+        $this->auditCentralEntry(
+            actorUserId: $this->actingUserId($request),
+            offering: $offering,
+            audit: $audit,
+            action: 'grade.incomplete_declared_centrally',
+            gradeSheetId: (int) $gradeSheet->getKey(),
+            metadata: [
+                'enrollment_id' => $line->id,
+                'completion_percentage' => (int) $incomplete->completion_percentage,
+            ],
+        );
 
         return response()->json([
             'data' => [
@@ -412,22 +510,6 @@ class GradeSheetController
         }
 
         return response()->json(['data' => ['sheet' => $this->sheetArray($gradeSheet)]]);
-    }
-
-    /**
-     * The Offering the acting user is working, or an abort: a 404 when the reference dangles,
-     * a 403 when they are not its assigned Instructor. Authority over a Sheet is the Offering
-     * assignment, not the `grades.enter` permission the route already checked — Student
-     * Affairs' central-entry path and the ADR-0015 administrative override are their own
-     * tickets, so holding the permission without the assignment is forbidden here.
-     */
-    private function authorizeOffering(int $offeringId, Request $request, EnrollmentRecords $enrollments): OfferingSummary
-    {
-        $offering = $enrollments->findOffering($offeringId);
-        abort_if($offering === null, 404, __('grading.offering.missing'));
-        abort_if($offering->instructorId !== $this->actingUserId($request), 403, __('grading.offering.not_yours'));
-
-        return $offering;
     }
 
     /**
@@ -491,10 +573,5 @@ class GradeSheetController
         }
 
         abort(404, __('grading.line.not_found'));
-    }
-
-    private function actingUserId(Request $request): int
-    {
-        return (int) $request->user()?->getAuthIdentifier();
     }
 }

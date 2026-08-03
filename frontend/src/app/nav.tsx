@@ -220,17 +220,20 @@ export const navItems: NavItem[] = [
     section: 'enrollment',
     roles: [ROLE.instructor, ...ADMIN_ROLES],
   },
-  // Grading (Phase 4, ticket 01): the Instructor's grade sheets, in their own nav section.
-  // A **persona** item on the Instructor role (R04) — grades.enter is also held by Student
-  // Affairs, but their central-entry path is its own ticket, and authority over a particular
-  // Sheet is the Offering assignment, which the server checks. The Department Head's review
-  // queue and the Student's My Grades join this section in later tickets.
+  // Grading (Phase 4, ticket 01): the grade-sheet list, in its own nav section. A **persona**
+  // item on the Instructor role (R04) — and, from ticket 09, on Student Affairs (R05) too, whose
+  // `grades.enter` without `grades.finalize` makes the very same screen their central-entry
+  // picker over every Offering. It stays role-gated rather than permission-gated because an
+  // administrator inherits `grades.enter` but is scoped by Offering assignment like an
+  // Instructor, so the permission alone would not describe who this screen is for. The server
+  // decides which of the two lists comes back. The Department Head's review queue and the
+  // Student's My Grades join this section in later tickets.
   {
     key: 'gradeSheets',
     to: '/grading',
     icon: <GradingIcon />,
     section: 'grading',
-    roles: [ROLE.instructor],
+    roles: [ROLE.instructor, ROLE.studentAffairs],
   },
   // The Instructor's outstanding Incompletes (ticket 05): declared on their own Sheets,
   // resolved through the same signature + Department-Head review as any other grade. A

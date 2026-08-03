@@ -43,6 +43,7 @@ class SemesterFactory extends Factory
                 lateAddEnds: '+5 weeks',
                 withdrawalDeadline: '+10 weeks',
                 ends: '+16 weeks',
+                gradeSubmissionDeadline: '+18 weeks',
             ),
         );
     }
@@ -58,6 +59,7 @@ class SemesterFactory extends Factory
             lateAddEnds: '+5 weeks',
             withdrawalDeadline: '+10 weeks',
             ends: '+16 weeks',
+            gradeSubmissionDeadline: '+18 weeks',
         ));
     }
 
@@ -72,6 +74,7 @@ class SemesterFactory extends Factory
             lateAddEnds: '+9 weeks',
             withdrawalDeadline: '+14 weeks',
             ends: '+20 weeks',
+            gradeSubmissionDeadline: '+22 weeks',
         ));
     }
 
@@ -86,6 +89,7 @@ class SemesterFactory extends Factory
             lateAddEnds: '-3 weeks',
             withdrawalDeadline: '+2 weeks',
             ends: '+6 weeks',
+            gradeSubmissionDeadline: '+8 weeks',
         ));
     }
 
@@ -100,11 +104,12 @@ class SemesterFactory extends Factory
             lateAddEnds: '-23 weeks',
             withdrawalDeadline: '-18 weeks',
             ends: '-12 weeks',
+            gradeSubmissionDeadline: '-10 weeks',
         ));
     }
 
     /**
-     * Build the seven period columns from human-readable offsets relative to `now()`.
+     * Build the eight period columns from human-readable offsets relative to `now()`.
      *
      * @return array<string, Carbon>
      */
@@ -116,6 +121,7 @@ class SemesterFactory extends Factory
         string $lateAddEnds,
         string $withdrawalDeadline,
         string $ends,
+        string $gradeSubmissionDeadline,
     ): array {
         return [
             'registration_opens_at' => now()->modify($registrationOpens),
@@ -125,6 +131,7 @@ class SemesterFactory extends Factory
             'late_add_ends_at' => now()->modify($lateAddEnds),
             'withdrawal_deadline_at' => now()->modify($withdrawalDeadline),
             'ends_at' => now()->modify($ends),
+            'grade_submission_deadline_at' => now()->modify($gradeSubmissionDeadline),
         ];
     }
 }

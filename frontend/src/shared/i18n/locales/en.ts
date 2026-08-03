@@ -279,6 +279,7 @@ export const en = {
       incompleteReminder:
         'Your Incomplete resolution deadline is coming up in {{days_remaining}} day(s).',
       incompleteConverted: 'Your unresolved Incomplete became a Fail Withdrawal.',
+      gradesOverdue: 'Grades for {{course_code}} are past the submission deadline.',
       fallback: 'You have a new notification.',
     },
   },
@@ -744,7 +745,7 @@ export const en = {
       loading: 'Loading semesters',
       loadError: 'Could not load semesters.',
       saveError:
-        'Could not save the semester. Check that this term and year are not already used, and that the dates are in order: registration opens before the term starts, registration closes by the add/drop deadline, and add/drop end < late-add end < withdrawal deadline ≤ semester end.',
+        'Could not save the semester. Check that this term and year are not already used, and that the dates are in order: registration opens before the term starts, registration closes by the add/drop deadline, add/drop end < late-add end < withdrawal deadline ≤ semester end, and the grade-submission deadline is on or after the semester ends.',
       term: 'Term',
       terms: { Fall: 'Fall', Spring: 'Spring' },
       year: 'Year',
@@ -762,6 +763,7 @@ export const en = {
         add_drop_ends_at: 'Add/drop ends',
         late_add_ends_at: 'Late-add ends',
         withdrawal_deadline_at: 'Withdrawal deadline',
+        grade_submission_deadline_at: 'Grade-submission deadline',
       },
       save: 'Save',
       cancel: 'Cancel',
@@ -1194,8 +1196,16 @@ export const en = {
       title: 'Grade sheets',
       intro:
         'The courses you teach. Open a grade sheet to record what each student achieved; nothing is visible to students until it has been signed and finalized.',
-      loading: 'Loading the courses you teach',
-      loadError: 'Could not load the courses you teach. Please try again.',
+      // Central data entry (ticket 09): the same screen and the same sheet editor, over every
+      // offering rather than the ones the signed-in user teaches.
+      centralTitle: 'Central grade entry',
+      centralIntro:
+        'Every course offering. Open a grade sheet to key in marks that arrived on paper. Each mark you enter on another instructor’s sheet is recorded in the audit log, and only that instructor can sign it.',
+      centralEmpty: 'No course offerings exist yet.',
+      // Persona-neutral: the server names the scope in the response, so while the request is in
+      // flight there is nothing yet to say whose list this is.
+      loading: 'Loading course offerings',
+      loadError: 'Could not load the course offerings. Please try again.',
       empty: 'You are not teaching any courses yet.',
       openSheet: 'Open grade sheet',
       unstarted: 'Not started',
@@ -1203,6 +1213,8 @@ export const en = {
       gradableCount_other: '{{count}} students',
       columns: {
         course: 'Course',
+        semester: 'Semester',
+        instructor: 'Instructor',
         students: 'To grade',
         state: 'State',
         actions: 'Actions',
@@ -1226,6 +1238,8 @@ export const en = {
       history: 'Earlier finalized grades: {{grades}}',
       historySuperseded: 'superseded',
       sign: 'Sign and submit for review',
+      signIsInstructors:
+        'Only the instructor who teaches this course can sign this sheet and send it for review.',
       signError: 'Could not sign this grade sheet. Please try again.',
       allGraded: 'Every line is graded — ready to sign.',
       blankCount: '{{count}} line is still ungraded before this sheet can be signed.',

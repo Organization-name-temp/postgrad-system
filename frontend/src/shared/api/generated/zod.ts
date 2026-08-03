@@ -1484,6 +1484,7 @@ export const ListSemestersResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 })).optional()
 })
@@ -1501,7 +1502,8 @@ export const CreateASemesterBody = zod.object({
   "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
   "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
   "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
-  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).'),
+  "grade_submission_deadline_at": zod.string().describe('When instructors must have submitted grades — on or after the semester ends (ISO 8601).')
 })
 
 export const CreateASemesterResponse = zod.object({
@@ -1518,6 +1520,7 @@ export const CreateASemesterResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 }).optional()
 })
@@ -1544,6 +1547,7 @@ export const ShowASemesterResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 }).optional()
 })
@@ -1567,7 +1571,8 @@ export const UpdateASemesterBody = zod.object({
   "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
   "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
   "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
-  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).'),
+  "grade_submission_deadline_at": zod.string().describe('When instructors must have submitted grades — on or after the semester ends (ISO 8601).')
 })
 
 export const UpdateASemesterResponse = zod.object({
@@ -1584,6 +1589,7 @@ export const UpdateASemesterResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 }).optional()
 })
@@ -3704,13 +3710,19 @@ export const RecordorCorrectASessionsAttendanceRegisterResponse = zod.object({
 
 /**
  * Every Course Offering the acting user teaches, across all Semesters, each with its
- * resolved Course, the number of gradable lines its Sheet would carry, and the Initial
- * round's state — `null` while unstarted, else Draft/Submitted/Returned/Finalized (ticket
- * 03) — the entry point to each Offering's Grade Sheet. Scoped to the acting user by the
- * Offering assignment: a user who teaches nothing gets an empty list rather than an error.
- * @summary My Offerings to grade.
+ * resolved Course and Semester, the Instructor it is assigned to, the number of gradable
+ * lines its Sheet would carry, and the Initial round's state — `null` while unstarted, else
+ * Draft/Submitted/Returned/Finalized (ticket 03) — the entry point to each Offering's Grade
+ * Sheet. A user who teaches nothing gets an empty list rather than an error.
+ *
+ * For a **central-entry** user — `grades.enter` without `grades.finalize`, which by §3.2 is
+ * Student Affairs — this is instead the picker over **every** Offering (ticket 09), because
+ * grades arriving on paper belong to Offerings the records office does not teach. Which of
+ * the two lists was returned is stated in `meta.scope` (`own` / `central`), so the SPA never
+ * has to re-derive the rule the server applied.
+ * @summary Offerings to grade.
  */
-export const MyOfferingsToGradeResponse = zod.object({
+export const OfferingsToGradeResponse = zod.object({
   "data": zod.array(zod.object({
   "offering_id": zod.number().optional(),
   "gradable_count": zod.number().optional(),
@@ -3724,8 +3736,21 @@ export const MyOfferingsToGradeResponse = zod.object({
   "total_ch": zod.number().optional(),
   "research_type": zod.string().nullish(),
   "is_active": zod.boolean().optional()
+}).optional(),
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
 }).optional()
-})).optional()
+})).optional(),
+  "meta": zod.object({
+  "scope": zod.string().optional()
+}).optional()
 })
 
 
@@ -3737,6 +3762,8 @@ export const MyOfferingsToGradeResponse = zod.object({
  * through Identity\Public, and the Grade already recorded for it, or `null` while the line
  * is still blank. Audit and Withdrawn Enrollments are omitted.
  * Authorised by assignment: an Instructor opening an Offering they do not teach gets a 403.
+ * A central-entry user (ticket 09) reaches any Offering's Sheet here, and opening one — a
+ * read — is not audited; their line writes are.
  * @summary Open an Offering's Grade Sheet.
  */
 export const OpenAnOfferingsGradeSheetParams = zod.object({
@@ -3798,7 +3825,9 @@ export const OpenAnOfferingsGradeSheetResponse = zod.object({
  * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
  * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
  * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
- * Sheet is a 404. Authorised by assignment — only the Offering's Instructor (else 403).
+ * Sheet is a 404. Authorised by assignment — the Offering's Instructor, or a central-entry
+ * user keying grades in for someone else's Offering (ticket 09), whose write is recorded in
+ * the Audit Log; anyone else is a 403.
  *
  * On an **Initial** round, a line may be marked Incomplete instead — send
  * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
@@ -3845,7 +3874,10 @@ export const SaveOneGradeSheetLineResponse = zod.union([zod.object({
  * the selected lines (ADR-0023): the original round is untouched and remains finalized
  * throughout. The returned round is then edited, signed and Department-Head-reviewed
  * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
- * Instructor who teaches this Offering may start a correction on it.
+ * Instructor who teaches this Offering may start a correction on it. Central entry (ticket
+ * 09) does **not** reach here: keying marks into a Draft round is data entry, reopening the
+ * finalized record is the Instructor's own judgement. Once they have started one, its lines
+ * are an ordinary Draft Sheet that central entry may key like any other.
  * @summary Open a Correction round against a finalized Sheet.
  */
 export const OpenACorrectionRoundAgainstAFinalizedSheetParams = zod.object({

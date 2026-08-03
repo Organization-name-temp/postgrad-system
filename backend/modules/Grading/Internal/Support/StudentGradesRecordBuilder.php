@@ -103,7 +103,10 @@ final readonly class StudentGradesRecordBuilder
         return ['cgpa' => $cgpa, 'semesters' => $semesters];
     }
 
-    /** @param list<EnrollmentSummary> $enrollments @return list<int> */
+    /**
+     * @param  list<EnrollmentSummary>  $enrollments
+     * @return list<int>
+     */
     private function mustRetakeEnrollmentIds(array $enrollments): array
     {
         $byCourse = [];
@@ -114,11 +117,8 @@ final readonly class StudentGradesRecordBuilder
         $marked = [];
         foreach ($byCourse as $attempts) {
             $mustRetake = false;
-            $latestId = null;
 
             foreach ($attempts as $attempt) {
-                $latestId = $attempt->id;
-
                 if (! in_array($attempt->classification, ['Preparatory', 'Core'], true)) {
                     continue;
                 }
@@ -134,8 +134,11 @@ final readonly class StudentGradesRecordBuilder
                 }
             }
 
-            if ($mustRetake && $latestId !== null) {
-                $marked[] = $latestId;
+            // The marker hangs off the Course's latest Attempt — the last of a list built in
+            // Enrollment's own id order, and never empty, since a key only exists because an
+            // Attempt was pushed under it.
+            if ($mustRetake) {
+                $marked[] = $attempts[count($attempts) - 1]->id;
             }
         }
 

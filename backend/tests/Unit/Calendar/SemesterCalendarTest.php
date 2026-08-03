@@ -14,7 +14,7 @@ use Modules\Calendar\Internal\Support\SemesterCalendar;
 | A well-ordered reference calendar the cases perturb one field at a time:
 |   reg opens  2026-08-01  →  reg closes 2026-09-05  →  starts 2026-09-01
 |   add/drop end 2026-09-14  →  late-add end 2026-09-21  →  withdrawal 2026-11-30
-|   ends 2026-12-20
+|   ends 2026-12-20  →  grade submission 2027-01-10
 */
 
 /**
@@ -30,6 +30,7 @@ function calendar(array $overrides = []): SemesterCalendar
         'add_drop_ends_at' => '2026-09-14 00:00',
         'late_add_ends_at' => '2026-09-21 00:00',
         'withdrawal_deadline_at' => '2026-11-30 00:00',
+        'grade_submission_deadline_at' => '2027-01-10 00:00',
     ], $overrides);
 
     return new SemesterCalendar(
@@ -40,6 +41,7 @@ function calendar(array $overrides = []): SemesterCalendar
         addDropEndsAt: Carbon::parse($dates['add_drop_ends_at']),
         lateAddEndsAt: Carbon::parse($dates['late_add_ends_at']),
         withdrawalDeadlineAt: Carbon::parse($dates['withdrawal_deadline_at']),
+        gradeSubmissionDeadlineAt: Carbon::parse($dates['grade_submission_deadline_at']),
     );
 }
 
@@ -88,6 +90,18 @@ it('rejects a withdrawal deadline after the semester ends', function () {
 
 it('accepts a withdrawal deadline exactly on the semester end (inclusive bound)', function () {
     expect(calendar(['withdrawal_deadline_at' => '2026-12-20 00:00'])->orderingViolations())->toBe([]);
+});
+
+it('rejects a grade-submission deadline before the semester ends', function () {
+    // Phase 4 ticket 09: the one new date joins the same invariant — grades are submitted for a
+    // term that has finished, so the deadline can never precede the end.
+    $violations = calendar(['grade_submission_deadline_at' => '2026-12-19 00:00'])->orderingViolations();
+
+    expect($violations)->toHaveKey('grade_submission_deadline_at');
+});
+
+it('accepts a grade-submission deadline exactly on the semester end (inclusive bound)', function () {
+    expect(calendar(['grade_submission_deadline_at' => '2026-12-20 00:00'])->orderingViolations())->toBe([]);
 });
 
 it('rejects a semester that ends on or before it starts', function () {
@@ -150,6 +164,20 @@ it('reports having ended only strictly after the semester end', function () {
 
     expect($cal->hasEnded(Carbon::parse('2026-12-20 00:00')))->toBeFalse()
         ->and($cal->hasEnded(Carbon::parse('2026-12-21 00:00')))->toBeTrue();
+});
+
+it('reports the grade-submission deadline passed only strictly after it', function () {
+    $cal = calendar();
+
+    expect($cal->hasGradeSubmissionDeadlinePassed(Carbon::parse('2027-01-09 00:00')))->toBeFalse()
+        ->and($cal->hasGradeSubmissionDeadlinePassed(Carbon::parse('2027-01-10 00:00')))->toBeFalse()  // the day itself is in time
+        ->and($cal->hasGradeSubmissionDeadlinePassed(Carbon::parse('2027-01-11 00:00')))->toBeTrue();
+});
+
+it('keeps the grade-submission deadline out of the period vocabulary', function () {
+    // The deadline is not a registration period: a term past its withdrawal deadline reads
+    // `closed` whether or not grades are still due (ticket 09 flags lateness, gates nothing).
+    expect(calendar()->currentPeriod(Carbon::parse('2027-01-05 00:00')))->toBe('closed');
 });
 
 it('names the current period, change windows taking precedence over the registration overlap', function () {

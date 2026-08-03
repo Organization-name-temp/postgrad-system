@@ -28,6 +28,18 @@ interface AcademicCalendar
     public function find(int $id): ?SemesterSummary;
 
     /**
+     * The summaries for the given Semester ids, keyed by id; ids with no matching Semester are
+     * simply absent from the result. Lets a screen or a command resolve several Semesters in one
+     * read instead of N single lookups — the `CourseCatalog::findMany()` shape. Grading is the
+     * first consumer: its Offering picker spans every Semester, and its late-Sheet flagging
+     * command reads each Offering's Semester deadline.
+     *
+     * @param  list<int>  $ids
+     * @return array<int, SemesterSummary>
+     */
+    public function findMany(array $ids): array;
+
+    /**
      * The Semester whose registration window is open right now, or `null` when none
      * is — the front the student registration screen reads (user story 13). If more
      * than one qualifies (an operator error the ordering invariant does not prevent

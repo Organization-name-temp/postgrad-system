@@ -58,6 +58,7 @@ const TYPE_ALIAS: Record<string, string> = {
   'incomplete.declared': 'incompleteDeclared',
   'incomplete.reminder': 'incompleteReminder',
   'incomplete.converted': 'incompleteConverted',
+  'grades.overdue': 'gradesOverdue',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

@@ -96,6 +96,24 @@ it('returns an empty list for a user who teaches nothing', function () {
     expect(enrollmentRecords()->offeringsTaughtBy(User::factory()->create()->id))->toBe([]);
 });
 
+it('lists every offering there is, whoever teaches it — the central picker read', function () {
+    // Phase 4 ticket 09: Student Affairs keys grades in for Offerings it does not teach, so this
+    // read is deliberately unscoped and the caller does the authorising.
+    $mine = erOffering(User::factory()->create()->id);
+    $theirs = erOffering(User::factory()->create()->id);
+
+    $offerings = enrollmentRecords()->allOfferings();
+
+    expect($offerings)->toHaveCount(2)
+        ->and($offerings[0])->toBeInstanceOf(OfferingSummary::class)
+        ->and(array_map(fn (OfferingSummary $o): int => $o->id, $offerings))
+        ->toEqualCanonicalizing([$mine->id, $theirs->id]);
+});
+
+it('returns an empty list from the central picker read when nothing runs at all', function () {
+    expect(enrollmentRecords()->allOfferings())->toBe([]);
+});
+
 // ---------------------------------------------------------------------------
 // The gradable roster
 // ---------------------------------------------------------------------------

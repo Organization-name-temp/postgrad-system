@@ -44,6 +44,7 @@ export const ar = {
       myOfferings: 'تدريسي',
       gradeSheets: 'كشوف الدرجات',
       outstandingIncompletes: 'حالات "غير مكتمل" المعلّقة',
+      gradeReview: 'مراجعة الدرجات',
       myGrades: 'درجاتي',
       assignments: 'عمداء الكليات',
       departmentHeads: 'رؤساء الأقسام',

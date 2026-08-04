@@ -1,88 +1,134 @@
-# Handoff — PRS Phase 0 build (localhost learning build)
+# Handoff — PRS (localhost learning build)
 
 **Project:** Postgraduate Registration System (PRS) for E-JUST.
-**Workspace:** `c:\Users\Mohamed\Desktop\Postgrad System`
-**Branch:** `main` (nothing committed this session — user chose "don't commit yet").
-**Date of handoff:** 2026-07-10.
+**Workspace:** `postgrad-system` (git remote `MohamedYasser343/postgrad-system`).
+**Last refreshed:** end of **Phase 4 — Grading & GPA/CGPA** (phase 4, ticket 10).
 
-You are continuing a `/tdd all tickets` run that is building Phase 0. Read this, then
-the referenced artifacts. Do **not** re-plan — the plan is settled and recorded.
+This file is the *entry point for a fresh session*. It carries only what the repo does **not**
+already record; everything else is deliberately a pointer, so it cannot drift.
 
 ---
 
 ## Read these first (don't duplicate them)
 
-- Phase plan: [docs/ROADMAP.md](docs/ROADMAP.md) (Phase 0 section)
-- Spec / PRD: [.scratch/phase-0/spec.md](.scratch/phase-0/spec.md)
-- Tickets (the work unit): [.scratch/phase-0/issues/](.scratch/phase-0/issues/) (`01..07-*.md`)
-- Ubiquitous language: [CONTEXT.md](CONTEXT.md) (Identity & access: User, Role, Permission, Audit Log)
-- Load-bearing decisions: [docs/adr/](docs/adr/) — esp. **0005** (localhost scope), **0006** (Laravel 12 / PHP 8.4), **0007** (hand-rolled PSR-4 modules), **0008** (RBAC = enums + static matrix)
-- Issue-tracker convention (local markdown): [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md)
-
-Paths below are relative to the workspace root.
-
----
-
-## Environment facts (verified this session)
-
-- PHP **8.4.15**, Composer **2.9.1**, Node **24**, npm **11** — all present. PHP has `pdo_pgsql`.
-- **Docker is NOT installed. Postgres is NOT running.** `winget` IS available.
-- **`gh` CLI is NOT installed** — that's why the issue tracker is local markdown, not GitHub Issues (the repo does have a GitHub remote `MohamedYasser343/postgrad-system`).
-- Postgres is provisioned by [docker-compose.yml](docker-compose.yml) (repo root): Postgres 17, db **prs** (+ **prs_test** via `docker/postgres/init/01-create-test-db.sql`), user **prs**, password **secret** (dev-only, in `backend/.env`).
-
-## To unblock DB-dependent work (the current blocker)
-```
-winget install Docker.DockerDesktop   # then reboot + launch Docker Desktop
-docker compose up -d                  # repo root; wait for healthy
-cd backend; php artisan migrate --seed
-php artisan test                       # HealthTest + RoleEnum + AuthTest expected green
-```
+- **Plan and per-phase record:** [docs/ROADMAP.md](docs/ROADMAP.md) — §3 has one section per
+  phase describing what that phase actually built, plus its Deferred list. §4 is the
+  Definition of Done every phase is held to.
+- **Requirements source of truth:** [docs/SRS.md](docs/SRS.md) ·
+  [docs/business-requirements.md](docs/business-requirements.md)
+- **Ubiquitous language:** [CONTEXT.md](CONTEXT.md) — the resolved glossary. Read it before
+  naming anything.
+- **Load-bearing decisions:** [docs/adr/](docs/adr/) — 0001–0023. Where an ADR contradicts an
+  older document it says so explicitly (0020 amends architecture.md §5; 0021 replaces SRS
+  Appendix A's grading bands).
+- **Structure and seams:** [docs/architecture.md](docs/architecture.md) ·
+  [docs/tech-stack.md](docs/tech-stack.md) · [docs/design-system.md](docs/design-system.md)
+- **How this repo is built:** [AI_workflow.md](AI_workflow.md) — the
+  `/grill-with-docs → /to-prd → /to-issues → /tdd → manual review` loop every phase follows.
+- **Issue-tracker convention** (local markdown, not GitHub Issues):
+  [docs/agents/issue-tracker.md](docs/agents/issue-tracker.md). Per-phase specs and tickets
+  live in `.scratch/phase-N/`.
 
 ---
 
-## Status by ticket
+## Where the build is
 
-| Ticket | State |
+| Phase | State |
 |---|---|
-| 01 Walking skeleton | **Done, verified green** (Pest health test + Playwright smoke) |
-| 02 Module seams + gates + CI | **Done, verified** (deptrac catches App→Internal; both gates green; `.github/workflows/ci.yml`) |
-| 03 OpenAPI→typed client | **Done, verified** (Scribe spec, Orval client, drift-checks) |
-| 04 backend (auth/roles/audit) | **Written + statically green** (Pint, PHPStan L6, deptrac, RoleEnum test, FE typecheck). **`AuthTest` (5 tests) RED pending Postgres.** |
-| 04 frontend (login/router/guard) | **Not built** — deliberately deferred until backend tests pass on a real DB |
-| 05 RBAC authorization | Not started |
-| 06 Bilingual i18n loop | Not started |
-| 07 Demo capstone + headline smoke | Not started |
+| 0 Foundations · 0.5 Design system · 1 Catalog · 2 Admissions · 2.5 Admissions fixes · 3 Enrollment | **Done, merged to `main`** |
+| **4 Grading & GPA/CGPA** | **Done on `phase-4-grading`** — all ten tickets; awaiting the manual review gate before Phase 5 |
+| 5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver | Next |
+| 6 Records & Transcript · 7 Reporting & polish | Not started |
 
-**`composer gate` is RED right now** — expected — because it runs `AuthTest`, which needs Postgres. Static checks and `RoleEnum` pass; run `php artisan test --filter=RoleEnum` to confirm the DB-free slice.
+**Working convention:** one branch per phase (`phase-N-slug`), merged to `main` by PR after the
+phase's headline demo is reviewed by hand. Seven backend modules exist:
+`Identity`, `Catalog`, `Admissions`, `Notifications`, `Calendar`, `Enrollment`, `Grading`.
 
 ---
 
-## Implementation notes NOT captured elsewhere (important)
+## Environment — how to actually run it
 
-- **Modules** auto-discovered in `backend/bootstrap/providers.php` (globs `modules/*/*ServiceProvider.php`). deptrac config: `backend/deptrac.yaml` (per-module Public/Internal layers; add each new module's layers as built).
-- **User model was relocated** to `Modules\Identity\Internal\Models\User` (was `app/Models/User.php`, now deleted). `config/auth.php` and `database/factories/UserFactory.php` updated to point at it. This keeps deptrac clean (module code never imports `app/`).
-- **Roles** are the `Role` enum (`Modules\Identity\Public\Enums\Role`, R01–R10) + a `user_roles` pivot (no roles table). `User::roles()/assignRole()/hasRole()`.
-- **Audit**: write only through `Modules\Identity\Public\Contracts\AuditLogger` (impl `Internal\Audit\EloquentAuditLogger`). Table `audit_log` is append-only (no `updated_at`).
-- **Sanctum SPA**: `statefulApi()` in `bootstrap/app.php`; `SANCTUM_STATEFUL_DOMAINS` in `backend/.env` includes `localhost:5173`. In feature tests, stateful requests are simulated with header `Origin: http://localhost`; `/me` uses `Sanctum::actingAs()`. CSRF is auto-skipped in the test env.
-- **Scribe**: response calls are **disabled** (so spec generation needs no DB) — document responses with `@response` annotations. The controller docblock's **first line becomes the operationId** → keep it short, or Orval hook names balloon (already fixed: `useLogIn`, `useLogOut`, `useCurrentUser`, `useServiceHealthCheck`).
-- **Orval**: mutator is `customInstance` in `frontend/src/shared/api/http.ts` (Axios, no baseURL, `withCredentials`). Generated dir `src/shared/api/generated/` is git-committed but **excluded from ESLint + Prettier**; kept LF via root `.gitattributes`.
-- **PHPStan** is level 6 (tech-stack targets "max" — later hardening). Larastan infers model columns from `database/migrations` only, so **columns added by module migrations need a `@property` on the model** (see `preferred_locale` on User).
-- **Drift-checks** (`composer api:check`, `npm run api:check`) use `git diff --exit-code`; they are **no-ops until the generated files are committed** (untracked files don't show in `git diff`). They become meaningful in CI / after the first commit.
+Everything below is verified; the details that bite are marked.
 
-## Known gaps / watch-outs for next session
+```bash
+docker compose up -d                          # repo root: Postgres 17 (prs + prs_test)
+cd backend && php artisan migrate:fresh --seed --force
+composer gate                                 # Pint, PHPStan L6, deptrac, Pest, openapi drift
+cd ../frontend && npm run gate                # api:check, ESLint, Prettier, tsc, Vitest, Playwright
+```
 
-- **`backend/.env.example` was NOT updated** with the Postgres + `SANCTUM_STATEFUL_DOMAINS` vars (only `.env` was). The CI backend job does `cp .env.example .env`, so **CI will use SQLite and miss Sanctum config** until `.env.example` is fixed. Update it before relying on CI.
-- `AuthTest`'s Sanctum stateful behavior is **unverified** (no DB yet) — may need small tweaks when first run.
-- Frontend `eslint-plugin-boundaries` v7 own-feature capture rule was deferred — wire + verify it when the first real feature (`auth`) is created in ticket 04 frontend (see comment in `frontend/eslint.config.js`).
-- Leftover `backend/database/database.sqlite` from scaffolding — harmless.
+- **PHP 8.4 and Composer come from Laravel Herd.** ⚠ The `php` on Git Bash's PATH is **8.2**
+  and fails the project's `>= 8.4.1` platform check — run artisan/pint/phpstan/pest **from
+  PowerShell**, where `php` resolves to Herd's `php.bat`.
+- `backend/.env` is gitignored. Recreate with `cp .env.example .env && php artisan key:generate`;
+  `.env.example` already carries the real Postgres + Sanctum config.
+- **Playwright:** run it from PowerShell too (its `webServer` spawns `php artisan serve`), and
+  **seed first** — the seeder-driven smokes are only re-runnable against a fresh seed. Use
+  `npm run e2e -- --workers=1`: the whole suite runs against one single-threaded `artisan serve`,
+  so extra workers make it slower *and* red. CI is effectively serial already.
+- `git config core.autocrlf` is `true`, so `frontend/.prettierrc` sets `endOfLine: "auto"`;
+  generated API artifacts are pinned LF via the root `.gitattributes`.
+- **No `gh` CLI**, which is why the issue tracker is local markdown.
 
 ---
 
-## Suggested skills for the next session
+## Things that are not obvious from the code
 
-- **`/tdd`** — resume the red→green loop. First actionable step once Postgres is up: run `AuthTest`, fix to green, then build ticket-04 frontend (login page + React Router + permission-less auth guard + auth state via `useCurrentUser`), then proceed to tickets 05 → 06 → 07 (05 and 06 can run in parallel; 07 depends on both).
-- **`/verify`** — after ticket 07, exercise the headline flow (login as a seeded role → guarded dashboard → EN↔AR/RTL toggle → logout) in the real app.
-- **`gh-commit`** (or plain commit) — once the user approves committing; recommend a `phase-0-foundations` branch. This also makes the drift-checks meaningful.
+- **Modules are auto-discovered** by `backend/bootstrap/providers.php` (globs
+  `modules/*/*ServiceProvider.php`). Every new module must also add its `Public`/`Internal`
+  layers **and its allowed edges** to `backend/deptrac.yaml`, or deptrac silently permits
+  nothing.
+- **Cross-module references are opaque ids with no FK** (ADR-0012) — so there is no relation to
+  join through, and a consumer resolves the other side through that module's `Public` facade.
+  Everything crossing a seam is a DTO, never an Eloquent model.
+- **PHPStan is Larastan level 6** and infers columns from `database/migrations` only, so a column
+  added by a *module* migration needs an explicit `@property` on the model.
+- **Scribe:** response calls are disabled (spec generation needs no DB) — document responses with
+  `@response`. The controller docblock's **first line becomes the operationId**, which becomes the
+  Orval hook name, so keep it short. Every model-bound route needs an explicit `@urlParam …
+  Example:` or the `openapi.yaml` drift check flakes in CI.
+- **The generated client** (`frontend/src/shared/api/generated/`) is committed but excluded from
+  ESLint and Prettier; both `composer api:check` and `npm run api:check` are `git diff
+  --exit-code` gates, so they only mean something once the generated files are committed.
+- **Derived, never stored** is the house rule: period state, attendance percentage, Incomplete
+  deadlines, grade supersession and GPA/CGPA are all recomputed on read. Nothing is cached (no
+  Redis in this build, ADR-0005), so nothing can drift.
+- **Scheduled work is hand-run artisan commands**, and every one of them is *flag-and-notify
+  only* except `grading:convert-expired-incompletes`, which the SRS explicitly mandates as a
+  state change.
 
-## Immediate next action
-Ask the user whether Postgres is up. If yes: `docker compose up -d` (if not already), `php artisan migrate --seed`, run `AuthTest`, fix, continue. If no: either wait, or continue building tickets 05/06 backend logic that is DB-light, but note verification will lag.
+---
+
+## The seeded demo world
+
+`php artisan migrate:fresh --seed --force` builds it; it is deterministic and idempotent, and
+every window is a **relative offset from seed time**, so it never goes stale. Shared dev
+password for every account: `password`.
+
+- **Role accounts** `r01@ejust.test … r10@ejust.test` (one per role), plus `multi@ejust.test`
+  (Advisor + Instructor).
+- **Named personas** under `@seed.ejust.test`: applicants in every Admissions status, advisors,
+  faculty deans, interviewers, Department Heads, and a `student.*` cohort. The seeders reserve
+  that namespace so the Playwright smokes' own data never collides with it.
+- **Five Semesters**, chronological: `Fall 2024 → Spring 2025 → Fall 2025` (completed, Phase 4)
+  `→ Spring 2026` (running, in its withdrawal window) `→ Fall 2026` (registration open).
+  The three completed ones exist because grading needs a *finished* term, and an Incomplete only
+  becomes overdue once the **following** term has passed its own week 10 — see
+  `GradingSeeder`'s class docblock, which explains the calendar in full.
+- **What each phase's demo drives** is the corresponding Playwright smoke: `admissions.spec.ts`,
+  `enrollment.spec.ts`, `grading.spec.ts` (the headline test at the bottom of the file), plus
+  `headline.spec.ts` for the Phase-0/1 walking skeleton.
+
+---
+
+## Immediate next steps
+
+1. **Run the Phase-4 headline demo by hand** and take it through the per-phase manual review
+   gate; then open the PR from `phase-4-grading` to `main`.
+2. **Start Phase 5** (SRS §4.8, §4.5, §4.6 — Academic Standing, Credit-Hour Summary,
+   Exemption/Transfer/Waiver) with the usual loop: `/to-prd` → `/to-issues` → `/tdd` per ticket
+   → `/code-review`. Phase 4 left it two hooks: the `GradeFinalized` domain event, and
+   `Grading\Public::GradingRecords` for CGPA/Semester GPA — Phase 5 must consume that contract
+   rather than re-deriving the arithmetic (ADR-0020). The three `CourseStatus` values still
+   unreachable (`Transfer`, `Waive`, `Exempted`) are exactly Phase 5's remit, at which point the
+   Appendix-D counting matrix is fully live.

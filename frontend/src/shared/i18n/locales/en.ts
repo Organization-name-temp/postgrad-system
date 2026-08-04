@@ -45,6 +45,7 @@ export const en = {
       myOfferings: 'My teaching',
       gradeSheets: 'Grade sheets',
       outstandingIncompletes: 'Outstanding Incompletes',
+      gradeReview: 'Grade review',
       myGrades: 'My Grades',
       assignments: 'Faculty deans',
       departmentHeads: 'Department heads',

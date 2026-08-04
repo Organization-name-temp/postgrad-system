@@ -4,6 +4,7 @@ namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Enrollment\EnrollmentServiceProvider;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Models\CourseOffering;
@@ -24,6 +25,13 @@ use Modules\Enrollment\Public\OfferingSummary;
  */
 class EloquentEnrollmentRecords implements EnrollmentRecords
 {
+    /**
+     * The Calendar facade is read only to order the Offering lists chronologically — the
+     * Semester reference is an opaque id with no FK to join on (ADR-0012), so "most recent
+     * Semester first" cannot be expressed as a SQL ordering.
+     */
+    public function __construct(private readonly AcademicCalendar $calendar) {}
+
     public function findOffering(int $offeringId): ?OfferingSummary
     {
         $offering = CourseOffering::query()->find($offeringId);
@@ -52,17 +60,35 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
      * because they populate the same screen (the Instructor's own, and ticket 09's central
      * picker). The optional constraint is the only thing that differs between them.
      *
+     * "Most recent" is the Semester's **`starts_at`**, resolved through `Calendar\Public` and
+     * sorted in PHP, because the Semester reference is an opaque id with no FK to join on
+     * (ADR-0012) — and because a descending id is not the same ordering: a back-filled past
+     * term (Phase 4's completed Semesters, seeded after Phase 3's) carries the *higher* id while
+     * being the *older* term, which would have listed it above a future one. Offerings whose
+     * Semester no longer resolves sort last rather than disappearing, and the offering id breaks
+     * ties — **negated**, because the whole sort is descending and two Offerings of one Semester
+     * should still read in the order they were created.
+     *
      * @param  (callable(Builder<CourseOffering>): Builder<CourseOffering>)|null  $constrain
      * @return list<OfferingSummary>
      */
     private function offerings(?callable $constrain = null): array
     {
-        $query = CourseOffering::query()->orderByDesc('semester_id')->orderBy('id');
+        $query = CourseOffering::query()->orderBy('id');
 
         /** @var Collection<int, CourseOffering> $offerings */
         $offerings = ($constrain === null ? $query : $constrain($query))->get();
 
-        return $offerings->map(fn (CourseOffering $o): OfferingSummary => $this->toOfferingSummary($o))
+        $semesters = $this->calendar->findMany(
+            $offerings->pluck('semester_id')->map(fn ($id): int => (int) $id)->unique()->values()->all(),
+        );
+
+        return $offerings
+            ->sortByDesc(fn (CourseOffering $o): array => [
+                ($semesters[(int) $o->semester_id] ?? null)?->startsAt->getTimestamp() ?? PHP_INT_MIN,
+                -((int) $o->getKey()),
+            ])
+            ->map(fn (CourseOffering $o): OfferingSummary => $this->toOfferingSummary($o))
             ->values()
             ->all();
     }

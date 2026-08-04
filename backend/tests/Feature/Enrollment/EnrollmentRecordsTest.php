@@ -114,6 +114,36 @@ it('returns an empty list from the central picker read when nothing runs at all'
     expect(enrollmentRecords()->allOfferings())->toBe([]);
 });
 
+it('orders both offering lists by the semester that starts latest, not by the newest row', function () {
+    // The row created *last* is the *oldest* term — exactly what a back-filled Semester looks
+    // like (phase 4 ticket 10's seeder adds three completed terms behind the running one), and
+    // exactly what an id-ordered list would get backwards.
+    $instructor = User::factory()->create()->id;
+    $upcoming = erOffering($instructor, Semester::factory()->create(['starts_at' => now()->addMonths(3)]));
+    $running = erOffering($instructor, Semester::factory()->create(['starts_at' => now()->subMonth()]));
+    $completed = erOffering($instructor, Semester::factory()->create(['starts_at' => now()->subYear()]));
+
+    $ids = fn (array $offerings): array => array_map(fn (OfferingSummary $o): int => $o->id, $offerings);
+    $expected = [$upcoming->id, $running->id, $completed->id];
+
+    expect($ids(enrollmentRecords()->offeringsTaughtBy($instructor)))->toBe($expected)
+        ->and($ids(enrollmentRecords()->allOfferings()))->toBe($expected);
+});
+
+it('keeps two offerings of one semester in creation order', function () {
+    // The tie-break: same Semester, so only the offering id separates them, and it must read
+    // ascending even though the whole sort is descending.
+    $instructor = User::factory()->create()->id;
+    $semester = Semester::factory()->create();
+    $first = erOffering($instructor, $semester);
+    $second = erOffering($instructor, $semester);
+
+    expect(array_map(
+        fn (OfferingSummary $o): int => $o->id,
+        enrollmentRecords()->offeringsTaughtBy($instructor),
+    ))->toBe([$first->id, $second->id]);
+});
+
 // ---------------------------------------------------------------------------
 // The gradable roster
 // ---------------------------------------------------------------------------

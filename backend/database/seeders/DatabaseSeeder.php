@@ -43,5 +43,12 @@ class DatabaseSeeder extends Seeder
         // registration open), Offerings over the anchor programs, and students resting in
         // every interesting state. Runs after the Catalog + Admissions seeders it reads.
         $this->call(EnrollmentSeeder::class);
+
+        // The Grading demo (Phase 4): three *completed* Semesters behind the Phase-3 pair — the
+        // only way a grade, an overdue Incomplete and its Fail-Withdrawal conversion are all
+        // demonstrable on seed day — with Department Heads, Grade Sheets resting in every state,
+        // and Students carrying a superseded Retake, a must-retake prep grade, a corrected grade
+        // and a failed external elective. Runs last: it reads all three seeders above.
+        $this->call(GradingSeeder::class);
     }
 }

@@ -63,9 +63,11 @@ cd ../frontend && npm run gate                # api:check, ESLint, Prettier, tsc
 - `backend/.env` is gitignored. Recreate with `cp .env.example .env && php artisan key:generate`;
   `.env.example` already carries the real Postgres + Sanctum config.
 - **Playwright:** run it from PowerShell too (its `webServer` spawns `php artisan serve`), and
-  **seed first** — the seeder-driven smokes are only re-runnable against a fresh seed. Use
-  `npm run e2e -- --workers=1`: the whole suite runs against one single-threaded `artisan serve`,
-  so extra workers make it slower *and* red. CI is effectively serial already.
+  **seed first** — the seeder-driven smokes are only re-runnable against a fresh seed
+  (`php artisan migrate:fresh --seed --force`; stop any leftover `artisan serve` first, or the
+  drop blocks on its connection). The suite is **serial by config** and must stay that way: it
+  shares one database and one set of seeded accounts whose UI language is server-persisted, so a
+  parallel run flips another test's locale mid-flow. See `frontend/playwright.config.ts`.
 - `git config core.autocrlf` is `true`, so `frontend/.prettierrc` sets `endOfLine: "auto"`;
   generated API artifacts are pinned LF via the root `.gitattributes`.
 - **No `gh` CLI**, which is why the issue tracker is local markdown.

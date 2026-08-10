@@ -72,6 +72,76 @@ export const UnassignADeanFromAFacultyResponse = zod.looseObject({
 
 
 /**
+ * The R06 (Department Head) users an administrator may assign to a scope — the
+ * source for the assignment screen's Head picker. Admin-only (R09/R10).
+ * @summary List assignable Department Heads.
+ */
+export const ListAssignableDepartmentHeadsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Every current assignment with the assigned Head's identity and the opaque
+ * Department id — `null` for the university-wide Preparatory scope. Admin-only
+ * (R09/R10).
+ * @summary List Department-Head↔Department assignments.
+ */
+export const ListDepartmentHeadDepartmentAssignmentsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "university_wide": zod.boolean().optional(),
+  "head_name": zod.string().optional(),
+  "head_email": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Creates one Head↔Department routing row. `department_id` is required to be
+ * *present* but may be `null`, which assigns the university-wide Preparatory
+ * scope (the Courses that belong to no Department). The user must hold the
+ * Department Head role (R06) and the (Head, scope) pair must not already exist —
+ * either fails validation (422). Admin-only (R09/R10).
+ * @summary Assign a Department Head to a scope.
+ */
+export const AssignADepartmentHeadToAScopeBody = zod.object({
+  "user_id": zod.number().describe('The Department Head (R06 user) to assign.'),
+  "department_id": zod.number().nullable().describe('The opaque Catalog Department id, or null for the university-wide Preparatory scope.')
+})
+
+export const AssignADepartmentHeadToAScopeResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "user_id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "university_wide": zod.boolean().optional(),
+  "head_name": zod.string().optional(),
+  "head_email": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Department Head from a scope.
+ */
+export const UnassignADepartmentHeadFromAScopeParams = zod.object({
+  "assignment_id": zod.number().describe('The assignment row id.')
+})
+
+export const UnassignADepartmentHeadFromAScopeResponse = zod.looseObject({
+
+})
+
+
+/**
  * Public, unauthenticated: the front door the registration screen reads to
  * know whether (and into which intake) a stranger may apply. Returns only
  * Cycles that are active and whose window contains the current moment.
@@ -1414,6 +1484,7 @@ export const ListSemestersResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 })).optional()
 })
@@ -1431,7 +1502,8 @@ export const CreateASemesterBody = zod.object({
   "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
   "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
   "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
-  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).'),
+  "grade_submission_deadline_at": zod.string().describe('When instructors must have submitted grades — on or after the semester ends (ISO 8601).')
 })
 
 export const CreateASemesterResponse = zod.object({
@@ -1448,6 +1520,7 @@ export const CreateASemesterResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 }).optional()
 })
@@ -1474,6 +1547,7 @@ export const ShowASemesterResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 }).optional()
 })
@@ -1497,7 +1571,8 @@ export const UpdateASemesterBody = zod.object({
   "registration_closes_at": zod.string().describe('When registration closes (ISO 8601).'),
   "add_drop_ends_at": zod.string().describe('End of the free add\/drop period (ISO 8601).'),
   "late_add_ends_at": zod.string().describe('End of the late-add period (ISO 8601).'),
-  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).')
+  "withdrawal_deadline_at": zod.string().describe('The withdrawal deadline (ISO 8601).'),
+  "grade_submission_deadline_at": zod.string().describe('When instructors must have submitted grades — on or after the semester ends (ISO 8601).')
 })
 
 export const UpdateASemesterResponse = zod.object({
@@ -1514,6 +1589,7 @@ export const UpdateASemesterResponse = zod.object({
   "add_drop_ends_at": zod.string().optional(),
   "late_add_ends_at": zod.string().optional(),
   "withdrawal_deadline_at": zod.string().optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
   "is_registration_open": zod.boolean().optional()
 }).optional()
 })
@@ -2645,6 +2721,7 @@ export const ListTheActingStudentsEligibleCoursesForTheOpenSemesterResponse = zo
   "capacity": zod.number().optional(),
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -2838,6 +2915,7 @@ export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterRes
   "capacity": zod.number().optional(),
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -2865,6 +2943,7 @@ export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterRes
   "course_status": zod.string().optional(),
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -2918,6 +2997,7 @@ export const FreeAddACourseToTheScheduleadddropPeriodResponse = zod.object({
   "course_status": zod.string().optional(),
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3387,6 +3467,7 @@ export const ViewAnyStudentsScheduleoversightResponse = zod.object({
   "capacity": zod.number().optional(),
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3414,6 +3495,7 @@ export const ViewAnyStudentsScheduleoversightResponse = zod.object({
   "course_status": zod.string().optional(),
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
+  "must_retake": zod.boolean().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3621,6 +3703,745 @@ export const RecordorCorrectASessionsAttendanceRegisterResponse = zod.object({
   "recorded": zod.number().optional(),
   "percentage": zod.number().optional(),
   "at_risk": zod.boolean().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Every Course Offering the acting user teaches, across all Semesters, each with its
+ * resolved Course and Semester, the Instructor it is assigned to, the number of gradable
+ * lines its Sheet would carry, and the Initial round's state — `null` while unstarted, else
+ * Draft/Submitted/Returned/Finalized (ticket 03) — the entry point to each Offering's Grade
+ * Sheet. A user who teaches nothing gets an empty list rather than an error.
+ *
+ * For a **central-entry** user — `grades.enter` without `grades.finalize`, which by §3.2 is
+ * Student Affairs — this is instead the picker over **every** Offering (ticket 09), because
+ * grades arriving on paper belong to Offerings the records office does not teach. Which of
+ * the two lists was returned is stated in `meta.scope` (`own` / `central`), so the SPA never
+ * has to re-derive the rule the server applied.
+ * @summary Offerings to grade.
+ */
+export const OfferingsToGradeResponse = zod.object({
+  "data": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "gradable_count": zod.number().optional(),
+  "sheet_status": zod.string().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional()
+})).optional(),
+  "meta": zod.object({
+  "scope": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**
+ * Enrollment. The Initial round is created **lazily** on this first open (ADR-0023) —
+ * never eagerly at semester end — and re-opening returns the same round rather than
+ * starting another. Each line carries the Student's University ID and name, resolved
+ * through Identity\Public, and the Grade already recorded for it, or `null` while the line
+ * is still blank. Audit and Withdrawn Enrollments are omitted.
+ * Authorised by assignment: an Instructor opening an Offering they do not teach gets a 403.
+ * A central-entry user (ticket 09) reaches any Offering's Sheet here, and opening one — a
+ * read — is not audited; their line writes are.
+ * @summary Open an Offering's Grade Sheet.
+ */
+export const OpenAnOfferingsGradeSheetParams = zod.object({
+  "offering_id": zod.number().describe('The ID of the course offering.')
+})
+
+export const OpenAnOfferingsGradeSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().optional(),
+  "review_note": zod.string().optional()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "incomplete": zod.string().nullish()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Records the final percentage for a single line and returns the Letter Grade and GPA
+ * points the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale
+ * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
+ * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
+ * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
+ * Sheet is a 404. Authorised by assignment — the Offering's Instructor, or a central-entry
+ * user keying grades in for someone else's Offering (ticket 09), whose write is recorded in
+ * the Audit Log; anyone else is a 403.
+ *
+ * On an **Initial** round, a line may be marked Incomplete instead — send
+ * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
+ * figure below the configured threshold is a 422 naming the field. Entering one supersedes
+ * the other on the same line: a mark clears an earlier Incomplete declaration and an
+ * Incomplete declaration clears an earlier mark.
+ * @summary Save one Grade Sheet line.
+ */
+export const SaveOneGradeSheetLineParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.'),
+  "enrollment_id": zod.number().describe('The ID of the enrollment being marked.')
+})
+
+export const SaveOneGradeSheetLineBody = zod.object({
+  "mark": zod.number().optional().describe('The final percentage, 0–100 with at most two decimals. Required unless declaring an Incomplete.'),
+  "completion_percentage": zod.number().optional().describe('The coursework percentage completed, 0–100. Declares an Incomplete in place of a mark; requires `reason`.'),
+  "reason": zod.string().optional().describe('The reason for the Incomplete. Required alongside `completion_percentage`.')
+})
+
+export const SaveOneGradeSheetLineResponse = zod.union([zod.object({
+  "data": zod.object({
+  "enrollment_id": zod.number().optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "incomplete": zod.string().nullish()
+}).optional()
+}).describe('a mark'),zod.object({
+  "data": zod.object({
+  "enrollment_id": zod.number().optional(),
+  "grade": zod.string().nullish(),
+  "incomplete": zod.object({
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional()
+}).optional()
+}).optional()
+}).describe('an incomplete declaration')])
+
+
+/**
+ * Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only
+ * the selected lines (ADR-0023): the original round is untouched and remains finalized
+ * throughout. The returned round is then edited, signed and Department-Head-reviewed
+ * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
+ * Instructor who teaches this Offering may start a correction on it. Central entry (ticket
+ * 09) does **not** reach here: keying marks into a Draft round is data entry, reopening the
+ * finalized record is the Instructor's own judgement. Once they have started one, its lines
+ * are an ordinary Draft Sheet that central entry may key like any other.
+ * @summary Open a Correction round against a finalized Sheet.
+ */
+export const OpenACorrectionRoundAgainstAFinalizedSheetParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the finalized sheet being corrected.')
+})
+
+export const OpenACorrectionRoundAgainstAFinalizedSheetBody = zod.object({
+  "enrollment_ids": zod.array(zod.number()).describe('The enrollment ids to correct from that finalized sheet.')
+})
+
+export const OpenACorrectionRoundAgainstAFinalizedSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.string().nullish(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "incomplete": zod.string().nullish()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * A previously-opened Correction round, read by its own Sheet id so the SPA can return to
+ * it directly. The round contains only the selected lines persisted on it at creation time;
+ * the original finalized Sheet it corrects is untouched. Authorised by the same Offering
+ * assignment as every other Instructor Sheet.
+ * @summary Open one Correction round.
+ */
+export const OpenOneCorrectionRoundParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the correction round.')
+})
+
+export const OpenOneCorrectionRoundResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.string().nullish(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "incomplete": zod.string().nullish()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Every unresolved, unconverted Incomplete declared on an Offering the acting user
+ * teaches, each with the Student it names and its derived resolution deadline — `null`
+ * while the next Semester does not exist in the Calendar yet (declaring, and viewing, are
+ * never blocked for an admin's omission).
+ * @summary My outstanding Incompletes.
+ */
+export const MyOutstandingIncompletesResponse = zod.object({
+  "data": zod.array(zod.object({
+  "incomplete_id": zod.number().optional(),
+  "enrollment_id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional(),
+  "deadline": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * Lazily opens the `IncompleteResolution` Sheet round for one outstanding Incomplete — a
+ * single line, the Incomplete's own Enrollment — or returns the round already open for it
+ * (the Initial round's lazy-open precedent). From here, entering the mark, signing and
+ * Department-Head finalization all behave exactly as ticket 03 established: the returned
+ * Sheet id is used with {@see GradeSheetController::saveLine()}/{@see GradeSheetController::sign()}
+ * and the Department Head's queue/show/finalize/return, all unchanged. A 409 when the
+ * Incomplete has already been resolved or converted.
+ * @summary Open (or resume) the Incomplete's resolution round.
+ */
+export const OpenorResumeTheIncompletesResolutionRoundParams = zod.object({
+  "incomplete_id": zod.number().describe('The ID of the incomplete.')
+})
+
+export const OpenorResumeTheIncompletesResolutionRoundResponse = zod.union([zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.string().nullish(),
+  "incomplete": zod.object({
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional()
+}).optional()
+})).optional()
+}).optional()
+}).describe('freshly opened, no mark entered yet'),zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().nullish(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "incomplete": zod.object({
+  "completion_percentage": zod.number().optional(),
+  "reason": zod.string().optional()
+}).optional()
+})).optional()
+}).optional()
+}).describe('the outstanding mark already entered')])
+
+
+/**
+ * The Instructor's signature — one act that sends the whole round to the Department Head
+ * (SRS §4.7.1.4). Draft or Returned → Submitted (ADR-0023); any other current state is a
+ * 409. Refused with a 422 naming how many lines are still blank — the UI already shows
+ * that count from the Sheet's own lines, so this is a defence against a stale client, not
+ * the Instructor's first signal. Once Submitted, the Sheet is read-only to everyone,
+ * including its own Instructor, and every configured Department Head (or the
+ * university-wide Head for a department-less Preparatory Offering) is notified.
+ * @summary Sign the Sheet.
+ */
+export const SignTheSheetParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const SignTheSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Every Submitted Grade Sheet routed to the acting Head's Department(s) — including, for a
+ * Head assigned university-wide, the department-less Preparatory Offerings a
+ * Department-scoped Head never sees ({@see ScopesToDepartmentHead}). Oldest signature
+ * first.
+ * @summary The Department Head's review queue.
+ */
+export const TheDepartmentHeadsReviewQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "instructor": zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "email": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * Every mark, letter and Incomplete on the round, the Student identity per line, and the
+ * Offering's grade distribution — a view, not a report (Phase 7 owns reporting). Scoped
+ * exactly as the queue: a Sheet outside the acting Head's Department is a 403, regardless
+ * of its status.
+ * @summary Open one Sheet for review.
+ */
+export const OpenOneSheetForReviewParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const OpenOneSheetForReviewResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().nullish(),
+  "review_note": zod.string().nullish()
+}).optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "lines": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "incomplete": zod.string().nullish()
+})).optional(),
+  "distribution": zod.array(zod.object({
+  "letter": zod.string().optional(),
+  "count": zod.number().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * Submitted → Finalized (else a 409): the round's Grades become part of the academic
+ * record and the round is permanently closed (ADR-0023). In the same transaction, for each
+ * Grade, `earned` — "this Attempt reached C+ and earned its credit hours" — is written onto
+ * its Enrollment through `Enrollment\Public` (ADR-0022): a plain
+ * {@see EnrollmentRecords::recordOutcome()} normally, or, when the Grade resolves an
+ * outstanding Incomplete (this round is an `IncompleteResolution`, ticket 05),
+ * {@see EnrollmentRecords::resolveIncomplete()} instead — which also restores the Course
+ * Status the Enrollment held before it became Incomplete. On an **Initial** round, every
+ * line declared Incomplete instead of graded (no Grade row) becomes one through
+ * {@see EnrollmentRecords::markIncomplete()}, in the same transaction — no grade, and no
+ * Incomplete, enters the record on one signature. After commit, `GradeFinalized` fires for
+ * its side effects only: one notification per graded Student (their letter and whether it
+ * fell below C+), and one per newly-declared Incomplete (the reason and its derived
+ * deadline).
+ * @summary Finalize the Sheet.
+ */
+export const FinalizeTheSheetParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const FinalizeTheSheetResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().optional(),
+  "review_note": zod.string().nullish()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Submitted → Returned (else a 409): the round becomes editable and re-signable again, and
+ * the note reaches the Instructor as a notification. A note is required — a bilingual 422
+ * when it is missing.
+ * @summary Return the Sheet with a note.
+ */
+export const ReturnTheSheetWithANoteParams = zod.object({
+  "grade_sheet_id": zod.number().describe('The ID of the grade sheet.')
+})
+
+export const ReturnTheSheetWithANoteBody = zod.object({
+  "note": zod.string().describe('Why the sheet is being returned.')
+})
+
+export const ReturnTheSheetWithANoteResponse = zod.object({
+  "data": zod.object({
+  "sheet": zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "status": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "reviewed_at": zod.string().optional(),
+  "review_note": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary My Grades.
+ */
+export const MyGradesResponse = zod.object({
+  "data": zod.object({
+  "cgpa": zod.number().optional(),
+  "semesters": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "gpa": zod.number().optional(),
+  "courses": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "credit_hours": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "earned": zod.boolean().optional(),
+  "superseded": zod.boolean().optional(),
+  "must_retake": zod.boolean().optional(),
+  "incomplete_deadline": zod.string().nullish()
+})).optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * A searchable picker population for the grade-oversight screen: Advisors see their live
+ * advisees; Department Heads the Students in Programs under their Departments; Deans the
+ * Students in their Faculties; Instructors the Students on Offerings they teach; Student
+ * Affairs, Council and administrators every Student. Each row carries the same lightweight
+ * Student context the existing register-for-student picker renders.
+ * @summary The students whose grades the reviewer may inspect.
+ */
+export const TheStudentsWhoseGradesTheReviewerMayInspectResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "name": zod.string().optional(),
+  "university_id": zod.string().optional(),
+  "enrollment_term": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "current_load": zod.string().nullish(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional()
+}).optional()
+})).optional()
+})
+
+
+/**
+ * The exact academic-record payload the Student's own My Grades page reads — CGPA,
+ * Semester GPAs, superseded attempts, Incomplete deadlines and must-retake markers — but
+ * for a reviewer whose role legitimately covers the target Student.
+ * @summary One Student's grade record for a scoped reviewer.
+ */
+export const OneStudentsGradeRecordForAScopedReviewerParams = zod.object({
+  "student_id": zod.number().describe('The target Student anchor\'s id.')
+})
+
+export const OneStudentsGradeRecordForAScopedReviewerResponse = zod.object({
+  "data": zod.object({
+  "cgpa": zod.number().optional(),
+  "semesters": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "gpa": zod.number().optional(),
+  "courses": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional(),
+  "credit_hours": zod.number().optional(),
+  "course_status": zod.string().optional(),
+  "grade": zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional()
+}).optional(),
+  "grade_history": zod.array(zod.object({
+  "mark": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "gpa_points": zod.number().optional(),
+  "finalized_at": zod.string().optional(),
+  "superseded": zod.boolean().optional()
+})).optional(),
+  "earned": zod.boolean().optional(),
+  "superseded": zod.boolean().optional(),
+  "must_retake": zod.boolean().optional(),
+  "incomplete_deadline": zod.string().nullish()
+})).optional()
 })).optional()
 }).optional()
 })

@@ -356,14 +356,106 @@ register — a deliberate SRS extension).
   course (W chip), and the Instructor cancels a session and marks a register until an
   audit-at-risk flag appears.
 
-### Phase 4 — Grading & GPA/CGPA (SRS §4.7)
-- **Grading module:** instructor mark entry → auto letter-grade mapping (Appendix A) →
-  sign/finalize → Department-Head review → `GradeFinalized`.
-- Incomplete handling: I allowed at ≥70% completion; **artisan command** converts
-  unresolved I→FW at the deadline; reminder logic recorded as in-app notifications.
-- **GPA/CGPA calculation** — the SRS §4.7.2 gap; resolve the agenda in §5 first, then
-  implement test-first.
-- **Demo:** grades entered, signed, reviewed, finalized; GPA/CGPA displayed.
+### Phase 4 — Grading & GPA/CGPA (SRS §4.7; §4.4.6's grade-gated rules, deferred from Phase 3)
+The design below was sharpened in a `/grill-with-docs` session; the resolved glossary lives in
+[CONTEXT.md](../CONTEXT.md) (Grade, Mark, Letter Grade, Grade Sheet, Attempt, Incomplete, Fail
+Withdrawal, CGPA Improvement, Quality Points) and the hard-to-reverse choices in
+[ADR-0020](./adr/0020-grading-owns-gpa-read-model.md) (Grading owns the GPA/CGPA read model,
+amending [architecture.md](./architecture.md) §5),
+[ADR-0021](./adr/0021-grading-scale-uniform-bands.md) (a uniform grading scale replacing SRS
+Appendix A's non-contiguous bands),
+[ADR-0022](./adr/0022-grade-outcome-pushed-to-enrollment.md) (the `earned` bit pushed across
+the seam to keep `Grading → Enrollment` one-way) and
+[ADR-0023](./adr/0023-grade-sheet-submission-rounds.md) (the Grade Sheet is a submission
+round). **§5's GPA/CGPA agenda is closed by this phase** — see below.
+
+- **New `Grading` module** owning the Grade, the Grade Sheet, the Incomplete and the GPA/CGPA
+  read model (ADR-0020 — *not* Records, which is a Phase-6 document-issuance context). New
+  deptrac edges: `Grading_Internal → {Identity, Catalog, Calendar, Enrollment,
+  Notifications}\Public`, `App → Grading\Public`.
+- **`Enrollment\Public` finally ships** (ADR-0017's deferral, now due): roster and Enrollment
+  reads as DTOs with opaque ids, plus four commands (`recordOutcome`, `markIncomplete`,
+  `resolveIncomplete`, `convertIncompleteToFailWithdrawal`) so **Enrollment stays the sole
+  writer of `course_status`**. The dependency runs **one way** (ADR-0022): at finalize Grading
+  pushes a single nullable `earned` boolean — "this Attempt reached C+" — so Enrollment's
+  registration gates stay pure functions over its own rows and there is no `Public↔Public` cycle.
+- **The scale** (ADR-0021): nine letters A+…F as a `LetterGrade` enum carrying its own points
+  and band — uniform five-point bands, total over 0–100, **replacing** Appendix A's
+  non-contiguous ones (which left 91 unrepresentable) and moving the minimum pass from 77% to
+  75%. No P/FL, no A−/B−/C−. One **Mark** per Enrollment; letter and points derived and
+  **frozen** onto the Grade, so a later scale change never rewrites a grade already given.
+- **Grade Sheet = one submission round for one Offering** (ADR-0023), created lazily on first
+  open: `Draft → Submitted → Finalized`, or `Submitted → Returned → Draft`; kinds Initial /
+  IncompleteResolution / Correction; illegal transition = **409** (the Admissions precedent).
+  A Finalized round is **never reopened** — correcting it means a Correction round carrying only
+  the affected lines. **Supersession is derived, never stored:** the current Grade is the one on
+  the latest Finalized Sheet, and the earlier one stays visible as history.
+- **Routing and authority:** a Sheet routes to the Department Head of its Course's Department
+  via a new Identity **Department-Head assignment** whose department reference is **nullable** —
+  NULL being the university-wide scope, so the department-less Preparatory Courses route with
+  **no special case** (ADR-0010). The §3.2 matrix is **untouched**: entry is `grades.enter`
+  (Instructor + SA), signing and review are `grades.finalize`, and *which* Sheet is authorised by
+  assignment. SA keys in marks centrally but can never sign; every such write is audited.
+- **GPA/CGPA — closing SRS §4.7.2:** `Σ(points × CH) ÷ Σ(CH)` over CGPA-counting,
+  non-superseded, graded Enrollments; Semester GPA is the same sum restricted to a term. Counting
+  is Phase 3's Appendix-D matrix, read never reimplemented; **earning** credit is a separate
+  `≥ C+` test, so a D counts fully and earns nothing. Among a Course's Attempts only the
+  chronologically latest by the Semester's **`starts_at`** counts (Fall precedes the following
+  Spring) — unconditionally, so a worse Retake genuinely lowers the CGPA. Accumulated in integer
+  hundredths and **rounded half-up to two decimals exactly once**, that one figure authoritative
+  for display *and* every threshold. **No CGPA-counting graded Enrollment ⇒ `null`, not 0.00.**
+  Computed **on demand, never stored or cached** (§1 — no Redis, so it cannot drift).
+- **Incomplete** (SRS §4.7.3): declared on a Sheet line in place of a mark with a completion
+  percentage (≥ 70, config-driven) and a reason — an attestation, not a measurement (ADR-0019).
+  Its **deadline is derived, never stored**: the following Semester's `starts_at` + 63 days
+  (week 10), so correcting a start date moves every outstanding deadline with it. Resolution is
+  its own round landing in the *original* Semester's GPA. **FW is reachable only from an
+  unresolved Incomplete** — no administrative late-withdrawal path, no Instructor-assigned FW.
+- **The grade-gated registration rules Phase 3 documented as hooks become real:** one combined
+  allowance of **at most two for-credit Attempts** ever; the second is a `Retake` below C+ and a
+  `CgpaImprovement` at or above it; registration refused while an earlier Attempt is an
+  unresolved Incomplete; a **failed external elective frees** the lifetime external allowance
+  (FR-REG-006.4); `RetakeDeriver` renamed **`AttemptDeriver`**. FR-REG-006.5's "must retake" is a
+  **visible marker, not a gate** — the house style throughout.
+- **Calendar gains exactly one column**, the grade-submission deadline
+  (`ends_at ≤ deadline`); exam-period/holiday columns stay deferred (ADR-0018 forbids
+  anticipatory schema). **Catalog is unchanged.**
+- **Three manually-run commands** (ADR-0005, the `admissions:flag-overdue` precedent) —
+  flag-and-notify only, except the conversion the SRS mandates:
+  `grading:convert-expired-incompletes` (the one that changes state; skips and *reports* an
+  Incomplete whose next Semester does not exist yet), `grading:send-incomplete-reminders`
+  (fires on an exact 28/14/7/1-day match, so no sent-marker is needed) and
+  `grading:flag-late-sheets`.
+- **Notifications:** seven new in-app types — sheet submitted/returned, grade finalized
+  (carrying the letter *and* whether it fell below C+, so the must-retake warning needs no second
+  type), Incomplete declared/reminder/converted, grades overdue. Advisors deliberately excluded
+  (§4.8's advisor copy is Phase 5's standing module).
+- **Frontend:** new `features/grading`, **no new dependencies** — the Instructor's sheet list and
+  MUI-`Table` editor with a live client-mirrored letter preview (ADR-0014;
+  `@mui/x-data-grid` stays deferred to Phase 7), outstanding Incompletes + resolution, the
+  Department Head's queue and review (finalize / return with a note, plus the distribution),
+  Student **My Grades**, Advisor/SA scoped oversight, and SA central entry reusing the same
+  editor. New **grading nav section**; Department-Head assignment joins `features/admin`.
+- **DoD:** Pest feature-first + targeted units (the scale at **every band boundary and both
+  sides**, quality-points accumulation and half-up rounding including a case that rounds *across*
+  a threshold, supersession across a Fall→Spring boundary, the Incomplete deadline arithmetic);
+  **one multi-role Playwright smoke** (instructor grades + defers → head finalizes → student sees
+  their GPA/CGPA as a **value** → the conversion command runs → the student sees the Fail
+  Withdrawal) + axe; Scribe `@urlParam` examples on all model-bound routes. Deterministic seeder:
+  **three completed Semesters behind Phase 3's pair** (windows relative to seed time) so an
+  Incomplete is genuinely overdue on seed day, Sheets in every state incl. a Correction round,
+  Department Heads per Department + one university-wide (and one Department deliberately
+  uncovered), and Students carrying a superseded Retake, a must-retake prep grade, a corrected
+  grade and a failed external elective.
+- **Deferred:** academic standing/warnings + the Credit-Hour Summary, and
+  exemption/transfer/waiver (Phase 5 — `GradeFinalized` is their hook); transcripts and the
+  AU/W/FW/I grade-column projection (Phase 6); the GPA-distribution report (Phase 7); grade
+  appeals as a student-initiated workflow; assessment components/weights/curves and letter
+  overrides; blocking registration on an outstanding must-retake obligation; caching the CGPA.
+- **Demo:** an Instructor opens a completed term's grade sheet, marks one student and defers
+  another with a reason, and signs; the Department Head reads the distribution and finalizes;
+  the student sees their letter, Semester GPA and CGPA; the conversion command runs and the
+  deferred student's Incomplete has become a Fail Withdrawal.
 
 ### Phase 5 — Academic Standing + Credit-Hour Summary + Exemption/Transfer/Waiver (SRS §4.8, §4.5, §4.6)
 - **Derived read models** (on-demand): per-category Credit-Hour Summary (Appendix D
@@ -404,23 +496,36 @@ register — a deliberate SRS extension).
 
 ---
 
-## 5. Phase 4 GPA/CGPA agenda (deferred from alignment)
+## 5. Phase 4 GPA/CGPA agenda — **CLOSED**
 
-SRS §4.7.2 is intentionally blank. Resolve these — via a focused `/domain-modeling`
-drill at the start of Phase 4 — before implementing, and record the outcomes in
-`CONTEXT.md` (+ an ADR on the counting interpretation if it proves contentious):
+SRS §4.7.2 was intentionally blank. All seven items were resolved during Phase 4's
+`/grill-with-docs` session and are implemented; the resolutions live in the Phase 4 section
+above, in [CONTEXT.md](../CONTEXT.md), and in
+[ADR-0020](./adr/0020-grading-owns-gpa-read-model.md) /
+[ADR-0021](./adr/0021-grading-scale-uniform-bands.md). Kept here as the record of what was
+asked and what was decided:
 
-1. **Prep-course CGPA treatment** — letter-graded and counted (favoured by BR-56's
-   "below C+ → retake"), or Pass/Fail and excluded?
-2. **Formula** — confirm quality-points weighted average
-   `Σ(points × CH) / Σ(CH)` over CGPA-counted courses.
-3. **Different-elective retake penalty** — BR-55/Appendix D say *both* the failed
-   elective and the replacement count in CGPA. Confirm and model.
-4. **Earn threshold vs CGPA** — C+ (2.5) is required to earn a course's CH, but sub-C+
-   grades still count in the CGPA denominator. Confirm.
-5. **Incomplete → FW** denominator effects (excluded until resolved; FW excluded).
-6. **Transfer / Waive / Exempted** — count toward Required CH, excluded from CGPA.
-7. **Rounding / precision** — compute full precision, display 2 dp; rounding mode.
+1. **Prep-course CGPA treatment** → **letter-graded and counted.** BR-56's "below C+ →
+   retake" and §4.8's termination criterion both need it; **P/FL is not modelled at all**.
+2. **Formula** → confirmed: `Σ(points × CH) ÷ Σ(CH)` over CGPA-counting, non-superseded,
+   graded Enrollments. Semester GPA is the same sum restricted to one Semester.
+3. **Different-elective retake penalty** → confirmed: different Courses never supersede each
+   other, so FR-REG-006.4's "all grades count" needed **no code at all**. Supersession applies
+   only among Attempts *of the same Course*, and picks the chronologically latest by the
+   Semester's `starts_at` — unconditionally, so a worse Retake genuinely lowers the CGPA.
+4. **Earn threshold vs CGPA** → confirmed and kept **independent**: every letter from A+ to F
+   counts (F at 0.00 included), while *earning* a Course's credit hours is a separate `≥ C+`
+   (2.50) test pushed onto the Enrollment as `earned` (ADR-0022). A D counts fully and earns
+   nothing.
+5. **Incomplete → FW** → Incomplete excluded from CGPA *and* Earned CH until resolved, and
+   counted in the Semester it was originally taken once it is; **FW excluded permanently**.
+6. **Transfer / Waive / Exempted** → confirmed: Required CH yes, CGPA no — already encoded in
+   Phase 3's Appendix-D matrix; the workflows themselves stay Phase 5.
+7. **Rounding / precision** → accumulate `Σ(points × 100 × CH)` in **integer hundredths** (no
+   float drift), divide, then **round half-up to two decimals exactly once** — and that single
+   figure is authoritative for display *and* for every threshold test (graduation `≥ 3.0`,
+   Phase 5's probation `< 3.0`), so display and decisions can never disagree. With no
+   CGPA-counting graded Enrollment the CGPA is **`null`**, not 0.00, and renders as a dash.
 
 ---
 

@@ -1,6 +1,8 @@
 import { Button, Stack, TableCell, TableRow, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
+import { StatusChip } from '../../../shared/ui/StatusChip'
+import { mustRetakeChip } from '../mustRetakeChip'
 import type { EligibleCourse } from './classification'
 
 interface EligibleCourseRowProps {
@@ -28,10 +30,15 @@ export function EligibleCourseRow({ course, inCart, onToggle }: EligibleCourseRo
   return (
     <TableRow hover>
       <TableCell>
-        <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
-          {catalogCourse?.code}
-        </Typography>{' '}
-        {courseName}
+        <Stack spacing={0.75} sx={{ alignItems: 'flex-start' }}>
+          <Typography variant="body2">
+            <Typography component="span" variant="body2" sx={{ fontWeight: 600 }}>
+              {catalogCourse?.code}
+            </Typography>{' '}
+            {courseName}
+          </Typography>
+          {course.must_retake && <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />}
+        </Stack>
       </TableCell>
       <TableCell>{course.instructor?.name}</TableCell>
       <TableCell>

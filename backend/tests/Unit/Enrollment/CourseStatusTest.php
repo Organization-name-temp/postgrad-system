@@ -44,14 +44,30 @@ it('marks every status as appearing on the transcript', function () {
     }
 });
 
-it('counts only Regular and Retake as burning the retake allowance', function () {
+it('counts every for-credit re-registration status toward the one combined allowance', function () {
     $burns = array_filter(CourseStatus::cases(), fn (CourseStatus $s): bool => $s->burnsRetakeAllowance());
 
     expect(array_map(fn (CourseStatus $s): string => $s->value, $burns))
-        ->toEqualCanonicalizing(['Regular', 'Retake']);
+        ->toEqualCanonicalizing(['Regular', 'Retake', 'CgpaImprovement']);
 });
 
 it('does not burn the retake allowance for withdrawal or audit', function () {
     expect(CourseStatus::Withdrawn->burnsRetakeAllowance())->toBeFalse()
         ->and(CourseStatus::Audit->burnsRetakeAllowance())->toBeFalse();
+});
+
+it('counts only the three for-credit attempt kinds as gradable', function () {
+    // The Grade Sheet's lines (Phase 4, ADR-0023). Everything else is on the roster but is
+    // never asked for a mark — an Audit is sat without credit, a Withdrawal left, a
+    // Transfer/Waive/Exempted was decided administratively, an FW is terminal, and an
+    // Incomplete is resolved through its own later Sheet round.
+    $gradable = array_filter(CourseStatus::cases(), fn (CourseStatus $s): bool => $s->isGradable());
+
+    expect(array_map(fn (CourseStatus $s): string => $s->value, $gradable))
+        ->toEqualCanonicalizing(['Regular', 'Retake', 'CgpaImprovement']);
+});
+
+it('never treats an audit or a withdrawal as gradable', function () {
+    expect(CourseStatus::Audit->isGradable())->toBeFalse()
+        ->and(CourseStatus::Withdrawn->isGradable())->toBeFalse();
 });

@@ -52,6 +52,7 @@ class EloquentCourseCatalog implements CourseCatalog
             totalCh: $course->total_ch,
             researchType: $course->research_type?->value,
             isActive: $course->is_active,
+            departmentId: $course->department_id,
         );
     }
 }

@@ -28,6 +28,18 @@ interface AcademicCalendar
     public function find(int $id): ?SemesterSummary;
 
     /**
+     * The summaries for the given Semester ids, keyed by id; ids with no matching Semester are
+     * simply absent from the result. Lets a screen or a command resolve several Semesters in one
+     * read instead of N single lookups — the `CourseCatalog::findMany()` shape. Grading is the
+     * first consumer: its Offering picker spans every Semester, and its late-Sheet flagging
+     * command reads each Offering's Semester deadline.
+     *
+     * @param  list<int>  $ids
+     * @return array<int, SemesterSummary>
+     */
+    public function findMany(array $ids): array;
+
+    /**
      * The Semester whose registration window is open right now, or `null` when none
      * is — the front the student registration screen reads (user story 13). If more
      * than one qualifies (an operator error the ordering invariant does not prevent
@@ -40,4 +52,14 @@ interface AcademicCalendar
      * The most recent by year is returned if more than one qualifies.
      */
     public function running(): ?SemesterSummary;
+
+    /**
+     * The Semester whose `starts_at` is the earliest one **after** the given Semester's own —
+     * never by (year, term), since Fall precedes the following Spring (the same ordering rule
+     * Grading's CGPA supersession follows). `null` when `$semesterId` does not exist, or when
+     * it is the last Semester on the Calendar so far (an admin has not entered the next one
+     * yet). Ticket 05's Incomplete deadline is derived from this Semester's `starts_at`, so a
+     * later correction to it moves every outstanding deadline with it — nothing is frozen.
+     */
+    public function nextAfter(int $semesterId): ?SemesterSummary;
 }

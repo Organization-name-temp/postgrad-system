@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router-dom'
 import type { AxiosRequestConfig } from 'axios'
 import '../../../shared/i18n/config' // initialise i18next so useTranslation works
 import { StudentSchedulePage } from './StudentSchedulePage'
@@ -34,7 +35,9 @@ function renderPage() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
-      <StudentSchedulePage />
+      <MemoryRouter>
+        <StudentSchedulePage />
+      </MemoryRouter>
     </QueryClientProvider>,
   )
 }
@@ -67,6 +70,7 @@ const scheduleGroup = {
       course_status: 'Regular',
       classification: 'Core',
       credit_hours: 3,
+      must_retake: false,
       course: {
         id: 1,
         code: 'DEP501',
@@ -99,6 +103,10 @@ describe('StudentSchedulePage', () => {
     expect(await screen.findByText('DEP501')).toBeInTheDocument()
     expect(screen.getByText('Fall 2026')).toBeInTheDocument()
     expect(screen.getByText('80%')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /student grades/i })).toHaveAttribute(
+      'href',
+      '/grading/students/5',
+    )
     // Read-only: no drop / withdraw actions on the oversight view.
     expect(screen.queryByRole('button', { name: /drop|withdraw/i })).not.toBeInTheDocument()
   }, 20000)
@@ -113,5 +121,24 @@ describe('StudentSchedulePage', () => {
     await user.click(await screen.findByRole('option', { name: /Sara Student/i }))
 
     expect(await screen.findByText(/no enrollments yet/i)).toBeInTheDocument()
+  }, 20000)
+
+  it('shows the must-retake marker on oversight schedule rows', async () => {
+    srv.schedule = {
+      data: [
+        {
+          ...scheduleGroup,
+          enrollments: [{ ...scheduleGroup.enrollments[0], must_retake: true }],
+        },
+      ],
+    }
+    const user = userEvent.setup()
+    renderPage()
+
+    const picker = await screen.findByRole('combobox', { name: /choose a student/i })
+    await user.click(picker)
+    await user.click(await screen.findByRole('option', { name: /Sara Student/i }))
+
+    expect(await screen.findByText(/must retake/i)).toBeInTheDocument()
   }, 20000)
 })

@@ -99,6 +99,86 @@ export type UnassignADeanFromAFaculty404 = {
   message?: string;
 };
 
+export type ListAssignableDepartmentHeads200DataItem = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type ListAssignableDepartmentHeads200 = {
+  data?: ListAssignableDepartmentHeads200DataItem[];
+};
+
+export type ListAssignableDepartmentHeads403 = {
+  message?: string;
+};
+
+export type ListDepartmentHeadDepartmentAssignments200DataItem = {
+  id?: number;
+  user_id?: number;
+  department_id?: number;
+  university_wide?: boolean;
+  head_name?: string;
+  head_email?: string;
+};
+
+export type ListDepartmentHeadDepartmentAssignments200 = {
+  data?: ListDepartmentHeadDepartmentAssignments200DataItem[];
+};
+
+export type ListDepartmentHeadDepartmentAssignments403 = {
+  message?: string;
+};
+
+export type AssignADepartmentHeadToAScopeBody = {
+  /** The Department Head (R06 user) to assign. */
+  user_id: number;
+  /**
+     * The opaque Catalog Department id, or null for the university-wide Preparatory scope.
+     * @nullable
+     */
+  department_id: number | null;
+};
+
+export type AssignADepartmentHeadToAScope201Data = {
+  id?: number;
+  user_id?: number;
+  department_id?: number;
+  university_wide?: boolean;
+  head_name?: string;
+  head_email?: string;
+};
+
+export type AssignADepartmentHeadToAScope201 = {
+  data?: AssignADepartmentHeadToAScope201Data;
+};
+
+export type AssignADepartmentHeadToAScope403 = {
+  message?: string;
+};
+
+export type AssignADepartmentHeadToAScope422 = {
+  message?: string;
+  errors?: {
+  user_id?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  department_id?: string[];
+};
+};
+
+export type UnassignADepartmentHeadFromAScope204 = { [key: string]: unknown };
+
+export type UnassignADepartmentHeadFromAScope403 = {
+  message?: string;
+};
+
+export type UnassignADepartmentHeadFromAScope404 = {
+  message?: string;
+};
+
 export type ListCurrentlyOpenAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -1643,6 +1723,7 @@ export type ListSemesters200DataItem = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -1669,6 +1750,8 @@ export type CreateASemesterBody = {
   late_add_ends_at: string;
   /** The withdrawal deadline (ISO 8601). */
   withdrawal_deadline_at: string;
+  /** When instructors must have submitted grades — on or after the semester ends (ISO 8601). */
+  grade_submission_deadline_at: string;
 };
 
 export type CreateASemester201Data = {
@@ -1684,6 +1767,7 @@ export type CreateASemester201Data = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -1713,6 +1797,7 @@ export type ShowASemester200Data = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -1739,6 +1824,8 @@ export type UpdateASemesterBody = {
   late_add_ends_at: string;
   /** The withdrawal deadline (ISO 8601). */
   withdrawal_deadline_at: string;
+  /** When instructors must have submitted grades — on or after the semester ends (ISO 8601). */
+  grade_submission_deadline_at: string;
 };
 
 export type UpdateASemester200Data = {
@@ -1754,6 +1841,7 @@ export type UpdateASemester200Data = {
   add_drop_ends_at?: string;
   late_add_ends_at?: string;
   withdrawal_deadline_at?: string;
+  grade_submission_deadline_at?: string;
   is_registration_open?: boolean;
 };
 
@@ -2891,6 +2979,7 @@ export type ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCourses
   capacity?: number;
   seats_remaining?: number;
   total_ch?: number;
+  must_retake?: boolean;
   course?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemCourse;
   instructor?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemInstructor;
   meetings?: ListTheActingStudentsEligibleCoursesForTheOpenSemester200DataCoursesItemMeetingsItem[];
@@ -3110,6 +3199,7 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
   capacity?: number;
   seats_remaining?: number;
   total_ch?: number;
+  must_retake?: boolean;
   course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemCourse;
   instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemInstructor;
   meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemAddableCoursesItemMeetingsItem[];
@@ -3152,6 +3242,7 @@ export type TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200D
   course_status?: string;
   classification?: string;
   credit_hours?: number;
+  must_retake?: boolean;
   course?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemCourse;
   instructor?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemInstructor;
   meetings?: TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemester200DataItemEnrollmentsItemMeetingsItem[];
@@ -3219,6 +3310,7 @@ export type FreeAddACourseToTheScheduleadddropPeriod201Data = {
   course_status?: string;
   classification?: string;
   credit_hours?: number;
+  must_retake?: boolean;
   course?: FreeAddACourseToTheScheduleadddropPeriod201DataCourse;
   instructor?: FreeAddACourseToTheScheduleadddropPeriod201DataInstructor;
   meetings?: FreeAddACourseToTheScheduleadddropPeriod201DataMeetingsItem[];
@@ -3742,6 +3834,7 @@ export type ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItem = {
   capacity?: number;
   seats_remaining?: number;
   total_ch?: number;
+  must_retake?: boolean;
   course?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemCourse;
   instructor?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemInstructor;
   meetings?: ViewAnyStudentsScheduleoversight200DataItemAddableCoursesItemMeetingsItem[];
@@ -3784,6 +3877,7 @@ export type ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItem = {
   course_status?: string;
   classification?: string;
   credit_hours?: number;
+  must_retake?: boolean;
   course?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemCourse;
   instructor?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemInstructor;
   meetings?: ViewAnyStudentsScheduleoversight200DataItemEnrollmentsItemMeetingsItem[];
@@ -4003,6 +4097,831 @@ export type RecordorCorrectASessionsAttendanceRegister422Errors = {
 export type RecordorCorrectASessionsAttendanceRegister422 = {
   message?: string;
   errors?: RecordorCorrectASessionsAttendanceRegister422Errors;
+};
+
+export type OfferingsToGrade200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type OfferingsToGrade200DataItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type OfferingsToGrade200DataItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type OfferingsToGrade200DataItem = {
+  offering_id?: number;
+  gradable_count?: number;
+  sheet_status?: string;
+  course?: OfferingsToGrade200DataItemCourse;
+  semester?: OfferingsToGrade200DataItemSemester;
+  instructor?: OfferingsToGrade200DataItemInstructor;
+};
+
+export type OfferingsToGrade200Meta = {
+  scope?: string;
+};
+
+export type OfferingsToGrade200 = {
+  data?: OfferingsToGrade200DataItem[];
+  meta?: OfferingsToGrade200Meta;
+};
+
+export type OpenAnOfferingsGradeSheet200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  signed_at?: string;
+  reviewed_at?: string;
+  review_note?: string;
+};
+
+export type OpenAnOfferingsGradeSheet200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OpenAnOfferingsGradeSheet200DataLinesItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type OpenAnOfferingsGradeSheet200DataLinesItemGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type OpenAnOfferingsGradeSheet200DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OpenAnOfferingsGradeSheet200DataLinesItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: OpenAnOfferingsGradeSheet200DataLinesItemStudent;
+  grade?: OpenAnOfferingsGradeSheet200DataLinesItemGrade;
+  grade_history?: OpenAnOfferingsGradeSheet200DataLinesItemGradeHistoryItem[];
+  /** @nullable */
+  incomplete?: string | null;
+};
+
+export type OpenAnOfferingsGradeSheet200Data = {
+  sheet?: OpenAnOfferingsGradeSheet200DataSheet;
+  course?: OpenAnOfferingsGradeSheet200DataCourse;
+  lines?: OpenAnOfferingsGradeSheet200DataLinesItem[];
+};
+
+export type OpenAnOfferingsGradeSheet200 = {
+  data?: OpenAnOfferingsGradeSheet200Data;
+};
+
+export type OpenAnOfferingsGradeSheet403 = {
+  message?: string;
+};
+
+export type OpenAnOfferingsGradeSheet404 = {
+  message?: string;
+};
+
+export type SaveOneGradeSheetLineBody = {
+  /** The final percentage, 0–100 with at most two decimals. Required unless declaring an Incomplete. */
+  mark?: number;
+  /** The coursework percentage completed, 0–100. Declares an Incomplete in place of a mark; requires `reason`. */
+  completion_percentage?: number;
+  /** The reason for the Incomplete. Required alongside `completion_percentage`. */
+  reason?: string;
+};
+
+export type SaveOneGradeSheetLine200 = {
+  data?: {
+  enrollment_id?: number;
+  grade?: {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+  /** @nullable */
+  incomplete?: string | null;
+};
+} | {
+  data?: {
+  enrollment_id?: number;
+  /** @nullable */
+  grade?: string | null;
+  incomplete?: {
+  completion_percentage?: number;
+  reason?: string;
+};
+};
+};
+
+export type SaveOneGradeSheetLine403 = {
+  message?: string;
+};
+
+export type SaveOneGradeSheetLine404 = {
+  message?: string;
+};
+
+export type SaveOneGradeSheetLine422 = {
+  message?: string;
+  errors?: {
+  mark?: string[];
+};
+} | {
+  message?: string;
+  errors?: {
+  completion_percentage?: string[];
+};
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheetBody = {
+  /** The enrollment ids to correct from that finalized sheet. */
+  enrollment_ids: number[];
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemStudent;
+  /** @nullable */
+  grade?: string | null;
+  grade_history?: OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItemGradeHistoryItem[];
+  /** @nullable */
+  incomplete?: string | null;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201Data = {
+  sheet?: OpenACorrectionRoundAgainstAFinalizedSheet201DataSheet;
+  course?: OpenACorrectionRoundAgainstAFinalizedSheet201DataCourse;
+  lines?: OpenACorrectionRoundAgainstAFinalizedSheet201DataLinesItem[];
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet201 = {
+  data?: OpenACorrectionRoundAgainstAFinalizedSheet201Data;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet403 = {
+  message?: string;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet409 = {
+  message?: string;
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet422Errors = {
+  enrollment_ids?: string[];
+};
+
+export type OpenACorrectionRoundAgainstAFinalizedSheet422 = {
+  message?: string;
+  errors?: OpenACorrectionRoundAgainstAFinalizedSheet422Errors;
+};
+
+export type OpenOneCorrectionRound200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+
+export type OpenOneCorrectionRound200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OpenOneCorrectionRound200DataLinesItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type OpenOneCorrectionRound200DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OpenOneCorrectionRound200DataLinesItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: OpenOneCorrectionRound200DataLinesItemStudent;
+  /** @nullable */
+  grade?: string | null;
+  grade_history?: OpenOneCorrectionRound200DataLinesItemGradeHistoryItem[];
+  /** @nullable */
+  incomplete?: string | null;
+};
+
+export type OpenOneCorrectionRound200Data = {
+  sheet?: OpenOneCorrectionRound200DataSheet;
+  course?: OpenOneCorrectionRound200DataCourse;
+  lines?: OpenOneCorrectionRound200DataLinesItem[];
+};
+
+export type OpenOneCorrectionRound200 = {
+  data?: OpenOneCorrectionRound200Data;
+};
+
+export type OpenOneCorrectionRound403 = {
+  message?: string;
+};
+
+export type MyOutstandingIncompletes200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+
+export type MyOutstandingIncompletes200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type MyOutstandingIncompletes200DataItem = {
+  incomplete_id?: number;
+  enrollment_id?: number;
+  course_offering_id?: number;
+  course?: MyOutstandingIncompletes200DataItemCourse;
+  student?: MyOutstandingIncompletes200DataItemStudent;
+  completion_percentage?: number;
+  reason?: string;
+  deadline?: string;
+};
+
+export type MyOutstandingIncompletes200 = {
+  data?: MyOutstandingIncompletes200DataItem[];
+};
+
+export type OpenorResumeTheIncompletesResolutionRound200 = {
+  data?: {
+  sheet?: {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+  course?: {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+  lines?: ({
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+  /** @nullable */
+  grade?: string | null;
+  incomplete?: {
+  completion_percentage?: number;
+  reason?: string;
+};
+})[];
+};
+} | {
+  data?: {
+  sheet?: {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  /** @nullable */
+  signed_at?: string | null;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+  course?: {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+};
+  lines?: {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+  grade?: {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+  incomplete?: {
+  completion_percentage?: number;
+  reason?: string;
+};
+}[];
+};
+};
+
+export type OpenorResumeTheIncompletesResolutionRound403 = {
+  message?: string;
+};
+
+export type OpenorResumeTheIncompletesResolutionRound409 = {
+  message?: string;
+};
+
+export type SignTheSheet200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  signed_at?: string;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+
+export type SignTheSheet200Data = {
+  sheet?: SignTheSheet200DataSheet;
+};
+
+export type SignTheSheet200 = {
+  data?: SignTheSheet200Data;
+};
+
+export type SignTheSheet403 = {
+  message?: string;
+};
+
+export type SignTheSheet409 = {
+  message?: string;
+};
+
+export type SignTheSheet422Errors = {
+  lines?: string[];
+};
+
+export type SignTheSheet422 = {
+  message?: string;
+  errors?: SignTheSheet422Errors;
+};
+
+export type TheDepartmentHeadsReviewQueue200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type TheDepartmentHeadsReviewQueue200DataItemInstructor = {
+  id?: number;
+  name?: string;
+  email?: string;
+};
+
+export type TheDepartmentHeadsReviewQueue200DataItem = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  signed_at?: string;
+  course?: TheDepartmentHeadsReviewQueue200DataItemCourse;
+  instructor?: TheDepartmentHeadsReviewQueue200DataItemInstructor;
+};
+
+export type TheDepartmentHeadsReviewQueue200 = {
+  data?: TheDepartmentHeadsReviewQueue200DataItem[];
+};
+
+export type OpenOneSheetForReview200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  signed_at?: string;
+  /** @nullable */
+  reviewed_at?: string | null;
+  /** @nullable */
+  review_note?: string | null;
+};
+
+export type OpenOneSheetForReview200DataCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OpenOneSheetForReview200DataLinesItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type OpenOneSheetForReview200DataLinesItemGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type OpenOneSheetForReview200DataLinesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OpenOneSheetForReview200DataLinesItem = {
+  enrollment_id?: number;
+  course_status?: string;
+  credit_hours?: number;
+  student?: OpenOneSheetForReview200DataLinesItemStudent;
+  grade?: OpenOneSheetForReview200DataLinesItemGrade;
+  grade_history?: OpenOneSheetForReview200DataLinesItemGradeHistoryItem[];
+  /** @nullable */
+  incomplete?: string | null;
+};
+
+export type OpenOneSheetForReview200DataDistributionItem = {
+  letter?: string;
+  count?: number;
+};
+
+export type OpenOneSheetForReview200Data = {
+  sheet?: OpenOneSheetForReview200DataSheet;
+  course?: OpenOneSheetForReview200DataCourse;
+  lines?: OpenOneSheetForReview200DataLinesItem[];
+  distribution?: OpenOneSheetForReview200DataDistributionItem[];
+};
+
+export type OpenOneSheetForReview200 = {
+  data?: OpenOneSheetForReview200Data;
+};
+
+export type OpenOneSheetForReview403 = {
+  message?: string;
+};
+
+export type FinalizeTheSheet200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  signed_at?: string;
+  reviewed_at?: string;
+  /** @nullable */
+  review_note?: string | null;
+};
+
+export type FinalizeTheSheet200Data = {
+  sheet?: FinalizeTheSheet200DataSheet;
+};
+
+export type FinalizeTheSheet200 = {
+  data?: FinalizeTheSheet200Data;
+};
+
+export type FinalizeTheSheet403 = {
+  message?: string;
+};
+
+export type FinalizeTheSheet409 = {
+  message?: string;
+};
+
+export type ReturnTheSheetWithANoteBody = {
+  /** Why the sheet is being returned. */
+  note: string;
+};
+
+export type ReturnTheSheetWithANote200DataSheet = {
+  id?: number;
+  course_offering_id?: number;
+  kind?: string;
+  status?: string;
+  signed_at?: string;
+  reviewed_at?: string;
+  review_note?: string;
+};
+
+export type ReturnTheSheetWithANote200Data = {
+  sheet?: ReturnTheSheetWithANote200DataSheet;
+};
+
+export type ReturnTheSheetWithANote200 = {
+  data?: ReturnTheSheetWithANote200Data;
+};
+
+export type ReturnTheSheetWithANote403 = {
+  message?: string;
+};
+
+export type ReturnTheSheetWithANote409 = {
+  message?: string;
+};
+
+export type ReturnTheSheetWithANote422Errors = {
+  note?: string[];
+};
+
+export type ReturnTheSheetWithANote422 = {
+  message?: string;
+  errors?: ReturnTheSheetWithANote422Errors;
+};
+
+export type MyGrades200DataSemestersItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type MyGrades200DataSemestersItemCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type MyGrades200DataSemestersItemCoursesItemGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type MyGrades200DataSemestersItemCoursesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type MyGrades200DataSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: MyGrades200DataSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  course_status?: string;
+  grade?: MyGrades200DataSemestersItemCoursesItemGrade;
+  grade_history?: MyGrades200DataSemestersItemCoursesItemGradeHistoryItem[];
+  earned?: boolean;
+  superseded?: boolean;
+  must_retake?: boolean;
+  /** @nullable */
+  incomplete_deadline?: string | null;
+};
+
+export type MyGrades200DataSemestersItem = {
+  semester?: MyGrades200DataSemestersItemSemester;
+  gpa?: number;
+  courses?: MyGrades200DataSemestersItemCoursesItem[];
+};
+
+export type MyGrades200Data = {
+  cgpa?: number;
+  semesters?: MyGrades200DataSemestersItem[];
+};
+
+export type MyGrades200 = {
+  data?: MyGrades200Data;
+};
+
+export type MyGrades403 = {
+  message?: string;
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect200DataItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect200DataItem = {
+  student_id?: number;
+  name?: string;
+  university_id?: string;
+  enrollment_term?: string;
+  degree_level?: string;
+  /** @nullable */
+  current_load?: string | null;
+  program?: TheStudentsWhoseGradesTheReviewerMayInspect200DataItemProgram;
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect200 = {
+  data?: TheStudentsWhoseGradesTheReviewerMayInspect200DataItem[];
+};
+
+export type TheStudentsWhoseGradesTheReviewerMayInspect403 = {
+  message?: string;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  department_id?: number;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGrade = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGradeHistoryItem = {
+  mark?: number;
+  letter_grade?: string;
+  gpa_points?: number;
+  finalized_at?: string;
+  superseded?: boolean;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  course_status?: string;
+  grade?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGrade;
+  grade_history?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItemGradeHistoryItem[];
+  earned?: boolean;
+  superseded?: boolean;
+  must_retake?: boolean;
+  /** @nullable */
+  incomplete_deadline?: string | null;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200DataSemestersItem = {
+  semester?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemSemester;
+  gpa?: number;
+  courses?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItemCoursesItem[];
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200Data = {
+  cgpa?: number;
+  semesters?: OneStudentsGradeRecordForAScopedReviewer200DataSemestersItem[];
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer200 = {
+  data?: OneStudentsGradeRecordForAScopedReviewer200Data;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer403 = {
+  message?: string;
+};
+
+export type OneStudentsGradeRecordForAScopedReviewer404 = {
+  message?: string;
 };
 
 export type ListMyNotifications200DataItemData = {
@@ -4394,6 +5313,331 @@ export const useUnassignADeanFromAFaculty = <TError = UnassignADeanFromAFaculty4
         TContext
       > => {
       return useMutation(getUnassignADeanFromAFacultyMutationOptions(options), queryClient);
+    }
+
+/**
+ * The R06 (Department Head) users an administrator may assign to a scope — the
+ * source for the assignment screen's Head picker. Admin-only (R09/R10).
+ * @summary List assignable Department Heads.
+ */
+export const listAssignableDepartmentHeads = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListAssignableDepartmentHeads200>(
+      {url: `/api/v1/admin/department-heads`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListAssignableDepartmentHeadsQueryKey = () => {
+    return [
+    `/api/v1/admin/department-heads`
+    ] as const;
+    }
+
+
+export const getListAssignableDepartmentHeadsQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableDepartmentHeadsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>> = ({ signal }) => listAssignableDepartmentHeads(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListAssignableDepartmentHeadsQueryResult = NonNullable<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>>
+export type ListAssignableDepartmentHeadsQueryError = ListAssignableDepartmentHeads403
+
+
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>,
+          TError,
+          Awaited<ReturnType<typeof listAssignableDepartmentHeads>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List assignable Department Heads.
+ */
+
+export function useListAssignableDepartmentHeads<TData = Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError = ListAssignableDepartmentHeads403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableDepartmentHeads>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListAssignableDepartmentHeadsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every current assignment with the assigned Head's identity and the opaque
+ * Department id — `null` for the university-wide Preparatory scope. Admin-only
+ * (R09/R10).
+ * @summary List Department-Head↔Department assignments.
+ */
+export const listDepartmentHeadDepartmentAssignments = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListDepartmentHeadDepartmentAssignments200>(
+      {url: `/api/v1/admin/department-head-assignments`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getListDepartmentHeadDepartmentAssignmentsQueryKey = () => {
+    return [
+    `/api/v1/admin/department-head-assignments`
+    ] as const;
+    }
+
+
+export const getListDepartmentHeadDepartmentAssignmentsQueryOptions = <TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDepartmentHeadDepartmentAssignmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>> = ({ signal }) => listDepartmentHeadDepartmentAssignments(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListDepartmentHeadDepartmentAssignmentsQueryResult = NonNullable<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>>
+export type ListDepartmentHeadDepartmentAssignmentsQueryError = ListDepartmentHeadDepartmentAssignments403
+
+
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>,
+          TError,
+          Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List Department-Head↔Department assignments.
+ */
+
+export function useListDepartmentHeadDepartmentAssignments<TData = Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError = ListDepartmentHeadDepartmentAssignments403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listDepartmentHeadDepartmentAssignments>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListDepartmentHeadDepartmentAssignmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Creates one Head↔Department routing row. `department_id` is required to be
+ * *present* but may be `null`, which assigns the university-wide Preparatory
+ * scope (the Courses that belong to no Department). The user must hold the
+ * Department Head role (R06) and the (Head, scope) pair must not already exist —
+ * either fails validation (422). Admin-only (R09/R10).
+ * @summary Assign a Department Head to a scope.
+ */
+export const assignADepartmentHeadToAScope = (
+    assignADepartmentHeadToAScopeBody: AssignADepartmentHeadToAScopeBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AssignADepartmentHeadToAScope201>(
+      {url: `/api/v1/admin/department-head-assignments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: assignADepartmentHeadToAScopeBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAssignADepartmentHeadToAScopeMutationOptions = <TError = AssignADepartmentHeadToAScope403 | AssignADepartmentHeadToAScope422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, TError,{data: AssignADepartmentHeadToAScopeBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, TError,{data: AssignADepartmentHeadToAScopeBody}, TContext> => {
+
+const mutationKey = ['assignADepartmentHeadToAScope'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, {data: AssignADepartmentHeadToAScopeBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  assignADepartmentHeadToAScope(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignADepartmentHeadToAScopeMutationResult = NonNullable<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>>
+    export type AssignADepartmentHeadToAScopeMutationBody = AssignADepartmentHeadToAScopeBody
+    export type AssignADepartmentHeadToAScopeMutationError = AssignADepartmentHeadToAScope403 | AssignADepartmentHeadToAScope422
+
+    /**
+ * @summary Assign a Department Head to a scope.
+ */
+export const useAssignADepartmentHeadToAScope = <TError = AssignADepartmentHeadToAScope403 | AssignADepartmentHeadToAScope422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>, TError,{data: AssignADepartmentHeadToAScopeBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignADepartmentHeadToAScope>>,
+        TError,
+        {data: AssignADepartmentHeadToAScopeBody},
+        TContext
+      > => {
+      return useMutation(getAssignADepartmentHeadToAScopeMutationOptions(options), queryClient);
+    }
+
+/**
+ * Removes one routing row. Admin-only (R09/R10).
+ * @summary Unassign a Department Head from a scope.
+ */
+export const unassignADepartmentHeadFromAScope = (
+    assignmentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<UnassignADepartmentHeadFromAScope204>(
+      {url: `/api/v1/admin/department-head-assignments/${assignmentId}`, method: 'DELETE', signal
+    },
+      );
+    }
+
+
+
+
+export const getUnassignADepartmentHeadFromAScopeMutationOptions = <TError = UnassignADepartmentHeadFromAScope403 | UnassignADepartmentHeadFromAScope404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, TError,{assignmentId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, TError,{assignmentId: number}, TContext> => {
+
+const mutationKey = ['unassignADepartmentHeadFromAScope'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, {assignmentId: number}> = (props) => {
+          const {assignmentId} = props ?? {};
+
+          return  unassignADepartmentHeadFromAScope(assignmentId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnassignADepartmentHeadFromAScopeMutationResult = NonNullable<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>>
+
+    export type UnassignADepartmentHeadFromAScopeMutationError = UnassignADepartmentHeadFromAScope403 | UnassignADepartmentHeadFromAScope404
+
+    /**
+ * @summary Unassign a Department Head from a scope.
+ */
+export const useUnassignADepartmentHeadFromAScope = <TError = UnassignADepartmentHeadFromAScope403 | UnassignADepartmentHeadFromAScope404,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>, TError,{assignmentId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unassignADepartmentHeadFromAScope>>,
+        TError,
+        {assignmentId: number},
+        TContext
+      > => {
+      return useMutation(getUnassignADepartmentHeadFromAScopeMutationOptions(options), queryClient);
     }
 
 /**
@@ -12976,6 +14220,1358 @@ export const useRecordorCorrectASessionsAttendanceRegister = <TError = RecordorC
       > => {
       return useMutation(getRecordorCorrectASessionsAttendanceRegisterMutationOptions(options), queryClient);
     }
+
+/**
+ * Every Course Offering the acting user teaches, across all Semesters, each with its
+ * resolved Course and Semester, the Instructor it is assigned to, the number of gradable
+ * lines its Sheet would carry, and the Initial round's state — `null` while unstarted, else
+ * Draft/Submitted/Returned/Finalized (ticket 03) — the entry point to each Offering's Grade
+ * Sheet. A user who teaches nothing gets an empty list rather than an error.
+ *
+ * For a **central-entry** user — `grades.enter` without `grades.finalize`, which by §3.2 is
+ * Student Affairs — this is instead the picker over **every** Offering (ticket 09), because
+ * grades arriving on paper belong to Offerings the records office does not teach. Which of
+ * the two lists was returned is stated in `meta.scope` (`own` / `central`), so the SPA never
+ * has to re-derive the rule the server applied.
+ * @summary Offerings to grade.
+ */
+export const offeringsToGrade = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OfferingsToGrade200>(
+      {url: `/api/v1/grading/offerings`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOfferingsToGradeQueryKey = () => {
+    return [
+    `/api/v1/grading/offerings`
+    ] as const;
+    }
+
+
+export const getOfferingsToGradeQueryOptions = <TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOfferingsToGradeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof offeringsToGrade>>> = ({ signal }) => offeringsToGrade(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OfferingsToGradeQueryResult = NonNullable<Awaited<ReturnType<typeof offeringsToGrade>>>
+export type OfferingsToGradeQueryError = unknown
+
+
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof offeringsToGrade>>,
+          TError,
+          Awaited<ReturnType<typeof offeringsToGrade>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof offeringsToGrade>>,
+          TError,
+          Awaited<ReturnType<typeof offeringsToGrade>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Offerings to grade.
+ */
+
+export function useOfferingsToGrade<TData = Awaited<ReturnType<typeof offeringsToGrade>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof offeringsToGrade>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOfferingsToGradeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**
+ * Enrollment. The Initial round is created **lazily** on this first open (ADR-0023) —
+ * never eagerly at semester end — and re-opening returns the same round rather than
+ * starting another. Each line carries the Student's University ID and name, resolved
+ * through Identity\Public, and the Grade already recorded for it, or `null` while the line
+ * is still blank. Audit and Withdrawn Enrollments are omitted.
+ * Authorised by assignment: an Instructor opening an Offering they do not teach gets a 403.
+ * A central-entry user (ticket 09) reaches any Offering's Sheet here, and opening one — a
+ * read — is not audited; their line writes are.
+ * @summary Open an Offering's Grade Sheet.
+ */
+export const openAnOfferingsGradeSheet = (
+    offeringId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenAnOfferingsGradeSheet200>(
+      {url: `/api/v1/grading/offerings/${offeringId}/sheet`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenAnOfferingsGradeSheetQueryKey = (offeringId: number,) => {
+    return [
+    `/api/v1/grading/offerings/${offeringId}/sheet`
+    ] as const;
+    }
+
+
+export const getOpenAnOfferingsGradeSheetQueryOptions = <TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenAnOfferingsGradeSheetQueryKey(offeringId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>> = ({ signal }) => openAnOfferingsGradeSheet(offeringId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: offeringId !== null && offeringId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenAnOfferingsGradeSheetQueryResult = NonNullable<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>>
+export type OpenAnOfferingsGradeSheetQueryError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404
+
+
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>,
+          TError,
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>,
+          TError,
+          Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open an Offering's Grade Sheet.
+ */
+
+export function useOpenAnOfferingsGradeSheet<TData = Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError = OpenAnOfferingsGradeSheet403 | OpenAnOfferingsGradeSheet404>(
+ offeringId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openAnOfferingsGradeSheet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenAnOfferingsGradeSheetQueryOptions(offeringId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Records the final percentage for a single line and returns the Letter Grade and GPA
+ * points the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale
+ * change never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save
+ * precedent); re-saving a line corrects it rather than adding a second Grade. A mark
+ * outside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this
+ * Sheet is a 404. Authorised by assignment — the Offering's Instructor, or a central-entry
+ * user keying grades in for someone else's Offering (ticket 09), whose write is recorded in
+ * the Audit Log; anyone else is a 403.
+ *
+ * On an **Initial** round, a line may be marked Incomplete instead — send
+ * `completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a
+ * figure below the configured threshold is a 422 naming the field. Entering one supersedes
+ * the other on the same line: a mark clears an earlier Incomplete declaration and an
+ * Incomplete declaration clears an earlier mark.
+ * @summary Save one Grade Sheet line.
+ */
+export const saveOneGradeSheetLine = (
+    gradeSheetId: number,
+    enrollmentId: number,
+    saveOneGradeSheetLineBody?: SaveOneGradeSheetLineBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SaveOneGradeSheetLine200>(
+      {url: `/api/v1/grading/sheets/${gradeSheetId}/lines/${enrollmentId}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: saveOneGradeSheetLineBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSaveOneGradeSheetLineMutationOptions = <TError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}, TContext> => {
+
+const mutationKey = ['saveOneGradeSheetLine'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, {gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}> = (props) => {
+          const {gradeSheetId,enrollmentId,data} = props ?? {};
+
+          return  saveOneGradeSheetLine(gradeSheetId,enrollmentId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveOneGradeSheetLineMutationResult = NonNullable<Awaited<ReturnType<typeof saveOneGradeSheetLine>>>
+    export type SaveOneGradeSheetLineMutationBody = SaveOneGradeSheetLineBody | undefined
+    export type SaveOneGradeSheetLineMutationError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422
+
+    /**
+ * @summary Save one Grade Sheet line.
+ */
+export const useSaveOneGradeSheetLine = <TError = SaveOneGradeSheetLine403 | SaveOneGradeSheetLine404 | SaveOneGradeSheetLine422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveOneGradeSheetLine>>, TError,{gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveOneGradeSheetLine>>,
+        TError,
+        {gradeSheetId: number;enrollmentId: number;data?: SaveOneGradeSheetLineBody},
+        TContext
+      > => {
+      return useMutation(getSaveOneGradeSheetLineMutationOptions(options), queryClient);
+    }
+
+/**
+ * Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only
+ * the selected lines (ADR-0023): the original round is untouched and remains finalized
+ * throughout. The returned round is then edited, signed and Department-Head-reviewed
+ * through the existing Sheet endpoints. Authorised by the Offering assignment — only the
+ * Instructor who teaches this Offering may start a correction on it. Central entry (ticket
+ * 09) does **not** reach here: keying marks into a Draft round is data entry, reopening the
+ * finalized record is the Instructor's own judgement. Once they have started one, its lines
+ * are an ordinary Draft Sheet that central entry may key like any other.
+ * @summary Open a Correction round against a finalized Sheet.
+ */
+export const openACorrectionRoundAgainstAFinalizedSheet = (
+    gradeSheetId: number,
+    openACorrectionRoundAgainstAFinalizedSheetBody: OpenACorrectionRoundAgainstAFinalizedSheetBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenACorrectionRoundAgainstAFinalizedSheet201>(
+      {url: `/api/v1/grading/sheets/${gradeSheetId}/correction`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: openACorrectionRoundAgainstAFinalizedSheetBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenACorrectionRoundAgainstAFinalizedSheetMutationOptions = <TError = OpenACorrectionRoundAgainstAFinalizedSheet403 | OpenACorrectionRoundAgainstAFinalizedSheet409 | OpenACorrectionRoundAgainstAFinalizedSheet422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, TError,{gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, TError,{gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}, TContext> => {
+
+const mutationKey = ['openACorrectionRoundAgainstAFinalizedSheet'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, {gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}> = (props) => {
+          const {gradeSheetId,data} = props ?? {};
+
+          return  openACorrectionRoundAgainstAFinalizedSheet(gradeSheetId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OpenACorrectionRoundAgainstAFinalizedSheetMutationResult = NonNullable<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>>
+    export type OpenACorrectionRoundAgainstAFinalizedSheetMutationBody = OpenACorrectionRoundAgainstAFinalizedSheetBody
+    export type OpenACorrectionRoundAgainstAFinalizedSheetMutationError = OpenACorrectionRoundAgainstAFinalizedSheet403 | OpenACorrectionRoundAgainstAFinalizedSheet409 | OpenACorrectionRoundAgainstAFinalizedSheet422
+
+    /**
+ * @summary Open a Correction round against a finalized Sheet.
+ */
+export const useOpenACorrectionRoundAgainstAFinalizedSheet = <TError = OpenACorrectionRoundAgainstAFinalizedSheet403 | OpenACorrectionRoundAgainstAFinalizedSheet409 | OpenACorrectionRoundAgainstAFinalizedSheet422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>, TError,{gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof openACorrectionRoundAgainstAFinalizedSheet>>,
+        TError,
+        {gradeSheetId: number;data: OpenACorrectionRoundAgainstAFinalizedSheetBody},
+        TContext
+      > => {
+      return useMutation(getOpenACorrectionRoundAgainstAFinalizedSheetMutationOptions(options), queryClient);
+    }
+
+/**
+ * A previously-opened Correction round, read by its own Sheet id so the SPA can return to
+ * it directly. The round contains only the selected lines persisted on it at creation time;
+ * the original finalized Sheet it corrects is untouched. Authorised by the same Offering
+ * assignment as every other Instructor Sheet.
+ * @summary Open one Correction round.
+ */
+export const openOneCorrectionRound = (
+    gradeSheetId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenOneCorrectionRound200>(
+      {url: `/api/v1/grading/corrections/${gradeSheetId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenOneCorrectionRoundQueryKey = (gradeSheetId: number,) => {
+    return [
+    `/api/v1/grading/corrections/${gradeSheetId}`
+    ] as const;
+    }
+
+
+export const getOpenOneCorrectionRoundQueryOptions = <TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenOneCorrectionRoundQueryKey(gradeSheetId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openOneCorrectionRound>>> = ({ signal }) => openOneCorrectionRound(gradeSheetId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: gradeSheetId !== null && gradeSheetId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenOneCorrectionRoundQueryResult = NonNullable<Awaited<ReturnType<typeof openOneCorrectionRound>>>
+export type OpenOneCorrectionRoundQueryError = OpenOneCorrectionRound403
+
+
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openOneCorrectionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openOneCorrectionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openOneCorrectionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openOneCorrectionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open one Correction round.
+ */
+
+export function useOpenOneCorrectionRound<TData = Awaited<ReturnType<typeof openOneCorrectionRound>>, TError = OpenOneCorrectionRound403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneCorrectionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenOneCorrectionRoundQueryOptions(gradeSheetId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every unresolved, unconverted Incomplete declared on an Offering the acting user
+ * teaches, each with the Student it names and its derived resolution deadline — `null`
+ * while the next Semester does not exist in the Calendar yet (declaring, and viewing, are
+ * never blocked for an admin's omission).
+ * @summary My outstanding Incompletes.
+ */
+export const myOutstandingIncompletes = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyOutstandingIncompletes200>(
+      {url: `/api/v1/grading/incompletes`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyOutstandingIncompletesQueryKey = () => {
+    return [
+    `/api/v1/grading/incompletes`
+    ] as const;
+    }
+
+
+export const getMyOutstandingIncompletesQueryOptions = <TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyOutstandingIncompletesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myOutstandingIncompletes>>> = ({ signal }) => myOutstandingIncompletes(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyOutstandingIncompletesQueryResult = NonNullable<Awaited<ReturnType<typeof myOutstandingIncompletes>>>
+export type MyOutstandingIncompletesQueryError = unknown
+
+
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>,
+          TError,
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>,
+          TError,
+          Awaited<ReturnType<typeof myOutstandingIncompletes>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My outstanding Incompletes.
+ */
+
+export function useMyOutstandingIncompletes<TData = Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myOutstandingIncompletes>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyOutstandingIncompletesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Lazily opens the `IncompleteResolution` Sheet round for one outstanding Incomplete — a
+ * single line, the Incomplete's own Enrollment — or returns the round already open for it
+ * (the Initial round's lazy-open precedent). From here, entering the mark, signing and
+ * Department-Head finalization all behave exactly as ticket 03 established: the returned
+ * Sheet id is used with {@see GradeSheetController::saveLine()}/{@see GradeSheetController::sign()}
+ * and the Department Head's queue/show/finalize/return, all unchanged. A 409 when the
+ * Incomplete has already been resolved or converted.
+ * @summary Open (or resume) the Incomplete's resolution round.
+ */
+export const openorResumeTheIncompletesResolutionRound = (
+    incompleteId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenorResumeTheIncompletesResolutionRound200>(
+      {url: `/api/v1/grading/incompletes/${incompleteId}/resolution`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenorResumeTheIncompletesResolutionRoundQueryKey = (incompleteId: number,) => {
+    return [
+    `/api/v1/grading/incompletes/${incompleteId}/resolution`
+    ] as const;
+    }
+
+
+export const getOpenorResumeTheIncompletesResolutionRoundQueryOptions = <TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenorResumeTheIncompletesResolutionRoundQueryKey(incompleteId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>> = ({ signal }) => openorResumeTheIncompletesResolutionRound(incompleteId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: incompleteId !== null && incompleteId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenorResumeTheIncompletesResolutionRoundQueryResult = NonNullable<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>>
+export type OpenorResumeTheIncompletesResolutionRoundQueryError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409
+
+
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>,
+          TError,
+          Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open (or resume) the Incomplete's resolution round.
+ */
+
+export function useOpenorResumeTheIncompletesResolutionRound<TData = Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError = OpenorResumeTheIncompletesResolutionRound403 | OpenorResumeTheIncompletesResolutionRound409>(
+ incompleteId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openorResumeTheIncompletesResolutionRound>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenorResumeTheIncompletesResolutionRoundQueryOptions(incompleteId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The Instructor's signature — one act that sends the whole round to the Department Head
+ * (SRS §4.7.1.4). Draft or Returned → Submitted (ADR-0023); any other current state is a
+ * 409. Refused with a 422 naming how many lines are still blank — the UI already shows
+ * that count from the Sheet's own lines, so this is a defence against a stale client, not
+ * the Instructor's first signal. Once Submitted, the Sheet is read-only to everyone,
+ * including its own Instructor, and every configured Department Head (or the
+ * university-wide Head for a department-less Preparatory Offering) is notified.
+ * @summary Sign the Sheet.
+ */
+export const signTheSheet = (
+    gradeSheetId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SignTheSheet200>(
+      {url: `/api/v1/grading/sheets/${gradeSheetId}/sign`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getSignTheSheetMutationOptions = <TError = SignTheSheet403 | SignTheSheet409 | SignTheSheet422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signTheSheet>>, TError,{gradeSheetId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof signTheSheet>>, TError,{gradeSheetId: number}, TContext> => {
+
+const mutationKey = ['signTheSheet'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof signTheSheet>>, {gradeSheetId: number}> = (props) => {
+          const {gradeSheetId} = props ?? {};
+
+          return  signTheSheet(gradeSheetId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SignTheSheetMutationResult = NonNullable<Awaited<ReturnType<typeof signTheSheet>>>
+
+    export type SignTheSheetMutationError = SignTheSheet403 | SignTheSheet409 | SignTheSheet422
+
+    /**
+ * @summary Sign the Sheet.
+ */
+export const useSignTheSheet = <TError = SignTheSheet403 | SignTheSheet409 | SignTheSheet422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof signTheSheet>>, TError,{gradeSheetId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof signTheSheet>>,
+        TError,
+        {gradeSheetId: number},
+        TContext
+      > => {
+      return useMutation(getSignTheSheetMutationOptions(options), queryClient);
+    }
+
+/**
+ * Every Submitted Grade Sheet routed to the acting Head's Department(s) — including, for a
+ * Head assigned university-wide, the department-less Preparatory Offerings a
+ * Department-scoped Head never sees ({@see ScopesToDepartmentHead}). Oldest signature
+ * first.
+ * @summary The Department Head's review queue.
+ */
+export const theDepartmentHeadsReviewQueue = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheDepartmentHeadsReviewQueue200>(
+      {url: `/api/v1/grading/department-head/sheets`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheDepartmentHeadsReviewQueueQueryKey = () => {
+    return [
+    `/api/v1/grading/department-head/sheets`
+    ] as const;
+    }
+
+
+export const getTheDepartmentHeadsReviewQueueQueryOptions = <TData = Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheDepartmentHeadsReviewQueueQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>> = ({ signal }) => theDepartmentHeadsReviewQueue(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheDepartmentHeadsReviewQueueQueryResult = NonNullable<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>>
+export type TheDepartmentHeadsReviewQueueQueryError = unknown
+
+
+export function useTheDepartmentHeadsReviewQueue<TData = Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheDepartmentHeadsReviewQueue<TData = Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheDepartmentHeadsReviewQueue<TData = Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The Department Head's review queue.
+ */
+
+export function useTheDepartmentHeadsReviewQueue<TData = Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theDepartmentHeadsReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheDepartmentHeadsReviewQueueQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every mark, letter and Incomplete on the round, the Student identity per line, and the
+ * Offering's grade distribution — a view, not a report (Phase 7 owns reporting). Scoped
+ * exactly as the queue: a Sheet outside the acting Head's Department is a 403, regardless
+ * of its status.
+ * @summary Open one Sheet for review.
+ */
+export const openOneSheetForReview = (
+    gradeSheetId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OpenOneSheetForReview200>(
+      {url: `/api/v1/grading/department-head/sheets/${gradeSheetId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenOneSheetForReviewQueryKey = (gradeSheetId: number,) => {
+    return [
+    `/api/v1/grading/department-head/sheets/${gradeSheetId}`
+    ] as const;
+    }
+
+
+export const getOpenOneSheetForReviewQueryOptions = <TData = Awaited<ReturnType<typeof openOneSheetForReview>>, TError = OpenOneSheetForReview403>(gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneSheetForReview>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenOneSheetForReviewQueryKey(gradeSheetId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openOneSheetForReview>>> = ({ signal }) => openOneSheetForReview(gradeSheetId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: gradeSheetId !== null && gradeSheetId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openOneSheetForReview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenOneSheetForReviewQueryResult = NonNullable<Awaited<ReturnType<typeof openOneSheetForReview>>>
+export type OpenOneSheetForReviewQueryError = OpenOneSheetForReview403
+
+
+export function useOpenOneSheetForReview<TData = Awaited<ReturnType<typeof openOneSheetForReview>>, TError = OpenOneSheetForReview403>(
+ gradeSheetId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneSheetForReview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openOneSheetForReview>>,
+          TError,
+          Awaited<ReturnType<typeof openOneSheetForReview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenOneSheetForReview<TData = Awaited<ReturnType<typeof openOneSheetForReview>>, TError = OpenOneSheetForReview403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneSheetForReview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openOneSheetForReview>>,
+          TError,
+          Awaited<ReturnType<typeof openOneSheetForReview>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenOneSheetForReview<TData = Awaited<ReturnType<typeof openOneSheetForReview>>, TError = OpenOneSheetForReview403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneSheetForReview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open one Sheet for review.
+ */
+
+export function useOpenOneSheetForReview<TData = Awaited<ReturnType<typeof openOneSheetForReview>>, TError = OpenOneSheetForReview403>(
+ gradeSheetId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openOneSheetForReview>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenOneSheetForReviewQueryOptions(gradeSheetId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Submitted → Finalized (else a 409): the round's Grades become part of the academic
+ * record and the round is permanently closed (ADR-0023). In the same transaction, for each
+ * Grade, `earned` — "this Attempt reached C+ and earned its credit hours" — is written onto
+ * its Enrollment through `Enrollment\Public` (ADR-0022): a plain
+ * {@see EnrollmentRecords::recordOutcome()} normally, or, when the Grade resolves an
+ * outstanding Incomplete (this round is an `IncompleteResolution`, ticket 05),
+ * {@see EnrollmentRecords::resolveIncomplete()} instead — which also restores the Course
+ * Status the Enrollment held before it became Incomplete. On an **Initial** round, every
+ * line declared Incomplete instead of graded (no Grade row) becomes one through
+ * {@see EnrollmentRecords::markIncomplete()}, in the same transaction — no grade, and no
+ * Incomplete, enters the record on one signature. After commit, `GradeFinalized` fires for
+ * its side effects only: one notification per graded Student (their letter and whether it
+ * fell below C+), and one per newly-declared Incomplete (the reason and its derived
+ * deadline).
+ * @summary Finalize the Sheet.
+ */
+export const finalizeTheSheet = (
+    gradeSheetId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<FinalizeTheSheet200>(
+      {url: `/api/v1/grading/department-head/sheets/${gradeSheetId}/finalize`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getFinalizeTheSheetMutationOptions = <TError = FinalizeTheSheet403 | FinalizeTheSheet409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeTheSheet>>, TError,{gradeSheetId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof finalizeTheSheet>>, TError,{gradeSheetId: number}, TContext> => {
+
+const mutationKey = ['finalizeTheSheet'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof finalizeTheSheet>>, {gradeSheetId: number}> = (props) => {
+          const {gradeSheetId} = props ?? {};
+
+          return  finalizeTheSheet(gradeSheetId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FinalizeTheSheetMutationResult = NonNullable<Awaited<ReturnType<typeof finalizeTheSheet>>>
+
+    export type FinalizeTheSheetMutationError = FinalizeTheSheet403 | FinalizeTheSheet409
+
+    /**
+ * @summary Finalize the Sheet.
+ */
+export const useFinalizeTheSheet = <TError = FinalizeTheSheet403 | FinalizeTheSheet409,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof finalizeTheSheet>>, TError,{gradeSheetId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof finalizeTheSheet>>,
+        TError,
+        {gradeSheetId: number},
+        TContext
+      > => {
+      return useMutation(getFinalizeTheSheetMutationOptions(options), queryClient);
+    }
+
+/**
+ * Submitted → Returned (else a 409): the round becomes editable and re-signable again, and
+ * the note reaches the Instructor as a notification. A note is required — a bilingual 422
+ * when it is missing.
+ * @summary Return the Sheet with a note.
+ */
+export const returnTheSheetWithANote = (
+    gradeSheetId: number,
+    returnTheSheetWithANoteBody: ReturnTheSheetWithANoteBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReturnTheSheetWithANote200>(
+      {url: `/api/v1/grading/department-head/sheets/${gradeSheetId}/return`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: returnTheSheetWithANoteBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getReturnTheSheetWithANoteMutationOptions = <TError = ReturnTheSheetWithANote403 | ReturnTheSheetWithANote409 | ReturnTheSheetWithANote422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof returnTheSheetWithANote>>, TError,{gradeSheetId: number;data: ReturnTheSheetWithANoteBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof returnTheSheetWithANote>>, TError,{gradeSheetId: number;data: ReturnTheSheetWithANoteBody}, TContext> => {
+
+const mutationKey = ['returnTheSheetWithANote'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof returnTheSheetWithANote>>, {gradeSheetId: number;data: ReturnTheSheetWithANoteBody}> = (props) => {
+          const {gradeSheetId,data} = props ?? {};
+
+          return  returnTheSheetWithANote(gradeSheetId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReturnTheSheetWithANoteMutationResult = NonNullable<Awaited<ReturnType<typeof returnTheSheetWithANote>>>
+    export type ReturnTheSheetWithANoteMutationBody = ReturnTheSheetWithANoteBody
+    export type ReturnTheSheetWithANoteMutationError = ReturnTheSheetWithANote403 | ReturnTheSheetWithANote409 | ReturnTheSheetWithANote422
+
+    /**
+ * @summary Return the Sheet with a note.
+ */
+export const useReturnTheSheetWithANote = <TError = ReturnTheSheetWithANote403 | ReturnTheSheetWithANote409 | ReturnTheSheetWithANote422,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof returnTheSheetWithANote>>, TError,{gradeSheetId: number;data: ReturnTheSheetWithANoteBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof returnTheSheetWithANote>>,
+        TError,
+        {gradeSheetId: number;data: ReturnTheSheetWithANoteBody},
+        TContext
+      > => {
+      return useMutation(getReturnTheSheetWithANoteMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary My Grades.
+ */
+export const myGrades = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyGrades200>(
+      {url: `/api/v1/grading/my-grades`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyGradesQueryKey = () => {
+    return [
+    `/api/v1/grading/my-grades`
+    ] as const;
+    }
+
+
+export const getMyGradesQueryOptions = <TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyGradesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myGrades>>> = ({ signal }) => myGrades(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyGradesQueryResult = NonNullable<Awaited<ReturnType<typeof myGrades>>>
+export type MyGradesQueryError = MyGrades403
+
+
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myGrades>>,
+          TError,
+          Awaited<ReturnType<typeof myGrades>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myGrades>>,
+          TError,
+          Awaited<ReturnType<typeof myGrades>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Grades.
+ */
+
+export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError = MyGrades403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myGrades>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyGradesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * A searchable picker population for the grade-oversight screen: Advisors see their live
+ * advisees; Department Heads the Students in Programs under their Departments; Deans the
+ * Students in their Faculties; Instructors the Students on Offerings they teach; Student
+ * Affairs, Council and administrators every Student. Each row carries the same lightweight
+ * Student context the existing register-for-student picker renders.
+ * @summary The students whose grades the reviewer may inspect.
+ */
+export const theStudentsWhoseGradesTheReviewerMayInspect = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TheStudentsWhoseGradesTheReviewerMayInspect200>(
+      {url: `/api/v1/grading/students`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTheStudentsWhoseGradesTheReviewerMayInspectQueryKey = () => {
+    return [
+    `/api/v1/grading/students`
+    ] as const;
+    }
+
+
+export const getTheStudentsWhoseGradesTheReviewerMayInspectQueryOptions = <TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTheStudentsWhoseGradesTheReviewerMayInspectQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>> = ({ signal }) => theStudentsWhoseGradesTheReviewerMayInspect(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TheStudentsWhoseGradesTheReviewerMayInspectQueryResult = NonNullable<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>>
+export type TheStudentsWhoseGradesTheReviewerMayInspectQueryError = TheStudentsWhoseGradesTheReviewerMayInspect403
+
+
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>,
+          TError,
+          Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary The students whose grades the reviewer may inspect.
+ */
+
+export function useTheStudentsWhoseGradesTheReviewerMayInspect<TData = Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError = TheStudentsWhoseGradesTheReviewerMayInspect403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof theStudentsWhoseGradesTheReviewerMayInspect>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTheStudentsWhoseGradesTheReviewerMayInspectQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The exact academic-record payload the Student's own My Grades page reads — CGPA,
+ * Semester GPAs, superseded attempts, Incomplete deadlines and must-retake markers — but
+ * for a reviewer whose role legitimately covers the target Student.
+ * @summary One Student's grade record for a scoped reviewer.
+ */
+export const oneStudentsGradeRecordForAScopedReviewer = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OneStudentsGradeRecordForAScopedReviewer200>(
+      {url: `/api/v1/grading/students/${studentId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOneStudentsGradeRecordForAScopedReviewerQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/grading/students/${studentId}`
+    ] as const;
+    }
+
+
+export const getOneStudentsGradeRecordForAScopedReviewerQueryOptions = <TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOneStudentsGradeRecordForAScopedReviewerQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>> = ({ signal }) => oneStudentsGradeRecordForAScopedReviewer(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OneStudentsGradeRecordForAScopedReviewerQueryResult = NonNullable<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>>
+export type OneStudentsGradeRecordForAScopedReviewerQueryError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404
+
+
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>,
+          TError,
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>,
+          TError,
+          Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary One Student's grade record for a scoped reviewer.
+ */
+
+export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError = OneStudentsGradeRecordForAScopedReviewer403 | OneStudentsGradeRecordForAScopedReviewer404>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof oneStudentsGradeRecordForAScopedReviewer>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOneStudentsGradeRecordForAScopedReviewerQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Paginated, newest-first. Scoped to the authenticated user.

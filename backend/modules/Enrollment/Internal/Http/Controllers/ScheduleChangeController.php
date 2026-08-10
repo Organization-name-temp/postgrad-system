@@ -24,12 +24,12 @@ use Modules\Enrollment\Internal\Http\Resources\EnrollmentResource;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
+use Modules\Enrollment\Internal\Support\AttemptDeriver;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
-use Modules\Enrollment\Internal\Support\RetakeDeriver;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -83,7 +83,7 @@ class ScheduleChangeController
      * @bodyParam offering_id integer required An eligible Course Offering's id. Example: 1
      * @bodyParam mode string required How to take it — Regular or Audit. Example: Regular
      *
-     * @response 201 {"data": {"id": 5, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 0, "recorded": 0, "percentage": 0, "at_risk": false}}}
+     * @response 201 {"data": {"id": 5, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 0, "recorded": 0, "percentage": 0, "at_risk": false}}}
      * @response 403 scenario="no approved initial registration" {"message": "Free add/drop needs an approved initial registration for this semester."}
      * @response 409 scenario="outside the add/drop window" {"message": "The add/drop period is not open for this course."}
      * @response 422 scenario="external elective" {"message": "An external elective can only be added through a registration request.", "errors": {"offering_id": ["An external elective can only be added through a registration request."]}}
@@ -147,12 +147,17 @@ class ScheduleChangeController
         $validator = new CartValidator(CreditHoursValidator::fromConfig());
         $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester), $existing);
 
-        // Derive the status (Regular/Retake/Audit); a second retake blocks the add.
-        $derivation = (new RetakeDeriver)->derive($mode, $existing->priorForCreditFor($cartLine->courseId));
+        // Derive the status (Regular/Retake/CGPA Improvement/Audit); a third for-credit
+        // attempt blocks the add.
+        $derivation = (new AttemptDeriver)->derive(
+            $mode,
+            $existing->priorForCreditFor($cartLine->courseId),
+            $existing->priorEarnedFor($cartLine->courseId),
+        );
         if ($derivation->blocked) {
             $violations[] = new CartViolation(
                 CartViolation::RETAKE_LIMIT,
-                "{$cartLine->courseCode} has already used its one allowed retake.",
+                "{$cartLine->courseCode} has already used its one allowed re-registration.",
                 [$cartLine->offeringId],
             );
         }

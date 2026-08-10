@@ -24,6 +24,25 @@ final class EloquentAcademicCalendar implements AcademicCalendar
         return $semester === null ? null : $this->toSummary($semester);
     }
 
+    /**
+     * @param  list<int>  $ids
+     * @return array<int, SemesterSummary>
+     */
+    public function findMany(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return Semester::query()
+            ->whereIn('id', $ids)
+            ->get()
+            ->mapWithKeys(fn (Semester $semester): array => [
+                (int) $semester->getKey() => $this->toSummary($semester),
+            ])
+            ->all();
+    }
+
     public function openForRegistration(): ?SemesterSummary
     {
         $semester = Semester::query()->registrationOpen()->orderByDesc('year')->first();
@@ -36,6 +55,21 @@ final class EloquentAcademicCalendar implements AcademicCalendar
         $semester = Semester::query()->running()->orderByDesc('year')->first();
 
         return $semester === null ? null : $this->toSummary($semester);
+    }
+
+    public function nextAfter(int $semesterId): ?SemesterSummary
+    {
+        $semester = Semester::query()->find($semesterId);
+        if ($semester === null) {
+            return null;
+        }
+
+        $next = Semester::query()
+            ->where('starts_at', '>', $semester->starts_at)
+            ->orderBy('starts_at')
+            ->first();
+
+        return $next === null ? null : $this->toSummary($next);
     }
 
     private function toSummary(Semester $semester): SemesterSummary
@@ -53,6 +87,7 @@ final class EloquentAcademicCalendar implements AcademicCalendar
             addDropEndsAt: $semester->add_drop_ends_at->toImmutable(),
             lateAddEndsAt: $semester->late_add_ends_at->toImmutable(),
             withdrawalDeadlineAt: $semester->withdrawal_deadline_at->toImmutable(),
+            gradeSubmissionDeadlineAt: $semester->grade_submission_deadline_at->toImmutable(),
         );
     }
 }

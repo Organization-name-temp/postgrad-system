@@ -36,6 +36,7 @@ import { StatusChip } from '../../../shared/ui/StatusChip'
 import type { EligibleCourse } from '../registration/classification'
 import { courseStatusChip } from '../courseStatusChip'
 import { MeetingTimes } from '../MeetingTimes'
+import { mustRetakeChip } from '../mustRetakeChip'
 import { AddCoursePanel } from './AddCoursePanel'
 import { AttendanceCell } from './AttendanceCell'
 
@@ -222,10 +223,15 @@ function EnrollmentRow({
   return (
     <TableRow>
       <TableCell>
-        <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
-          {course?.code}
-        </Typography>{' '}
-        {name}
+        <Stack spacing={0.75} sx={{ alignItems: 'flex-start' }}>
+          <Typography variant="body2">
+            <Typography component="span" variant="body2" sx={{ fontWeight: 600 }}>
+              {course?.code}
+            </Typography>{' '}
+            {name}
+          </Typography>
+          {enrollment.must_retake && <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />}
+        </Stack>
       </TableCell>
       <TableCell>
         <StatusChip {...courseStatusChip(status, t(`courseStatus.${status}`))} />

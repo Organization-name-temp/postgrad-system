@@ -12,7 +12,7 @@ import type { TheStudentsTheComposerMayRegisterOnBehalfOf200DataItem as Composab
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { CartBuilder } from '../registration/CartBuilder'
 import type { EligibleCourse } from '../registration/classification'
-import { StudentPicker } from './StudentPicker'
+import { StudentPicker } from '../../../shared/ui/StudentPicker'
 
 /**
  * Register courses on a student's behalf (features/enrollment, ticket 09). Staff pick a

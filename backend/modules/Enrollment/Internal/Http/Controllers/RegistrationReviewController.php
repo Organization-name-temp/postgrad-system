@@ -56,7 +56,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * Approving **re-validates** the approved subset at decision time — the same batch rules the
  * cart enforced ({@see CartValidator}) plus the checks that need the Student's record: the
  * composition caps and duplicate/clash against existing Enrollments, and the derived Retake
- * ({@see RetakeDeriver}) with its cap of one. A clean subset **mints one Enrollment per
+ * ({@see AttemptDeriver}) with its cap of one. A clean subset **mints one Enrollment per
  * approved line atomically in the decision transaction** (the ADR-0013 accept→mint
  * precedent); ≥1 approved line ⇒ the request is Approved, all rejected ⇒ Rejected. The
  * Student is notified either way ({@see NotifiesRegistration}). Every cross-module fact is
@@ -171,7 +171,9 @@ class RegistrationReviewController
             $courseId = $offering === null ? null : (int) $offering->course_id;
             $line->setAttribute(
                 'derived_retake',
-                $courseId !== null && $existing->priorForCreditFor($courseId) >= 1,
+                $courseId !== null
+                    && $existing->priorForCreditFor($courseId) === 1
+                    && $existing->priorEarnedFor($courseId) === false,
             );
         });
 

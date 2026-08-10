@@ -11,6 +11,7 @@ import FactCheckIcon from '@mui/icons-material/FactCheck'
 import GavelIcon from '@mui/icons-material/Gavel'
 import HowToRegIcon from '@mui/icons-material/HowToReg'
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount'
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
@@ -20,6 +21,10 @@ import RuleIcon from '@mui/icons-material/Rule'
 import CoPresentIcon from '@mui/icons-material/CoPresent'
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1'
 import PersonSearchIcon from '@mui/icons-material/PersonSearch'
+import GradingIcon from '@mui/icons-material/Grading'
+import RateReviewIcon from '@mui/icons-material/RateReview'
+import GradeIcon from '@mui/icons-material/Grade'
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -215,12 +220,78 @@ export const navItems: NavItem[] = [
     section: 'enrollment',
     roles: [ROLE.instructor, ...ADMIN_ROLES],
   },
+  // Grading (Phase 4, ticket 01): the grade-sheet list, in its own nav section. A **persona**
+  // item on the Instructor role (R04) — and, from ticket 09, on Student Affairs (R05) too, whose
+  // `grades.enter` without `grades.finalize` makes the very same screen their central-entry
+  // picker over every Offering. It stays role-gated rather than permission-gated because an
+  // administrator inherits `grades.enter` but is scoped by Offering assignment like an
+  // Instructor, so the permission alone would not describe who this screen is for. The server
+  // decides which of the two lists comes back. The Department Head's review queue and the
+  // Student's My Grades join this section in later tickets.
+  {
+    key: 'gradeSheets',
+    to: '/grading',
+    icon: <GradingIcon />,
+    section: 'grading',
+    roles: [ROLE.instructor, ROLE.studentAffairs],
+  },
+  // The Instructor's outstanding Incompletes (ticket 05): declared on their own Sheets,
+  // resolved through the same signature + Department-Head review as any other grade. A
+  // **persona** item beside "Grade sheets" — the Offering assignment is re-enforced
+  // server-side exactly as the Sheet routes are.
+  {
+    key: 'outstandingIncompletes',
+    to: '/grading/incompletes',
+    icon: <HourglassBottomIcon />,
+    section: 'grading',
+    roles: [ROLE.instructor],
+  },
+  // The Department Head's review queue (ticket 03): a **persona** item on the
+  // Department-Head role (R06), beside the Instructor's own grade sheets — both share
+  // `grades.finalize`, but only a Head reviews a queue, so this gates on the role rather
+  // than the permission (the myOfferings precedent).
+  {
+    key: 'gradeReview',
+    to: '/grading/review',
+    icon: <RateReviewIcon />,
+    section: 'grading',
+    roles: [ROLE.departmentHead],
+  },
+  // My Grades (ticket 04): the Student's own Semester GPAs and CGPA. A **persona** item on
+  // the Student role (R02) — the SchedulePage precedent — since an admin inheriting
+  // grades.view_own has no Student record for the page to read.
+  {
+    key: 'myGrades',
+    to: '/grading/my-grades',
+    icon: <GradeIcon />,
+    section: 'grading',
+    roles: [ROLE.student],
+  },
+  // Student-grade oversight (ticket 08): the scoped reviewer read of a Student's academic
+  // record. A capability item on grades.view_student — Advisors, Instructors, Student
+  // Affairs, Department Heads, Deans, Council, plus admins inheriting everything.
+  {
+    key: 'studentGrades',
+    to: '/grading/students',
+    icon: <GradeIcon />,
+    section: 'grading',
+    permission: PERMISSION.viewStudentGrades,
+  },
   // Administration (ticket 08): role-gated to System/Super Admins (R09/R10), grouped
   // under its own subheader — the first role-gated (not permission-gated) nav section.
   {
     key: 'assignments',
     to: '/admin/assignments',
     icon: <SupervisorAccountIcon />,
+    section: 'administration',
+    adminOnly: true,
+  },
+  // Department-Head↔Department routing (phase 4, ticket 02), beside the Dean map and
+  // under the same role gate — it decides where a signed Grade Sheet goes for review.
+  {
+    key: 'departmentHeads',
+    to: '/admin/department-heads',
+    icon: <ManageAccountsIcon />,
     section: 'administration',
     adminOnly: true,
   },

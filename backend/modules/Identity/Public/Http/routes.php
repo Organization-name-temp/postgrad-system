@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Identity\Internal\Http\Controllers\DepartmentHeadAssignmentController;
 use Modules\Identity\Internal\Http\Controllers\FacultyDeanAssignmentController;
 use Modules\Identity\Internal\Http\Controllers\LoginController;
 use Modules\Identity\Internal\Http\Controllers\LogoutController;
@@ -29,5 +30,14 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/faculty-dean-assignments', [FacultyDeanAssignmentController::class, 'index']);
     Route::post('/faculty-dean-assignments', [FacultyDeanAssignmentController::class, 'store']);
     Route::delete('/faculty-dean-assignments/{assignment}', [FacultyDeanAssignmentController::class, 'destroy'])
+        ->whereNumber('assignment');
+
+    // Department-Head↔Department routing (phase 4, ticket 02), beside the Dean map and
+    // behind the same role gate. Grading reads the result to route a signed Grade Sheet
+    // to its reviewer; a NULL Department is the university-wide Preparatory scope.
+    Route::get('/department-heads', [DepartmentHeadAssignmentController::class, 'heads']);
+    Route::get('/department-head-assignments', [DepartmentHeadAssignmentController::class, 'index']);
+    Route::post('/department-head-assignments', [DepartmentHeadAssignmentController::class, 'store']);
+    Route::delete('/department-head-assignments/{assignment}', [DepartmentHeadAssignmentController::class, 'destroy'])
         ->whereNumber('assignment');
 });

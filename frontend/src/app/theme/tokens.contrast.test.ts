@@ -20,6 +20,10 @@ const lightText: Pair[] = [
   { name: 'text.secondary on paper', fg: L.text.secondary, bg: L.background.paper },
   { name: 'button label on primary', fg: L.primary.contrastText, bg: L.primary.main },
   { name: 'brand-red text on paper', fg: L.primary.text, bg: L.background.paper },
+  // The shade a text/outlined primary button reads in light (MuiButton's `.dark`), on both
+  // surfaces — the pair the Phase-4 dark-mode axe scan caught unwired on the dark side.
+  { name: 'primary button label on paper', fg: L.primary.dark, bg: L.background.paper },
+  { name: 'primary button label on default', fg: L.primary.dark, bg: L.background.default },
   { name: 'secondary text on paper', fg: L.secondary.main, bg: L.background.paper },
   { name: 'success text on paper', fg: L.success.dark, bg: L.background.paper },
   { name: 'warning text on paper', fg: L.warning.dark, bg: L.background.paper },
@@ -32,6 +36,11 @@ const darkText: Pair[] = [
   { name: 'text.secondary on paper', fg: D.text.secondary, bg: D.background.paper },
   { name: 'button label on primary', fg: D.primary.contrastText, bg: D.primary.main },
   { name: 'brand-red text on paper', fg: D.primary.text, bg: D.background.paper },
+  // The shade a text/outlined primary button reads in dark (MuiButton's `.light`, mapped
+  // from `primary.text`), on both surfaces. The vivid `.main` is deliberately NOT here: it
+  // is ~3.8:1 on the dark surface, which is why the palette maps this shade at all.
+  { name: 'primary button label on paper', fg: D.primary.text, bg: D.background.paper },
+  { name: 'primary button label on default', fg: D.primary.text, bg: D.background.default },
   { name: 'secondary text on paper', fg: D.secondary.main, bg: D.background.paper },
   { name: 'success text on paper', fg: D.success.main, bg: D.background.paper },
   { name: 'warning text on paper', fg: D.warning.main, bg: D.background.paper },

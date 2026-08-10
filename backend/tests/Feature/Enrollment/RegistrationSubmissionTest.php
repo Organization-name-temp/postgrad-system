@@ -14,6 +14,7 @@ use Modules\Catalog\Public\Enums\CourseLevel;
 use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Enrollment\Internal\Enums\Weekday;
 use Modules\Enrollment\Internal\Models\CourseOffering;
+use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\OfferingMeeting;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Identity\Internal\Models\Student;
@@ -101,6 +102,24 @@ function offeredCore(
     placeIn($program, $course, CourseCategory::ProgramCore);
 
     return offerWith($semester, $course, $capacity, $meetings);
+}
+
+/** A current-Student Enrollment in the given Offering, with an optional earned outcome. */
+function submittedEnrollment(
+    Student $student,
+    CourseOffering $offering,
+    string $classification = 'Core',
+    string $status = 'Regular',
+    ?bool $earned = null,
+): Enrollment {
+    return Enrollment::factory()->create([
+        'student_id' => $student->id,
+        'course_offering_id' => $offering->id,
+        'classification' => $classification,
+        'course_status' => $status,
+        'credit_hours' => 3,
+        'earned' => $earned,
+    ]);
 }
 
 /** POST a cart of lines. */
@@ -297,6 +316,63 @@ it('rejects a cart line for a course that is not eligible', function () {
     submitCart([cartItem($orphan)])
         ->assertStatus(422)
         ->assertJsonValidationErrors(['lines.0.offering_id']);
+});
+
+it('rejects re-registering a course whose earlier attempt is still unresolved Incomplete', function () {
+    $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
+    $previous = Semester::factory()->ended()->create(['term' => Term::Spring, 'year' => 2026]);
+    $current = openSemester(Term::Fall, 2026);
+    $student = cartStudent($program, enrollmentTerm: 'Fall 2026');
+
+    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3, 'code' => 'DEP501']);
+    placeIn($program, $course, CourseCategory::ProgramCore);
+    $oldOffering = offerWith($previous, $course);
+    $newOffering = offerWith($current, $course, meetings: [[Weekday::Tuesday, '09:00', '11:00']]);
+    submittedEnrollment($student, $oldOffering, status: 'Incomplete');
+
+    submitCart([cartItem($newOffering)])
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['outstanding_incomplete']);
+
+    expect(RegistrationRequest::query()->count())->toBe(0);
+});
+
+it('lets a student register a different external elective after failing the first one', function () {
+    $own = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
+    $otherA = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
+    $otherB = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
+    $previous = Semester::factory()->ended()->create(['term' => Term::Spring, 'year' => 2026]);
+    $current = openSemester(Term::Fall, 2026);
+    $student = cartStudent($own, enrollmentTerm: 'Fall 2026');
+
+    $failedCourse = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    placeIn($otherA, $failedCourse, CourseCategory::ResearchElective);
+    $failedOffering = offerWith($previous, $failedCourse);
+    submittedEnrollment($student, $failedOffering, classification: 'ExternalElective', earned: false);
+
+    $replacement = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    placeIn($otherB, $replacement, CourseCategory::ResearchElective);
+    $replacementOffering = offerWith($current, $replacement, meetings: [[Weekday::Tuesday, '09:00', '11:00']]);
+
+    submitCart([cartItem($replacementOffering)])->assertCreated()->assertJsonPath('data.lines.0.classification', 'ExternalElective');
+});
+
+it('does not block registration just because a failed core course now carries a must-retake obligation', function () {
+    $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
+    $previous = Semester::factory()->ended()->create(['term' => Term::Spring, 'year' => 2026]);
+    $current = openSemester(Term::Fall, 2026);
+    $student = cartStudent($program, enrollmentTerm: 'Fall 2026');
+
+    $failedCore = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    placeIn($program, $failedCore, CourseCategory::ProgramCore);
+    $failedOffering = offerWith($previous, $failedCore);
+    submittedEnrollment($student, $failedOffering, classification: 'Core', earned: false);
+
+    $newCourse = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    placeIn($program, $newCourse, CourseCategory::ProgramCore);
+    $newOffering = offerWith($current, $newCourse, meetings: [[Weekday::Tuesday, '09:00', '11:00']]);
+
+    submitCart([cartItem($newOffering)])->assertCreated();
 });
 
 // ---------------------------------------------------------------------------

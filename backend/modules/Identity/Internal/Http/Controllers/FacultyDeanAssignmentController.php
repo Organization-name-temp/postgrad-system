@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Modules\Identity\Internal\Http\Resources\DeanResource;
+use Modules\Identity\Internal\Http\Resources\AssignableUserResource;
 use Modules\Identity\Internal\Http\Resources\FacultyDeanAssignmentResource;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
@@ -57,7 +57,7 @@ class FacultyDeanAssignmentController
      */
     public function deans(): AnonymousResourceCollection
     {
-        return DeanResource::collection(
+        return AssignableUserResource::collection(
             User::query()
                 ->whereHas('userRoles', fn ($query) => $query->where('role', Role::Dean->value))
                 ->orderBy('name')

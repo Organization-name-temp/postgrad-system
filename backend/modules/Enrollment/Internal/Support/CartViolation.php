@@ -26,6 +26,9 @@ final readonly class CartViolation
     /** A second retake of a course whose one allowed retake is already used (mint, FR-REG-006). */
     public const string RETAKE_LIMIT = 'retake_limit';
 
+    /** Re-registering a Course whose earlier Attempt is still Incomplete (ticket 07). */
+    public const string OUTSTANDING_INCOMPLETE = 'outstanding_incomplete';
+
     /** Two chosen Offerings meet at overlapping weekly times (or clash with the record). */
     public const string TIME_CLASH = 'time_clash';
 

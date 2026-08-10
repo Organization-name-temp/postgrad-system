@@ -52,6 +52,13 @@ const TYPE_ALIAS: Record<string, string> = {
   'enrollment.adjusted': 'enrollmentAdjusted',
   'enrollment.withdrawn': 'enrollmentWithdrawn',
   'attendance.audit_at_risk': 'attendanceAuditAtRisk',
+  'grade.sheet_submitted': 'gradeSheetSubmitted',
+  'grade.sheet_returned': 'gradeSheetReturned',
+  'grade.finalized': 'gradeFinalized',
+  'incomplete.declared': 'incompleteDeclared',
+  'incomplete.reminder': 'incompleteReminder',
+  'incomplete.converted': 'incompleteConverted',
+  'grades.overdue': 'gradesOverdue',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

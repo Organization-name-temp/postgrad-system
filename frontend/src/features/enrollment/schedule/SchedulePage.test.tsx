@@ -48,6 +48,7 @@ function enrollment(overrides: Record<string, unknown> = {}) {
     course_status: 'Regular',
     classification: 'Core',
     credit_hours: 3,
+    must_retake: false,
     course: {
       id: 1,
       code: 'DEP501',
@@ -142,5 +143,12 @@ describe('SchedulePage period-gated actions', () => {
     expect(screen.queryByRole('button', { name: /drop dep501/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /withdraw from dep501/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /add a course/i })).not.toBeInTheDocument()
+  })
+
+  it('shows the must-retake marker on schedule rows that still carry the obligation', async () => {
+    srv.schedule = { data: [group({ enrollments: [enrollment({ must_retake: true })] })] }
+    renderPage()
+
+    expect(await screen.findByText(/must retake/i)).toBeInTheDocument()
   })
 })

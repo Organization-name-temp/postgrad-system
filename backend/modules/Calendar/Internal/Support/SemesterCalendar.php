@@ -10,11 +10,11 @@ use Modules\Calendar\Public\SemesterSummary;
  * ordering invariant enforced on write, and the period answers derived from the
  * dates — never stored flags (the `AdmissionCycle::isOpen()` precedent).
  *
- * A stateless value with no clock of its own: the caller passes the seven period
+ * A stateless value with no clock of its own: the caller passes the eight period
  * dates once and asks its questions against an explicit `$now`. This is the single
- * authority for "is registration open", "is the term running", and the add/drop /
- * late-add / withdrawal windows — the model's derived attributes, the CRUD
- * validation, and the {@see SemesterSummary} period
+ * authority for "is registration open", "is the term running", the add/drop /
+ * late-add / withdrawal windows, and whether grades are late — the model's derived
+ * attributes, the CRUD validation, and the {@see SemesterSummary} period
  * answers all delegate here so a query, a loaded model, and the cross-module facade
  * can never drift (ADR-0018 §Consequences). Unit-tested directly (spec §Testing).
  */
@@ -28,6 +28,7 @@ final class SemesterCalendar
         public readonly CarbonInterface $addDropEndsAt,
         public readonly CarbonInterface $lateAddEndsAt,
         public readonly CarbonInterface $withdrawalDeadlineAt,
+        public readonly CarbonInterface $gradeSubmissionDeadlineAt,
     ) {}
 
     /**
@@ -35,9 +36,9 @@ final class SemesterCalendar
      * broken; an empty array means the calendar is well-ordered. The invariant
      * (ticket 01, ADR-0018): registration opens before it closes and before the
      * semester starts; registration closes no later than the add/drop deadline;
-     * add/drop end < late-add end < withdrawal deadline ≤ semester end; and the
-     * semester ends after it starts. Each broken rule is keyed to the field an
-     * administrator would move to fix it, so the 422 reads naturally on the form.
+     * add/drop end < late-add end < withdrawal deadline ≤ semester end ≤ grade-submission
+     * deadline; and the semester ends after it starts. Each broken rule is keyed to the
+     * field an administrator would move to fix it, so the 422 reads naturally on the form.
      *
      * @return array<string, string>
      */
@@ -66,6 +67,13 @@ final class SemesterCalendar
             $violations['withdrawal_deadline_at'] = 'ordering.withdrawal_deadline_at';
         }
 
+        // Phase 4 ticket 09: grades are submitted for a term that has finished, so the deadline
+        // sits on or after the end — keyed to the deadline itself, the field an administrator
+        // moves to fix it, exactly as the withdrawal rule above is.
+        if ($this->gradeSubmissionDeadlineAt->lessThan($this->endsAt)) {
+            $violations['grade_submission_deadline_at'] = 'ordering.grade_submission_deadline_at';
+        }
+
         if ($this->endsAt->lessThanOrEqualTo($this->startsAt)) {
             $violations['ends_at'] = 'ordering.ends_at';
         }
@@ -89,6 +97,18 @@ final class SemesterCalendar
     public function hasEnded(CarbonInterface $now): bool
     {
         return $now->greaterThan($this->endsAt);
+    }
+
+    /**
+     * Whether the grade-submission deadline has passed (strictly after it, so the deadline day
+     * itself is still in time — the Incomplete resolution window's inclusive reading). This
+     * gates **nothing**: Phase 4 ticket 09 flags an Offering with no finalized Sheet past this
+     * moment and notifies, the SLA-aging pattern, because an Instructor locked out of
+     * submitting could not deliver grades at all.
+     */
+    public function hasGradeSubmissionDeadlinePassed(CarbonInterface $now): bool
+    {
+        return $now->greaterThan($this->gradeSubmissionDeadlineAt);
     }
 
     /**

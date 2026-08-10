@@ -36,6 +36,7 @@ final readonly class SemesterSummary
         public CarbonImmutable $addDropEndsAt,
         public CarbonImmutable $lateAddEndsAt,
         public CarbonImmutable $withdrawalDeadlineAt,
+        public CarbonImmutable $gradeSubmissionDeadlineAt,
     ) {}
 
     /** Whether registration is open at the given moment. */
@@ -54,6 +55,16 @@ final readonly class SemesterSummary
     public function hasEnded(CarbonInterface $now): bool
     {
         return $this->calendar()->hasEnded($now);
+    }
+
+    /**
+     * Whether the grade-submission deadline has passed by the given moment (phase 4 ticket 09).
+     * Grading is the consumer: its late-Sheet flagging command asks this of each Offering's
+     * Semester. It gates nothing — an Instructor past the deadline is nudged, never locked out.
+     */
+    public function hasGradeSubmissionDeadlinePassed(CarbonInterface $now): bool
+    {
+        return $this->calendar()->hasGradeSubmissionDeadlinePassed($now);
     }
 
     /** Whether the free add/drop period (FR-REG-004 weeks 1–2) is active. */
@@ -94,6 +105,7 @@ final readonly class SemesterSummary
             addDropEndsAt: $this->addDropEndsAt,
             lateAddEndsAt: $this->lateAddEndsAt,
             withdrawalDeadlineAt: $this->withdrawalDeadlineAt,
+            gradeSubmissionDeadlineAt: $this->gradeSubmissionDeadlineAt,
         );
     }
 }

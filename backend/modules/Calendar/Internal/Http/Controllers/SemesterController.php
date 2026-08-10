@@ -17,35 +17,23 @@ use Modules\Calendar\Public\Enums\Term;
  * @group Calendar
  *
  * Manage Semesters — the academic term (Fall/Spring + year) the university runs
- * (ADR-0018, FR-CAL-001), the single authority every later Phase-3 record reads
+ * (ADR-0018, FR-CAL-001), the single authority every later Phase-3/4 record reads
  * from. Creating and editing require the calendar.manage permission (Student
  * Affairs / Dean / SysAdmin); reading is open to any authenticated user who needs
  * the calendar. A Semester's period state (registration open, running, …) is
- * derived from its dates, never a stored flag; the five windows must be ordered
- * (ADR-0018) and (term, year) is unique. Semesters are edited in place, never
- * hard-deleted (no delete verb → 405).
+ * derived from its dates, never a stored flag; the period dates — the five
+ * registration windows plus the grade-submission deadline that closes them (phase 4
+ * ticket 09) — must be ordered (ADR-0018) and (term, year) is unique. Semesters are
+ * edited in place, never hard-deleted (no delete verb → 405).
  */
 class SemesterController
 {
-    /**
-     * The human message for each ordering rule the pure {@see SemesterCalendar}
-     * can flag, keyed by the field an administrator would move to fix it.
-     */
-    private const ORDERING_MESSAGES = [
-        'registration_opens_at' => 'Registration must open before it closes and before the semester starts.',
-        'registration_closes_at' => 'Registration must close on or before the add/drop deadline.',
-        'add_drop_ends_at' => 'The add/drop period must end before the late-add deadline.',
-        'late_add_ends_at' => 'The late-add period must end before the withdrawal deadline.',
-        'withdrawal_deadline_at' => 'The withdrawal deadline must be on or before the semester ends.',
-        'ends_at' => 'The semester must end after it starts.',
-    ];
-
     /**
      * List Semesters.
      *
      * Newest term first. Available to any authenticated user who needs the calendar.
      *
-     * @response 200 {"data": [{"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "is_registration_open": true}]}
+     * @response 200 {"data": [{"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "grade_submission_deadline_at": "2027-01-10T00:00:00+00:00", "is_registration_open": true}]}
      */
     public function index(): AnonymousResourceCollection
     {
@@ -59,7 +47,7 @@ class SemesterController
      *
      * @urlParam semester_id integer required The ID of the semester. Example: 1
      *
-     * @response 200 {"data": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "is_registration_open": true}}
+     * @response 200 {"data": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "grade_submission_deadline_at": "2027-01-10T00:00:00+00:00", "is_registration_open": true}}
      */
     public function show(Semester $semester): SemesterResource
     {
@@ -78,8 +66,9 @@ class SemesterController
      * @bodyParam add_drop_ends_at string required End of the free add/drop period (ISO 8601). Example: 2026-09-14T00:00:00+00:00
      * @bodyParam late_add_ends_at string required End of the late-add period (ISO 8601). Example: 2026-09-21T00:00:00+00:00
      * @bodyParam withdrawal_deadline_at string required The withdrawal deadline (ISO 8601). Example: 2026-11-30T00:00:00+00:00
+     * @bodyParam grade_submission_deadline_at string required When instructors must have submitted grades — on or after the semester ends (ISO 8601). Example: 2027-01-10T00:00:00+00:00
      *
-     * @response 201 {"data": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "is_registration_open": true}}
+     * @response 201 {"data": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "grade_submission_deadline_at": "2027-01-10T00:00:00+00:00", "is_registration_open": true}}
      * @response 422 {"message": "The term has already been taken.", "errors": {"term": ["The term has already been taken."]}}
      */
     public function store(Request $request): JsonResponse
@@ -109,8 +98,9 @@ class SemesterController
      * @bodyParam add_drop_ends_at string required End of the free add/drop period (ISO 8601). Example: 2026-09-14T00:00:00+00:00
      * @bodyParam late_add_ends_at string required End of the late-add period (ISO 8601). Example: 2026-09-21T00:00:00+00:00
      * @bodyParam withdrawal_deadline_at string required The withdrawal deadline (ISO 8601). Example: 2026-11-30T00:00:00+00:00
+     * @bodyParam grade_submission_deadline_at string required When instructors must have submitted grades — on or after the semester ends (ISO 8601). Example: 2027-01-10T00:00:00+00:00
      *
-     * @response 200 {"data": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "is_registration_open": true}}
+     * @response 200 {"data": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-30T00:00:00+00:00", "grade_submission_deadline_at": "2027-01-10T00:00:00+00:00", "is_registration_open": true}}
      */
     public function update(Request $request, Semester $semester): SemesterResource
     {
@@ -147,13 +137,16 @@ class SemesterController
             'add_drop_ends_at' => ['required', 'date'],
             'late_add_ends_at' => ['required', 'date'],
             'withdrawal_deadline_at' => ['required', 'date'],
+            'grade_submission_deadline_at' => ['required', 'date'],
         ];
     }
 
     /**
      * Enforce the cross-field ordering invariant through the one pure authority
      * ({@see SemesterCalendar}), raising a 422 keyed per offending field so the SPA
-     * mirror and the form both read naturally (ADR-0018).
+     * mirror and the form both read naturally (ADR-0018). Each violation the calendar
+     * reports is already a `calendar.php` translation key, so the message an administrator
+     * reads is bilingual without the rule living in two places.
      *
      * @param  array<string, mixed>  $validated
      */
@@ -167,6 +160,7 @@ class SemesterController
             addDropEndsAt: Carbon::parse($validated['add_drop_ends_at']),
             lateAddEndsAt: Carbon::parse($validated['late_add_ends_at']),
             withdrawalDeadlineAt: Carbon::parse($validated['withdrawal_deadline_at']),
+            gradeSubmissionDeadlineAt: Carbon::parse($validated['grade_submission_deadline_at']),
         );
 
         $violations = $calendar->orderingViolations();
@@ -176,8 +170,8 @@ class SemesterController
         }
 
         $messages = [];
-        foreach (array_keys($violations) as $field) {
-            $messages[$field] = self::ORDERING_MESSAGES[$field];
+        foreach ($violations as $field => $reasonKey) {
+            $messages[$field] = __('calendar.'.$reasonKey);
         }
 
         throw ValidationException::withMessages($messages);

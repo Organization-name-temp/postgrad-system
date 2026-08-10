@@ -4,24 +4,29 @@ namespace Modules\Enrollment;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Enrollment\Internal\Support\EloquentEnrollmentRecords;
+use Modules\Enrollment\Public\EnrollmentRecords;
 
 /**
- * The Enrollment domain module (ADR-0017): it owns Course Offerings — and, in later
- * Phase-3 tickets, Registration Requests, Enrollments, Class Sessions and Attendance.
- * Auto-discovered from bootstrap/providers.php by dropping the module directory in
- * place (ADR-0007); deptrac governs what it may import ({Identity, Catalog, Calendar,
- * Notifications}\Public — never another module's Internal).
+ * The Enrollment domain module (ADR-0017): it owns Course Offerings, Registration Requests,
+ * Enrollments, Class Sessions and Attendance. Auto-discovered from bootstrap/providers.php
+ * by dropping the module directory in place (ADR-0007); deptrac governs what it may import
+ * ({Identity, Catalog, Calendar, Notifications}\Public — never another module's Internal).
  *
- * `Enrollment\Public` ships empty beyond its route file in Phase 3 (ADR-0017): the
- * offering/roster read surface other modules will consume is built in Phase 4 against
- * grading, its first real consumer. There is nothing to bind in the container yet —
- * the cross-module facades this module reads are bound by their own providers.
+ * `Enrollment\Public` shipped empty beyond its route file in Phase 3; Phase 4 makes it
+ * load-bearing (ADR-0017 deferred the read surface to "built against grading", ADR-0020 is
+ * the consumer that arrived). {@see EnrollmentRecords} is the cross-module read facade
+ * Grading resolves rosters and Offering routing facts through; the Eloquent reader lives in
+ * `Enrollment\Internal`. The cross-module facades this module itself reads are bound by
+ * their own providers.
  */
 class EnrollmentServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // The cross-module read facade (ADR-0012/0017): consumers depend on the
+        // Enrollment\Public contract; the Eloquent reader lives in Enrollment\Internal.
+        $this->app->bind(EnrollmentRecords::class, EloquentEnrollmentRecords::class);
     }
 
     public function boot(): void

@@ -29,6 +29,7 @@ final readonly class ProgramSummary
         public string $nameEn,
         public string $nameAr,
         public DegreeLevel $degreeLevel,
+        public int $departmentId,
         public int $facultyId,
         public string $departmentNameEn,
         public string $departmentNameAr,

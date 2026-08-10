@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import type { Page, TestInfo } from '@playwright/test'
+import type { Locator, Page, TestInfo } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
 // The Phase 3 headline smoke — the whole enrollment loop in one flow, against the real
@@ -25,12 +25,42 @@ async function login(page: Page, email: string) {
   await page.getByLabel('Password').fill('password')
   await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page).toHaveURL(/\/$/)
+  // Pin English. The locale is persisted per user (`preferred_locale` on /me), and the bilingual
+  // axe specs sign in as these same seeded accounts and leave Arabic behind — so a flow that
+  // asserts English copy must state that rather than inherit whatever ran before it.
+  await page.getByRole('button', { name: 'English' }).click()
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
 }
 
 async function logout(page: Page) {
   await page.getByRole('button', { name: 'Account menu' }).click()
   await page.getByRole('menuitem', { name: 'Log out' }).click()
   await expect(page).toHaveURL(/\/login$/)
+}
+
+/**
+ * Wait until nothing above `surface` is still animating, so axe measures a stationary screen.
+ *
+ * axe measures **rendered** colour, so a dialog caught mid-fade has every label on it measured
+ * blended with the backdrop and the page behind it: the New-semester dialog's field labels
+ * (`text.secondary`, 4.83:1 at rest) were reported at 3.73:1 — ink-500 read as #737985 on a paper
+ * white read as #ededed — which is a serious `color-contrast` violation against a screen that is
+ * compliant once it stops moving. Being visible is not enough to scan.
+ *
+ * This waits on the **ancestors'** animations, not the surface's own, because that is where MUI
+ * puts them: `Fade` wraps a Dialog's `.MuiDialog-container`, and the element carrying
+ * `role="dialog"` inside it sits at opacity 1 for the whole transition. (Same helper, same
+ * rationale, as department-heads.spec.ts.)
+ */
+async function settled(surface: Locator) {
+  await surface.evaluate(async (element) => {
+    const running: Animation[] = []
+    for (let node: Element | null = element; node !== null; node = node.parentElement) {
+      running.push(...node.getAnimations())
+    }
+    // A cancelled animation rejects `finished`; it has stopped either way.
+    await Promise.all(running.map((animation) => animation.finished.catch(() => undefined)))
+  })
 }
 
 // WCAG AA gate (design-system.md §12): axe on the real screens, no serious/critical.
@@ -79,6 +109,18 @@ test('headline: an admin, a student, their advisor and an instructor run the enr
   const fallRow = page.getByRole('row', { name: /Fall 2026/ })
   await expect(fallRow).toBeVisible()
   await expectNoSeriousA11y(page)
+
+  // The semester form itself, opened and cancelled without saving: it gained the
+  // grade-submission deadline in phase 4 ticket 09, and a dialog of eight datetime inputs is
+  // exactly where a missing label hides. Scanned here rather than in its own spec because this
+  // is already the signed-in Student Affairs journey through the semesters screen.
+  await page.getByRole('button', { name: 'New semester' }).click()
+  const semesterDialog = page.getByRole('dialog')
+  await expect(semesterDialog.getByLabel('Grade-submission deadline')).toBeVisible()
+  await settled(semesterDialog)
+  await expectNoSeriousA11y(page)
+  await page.getByRole('button', { name: 'Cancel' }).click()
+
   await fallRow.getByRole('link', { name: 'Offerings' }).click()
   await expect(page).toHaveURL(/\/admin\/semesters\/\d+\/offerings$/)
   await expect(page.getByRole('heading', { name: /^Offerings — / })).toBeVisible()

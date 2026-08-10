@@ -11,13 +11,15 @@ tags:
   - name: Admissions
     description: "\nManage Admission Cycles — the windowed Fall/Spring intake (e.g. \"Fall 2026\")\nevery Application hangs off. Listing/creating/editing/activating requires the\ncalendar.manage permission (Student Affairs or a Dean). A Cycle is \"open\" when\nit is active and the current moment falls inside its window — derived, never a\nstored status column (ADR-0012, ticket 01). Cycles are deactivated, never\ndeleted. The {@see self::open()} lookup is public — it feeds the\nunauthenticated registration screen."
   - name: Calendar
-    description: "\nManage Semesters — the academic term (Fall/Spring + year) the university runs\n(ADR-0018, FR-CAL-001), the single authority every later Phase-3 record reads\nfrom. Creating and editing require the calendar.manage permission (Student\nAffairs / Dean / SysAdmin); reading is open to any authenticated user who needs\nthe calendar. A Semester's period state (registration open, running, …) is\nderived from its dates, never a stored flag; the five windows must be ordered\n(ADR-0018) and (term, year) is unique. Semesters are edited in place, never\nhard-deleted (no delete verb → 405)."
+    description: "\nManage Semesters — the academic term (Fall/Spring + year) the university runs\n(ADR-0018, FR-CAL-001), the single authority every later Phase-3/4 record reads\nfrom. Creating and editing require the calendar.manage permission (Student\nAffairs / Dean / SysAdmin); reading is open to any authenticated user who needs\nthe calendar. A Semester's period state (registration open, running, …) is\nderived from its dates, never a stored flag; the period dates — the five\nregistration windows plus the grade-submission deadline that closes them (phase 4\nticket 09) — must be ordered (ADR-0018) and (term, year) is unique. Semesters are\nedited in place, never hard-deleted (no delete verb → 405)."
   - name: Catalog
     description: "\nThe catalog browse tree — the whole academic hierarchy (Faculty → Department →\nProgram → Category → Course) in a single read-model payload so the front end can\nrender and search it client-side without chatty per-node requests (FR-PCM-002,\nspec §API). Every node carries both language names; Course nodes carry their\nactive status so retired courses read accessibly. Reading requires catalog.view —\nthe catalog is universally browsable (ADR-0008). \"University\" is a synthetic root\nthe SPA prepends; it is not an entity, so it is not in this payload."
   - name: Endpoints
     description: ''
   - name: Enrollment
     description: "\nCourse Offering management (ADR-0017, ticket 03) — \"what actually runs this\nsemester.\" An administrator holding `calendar.manage` (Student Affairs / Dean;\nSysAdmin inherits) populates a Semester with Offerings: one Catalog Course taught in\nthat Semester, carrying an assigned Instructor, an optional seat capacity, and one or\nmore weekly meeting times. This is the record Phase-4 grading's Instructor→Course\nlink is born from.\n\nThe Semester, Course and Instructor are referenced by opaque id (no cross-module\nforeign key, ADR-0012); each is validated through its module's Public facade — the\nCourse through {@see CourseCatalog}, the Instructor (a faculty R04 User) through the\nIdentity\\Public {@see Directory}, the Semester through\n{@see AcademicCalendar}. One Course runs at most once per\nSemester (unique), an Offering's own meetings may not overlap each other (the\ninterval-overlap seam), and an Offering is deletable only while nothing references it."
+  - name: Grading
+    description: "\nThe **Grade Sheet** — the Instructor's mark-entry surface (ADR-0023, ticket 01). A Sheet is\none submission round for one Course Offering, created **lazily** the first time it is opened\nrather than eagerly at semester end, and it lists one line per **gradable** Enrollment:\nAudit and Withdrawn Enrollments are on the roster but never lines, so an Instructor is never\nasked for a mark that cannot exist.\n\nEntry is gated on `grades.enter`, but the permission is not authority over a *particular*\nSheet — that comes from the Offering assignment, or from being a central-entry user (ticket\n09: `grades.enter` without `grades.finalize`, which by §3.2 is Student Affairs), both checked\nby {@see AuthorizesGradeEntry}. Every central write to someone else's Sheet is audited; an\nInstructor's own is not. The §3.2 matrix itself is untouched throughout.\n\nOne Mark, 0–100 with two decimals, is entered per line, and the Letter Grade and GPA points\nare **derived from the ADR-0021 scale and frozen onto the Grade** — so a later change to the\nscale never rewrites a grade already given, and there is no letter override to make\n`letter == scale(mark)` anything but an invariant. Each mark saves on its own, not as a\nbatch (the Phase-2 per-step-save precedent), so a long roster survives a closed tab.\n\nNothing here signs, reviews or finalizes: ticket 03 builds the Instructor signature and the\nDepartment-Head review that turn a Draft round into part of the academic record, and no\nStudent can see anything until it does."
   - name: Notifications
     description: "\nA signed-in user's own in-app notifications — the data behind the shell's bell\n(ticket 02). Every endpoint is scoped to the authenticated user by\n{@see Notification::scopeForUser()}, so no request can list, count, or mutate\nanother user's notifications (a foreign id simply is not found → 404). Content\nis a type + payload; the SPA renders it bilingually, so nothing here is\nlocalised server-side."
 paths:
@@ -260,6 +262,315 @@ paths:
     delete:
       summary: 'Unassign a Dean from a Faculty.'
       operationId: unassignADeanFromAFaculty
+      description: 'Removes one routing row. Admin-only (R09/R10).'
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+                properties: {}
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No query results for model.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No query results for model.'
+      tags:
+        - Administration
+      security: []
+    parameters:
+      -
+        in: path
+        name: assignment_id
+        description: 'The assignment row id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/admin/department-heads:
+    get:
+      summary: 'List assignable Department Heads.'
+      operationId: listAssignableDepartmentHeads
+      description: "The R06 (Department Head) users an administrator may assign to a scope — the\nsource for the assignment screen's Head picker. Admin-only (R09/R10)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 6
+                      name: 'Dr. Head of Computer Engineering'
+                      email: head.ce@ejust.edu.eg
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 6
+                        name: 'Dr. Head of Computer Engineering'
+                        email: head.ce@ejust.edu.eg
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 6
+                        name:
+                          type: string
+                          example: 'Dr. Head of Computer Engineering'
+                        email:
+                          type: string
+                          example: head.ce@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
+  /api/v1/admin/department-head-assignments:
+    get:
+      summary: 'List Department-Head↔Department assignments.'
+      operationId: listDepartmentHeadDepartmentAssignments
+      description: "Every current assignment with the assigned Head's identity and the opaque\nDepartment id — `null` for the university-wide Preparatory scope. Admin-only\n(R09/R10)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      user_id: 6
+                      department_id: 3
+                      university_wide: false
+                      head_name: 'Dr. Head of Computer Engineering'
+                      head_email: head.ce@ejust.edu.eg
+                    -
+                      id: 2
+                      user_id: 8
+                      department_id: null
+                      university_wide: true
+                      head_name: 'Dr. Preparatory Coordinator'
+                      head_email: prep@ejust.edu.eg
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        user_id: 6
+                        department_id: 3
+                        university_wide: false
+                        head_name: 'Dr. Head of Computer Engineering'
+                        head_email: head.ce@ejust.edu.eg
+                      - id: 2
+                        user_id: 8
+                        department_id: null
+                        university_wide: true
+                        head_name: 'Dr. Preparatory Coordinator'
+                        head_email: prep@ejust.edu.eg
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        user_id:
+                          type: integer
+                          example: 6
+                        department_id:
+                          type: integer
+                          example: 3
+                        university_wide:
+                          type: boolean
+                          example: false
+                        head_name:
+                          type: string
+                          example: 'Dr. Head of Computer Engineering'
+                        head_email:
+                          type: string
+                          example: head.ce@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
+    post:
+      summary: 'Assign a Department Head to a scope.'
+      operationId: assignADepartmentHeadToAScope
+      description: "Creates one Head↔Department routing row. `department_id` is required to be\n*present* but may be `null`, which assigns the university-wide Preparatory\nscope (the Courses that belong to no Department). The user must hold the\nDepartment Head role (R06) and the (Head, scope) pair must not already exist —\neither fails validation (422). Admin-only (R09/R10)."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    user_id: 6
+                    department_id: 3
+                    university_wide: false
+                    head_name: 'Dr. Head of Computer Engineering'
+                    head_email: head.ce@ejust.edu.eg
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      user_id:
+                        type: integer
+                        example: 6
+                      department_id:
+                        type: integer
+                        example: 3
+                      university_wide:
+                        type: boolean
+                        example: false
+                      head_name:
+                        type: string
+                        example: 'Dr. Head of Computer Engineering'
+                      head_email:
+                        type: string
+                        example: head.ce@ejust.edu.eg
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'not a Department Head'
+                    type: object
+                    example:
+                      message: 'The selected user is not a Department Head.'
+                      errors:
+                        user_id:
+                          - 'The selected user is not a Department Head.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'The selected user is not a Department Head.'
+                      errors:
+                        type: object
+                        properties:
+                          user_id:
+                            type: array
+                            example:
+                              - 'The selected user is not a Department Head.'
+                            items:
+                              type: string
+                  -
+                    description: 'already assigned'
+                    type: object
+                    example:
+                      message: 'This Department Head is already assigned to that department.'
+                      errors:
+                        department_id:
+                          - 'This Department Head is already assigned to that department.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'This Department Head is already assigned to that department.'
+                      errors:
+                        type: object
+                        properties:
+                          department_id:
+                            type: array
+                            example:
+                              - 'This Department Head is already assigned to that department.'
+                            items:
+                              type: string
+      tags:
+        - Administration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                  description: 'The Department Head (R06 user) to assign.'
+                  example: 6
+                department_id:
+                  type: integer
+                  description: 'The opaque Catalog Department id, or null for the university-wide Preparatory scope.'
+                  example: 3
+                  nullable: true
+              required:
+                - user_id
+                - department_id
+      security: []
+  '/api/v1/admin/department-head-assignments/{assignment_id}':
+    delete:
+      summary: 'Unassign a Department Head from a scope.'
+      operationId: unassignADepartmentHeadFromAScope
       description: 'Removes one routing row. Admin-only (R09/R10).'
       parameters: []
       responses:
@@ -5479,6 +5790,7 @@ paths:
                       add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                       late_add_ends_at: '2026-09-21T00:00:00+00:00'
                       withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                       is_registration_open: true
                 properties:
                   data:
@@ -5496,6 +5808,7 @@ paths:
                         add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                         late_add_ends_at: '2026-09-21T00:00:00+00:00'
                         withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                        grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                         is_registration_open: true
                     items:
                       type: object
@@ -5536,6 +5849,9 @@ paths:
                         withdrawal_deadline_at:
                           type: string
                           example: '2026-11-30T00:00:00+00:00'
+                        grade_submission_deadline_at:
+                          type: string
+                          example: '2027-01-10T00:00:00+00:00'
                         is_registration_open:
                           type: boolean
                           example: true
@@ -5568,6 +5884,7 @@ paths:
                     add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                     late_add_ends_at: '2026-09-21T00:00:00+00:00'
                     withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                    grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                     is_registration_open: true
                 properties:
                   data:
@@ -5609,6 +5926,9 @@ paths:
                       withdrawal_deadline_at:
                         type: string
                         example: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at:
+                        type: string
+                        example: '2027-01-10T00:00:00+00:00'
                       is_registration_open:
                         type: boolean
                         example: true
@@ -5681,6 +6001,10 @@ paths:
                   type: string
                   description: 'The withdrawal deadline (ISO 8601).'
                   example: '2026-11-30T00:00:00+00:00'
+                grade_submission_deadline_at:
+                  type: string
+                  description: 'When instructors must have submitted grades — on or after the semester ends (ISO 8601).'
+                  example: '2027-01-10T00:00:00+00:00'
               required:
                 - term
                 - year
@@ -5691,6 +6015,7 @@ paths:
                 - add_drop_ends_at
                 - late_add_ends_at
                 - withdrawal_deadline_at
+                - grade_submission_deadline_at
       security: []
   '/api/v1/semesters/{semester_id}':
     get:
@@ -5719,6 +6044,7 @@ paths:
                     add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                     late_add_ends_at: '2026-09-21T00:00:00+00:00'
                     withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                    grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                     is_registration_open: true
                 properties:
                   data:
@@ -5760,6 +6086,9 @@ paths:
                       withdrawal_deadline_at:
                         type: string
                         example: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at:
+                        type: string
+                        example: '2027-01-10T00:00:00+00:00'
                       is_registration_open:
                         type: boolean
                         example: true
@@ -5792,6 +6121,7 @@ paths:
                     add_drop_ends_at: '2026-09-14T00:00:00+00:00'
                     late_add_ends_at: '2026-09-21T00:00:00+00:00'
                     withdrawal_deadline_at: '2026-11-30T00:00:00+00:00'
+                    grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
                     is_registration_open: true
                 properties:
                   data:
@@ -5833,6 +6163,9 @@ paths:
                       withdrawal_deadline_at:
                         type: string
                         example: '2026-11-30T00:00:00+00:00'
+                      grade_submission_deadline_at:
+                        type: string
+                        example: '2027-01-10T00:00:00+00:00'
                       is_registration_open:
                         type: boolean
                         example: true
@@ -5881,6 +6214,10 @@ paths:
                   type: string
                   description: 'The withdrawal deadline (ISO 8601).'
                   example: '2026-11-30T00:00:00+00:00'
+                grade_submission_deadline_at:
+                  type: string
+                  description: 'When instructors must have submitted grades — on or after the semester ends (ISO 8601).'
+                  example: '2027-01-10T00:00:00+00:00'
               required:
                 - term
                 - year
@@ -5891,6 +6228,7 @@ paths:
                 - add_drop_ends_at
                 - late_add_ends_at
                 - withdrawal_deadline_at
+                - grade_submission_deadline_at
       security: []
     parameters:
       -
@@ -9726,6 +10064,7 @@ paths:
                         capacity: 30
                         seats_remaining: 30
                         total_ch: 3
+                        must_retake: false
                         course:
                           id: 1
                           code: DEP501
@@ -9799,6 +10138,7 @@ paths:
                             capacity: 30
                             seats_remaining: 30
                             total_ch: 3
+                            must_retake: false
                             course:
                               id: 1
                               code: DEP501
@@ -9834,6 +10174,9 @@ paths:
                             total_ch:
                               type: integer
                               example: 3
+                            must_retake:
+                              type: boolean
+                              example: false
                             course:
                               type: object
                               properties:
@@ -10456,6 +10799,7 @@ paths:
                           capacity: 30
                           seats_remaining: 28
                           total_ch: 3
+                          must_retake: false
                           course:
                             id: 2
                             code: DEP502
@@ -10481,6 +10825,7 @@ paths:
                           course_status: Regular
                           classification: Core
                           credit_hours: 3
+                          must_retake: false
                           course:
                             id: 1
                             code: DEP501
@@ -10533,6 +10878,7 @@ paths:
                             capacity: 30
                             seats_remaining: 28
                             total_ch: 3
+                            must_retake: false
                             course:
                               id: 2
                               code: DEP502
@@ -10557,6 +10903,7 @@ paths:
                             course_status: Regular
                             classification: Core
                             credit_hours: 3
+                            must_retake: false
                             course:
                               id: 1
                               code: DEP501
@@ -10642,6 +10989,7 @@ paths:
                               capacity: 30
                               seats_remaining: 28
                               total_ch: 3
+                              must_retake: false
                               course:
                                 id: 2
                                 code: DEP502
@@ -10677,6 +11025,9 @@ paths:
                               total_ch:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:
@@ -10744,6 +11095,7 @@ paths:
                               course_status: Regular
                               classification: Core
                               credit_hours: 3
+                              must_retake: false
                               course:
                                 id: 1
                                 code: DEP501
@@ -10784,6 +11136,9 @@ paths:
                               credit_hours:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:
@@ -10892,6 +11247,7 @@ paths:
                     course_status: Regular
                     classification: Core
                     credit_hours: 3
+                    must_retake: false
                     course:
                       id: 1
                       code: DEP501
@@ -10934,6 +11290,9 @@ paths:
                       credit_hours:
                         type: integer
                         example: 3
+                      must_retake:
+                        type: boolean
+                        example: false
                       course:
                         type: object
                         properties:
@@ -12658,6 +13017,7 @@ paths:
                           capacity: 30
                           seats_remaining: 28
                           total_ch: 3
+                          must_retake: false
                           course:
                             id: 2
                             code: DEP502
@@ -12683,6 +13043,7 @@ paths:
                           course_status: Regular
                           classification: Core
                           credit_hours: 3
+                          must_retake: false
                           course:
                             id: 1
                             code: DEP501
@@ -12735,6 +13096,7 @@ paths:
                             capacity: 30
                             seats_remaining: 28
                             total_ch: 3
+                            must_retake: false
                             course:
                               id: 2
                               code: DEP502
@@ -12759,6 +13121,7 @@ paths:
                             course_status: Regular
                             classification: Core
                             credit_hours: 3
+                            must_retake: false
                             course:
                               id: 1
                               code: DEP501
@@ -12844,6 +13207,7 @@ paths:
                               capacity: 30
                               seats_remaining: 28
                               total_ch: 3
+                              must_retake: false
                               course:
                                 id: 2
                                 code: DEP502
@@ -12879,6 +13243,9 @@ paths:
                               total_ch:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:
@@ -12946,6 +13313,7 @@ paths:
                               course_status: Regular
                               classification: Core
                               credit_hours: 3
+                              must_retake: false
                               course:
                                 id: 1
                                 code: DEP501
@@ -12986,6 +13354,9 @@ paths:
                               credit_hours:
                                 type: integer
                                 example: 3
+                              must_retake:
+                                type: boolean
+                                example: false
                               course:
                                 type: object
                                 properties:
@@ -13719,6 +14090,2890 @@ paths:
         name: class_session_id
         description: 'The ID of the class session.'
         example: 10
+        required: true
+        schema:
+          type: integer
+  /api/v1/grading/offerings:
+    get:
+      summary: 'Offerings to grade.'
+      operationId: offeringsToGrade
+      description: "Every Course Offering the acting user teaches, across all Semesters, each with its\nresolved Course and Semester, the Instructor it is assigned to, the number of gradable\nlines its Sheet would carry, and the Initial round's state — `null` while unstarted, else\nDraft/Submitted/Returned/Finalized (ticket 03) — the entry point to each Offering's Grade\nSheet. A user who teaches nothing gets an empty list rather than an error.\n\nFor a **central-entry** user — `grades.enter` without `grades.finalize`, which by §3.2 is\nStudent Affairs — this is instead the picker over **every** Offering (ticket 09), because\ngrades arriving on paper belong to Offerings the records office does not teach. Which of\nthe two lists was returned is stated in `meta.scope` (`own` / `central`), so the SPA never\nhas to re-derive the rule the server applied."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      offering_id: 3
+                      gradable_count: 12
+                      sheet_status: Draft
+                      course:
+                        id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        total_ch: 3
+                        research_type: null
+                        is_active: true
+                      semester:
+                        id: 2
+                        name_en: 'Fall 2026'
+                        name_ar: 'خريف 2026'
+                      instructor:
+                        id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                  meta:
+                    scope: own
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        offering_id: 3
+                        gradable_count: 12
+                        sheet_status: Draft
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        semester:
+                          id: 2
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                    items:
+                      type: object
+                      properties:
+                        offering_id:
+                          type: integer
+                          example: 3
+                        gradable_count:
+                          type: integer
+                          example: 12
+                        sheet_status:
+                          type: string
+                          example: Draft
+                        course:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: DEP501
+                            name_en:
+                              type: string
+                              example: 'Advanced Algorithms'
+                            name_ar:
+                              type: string
+                              example: 'خوارزميات متقدمة'
+                            level:
+                              type: integer
+                              example: 500
+                            total_ch:
+                              type: integer
+                              example: 3
+                            research_type:
+                              type: string
+                              example: null
+                              nullable: true
+                            is_active:
+                              type: boolean
+                              example: true
+                        semester:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            name_en:
+                              type: string
+                              example: 'Fall 2026'
+                            name_ar:
+                              type: string
+                              example: 'خريف 2026'
+                        instructor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            name:
+                              type: string
+                              example: 'Dr. Instructor'
+                            email:
+                              type: string
+                              example: instructor@ejust.test
+                  meta:
+                    type: object
+                    properties:
+                      scope:
+                        type: string
+                        example: own
+      tags:
+        - Grading
+      security: []
+  '/api/v1/grading/offerings/{offering_id}/sheet':
+    get:
+      summary: "Open an Offering's Grade Sheet."
+      operationId: openAnOfferingsGradeSheet
+      description: "The assigned Instructor's Sheet for one Offering, carrying one line per **gradable**\nEnrollment. The Initial round is created **lazily** on this first open (ADR-0023) —\nnever eagerly at semester end — and re-opening returns the same round rather than\nstarting another. Each line carries the Student's University ID and name, resolved\nthrough Identity\\Public, and the Grade already recorded for it, or `null` while the line\nis still blank. Audit and Withdrawn Enrollments are omitted.\nAuthorised by assignment: an Instructor opening an Offering they do not teach gets a 403.\nA central-entry user (ticket 09) reaches any Offering's Sheet here, and opening one — a\nread — is not audited; their line writes are."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Returned
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: '2026-08-11T09:00:00+00:00'
+                      review_note: 'Please recheck line 3.'
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                      department_id: 1
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade:
+                          mark: 82.5
+                          letter_grade: B
+                          gpa_points: 3
+                        grade_history:
+                          -
+                            mark: 71
+                            letter_grade: C
+                            gpa_points: 2.0
+                            finalized_at: '2026-06-01T09:00:00+00:00'
+                            superseded: true
+                        incomplete: null
+                      -
+                        enrollment_id: 6
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 8
+                          university_id: 2026-MSC-CE-0002
+                          name: 'Omar Student'
+                        grade: null
+                        grade_history: []
+                        incomplete:
+                          completion_percentage: 80
+                          reason: 'Hospitalised before the final project was due.'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Returned
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: '2026-08-11T09:00:00+00:00'
+                          review_note:
+                            type: string
+                            example: 'Please recheck line 3.'
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                          department_id:
+                            type: integer
+                            example: 1
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade:
+                              mark: 82.5
+                              letter_grade: B
+                              gpa_points: 3
+                            grade_history:
+                              - mark: 71
+                                letter_grade: C
+                                gpa_points: 2
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
+                            incomplete: null
+                          -
+                            enrollment_id: 6
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 8
+                              university_id: 2026-MSC-CE-0002
+                              name: 'Omar Student'
+                            grade: null
+                            grade_history: []
+                            incomplete:
+                              completion_percentage: 80
+                              reason: 'Hospitalised before the final project was due.'
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: object
+                              properties:
+                                mark:
+                                  type: number
+                                  example: 82.5
+                                letter_grade:
+                                  type: string
+                                  example: B
+                                gpa_points:
+                                  type: integer
+                                  example: 3
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 71
+                                  letter_grade: C
+                                  gpa_points: 2
+                                  finalized_at: '2026-06-01T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: integer
+                                    example: 71
+                                  letter_grade:
+                                    type: string
+                                    example: C
+                                  gpa_points:
+                                    type: number
+                                    example: 2.0
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-06-01T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
+                            incomplete:
+                              type: string
+                              example: null
+                              nullable: true
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        404:
+          description: 'no such offering'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'That course offering no longer exists.'
+                properties:
+                  message:
+                    type: string
+                    example: 'That course offering no longer exists.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: offering_id
+        description: 'The ID of the course offering.'
+        example: 3
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/sheets/{grade_sheet_id}/lines/{enrollment_id}':
+    put:
+      summary: 'Save one Grade Sheet line.'
+      operationId: saveOneGradeSheetLine
+      description: "Records the final percentage for a single line and returns the Letter Grade and GPA\npoints the ADR-0021 scale derives from it, **frozen** onto the Grade so a later scale\nchange never rewrites it. One line at a time, not a batch (the Phase-2 per-step-save\nprecedent); re-saving a line corrects it rather than adding a second Grade. A mark\noutside 0–100 is a 422 naming the field, and an Enrollment that is not a line of this\nSheet is a 404. Authorised by assignment — the Offering's Instructor, or a central-entry\nuser keying grades in for someone else's Offering (ticket 09), whose write is recorded in\nthe Audit Log; anyone else is a 403.\n\nOn an **Initial** round, a line may be marked Incomplete instead — send\n`completion_percentage` and `reason` in place of `mark` (ticket 05, SRS §4.7.3.1); a\nfigure below the configured threshold is a 422 naming the field. Entering one supersedes\nthe other on the same line: a mark clears an earlier Incomplete declaration and an\nIncomplete declaration clears an earlier mark."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'a mark'
+                    type: object
+                    example:
+                      data:
+                        enrollment_id: 5
+                        grade:
+                          mark: 82.5
+                          letter_grade: B
+                          gpa_points: 3
+                        incomplete: null
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          enrollment_id:
+                            type: integer
+                            example: 5
+                          grade:
+                            type: object
+                            properties:
+                              mark:
+                                type: number
+                                example: 82.5
+                              letter_grade:
+                                type: string
+                                example: B
+                              gpa_points:
+                                type: integer
+                                example: 3
+                          incomplete:
+                            type: string
+                            example: null
+                            nullable: true
+                  -
+                    description: 'an incomplete declaration'
+                    type: object
+                    example:
+                      data:
+                        enrollment_id: 5
+                        grade: null
+                        incomplete:
+                          completion_percentage: 80
+                          reason: 'Hospitalised before the final project was due.'
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          enrollment_id:
+                            type: integer
+                            example: 5
+                          grade:
+                            type: string
+                            example: null
+                            nullable: true
+                          incomplete:
+                            type: object
+                            properties:
+                              completion_percentage:
+                                type: integer
+                                example: 80
+                              reason:
+                                type: string
+                                example: 'Hospitalised before the final project was due.'
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        404:
+          description: 'not a line of this sheet'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'That enrollment is not a line of this grade sheet.'
+                properties:
+                  message:
+                    type: string
+                    example: 'That enrollment is not a line of this grade sheet.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'mark out of range'
+                    type: object
+                    example:
+                      message: 'A mark must be a percentage between 0 and 100.'
+                      errors:
+                        mark:
+                          - 'A mark must be a percentage between 0 and 100.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'A mark must be a percentage between 0 and 100.'
+                      errors:
+                        type: object
+                        properties:
+                          mark:
+                            type: array
+                            example:
+                              - 'A mark must be a percentage between 0 and 100.'
+                            items:
+                              type: string
+                  -
+                    description: 'completion below threshold'
+                    type: object
+                    example:
+                      message: 'An Incomplete requires at least 70% of the coursework completed.'
+                      errors:
+                        completion_percentage:
+                          - 'An Incomplete requires at least 70% of the coursework completed.'
+                    properties:
+                      message:
+                        type: string
+                        example: 'An Incomplete requires at least 70% of the coursework completed.'
+                      errors:
+                        type: object
+                        properties:
+                          completion_percentage:
+                            type: array
+                            example:
+                              - 'An Incomplete requires at least 70% of the coursework completed.'
+                            items:
+                              type: string
+      tags:
+        - Grading
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mark:
+                  type: number
+                  description: 'The final percentage, 0–100 with at most two decimals. Required unless declaring an Incomplete.'
+                  example: 82.5
+                completion_percentage:
+                  type: integer
+                  description: 'The coursework percentage completed, 0–100. Declares an Incomplete in place of a mark; requires `reason`.'
+                  example: 80
+                reason:
+                  type: string
+                  description: 'The reason for the Incomplete. Required alongside `completion_percentage`.'
+                  example: 'Hospitalised before the final project was due.'
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: enrollment_id
+        description: 'The ID of the enrollment being marked.'
+        example: 5
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/sheets/{grade_sheet_id}/correction':
+    post:
+      summary: 'Open a Correction round against a finalized Sheet.'
+      operationId: openACorrectionRoundAgainstAFinalizedSheet
+      description: "Creates a fresh `Correction` round for a Sheet already in `Finalized`, containing only\nthe selected lines (ADR-0023): the original round is untouched and remains finalized\nthroughout. The returned round is then edited, signed and Department-Head-reviewed\nthrough the existing Sheet endpoints. Authorised by the Offering assignment — only the\nInstructor who teaches this Offering may start a correction on it. Central entry (ticket\n09) does **not** reach here: keying marks into a Draft round is data entry, reopening the\nfinalized record is the Instructor's own judgement. Once they have started one, its lines\nare an ordinary Draft Sheet that central entry may key like any other."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 7
+                      course_offering_id: 3
+                      kind: Correction
+                      status: Draft
+                      signed_at: null
+                      reviewed_at: null
+                      review_note: null
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                      department_id: 1
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade: null
+                        grade_history:
+                          -
+                            mark: 82.5
+                            letter_grade: B
+                            gpa_points: 3.0
+                            finalized_at: '2026-08-11T09:00:00+00:00'
+                            superseded: true
+                        incomplete: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 7
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Correction
+                          status:
+                            type: string
+                            example: Draft
+                          signed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                          department_id:
+                            type: integer
+                            example: 1
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade: null
+                            grade_history:
+                              - mark: 82.5
+                                letter_grade: B
+                                gpa_points: 3
+                                finalized_at: '2026-08-11T09:00:00+00:00'
+                                superseded: true
+                            incomplete: null
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: string
+                              example: null
+                              nullable: true
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 82.5
+                                  letter_grade: B
+                                  gpa_points: 3
+                                  finalized_at: '2026-08-11T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: number
+                                    example: 82.5
+                                  letter_grade:
+                                    type: string
+                                    example: B
+                                  gpa_points:
+                                    type: number
+                                    example: 3.0
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-08-11T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
+                            incomplete:
+                              type: string
+                              example: null
+                              nullable: true
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        409:
+          description: 'sheet not finalized'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Only a finalized grade sheet can start a correction round.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Only a finalized grade sheet can start a correction round.'
+        422:
+          description: 'selected line not on that finalized sheet'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A correction round can only include lines from that finalized grade sheet.'
+                  errors:
+                    enrollment_ids:
+                      - 'A correction round can only include lines from that finalized grade sheet.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A correction round can only include lines from that finalized grade sheet.'
+                  errors:
+                    type: object
+                    properties:
+                      enrollment_ids:
+                        type: array
+                        example:
+                          - 'A correction round can only include lines from that finalized grade sheet.'
+                        items:
+                          type: string
+      tags:
+        - Grading
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enrollment_ids:
+                  type: array
+                  description: 'The enrollment ids to correct from that finalized sheet.'
+                  example:
+                    - 5
+                  items:
+                    type: integer
+              required:
+                - enrollment_ids
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the finalized sheet being corrected.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/corrections/{grade_sheet_id}':
+    get:
+      summary: 'Open one Correction round.'
+      operationId: openOneCorrectionRound
+      description: "A previously-opened Correction round, read by its own Sheet id so the SPA can return to\nit directly. The round contains only the selected lines persisted on it at creation time;\nthe original finalized Sheet it corrects is untouched. Authorised by the same Offering\nassignment as every other Instructor Sheet."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 7
+                      course_offering_id: 3
+                      kind: Correction
+                      status: Draft
+                      signed_at: null
+                      reviewed_at: null
+                      review_note: null
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                      department_id: 1
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade: null
+                        grade_history:
+                          -
+                            mark: 82.5
+                            letter_grade: B
+                            gpa_points: 3.0
+                            finalized_at: '2026-08-11T09:00:00+00:00'
+                            superseded: true
+                        incomplete: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 7
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Correction
+                          status:
+                            type: string
+                            example: Draft
+                          signed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                          department_id:
+                            type: integer
+                            example: 1
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade: null
+                            grade_history:
+                              - mark: 82.5
+                                letter_grade: B
+                                gpa_points: 3
+                                finalized_at: '2026-08-11T09:00:00+00:00'
+                                superseded: true
+                            incomplete: null
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: string
+                              example: null
+                              nullable: true
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 82.5
+                                  letter_grade: B
+                                  gpa_points: 3
+                                  finalized_at: '2026-08-11T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: number
+                                    example: 82.5
+                                  letter_grade:
+                                    type: string
+                                    example: B
+                                  gpa_points:
+                                    type: number
+                                    example: 3.0
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-08-11T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
+                            incomplete:
+                              type: string
+                              example: null
+                              nullable: true
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the correction round.'
+        example: 7
+        required: true
+        schema:
+          type: integer
+  /api/v1/grading/incompletes:
+    get:
+      summary: 'My outstanding Incompletes.'
+      operationId: myOutstandingIncompletes
+      description: "Every unresolved, unconverted Incomplete declared on an Offering the acting user\nteaches, each with the Student it names and its derived resolution deadline — `null`\nwhile the next Semester does not exist in the Calendar yet (declaring, and viewing, are\nnever blocked for an admin's omission)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      incomplete_id: 9
+                      enrollment_id: 5
+                      course_offering_id: 3
+                      course:
+                        id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        total_ch: 3
+                        research_type: null
+                        is_active: true
+                      student:
+                        student_id: 7
+                        university_id: 2026-MSC-CE-0001
+                        name: 'Sara Student'
+                      completion_percentage: 80
+                      reason: 'Hospitalised before the final project was due.'
+                      deadline: '2026-11-03T00:00:00+00:00'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        incomplete_id: 9
+                        enrollment_id: 5
+                        course_offering_id: 3
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        completion_percentage: 80
+                        reason: 'Hospitalised before the final project was due.'
+                        deadline: '2026-11-03T00:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        incomplete_id:
+                          type: integer
+                          example: 9
+                        enrollment_id:
+                          type: integer
+                          example: 5
+                        course_offering_id:
+                          type: integer
+                          example: 3
+                        course:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: DEP501
+                            name_en:
+                              type: string
+                              example: 'Advanced Algorithms'
+                            name_ar:
+                              type: string
+                              example: 'خوارزميات متقدمة'
+                            level:
+                              type: integer
+                              example: 500
+                            total_ch:
+                              type: integer
+                              example: 3
+                            research_type:
+                              type: string
+                              example: null
+                              nullable: true
+                            is_active:
+                              type: boolean
+                              example: true
+                        student:
+                          type: object
+                          properties:
+                            student_id:
+                              type: integer
+                              example: 7
+                            university_id:
+                              type: string
+                              example: 2026-MSC-CE-0001
+                            name:
+                              type: string
+                              example: 'Sara Student'
+                        completion_percentage:
+                          type: integer
+                          example: 80
+                        reason:
+                          type: string
+                          example: 'Hospitalised before the final project was due.'
+                        deadline:
+                          type: string
+                          example: '2026-11-03T00:00:00+00:00'
+      tags:
+        - Grading
+      security: []
+  '/api/v1/grading/incompletes/{incomplete_id}/resolution':
+    get:
+      summary: "Open (or resume) the Incomplete's resolution round."
+      operationId: openorResumeTheIncompletesResolutionRound
+      description: "Lazily opens the `IncompleteResolution` Sheet round for one outstanding Incomplete — a\nsingle line, the Incomplete's own Enrollment — or returns the round already open for it\n(the Initial round's lazy-open precedent). From here, entering the mark, signing and\nDepartment-Head finalization all behave exactly as ticket 03 established: the returned\nSheet id is used with {@see GradeSheetController::saveLine()}/{@see GradeSheetController::sign()}\nand the Department Head's queue/show/finalize/return, all unchanged. A 409 when the\nIncomplete has already been resolved or converted."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'freshly opened, no mark entered yet'
+                    type: object
+                    example:
+                      data:
+                        sheet:
+                          id: 6
+                          course_offering_id: 3
+                          kind: IncompleteResolution
+                          status: Draft
+                          signed_at: null
+                          reviewed_at: null
+                          review_note: null
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        lines:
+                          -
+                            enrollment_id: 5
+                            course_status: Incomplete
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade: null
+                            incomplete:
+                              completion_percentage: 80
+                              reason: 'Hospitalised before the final project was due.'
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sheet:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 6
+                              course_offering_id:
+                                type: integer
+                                example: 3
+                              kind:
+                                type: string
+                                example: IncompleteResolution
+                              status:
+                                type: string
+                                example: Draft
+                              signed_at:
+                                type: string
+                                example: null
+                                nullable: true
+                              reviewed_at:
+                                type: string
+                                example: null
+                                nullable: true
+                              review_note:
+                                type: string
+                                example: null
+                                nullable: true
+                          course:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              code:
+                                type: string
+                                example: DEP501
+                              name_en:
+                                type: string
+                                example: 'Advanced Algorithms'
+                              name_ar:
+                                type: string
+                                example: 'خوارزميات متقدمة'
+                              level:
+                                type: integer
+                                example: 500
+                              total_ch:
+                                type: integer
+                                example: 3
+                              research_type:
+                                type: string
+                                example: null
+                                nullable: true
+                              is_active:
+                                type: boolean
+                                example: true
+                          lines:
+                            type: array
+                            example:
+                              -
+                                enrollment_id: 5
+                                course_status: Incomplete
+                                credit_hours: 3
+                                student:
+                                  student_id: 7
+                                  university_id: 2026-MSC-CE-0001
+                                  name: 'Sara Student'
+                                grade: null
+                                incomplete:
+                                  completion_percentage: 80
+                                  reason: 'Hospitalised before the final project was due.'
+                            items:
+                              type: object
+                              properties:
+                                enrollment_id:
+                                  type: integer
+                                  example: 5
+                                course_status:
+                                  type: string
+                                  example: Incomplete
+                                credit_hours:
+                                  type: integer
+                                  example: 3
+                                student:
+                                  type: object
+                                  properties:
+                                    student_id:
+                                      type: integer
+                                      example: 7
+                                    university_id:
+                                      type: string
+                                      example: 2026-MSC-CE-0001
+                                    name:
+                                      type: string
+                                      example: 'Sara Student'
+                                grade:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                incomplete:
+                                  type: object
+                                  properties:
+                                    completion_percentage:
+                                      type: integer
+                                      example: 80
+                                    reason:
+                                      type: string
+                                      example: 'Hospitalised before the final project was due.'
+                  -
+                    description: 'the outstanding mark already entered'
+                    type: object
+                    example:
+                      data:
+                        sheet:
+                          id: 6
+                          course_offering_id: 3
+                          kind: IncompleteResolution
+                          status: Draft
+                          signed_at: null
+                          reviewed_at: null
+                          review_note: null
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                        lines:
+                          -
+                            enrollment_id: 5
+                            course_status: Incomplete
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade:
+                              mark: 88
+                              letter_grade: B+
+                              gpa_points: 3.3
+                            incomplete:
+                              completion_percentage: 80
+                              reason: 'Hospitalised before the final project was due.'
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sheet:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 6
+                              course_offering_id:
+                                type: integer
+                                example: 3
+                              kind:
+                                type: string
+                                example: IncompleteResolution
+                              status:
+                                type: string
+                                example: Draft
+                              signed_at:
+                                type: string
+                                example: null
+                                nullable: true
+                              reviewed_at:
+                                type: string
+                                example: null
+                                nullable: true
+                              review_note:
+                                type: string
+                                example: null
+                                nullable: true
+                          course:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              code:
+                                type: string
+                                example: DEP501
+                              name_en:
+                                type: string
+                                example: 'Advanced Algorithms'
+                              name_ar:
+                                type: string
+                                example: 'خوارزميات متقدمة'
+                              level:
+                                type: integer
+                                example: 500
+                              total_ch:
+                                type: integer
+                                example: 3
+                              research_type:
+                                type: string
+                                example: null
+                                nullable: true
+                              is_active:
+                                type: boolean
+                                example: true
+                          lines:
+                            type: array
+                            example:
+                              -
+                                enrollment_id: 5
+                                course_status: Incomplete
+                                credit_hours: 3
+                                student:
+                                  student_id: 7
+                                  university_id: 2026-MSC-CE-0001
+                                  name: 'Sara Student'
+                                grade:
+                                  mark: 88
+                                  letter_grade: B+
+                                  gpa_points: 3.3
+                                incomplete:
+                                  completion_percentage: 80
+                                  reason: 'Hospitalised before the final project was due.'
+                            items:
+                              type: object
+                              properties:
+                                enrollment_id:
+                                  type: integer
+                                  example: 5
+                                course_status:
+                                  type: string
+                                  example: Incomplete
+                                credit_hours:
+                                  type: integer
+                                  example: 3
+                                student:
+                                  type: object
+                                  properties:
+                                    student_id:
+                                      type: integer
+                                      example: 7
+                                    university_id:
+                                      type: string
+                                      example: 2026-MSC-CE-0001
+                                    name:
+                                      type: string
+                                      example: 'Sara Student'
+                                grade:
+                                  type: object
+                                  properties:
+                                    mark:
+                                      type: integer
+                                      example: 88
+                                    letter_grade:
+                                      type: string
+                                      example: B+
+                                    gpa_points:
+                                      type: number
+                                      example: 3.3
+                                incomplete:
+                                  type: object
+                                  properties:
+                                    completion_percentage:
+                                      type: integer
+                                      example: 80
+                                    reason:
+                                      type: string
+                                      example: 'Hospitalised before the final project was due.'
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        409:
+          description: 'already settled'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'That incomplete has already been resolved or converted.'
+                properties:
+                  message:
+                    type: string
+                    example: 'That incomplete has already been resolved or converted.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: incomplete_id
+        description: 'The ID of the incomplete.'
+        example: 9
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/sheets/{grade_sheet_id}/sign':
+    post:
+      summary: 'Sign the Sheet.'
+      operationId: signTheSheet
+      description: "The Instructor's signature — one act that sends the whole round to the Department Head\n(SRS §4.7.1.4). Draft or Returned → Submitted (ADR-0023); any other current state is a\n409. Refused with a 422 naming how many lines are still blank — the UI already shows\nthat count from the Sheet's own lines, so this is a defence against a stale client, not\nthe Instructor's first signal. Once Submitted, the Sheet is read-only to everyone,\nincluding its own Instructor, and every configured Department Head (or the\nuniversity-wide Head for a department-less Preparatory Offering) is notified."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Submitted
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: null
+                      review_note: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Submitted
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+        403:
+          description: 'not the assigned instructor'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You are not assigned to teach this offering.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You are not assigned to teach this offering.'
+        409:
+          description: 'already submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A grade sheet cannot move from Submitted to Submitted.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A grade sheet cannot move from Submitted to Submitted.'
+        422:
+          description: 'blank lines remain'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet still has 2 ungraded line(s) remaining.'
+                  errors:
+                    lines:
+                      - 'This grade sheet still has 2 ungraded line(s) remaining.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet still has 2 ungraded line(s) remaining.'
+                  errors:
+                    type: object
+                    properties:
+                      lines:
+                        type: array
+                        example:
+                          - 'This grade sheet still has 2 ungraded line(s) remaining.'
+                        items:
+                          type: string
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/grading/department-head/sheets:
+    get:
+      summary: "The Department Head's review queue."
+      operationId: theDepartmentHeadsReviewQueue
+      description: "Every Submitted Grade Sheet routed to the acting Head's Department(s) — including, for a\nHead assigned university-wide, the department-less Preparatory Offerings a\nDepartment-scoped Head never sees ({@see ScopesToDepartmentHead}). Oldest signature\nfirst."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 4
+                      course_offering_id: 3
+                      kind: Initial
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      course:
+                        id: 1
+                        code: DEP501
+                        name_en: 'Advanced Algorithms'
+                        name_ar: 'خوارزميات متقدمة'
+                        level: 500
+                        total_ch: 3
+                        research_type: null
+                        is_active: true
+                        department_id: 1
+                      instructor:
+                        id: 4
+                        name: 'Dr. Instructor'
+                        email: instructor@ejust.test
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 4
+                        course_offering_id: 3
+                        kind: Initial
+                        signed_at: '2026-08-10T09:00:00+00:00'
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                          department_id: 1
+                        instructor:
+                          id: 4
+                          name: 'Dr. Instructor'
+                          email: instructor@ejust.test
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 4
+                        course_offering_id:
+                          type: integer
+                          example: 3
+                        kind:
+                          type: string
+                          example: Initial
+                        signed_at:
+                          type: string
+                          example: '2026-08-10T09:00:00+00:00'
+                        course:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: DEP501
+                            name_en:
+                              type: string
+                              example: 'Advanced Algorithms'
+                            name_ar:
+                              type: string
+                              example: 'خوارزميات متقدمة'
+                            level:
+                              type: integer
+                              example: 500
+                            total_ch:
+                              type: integer
+                              example: 3
+                            research_type:
+                              type: string
+                              example: null
+                              nullable: true
+                            is_active:
+                              type: boolean
+                              example: true
+                            department_id:
+                              type: integer
+                              example: 1
+                        instructor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            name:
+                              type: string
+                              example: 'Dr. Instructor'
+                            email:
+                              type: string
+                              example: instructor@ejust.test
+      tags:
+        - Grading
+      security: []
+  '/api/v1/grading/department-head/sheets/{grade_sheet_id}':
+    get:
+      summary: 'Open one Sheet for review.'
+      operationId: openOneSheetForReview
+      description: "Every mark, letter and Incomplete on the round, the Student identity per line, and the\nOffering's grade distribution — a view, not a report (Phase 7 owns reporting). Scoped\nexactly as the queue: a Sheet outside the acting Head's Department is a 403, regardless\nof its status."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Submitted
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: null
+                      review_note: null
+                    course:
+                      id: 1
+                      code: DEP501
+                      name_en: 'Advanced Algorithms'
+                      name_ar: 'خوارزميات متقدمة'
+                      level: 500
+                      total_ch: 3
+                      research_type: null
+                      is_active: true
+                      department_id: 1
+                    lines:
+                      -
+                        enrollment_id: 5
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 7
+                          university_id: 2026-MSC-CE-0001
+                          name: 'Sara Student'
+                        grade:
+                          mark: 82.5
+                          letter_grade: B
+                          gpa_points: 3
+                        grade_history:
+                          -
+                            mark: 71
+                            letter_grade: C
+                            gpa_points: 2
+                            finalized_at: '2026-06-01T09:00:00+00:00'
+                            superseded: true
+                        incomplete: null
+                      -
+                        enrollment_id: 6
+                        course_status: Regular
+                        credit_hours: 3
+                        student:
+                          student_id: 8
+                          university_id: 2026-MSC-CE-0002
+                          name: 'Omar Student'
+                        grade: null
+                        grade_history: []
+                        incomplete:
+                          completion_percentage: 80
+                          reason: 'Hospitalised before the final project was due.'
+                    distribution:
+                      -
+                        letter: A+
+                        count: 0
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Submitted
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: null
+                            nullable: true
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Advanced Algorithms'
+                          name_ar:
+                            type: string
+                            example: 'خوارزميات متقدمة'
+                          level:
+                            type: integer
+                            example: 500
+                          total_ch:
+                            type: integer
+                            example: 3
+                          research_type:
+                            type: string
+                            example: null
+                            nullable: true
+                          is_active:
+                            type: boolean
+                            example: true
+                          department_id:
+                            type: integer
+                            example: 1
+                      lines:
+                        type: array
+                        example:
+                          -
+                            enrollment_id: 5
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 7
+                              university_id: 2026-MSC-CE-0001
+                              name: 'Sara Student'
+                            grade:
+                              mark: 82.5
+                              letter_grade: B
+                              gpa_points: 3
+                            grade_history:
+                              - mark: 71
+                                letter_grade: C
+                                gpa_points: 2
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
+                            incomplete: null
+                          -
+                            enrollment_id: 6
+                            course_status: Regular
+                            credit_hours: 3
+                            student:
+                              student_id: 8
+                              university_id: 2026-MSC-CE-0002
+                              name: 'Omar Student'
+                            grade: null
+                            grade_history: []
+                            incomplete:
+                              completion_percentage: 80
+                              reason: 'Hospitalised before the final project was due.'
+                        items:
+                          type: object
+                          properties:
+                            enrollment_id:
+                              type: integer
+                              example: 5
+                            course_status:
+                              type: string
+                              example: Regular
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            student:
+                              type: object
+                              properties:
+                                student_id:
+                                  type: integer
+                                  example: 7
+                                university_id:
+                                  type: string
+                                  example: 2026-MSC-CE-0001
+                                name:
+                                  type: string
+                                  example: 'Sara Student'
+                            grade:
+                              type: object
+                              properties:
+                                mark:
+                                  type: number
+                                  example: 82.5
+                                letter_grade:
+                                  type: string
+                                  example: B
+                                gpa_points:
+                                  type: integer
+                                  example: 3
+                            grade_history:
+                              type: array
+                              example:
+                                - mark: 71
+                                  letter_grade: C
+                                  gpa_points: 2
+                                  finalized_at: '2026-06-01T09:00:00+00:00'
+                                  superseded: true
+                              items:
+                                type: object
+                                properties:
+                                  mark:
+                                    type: integer
+                                    example: 71
+                                  letter_grade:
+                                    type: string
+                                    example: C
+                                  gpa_points:
+                                    type: integer
+                                    example: 2
+                                  finalized_at:
+                                    type: string
+                                    example: '2026-06-01T09:00:00+00:00'
+                                  superseded:
+                                    type: boolean
+                                    example: true
+                            incomplete:
+                              type: string
+                              example: null
+                              nullable: true
+                      distribution:
+                        type: array
+                        example:
+                          - letter: A+
+                            count: 0
+                        items:
+                          type: object
+                          properties:
+                            letter:
+                              type: string
+                              example: A+
+                            count:
+                              type: integer
+                              example: 0
+        403:
+          description: "not this sheet's department head"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet does not belong to your department.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet does not belong to your department.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/department-head/sheets/{grade_sheet_id}/finalize':
+    post:
+      summary: 'Finalize the Sheet.'
+      operationId: finalizeTheSheet
+      description: "Submitted → Finalized (else a 409): the round's Grades become part of the academic\nrecord and the round is permanently closed (ADR-0023). In the same transaction, for each\nGrade, `earned` — \"this Attempt reached C+ and earned its credit hours\" — is written onto\nits Enrollment through `Enrollment\\Public` (ADR-0022): a plain\n{@see EnrollmentRecords::recordOutcome()} normally, or, when the Grade resolves an\noutstanding Incomplete (this round is an `IncompleteResolution`, ticket 05),\n{@see EnrollmentRecords::resolveIncomplete()} instead — which also restores the Course\nStatus the Enrollment held before it became Incomplete. On an **Initial** round, every\nline declared Incomplete instead of graded (no Grade row) becomes one through\n{@see EnrollmentRecords::markIncomplete()}, in the same transaction — no grade, and no\nIncomplete, enters the record on one signature. After commit, `GradeFinalized` fires for\nits side effects only: one notification per graded Student (their letter and whether it\nfell below C+), and one per newly-declared Incomplete (the reason and its derived\ndeadline)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Finalized
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: '2026-08-11T09:00:00+00:00'
+                      review_note: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Finalized
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: '2026-08-11T09:00:00+00:00'
+                          review_note:
+                            type: string
+                            example: null
+                            nullable: true
+        403:
+          description: "not this sheet's department head"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet does not belong to your department.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet does not belong to your department.'
+        409:
+          description: 'not submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A grade sheet cannot move from Draft to Finalized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A grade sheet cannot move from Draft to Finalized.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/grading/department-head/sheets/{grade_sheet_id}/return':
+    post:
+      summary: 'Return the Sheet with a note.'
+      operationId: returnTheSheetWithANote
+      description: "Submitted → Returned (else a 409): the round becomes editable and re-signable again, and\nthe note reaches the Instructor as a notification. A note is required — a bilingual 422\nwhen it is missing."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    sheet:
+                      id: 1
+                      course_offering_id: 3
+                      kind: Initial
+                      status: Returned
+                      signed_at: '2026-08-10T09:00:00+00:00'
+                      reviewed_at: '2026-08-11T09:00:00+00:00'
+                      review_note: 'Please recheck line 3.'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      sheet:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          course_offering_id:
+                            type: integer
+                            example: 3
+                          kind:
+                            type: string
+                            example: Initial
+                          status:
+                            type: string
+                            example: Returned
+                          signed_at:
+                            type: string
+                            example: '2026-08-10T09:00:00+00:00'
+                          reviewed_at:
+                            type: string
+                            example: '2026-08-11T09:00:00+00:00'
+                          review_note:
+                            type: string
+                            example: 'Please recheck line 3.'
+        403:
+          description: "not this sheet's department head"
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This grade sheet does not belong to your department.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This grade sheet does not belong to your department.'
+        409:
+          description: 'not submitted'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A grade sheet cannot move from Draft to Returned.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A grade sheet cannot move from Draft to Returned.'
+        422:
+          description: 'missing note'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A note is required when returning a grade sheet to its instructor.'
+                  errors:
+                    note:
+                      - 'A note is required when returning a grade sheet to its instructor.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A note is required when returning a grade sheet to its instructor.'
+                  errors:
+                    type: object
+                    properties:
+                      note:
+                        type: array
+                        example:
+                          - 'A note is required when returning a grade sheet to its instructor.'
+                        items:
+                          type: string
+      tags:
+        - Grading
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  description: 'Why the sheet is being returned.'
+                  example: 'The distribution looks implausible — please recheck line 5.'
+              required:
+                - note
+      security: []
+    parameters:
+      -
+        in: path
+        name: grade_sheet_id
+        description: 'The ID of the grade sheet.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/grading/my-grades:
+    get:
+      summary: 'My Grades.'
+      operationId: myGrades
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    cgpa: 3.42
+                    semesters:
+                      -
+                        semester:
+                          id: 2
+                          term: Fall
+                          year: 2026
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                        gpa: 3.42
+                        courses:
+                          -
+                            enrollment_id: 5
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                              department_id: 1
+                            credit_hours: 3
+                            course_status: Regular
+                            grade:
+                              mark: 82.5
+                              letter_grade: B
+                              gpa_points: 3.0
+                            grade_history:
+                              -
+                                mark: 71
+                                letter_grade: C
+                                gpa_points: 2.0
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
+                            earned: true
+                            superseded: false
+                            must_retake: false
+                            incomplete_deadline: null
+                          -
+                            enrollment_id: 9
+                            course:
+                              id: 2
+                              code: DEP502
+                              name_en: 'Distributed Systems'
+                              name_ar: 'الأنظمة الموزعة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                              department_id: 1
+                            credit_hours: 3
+                            course_status: Incomplete
+                            grade: null
+                            grade_history: []
+                            earned: null
+                            superseded: false
+                            must_retake: false
+                            incomplete_deadline: '2026-11-03T00:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      cgpa:
+                        type: number
+                        example: 3.42
+                      semesters:
+                        type: array
+                        example:
+                          -
+                            semester:
+                              id: 2
+                              term: Fall
+                              year: 2026
+                              name_en: 'Fall 2026'
+                              name_ar: 'خريف 2026'
+                            gpa: 3.42
+                            courses:
+                              -
+                                enrollment_id: 5
+                                course:
+                                  id: 1
+                                  code: DEP501
+                                  name_en: 'Advanced Algorithms'
+                                  name_ar: 'خوارزميات متقدمة'
+                                  level: 500
+                                  total_ch: 3
+                                  research_type: null
+                                  is_active: true
+                                  department_id: 1
+                                credit_hours: 3
+                                course_status: Regular
+                                grade:
+                                  mark: 82.5
+                                  letter_grade: B
+                                  gpa_points: 3
+                                grade_history:
+                                  - mark: 71
+                                    letter_grade: C
+                                    gpa_points: 2
+                                    finalized_at: '2026-06-01T09:00:00+00:00'
+                                    superseded: true
+                                earned: true
+                                superseded: false
+                                must_retake: false
+                                incomplete_deadline: null
+                              -
+                                enrollment_id: 9
+                                course:
+                                  id: 2
+                                  code: DEP502
+                                  name_en: 'Distributed Systems'
+                                  name_ar: 'الأنظمة الموزعة'
+                                  level: 500
+                                  total_ch: 3
+                                  research_type: null
+                                  is_active: true
+                                  department_id: 1
+                                credit_hours: 3
+                                course_status: Incomplete
+                                grade: null
+                                grade_history: []
+                                earned: null
+                                superseded: false
+                                must_retake: false
+                                incomplete_deadline: '2026-11-03T00:00:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            semester:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                term:
+                                  type: string
+                                  example: Fall
+                                year:
+                                  type: integer
+                                  example: 2026
+                                name_en:
+                                  type: string
+                                  example: 'Fall 2026'
+                                name_ar:
+                                  type: string
+                                  example: 'خريف 2026'
+                            gpa:
+                              type: number
+                              example: 3.42
+                            courses:
+                              type: array
+                              example:
+                                -
+                                  enrollment_id: 5
+                                  course:
+                                    id: 1
+                                    code: DEP501
+                                    name_en: 'Advanced Algorithms'
+                                    name_ar: 'خوارزميات متقدمة'
+                                    level: 500
+                                    total_ch: 3
+                                    research_type: null
+                                    is_active: true
+                                    department_id: 1
+                                  credit_hours: 3
+                                  course_status: Regular
+                                  grade:
+                                    mark: 82.5
+                                    letter_grade: B
+                                    gpa_points: 3
+                                  grade_history:
+                                    - mark: 71
+                                      letter_grade: C
+                                      gpa_points: 2
+                                      finalized_at: '2026-06-01T09:00:00+00:00'
+                                      superseded: true
+                                  earned: true
+                                  superseded: false
+                                  must_retake: false
+                                  incomplete_deadline: null
+                                -
+                                  enrollment_id: 9
+                                  course:
+                                    id: 2
+                                    code: DEP502
+                                    name_en: 'Distributed Systems'
+                                    name_ar: 'الأنظمة الموزعة'
+                                    level: 500
+                                    total_ch: 3
+                                    research_type: null
+                                    is_active: true
+                                    department_id: 1
+                                  credit_hours: 3
+                                  course_status: Incomplete
+                                  grade: null
+                                  grade_history: []
+                                  earned: null
+                                  superseded: false
+                                  must_retake: false
+                                  incomplete_deadline: '2026-11-03T00:00:00+00:00'
+                              items:
+                                type: object
+                                properties:
+                                  enrollment_id:
+                                    type: integer
+                                    example: 5
+                                  course:
+                                    type: object
+                                    properties:
+                                      id: { type: integer, example: 1 }
+                                      code: { type: string, example: DEP501 }
+                                      name_en: { type: string, example: 'Advanced Algorithms' }
+                                      name_ar: { type: string, example: 'خوارزميات متقدمة' }
+                                      level: { type: integer, example: 500 }
+                                      total_ch: { type: integer, example: 3 }
+                                      research_type: { type: string, example: null, nullable: true }
+                                      is_active: { type: boolean, example: true }
+                                      department_id: { type: integer, example: 1 }
+                                  credit_hours:
+                                    type: integer
+                                    example: 3
+                                  course_status:
+                                    type: string
+                                    example: Regular
+                                  grade:
+                                    type: object
+                                    properties:
+                                      mark: { type: number, example: 82.5 }
+                                      letter_grade: { type: string, example: B }
+                                      gpa_points: { type: number, example: 3.0 }
+                                  grade_history:
+                                    type: array
+                                    example:
+                                      - { mark: 71, letter_grade: C, gpa_points: 2, finalized_at: '2026-06-01T09:00:00+00:00', superseded: true }
+                                    items:
+                                      type: object
+                                      properties: { mark: { type: integer, example: 71 }, letter_grade: { type: string, example: C }, gpa_points: { type: number, example: 2.0 }, finalized_at: { type: string, example: '2026-06-01T09:00:00+00:00' }, superseded: { type: boolean, example: true } }
+                                  earned:
+                                    type: boolean
+                                    example: true
+                                  superseded:
+                                    type: boolean
+                                    example: false
+                                  must_retake:
+                                    type: boolean
+                                    example: false
+                                  incomplete_deadline:
+                                    type: string
+                                    example: null
+                                    nullable: true
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record.'
+      tags:
+        - Grading
+      security: []
+  /api/v1/grading/students:
+    get:
+      summary: 'The students whose grades the reviewer may inspect.'
+      operationId: theStudentsWhoseGradesTheReviewerMayInspect
+      description: "A searchable picker population for the grade-oversight screen: Advisors see their live\nadvisees; Department Heads the Students in Programs under their Departments; Deans the\nStudents in their Faculties; Instructors the Students on Offerings they teach; Student\nAffairs, Council and administrators every Student. Each row carries the same lightweight\nStudent context the existing register-for-student picker renders."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      student_id: 5
+                      name: 'Sara Student'
+                      university_id: 2026-MSC-CE-0001
+                      enrollment_term: 'Fall 2026'
+                      degree_level: MSc
+                      current_load: null
+                      program:
+                        id: 1
+                        code: MSC-CE
+                        name_en: 'MSc in Computer Engineering'
+                        name_ar: 'ماجستير هندسة الحاسوب'
+                        degree_level: MSc
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        student_id: 5
+                        name: 'Sara Student'
+                        university_id: 2026-MSC-CE-0001
+                        enrollment_term: 'Fall 2026'
+                        degree_level: MSc
+                        current_load: null
+                        program:
+                          id: 1
+                          code: MSC-CE
+                          name_en: 'MSc in Computer Engineering'
+                          name_ar: 'ماجستير هندسة الحاسوب'
+                          degree_level: MSc
+                    items:
+                      type: object
+                      properties:
+                        student_id:
+                          type: integer
+                          example: 5
+                        name:
+                          type: string
+                          example: 'Sara Student'
+                        university_id:
+                          type: string
+                          example: 2026-MSC-CE-0001
+                        enrollment_term:
+                          type: string
+                          example: 'Fall 2026'
+                        degree_level:
+                          type: string
+                          example: MSc
+                        current_load:
+                          type: string
+                          example: null
+                          nullable: true
+                        program:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: MSC-CE
+                            name_en:
+                              type: string
+                              example: 'MSc in Computer Engineering'
+                            name_ar:
+                              type: string
+                              example: 'ماجستير هندسة الحاسوب'
+                            degree_level:
+                              type: string
+                              example: MSc
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Grading
+      security: []
+  '/api/v1/grading/students/{student_id}':
+    get:
+      summary: "One Student's grade record for a scoped reviewer."
+      operationId: oneStudentsGradeRecordForAScopedReviewer
+      description: "The exact academic-record payload the Student's own My Grades page reads — CGPA,\nSemester GPAs, superseded attempts, Incomplete deadlines and must-retake markers — but\nfor a reviewer whose role legitimately covers the target Student."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    cgpa: 3.42
+                    semesters:
+                      -
+                        semester:
+                          id: 2
+                          term: Fall
+                          year: 2026
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                        gpa: 3.42
+                        courses:
+                          -
+                            enrollment_id: 5
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                              department_id: 1
+                            credit_hours: 3
+                            course_status: Retake
+                            grade:
+                              mark: 62
+                              letter_grade: D
+                              gpa_points: 1.0
+                            grade_history:
+                              -
+                                mark: 45
+                                letter_grade: F
+                                gpa_points: 0.0
+                                finalized_at: '2026-06-01T09:00:00+00:00'
+                                superseded: true
+                            earned: false
+                            superseded: false
+                            must_retake: true
+                            incomplete_deadline: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      cgpa:
+                        type: number
+                        example: 3.42
+                      semesters:
+                        type: array
+                        example:
+                          -
+                            semester:
+                              id: 2
+                              term: Fall
+                              year: 2026
+                              name_en: 'Fall 2026'
+                              name_ar: 'خريف 2026'
+                            gpa: 3.42
+                            courses:
+                              -
+                                enrollment_id: 5
+                                course:
+                                  id: 1
+                                  code: DEP501
+                                  name_en: 'Advanced Algorithms'
+                                  name_ar: 'خوارزميات متقدمة'
+                                  level: 500
+                                  total_ch: 3
+                                  research_type: null
+                                  is_active: true
+                                  department_id: 1
+                                credit_hours: 3
+                                course_status: Retake
+                                grade:
+                                  mark: 62
+                                  letter_grade: D
+                                  gpa_points: 1
+                                grade_history:
+                                  - mark: 45
+                                    letter_grade: F
+                                    gpa_points: 0
+                                    finalized_at: '2026-06-01T09:00:00+00:00'
+                                    superseded: true
+                                earned: false
+                                superseded: false
+                                must_retake: true
+                                incomplete_deadline: null
+                        items:
+                          type: object
+                          properties:
+                            semester:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                term:
+                                  type: string
+                                  example: Fall
+                                year:
+                                  type: integer
+                                  example: 2026
+                                name_en:
+                                  type: string
+                                  example: 'Fall 2026'
+                                name_ar:
+                                  type: string
+                                  example: 'خريف 2026'
+                            gpa:
+                              type: number
+                              example: 3.42
+                            courses:
+                              type: array
+                              example:
+                                -
+                                  enrollment_id: 5
+                                  course:
+                                    id: 1
+                                    code: DEP501
+                                    name_en: 'Advanced Algorithms'
+                                    name_ar: 'خوارزميات متقدمة'
+                                    level: 500
+                                    total_ch: 3
+                                    research_type: null
+                                    is_active: true
+                                    department_id: 1
+                                  credit_hours: 3
+                                  course_status: Retake
+                                  grade:
+                                    mark: 62
+                                    letter_grade: D
+                                    gpa_points: 1
+                                  grade_history:
+                                    - mark: 45
+                                      letter_grade: F
+                                      gpa_points: 0
+                                      finalized_at: '2026-06-01T09:00:00+00:00'
+                                      superseded: true
+                                  earned: false
+                                  superseded: false
+                                  must_retake: true
+                                  incomplete_deadline: null
+                              items:
+                                type: object
+                                properties:
+                                  enrollment_id:
+                                    type: integer
+                                    example: 5
+                                  course:
+                                    type: object
+                                    properties:
+                                      id: { type: integer, example: 1 }
+                                      code: { type: string, example: DEP501 }
+                                      name_en: { type: string, example: 'Advanced Algorithms' }
+                                      name_ar: { type: string, example: 'خوارزميات متقدمة' }
+                                      level: { type: integer, example: 500 }
+                                      total_ch: { type: integer, example: 3 }
+                                      research_type: { type: string, example: null, nullable: true }
+                                      is_active: { type: boolean, example: true }
+                                      department_id: { type: integer, example: 1 }
+                                  credit_hours:
+                                    type: integer
+                                    example: 3
+                                  course_status:
+                                    type: string
+                                    example: Retake
+                                  grade:
+                                    type: object
+                                    properties:
+                                      mark: { type: integer, example: 62 }
+                                      letter_grade: { type: string, example: D }
+                                      gpa_points: { type: number, example: 1.0 }
+                                  grade_history:
+                                    type: array
+                                    example:
+                                      - { mark: 45, letter_grade: F, gpa_points: 0, finalized_at: '2026-06-01T09:00:00+00:00', superseded: true }
+                                    items:
+                                      type: object
+                                      properties: { mark: { type: integer, example: 45 }, letter_grade: { type: string, example: F }, gpa_points: { type: number, example: 0.0 }, finalized_at: { type: string, example: '2026-06-01T09:00:00+00:00' }, superseded: { type: boolean, example: true } }
+                                  earned:
+                                    type: boolean
+                                    example: false
+                                  superseded:
+                                    type: boolean
+                                    example: false
+                                  must_retake:
+                                    type: boolean
+                                    example: true
+                                  incomplete_deadline:
+                                    type: string
+                                    example: null
+                                    nullable: true
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        404:
+          description: 'no such student'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'No such student.'
+                properties:
+                  message:
+                    type: string
+                    example: 'No such student.'
+      tags:
+        - Grading
+      security: []
+    parameters:
+      -
+        in: path
+        name: student_id
+        description: "The target Student anchor's id."
+        example: 5
         required: true
         schema:
           type: integer

@@ -26,6 +26,7 @@ import { CyclesPage } from '../features/admin/cycles/CyclesPage'
 import { SemestersPage } from '../features/admin/semesters/SemestersPage'
 import { OfferingsPage } from '../features/admin/offerings/OfferingsPage'
 import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
+import { DepartmentHeadsPage } from '../features/admin/assignments/DepartmentHeadsPage'
 import { RegistrationPage } from '../features/enrollment/registration/RegistrationPage'
 import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
 import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
@@ -34,9 +35,19 @@ import { StudentSchedulePage } from '../features/enrollment/advising/StudentSche
 import { ComposeForStudentPage } from '../features/enrollment/on-behalf/ComposeForStudentPage'
 import { MyOfferingsPage } from '../features/enrollment/instructor/MyOfferingsPage'
 import { OfferingRegisterPage } from '../features/enrollment/instructor/OfferingRegisterPage'
+import { GradeSheetsPage } from '../features/grading/instructor/GradeSheetsPage'
+import { GradeSheetPage } from '../features/grading/instructor/GradeSheetPage'
+import { CorrectionSheetPage } from '../features/grading/instructor/CorrectionSheetPage'
+import { OutstandingIncompletesPage } from '../features/grading/instructor/OutstandingIncompletesPage'
+import { IncompleteResolutionPage } from '../features/grading/instructor/IncompleteResolutionPage'
+import { DepartmentHeadQueuePage } from '../features/grading/department-head/DepartmentHeadQueuePage'
+import { DepartmentHeadSheetPage } from '../features/grading/department-head/DepartmentHeadSheetPage'
+import { MyGradesPage } from '../features/grading/student/MyGradesPage'
+import { StudentGradesPage } from '../features/grading/oversight/StudentGradesPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
+import { PERMISSION } from '../shared/access/permissions'
 
 // Dev-only design-system gallery. Gating the lazy import on `import.meta.env.DEV`
 // keeps both the route AND its chunk out of production builds.
@@ -81,6 +92,16 @@ export function App() {
                   <Route path="/registration" element={<RegistrationPage />} />
                   <Route path="/schedule" element={<SchedulePage />} />
                 </Route>
+                {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
+                    Persona-guarded to R02 — an admin inheriting grades.view_own has no Student
+                    record to read (the server 403s it), so the nav/route gate on the role. */}
+                <Route element={<RequireAuth roles={[ROLE.student]} />}>
+                  <Route path="/grading/my-grades" element={<MyGradesPage />} />
+                </Route>
+                <Route element={<RequireAuth permission={PERMISSION.viewStudentGrades} />}>
+                  <Route path="/grading/students" element={<StudentGradesPage />} />
+                  <Route path="/grading/students/:studentId" element={<StudentGradesPage />} />
+                </Route>
                 {/* Persona-guarded: Instructors (R04) reach My Teaching + the register;
                     attendance is authorised by assignment server-side (ticket 08).
                     Administrators (R09/R10) reach them for oversight — the register unscopes
@@ -91,6 +112,35 @@ export function App() {
                     path="/offerings/:offeringId/register"
                     element={<OfferingRegisterPage />}
                   />
+                </Route>
+                {/* Persona-guarded: Instructors (R04) reach their grade sheets (Phase 4,
+                    ticket 01), and Student Affairs (R05) the same screens as their central
+                    entry path (ticket 09) — the list becomes a picker over every Offering, and
+                    the sheet editor is reused rather than duplicated. Which Sheets either may
+                    reach, and that only an Instructor may sign, is re-enforced server-side. */}
+                <Route element={<RequireAuth roles={[ROLE.instructor, ROLE.studentAffairs]} />}>
+                  <Route path="/grading" element={<GradeSheetsPage />} />
+                  <Route path="/grading/offerings/:offeringId" element={<GradeSheetPage />} />
+                  <Route path="/grading/corrections/:sheetId" element={<CorrectionSheetPage />} />
+                </Route>
+                {/* The Instructor's outstanding Incompletes and their resolution round
+                    (ticket 05): declared "mine" is the Offering assignment, re-enforced
+                    server-side, and there is no central list of them — so this stays R04. */}
+                <Route element={<RequireAuth roles={[ROLE.instructor]} />}>
+                  <Route path="/grading/incompletes" element={<OutstandingIncompletesPage />} />
+                  <Route
+                    path="/grading/incompletes/:incompleteId"
+                    element={<IncompleteResolutionPage />}
+                  />
+                </Route>
+                {/* The Department Head's review of a signed Grade Sheet (Phase 4, ticket 03):
+                    persona-guarded to R06 — both Instructor and Department Head hold
+                    grades.finalize, so the distinguishing gate is the role, not the permission,
+                    matching the myOfferings precedent. The Department scope is re-enforced
+                    server-side (ScopesToDepartmentHead). */}
+                <Route element={<RequireAuth roles={[ROLE.departmentHead]} />}>
+                  <Route path="/grading/review" element={<DepartmentHeadQueuePage />} />
+                  <Route path="/grading/review/:sheetId" element={<DepartmentHeadSheetPage />} />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to
@@ -124,6 +174,7 @@ export function App() {
                 <Route path="/admin/semesters" element={<SemestersPage />} />
                 <Route path="/admin/semesters/:semesterId/offerings" element={<OfferingsPage />} />
                 <Route path="/admin/assignments" element={<AssignmentsPage />} />
+                <Route path="/admin/department-heads" element={<DepartmentHeadsPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

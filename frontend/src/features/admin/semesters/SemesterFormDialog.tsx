@@ -32,9 +32,11 @@ interface SemesterFormDialogProps {
 // re-validates the value against the enum, so this is only for the picker.
 const TERMS = ['Fall', 'Spring'] as const
 
-// The seven period dates, listed in the order the server's invariant expects, so
-// the admin fills the form top-to-bottom. The server re-validates the ordering and
-// stays the authority; a violation surfaces as the inline alert below.
+// The eight period dates, listed in the order the server's invariant expects, so
+// the admin fills the form top-to-bottom. The grade-submission deadline (phase 4
+// ticket 09) closes the sequence: it is the one date that falls *after* the term
+// ends. The server re-validates the ordering and stays the authority; a violation
+// surfaces as the inline alert below.
 const DATE_FIELDS = [
   'registration_opens_at',
   'registration_closes_at',
@@ -43,6 +45,7 @@ const DATE_FIELDS = [
   'late_add_ends_at',
   'withdrawal_deadline_at',
   'ends_at',
+  'grade_submission_deadline_at',
 ] as const
 
 type DateField = (typeof DATE_FIELDS)[number]
@@ -100,6 +103,7 @@ export function SemesterFormDialog({ open, onClose, semester }: SemesterFormDial
       add_drop_ends_at: dates.add_drop_ends_at,
       late_add_ends_at: dates.late_add_ends_at,
       withdrawal_deadline_at: dates.withdrawal_deadline_at,
+      grade_submission_deadline_at: dates.grade_submission_deadline_at,
     }
     if (isEdit && semester?.id !== undefined) {
       update.mutate({ semesterId: semester.id, data }, { onSuccess: onSaved })

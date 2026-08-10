@@ -30,7 +30,7 @@ import {
 } from '../../../shared/api/generated/endpoints'
 import type { ListDeanFacultyAssignments200DataItem } from '../../../shared/api/generated/endpoints'
 import { AssignmentFormDialog } from './AssignmentFormDialog'
-import { facultyName } from './facultyName'
+import { nameById } from './nameById'
 
 /**
  * The Dean↔Faculty assignment admin screen (features/admin) — the first role-gated
@@ -54,7 +54,7 @@ export function AssignmentsPage() {
   const unassign = useUnassignADeanFromAFaculty()
 
   const facultyLabel = (facultyId: number | undefined): string =>
-    facultyName(
+    nameById(
       faculties,
       facultyId,
       i18n.language,

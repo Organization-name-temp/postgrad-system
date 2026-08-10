@@ -1,0 +1,95 @@
+import type { SxProps, Theme } from '@mui/material/styles'
+import type { StatusChipProps, StatusTone, StatusChipVariant } from '../../shared/ui/StatusChip'
+
+/**
+ * Maps a Grade Sheet's state, and one line's, onto <StatusChip> props, per design-system.md
+ * §10. Colour is never the only signal — the label always accompanies it (WCAG 1.4.1); the
+ * caller passes the already-localised label. The map lives at the feature root, the way each
+ * feature colocates its own status→chip map (no status names in shared/ui).
+ *
+ * Only `Draft` is reachable in ticket 01 — nothing is signed or reviewed yet — but all four
+ * Sheet states are mapped up front so ticket 03's signature loop renders a stable chip, the
+ * same discipline courseStatusChip followed in Phase 3.
+ */
+type ChipStyle = { tone: StatusTone; variant: StatusChipVariant }
+
+const SHEET_TONE: Record<string, ChipStyle> = {
+  // Being filled in — neutral: an unfinished Sheet is the normal working state, not a warning.
+  Draft: { tone: 'neutral', variant: 'outlined' },
+  // Signed and waiting on the Department Head — informational, and read-only.
+  Submitted: { tone: 'info', variant: 'filled-soft' },
+  // Sent back with a note: the one Sheet state that needs the Instructor to act.
+  Returned: { tone: 'warning', variant: 'filled-soft' },
+  // Part of the academic record, and permanently closed.
+  Finalized: { tone: 'success', variant: 'filled-soft' },
+}
+
+export function gradeSheetChip(status: string, label: string): StatusChipProps {
+  const { tone, variant } = SHEET_TONE[status] ?? { tone: 'neutral', variant: 'outlined' }
+  return { tone, variant, label }
+}
+
+/**
+ * A line's own state: recorded, declared Incomplete (ticket 05), or still blank — deliberately
+ * the smallest state machine that fits, since the Sheet, never the individual Grade, carries
+ * the workflow (ADR-0023). The blank chip is what makes an unfinished roster scannable, and
+ * ticket 03's blank-line guard on signing counts a declared Incomplete as decided too, never
+ * blank.
+ */
+export type GradeLineState = 'recorded' | 'incomplete' | 'blank'
+
+const GRADE_LINE_TONE: Record<GradeLineState, ChipStyle> = {
+  recorded: { tone: 'success', variant: 'outlined' },
+  incomplete: { tone: 'warning', variant: 'filled-soft' },
+  blank: { tone: 'neutral', variant: 'outlined' },
+}
+
+export function gradeLineChip(state: GradeLineState, label: string): StatusChipProps {
+  const { tone, variant } = GRADE_LINE_TONE[state]
+  return { tone, variant, label }
+}
+
+/**
+ * The **grade colour groups** of design-system.md §10 ("Grade display"): a letter at or above
+ * C+ earned its credit and reads as ordinary text; one below C+ but above F counted toward the
+ * CGPA without earning anything, and carries the sub-earn warning; an F is an error. Colour is
+ * explicitly *secondary* there — the letter itself is always shown, so this is emphasis, never
+ * the signal (WCAG 1.4.1).
+ *
+ * Returned as a group name rather than a colour so the mapping to an accessible shade per
+ * colour scheme stays in one place: `.main` is a fill colour, so a label needs `.dark` in
+ * light and `.light` in dark, the rule StatusChip and the primary/warning button overrides
+ * both follow.
+ *
+ * AU / W / FW / I are absent on purpose — those are Course Statuses, never Grades (ADR-0023),
+ * and §10's rows for them belong to Phase 6's transcript grade-column projection.
+ */
+export type GradeEmphasis = 'earned' | 'subEarn' | 'fail'
+
+/** Appendix C's `min_grade_per_course`: C+ is 2.50 points, the earn-your-credit threshold. */
+const MINIMUM_EARNING_POINTS = 2.5
+
+export function gradeEmphasisFor(points: number | undefined): GradeEmphasis {
+  if (points === undefined || points >= MINIMUM_EARNING_POINTS) return 'earned'
+  return points > 0 ? 'subEarn' : 'fail'
+}
+
+/**
+ * Per design-system.md §10 ("Grade display"), the text-colour override each emphasis group
+ * carries — ordinary text at or above C+, the sub-earn warning below it, error for an F.
+ * `.main` is a fill colour, so a *label* takes the accessible shade — `.dark` in light,
+ * `.light` in dark — the same rule StatusChip and the button overrides follow. Shared by the
+ * Instructor's Grade Sheet table and the Student's My Grades page (both features/grading), so
+ * a letter reads with the same emphasis wherever it appears.
+ */
+export const GRADE_EMPHASIS_SX: Record<GradeEmphasis, SxProps<Theme>> = {
+  earned: { color: 'text.primary' },
+  subEarn: [
+    (theme: Theme) => ({ color: theme.vars.palette.warning.dark }),
+    (theme: Theme) => theme.applyStyles('dark', { color: theme.vars.palette.warning.light }),
+  ],
+  fail: [
+    (theme: Theme) => ({ color: theme.vars.palette.error.dark }),
+    (theme: Theme) => theme.applyStyles('dark', { color: theme.vars.palette.error.light }),
+  ],
+}

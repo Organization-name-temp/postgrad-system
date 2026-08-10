@@ -27,7 +27,7 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
  * At the **advisor mint** (ticket 06) the caller passes the Student's record, and the same
  * seam additionally checks the caps, the duplicate and the clash **against existing
  * Enrollments** — the {@see MeetingTime} overlap primitive simply extends to the record.
- * Retake derivation (and its cap of one) is the {@see RetakeDeriver}'s job, done by the
+ * Retake derivation (and its cap of one) is the {@see AttemptDeriver}'s job, done by the
  * caller alongside this. Eligibility (an Offering the Student may not take at all) is
  * enforced by the controller before a line is built.
  */
@@ -49,6 +49,7 @@ final readonly class CartValidator
             ...$this->creditHourViolations($lines, $exceptions, $existing),
             ...$this->duplicateViolations($lines, $existing),
             ...$this->capViolations($lines, $existing),
+            ...$this->outstandingIncompleteViolations($lines, $existing),
             ...$this->capacityViolations($lines),
             ...$this->clashViolations($lines, $existing),
         ];
@@ -164,6 +165,30 @@ final readonly class CartValidator
                 'Only one research course is allowed per registration.',
                 $this->offeringIds($research),
             );
+        }
+
+        return $violations;
+    }
+
+    /**
+     * Re-registering a Course whose earlier Attempt is still unresolved Incomplete is illegal:
+     * the existing Enrollment must be resolved, not bypassed with a fresh one.
+     *
+     * @param  list<CartLine>  $lines
+     * @return list<CartViolation>
+     */
+    private function outstandingIncompleteViolations(array $lines, ExistingEnrollments $existing): array
+    {
+        $violations = [];
+
+        foreach ($lines as $line) {
+            if ($existing->hasOutstandingIncompleteFor($line->courseId)) {
+                $violations[] = new CartViolation(
+                    CartViolation::OUTSTANDING_INCOMPLETE,
+                    "{$line->courseCode} still has an unresolved Incomplete and cannot be registered again yet.",
+                    [$line->offeringId],
+                );
+            }
         }
 
         return $violations;

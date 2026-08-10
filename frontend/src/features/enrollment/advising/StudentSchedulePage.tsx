@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   Alert,
+  Button,
   CircularProgress,
   Paper,
   Stack,
@@ -12,6 +13,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   useTheStudentsTheComposerMayRegisterOnBehalfOf,
@@ -25,8 +27,9 @@ import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { StatusChip } from '../../../shared/ui/StatusChip'
 import { courseStatusChip } from '../courseStatusChip'
 import { MeetingTimes } from '../MeetingTimes'
+import { mustRetakeChip } from '../mustRetakeChip'
 import { AttendanceCell } from '../schedule/AttendanceCell'
-import { StudentPicker } from '../on-behalf/StudentPicker'
+import { StudentPicker } from '../../../shared/ui/StudentPicker'
 
 /**
  * The student-schedule oversight view (features/enrollment, ticket 10, ADR-0015). A reviewer
@@ -72,11 +75,25 @@ export function StudentSchedulePage() {
               <Typography variant="h6" component="p">
                 {student.name}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {student.university_id}
-                {student.program &&
-                  ` · ${pickLocaleName(student.program, i18n.language, student.program.code ?? '')}`}
-              </Typography>
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' } }}
+              >
+                <Typography variant="body2" color="text.secondary">
+                  {student.university_id}
+                  {student.program &&
+                    ` · ${pickLocaleName(student.program, i18n.language, student.program.code ?? '')}`}
+                </Typography>
+                <Button
+                  component={RouterLink}
+                  to={`/grading/students/${student.student_id}`}
+                  size="small"
+                  variant="outlined"
+                >
+                  {t('grading:oversight.title')}
+                </Button>
+              </Stack>
             </Paper>
           )}
 
@@ -150,10 +167,17 @@ function SemesterCard({ group }: { group: ScheduleGroup }) {
               return (
                 <TableRow key={enrollment.id}>
                   <TableCell>
-                    <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
-                      {course?.code}
-                    </Typography>{' '}
-                    {name}
+                    <Stack spacing={0.75} sx={{ alignItems: 'flex-start' }}>
+                      <Typography variant="body2">
+                        <Typography component="span" variant="body2" sx={{ fontWeight: 600 }}>
+                          {course?.code}
+                        </Typography>{' '}
+                        {name}
+                      </Typography>
+                      {enrollment.must_retake && (
+                        <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />
+                      )}
+                    </Stack>
                   </TableCell>
                   <TableCell>
                     <StatusChip {...courseStatusChip(status, t(`courseStatus.${status}`))} />

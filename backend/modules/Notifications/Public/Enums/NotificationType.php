@@ -96,4 +96,58 @@ enum NotificationType: string
      * an automated status change. Payload: `course_code`, `percentage`.
      */
     case AttendanceAuditAtRisk = 'attendance.audit_at_risk';
+
+    /**
+     * An Instructor signed a Grade Sheet round (Phase 4, ticket 03) — raised to every
+     * Department Head who reviews it (SRS §4.7.1.4). Payload: `course_offering_id`,
+     * `grade_sheet_id`.
+     */
+    case GradeSheetSubmitted = 'grade.sheet_submitted';
+
+    /**
+     * A Department Head returned a Grade Sheet round with a note instead of finalizing it
+     * (Phase 4, ticket 03) — raised to the Instructor. Payload: `grade_sheet_id`, `note`.
+     */
+    case GradeSheetReturned = 'grade.sheet_returned';
+
+    /**
+     * A Department Head finalized a Grade — it is now part of the academic record (Phase 4,
+     * ticket 03). Raised to the Student, carrying the letter and whether it earned its credit
+     * (< C+), so no second type is needed for the must-retake warning (ticket 07). Payload:
+     * `enrollment_id`, `letter_grade`, `below_c_plus`.
+     */
+    case GradeFinalized = 'grade.finalized';
+
+    /**
+     * An Instructor's Incomplete declaration was finalized (Phase 4, ticket 05, SRS §4.7.3.2) —
+     * raised to the Student the moment the Course Status actually becomes Incomplete (at the
+     * Sheet's finalize, not the declaration), carrying the reason and the derived deadline so
+     * it is never a silent decision. Payload: `enrollment_id`, `reason`, `deadline` (nullable —
+     * absent exactly when the conversion command would also skip it).
+     */
+    case IncompleteDeclared = 'incomplete.declared';
+
+    /**
+     * A reminder that an outstanding Incomplete's resolution deadline is approaching (SRS
+     * §4.7.3.4), raised by the manual `grading:send-incomplete-reminders` command on the exact
+     * day the days-remaining figure matches one of the configured offsets. Payload:
+     * `enrollment_id`, `deadline`, `days_remaining`.
+     */
+    case IncompleteReminder = 'incomplete.reminder';
+
+    /**
+     * An unresolved Incomplete passed its deadline and became a Fail Withdrawal (SRS §4.7.3.3)
+     * — the one automated Course Status change in the system, raised by the manual
+     * `grading:convert-expired-incompletes` command. Payload: `enrollment_id`.
+     */
+    case IncompleteConverted = 'incomplete.converted';
+
+    /**
+     * A Course Offering is past its Semester's grade-submission deadline with no Finalized Grade
+     * Sheet (Phase 4, ticket 09) — raised by the manual `grading:flag-late-sheets` command to
+     * the Instructor and the routed Department Head. Purely a nudge, the Phase-2 SLA-aging
+     * pattern: the command changes no state and nothing is blocked by the deadline. Payload:
+     * `course_offering_id`, `course_code`, `deadline`.
+     */
+    case GradesOverdue = 'grades.overdue';
 }

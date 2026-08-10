@@ -11,8 +11,11 @@ use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\CourseLevel;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Enrollment\Internal\Enums\CourseStatus;
+use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\Weekday;
 use Modules\Enrollment\Internal\Models\CourseOffering;
+use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\OfferingMeeting;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
@@ -89,6 +92,15 @@ function classificationOf(TestResponse $response, int $courseId): ?string
         ->firstWhere('course.id', $courseId);
 
     return $line['classification'] ?? null;
+}
+
+/** Whether the eligible line for the course carries the must-retake marker. */
+function mustRetakeOf(TestResponse $response, int $courseId): ?bool
+{
+    $line = collect($response->json('data.courses'))
+        ->firstWhere('course.id', $courseId);
+
+    return $line['must_retake'] ?? null;
 }
 
 it('groups own-curriculum offered courses by their enrollment classification', function () {
@@ -226,6 +238,47 @@ it('reports null seats remaining for an uncapped offering', function () {
     actingAsStudentIn($program);
 
     eligible()->assertOk()->assertJsonPath('data.courses.0.seats_remaining', null);
+});
+
+it('marks failed preparatory and core courses as must-retake on the eligible list, but not electives', function () {
+    $semester = Semester::factory()->registrationOpen()->create();
+    $earlier = Semester::factory()->create();
+    $program = program(DegreeLevel::MSc);
+
+    $core = Course::factory()->create(['level' => CourseLevel::Master]);
+    $elective = Course::factory()->create(['level' => CourseLevel::Master]);
+    place($program, $core, CourseCategory::ProgramCore);
+    place($program, $elective, CourseCategory::ResearchElective);
+    offer($semester, $core);
+    offer($semester, $elective);
+
+    $user = actingAsStudentIn($program);
+    $student = Student::query()->where('user_id', $user->id)->firstOrFail();
+
+    $coreAttempt = CourseOffering::factory()->create(['semester_id' => $earlier->id, 'course_id' => $core->id]);
+    $electiveAttempt = CourseOffering::factory()->create(['semester_id' => $earlier->id, 'course_id' => $elective->id]);
+
+    Enrollment::factory()->create([
+        'student_id' => $student->id,
+        'course_offering_id' => $coreAttempt->id,
+        'classification' => EnrollmentClassification::Core,
+        'course_status' => CourseStatus::Regular,
+        'credit_hours' => 3,
+        'earned' => false,
+    ]);
+    Enrollment::factory()->create([
+        'student_id' => $student->id,
+        'course_offering_id' => $electiveAttempt->id,
+        'classification' => EnrollmentClassification::InternalElective,
+        'course_status' => CourseStatus::Regular,
+        'credit_hours' => 3,
+        'earned' => false,
+    ]);
+
+    $response = eligible()->assertOk();
+
+    expect(mustRetakeOf($response, $core->id))->toBeTrue()
+        ->and(mustRetakeOf($response, $elective->id))->toBeFalse();
 });
 
 it('returns a null semester and an empty list when no registration window is open', function () {

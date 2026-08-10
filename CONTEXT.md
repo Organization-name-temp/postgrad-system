@@ -176,13 +176,20 @@ Category is per-Program, never an intrinsic property of the Course.
 
 **Semester**:
 One academic term the university actually runs — a Term (Fall or Spring) of one year,
-e.g. "Fall 2026" — carrying its start/end dates and the registration-flow deadlines
-(registration window, add/drop end, late-add end, withdrawal deadline). Course Offerings,
-Enrollments, and academic deadlines all belong to a Semester. Related to but distinct
-from an Admission Cycle: the Cycle is the *application* window run by Admissions; the
-Semester is the *academic* term the accepted Applicant enrolls into (they share the
-Term + year naming).
+e.g. "Fall 2026" — carrying its start/end dates, the registration-flow deadlines
+(registration window, add/drop end, late-add end, withdrawal deadline), and the
+Grade-Submission Deadline that closes it. Course Offerings, Enrollments, and academic
+deadlines all belong to a Semester. Related to but distinct from an Admission Cycle: the
+Cycle is the *application* window run by Admissions; the Semester is the *academic* term
+the accepted Applicant enrolls into (they share the Term + year naming).
 _Avoid_: term alone (ambiguous with Intake Term), session, academic year.
+
+**Grade-Submission Deadline**:
+The date by which an Instructor is expected to have delivered a Semester's grades — the
+one Semester date that falls on or after the term ends. It is a *nudge, not a gate*: past
+it, an Offering with no Finalized Grade Sheet is flagged to its Instructor and Department
+Head, and nothing is blocked or changed. Distinct from the Incomplete resolution
+deadline, which is derived from the following Semester's start and is per-Enrollment.
 
 ## Enrollment & credit
 
@@ -259,12 +266,87 @@ _Avoid_: credit ledger, progress table.
 ## Grading & standing
 
 **Grade**:
-The letter grade (A+ … F, plus P/FL/AU/W/FW/I) and GPA points recorded against an
-Enrollment by its Instructor, then signed and reviewed.
+The academic result of one Enrollment — the Mark its Instructor entered, and the Letter
+Grade and GPA points derived from that Mark — then signed and reviewed. A Grade exists
+only for an Enrollment that was actually graded: an Audit, Withdrawal, Incomplete, or
+Fail-Withdrawal Enrollment has **no Grade at all**, because those are Course Statuses,
+not grades. (SRS Appendix A lists AU/W/FW/I beside the letters because a Transcript
+prints them in its grade column — that is a rendering of the Course Status, never a
+stored Grade.)
+_Avoid_: mark (the Mark is the input; the Grade is the result).
+
+**Mark**:
+The percentage from 0 to 100 an Instructor records for one Enrollment — the sole input
+from which the Letter Grade and its GPA points are derived. One final figure per
+Enrollment; this domain has no assessment components or weights.
+
+**Letter Grade**:
+One of the nine graded outcomes — A+, A, B+, B, C+, C, D+, D, F — each carrying fixed
+GPA points, derived from the Mark by the grading scale and frozen onto the Grade when it
+is recorded (a later change to the scale never rewrites a Grade already given). C+ (2.5
+points) is the minimum passing Letter Grade: the threshold at which a Course's credit
+hours are earned. No postgraduate Course is Pass/Fail, so Appendix A's P and FL are not
+part of this domain.
+_Avoid_: A−, B−, C− (not part of E-JUST's scale).
+
+**Grade Sheet**:
+One round of grade submission for one Course Offering — the Grades of the gradable
+Enrollments on its roster, moving as a single document from Draft to Submitted (the
+Instructor signs it) to Finalized (the Department Head accepts it), or Returned with a
+note for the Instructor to correct and re-sign. Grades become part of the academic record
+only when their Sheet is Finalized, and a Finalized Sheet is never reopened. An Offering
+accumulates Sheets: one Initial round covering every gradable Enrollment, then a
+follow-up round for each batch of Incomplete resolutions or Corrections. Audit and
+Withdrawal Enrollments appear on the roster but are never lines on a Sheet.
+_Avoid_: gradebook, grade roster, grade batch (the Sheet is the reviewable document).
+
+**Central Grade Entry**:
+Student Affairs keying marks into any Instructor's Draft Grade Sheet — the path for
+grades that arrive on paper. It is the plain reading of the SRS §3.2 matrix rather than
+a new power: Student Affairs holds "Enter Grades" and not "Finalize Grades", so they may
+key and never sign, the Instructor remains the author of their own grades, and every such
+write to someone else's Sheet is recorded in the Audit Log.
+_Avoid_: bulk entry, grade import (nothing is imported; a Sheet is keyed line by line).
+
+**Attempt**:
+One of the at most two for-credit Enrollments a Student may hold in a single Course. The
+first is Regular; the second is a Retake if the first earned no credit, or a CGPA
+Improvement if it did. Audit and Withdrawal Enrollments are not Attempts and consume
+nothing. Both Attempts appear on the Transcript, but only the later one counts toward the
+CGPA and earned credit.
+
+**CGPA Improvement**:
+The Course Status of a second Attempt at a Course the Student already passed at C+ or
+better, taken to raise the CGPA. It counts exactly as a Retake does — the later Attempt
+supersedes the earlier in the CGPA — and it consumes the same single re-registration
+allowance, so no Course is ever attempted for credit three times.
+
+**Quality Points**:
+One Enrollment's contribution to a GPA — its Letter Grade's GPA points multiplied by its
+credit hours. A GPA is the Quality Points of the counted Enrollments divided by their
+credit hours, which is why a 3-credit Course moves a GPA three times as far as a 1-credit
+Preparatory Course.
+
+**Incomplete**:
+The Course Status of an Enrollment whose coursework the Instructor attests is at least
+70% complete but unfinished, deferring its Grade rather than deciding it. It must be
+resolved before the 10th week of the following Semester; unresolved, it becomes a Fail
+Withdrawal. While Incomplete an Enrollment counts as attended but toward neither the
+CGPA nor earned credit; resolving it restores the Course Status the Enrollment held
+before and records the Grade in the Enrollment's *original* Semester.
+_Avoid_: incomplete grade (an Incomplete Enrollment has no Grade at all until resolved).
+
+**Fail Withdrawal**:
+The Course Status of an Enrollment whose Incomplete passed its resolution deadline
+unresolved — the only way an Enrollment becomes one. It appears on the Transcript and
+counts nowhere else: not toward the CGPA, nor required, attended, or earned credit
+hours. Distinct from a Withdrawal, which the Student chooses within the withdrawal
+period and which carries no failure.
 
 **GPA / CGPA**:
-GPA is the grade-point average for one semester; CGPA is cumulative across all counted
-semesters. Minimum CGPA for graduation is 3.0.
+GPA is the grade-point average for one Semester; CGPA is cumulative across every counted
+Semester. Both are always derived from the Grades of CGPA-counting Enrollments, never
+stored. Minimum CGPA for graduation is 3.0.
 
 **Academic Standing**:
 A Student's current classification derived from grades and CGPA: Good Standing,

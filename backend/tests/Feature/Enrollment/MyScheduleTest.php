@@ -42,6 +42,8 @@ function schEnroll(
     CourseStatus $status = CourseStatus::Regular,
     int $totalCh = 3,
     array $meetings = [[Weekday::Monday, '09:00', '11:00']],
+    EnrollmentClassification $classification = EnrollmentClassification::Core,
+    ?bool $earned = null,
 ): Enrollment {
     $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => $totalCh]);
     $offering = CourseOffering::factory()->create(['semester_id' => $semester->id, 'course_id' => $course->id]);
@@ -52,9 +54,10 @@ function schEnroll(
     return Enrollment::factory()->create([
         'student_id' => $student->id,
         'course_offering_id' => $offering->id,
-        'classification' => EnrollmentClassification::Core,
+        'classification' => $classification,
         'course_status' => $status,
         'credit_hours' => $totalCh,
+        'earned' => $earned,
     ]);
 }
 
@@ -90,6 +93,20 @@ it('renders each enrollment\'s status, classification, credit hours and meetings
         ->assertJsonPath('data.0.enrollments.0.credit_hours', 3)
         ->assertJsonPath('data.0.enrollments.0.meetings.0.weekday', 1)
         ->assertJsonPath('data.0.enrollments.0.meetings.0.starts_at', '09:00');
+});
+
+it('marks failed preparatory and core enrollments as must-retake, but not electives', function () {
+    $student = schStudent();
+    $semester = Semester::factory()->create(['term' => Term::Fall, 'year' => 2026]);
+
+    schEnroll($student, $semester, classification: EnrollmentClassification::Core, earned: false);
+    schEnroll($student, $semester, classification: EnrollmentClassification::InternalElective, earned: false);
+
+    $rows = collect(test()->getJson('/api/v1/registration/schedule')->assertOk()->json('data.0.enrollments'))
+        ->keyBy('classification');
+
+    expect($rows['Core']['must_retake'])->toBeTrue()
+        ->and($rows['InternalElective']['must_retake'])->toBeFalse();
 });
 
 it('returns an empty schedule when the student has no enrollments', function () {

@@ -53,6 +53,7 @@ class EloquentProgramCatalog implements ProgramCatalog
             nameEn: $program->name_en,
             nameAr: $program->name_ar,
             degreeLevel: $program->degree_level,
+            departmentId: $department->getKey(),
             facultyId: $faculty->getKey(),
             departmentNameEn: $department->name_en,
             departmentNameAr: $department->name_ar,

@@ -4362,6 +4362,32 @@ export const MyGradesResponse = zod.object({
 
 
 /**
+ * The three numbers a Student's landing page shows: the CGPA, the latest Semester's GPA, and
+ * the credit hours earned so far. `cgpa` and `latest_semester_gpa` are **null — never
+ * 0.00** — before any CGPA-counting Grade has been finalized, so the SPA renders a dash and
+ * "not yet calculated" is never mistaken for "you scored zero".
+ *
+ * Gated on `grades.view_own` (§3.2, Student only) and scoped to the acting user's own Student
+ * anchor: there is no id parameter, so another Student's record is unreachable from it.
+ * @summary My Academic Record Card.
+ */
+export const MyAcademicRecordCardResponse = zod.object({
+  "data": zod.object({
+  "cgpa": zod.number().optional(),
+  "latest_semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "latest_semester_gpa": zod.number().optional(),
+  "earned_credit_hours": zod.number().optional()
+}).optional()
+})
+
+
+/**
  * A searchable picker population for the grade-oversight screen: Advisors see their live
  * advisees; Department Heads the Students in Programs under their Departments; Deans the
  * Students in their Faculties; Instructors the Students on Offerings they teach; Student

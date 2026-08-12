@@ -60,6 +60,11 @@ export const ar = {
     menu: {
       account: 'قائمة الحساب',
     },
+    dashboard: {
+      title: 'لوحة التحكم',
+      universityId: 'الرقم الجامعي',
+      noCards: 'لا يوجد ما ينتظرك هنا بعد.',
+    },
   },
   auth: {
     login: {
@@ -71,14 +76,6 @@ export const ar = {
       password: 'كلمة المرور',
       noAccount: 'متقدّم جديد؟',
       register: 'ابدأ طلبك',
-    },
-    dashboard: {
-      title: 'لوحة التحكم',
-      roles: 'الأدوار',
-      permissions: 'الصلاحيات',
-      studentSection: 'سجل الطالب',
-      universityId: 'الرقم الجامعي',
-      enrollmentTerm: 'فصل الالتحاق',
     },
   },
   catalog: {
@@ -1320,6 +1317,19 @@ export const ar = {
       },
       incompleteDeadline: 'التسوية بحلول {{date}}',
       incompleteNoDeadline: 'لم يُحدَّد الموعد النهائي بعد',
+    },
+    cards: {
+      academicRecord: {
+        title: 'سجلي الأكاديمي',
+        cgpa: 'المعدل التراكمي',
+        semesterGpa: 'معدل آخر فصل',
+        dash: '—',
+        latestSemester: 'آخر فصل دراسي: {{semester}}',
+        earnedCreditHours: 'اكتسبت {{count}} ساعة معتمدة حتى الآن',
+        earnedCreditHours_other: 'اكتسبت {{count}} ساعة معتمدة حتى الآن',
+        action: 'عرض درجاتي',
+        loadError: 'تعذّر تحميل سجلك الأكاديمي.',
+      },
     },
     oversight: {
       title: 'درجات الطلاب',

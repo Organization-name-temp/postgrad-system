@@ -4825,6 +4825,29 @@ export type MyGrades403 = {
   message?: string;
 };
 
+export type MyAcademicRecordCard200DataLatestSemester = {
+  id?: number;
+  term?: string;
+  year?: number;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type MyAcademicRecordCard200Data = {
+  cgpa?: number;
+  latest_semester?: MyAcademicRecordCard200DataLatestSemester;
+  latest_semester_gpa?: number;
+  earned_credit_hours?: number;
+};
+
+export type MyAcademicRecordCard200 = {
+  data?: MyAcademicRecordCard200Data;
+};
+
+export type MyAcademicRecordCard403 = {
+  message?: string;
+};
+
 export type TheStudentsWhoseGradesTheReviewerMayInspect200DataItemProgram = {
   id?: number;
   code?: string;
@@ -15367,6 +15390,106 @@ export function useMyGrades<TData = Awaited<ReturnType<typeof myGrades>>, TError
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMyGradesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The three numbers a Student's landing page shows: the CGPA, the latest Semester's GPA, and
+ * the credit hours earned so far. `cgpa` and `latest_semester_gpa` are **null — never
+ * 0.00** — before any CGPA-counting Grade has been finalized, so the SPA renders a dash and
+ * "not yet calculated" is never mistaken for "you scored zero".
+ *
+ * Gated on `grades.view_own` (§3.2, Student only) and scoped to the acting user's own Student
+ * anchor: there is no id parameter, so another Student's record is unreachable from it.
+ * @summary My Academic Record Card.
+ */
+export const myAcademicRecordCard = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyAcademicRecordCard200>(
+      {url: `/api/v1/grading/cards/academic-record`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyAcademicRecordCardQueryKey = () => {
+    return [
+    `/api/v1/grading/cards/academic-record`
+    ] as const;
+    }
+
+
+export const getMyAcademicRecordCardQueryOptions = <TData = Awaited<ReturnType<typeof myAcademicRecordCard>>, TError = MyAcademicRecordCard403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicRecordCard>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyAcademicRecordCardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myAcademicRecordCard>>> = ({ signal }) => myAcademicRecordCard(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myAcademicRecordCard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyAcademicRecordCardQueryResult = NonNullable<Awaited<ReturnType<typeof myAcademicRecordCard>>>
+export type MyAcademicRecordCardQueryError = MyAcademicRecordCard403
+
+
+export function useMyAcademicRecordCard<TData = Awaited<ReturnType<typeof myAcademicRecordCard>>, TError = MyAcademicRecordCard403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicRecordCard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myAcademicRecordCard>>,
+          TError,
+          Awaited<ReturnType<typeof myAcademicRecordCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyAcademicRecordCard<TData = Awaited<ReturnType<typeof myAcademicRecordCard>>, TError = MyAcademicRecordCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicRecordCard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myAcademicRecordCard>>,
+          TError,
+          Awaited<ReturnType<typeof myAcademicRecordCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyAcademicRecordCard<TData = Awaited<ReturnType<typeof myAcademicRecordCard>>, TError = MyAcademicRecordCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicRecordCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Academic Record Card.
+ */
+
+export function useMyAcademicRecordCard<TData = Awaited<ReturnType<typeof myAcademicRecordCard>>, TError = MyAcademicRecordCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicRecordCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyAcademicRecordCardQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

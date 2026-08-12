@@ -61,6 +61,14 @@ export const en = {
     menu: {
       account: 'Account menu',
     },
+    // The Dashboard is the app shell's own page (phase 4.5, ticket 01) — it composes Cards
+    // from many features, so its chrome lives in `common` while each Card's copy stays in
+    // its owning feature's namespace.
+    dashboard: {
+      title: 'Dashboard',
+      universityId: 'University ID',
+      noCards: 'There is nothing waiting for you here yet.',
+    },
   },
   auth: {
     login: {
@@ -72,14 +80,6 @@ export const en = {
       password: 'Password',
       noAccount: 'New applicant?',
       register: 'Start an application',
-    },
-    dashboard: {
-      title: 'Dashboard',
-      roles: 'Roles',
-      permissions: 'Permissions',
-      studentSection: 'Student record',
-      universityId: 'University ID',
-      enrollmentTerm: 'Enrollment term',
     },
   },
   catalog: {
@@ -1354,6 +1354,23 @@ export const en = {
       },
       incompleteDeadline: 'Resolve by {{date}}',
       incompleteNoDeadline: 'Resolution deadline not yet set',
+    },
+    // Grading's Dashboard Cards (phase 4.5). Each Card's copy lives in the namespace of the
+    // feature that owns its data, per Card, EN + AR together.
+    cards: {
+      academicRecord: {
+        title: 'My academic record',
+        cgpa: 'CGPA',
+        semesterGpa: 'Latest semester GPA',
+        // A fresh record is a dash, never 0.00 — "not yet calculated" must never read as
+        // "you scored zero".
+        dash: '—',
+        latestSemester: 'Latest semester: {{semester}}',
+        earnedCreditHours: '{{count}} credit hour earned so far',
+        earnedCreditHours_other: '{{count}} credit hours earned so far',
+        action: 'View my grades',
+        loadError: 'Could not load your academic record.',
+      },
     },
     oversight: {
       title: 'Student Grades',

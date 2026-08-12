@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Grading\Internal\Http\Controllers\DashboardCardController;
 use Modules\Grading\Internal\Http\Controllers\DepartmentHeadReviewController;
 use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
 use Modules\Grading\Internal\Http\Controllers\IncompleteController;
@@ -97,6 +98,12 @@ Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {
     // The acting Student's own academic record — Semester GPAs and the CGPA prominently
     // (ticket 04). No id param: always the acting user's own Student anchor.
     Route::get('/grading/my-grades', [MyGradesController::class, 'index']);
+
+    // The My Academic Record Dashboard Card (phase 4.5, ticket 01) — the same record's three
+    // headline numbers, summarised for the landing page and linking into the screen above.
+    // Independently authorized here rather than trusting the SPA's choice of what to request
+    // (ADR-0024): the client composes Cards from the acting user's access as a UX mirror only.
+    Route::get('/grading/cards/academic-record', [DashboardCardController::class, 'academicRecord']);
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.view_student'])->group(function () {

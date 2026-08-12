@@ -16634,6 +16634,76 @@ paths:
       tags:
         - Grading
       security: []
+  /api/v1/grading/cards/academic-record:
+    get:
+      summary: 'My Academic Record Card.'
+      operationId: myAcademicRecordCard
+      description: "The three numbers a Student's landing page shows: the CGPA, the latest Semester's GPA, and\nthe credit hours earned so far. `cgpa` and `latest_semester_gpa` are **null — never\n0.00** — before any CGPA-counting Grade has been finalized, so the SPA renders a dash and\n\"not yet calculated\" is never mistaken for \"you scored zero\".\n\nGated on `grades.view_own` (§3.2, Student only) and scoped to the acting user's own Student\nanchor: there is no id parameter, so another Student's record is unreachable from it."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    cgpa: 3.42
+                    latest_semester:
+                      id: 3
+                      term: Fall
+                      year: 2025
+                      name_en: 'Fall 2025'
+                      name_ar: 'خريف 2025'
+                    latest_semester_gpa: 3.67
+                    earned_credit_hours: 12
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      cgpa:
+                        type: number
+                        example: 3.42
+                      latest_semester:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          term:
+                            type: string
+                            example: Fall
+                          year:
+                            type: integer
+                            example: 2025
+                          name_en:
+                            type: string
+                            example: 'Fall 2025'
+                          name_ar:
+                            type: string
+                            example: 'خريف 2025'
+                      latest_semester_gpa:
+                        type: number
+                        example: 3.67
+                      earned_credit_hours:
+                        type: integer
+                        example: 12
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record.'
+      tags:
+        - Grading
+      security: []
   /api/v1/grading/students:
     get:
       summary: 'The students whose grades the reviewer may inspect.'

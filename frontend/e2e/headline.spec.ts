@@ -42,10 +42,12 @@ test('headline: sign in, browse the catalog tree, open a course, flip to RTL, si
   await page.getByRole('button', { name: 'English' }).click()
   await expect(page).toHaveURL(/\/$/)
 
-  // Identity, roles, and effective permissions are shown (Phase 0 proof, retained).
+  // The Dashboard's identity header: who is signed in, and the roles they hold. The Phase-0
+  // wall of raw permission chips is gone (phase 4.5, ticket 01) — the RBAC proof it stood for
+  // is the permission-filtered side nav below, and dashboard.spec.ts asserts the Card sets.
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
   await expect(page.getByText('r07@ejust.test')).toBeVisible()
-  await expect(page.getByText('catalog.view')).toBeVisible()
+  await expect(page.getByText('R07 · Dean of Faculty')).toBeVisible()
 
   // Open the browse catalog from the side nav.
   await page.getByRole('link', { name: 'Browse catalog' }).first().click()

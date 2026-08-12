@@ -42,6 +42,51 @@ final class GpaCalculator
     }
 
     /**
+     * The chronologically **latest** Attempt by Semester `starts_at` — the same ordering
+     * {@see self::nonSuperseded()} supersedes by, and never (year, term), since Fall precedes
+     * the following Spring. `null` for an empty set.
+     *
+     * Callers pass the already-eligible set, so a term whose every Attempt was later superseded
+     * is never reported as the latest one.
+     *
+     * @param  list<GpaAttempt>  $attempts
+     */
+    public static function latest(array $attempts): ?GpaAttempt
+    {
+        $latest = null;
+        foreach ($attempts as $attempt) {
+            if ($latest === null || $attempt->semesterStartsAt->greaterThan($latest->semesterStartsAt)) {
+                $latest = $attempt;
+            }
+        }
+
+        return $latest;
+    }
+
+    /**
+     * The credit hours these Attempts actually **earned** — the sum of `creditHours` over those
+     * whose ADR-0022 `earned` bit is true. A grade below the C+ threshold counts toward the CGPA
+     * but earns nothing, so this is never the same as the credit hours the average weights by.
+     *
+     * Callers pass the eligible (non-superseded) set: a superseded Attempt's credit hours were
+     * already re-earned, or not, by the Attempt that superseded it, so counting both would
+     * double the hours for one Course.
+     *
+     * @param  list<GpaAttempt>  $attempts
+     */
+    public static function earnedCreditHours(array $attempts): int
+    {
+        $hours = 0;
+        foreach ($attempts as $attempt) {
+            if ($attempt->earned === true) {
+                $hours += $attempt->creditHours;
+            }
+        }
+
+        return $hours;
+    }
+
+    /**
      * The credit-weighted average over the given Attempts: `Σ(GPA points × credit hours) ÷
      * Σ(credit hours)`, rounded **half-up to two decimals exactly once** so display and every
      * threshold comparison agree. `null` — never `0.00` — when the Attempts carry no credit

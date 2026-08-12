@@ -71,6 +71,11 @@ export function DashboardPage() {
               <Typography variant="body1" component="p">
                 {student.university_id}
               </Typography>
+              {student.enrollment_term && (
+                <Typography variant="body2" color="text.secondary">
+                  {t('dashboard.enrollmentTerm', { term: student.enrollment_term })}
+                </Typography>
+              )}
             </Box>
           )}
 

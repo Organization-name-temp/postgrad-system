@@ -33,6 +33,7 @@ export function AcademicRecordCard() {
   const semesterName = record?.latest_semester
     ? pickLocaleName(record.latest_semester, i18n.language)
     : null
+  const earnedCreditHours = record?.earned_credit_hours ?? 0
 
   return (
     <DashboardCard
@@ -57,11 +58,18 @@ export function AcademicRecordCard() {
               {t('cards.academicRecord.latestSemester', { semester: semesterName })}
             </Typography>
           )}
-          <Typography variant="body2" color="text.secondary" sx={tabularNums}>
-            {t('cards.academicRecord.earnedCreditHours', {
-              count: record?.earned_credit_hours ?? 0,
-            })}
-          </Typography>
+          {/* The GPAs dash when nothing is finalized, but "0 credit hours earned" would be the
+              bare zero the empty-state rule exists to prevent — so before the first finalized
+              Grade the row says so in words instead. */}
+          {earnedCreditHours > 0 ? (
+            <Typography variant="body2" color="text.secondary" sx={tabularNums}>
+              {t('cards.academicRecord.earnedCreditHours', { count: earnedCreditHours })}
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              {t('cards.academicRecord.nothingFinalized')}
+            </Typography>
+          )}
         </Stack>
       }
     />

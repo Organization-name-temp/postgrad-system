@@ -67,6 +67,7 @@ export const en = {
     dashboard: {
       title: 'Dashboard',
       universityId: 'University ID',
+      enrollmentTerm: 'Enrolled {{term}}',
       noCards: 'There is nothing waiting for you here yet.',
     },
   },
@@ -1368,6 +1369,7 @@ export const en = {
         latestSemester: 'Latest semester: {{semester}}',
         earnedCreditHours: '{{count}} credit hour earned so far',
         earnedCreditHours_other: '{{count}} credit hours earned so far',
+        nothingFinalized: 'No grades have been finalized yet.',
         action: 'View my grades',
         loadError: 'Could not load your academic record.',
       },

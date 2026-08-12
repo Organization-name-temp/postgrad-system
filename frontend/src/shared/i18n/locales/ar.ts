@@ -63,6 +63,7 @@ export const ar = {
     dashboard: {
       title: 'لوحة التحكم',
       universityId: 'الرقم الجامعي',
+      enrollmentTerm: 'التحق في {{term}}',
       noCards: 'لا يوجد ما ينتظرك هنا بعد.',
     },
   },
@@ -1327,6 +1328,7 @@ export const ar = {
         latestSemester: 'آخر فصل دراسي: {{semester}}',
         earnedCreditHours: 'اكتسبت {{count}} ساعة معتمدة حتى الآن',
         earnedCreditHours_other: 'اكتسبت {{count}} ساعة معتمدة حتى الآن',
+        nothingFinalized: 'لم يُعتمد أي درجة حتى الآن.',
         action: 'عرض درجاتي',
         loadError: 'تعذّر تحميل سجلك الأكاديمي.',
       },

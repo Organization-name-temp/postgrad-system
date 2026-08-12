@@ -1,4 +1,4 @@
-import { Alert, Box, CircularProgress, Link, Paper, Stack, Typography } from '@mui/material'
+import { Alert, Box, Link, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { useId } from 'react'
 import type { ReactNode } from 'react'
@@ -62,6 +62,7 @@ export function DashboardCard({
       component="section"
       variant="outlined"
       aria-labelledby={titleId}
+      aria-busy={isPending}
       sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}
     >
       <Typography id={titleId} variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>
@@ -69,7 +70,16 @@ export function DashboardCard({
       </Typography>
 
       <Box sx={{ flexGrow: 1 }}>
-        {isPending && <CircularProgress size={24} aria-label={title} />}
+        {/* Skeletons matching the final layout — one tall count line over two row lines — not a
+            spinner (design-system.md §9: skeletons for tables and cards). `aria-busy` on the
+            section is what a screen reader reads; the skeletons themselves are decoration. */}
+        {isPending && (
+          <Stack spacing={1}>
+            <Skeleton variant="text" width="45%" sx={{ fontSize: '2rem' }} />
+            <Skeleton variant="text" width="75%" />
+            <Skeleton variant="text" width="55%" />
+          </Stack>
+        )}
 
         {!isPending && isError && <Alert severity="error">{errorText}</Alert>}
 

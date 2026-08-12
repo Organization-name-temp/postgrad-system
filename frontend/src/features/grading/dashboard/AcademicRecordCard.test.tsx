@@ -51,7 +51,7 @@ describe('AcademicRecordCard', () => {
     expect(screen.getByText('6 credit hours earned so far')).toBeInTheDocument()
   })
 
-  it('renders a dash for a record with no finalized grade yet — never 0.00', () => {
+  it('renders a dash for a record with no finalized grade yet — never 0.00 and never a bare 0', () => {
     mockedQuery.mockReturnValue(
       queryResult({
         data: {
@@ -68,6 +68,9 @@ describe('AcademicRecordCard', () => {
 
     expect(screen.getAllByText('—')).toHaveLength(2)
     expect(screen.queryByText('0.00')).not.toBeInTheDocument()
+    // "0 credit hours earned" would be exactly the bare zero the empty-state rule forbids.
+    expect(screen.queryByText(/0 credit hours/)).not.toBeInTheDocument()
+    expect(screen.getByText('No grades have been finalized yet.')).toBeInTheDocument()
   })
 
   it('links into the full record behind it', () => {

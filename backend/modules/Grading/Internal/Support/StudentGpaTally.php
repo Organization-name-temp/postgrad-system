@@ -102,6 +102,7 @@ final readonly class StudentGpaTally
                 semesterStartsAt: $semester->startsAt,
                 creditHours: $enrollment->creditHours,
                 gpaPoints: (float) $grades[$enrollment->id]->gpa_points,
+                earned: $enrollment->earned,
             );
         }
 

@@ -67,10 +67,15 @@ describe('DashboardCard', () => {
     expect(screen.queryByText('6 pending')).not.toBeInTheDocument()
   })
 
-  it('renders a loading indicator instead of content while pending', () => {
+  it('marks itself busy and holds back its content while pending', () => {
     renderCard(<DashboardCard title="Advisee requests" count={<span>6 pending</span>} isPending />)
 
-    expect(screen.getByRole('progressbar')).toBeInTheDocument()
+    // A skeleton, not a spinner (design-system.md §9); `aria-busy` on the region is the part
+    // assistive technology reads, so that is what is asserted.
+    expect(screen.getByRole('region', { name: 'Advisee requests' })).toHaveAttribute(
+      'aria-busy',
+      'true',
+    )
     expect(screen.queryByText('6 pending')).not.toBeInTheDocument()
   })
 

@@ -148,17 +148,14 @@ class RoleAccountSeeder extends Seeder
             return;
         }
 
-        $C = EnrollmentClassification::class;
-        $M = RegistrationMode::class;
-        $S = CourseStatus::class;
         $advisorId = (int) $advisor->getKey();
 
         $this->enrollViaApprovedRequest($student->studentId, $advisorId, $fall2024, [
-            ['offering' => $f24Cse511, 'mode' => $M::Regular, 'class' => $C::Core, 'status' => $S::Regular, 'ch' => 3],
+            $this->line($f24Cse511, EnrollmentClassification::Core, 3),
         ]);
         $this->enrollViaApprovedRequest($student->studentId, $advisorId, $spring2025, [
-            ['offering' => $s25Dep501, 'mode' => $M::Regular, 'class' => $C::Preparatory, 'status' => $S::Regular, 'ch' => 1],
-            ['offering' => $s25Cse512, 'mode' => $M::Regular, 'class' => $C::Core, 'status' => $S::Regular, 'ch' => 3],
+            $this->line($s25Dep501, EnrollmentClassification::Preparatory, 1),
+            $this->line($s25Cse512, EnrollmentClassification::Core, 3),
         ]);
 
         // The Initial rounds on those Offerings were Finalized by the Phase-4 seeder, and
@@ -221,17 +218,12 @@ class RoleAccountSeeder extends Seeder
         $cse512 = $this->existingOffering($fall2026, 'CSE512');
 
         if ($cse511 !== null && $cse512 !== null) {
-            $M = RegistrationMode::class;
-
             $this->pendingRequest($students['waiting']->studentId, $fall2026, [
-                ['offering' => $cse511, 'mode' => $M::Regular],
-                ['offering' => $cse512, 'mode' => $M::Regular],
+                ['offering' => $cse511, 'mode' => RegistrationMode::Regular],
+                ['offering' => $cse512, 'mode' => RegistrationMode::Regular],
             ]);
             $this->enrollViaApprovedRequest($students['settled']->studentId, (int) $advisor->getKey(), $fall2026, [
-                [
-                    'offering' => $cse511, 'mode' => $M::Regular,
-                    'class' => EnrollmentClassification::Core, 'status' => CourseStatus::Regular, 'ch' => 3,
-                ],
+                $this->line($cse511, EnrollmentClassification::Core, 3),
             ]);
         }
 
@@ -264,14 +256,8 @@ class RoleAccountSeeder extends Seeder
 
         foreach ($roster as $student) {
             $this->enrollViaApprovedRequest($student->studentId, (int) $instructor->getKey(), $semester, [
-                [
-                    'offering' => $cse511, 'mode' => RegistrationMode::Regular,
-                    'class' => EnrollmentClassification::Core, 'status' => CourseStatus::Regular, 'ch' => 3,
-                ],
-                [
-                    'offering' => $dep501, 'mode' => RegistrationMode::Regular,
-                    'class' => EnrollmentClassification::Preparatory, 'status' => CourseStatus::Regular, 'ch' => 1,
-                ],
+                $this->line($cse511, EnrollmentClassification::Core, 3),
+                $this->line($dep501, EnrollmentClassification::Preparatory, 1),
             ]);
         }
 
@@ -279,6 +265,24 @@ class RoleAccountSeeder extends Seeder
         // open is what creates one (ADR-0023) and an Offering nobody has opened yet is the other
         // half of what an Instructor still has to do.
         $this->sheet($cse511, GradeSheetKind::Initial, GradeSheetStatus::Draft);
+    }
+
+    /**
+     * One ordinary for-credit registration line. Every Enrollment this seeder mints is a Regular
+     * Attempt at its full snapshot credit hours — the interesting Course Statuses (Audit,
+     * Withdrawn, Retake, Incomplete) are the Phase-3/4 cohorts' job, not the role accounts'.
+     *
+     * @return array{offering: CourseOffering, mode: RegistrationMode, class: EnrollmentClassification, status: CourseStatus, ch: int}
+     */
+    private function line(CourseOffering $offering, EnrollmentClassification $classification, int $creditHours): array
+    {
+        return [
+            'offering' => $offering,
+            'mode' => RegistrationMode::Regular,
+            'class' => $classification,
+            'status' => CourseStatus::Regular,
+            'ch' => $creditHours,
+        ];
     }
 
     /** One already-seeded Offering by Semester and Course code, or `null` if it is absent. */

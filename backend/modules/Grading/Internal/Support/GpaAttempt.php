@@ -15,6 +15,11 @@ use Carbon\CarbonImmutable;
  * `$gpaPoints` is the Grade's own frozen points (ADR-0021) — a plain float, since the
  * calculator converts it to integer hundredths internally to keep the running sum exact
  * (spec §GPA and CGPA's "no floating-point drift" rule).
+ *
+ * `$earned` is ADR-0022's bit as `Enrollment\Public` reports it — whether this Attempt reached
+ * C+ and so earned its credit hours. It rides along rather than being looked up again, because
+ * {@see GpaCalculator::earnedCreditHours()} needs exactly the same eligible set the averages are
+ * drawn from.
  */
 final readonly class GpaAttempt
 {
@@ -25,5 +30,6 @@ final readonly class GpaAttempt
         public CarbonImmutable $semesterStartsAt,
         public int $creditHours,
         public float $gpaPoints,
+        public ?bool $earned = null,
     ) {}
 }

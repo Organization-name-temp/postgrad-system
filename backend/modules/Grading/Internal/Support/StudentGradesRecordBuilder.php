@@ -2,7 +2,6 @@
 
 namespace Modules\Grading\Internal\Support;
 
-use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentSummary;
 
@@ -94,7 +93,7 @@ final readonly class StudentGradesRecordBuilder
             ));
 
             $semesters[] = [
-                'semester' => $this->semesterArray($record->semesters[$semesterId]),
+                'semester' => SemesterPayload::from($record->semesters[$semesterId]),
                 'gpa' => GpaCalculator::average($semesterEligible),
                 'courses' => $rows,
             ];
@@ -143,17 +142,5 @@ final readonly class StudentGradesRecordBuilder
         }
 
         return $marked;
-    }
-
-    /** @return array<string, mixed> */
-    private function semesterArray(SemesterSummary $semester): array
-    {
-        return [
-            'id' => $semester->id,
-            'term' => $semester->term->value,
-            'year' => $semester->year,
-            'name_en' => $semester->nameEn,
-            'name_ar' => $semester->nameAr,
-        ];
     }
 }

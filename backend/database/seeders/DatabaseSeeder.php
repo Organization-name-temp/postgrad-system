@@ -50,5 +50,11 @@ class DatabaseSeeder extends Seeder
         // and Students carrying a superseded Retake, a must-retake prep grade, a corrected grade
         // and a failed external elective. Runs last: it reads all three seeders above.
         $this->call(GradingSeeder::class);
+
+        // The canonical role accounts' own academic footprint (phase 4.5): r02@ as a real
+        // Student with finalized Grades, r03@ with advisees and a request waiting on them, and
+        // multi@ with **both** — the one account that demonstrates the Dashboard's composition
+        // rule. Runs last: it adds to the four worlds above and disturbs none of them.
+        $this->call(RoleAccountSeeder::class);
     }
 }

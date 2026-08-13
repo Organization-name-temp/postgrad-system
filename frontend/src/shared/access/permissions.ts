@@ -13,6 +13,10 @@ export const PERMISSION = {
   approveCourseRegistration: 'registration.approve',
   registerCoursesForStudent: 'courses.register_for_student',
   viewStudentGrades: 'grades.view_student',
+  // Held by Instructors and Student Affairs (§3.2) — the mark-entry gate, and so the gate on
+  // the My Grade Sheets Dashboard Card, whose list is the acting user's own Offerings or, for
+  // a central-entry user, every Offering (phase 4.5, ticket 05).
+  enterGrades: 'grades.enter',
   // Held by Instructors and Department Heads, never by Student Affairs (§3.2) — which is
   // exactly what tells the sheet editor whether the signed-in user could ever sign the sheet
   // they are keying marks into (phase 4 ticket 09).

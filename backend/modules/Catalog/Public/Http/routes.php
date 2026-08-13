@@ -5,6 +5,7 @@ use Modules\Catalog\Internal\Http\Controllers\CatalogTreeController;
 use Modules\Catalog\Internal\Http\Controllers\CatalogVersionController;
 use Modules\Catalog\Internal\Http\Controllers\CourseController;
 use Modules\Catalog\Internal\Http\Controllers\CurriculumController;
+use Modules\Catalog\Internal\Http\Controllers\DashboardCardController;
 use Modules\Catalog\Internal\Http\Controllers\DepartmentController;
 use Modules\Catalog\Internal\Http\Controllers\FacultyController;
 use Modules\Catalog\Internal\Http\Controllers\ProgramController;
@@ -20,6 +21,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Browse tree — the whole hierarchy in one read-model payload; search/filter
     // runs client-side over it (FR-PCM-002). A catalog read like any other.
     Route::get('/catalog/tree', [CatalogTreeController::class, 'index'])->middleware('can:catalog.view');
+
+    // The Catalog Summary Dashboard Card (phase 4.5, ticket 06) — the active Program and Course
+    // counts, linking into the browse tree above. Gated on catalog.manage rather than
+    // catalog.view: it is a Card about how the catalog is *configured*, so it belongs to the
+    // people who configure it (ADR-0024). Declared before the model-bound catalog routes; the
+    // literal `/catalog/cards/...` path cannot be read as any of them.
+    Route::get('/catalog/cards/summary', [DashboardCardController::class, 'catalogSummary'])
+        ->middleware('can:catalog.manage');
 
     // Faculties
     Route::get('/faculties', [FacultyController::class, 'index'])->middleware('can:catalog.view');

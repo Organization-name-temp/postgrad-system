@@ -4,7 +4,12 @@ namespace Modules\Grading\Internal\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Enrollment\Public\EnrollmentRecords;
+use Modules\Grading\Internal\Http\Concerns\AuthorizesGradeEntry;
+use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Support\AcademicRecordCardBuilder;
+use Modules\Grading\Internal\Support\DepartmentHeadSheetQueue;
+use Modules\Grading\Internal\Support\GradeSheetsCardBuilder;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
 
@@ -23,6 +28,110 @@ use Modules\Identity\Public\StudentSummary;
  */
 class DashboardCardController
 {
+    use AuthorizesGradeEntry;
+
+    /** The three-row Card convention the shared `<DashboardCard>` is built around. */
+    private const ROW_LIMIT = 3;
+
+    /**
+     * My Grade Sheets Card.
+     *
+     * The acting user's teaching load for their current term and what it owes: the Offerings, how
+     * many of their Grade Sheets are **not yet Finalized**, and which are past the Semester's
+     * Grade-Submission Deadline with nothing finalized. `offerings` carries the first few rows so
+     * the Card links into each Offering's Sheet, while the counts are over the whole term.
+     *
+     * The overdue flag is a **nudge, not a gate**: nothing here is blocked, changed or
+     * auto-actioned by it — this is a second surface for the flag phase 4 ticket 09 already
+     * raises, read from the same derived predicate.
+     *
+     * Whose Offerings, exactly, is the rule the Grade Sheets screen already applies: an
+     * Instructor's own, or — for a **central-entry** user, `grades.enter` without
+     * `grades.finalize`, which by §3.2 is Student Affairs — every Offering, because grades
+     * arriving on paper belong to Offerings the records office does not teach. `meta.scope` says
+     * which list came back (`own` / `central`), exactly as that screen's endpoint does.
+     *
+     * The term is derived from the Offerings themselves — the latest-starting Semester the user
+     * teaches in that has already begun — because grades are keyed in *after* a term ends, when
+     * no Semester is running and the marks are still owed. A user who teaches nothing, or only in
+     * terms still ahead, gets a null Semester and the Card's empty state rather than an error.
+     *
+     * Gated on `grades.enter` (§3.2 — Instructor / Student Affairs).
+     *
+     * The empty case is described above rather than given its own `@response` scenario: a second 200
+     * whose body is a *different shape* — nulls and empty lists where the first has objects — makes
+     * Scribe emit a union response type, and the generated Orval client then cannot read either
+     * branch.
+     *
+     * @response 200 {"data": {"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "grade_submission_deadline_at": "2027-01-10T00:00:00+00:00", "offering_count": 2, "unfinalized_count": 1, "overdue_count": 1, "offerings": [{"offering_id": 3, "sheet_status": "Draft", "is_overdue": true, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}}]}, "meta": {"scope": "own"}}
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function gradeSheets(
+        Request $request,
+        EnrollmentRecords $enrollments,
+        GradeSheetsCardBuilder $card,
+    ): JsonResponse {
+        $central = $this->actingAsCentralEntry($request);
+        $offerings = $central
+            ? $enrollments->allOfferings()
+            : $enrollments->offeringsTaughtBy($this->actingUserId($request));
+
+        return response()->json([
+            'data' => $card->build($offerings),
+            'meta' => ['scope' => $central ? 'central' : 'own'],
+        ]);
+    }
+
+    /**
+     * Sheets Awaiting Review Card.
+     *
+     * The Department Head's review queue at a glance: how many Submitted Grade Sheets are waiting
+     * on them and which Offerings the oldest few belong to, linking into the review screen — so an
+     * Instructor blocked on a Head becomes visible to that Head on sign-in.
+     *
+     * The Permission opens the Card; the **assignment** scopes its contents, exactly as the review
+     * queue itself works. Both read the one seam ({@see DepartmentHeadSheetQueue}), so this Card
+     * counts precisely what that queue would show — including the case that is easy to miss: a
+     * Head assigned **university-wide** reaches the department-less Preparatory Sheets (ADR-0010)
+     * and a Department-scoped Head does not. A Department with no Head assigned is on nobody's
+     * Card, and that is not an error.
+     *
+     * Gated on `grades.finalize`, which Instructors hold too (§3.2) — an Instructor who heads no
+     * Department therefore gets an empty queue rather than a 403, because the assignment, not the
+     * Permission, is what fills it.
+     *
+     * The empty queue is described above rather than given its own `@response` scenario, for the
+     * same reason as the Card above: an empty `sheets` list beside a populated one makes Scribe emit
+     * a union response type the generated client cannot read.
+     *
+     * @response 200 {"data": {"pending_count": 2, "sheets": [{"id": 4, "course_offering_id": 3, "kind": "Initial", "signed_at": "2026-08-10T09:00:00+00:00", "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}}]}}
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function sheetsAwaitingReview(Request $request, DepartmentHeadSheetQueue $queue): JsonResponse
+    {
+        ['sheets' => $mine, 'offerings' => $offerings, 'courses' => $courses] =
+            $queue->forHead($this->actingUserId($request));
+
+        $rows = $mine->take(self::ROW_LIMIT)->map(function (GradeSheet $sheet) use ($offerings, $courses): array {
+            $offering = $offerings[(int) $sheet->course_offering_id];
+
+            return [
+                'id' => (int) $sheet->getKey(),
+                'course_offering_id' => $offering->id,
+                'kind' => $sheet->kind->value,
+                'signed_at' => $sheet->signed_at?->toIso8601String(),
+                'course' => ($courses[$offering->courseId] ?? null)?->toArray(),
+            ];
+        })->values()->all();
+
+        return response()->json([
+            'data' => [
+                'pending_count' => $mine->count(),
+                'sheets' => $rows,
+            ],
+        ]);
+    }
+
     /**
      * My Academic Record Card.
      *

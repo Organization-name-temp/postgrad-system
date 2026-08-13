@@ -15,9 +15,11 @@ import { dashboardCards } from './dashboardCards'
  *
  * The filter below is the whole selection rule, read straight off the declarative registry
  * ({@link ./dashboardCards.tsx}): an administrator (R09/R10) sees **only** the administration
- * set, and everyone else sees the Cards whose Permission and Role gates they satisfy. This is
- * a UX mirror of the server's authority only — every Card endpoint re-authorizes its own
- * request (ADR-0014).
+ * set, and everyone else sees the Cards whose Permission and Role gates they satisfy. The two
+ * branches are independent because membership of the administration set is: a configuration
+ * Card belongs to it *and* is seen by the §3.2 holders of its Permission, while a Card
+ * exclusive to administrators is one that gates on the admin Roles. This is a UX mirror of the
+ * server's authority only — every Card endpoint re-authorizes its own request (ADR-0014).
  */
 export function DashboardPage() {
   const { t } = useTranslation('common')
@@ -30,9 +32,8 @@ export function DashboardPage() {
 
   const visible = dashboardCards.filter((card) =>
     isAdmin
-      ? card.adminOnly === true
-      : card.adminOnly !== true &&
-        (!card.permission || hasPermission(card.permission)) &&
+      ? card.adminSet === true
+      : (!card.permission || hasPermission(card.permission)) &&
         (!card.roles || card.roles.some((role) => hasRole(role))),
   )
 

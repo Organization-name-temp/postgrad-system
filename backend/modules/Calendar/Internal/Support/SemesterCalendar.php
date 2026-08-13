@@ -162,4 +162,26 @@ final class SemesterCalendar
             default => 'closed',
         };
     }
+
+    /**
+     * When the period {@see self::currentPeriod()} reports **closes** — the deadline a Student or an
+     * administrator is actually working against — or null when the current period is not a window
+     * that closes: `upcoming` has not opened yet and `closed` has nothing left to close.
+     *
+     * Matched on the period label rather than re-testing the predicates, so it inherits the
+     * precedence above for free and the two answers can never disagree about which window is live.
+     * It lives here, beside the phase vocabulary, for the reason ADR-0018 gives: a consumer must
+     * never re-derive a period answer, and phase 4.5's Dashboard Cards are the second and third
+     * consumers to need this one.
+     */
+    public function currentPeriodEndsAt(CarbonInterface $now): ?CarbonInterface
+    {
+        return match ($this->currentPeriod($now)) {
+            'withdrawal' => $this->withdrawalDeadlineAt,
+            'late_add' => $this->lateAddEndsAt,
+            'add_drop' => $this->addDropEndsAt,
+            'registration' => $this->registrationClosesAt,
+            default => null,
+        };
+    }
 }

@@ -192,3 +192,26 @@ it('names the current period, change windows taking precedence over the registra
         ->and($cal->currentPeriod(Carbon::parse('2026-12-10 00:00')))->toBe('closed')       // past withdrawal, still running
         ->and($cal->currentPeriod(Carbon::parse('2026-12-21 00:00')))->toBe('closed');      // ended
 });
+
+it('gives the current period its own closing date, matching whichever window is live', function () {
+    // The deadline a Student or an administrator is working against (phase 4.5). It follows
+    // `currentPeriod`'s precedence, so during the registration/add-drop overlap it is the add/drop
+    // end — the live window's — and never the registration close the other answer has passed over.
+    $cal = calendar();
+    $endsAt = fn (string $now): ?string => $cal->currentPeriodEndsAt(Carbon::parse($now))?->toDateString();
+
+    expect($endsAt('2026-08-15 00:00'))->toBe('2026-09-05')  // registration open → its close
+        ->and($endsAt('2026-09-03 00:00'))->toBe('2026-09-14') // overlap → the live add/drop end
+        ->and($endsAt('2026-09-18 00:00'))->toBe('2026-09-21') // late-add → its end
+        ->and($endsAt('2026-10-15 00:00'))->toBe('2026-11-30'); // withdrawal → the deadline
+});
+
+it('has no closing date for a period that is not an open window', function () {
+    // `upcoming` has not opened yet and `closed` has nothing left to close, so inventing a date for
+    // either would be a fiction the Card would then display.
+    $cal = calendar();
+
+    expect($cal->currentPeriodEndsAt(Carbon::parse('2026-07-15 00:00')))->toBeNull()  // upcoming
+        ->and($cal->currentPeriodEndsAt(Carbon::parse('2026-12-10 00:00')))->toBeNull() // closed, running
+        ->and($cal->currentPeriodEndsAt(Carbon::parse('2026-12-21 00:00')))->toBeNull(); // ended
+});

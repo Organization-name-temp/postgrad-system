@@ -18,10 +18,20 @@ vi.mock('./dashboardCards', () => {
   const stub = (name: string) => () => <div>{name}</div>
   const cards: DashboardCardEntry[] = [
     { key: 'permissionCard', component: stub('permission card'), permission: 'application.screen' },
-    // `ROLE.student` inlined: a vi.mock factory is hoisted above the imports, so it cannot
-    // read a top-level binding.
+    // `ROLE.student` / `ADMIN_ROLES` inlined: a vi.mock factory is hoisted above the imports,
+    // so it cannot read a top-level binding.
     { key: 'personaCard', component: stub('persona card'), roles: ['R02'] },
-    { key: 'adminCard', component: stub('admin card'), adminOnly: true },
+    // A Card exclusive to administrators: in the admin set, and gated on the admin Roles,
+    // which is what refuses it to everyone else.
+    { key: 'adminCard', component: stub('admin card'), roles: ['R09', 'R10'], adminSet: true },
+    // A configuration Card: in the admin set **and** seen by the §3.2 holders of its
+    // Permission (phase 4.5, ticket 06) — the case the two independent branches exist for.
+    {
+      key: 'configCard',
+      component: stub('config card'),
+      permission: 'calendar.manage',
+      adminSet: true,
+    },
   ]
 
   return { dashboardCards: cards }
@@ -118,6 +128,16 @@ describe('DashboardPage — card composition (ADR-0024)', () => {
     expect(screen.queryByText('admin card')).not.toBeInTheDocument()
   })
 
+  it('shows a configuration card to the permission holder who is not an administrator', () => {
+    // Membership of the admin set never *withholds* a Card from the §3.2 role the matrix gives
+    // its Permission to — Student Affairs manages the calendar and sees this Card too.
+    mockedUseAuth.mockReturnValue(authState({ hasPermission: (p) => p === 'calendar.manage' }))
+    renderDashboard()
+
+    expect(screen.getByText('config card')).toBeInTheDocument()
+    expect(screen.queryByText('admin card')).not.toBeInTheDocument()
+  })
+
   it('hides a permission-gated card from a user without the permission', () => {
     mockedUseAuth.mockReturnValue(authState({ hasPermission: () => false }))
     renderDashboard()
@@ -159,6 +179,9 @@ describe('DashboardPage — card composition (ADR-0024)', () => {
     renderDashboard()
 
     expect(screen.getByText('admin card')).toBeInTheDocument()
+    // The configuration Cards are the rest of that set, so an administrator sees them…
+    expect(screen.getByText('config card')).toBeInTheDocument()
+    // …and no queue Card, though they inherit every Permission gating one.
     expect(screen.queryByText('permission card')).not.toBeInTheDocument()
   })
 

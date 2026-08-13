@@ -1,5 +1,14 @@
 import type { ComponentType } from 'react'
+import { MyApplicationCard } from '../features/admissions/dashboard/MyApplicationCard'
+import { ScreeningQueueCard } from '../features/admissions/dashboard/ScreeningQueueCard'
+import { CatalogSummaryCard } from '../features/catalog/dashboard/CatalogSummaryCard'
+import { AdviseeRequestsCard } from '../features/enrollment/dashboard/AdviseeRequestsCard'
+import { MyRegistrationCard } from '../features/enrollment/dashboard/MyRegistrationCard'
 import { AcademicRecordCard } from '../features/grading/dashboard/AcademicRecordCard'
+import { MyGradeSheetsCard } from '../features/grading/dashboard/MyGradeSheetsCard'
+import { SheetsAwaitingReviewCard } from '../features/grading/dashboard/SheetsAwaitingReviewCard'
+import { SemesterWindowsCard } from '../features/admin/dashboard/SemesterWindowsCard'
+import { PERMISSION } from '../shared/access/permissions'
 import { ROLE } from '../shared/access/roles'
 
 export interface DashboardCardEntry {
@@ -25,8 +34,16 @@ export interface DashboardCardEntry {
    * (R09/R10) sees. Holding every Permission is an authorization fact, not a description of
    * an administrator's job, so they get an explicit set rather than the union of everyone
    * else's queues.
+   *
+   * Membership is *orthogonal* to the gate above, because the administrator's set is not all
+   * administrator-exclusive: the two configuration Cards (phase 4.5, ticket 06) belong to it
+   * **and** are seen by the Student Affairs / Dean holders of `calendar.manage` /
+   * `catalog.manage` the §3.2 matrix gives them to. So this flag says what an administrator
+   * sees, and `permission`/`roles` say what everyone else sees; a Card exclusive to
+   * administrators sets `adminSet` and gates on the `ADMIN_ROLES` pair, which is what refuses
+   * it to everyone else.
    */
-  adminOnly?: boolean
+  adminSet?: boolean
 }
 
 /**
@@ -41,12 +58,65 @@ export interface DashboardCardEntry {
  * placeholder.
  *
  * Three gate kinds, all understood by the page: a single `permission` (the default), `roles`
- * (persona Cards), and `adminOnly` (the administration set, which an administrator sees
- * *instead of* everything else). The set is empty until the Administration Card ships, so an
- * administrator deliberately lands on a correct, empty Dashboard rather than accumulating
- * every other role's queue and having it taken away later.
+ * (persona Cards), and `adminSet` (the administration set, which an administrator sees
+ * *instead of* everything else).
  */
 export const dashboardCards: DashboardCardEntry[] = [
+  // My Application (phase 4.5, ticket 03) — the Applicant's own Application status, next
+  // action and a link into its timeline. A persona Card on the Applicant role (R01): an
+  // administrator inherits `application.view_status` but has no Application.
+  {
+    key: 'myApplication',
+    component: MyApplicationCard,
+    roles: [ROLE.applicant],
+  },
+
+  // Screening Queue (phase 4.5, ticket 03) — pending and overdue counts with the three
+  // oldest, closing SRS FR-ADM-005.5. Student Affairs / Dean hold `application.screen`.
+  {
+    key: 'screeningQueue',
+    component: ScreeningQueueCard,
+    permission: PERMISSION.screenApplications,
+  },
+
+  // My Registration (phase 4.5, ticket 04) — this Semester's credit-hour load against the
+  // 6–12 bounds, the open period and its deadline. A persona Card on the Student role (R02):
+  // an administrator inherits `courses.register_self` but has no Student anchor.
+  {
+    key: 'myRegistration',
+    component: MyRegistrationCard,
+    roles: [ROLE.student],
+  },
+
+  // Advisee Requests (phase 4.5, ticket 04) — the registration requests waiting on the acting
+  // reviewer, scoped to their own advisees server-side. Advisor / Student Affairs hold
+  // `registration.approve`.
+  {
+    key: 'adviseeRequests',
+    component: AdviseeRequestsCard,
+    permission: PERMISSION.approveCourseRegistration,
+  },
+
+  // My Grade Sheets (phase 4.5, ticket 05) — the current teaching term's Offerings, how many
+  // Sheets are not yet Finalized, and the passed-deadline flag. Instructor / Student Affairs
+  // hold `grades.enter`; a central-entry user's list is every Offering, as their existing
+  // Grade Sheets screen already is.
+  {
+    key: 'myGradeSheets',
+    component: MyGradeSheetsCard,
+    permission: PERMISSION.enterGrades,
+  },
+
+  // Sheets Awaiting Review (phase 4.5, ticket 05) — the Department Head's review queue,
+  // scoped by the Head↔Department assignment server-side. Gated on `grades.finalize`, which
+  // Instructors hold too (§3.2) — they see the Card's empty state, because the assignment,
+  // not the Permission, is what fills it.
+  {
+    key: 'sheetsAwaitingReview',
+    component: SheetsAwaitingReviewCard,
+    permission: PERMISSION.finalizeGrades,
+  },
+
   // My Academic Record (phase 4.5, ticket 01) — CGPA, latest Semester GPA, earned credit
   // hours. A persona Card on the Student role (R02): an administrator inherits
   // `grades.view_own` but has no Student anchor, so the server 403s the endpoint.
@@ -54,5 +124,22 @@ export const dashboardCards: DashboardCardEntry[] = [
     key: 'myAcademicRecord',
     component: AcademicRecordCard,
     roles: [ROLE.student],
+  },
+
+  // Semester & Open Windows and Catalog Summary (phase 4.5, ticket 06) — the two Cards about
+  // how the system is *configured* rather than about a queue of work. Both are members of the
+  // administration set **and** permission-gated for the §3.2 holders of `calendar.manage` /
+  // `catalog.manage`, which is the case `adminSet` exists to express.
+  {
+    key: 'semesterWindows',
+    component: SemesterWindowsCard,
+    permission: PERMISSION.manageCalendar,
+    adminSet: true,
+  },
+  {
+    key: 'catalogSummary',
+    component: CatalogSummaryCard,
+    permission: PERMISSION.manageCatalog,
+    adminSet: true,
   },
 ]

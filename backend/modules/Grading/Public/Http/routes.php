@@ -71,6 +71,12 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
     Route::get('/grading/incompletes', [IncompleteController::class, 'outstanding']);
     Route::get('/grading/incompletes/{incomplete}/resolution', [IncompleteController::class, 'resolution'])
         ->whereNumber('incomplete');
+
+    // The My Grade Sheets Dashboard Card (phase 4.5, ticket 05) — the current teaching term's
+    // Offerings, how many Sheets are not yet Finalized, and the passed-deadline flag, summarised
+    // for the landing page and linking into the screens above. It reuses this group's gate and
+    // the same own-versus-central list rule the offerings endpoint applies.
+    Route::get('/grading/cards/grade-sheets', [DashboardCardController::class, 'gradeSheets']);
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
@@ -92,6 +98,12 @@ Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
         ->whereNumber('grade_sheet');
     Route::post('/grading/department-head/sheets/{grade_sheet}/return', [DepartmentHeadReviewController::class, 'returnSheet'])
         ->whereNumber('grade_sheet');
+
+    // The Sheets Awaiting Review Dashboard Card (phase 4.5, ticket 05) — the same queue's count
+    // and oldest few, summarised for the landing page. The gate is shared with the Instructor's
+    // signature above, so an Instructor who heads no Department reaches it and finds it empty:
+    // the Department assignment, not the permission, is what fills a Head's queue.
+    Route::get('/grading/cards/sheets-awaiting-review', [DashboardCardController::class, 'sheetsAwaitingReview']);
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {

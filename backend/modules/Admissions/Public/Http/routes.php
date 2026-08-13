@@ -5,6 +5,7 @@ use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicantInterviewController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
+use Modules\Admissions\Internal\Http\Controllers\DashboardCardController;
 use Modules\Admissions\Internal\Http\Controllers\DeanReviewController;
 use Modules\Admissions\Internal\Http\Controllers\DocumentController;
 use Modules\Admissions\Internal\Http\Controllers\EmailVerificationController;
@@ -81,6 +82,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/application/interview', [ApplicantInterviewController::class, 'show']);
     Route::post('/application/interview/confirm', [ApplicantInterviewController::class, 'confirm']);
     Route::post('/application/interview/reschedule', [ApplicantInterviewController::class, 'reschedule']);
+
+    // The My Application Dashboard Card (phase 4.5, ticket 03) — where the acting applicant's
+    // Application stands, summarised for the landing page and linking into the status timeline it
+    // sits above. Like the wizard routes above it acts on the signed-in applicant's own Application
+    // implicitly, so there is no id with which to reach another applicant's; unlike them it also
+    // carries its own `can:` gate, because ADR-0024 asks every Card endpoint to be **independently
+    // authorized** rather than to inherit its group's. `application.view_status` is the §3.2
+    // permission for exactly this read (Applicant / Student Affairs / Dean).
+    //
+    // The gate is not the whole story, which is why the SPA gates the Card on the Applicant Role:
+    // an administrator inherits the Permission (ADR-0008) and holds no Application, so the endpoint
+    // answers them with a null payload rather than a 403 — an Applicant who has not started their
+    // first draft is the same legitimate state, and it must not read as an error.
+    Route::get('/admissions/cards/my-application', [DashboardCardController::class, 'myApplication'])
+        ->middleware('can:application.view_status');
 });
 
 // Interviewer evaluation (ticket 09). Sanctum-authed but **not** permission-gated: an
@@ -129,6 +145,12 @@ Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function ()
     Route::get('/applications', [ApplicationScreeningController::class, 'index']);
     Route::get('/applications/{application}', [ApplicationScreeningController::class, 'show'])->whereNumber('application');
     Route::post('/applications/{application}/screen', [ApplicationScreeningController::class, 'screen'])->whereNumber('application');
+
+    // The Screening Queue Dashboard Card (phase 4.5, ticket 03) — the same queue's pending count,
+    // its overdue count and the oldest few with their age, closing SRS FR-ADM-005.5. It shares the
+    // queue's gate, and its aging reads the same business-day/SLA derivation the overdue-flagging
+    // command does, so a Card can never disagree with a notification already sent.
+    Route::get('/admissions/cards/screening-queue', [DashboardCardController::class, 'screeningQueue']);
 });
 
 // Dean review (ticket 08). The Dean's faculty-scoped queue and decision, gated on

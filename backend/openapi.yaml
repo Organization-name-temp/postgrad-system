@@ -618,6 +618,81 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/admin/cards/administration:
+    get:
+      summary: 'Administration Card.'
+      operationId: administrationCard
+      description: "The shape of the system at a glance — how many Users exist and how many Role assignments\nthey hold between them — over the most recent Audit Log activity, linking into the\nadministration surfaces.\n\nThe two counts are aggregate `COUNT`s, never a materialised collection counted in PHP, so the\nCard costs two scalar queries however large the installation grows. They are deliberately two\ndifferent numbers: a User may hold several Roles (`multi@` holds two), which is the fact the\nwhole permission-union Dashboard rests on, so `role_assignment_count` is not a synonym for\n`user_count` and reading them side by side is what shows an administrator that.\n\nThe activity is a **bounded recent-activity read** of the append-only log: the newest few\nentries, newest first, each as its action key, the acting User (id and name, `null` for an\nentry with no actor — a failed sign-in has none), and when it happened. It is emphatically\n**not** the Phase 7 Audit Log *Report*: there is no filter, no date range, no pagination and\nno export, because a Card is fixed, scoped and summary while a Report is filterable,\nparameterised and cross-cutting (spec §Glossary). Phase 7 builds the Report beside this Card,\nnot out of it.\n\nAn empty Audit Log returns an empty list and the SPA says so in words — a fresh installation\nwith nothing recorded yet is a legitimate state, never an error.\n\nGated on the R09/R10 Role by the `admin` middleware; every other role, and every\nunauthenticated request, is refused."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    user_count: 24
+                    role_assignment_count: 27
+                    recent_activity:
+                      -
+                        id: 91
+                        action: student.admitted
+                        actor_user_id: 7
+                        actor_name: 'Dr. Dean'
+                        at: '2026-08-10T09:15:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      user_count:
+                        type: integer
+                        example: 24
+                      role_assignment_count:
+                        type: integer
+                        example: 27
+                      recent_activity:
+                        type: array
+                        example:
+                          - id: 91
+                            action: student.admitted
+                            actor_user_id: 7
+                            actor_name: 'Dr. Dean'
+                            at: '2026-08-10T09:15:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 91
+                            action:
+                              type: string
+                              example: student.admitted
+                            actor_user_id:
+                              type: integer
+                              example: 7
+                            actor_name:
+                              type: string
+                              example: 'Dr. Dean'
+                            at:
+                              type: string
+                              example: '2026-08-10T09:15:00+00:00'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
   /api/v1/admission-cycles/open:
     get:
       summary: 'List currently-open Admission Cycles.'
@@ -5372,6 +5447,44 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/admissions/cards/admission-decisions:
+    get:
+      summary: 'Admission Decisions Card.'
+      operationId: admissionDecisionsCard
+      description: "How many Applications are waiting on the acting Dean's decision, linking into the decisions\nqueue. Admissions decisions are the last step before an Applicant becomes a Student, and\nuntil now nothing told a Dean that applicants were waiting on them.\n\nThe count is **scoped to the Dean's own Faculty** and the scope is not re-derived here: the\nCard reads {@see ResolvesQueuePrograms::awaitingDecisionQueue()}, the same faculty-scoped\nderivation the decisions queue itself lists, so the Card and that screen can never disagree\nabout what a Dean is responsible for and one Dean's Card never counts another Faculty's\nApplications. A Dean with no assigned Faculty counts nothing, which is the existing rule for\nevery Dean surface rather than a new one.\n\nFaculty scoping resolves `application → primary_program_id → facultyId` through the\nCatalog\\Public facade (ADR-0012), which SQL cannot express across the module seam, so the\nqueue is materialised and counted — the same trade the Screening Queue Card documents, and\nbounded the same way: by the work actually waiting on one reviewer.\n\nAn administrator sees the queue unscoped (ADR-0015), consistent with the screen; they are\nnot shown this Card, because a Dashboard for an administrator is the administration set\nrather than the union of every queue they inherit (ADR-0024).\n\nGated on `applicant.decide` (§3.2 — Dean only). Zero waiting is zero, and the SPA renders\nthe shared empty state rather than a bare `0`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    pending_count: 3
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      pending_count:
+                        type: integer
+                        example: 3
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
   '/api/v1/documents/{document_ulid}':
     get:
       summary: 'Stream a document.'
@@ -16195,6 +16308,52 @@ paths:
                       scope:
                         type: string
                         example: own
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Grading
+      security: []
+  /api/v1/grading/cards/incompletes:
+    get:
+      summary: 'Outstanding Incompletes Card.'
+      operationId: outstandingIncompletesCard
+      description: "How many Incompletes the acting Instructor has declared that are still waiting on the\noutstanding mark, and **when the nearest one is due** — the Card that earns its place by\npreventing real harm, since an Incomplete left unresolved past its deadline is converted to\na Fail Withdrawal by the one state-changing scheduled command in the system. Surfacing the\nnearest deadline on sign-in gives the Instructor the chance to resolve it first.\n\nThe set is the same one the resolution screen lists — both read\n{@see OutstandingIncompleteQueue} — so the Card can never count something the screen behind\nit does not show.\n\nThe deadline is **derived, never stored**: the following Semester's start plus the\nconfigured offset, read through {@see IncompleteDeadlineResolver} on every request\n(ADR-0018), so correcting a Semester's `starts_at` moves every outstanding deadline with it\nand this Card with them. The resolver is asked once per Enrollment Semester rather than once\nper Incomplete, since a term's answer is the same for every Incomplete declared in it.\n\n`without_deadline_count` is the case the conversion command already handles explicitly and\nthis Card must not paper over: an Incomplete whose following Semester **does not exist yet**\nhas no computable deadline. It is counted and reported as having none, never given a\nfabricated one, and it never errors the Card — an admin's omission in the Calendar does not\nhide an Instructor's work from them.\n\nGated on `grades.enter` (§3.2 — Instructor / Student Affairs). A central-entry user teaches\nno Offerings of their own, so they get the empty state, exactly as the resolution screen\nalready shows them."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    outstanding_count: 2
+                    nearest_deadline: '2026-11-03T00:00:00+00:00'
+                    without_deadline_count: 1
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      outstanding_count:
+                        type: integer
+                        example: 2
+                      nearest_deadline:
+                        type: string
+                        example: '2026-11-03T00:00:00+00:00'
+                      without_deadline_count:
+                        type: integer
+                        example: 1
         403:
           description: ''
           content:

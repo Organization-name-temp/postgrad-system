@@ -77,6 +77,13 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
     // for the landing page and linking into the screens above. It reuses this group's gate and
     // the same own-versus-central list rule the offerings endpoint applies.
     Route::get('/grading/cards/grade-sheets', [DashboardCardController::class, 'gradeSheets']);
+
+    // The Outstanding Incompletes Dashboard Card (phase 4.5, ticket 08) — how many Incompletes
+    // are still waiting on their mark and when the nearest is due, linking into the resolution
+    // screen above. Same gate, same set (OutstandingIncompleteQueue), and the same derived
+    // deadline: an unresolved Incomplete converts to a Fail Withdrawal when its deadline passes,
+    // so the Card exists to reach the Instructor before that command does.
+    Route::get('/grading/cards/incompletes', [DashboardCardController::class, 'incompletes']);
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {

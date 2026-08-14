@@ -90,6 +90,23 @@ interface EnrollmentRecords
     public function findEnrollment(int $enrollmentId): ?EnrollmentSummary;
 
     /**
+     * The summaries of several Enrollments at once, keyed by id; ids that resolve to nothing are
+     * simply absent from the result. Unfiltered by gradability for the same reason
+     * {@see self::findEnrollment()} is — the `findMany` shape the Catalog facades already use,
+     * added (phase 4.5, ticket 08) so a caller holding a set of `enrollment_id`s resolves them in
+     * one read rather than in a loop.
+     *
+     * The caller that forced it is the Outstanding Incompletes Dashboard Card: an Incomplete
+     * carries no Offering column, so "is this one mine?" can only be answered through its
+     * Enrollment, and asking one at a time put an N+1 on the landing page of every user holding
+     * `grades.enter`.
+     *
+     * @param  list<int>  $enrollmentIds
+     * @return array<int, EnrollmentSummary>
+     */
+    public function findManyEnrollments(array $enrollmentIds): array;
+
+    /**
      * Every Enrollment the given Student has, in every Course Status, ordered by id — the
      * CGPA tally's whole input (ticket 04, spec §GPA and CGPA): Grading groups these by
      * {@see EnrollmentSummary::$courseId} for supersession and by

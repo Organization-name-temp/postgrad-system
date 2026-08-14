@@ -174,6 +174,12 @@ Route::middleware(['auth:sanctum', 'can:applicant.decide'])->group(function () {
     Route::get('/dean/decisions', [FinalDecisionController::class, 'index']);
     Route::get('/dean/advisors', [FinalDecisionController::class, 'advisors']);
     Route::post('/dean/applications/{application}/decide', [FinalDecisionController::class, 'decide'])->whereNumber('application');
+
+    // The Admission Decisions Dashboard Card (phase 4.5, ticket 08) — the same worklist's count,
+    // faculty-scoped by the same derivation, summarised for the landing page and linking into the
+    // queue above. It shares this group's `applicant.decide` gate, so a Dean's Card and a Dean's
+    // queue are opened by exactly the same authority.
+    Route::get('/admissions/cards/admission-decisions', [DashboardCardController::class, 'admissionDecisions']);
 });
 
 // Streaming download (ticket 05). Sanctum-authed but not applicant-scoped: served

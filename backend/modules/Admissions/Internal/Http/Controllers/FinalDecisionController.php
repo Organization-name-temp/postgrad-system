@@ -73,12 +73,9 @@ class FinalDecisionController
         // Post-interview applications awaiting a first decision, plus the held offers
         // awaiting resolution. An administrator sees them unscoped across every Faculty
         // (ADR-0015); a Dean sees only their own, faculty-scoped exactly like the Dean
-        // review queue.
-        $queue = $this->deanOrAdminQueue($request, [
-            ApplicationStatus::InterviewCompleted,
-            ApplicationStatus::ConditionallyAccepted,
-            ApplicationStatus::Waitlisted,
-        ], $assignments, $catalog, $directory);
+        // review queue. The set is named once, in the trait, and shared with the
+        // Admission Decisions Dashboard Card that counts it (phase 4.5, ticket 08).
+        $queue = $this->awaitingDecisionQueue($request, $assignments, $catalog, $directory);
 
         return ApplicationQueueResource::collection($queue);
     }

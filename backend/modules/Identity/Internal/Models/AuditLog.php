@@ -3,6 +3,7 @@
 namespace Modules\Identity\Internal\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Append-only audit entry. There is no update path: $timestamps is disabled and
@@ -11,6 +12,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $actor_user_id
  * @property string $action
  * @property array<string, mixed>|null $metadata
+ * @property Carbon|null $created_at Written explicitly by the logger, not by Eloquent — the
+ *                                   column exists though $timestamps is off, so it is declared
+ *                                   here rather than inferred from the timestamp convention.
  */
 class AuditLog extends Model
 {

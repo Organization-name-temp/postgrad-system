@@ -142,6 +142,47 @@ export const UnassignADepartmentHeadFromAScopeResponse = zod.looseObject({
 
 
 /**
+ * The shape of the system at a glance — how many Users exist and how many Role assignments
+ * they hold between them — over the most recent Audit Log activity, linking into the
+ * administration surfaces.
+ *
+ * The two counts are aggregate `COUNT`s, never a materialised collection counted in PHP, so the
+ * Card costs two scalar queries however large the installation grows. They are deliberately two
+ * different numbers: a User may hold several Roles (`multi@` holds two), which is the fact the
+ * whole permission-union Dashboard rests on, so `role_assignment_count` is not a synonym for
+ * `user_count` and reading them side by side is what shows an administrator that.
+ *
+ * The activity is a **bounded recent-activity read** of the append-only log: the newest few
+ * entries, newest first, each as its action key, the acting User (id and name, `null` for an
+ * entry with no actor — a failed sign-in has none), and when it happened. It is emphatically
+ * **not** the Phase 7 Audit Log *Report*: there is no filter, no date range, no pagination and
+ * no export, because a Card is fixed, scoped and summary while a Report is filterable,
+ * parameterised and cross-cutting (spec §Glossary). Phase 7 builds the Report beside this Card,
+ * not out of it.
+ *
+ * An empty Audit Log returns an empty list and the SPA says so in words — a fresh installation
+ * with nothing recorded yet is a legitimate state, never an error.
+ *
+ * Gated on the R09/R10 Role by the `admin` middleware; every other role, and every
+ * unauthenticated request, is refused.
+ * @summary Administration Card.
+ */
+export const AdministrationCardResponse = zod.object({
+  "data": zod.object({
+  "user_count": zod.number().optional(),
+  "role_assignment_count": zod.number().optional(),
+  "recent_activity": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "actor_name": zod.string().optional(),
+  "at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
  * Public, unauthenticated: the front door the registration screen reads to
  * know whether (and into which intake) a stranger may apply. Returns only
  * Cycles that are active and whose window contains the current moment.
@@ -1383,6 +1424,38 @@ export const RecordTheFinalDecisionResponse = zod.union([zod.object({
   "status": zod.string().optional()
 }).optional()
 }).describe('rejected')])
+
+
+/**
+ * How many Applications are waiting on the acting Dean's decision, linking into the decisions
+ * queue. Admissions decisions are the last step before an Applicant becomes a Student, and
+ * until now nothing told a Dean that applicants were waiting on them.
+ *
+ * The count is **scoped to the Dean's own Faculty** and the scope is not re-derived here: the
+ * Card reads {@see ResolvesQueuePrograms::awaitingDecisionQueue()}, the same faculty-scoped
+ * derivation the decisions queue itself lists, so the Card and that screen can never disagree
+ * about what a Dean is responsible for and one Dean's Card never counts another Faculty's
+ * Applications. A Dean with no assigned Faculty counts nothing, which is the existing rule for
+ * every Dean surface rather than a new one.
+ *
+ * Faculty scoping resolves `application → primary_program_id → facultyId` through the
+ * Catalog\Public facade (ADR-0012), which SQL cannot express across the module seam, so the
+ * queue is materialised and counted — the same trade the Screening Queue Card documents, and
+ * bounded the same way: by the work actually waiting on one reviewer.
+ *
+ * An administrator sees the queue unscoped (ADR-0015), consistent with the screen; they are
+ * not shown this Card, because a Dashboard for an administrator is the administration set
+ * rather than the union of every queue they inherit (ADR-0024).
+ *
+ * Gated on `applicant.decide` (§3.2 — Dean only). Zero waiting is zero, and the SPA renders
+ * the shared empty state rather than a bare `0`.
+ * @summary Admission Decisions Card.
+ */
+export const AdmissionDecisionsCardResponse = zod.object({
+  "data": zod.object({
+  "pending_count": zod.number().optional()
+}).optional()
+})
 
 
 /**
@@ -4388,6 +4461,43 @@ export const MyGradeSheetsCardResponse = zod.object({
 }).optional(),
   "meta": zod.object({
   "scope": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * How many Incompletes the acting Instructor has declared that are still waiting on the
+ * outstanding mark, and **when the nearest one is due** — the Card that earns its place by
+ * preventing real harm, since an Incomplete left unresolved past its deadline is converted to
+ * a Fail Withdrawal by the one state-changing scheduled command in the system. Surfacing the
+ * nearest deadline on sign-in gives the Instructor the chance to resolve it first.
+ *
+ * The set is the same one the resolution screen lists — both read
+ * {@see OutstandingIncompleteQueue} — so the Card can never count something the screen behind
+ * it does not show.
+ *
+ * The deadline is **derived, never stored**: the following Semester's start plus the
+ * configured offset, read through {@see IncompleteDeadlineResolver} on every request
+ * (ADR-0018), so correcting a Semester's `starts_at` moves every outstanding deadline with it
+ * and this Card with them. The resolver is asked once per Enrollment Semester rather than once
+ * per Incomplete, since a term's answer is the same for every Incomplete declared in it.
+ *
+ * `without_deadline_count` is the case the conversion command already handles explicitly and
+ * this Card must not paper over: an Incomplete whose following Semester **does not exist yet**
+ * has no computable deadline. It is counted and reported as having none, never given a
+ * fabricated one, and it never errors the Card — an admin's omission in the Calendar does not
+ * hide an Instructor's work from them.
+ *
+ * Gated on `grades.enter` (§3.2 — Instructor / Student Affairs). A central-entry user teaches
+ * no Offerings of their own, so they get the empty state, exactly as the resolution screen
+ * already shows them.
+ * @summary Outstanding Incompletes Card.
+ */
+export const OutstandingIncompletesCardResponse = zod.object({
+  "data": zod.object({
+  "outstanding_count": zod.number().optional(),
+  "nearest_deadline": zod.string().optional(),
+  "without_deadline_count": zod.number().optional()
 }).optional()
 })
 

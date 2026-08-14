@@ -155,6 +155,26 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
         return $enrollment === null ? null : $this->toEnrollmentSummary($enrollment);
     }
 
+    /**
+     * @param  list<int>  $enrollmentIds
+     * @return array<int, EnrollmentSummary>
+     */
+    public function findManyEnrollments(array $enrollmentIds): array
+    {
+        if ($enrollmentIds === []) {
+            return [];
+        }
+
+        /** @var Collection<int, Enrollment> $enrollments */
+        $enrollments = Enrollment::query()->with('offering')->whereKey($enrollmentIds)->get();
+
+        return $enrollments
+            ->mapWithKeys(fn (Enrollment $e): array => [
+                (int) $e->getKey() => $this->toEnrollmentSummary($e),
+            ])
+            ->all();
+    }
+
     public function recordOutcome(int $enrollmentId, ?bool $earned): void
     {
         Enrollment::query()->whereKey($enrollmentId)->update(['earned' => $earned]);

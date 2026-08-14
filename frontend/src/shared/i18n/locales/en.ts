@@ -345,6 +345,16 @@ export const en = {
         action: 'Open the screening queue',
         loadError: 'Could not load the screening queue.',
       },
+      // The Dean's decision Card (phase 4.5, ticket 08) — the last step before an applicant
+      // becomes a student, and the count is faculty-scoped on the server.
+      admissionDecisions: {
+        title: 'Admission decisions',
+        pending: '{{count}} application awaiting your decision',
+        pending_other: '{{count}} applications awaiting your decision',
+        empty: 'No applications are waiting on your decision. You are up to date.',
+        action: 'Open the decisions queue',
+        loadError: 'Could not load the decisions queue.',
+      },
     },
     register: {
       title: 'Start your application',
@@ -798,6 +808,47 @@ export const en = {
         empty: 'No semester is running, and none is open for registration.',
         action: 'Manage semesters',
         loadError: 'Could not load the semester summary.',
+      },
+      // The Administration Card (phase 4.5, ticket 07) — the one Card an administrator's landing
+      // page is *about*. A Card, not the Phase 7 Audit Log Report: no filter, no range, no export.
+      administration: {
+        title: 'Administration',
+        users: 'Users',
+        // Deliberately a second number: a user may hold several roles, which is the fact the
+        // whole permission-composed dashboard rests on.
+        roleAssignments: 'Role assignments',
+        recentActivity: 'Recent activity',
+        entry: '{{action}} — {{actor}} · {{date}}',
+        noActor: 'No signed-in user',
+        noActivity: 'Nothing has been recorded in the audit log yet.',
+        // Every audit action is sent as its key and labelled here, exactly as notification types
+        // are — an action with no label yet falls back to its key rather than to a blank.
+        actions: {
+          login: 'Signed in',
+          logout: 'Signed out',
+          login_failed: 'Failed sign-in',
+          student: { admitted: 'Student admitted' },
+          department_head: {
+            assigned: 'Department head assigned',
+            unassigned: 'Department head unassigned',
+          },
+          registration: { decided_by_admin: 'Registration decided by an administrator' },
+          interview: {
+            evaluation_recorded_by_admin: 'Interview evaluation recorded by an administrator',
+          },
+          attendance: {
+            recorded_by_admin: 'Attendance recorded by an administrator',
+            session_updated_by_admin: 'Class session updated by an administrator',
+          },
+          grade: {
+            sheet_opened_centrally: 'Grade sheet opened centrally',
+            entered_centrally: 'Grade entered centrally',
+            incomplete_declared_centrally: 'Incomplete declared centrally',
+            correction_finalized: 'Grade correction finalized',
+          },
+        },
+        action: 'Manage assignments',
+        loadError: 'Could not load the administration summary.',
       },
     },
     cycles: {
@@ -1528,6 +1579,23 @@ export const en = {
         empty: 'No grade sheets are waiting on your review. You are up to date.',
         action: 'Open the review queue',
         loadError: 'Could not load the review queue.',
+      },
+      // The Incompletes Card (phase 4.5, ticket 08). Its deadline copy carries the whole point of
+      // the Card: an unresolved Incomplete converts to a Fail Withdrawal once its deadline passes.
+      outstandingIncompletes: {
+        title: 'Outstanding Incompletes',
+        outstanding: '{{count}} Incomplete still outstanding',
+        outstanding_other: '{{count}} Incompletes still outstanding',
+        nearestDeadline: 'Nearest resolution deadline: {{date}}',
+        // Derived, never stored: with no following semester on the calendar there is no date to
+        // show, and inventing one would be worse than saying so.
+        noDeadlineAtAll:
+          'No resolution deadline yet — the following semester is not on the calendar.',
+        withoutDeadline: '{{count}} with no deadline yet',
+        withoutDeadline_other: '{{count}} with no deadline yet',
+        empty: 'You have no outstanding Incompletes. You are up to date.',
+        action: 'Resolve Incompletes',
+        loadError: 'Could not load your outstanding Incompletes.',
       },
     },
     oversight: {

@@ -4,14 +4,19 @@ namespace Modules\Admissions\Internal\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Support\ReviewSla;
+use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Identity\Public\Contracts\DeanAssignments;
+use Modules\Identity\Public\Contracts\Directory;
 
 /**
  * @group Admissions
  *
- * Admissions' Dashboard Cards (phase 4.5, ADR-0024) — one for each side of the admissions counter:
- * the Applicant's own Application, and the Student Affairs screening queue. Each is **read-only**,
+ * Admissions' Dashboard Cards (phase 4.5, ADR-0024) — the admissions counter from every side it has:
+ * the Applicant's own Application, the Student Affairs screening queue, and the Dean's decision
+ * queue (ticket 08, the last step before an Applicant becomes a Student). Each is **read-only**,
  * lives in the module that owns the data, is **independently authorized**, and returns typed domain
  * values (enum values, ids, counts, ISO dates) rather than pre-rendered display strings: the SPA
  * renders the status chip and the aging copy bilingually from the payload, exactly as Notifications
@@ -25,8 +30,50 @@ use Modules\Admissions\Internal\Support\ReviewSla;
  */
 class DashboardCardController
 {
+    use ResolvesQueuePrograms;
+
     /** The three-row Card convention the shared `<DashboardCard>` is built around. */
     private const ROW_LIMIT = 3;
+
+    /**
+     * Admission Decisions Card.
+     *
+     * How many Applications are waiting on the acting Dean's decision, linking into the decisions
+     * queue. Admissions decisions are the last step before an Applicant becomes a Student, and
+     * until now nothing told a Dean that applicants were waiting on them.
+     *
+     * The count is **scoped to the Dean's own Faculty** and the scope is not re-derived here: the
+     * Card reads {@see ResolvesQueuePrograms::awaitingDecisionQueue()}, the same faculty-scoped
+     * derivation the decisions queue itself lists, so the Card and that screen can never disagree
+     * about what a Dean is responsible for and one Dean's Card never counts another Faculty's
+     * Applications. A Dean with no assigned Faculty counts nothing, which is the existing rule for
+     * every Dean surface rather than a new one.
+     *
+     * Faculty scoping resolves `application → primary_program_id → facultyId` through the
+     * Catalog\Public facade (ADR-0012), which SQL cannot express across the module seam, so the
+     * queue is materialised and counted — the same trade the Screening Queue Card documents, and
+     * bounded the same way: by the work actually waiting on one reviewer.
+     *
+     * An administrator sees the queue unscoped (ADR-0015), consistent with the screen; they are
+     * not shown this Card, because a Dashboard for an administrator is the administration set
+     * rather than the union of every queue they inherit (ADR-0024).
+     *
+     * Gated on `applicant.decide` (§3.2 — Dean only). Zero waiting is zero, and the SPA renders
+     * the shared empty state rather than a bare `0`.
+     *
+     * @response 200 {"data": {"pending_count": 3}}
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function admissionDecisions(
+        Request $request,
+        DeanAssignments $assignments,
+        ProgramCatalog $catalog,
+        Directory $directory,
+    ): JsonResponse {
+        $queue = $this->awaitingDecisionQueue($request, $assignments, $catalog, $directory);
+
+        return response()->json(['data' => ['pending_count' => $queue->count()]]);
+    }
 
     /**
      * My Application Card.

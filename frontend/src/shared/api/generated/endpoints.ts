@@ -179,6 +179,28 @@ export type UnassignADepartmentHeadFromAScope404 = {
   message?: string;
 };
 
+export type AdministrationCard200DataRecentActivityItem = {
+  id?: number;
+  action?: string;
+  actor_user_id?: number;
+  actor_name?: string;
+  at?: string;
+};
+
+export type AdministrationCard200Data = {
+  user_count?: number;
+  role_assignment_count?: number;
+  recent_activity?: AdministrationCard200DataRecentActivityItem[];
+};
+
+export type AdministrationCard200 = {
+  data?: AdministrationCard200Data;
+};
+
+export type AdministrationCard403 = {
+  message?: string;
+};
+
 export type ListCurrentlyOpenAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -1605,6 +1627,18 @@ export type RecordTheFinalDecision422Errors = {
 export type RecordTheFinalDecision422 = {
   message?: string;
   errors?: RecordTheFinalDecision422Errors;
+};
+
+export type AdmissionDecisionsCard200Data = {
+  pending_count?: number;
+};
+
+export type AdmissionDecisionsCard200 = {
+  data?: AdmissionDecisionsCard200Data;
+};
+
+export type AdmissionDecisionsCard403 = {
+  message?: string;
 };
 
 export type StreamADocument403 = {
@@ -4721,6 +4755,20 @@ export type MyGradeSheetsCard403 = {
   message?: string;
 };
 
+export type OutstandingIncompletesCard200Data = {
+  outstanding_count?: number;
+  nearest_deadline?: string;
+  without_deadline_count?: number;
+};
+
+export type OutstandingIncompletesCard200 = {
+  data?: OutstandingIncompletesCard200Data;
+};
+
+export type OutstandingIncompletesCard403 = {
+  message?: string;
+};
+
 export type SignTheSheet200DataSheet = {
   id?: number;
   course_offering_id?: number;
@@ -5872,6 +5920,122 @@ export const useUnassignADepartmentHeadFromAScope = <TError = UnassignADepartmen
       > => {
       return useMutation(getUnassignADepartmentHeadFromAScopeMutationOptions(options), queryClient);
     }
+
+/**
+ * The shape of the system at a glance — how many Users exist and how many Role assignments
+ * they hold between them — over the most recent Audit Log activity, linking into the
+ * administration surfaces.
+ *
+ * The two counts are aggregate `COUNT`s, never a materialised collection counted in PHP, so the
+ * Card costs two scalar queries however large the installation grows. They are deliberately two
+ * different numbers: a User may hold several Roles (`multi@` holds two), which is the fact the
+ * whole permission-union Dashboard rests on, so `role_assignment_count` is not a synonym for
+ * `user_count` and reading them side by side is what shows an administrator that.
+ *
+ * The activity is a **bounded recent-activity read** of the append-only log: the newest few
+ * entries, newest first, each as its action key, the acting User (id and name, `null` for an
+ * entry with no actor — a failed sign-in has none), and when it happened. It is emphatically
+ * **not** the Phase 7 Audit Log *Report*: there is no filter, no date range, no pagination and
+ * no export, because a Card is fixed, scoped and summary while a Report is filterable,
+ * parameterised and cross-cutting (spec §Glossary). Phase 7 builds the Report beside this Card,
+ * not out of it.
+ *
+ * An empty Audit Log returns an empty list and the SPA says so in words — a fresh installation
+ * with nothing recorded yet is a legitimate state, never an error.
+ *
+ * Gated on the R09/R10 Role by the `admin` middleware; every other role, and every
+ * unauthenticated request, is refused.
+ * @summary Administration Card.
+ */
+export const administrationCard = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdministrationCard200>(
+      {url: `/api/v1/admin/cards/administration`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAdministrationCardQueryKey = () => {
+    return [
+    `/api/v1/admin/cards/administration`
+    ] as const;
+    }
+
+
+export const getAdministrationCardQueryOptions = <TData = Awaited<ReturnType<typeof administrationCard>>, TError = AdministrationCard403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof administrationCard>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdministrationCardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof administrationCard>>> = ({ signal }) => administrationCard(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof administrationCard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdministrationCardQueryResult = NonNullable<Awaited<ReturnType<typeof administrationCard>>>
+export type AdministrationCardQueryError = AdministrationCard403
+
+
+export function useAdministrationCard<TData = Awaited<ReturnType<typeof administrationCard>>, TError = AdministrationCard403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof administrationCard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof administrationCard>>,
+          TError,
+          Awaited<ReturnType<typeof administrationCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdministrationCard<TData = Awaited<ReturnType<typeof administrationCard>>, TError = AdministrationCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof administrationCard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof administrationCard>>,
+          TError,
+          Awaited<ReturnType<typeof administrationCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdministrationCard<TData = Awaited<ReturnType<typeof administrationCard>>, TError = AdministrationCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof administrationCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Administration Card.
+ */
+
+export function useAdministrationCard<TData = Awaited<ReturnType<typeof administrationCard>>, TError = AdministrationCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof administrationCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdministrationCardQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Public, unauthenticated: the front door the registration screen reads to
@@ -9035,6 +9199,121 @@ export const useRecordTheFinalDecision = <TError = RecordTheFinalDecision403 | R
       > => {
       return useMutation(getRecordTheFinalDecisionMutationOptions(options), queryClient);
     }
+
+/**
+ * How many Applications are waiting on the acting Dean's decision, linking into the decisions
+ * queue. Admissions decisions are the last step before an Applicant becomes a Student, and
+ * until now nothing told a Dean that applicants were waiting on them.
+ *
+ * The count is **scoped to the Dean's own Faculty** and the scope is not re-derived here: the
+ * Card reads {@see ResolvesQueuePrograms::awaitingDecisionQueue()}, the same faculty-scoped
+ * derivation the decisions queue itself lists, so the Card and that screen can never disagree
+ * about what a Dean is responsible for and one Dean's Card never counts another Faculty's
+ * Applications. A Dean with no assigned Faculty counts nothing, which is the existing rule for
+ * every Dean surface rather than a new one.
+ *
+ * Faculty scoping resolves `application → primary_program_id → facultyId` through the
+ * Catalog\Public facade (ADR-0012), which SQL cannot express across the module seam, so the
+ * queue is materialised and counted — the same trade the Screening Queue Card documents, and
+ * bounded the same way: by the work actually waiting on one reviewer.
+ *
+ * An administrator sees the queue unscoped (ADR-0015), consistent with the screen; they are
+ * not shown this Card, because a Dashboard for an administrator is the administration set
+ * rather than the union of every queue they inherit (ADR-0024).
+ *
+ * Gated on `applicant.decide` (§3.2 — Dean only). Zero waiting is zero, and the SPA renders
+ * the shared empty state rather than a bare `0`.
+ * @summary Admission Decisions Card.
+ */
+export const admissionDecisionsCard = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdmissionDecisionsCard200>(
+      {url: `/api/v1/admissions/cards/admission-decisions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAdmissionDecisionsCardQueryKey = () => {
+    return [
+    `/api/v1/admissions/cards/admission-decisions`
+    ] as const;
+    }
+
+
+export const getAdmissionDecisionsCardQueryOptions = <TData = Awaited<ReturnType<typeof admissionDecisionsCard>>, TError = AdmissionDecisionsCard403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof admissionDecisionsCard>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdmissionDecisionsCardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof admissionDecisionsCard>>> = ({ signal }) => admissionDecisionsCard(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof admissionDecisionsCard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdmissionDecisionsCardQueryResult = NonNullable<Awaited<ReturnType<typeof admissionDecisionsCard>>>
+export type AdmissionDecisionsCardQueryError = AdmissionDecisionsCard403
+
+
+export function useAdmissionDecisionsCard<TData = Awaited<ReturnType<typeof admissionDecisionsCard>>, TError = AdmissionDecisionsCard403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof admissionDecisionsCard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof admissionDecisionsCard>>,
+          TError,
+          Awaited<ReturnType<typeof admissionDecisionsCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdmissionDecisionsCard<TData = Awaited<ReturnType<typeof admissionDecisionsCard>>, TError = AdmissionDecisionsCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof admissionDecisionsCard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof admissionDecisionsCard>>,
+          TError,
+          Awaited<ReturnType<typeof admissionDecisionsCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdmissionDecisionsCard<TData = Awaited<ReturnType<typeof admissionDecisionsCard>>, TError = AdmissionDecisionsCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof admissionDecisionsCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Admission Decisions Card.
+ */
+
+export function useAdmissionDecisionsCard<TData = Awaited<ReturnType<typeof admissionDecisionsCard>>, TError = AdmissionDecisionsCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof admissionDecisionsCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdmissionDecisionsCardQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Serves the stored file inline to the owning applicant or to a reviewer holding
@@ -15875,6 +16154,124 @@ export function useMyGradeSheetsCard<TData = Awaited<ReturnType<typeof myGradeSh
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMyGradeSheetsCardQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * How many Incompletes the acting Instructor has declared that are still waiting on the
+ * outstanding mark, and **when the nearest one is due** — the Card that earns its place by
+ * preventing real harm, since an Incomplete left unresolved past its deadline is converted to
+ * a Fail Withdrawal by the one state-changing scheduled command in the system. Surfacing the
+ * nearest deadline on sign-in gives the Instructor the chance to resolve it first.
+ *
+ * The set is the same one the resolution screen lists — both read
+ * {@see OutstandingIncompleteQueue} — so the Card can never count something the screen behind
+ * it does not show.
+ *
+ * The deadline is **derived, never stored**: the following Semester's start plus the
+ * configured offset, read through {@see IncompleteDeadlineResolver} on every request
+ * (ADR-0018), so correcting a Semester's `starts_at` moves every outstanding deadline with it
+ * and this Card with them. The resolver is asked once per Enrollment Semester rather than once
+ * per Incomplete, since a term's answer is the same for every Incomplete declared in it.
+ *
+ * `without_deadline_count` is the case the conversion command already handles explicitly and
+ * this Card must not paper over: an Incomplete whose following Semester **does not exist yet**
+ * has no computable deadline. It is counted and reported as having none, never given a
+ * fabricated one, and it never errors the Card — an admin's omission in the Calendar does not
+ * hide an Instructor's work from them.
+ *
+ * Gated on `grades.enter` (§3.2 — Instructor / Student Affairs). A central-entry user teaches
+ * no Offerings of their own, so they get the empty state, exactly as the resolution screen
+ * already shows them.
+ * @summary Outstanding Incompletes Card.
+ */
+export const outstandingIncompletesCard = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OutstandingIncompletesCard200>(
+      {url: `/api/v1/grading/cards/incompletes`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOutstandingIncompletesCardQueryKey = () => {
+    return [
+    `/api/v1/grading/cards/incompletes`
+    ] as const;
+    }
+
+
+export const getOutstandingIncompletesCardQueryOptions = <TData = Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError = OutstandingIncompletesCard403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOutstandingIncompletesCardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof outstandingIncompletesCard>>> = ({ signal }) => outstandingIncompletesCard(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OutstandingIncompletesCardQueryResult = NonNullable<Awaited<ReturnType<typeof outstandingIncompletesCard>>>
+export type OutstandingIncompletesCardQueryError = OutstandingIncompletesCard403
+
+
+export function useOutstandingIncompletesCard<TData = Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError = OutstandingIncompletesCard403>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof outstandingIncompletesCard>>,
+          TError,
+          Awaited<ReturnType<typeof outstandingIncompletesCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOutstandingIncompletesCard<TData = Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError = OutstandingIncompletesCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof outstandingIncompletesCard>>,
+          TError,
+          Awaited<ReturnType<typeof outstandingIncompletesCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOutstandingIncompletesCard<TData = Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError = OutstandingIncompletesCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Outstanding Incompletes Card.
+ */
+
+export function useOutstandingIncompletesCard<TData = Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError = OutstandingIncompletesCard403>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof outstandingIncompletesCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOutstandingIncompletesCardQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -2,6 +2,7 @@
 
 namespace Modules\Grading\Internal\Http\Controllers;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Enrollment\Public\EnrollmentRecords;
@@ -10,6 +11,8 @@ use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Support\AcademicRecordCardBuilder;
 use Modules\Grading\Internal\Support\DepartmentHeadSheetQueue;
 use Modules\Grading\Internal\Support\GradeSheetsCardBuilder;
+use Modules\Grading\Internal\Support\IncompleteDeadlineResolver;
+use Modules\Grading\Internal\Support\OutstandingIncompleteQueue;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
 
@@ -128,6 +131,76 @@ class DashboardCardController
             'data' => [
                 'pending_count' => $mine->count(),
                 'sheets' => $rows,
+            ],
+        ]);
+    }
+
+    /**
+     * Outstanding Incompletes Card.
+     *
+     * How many Incompletes the acting Instructor has declared that are still waiting on the
+     * outstanding mark, and **when the nearest one is due** — the Card that earns its place by
+     * preventing real harm, since an Incomplete left unresolved past its deadline is converted to
+     * a Fail Withdrawal by the one state-changing scheduled command in the system. Surfacing the
+     * nearest deadline on sign-in gives the Instructor the chance to resolve it first.
+     *
+     * The set is the same one the resolution screen lists — both read
+     * {@see OutstandingIncompleteQueue} — so the Card can never count something the screen behind
+     * it does not show.
+     *
+     * The deadline is **derived, never stored**: the following Semester's start plus the
+     * configured offset, read through {@see IncompleteDeadlineResolver} on every request
+     * (ADR-0018), so correcting a Semester's `starts_at` moves every outstanding deadline with it
+     * and this Card with them. The resolver is asked once per Enrollment Semester rather than once
+     * per Incomplete, since a term's answer is the same for every Incomplete declared in it.
+     *
+     * `without_deadline_count` is the case the conversion command already handles explicitly and
+     * this Card must not paper over: an Incomplete whose following Semester **does not exist yet**
+     * has no computable deadline. It is counted and reported as having none, never given a
+     * fabricated one, and it never errors the Card — an admin's omission in the Calendar does not
+     * hide an Instructor's work from them.
+     *
+     * Gated on `grades.enter` (§3.2 — Instructor / Student Affairs). A central-entry user teaches
+     * no Offerings of their own, so they get the empty state, exactly as the resolution screen
+     * already shows them.
+     *
+     * @response 200 {"data": {"outstanding_count": 2, "nearest_deadline": "2026-11-03T00:00:00+00:00", "without_deadline_count": 1}}
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function incompletes(
+        Request $request,
+        OutstandingIncompleteQueue $queue,
+        IncompleteDeadlineResolver $deadlines,
+    ): JsonResponse {
+        ['incompletes' => $outstanding, 'enrollments' => $enrollmentsByIncomplete] =
+            $queue->forInstructor($this->actingUserId($request));
+
+        /** @var array<int, ?CarbonImmutable> $deadlineBySemester */
+        $deadlineBySemester = [];
+        $nearest = null;
+        $withoutDeadline = 0;
+
+        foreach ($outstanding as $incomplete) {
+            $semesterId = $enrollmentsByIncomplete[(int) $incomplete->getKey()]->semesterId;
+
+            if (! array_key_exists($semesterId, $deadlineBySemester)) {
+                $deadlineBySemester[$semesterId] = $deadlines->forEnrollmentSemester($semesterId);
+            }
+
+            $deadline = $deadlineBySemester[$semesterId];
+
+            if ($deadline === null) {
+                $withoutDeadline++;
+            } elseif ($nearest === null || $deadline->lessThan($nearest)) {
+                $nearest = $deadline;
+            }
+        }
+
+        return response()->json([
+            'data' => [
+                'outstanding_count' => count($outstanding),
+                'nearest_deadline' => $nearest?->toIso8601String(),
+                'without_deadline_count' => $withoutDeadline,
             ],
         ]);
     }

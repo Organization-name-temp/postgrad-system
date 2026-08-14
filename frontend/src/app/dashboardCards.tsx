@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import { AdmissionDecisionsCard } from '../features/admissions/dashboard/AdmissionDecisionsCard'
 import { MyApplicationCard } from '../features/admissions/dashboard/MyApplicationCard'
 import { ScreeningQueueCard } from '../features/admissions/dashboard/ScreeningQueueCard'
 import { CatalogSummaryCard } from '../features/catalog/dashboard/CatalogSummaryCard'
@@ -6,10 +7,12 @@ import { AdviseeRequestsCard } from '../features/enrollment/dashboard/AdviseeReq
 import { MyRegistrationCard } from '../features/enrollment/dashboard/MyRegistrationCard'
 import { AcademicRecordCard } from '../features/grading/dashboard/AcademicRecordCard'
 import { MyGradeSheetsCard } from '../features/grading/dashboard/MyGradeSheetsCard'
+import { OutstandingIncompletesCard } from '../features/grading/dashboard/OutstandingIncompletesCard'
 import { SheetsAwaitingReviewCard } from '../features/grading/dashboard/SheetsAwaitingReviewCard'
+import { AdministrationCard } from '../features/admin/dashboard/AdministrationCard'
 import { SemesterWindowsCard } from '../features/admin/dashboard/SemesterWindowsCard'
 import { PERMISSION } from '../shared/access/permissions'
-import { ROLE } from '../shared/access/roles'
+import { ADMIN_ROLES, ROLE } from '../shared/access/roles'
 
 export interface DashboardCardEntry {
   /** Stable identity for the grid's React key and for tests to name a Card by. */
@@ -97,6 +100,15 @@ export const dashboardCards: DashboardCardEntry[] = [
     permission: PERMISSION.approveCourseRegistration,
   },
 
+  // Admission Decisions (phase 4.5, ticket 08) — the Applications awaiting the acting Dean's
+  // decision, faculty-scoped server-side by the same derivation the decisions queue lists. The
+  // §3.2 matrix gives `applicant.decide` to the Dean alone.
+  {
+    key: 'admissionDecisions',
+    component: AdmissionDecisionsCard,
+    permission: PERMISSION.decideApplicants,
+  },
+
   // My Grade Sheets (phase 4.5, ticket 05) — the current teaching term's Offerings, how many
   // Sheets are not yet Finalized, and the passed-deadline flag. Instructor / Student Affairs
   // hold `grades.enter`; a central-entry user's list is every Offering, as their existing
@@ -115,6 +127,16 @@ export const dashboardCards: DashboardCardEntry[] = [
     key: 'sheetsAwaitingReview',
     component: SheetsAwaitingReviewCard,
     permission: PERMISSION.finalizeGrades,
+  },
+
+  // Outstanding Incompletes (phase 4.5, ticket 08) — how many Incompletes are still waiting on
+  // their mark and when the nearest is due. Shares `grades.enter` with My Grade Sheets: a
+  // central-entry user teaches nothing of their own and sees the empty state, exactly as the
+  // resolution screen already shows them.
+  {
+    key: 'outstandingIncompletes',
+    component: OutstandingIncompletesCard,
+    permission: PERMISSION.enterGrades,
   },
 
   // My Academic Record (phase 4.5, ticket 01) — CGPA, latest Semester GPA, earned credit
@@ -140,6 +162,20 @@ export const dashboardCards: DashboardCardEntry[] = [
     key: 'catalogSummary',
     component: CatalogSummaryCard,
     permission: PERMISSION.manageCatalog,
+    adminSet: true,
+  },
+
+  // Administration (phase 4.5, ticket 07) — User and role-assignment counts over recent Audit Log
+  // activity: the page an administrator's landing screen is *about*, and the phase's one
+  // deliberate exception to the composition rule. The only Card exclusive to the administration
+  // set, so it is the case `adminSet` + `roles: ADMIN_ROLES` describes: the flag is what an
+  // administrator sees, and the Role gate is what refuses it to everyone else — including the
+  // §3.2 holders of every Permission an administrator inherits, since no Permission distinguishes
+  // an administrator (ADR-0008) and none was invented for this.
+  {
+    key: 'administration',
+    component: AdministrationCard,
+    roles: ADMIN_ROLES,
     adminSet: true,
   },
 ]

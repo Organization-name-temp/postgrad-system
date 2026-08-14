@@ -2,7 +2,7 @@
 
 **Project:** Postgraduate Registration System (PRS) for E-JUST.
 **Workspace:** `postgrad-system` (git remote `MohamedYasser343/postgrad-system`).
-**Last refreshed:** end of **Phase 4 — Grading & GPA/CGPA** (phase 4, ticket 10).
+**Last refreshed:** end of **Phase 4.5 — Dashboards** (phase 4.5, ticket 09).
 
 This file is the *entry point for a fresh session*. It carries only what the repo does **not**
 already record; everything else is deliberately a pointer, so it cannot drift.
@@ -18,9 +18,10 @@ already record; everything else is deliberately a pointer, so it cannot drift.
   [docs/business-requirements.md](docs/business-requirements.md)
 - **Ubiquitous language:** [CONTEXT.md](CONTEXT.md) — the resolved glossary. Read it before
   naming anything.
-- **Load-bearing decisions:** [docs/adr/](docs/adr/) — 0001–0023. Where an ADR contradicts an
+- **Load-bearing decisions:** [docs/adr/](docs/adr/) — 0001–0024. Where an ADR contradicts an
   older document it says so explicitly (0020 amends architecture.md §5; 0021 replaces SRS
-  Appendix A's grading bands).
+  Appendix A's grading bands; 0024 departs from SRS §2.3 and architecture.md on "each role sees
+  a tailored dashboard").
 - **Structure and seams:** [docs/architecture.md](docs/architecture.md) ·
   [docs/tech-stack.md](docs/tech-stack.md) · [docs/design-system.md](docs/design-system.md)
 - **How this repo is built:** [AI_workflow.md](AI_workflow.md) — the
@@ -35,10 +36,15 @@ already record; everything else is deliberately a pointer, so it cannot drift.
 
 | Phase | State |
 |---|---|
-| 0 Foundations · 0.5 Design system · 1 Catalog · 2 Admissions · 2.5 Admissions fixes · 3 Enrollment | **Done, merged to `main`** |
-| **4 Grading & GPA/CGPA** | **Done on `phase-4-grading`** — all ten tickets; awaiting the manual review gate before Phase 5 |
+| 0 Foundations · 0.5 Design system · 1 Catalog · 2 Admissions · 2.5 Admissions fixes · 3 Enrollment · 4 Grading & GPA/CGPA | **Done, merged to `main`** (Phase 4 via PR #6) |
+| **4.5 Dashboards** | **Done on `phase-4.5-dashboards`** — all nine tickets; awaiting the manual review gate before Phase 5 |
 | 5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver | Next |
 | 6 Records & Transcript · 7 Reporting & polish | Not started |
+
+**Phase 4.5 is a composition slice**, inserted between Phases 4 and 5 as Phase 0.5 was inserted
+between 0 and 1 — it added no module, migration, Permission, Role or domain rule. Phases 5, 6 and
+7 keep their numbers and order; **Phase 7 stays last** because three of its eight reports depend
+on read models Phase 5 has not built.
 
 **Working convention:** one branch per phase (`phase-N-slug`), merged to `main` by PR after the
 phase's headline demo is reviewed by hand. Seven backend modules exist:
@@ -79,7 +85,10 @@ cd ../frontend && npm run gate                # api:check, ESLint, Prettier, tsc
 - **Modules are auto-discovered** by `backend/bootstrap/providers.php` (globs
   `modules/*/*ServiceProvider.php`). Every new module must also add its `Public`/`Internal`
   layers **and its allowed edges** to `backend/deptrac.yaml`, or deptrac silently permits
-  nothing.
+  nothing. ⚠ **Known drift, recorded not fixed** (found in Phase 4.5, which did not need it):
+  deptrac's `App` layer lists five module `Public` layers but neither `Admissions` nor
+  `Notifications`, though the ROADMAP records Phase 2 as having added those edges. Worth fixing
+  the next time something in `app/` needs to reach either.
 - **Cross-module references are opaque ids with no FK** (ADR-0012) — so there is no relation to
   join through, and a consumer resolves the other side through that module's `Public` facade.
   Everything crossing a seam is a DTO, never an Eloquent model.
@@ -108,7 +117,10 @@ every window is a **relative offset from seed time**, so it never goes stale. Sh
 password for every account: `password`.
 
 - **Role accounts** `r01@ejust.test … r10@ejust.test` (one per role), plus `multi@ejust.test`
-  (Advisor + Instructor).
+  (Advisor + Instructor). They began as pure authorization fixtures; since Phase 4.5 the three
+  that owned no data carry a real footprint — `r02@` is a Student with two graded Semesters (so a
+  CGPA exists), `r03@` holds advisees with a pending request, and **`multi@` holds both advisees
+  and Course Offerings**, which is what makes the multi-role Dashboard demonstrable.
 - **Named personas** under `@seed.ejust.test`: applicants in every Admissions status, advisors,
   faculty deans, interviewers, Department Heads, and a `student.*` cohort. The seeders reserve
   that namespace so the Playwright smokes' own data never collides with it.
@@ -118,19 +130,26 @@ password for every account: `password`.
   becomes overdue once the **following** term has passed its own week 10 — see
   `GradingSeeder`'s class docblock, which explains the calendar in full.
 - **What each phase's demo drives** is the corresponding Playwright smoke: `admissions.spec.ts`,
-  `enrollment.spec.ts`, `grading.spec.ts` (the headline test at the bottom of the file), plus
-  `headline.spec.ts` for the Phase-0/1 walking skeleton.
+  `enrollment.spec.ts`, `grading.spec.ts` (the headline test at the bottom of the file),
+  `dashboard.spec.ts` (Phase 4.5 — seven logins, each asserting its Card set presence *and*
+  absence), plus `headline.spec.ts` for the Phase-0/1 walking skeleton.
 
 ---
 
 ## Immediate next steps
 
-1. **Run the Phase-4 headline demo by hand** and take it through the per-phase manual review
-   gate; then open the PR from `phase-4-grading` to `main`.
+1. **Run the Phase-4.5 headline demo by hand** — sign in as `multi@` and see the advisee queue
+   and the ungraded grade sheets on one page with no role switcher, then as `r09@` for the
+   administration set — and take it through the per-phase manual review gate; then open the PR
+   from `phase-4.5-dashboards` to `main`.
 2. **Start Phase 5** (SRS §4.8, §4.5, §4.6 — Academic Standing, Credit-Hour Summary,
    Exemption/Transfer/Waiver) with the usual loop: `/to-prd` → `/to-issues` → `/tdd` per ticket
    → `/code-review`. Phase 4 left it two hooks: the `GradeFinalized` domain event, and
    `Grading\Public::GradingRecords` for CGPA/Semester GPA — Phase 5 must consume that contract
    rather than re-deriving the arithmetic (ADR-0020). The three `CourseStatus` values still
    unreachable (`Transfer`, `Waive`, `Exempted`) are exactly Phase 5's remit, at which point the
-   Appendix-D counting matrix is fully live.
+   Appendix-D counting matrix is fully live. Phase 4.5 left it one more: **Phase 5 ships its own
+   Dashboard Cards** (Academic Standing, Credit-Hour Summary) as part of its own work — one row in
+   `frontend/src/app/dashboardCards.tsx`, one component inside its own feature, one `can:`-gated
+   read endpoint in its own module. The Dashboard grows with the system rather than being
+   revisited, and no placeholder Card was left behind for it (ADR-0024).

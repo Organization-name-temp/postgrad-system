@@ -375,10 +375,29 @@ _Avoid_: home page, portal, role dashboard.
 
 **Dashboard Card**:
 One summary on the Dashboard, owned by the module whose data it summarises, gated on a
-single Permission or Role, showing a count or short list plus a link into the full surface
-behind it. A Card introduces no domain logic of its own — every figure is read from the
-derivation that already owns it. A Card is fixed, scoped to the acting user, and summary; a
-**Report** (SRS §4.12) is filterable, parameterised and cross-student, so the two are
-different objects even where they name the same subject.
+single Permission or Role, showing counts, a short list, a term-over-term delta or a single
+chart, plus a link into the full surface behind it. A Card introduces no domain logic of its
+own — every figure is read from the derivation that already owns it. A Card is scoped to the
+acting user and **takes no parameter**: that is what separates it from a Report, and the moment
+a Card would need one it has become a Report.
 _Avoid_: panel (already a generic word for a bordered page section across the codebase),
 widget, tile, summary card.
+
+**Report**:
+A parameterised, cross-record view of data the acting user may read — figures, charts, and the
+drillable list behind them — owned by the module that owns its spine data and presented together
+with the others as the Analytics surface. A Report is where a question is asked *about* a
+population (a Program's grade distribution, a Faculty's application pipeline); a Dashboard Card
+answers "what is waiting for me". A Report never discloses more than the screens its viewer may
+already open, and drilling into one lands on an ordinary filtered list.
+_Avoid_: analytics dashboard, analytical dashboard, role dashboard (Dashboard means the
+authenticated landing surface and nothing else); query; view.
+
+**Export**:
+A file rendering of one filtered list or Report, carrying a canonical column set decided by the
+system rather than by whoever requested it, rendered in the requester's language, and recorded in
+the Audit Log because the data leaves. An Export is authorised by the same access as the list it
+mirrors — it is a copy of what the requester could already read, not a new power. Distinct from
+issuing an official **Transcript**, which is a sealed, verifiable document about one Student that
+only Student Affairs may issue.
+_Avoid_: download, report file, extract, dump.

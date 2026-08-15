@@ -37,9 +37,10 @@ already record; everything else is deliberately a pointer, so it cannot drift.
 | Phase | State |
 |---|---|
 | 0 Foundations · 0.5 Design system · 1 Catalog · 2 Admissions · 2.5 Admissions fixes · 3 Enrollment · 4 Grading & GPA/CGPA | **Done, merged to `main`** (Phase 4 via PR #6) |
-| **4.5 Dashboards** | **Done on `phase-4.5-dashboards`** — all nine tickets; awaiting the manual review gate before Phase 5 |
-| 5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver | Next |
-| 6 Records & Transcript · 7 Reporting & polish | Not started |
+| **4.5 Dashboards** | **Done on `phase-4.5-dashboards`** — all nine tickets; awaiting the manual review gate before its PR |
+| **4.6 Query, Filter, Export & Reports** | **Planned, not started** — designed in a `/grill-with-docs` session; ROADMAP §3 section + ADR-0025–0028 written |
+| 5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver | After 4.6 |
+| 6 Records & Transcript · 7 Reporting & polish | Not started (7 is now much smaller — 4.6 takes five of its eight reports) |
 
 **Phase 4.5 is a composition slice**, inserted between Phases 4 and 5 as Phase 0.5 was inserted
 between 0 and 1 — it added no module, migration, Permission, Role or domain rule. Phases 5, 6 and
@@ -142,9 +143,19 @@ password for every account: `password`.
    and the ungraded grade sheets on one page with no role switcher, then as `r09@` for the
    administration set — and take it through the per-phase manual review gate; then open the PR
    from `phase-4.5-dashboards` to `main`.
-2. **Start Phase 5** (SRS §4.8, §4.5, §4.6 — Academic Standing, Credit-Hour Summary,
-   Exemption/Transfer/Waiver) with the usual loop: `/to-prd` → `/to-issues` → `/tdd` per ticket
-   → `/code-review`. Phase 4 left it two hooks: the `GradeFinalized` domain event, and
+2. **Start Phase 4.6** (Query, Filter, Export & Reports) with the usual loop: `/to-prd` →
+   `/to-issues` → `/tdd` per ticket → `/code-review`. It is designed but not built: the ROADMAP §3
+   section and [ADR-0025](docs/adr/0025-support-layer-query-contract.md)–
+   [0028](docs/adr/0028-aggregate-facades-sql-php-parity.md) are written, ADR-0024 carries a Phase-4.6
+   amendment, and CONTEXT.md has the new **Report** and **Export** entries. It is the largest phase
+   yet (~18–20 tickets) and it is sequenced **before** Phase 5 for one reason: it changes the
+   response envelope of every collection endpoint, so Phases 5–7 are born filterable rather than
+   retrofitted. Two things to know going in — the envelope change forces an `openapi.yaml` + Orval
+   regeneration across ~25 endpoints (both `api:check` gates are `git diff --exit-code`), and
+   `backend/support/` is the project's **first shared backend code**, so `deptrac.yaml` gains a
+   layer with seven inbound and **zero** outbound edges.
+3. **Then Phase 5** (SRS §4.8, §4.5, §4.6 — Academic Standing, Credit-Hour Summary,
+   Exemption/Transfer/Waiver). Phase 4 left it two hooks: the `GradeFinalized` domain event, and
    `Grading\Public::GradingRecords` for CGPA/Semester GPA — Phase 5 must consume that contract
    rather than re-deriving the arithmetic (ADR-0020). The three `CourseStatus` values still
    unreachable (`Transfer`, `Waive`, `Exempted`) are exactly Phase 5's remit, at which point the

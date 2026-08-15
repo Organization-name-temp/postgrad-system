@@ -96,3 +96,30 @@ and no placeholder, and each of those phases adds its own Card as part of its ow
   `VersionHistoryPanel` and `CartPanel` already ship using "Panel" as a generic word for a
   bordered page section; adopting it as a domain term would put four shipped components in
   violation of the ubiquitous language.
+
+## Amendment (Phase 4.6) — what a Card may carry
+
+Phase 4.6 builds the Analytics surface and makes **Report** a first-class term
+([ADR-0026](0026-reports-owned-by-modules.md)). With a Report now next door, the pressure runs the
+other way: every Card acquires a reason to grow a chart, and the distinction above erodes one Card
+at a time unless the line is mechanical.
+
+**A Card may carry headline figures, a term-over-term delta, and at most one chart — over data
+already scoped to the acting user** (their advisees, their Offerings, their own record).
+
+**A Card may not take a parameter.** That is the whole test, and it is deliberately mechanical:
+*if it needs a parameter, it is a Report.* A parameter is what makes a view cross-record and
+comparative; the moment a user can ask a Card about a Program they are not in or a term they did
+not teach, it has stopped being a summary of their own work and belongs in Analytics, where it can
+be gated, scoped and drilled into properly.
+
+Two things in the original decision are unchanged by this and remain load-bearing: a Card still
+introduces **no domain logic of its own** — a chart on a Card is drawn from a figure some
+derivation already owns, now often a batch method under
+[ADR-0028](0028-aggregate-facades-sql-php-parity.md) — and a Card payload still carries **typed
+domain values only**, so the SPA renders bilingually. The one recorded exception to that second
+rule is the export endpoint ([ADR-0027](0027-export-sibling-route-audited.md)), which has no client
+to render for.
+
+[CONTEXT.md](../../CONTEXT.md)'s **Dashboard Card** entry is amended to match, and **Report** is
+promoted there from a parenthetical in that entry to a definition of its own.

@@ -35,12 +35,17 @@ function toPalette(
       main: s.primary.main,
       dark: s.primary.dark,
       contrastText: s.primary.contrastText,
-      // In dark, the accessible brand-red *text* shade is a lighter one — MUI's `.light`
-      // slot, which a text/outlined button reads there (`.dark` serves light mode, and
-      // brand 600 already clears AA on light surfaces). The vivid `.main` is a fill colour,
-      // only ~3.8:1 against the dark surface, so it can never be a label. This is the
-      // `primary.text` token the ramp has always named; until now nothing consumed it.
-      ...(mode === 'dark' ? { light: s.primary.text } : {}),
+      // `primary.text` — the ramp's accessible brand-red **text** shade (design-system.md §2's
+      // contrast rule: brand 700 on light, brand 300 on dark) — mapped into MUI's `.light` slot,
+      // which no component in this app consumes, so the slot is free to mean *the readable red
+      // for this colour scheme*. The vivid `.main` is a **fill** colour: ~3.8:1 on the dark
+      // surface and only ~4.85:1 on white, so it can never be a label.
+      //
+      // It was mapped in dark only (phase 4, for the text/outlined button label, which reads
+      // `.dark` in light where brand 600 already clears AA); phase 4.5 made it symmetric so that
+      // a link — whose documented shade *is* `primary.text` in both schemes — needs no
+      // per-scheme branch at all.
+      light: s.primary.text,
     },
     secondary: { main: s.secondary.main },
     error: s.error,
@@ -151,6 +156,36 @@ export function createAppTheme(lang: string): Theme {
                   ...theme.applyStyles('dark', {
                     color: theme.vars.palette[ownerState.color].light,
                   }),
+                }
+              : {},
+        },
+      },
+      MuiLink: {
+        styleOverrides: {
+          // The same rule as the button above, for the other thing that renders a tone as
+          // *text*: a link's default `primary` colour resolves to the vivid `.main`, which is a
+          // fill shade — ~3.8:1 on the dark surface, so it fails AA outright there, and only
+          // ~4.85:1 on white. design-system.md §2's contrast rule names the shade a red **link**
+          // must use, and the palette above now carries exactly that (`primary.text`) in `.light`
+          // for both schemes, so this is one colour with no per-scheme branch. Both pairs are
+          // measured by the token-contrast gate (`tokens.contrast.test.ts`, "brand-red text on
+          // paper").
+          //
+          // Found by the phase 4.5 Dashboard axe scan (ticket 09) rather than invented here: a
+          // Card is made of links — each row links into its record and every Card links into the
+          // surface behind it — so the Dashboard is the first screen dense enough in links for
+          // a dark-mode scan to catch this. It is an app-wide defect, so it is fixed app-wide.
+          //
+          // `color` is defaulted to `primary` by Link itself before styleOverrides run, so an
+          // explicit comparison covers the default too.
+          root: ({ ownerState, theme }) =>
+            ownerState.color === 'primary'
+              ? {
+                  color: theme.vars.palette.primary.light,
+                  // MUI derives the underline from `.main`, independently of the text colour, so
+                  // it is re-pointed at the same shade or the two disagree. Channel token + alpha
+                  // is the repo idiom (`StatusChip`) and MUI's own here.
+                  '--Link-underlineColor': `rgba(${theme.vars.palette.primary.lightChannel} / 0.4)`,
                 }
               : {},
         },

@@ -367,3 +367,12 @@ it('resolves several semesters at once through the read facade, skipping ids tha
         ->and($summaries[$spring->id]->nameEn)->toBe('Spring 2027')
         ->and(app(AcademicCalendar::class)->findMany([]))->toBe([]);
 });
+
+it('resolves the latest started semester for academic work', function () {
+    Semester::factory()->ended()->create(['starts_at' => now()->subYear()]);
+    $latestStarted = Semester::factory()->ended()->create(['starts_at' => now()->subMonth()]);
+    Semester::factory()->upcoming()->create(['starts_at' => now()->addMonth()]);
+
+    expect(app(AcademicCalendar::class)->currentForAcademicWork()?->id)
+        ->toBe($latestStarted->id);
+});

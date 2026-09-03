@@ -56,6 +56,32 @@ trait ResolvesQueuePrograms
     }
 
     /**
+     * The applications **awaiting a Dean's decision**: those resting at `interview_completed`
+     * (a first decision is due) and those held at `conditionally_accepted` / `waitlisted` (a
+     * resolution is due), faculty-scoped exactly as every other Dean queue is.
+     *
+     * One definition, two readers (phase 4.5, ticket 08): the decisions queue itself
+     * ({@see FinalDecisionController::index()}) and the Dashboard Card that counts it. Naming
+     * the statuses in each place separately is how a Card comes to disagree with the screen it
+     * links into — a Dean told "3 waiting" who opens the queue and finds 5 has been given worse
+     * than nothing.
+     *
+     * @return Collection<int, Application>
+     */
+    protected function awaitingDecisionQueue(
+        Request $request,
+        DeanAssignments $assignments,
+        ProgramCatalog $catalog,
+        Directory $directory,
+    ): Collection {
+        return $this->deanOrAdminQueue($request, [
+            ApplicationStatus::InterviewCompleted,
+            ApplicationStatus::ConditionallyAccepted,
+            ApplicationStatus::Waitlisted,
+        ], $assignments, $catalog, $directory);
+    }
+
+    /**
      * @param  Collection<int, Application>  $applications
      */
     protected function attachPrimaryPrograms(Collection $applications, ProgramCatalog $catalog): void

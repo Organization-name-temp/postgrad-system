@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\AttendanceController;
+use Modules\Enrollment\Internal\Http\Controllers\DashboardCardController;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
@@ -57,6 +58,14 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
     Route::post('/registration/enrollments', [ScheduleChangeController::class, 'add']);
     Route::delete('/registration/enrollments/{enrollment}', [ScheduleChangeController::class, 'drop'])->whereNumber('enrollment');
     Route::post('/registration/enrollments/{enrollment}/withdrawal', [ScheduleChangeController::class, 'withdraw'])->whereNumber('enrollment');
+
+    // The My Registration Dashboard Card (phase 4.5, ticket 04) — this Semester's credit-hour load
+    // against the 6–12 bounds, the open period and the date it closes, summarised for the Dashboard
+    // page. It carries no id param, so it always reads the acting user's own Student anchor, and it
+    // is independently authorized here rather than trusting the SPA's choice of what to request
+    // (ADR-0024): the client composes Cards as a UX mirror only.
+    Route::get('/enrollment/cards/my-registration', [DashboardCardController::class, 'myRegistration'])
+        ->middleware('role:R02');
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {
@@ -89,6 +98,11 @@ Route::middleware(['auth:sanctum', 'can:registration.approve'])->group(function 
     // {student_id} is the Student anchor id (Identity-owned, resolved through the
     // StudentDirectory facade, not model-bound), so snake_case for Scribe/Orval determinism.
     Route::get('/registration/students/{student_id}/schedule', [RegistrationController::class, 'studentSchedule'])->whereNumber('student_id');
+
+    // The Advisee Requests Dashboard Card (phase 4.5, ticket 04) — the same queue's pending count,
+    // the reviewer's advisee count, and the oldest few by student name. It shares the queue's gate
+    // and its live advisee scope, so a Card can never count a request the queue would not show.
+    Route::get('/enrollment/cards/advisee-requests', [DashboardCardController::class, 'adviseeRequests']);
 });
 
 // The attendance register (ticket 08, ADR-0019) — the Instructor-facing surface, authorised

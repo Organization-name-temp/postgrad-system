@@ -4,7 +4,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RegisterPage } from '../features/admissions/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
-import { DashboardPage } from '../features/auth/DashboardPage'
 import { FacultiesPage } from '../features/catalog/faculties/FacultiesPage'
 import { DepartmentsPage } from '../features/catalog/departments/DepartmentsPage'
 import { ProgramsPage } from '../features/catalog/programs/ProgramsPage'
@@ -46,6 +45,9 @@ import { MyGradesPage } from '../features/grading/student/MyGradesPage'
 import { StudentGradesPage } from '../features/grading/oversight/StudentGradesPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
+// The Dashboard lives in the app shell, not in a feature: it composes Cards from many
+// features, and a feature may not import another feature (phase 4.5, ticket 01).
+import { DashboardPage } from './DashboardPage'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
 import { PERMISSION } from '../shared/access/permissions'
 

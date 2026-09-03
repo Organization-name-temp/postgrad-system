@@ -363,3 +363,22 @@ Academic Affairs Council.
 The official or unofficial record of a Student's Enrollments, Grades, and Credit-Hour
 Summary. Official transcripts are issued only by Student Affairs with seal, watermark,
 digital signature, and verification QR code.
+
+## Presentation
+
+**Dashboard**:
+The authenticated entry screen, composed from the acting User's own access rather than
+selected by a single Role: a User holding several Roles sees the union of their Dashboard
+Cards on one page, and there is no "view as role" switch (ADR-0024). A System/Super
+Administrator sees an explicit administration set instead of the union they inherit.
+_Avoid_: home page, portal, role dashboard.
+
+**Dashboard Card**:
+One summary on the Dashboard, owned by the module whose data it summarises, gated on a
+single Permission or Role, showing a count or short list plus a link into the full surface
+behind it. A Card introduces no domain logic of its own — every figure is read from the
+derivation that already owns it. A Card is fixed, scoped to the acting user, and summary; a
+**Report** (SRS §4.12) is filterable, parameterised and cross-student, so the two are
+different objects even where they name the same subject.
+_Avoid_: panel (already a generic word for a bordered page section across the codebase),
+widget, tile, summary card.

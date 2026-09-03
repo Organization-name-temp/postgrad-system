@@ -142,6 +142,50 @@ export const UnassignADepartmentHeadFromAScopeResponse = zod.looseObject({
 
 
 /**
+ * The shape of the system at a glance — how many Users exist and how many Role assignments
+ * they hold between them — over the most recent Audit Log activity, linking into the
+ * administration surfaces.
+ *
+ * The two counts are aggregate `COUNT`s, never a materialised collection counted in PHP, so the
+ * Card costs two scalar queries however large the installation grows. They are deliberately two
+ * different numbers: a User may hold several Roles (`multi@` holds two), which is the fact the
+ * whole permission-union Dashboard rests on, so `role_assignment_count` is not a synonym for
+ * `user_count` and reading them side by side is what shows an administrator that.
+ *
+ * The activity is a **bounded recent-activity read** of the append-only log: the newest few
+ * entries, newest first, each as its action key, the acting User (id and name, `null` for an
+ * entry with no actor — a failed sign-in has none), and when it happened. It is emphatically
+ * **not** the Phase 7 Audit Log *Report*: there is no filter, no date range, no pagination and
+ * no export, because a Card is fixed, scoped and summary while a Report is filterable,
+ * parameterised and cross-cutting (spec §Glossary). Phase 7 builds the Report beside this Card,
+ * not out of it.
+ *
+ * An empty Audit Log returns an empty list and the SPA says so in words — a fresh installation
+ * with nothing recorded yet is a legitimate state, never an error.
+ *
+ * Gated on the R09/R10 Role by the `admin` middleware; every other role, and every
+ * unauthenticated request, is refused.
+ * @summary Administration Card.
+ */
+export const AdministrationCardResponse = zod.object({
+  "data": zod.object({
+  "user_count": zod.number().optional(),
+  "role_assignment_count": zod.number().optional(),
+  "recent_activity": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "actor_name": zod.string().optional(),
+  "at": zod.string().optional()
+})).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
+})
+
+
+/**
  * Public, unauthenticated: the front door the registration screen reads to
  * know whether (and into which intake) a stranger may apply. Returns only
  * Cycles that are active and whose window contains the current moment.
@@ -624,6 +668,44 @@ export const RescheduleMyInterviewResponse = zod.object({
 }).optional(),
   "applicant": zod.string().nullish()
 }).optional()
+})
+
+
+/**
+ * Where the acting Applicant's Application stands: its current status and when it entered that
+ * status. The SPA renders the status as a chip and picks the "what happens next" copy from the
+ * status itself, which is why the status travels as its enum value and never as a sentence —
+ * the next action is a rendering of a state the domain already has, not a new fact about it.
+ *
+ * The Applicant owns one Application per Cycle, so the most recent is theirs — the same rule
+ * the applicant wizard's `ResolvesCurrentApplication` applies, but resolved here to **null**
+ * rather than to its 404: a user with no Application at all, possible between account creation
+ * and the first draft and true of every non-applicant, gets `{"data": null}` and the Card's
+ * empty state, because an Applicant who has not started is a legitimate state and not an error.
+ * That `null` deliberately gets no `@response` scenario of its own: a scalar-null `data` beside
+ * an object one makes Scribe emit a *union* response type, and the generated client then cannot
+ * read the payload at all.
+ *
+ * Gated on `application.view_status` (§3.2 — Applicant / Student Affairs / Dean) and inherently
+ * scoped on top of that: it reads the acting user's own Application and takes no id, so another
+ * applicant's is unreachable from it.
+ *
+ * The SPA nonetheless gates the Card on the **Applicant Role**, not on that Permission: an
+ * administrator inherits it (ADR-0008) and holds no Application, so a Permission-gated Card
+ * would sit permanently empty on their Dashboard. The Permission decides who may *ask*; holding
+ * an Application decides who has anything to see.
+ * @summary My Application Card.
+ */
+export const MyApplicationCardResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "status_entered_at": zod.string().optional(),
+  "finalized_at": zod.string().optional()
+}).nullable().describe('The acting Applicant\'s latest Application, or null when none exists.'),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -1140,6 +1222,52 @@ export const ScreenAnApplicationResponse = zod.union([zod.object({
 
 
 /**
+ * How much screening work is waiting: how many Applications are pending, **how many of those
+ * are overdue**, and the oldest few with their age — closing SRS FR-ADM-005.5, which has been
+ * unbuilt since Phase 2 because there was no dashboard to display it on.
+ *
+ * Aging is the business-day count since the Application entered review (the Egyptian
+ * Friday/Saturday weekend does not count) and the threshold is the configured screening SLA —
+ * both read from {@see ReviewSla}, the same seam the `admissions:flag-overdue` command uses, so
+ * this Card and that notification always agree. Neither is stored: the age is recomputed on
+ * every read from the timeline.
+ *
+ * **Overdue is a count and a visual distinction, nothing more.** It blocks nothing, changes no
+ * status and appends no timeline row, exactly as the existing flag-and-notify command does not.
+ *
+ * `sla_days` travels with the counts so the SPA can say *why* something is overdue without
+ * hard-coding the university's threshold. An empty queue returns zeros and an empty list, and
+ * the SPA renders the shared empty state rather than a bare `0`.
+ *
+ * Gated on `application.screen` (§3.2 — Student Affairs / Dean).
+ *
+ * The empty queue is described above rather than given its own `@response` scenario, for the same
+ * reason the Card above has only one: an empty `applications` list beside a populated one makes
+ * Scribe emit a union response type the generated client cannot read.
+ * @summary Screening Queue Card.
+ */
+export const ScreeningQueueCardResponse = zod.object({
+  "data": zod.object({
+  "pending_count": zod.number().optional(),
+  "overdue_count": zod.number().optional(),
+  "sla_days": zod.number().optional(),
+  "applications": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "status": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "age_days": zod.number().optional(),
+  "is_overdue": zod.boolean().optional(),
+  "review_entered_at": zod.string().optional()
+})).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
+})
+
+
+/**
  * The `under_dean_review` applications whose primary Program's Faculty is among
  * the signed-in Dean's assigned Faculties, oldest-first, each with the applicant's
  * identity, resolved primary Program, and days waited since entering Dean review.
@@ -1305,6 +1433,41 @@ export const RecordTheFinalDecisionResponse = zod.union([zod.object({
   "status": zod.string().optional()
 }).optional()
 }).describe('rejected')])
+
+
+/**
+ * How many Applications are waiting on the acting Dean's decision, linking into the decisions
+ * queue. Admissions decisions are the last step before an Applicant becomes a Student, and
+ * until now nothing told a Dean that applicants were waiting on them.
+ *
+ * The count is **scoped to the Dean's own Faculty** and the scope is not re-derived here: the
+ * Card reads {@see ResolvesQueuePrograms::awaitingDecisionQueue()}, the same faculty-scoped
+ * derivation the decisions queue itself lists, so the Card and that screen can never disagree
+ * about what a Dean is responsible for and one Dean's Card never counts another Faculty's
+ * Applications. A Dean with no assigned Faculty counts nothing, which is the existing rule for
+ * every Dean surface rather than a new one.
+ *
+ * Faculty scoping resolves `application → primary_program_id → facultyId` through the
+ * Catalog\Public facade (ADR-0012), which SQL cannot express across the module seam, so the
+ * queue is materialised and counted — the same trade the Screening Queue Card documents, and
+ * bounded the same way: by the work actually waiting on one reviewer.
+ *
+ * An administrator sees the queue unscoped (ADR-0015), consistent with the screen; they are
+ * not shown this Card, because a Dashboard for an administrator is the administration set
+ * rather than the union of every queue they inherit (ADR-0024).
+ *
+ * Gated on `applicant.decide` (§3.2 — Dean only). Zero waiting is zero, and the SPA renders
+ * the shared empty state rather than a bare `0`.
+ * @summary Admission Decisions Card.
+ */
+export const AdmissionDecisionsCardResponse = zod.object({
+  "data": zod.object({
+  "pending_count": zod.number().optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
+})
 
 
 /**
@@ -1596,6 +1759,45 @@ export const UpdateASemesterResponse = zod.object({
 
 
 /**
+ * The live Semester, which of its period windows are open right now, and the next date due.
+ * The Semester is the one **running** (start ≤ now ≤ end), or — when no term is running —
+ * the one whose registration window is open, which is the term an administrator is
+ * configuring. `open_windows` is a list because the windows overlap: registration may still
+ * be open past the semester start, while `current_period` names the single phase the
+ * Semester reads as. Every field is `null`/empty when no Semester is live at all, so the
+ * Card renders its empty state rather than an error.
+ *
+ * Gated on `calendar.manage` (§3.2 — Student Affairs / Dean; administrators inherit it).
+ *
+ * The empty case is described above rather than given its own `@response` scenario: a second
+ * 200 whose body is a *different shape* — nulls where the first has objects — makes Scribe emit
+ * a union response type, and the generated Orval client then cannot read either branch. Same
+ * shape, several scenarios is fine; different shapes are not.
+ * @summary Semester and Open Windows Card.
+ */
+export const SemesterAndOpenWindowsCardResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "current_period": zod.string().optional(),
+  "open_windows": zod.array(zod.string()).optional(),
+  "next_deadline": zod.object({
+  "window": zod.string().optional(),
+  "at": zod.string().optional()
+}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
+})
+
+
+/**
  * Faculties are ordered by code; within each Program the three Categories are
  * always present in bylaw order (Preparatory, Program Core, Research Elective)
  * with their required credit hours, and Courses within a Category follow the
@@ -1639,6 +1841,27 @@ export const TheCatalogBrowseTreeResponse = zod.object({
 })).optional()
 })).optional()
 }).optional()
+})
+
+
+/**
+ * How many Programs and Courses are **active** — the answer to "is the catalog populated?"
+ * without a navigation, linking into the catalog itself. Both are aggregate `COUNT`s, never a
+ * materialised collection counted in PHP, so the Card costs two scalar queries however large
+ * the catalog grows. A catalog with nothing active returns zeros and the SPA renders the
+ * shared empty state rather than a bare `0`.
+ *
+ * Gated on `catalog.manage` (§3.2 — Department Head / Dean; administrators inherit it).
+ * @summary Catalog Summary Card.
+ */
+export const CatalogSummaryCardResponse = zod.object({
+  "data": zod.object({
+  "active_program_count": zod.number().optional(),
+  "active_course_count": zod.number().optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -3095,6 +3318,51 @@ export const WithdrawFromACoursewithdrawalPeriodResponse = zod.object({
 
 
 /**
+ * The acting Student's current-semester registration at a glance: the credit hours they are
+ * carrying with the **6–12 bounds alongside them** — so the number is anchored rather than
+ * left to be judged — the period that is currently open, and the date it closes. The SPA sends
+ * the Student to whichever surface that period actually allows, so the Dashboard never
+ * offers an action the server would refuse.
+ *
+ * The Semester is the one **running** now, or — before the term starts — the one open for
+ * registration, which is the Semester a Student is registering into. Period state is read from
+ * ADR-0018's derived windows and never from a stored flag; the bounds come from the existing
+ * {@see CreditHoursValidator}'s configuration, so the Card cannot disagree with what the cart
+ * will enforce. `period_ends_at` is null when no window is open (`closed`), because that is a
+ * period rather than a window and giving it a closing date would be a fiction.
+ *
+ * Gated on `courses.register_self` (§3.2, Student only) and scoped to the acting user's own
+ * Student anchor — there is no id parameter, so another Student's load is unreachable from it.
+ *
+ * The no-semester-live case is described above rather than given its own `@response` scenario: a
+ * second 200 whose body is a *different shape* — a null Semester where the first has an object —
+ * makes Scribe emit a union response type, and the generated Orval client then cannot read
+ * either branch.
+ * @summary My Registration Card.
+ */
+export const MyRegistrationCardResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "current_period": zod.string().optional(),
+  "period_ends_at": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "min_credit_hours": zod.number().optional(),
+  "max_credit_hours": zod.number().optional(),
+  "enrollment_count": zod.number().optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
+})
+
+
+/**
  * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
  * Student Affairs (or an administrator) sees **every** Student, unscoped — the same
  * visibility rule the advisor queue uses ({@see ScopesToAdvisees}). Each row carries the
@@ -3524,6 +3792,44 @@ export const ViewAnyStudentsScheduleoversightResponse = zod.object({
 }).optional()
 })).optional()
 })).optional()
+})
+
+
+/**
+ * The registration requests waiting on the acting reviewer: how many are Pending, how many
+ * advisees they hold, and the oldest few by student name — linking into the advisor queue,
+ * which until now was discoverable only by opening it.
+ *
+ * Scoped by the one trait the queue itself uses ({@see ScopesToAdvisees}): an **Advisor** sees
+ * only their **live** advisee set, resolved at call time, so the Card follows advisor
+ * reassignment exactly as the queue does; **Student Affairs** and an administrator review
+ * unscoped, since scoping them to "their advisees" would show nothing and their remit is to
+ * unblock any request. `advisee_count` is therefore null for an unscoped reviewer — they hold
+ * no advisees, which is not the same fact as holding none.
+ *
+ * Gated on `registration.approve` (§3.2 — Advisor / Student Affairs).
+ *
+ * The empty queue is described above rather than given its own `@response` scenario: an empty
+ * `requests` list beside a populated one makes Scribe emit a union response type the generated
+ * client cannot read.
+ * @summary Advisee Requests Card.
+ */
+export const AdviseeRequestsCardResponse = zod.object({
+  "data": zod.object({
+  "pending_count": zod.number().optional(),
+  "advisee_count": zod.number().optional(),
+  "requests": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "student_name": zod.string().optional(),
+  "university_id": zod.string().optional(),
+  "course_count": zod.number().optional(),
+  "submitted_at": zod.string().optional()
+})).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -4119,6 +4425,111 @@ export const OpenorResumeTheIncompletesResolutionRoundResponse = zod.union([zod.
 
 
 /**
+ * The acting user's teaching load for their current term and what it owes: the Offerings, how
+ * many of their Grade Sheets are **not yet Finalized**, and which are past the Semester's
+ * Grade-Submission Deadline with nothing finalized. `offerings` carries the first few rows so
+ * the Card links into each Offering's Sheet, while the counts are over the whole term.
+ *
+ * The overdue flag is a **nudge, not a gate**: nothing here is blocked, changed or
+ * auto-actioned by it — this is a second surface for the flag phase 4 ticket 09 already
+ * raises, read from the same derived predicate.
+ *
+ * Whose Offerings, exactly, is the rule the Grade Sheets screen already applies: an
+ * Instructor's own, or — for a **central-entry** user, `grades.enter` without
+ * `grades.finalize`, which by §3.2 is Student Affairs — every Offering, because grades
+ * arriving on paper belong to Offerings the records office does not teach. `meta.scope` says
+ * which list came back (`own` / `central`), exactly as that screen's endpoint does.
+ *
+ * The term is derived from the Offerings themselves — the latest-starting Semester the user
+ * teaches in that has already begun — because grades are keyed in *after* a term ends, when
+ * no Semester is running and the marks are still owed. A user who teaches nothing, or only in
+ * terms still ahead, gets a null Semester and the Card's empty state rather than an error.
+ *
+ * Gated on `grades.enter` (§3.2 — Instructor / Student Affairs).
+ *
+ * The empty case is described above rather than given its own `@response` scenario: a second 200
+ * whose body is a *different shape* — nulls and empty lists where the first has objects — makes
+ * Scribe emit a union response type, and the generated Orval client then cannot read either
+ * branch.
+ * @summary My Grade Sheets Card.
+ */
+export const MyGradeSheetsCardResponse = zod.object({
+  "data": zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "grade_submission_deadline_at": zod.string().optional(),
+  "offering_count": zod.number().optional(),
+  "unfinalized_count": zod.number().optional(),
+  "overdue_count": zod.number().optional(),
+  "offerings": zod.array(zod.object({
+  "offering_id": zod.number().optional(),
+  "sheet_status": zod.string().optional(),
+  "is_overdue": zod.boolean().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional()
+})).optional()
+}).optional(),
+  "meta": zod.object({
+  "scope": zod.string().optional()
+}).describe('Card metadata, including the resolved scope.')
+})
+
+
+/**
+ * How many Incompletes the acting Instructor has declared that are still waiting on the
+ * outstanding mark, and **when the nearest one is due** — the Card that earns its place by
+ * preventing real harm, since an Incomplete left unresolved past its deadline is converted to
+ * a Fail Withdrawal by the one state-changing scheduled command in the system. Surfacing the
+ * nearest deadline on sign-in gives the Instructor the chance to resolve it first.
+ *
+ * The set is the same one the resolution screen lists — both read
+ * {@see OutstandingIncompleteQueue} — so the Card can never count something the screen behind
+ * it does not show.
+ *
+ * The deadline is **derived, never stored**: the following Semester's start plus the
+ * configured offset, read through {@see IncompleteDeadlineResolver} on every request
+ * (ADR-0018), so correcting a Semester's `starts_at` moves every outstanding deadline with it
+ * and this Card with them. The resolver is asked once per Enrollment Semester rather than once
+ * per Incomplete, since a term's answer is the same for every Incomplete declared in it.
+ *
+ * `without_deadline_count` is the case the conversion command already handles explicitly and
+ * this Card must not paper over: an Incomplete whose following Semester **does not exist yet**
+ * has no computable deadline. It is counted and reported as having none, never given a
+ * fabricated one, and it never errors the Card — an admin's omission in the Calendar does not
+ * hide an Instructor's work from them.
+ *
+ * Gated on `grades.enter` (§3.2 — Instructor / Student Affairs). A central-entry user teaches
+ * no Offerings of their own, so they get the empty state, exactly as the resolution screen
+ * already shows them.
+ * @summary Outstanding Incompletes Card.
+ */
+export const OutstandingIncompletesCardResponse = zod.object({
+  "data": zod.object({
+  "outstanding_count": zod.number().optional(),
+  "nearest_deadline": zod.string().optional(),
+  "without_deadline_count": zod.number().optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
+})
+
+
+/**
  * The Instructor's signature — one act that sends the whole round to the Department Head
  * (SRS §4.7.1.4). Draft or Returned → Submitted (ADR-0023); any other current state is a
  * 409. Refused with a 422 naming how many lines are still blank — the UI already shows
@@ -4310,6 +4721,54 @@ export const ReturnTheSheetWithANoteResponse = zod.object({
 
 
 /**
+ * The Department Head's review queue at a glance: how many Submitted Grade Sheets are waiting
+ * on them and which Offerings the oldest few belong to, linking into the review screen — so an
+ * Instructor blocked on a Head becomes visible to that Head on sign-in.
+ *
+ * The Permission opens the Card; the **assignment** scopes its contents, exactly as the review
+ * queue itself works. Both read the one seam ({@see DepartmentHeadSheetQueue}), so this Card
+ * counts precisely what that queue would show — including the case that is easy to miss: a
+ * Head assigned **university-wide** reaches the department-less Preparatory Sheets (ADR-0010)
+ * and a Department-scoped Head does not. A Department with no Head assigned is on nobody's
+ * Card, and that is not an error.
+ *
+ * Gated on `grades.finalize`, which Instructors hold too (§3.2) — an Instructor who heads no
+ * Department therefore gets an empty queue rather than a 403, because the assignment, not the
+ * Permission, is what fills it.
+ *
+ * The empty queue is described above rather than given its own `@response` scenario, for the
+ * same reason as the Card above: an empty `sheets` list beside a populated one makes Scribe emit
+ * a union response type the generated client cannot read.
+ * @summary Sheets Awaiting Review Card.
+ */
+export const SheetsAwaitingReviewCardResponse = zod.object({
+  "data": zod.object({
+  "pending_count": zod.number().optional(),
+  "sheets": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "kind": zod.string().optional(),
+  "signed_at": zod.string().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().optional()
+}).optional()
+})).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
+})
+
+
+/**
  * @summary My Grades.
  */
 export const MyGradesResponse = zod.object({
@@ -4358,6 +4817,35 @@ export const MyGradesResponse = zod.object({
 })).optional()
 })).optional()
 }).optional()
+})
+
+
+/**
+ * The three numbers a Student's Dashboard shows: the CGPA, the latest Semester's GPA, and
+ * the credit hours earned so far. `cgpa` and `latest_semester_gpa` are **null — never
+ * 0.00** — before any CGPA-counting Grade has been finalized, so the SPA renders a dash and
+ * "not yet calculated" is never mistaken for "you scored zero".
+ *
+ * Gated on `grades.view_own` (§3.2, Student only) and scoped to the acting user's own Student
+ * anchor: there is no id parameter, so another Student's record is unreachable from it.
+ * @summary My Academic Record Card.
+ */
+export const MyAcademicRecordCardResponse = zod.object({
+  "data": zod.object({
+  "cgpa": zod.number().optional(),
+  "latest_semester": zod.object({
+  "id": zod.number().optional(),
+  "term": zod.string().optional(),
+  "year": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "latest_semester_gpa": zod.number().optional(),
+  "earned_credit_hours": zod.number().optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 

@@ -14,6 +14,7 @@ use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Grading\Internal\Support\IncompleteDeadlineResolver;
+use Modules\Grading\Internal\Support\OutstandingIncompleteQueue;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -49,45 +50,29 @@ class IncompleteController
      */
     public function outstanding(
         Request $request,
-        EnrollmentRecords $enrollments,
+        OutstandingIncompleteQueue $queue,
         CourseCatalog $courses,
         StudentDirectory $students,
         Directory $directory,
         IncompleteDeadlineResolver $deadlines,
     ): JsonResponse {
-        $offeringIds = array_flip(array_map(
-            fn (OfferingSummary $offering): int => $offering->id,
-            $enrollments->offeringsTaughtBy($this->actingUserId($request)),
-        ));
+        // "Which outstanding Incompletes are mine" is one question with one answer, shared with
+        // the Dashboard Card that summarises this screen (phase 4.5, ticket 08), so the two can
+        // never disagree about what is waiting on the acting Instructor.
+        ['incompletes' => $outstanding, 'enrollments' => $enrollmentsByIncomplete] =
+            $queue->forInstructor($this->actingUserId($request));
 
-        $outstanding = Incomplete::query()
-            ->whereNull('resolved_grade_id')
-            ->whereNull('converted_at')
-            ->orderBy('id')
-            ->get();
-
-        // Resolve every Incomplete's Enrollment once, dropping any outside the acting
-        // Instructor's own Offerings — the same "which courses are mine" scope the Sheet list
-        // reads, applied here since an Incomplete carries no Offering column of its own.
-        $mine = [];
-        foreach ($outstanding as $incomplete) {
-            $enrollment = $enrollments->findEnrollment((int) $incomplete->enrollment_id);
-            if ($enrollment !== null && isset($offeringIds[$enrollment->courseOfferingId])) {
-                $mine[(int) $incomplete->getKey()] = $enrollment;
-            }
-        }
-
-        if ($mine === []) {
+        if ($outstanding === []) {
             return response()->json(['data' => []]);
         }
 
         $coursesById = $courses->findMany(array_values(array_unique(array_map(
             fn (EnrollmentSummary $enrollment): int => $enrollment->courseId,
-            $mine,
+            $enrollmentsByIncomplete,
         ))));
         $summaries = $students->findManyByStudentId(array_values(array_unique(array_map(
             fn (EnrollmentSummary $enrollment): int => $enrollment->studentId,
-            $mine,
+            $enrollmentsByIncomplete,
         ))));
         $users = $directory->findMany(array_values(array_map(
             fn (StudentSummary $summary): int => $summary->userId,
@@ -96,11 +81,7 @@ class IncompleteController
 
         $rows = [];
         foreach ($outstanding as $incomplete) {
-            $enrollment = $mine[(int) $incomplete->getKey()] ?? null;
-            if ($enrollment === null) {
-                continue;
-            }
-
+            $enrollment = $enrollmentsByIncomplete[(int) $incomplete->getKey()];
             $summary = $summaries[$enrollment->studentId] ?? null;
 
             $rows[] = [

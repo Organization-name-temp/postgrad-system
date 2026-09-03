@@ -181,4 +181,34 @@ trait SeedsAcademicWorld
             );
         }
     }
+
+    /**
+     * A Pending Initial request resting in the Advisor's queue (idempotent — one Pending per
+     * student+semester). Backdated a couple of days so the queue's oldest-first order reads
+     * sensibly on seed day, and so an Advisee Requests Dashboard Card has a real age to show.
+     *
+     * @param  list<array{offering: CourseOffering, mode: RegistrationMode}>  $lines
+     */
+    private function pendingRequest(int $studentId, Semester $semester, array $lines): void
+    {
+        if (RegistrationRequest::hasPendingFor($studentId, (int) $semester->getKey())) {
+            return;
+        }
+
+        $request = RegistrationRequest::create([
+            'student_id' => $studentId,
+            'semester_id' => $semester->getKey(),
+            'kind' => RegistrationKind::Initial,
+            'status' => RegistrationStatus::Pending,
+        ]);
+        $request->forceFill(['created_at' => Carbon::now()->subDays(2)])->save();
+
+        foreach ($lines as $line) {
+            $request->lines()->create([
+                'course_offering_id' => $line['offering']->getKey(),
+                'mode' => $line['mode'],
+                'decision' => null,
+            ]);
+        }
+    }
 }

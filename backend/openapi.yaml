@@ -618,6 +618,88 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/admin/cards/administration:
+    get:
+      summary: 'Administration Card.'
+      operationId: administrationCard
+      description: "The shape of the system at a glance — how many Users exist and how many Role assignments\nthey hold between them — over the most recent Audit Log activity, linking into the\nadministration surfaces.\n\nThe two counts are aggregate `COUNT`s, never a materialised collection counted in PHP, so the\nCard costs two scalar queries however large the installation grows. They are deliberately two\ndifferent numbers: a User may hold several Roles (`multi@` holds two), which is the fact the\nwhole permission-union Dashboard rests on, so `role_assignment_count` is not a synonym for\n`user_count` and reading them side by side is what shows an administrator that.\n\nThe activity is a **bounded recent-activity read** of the append-only log: the newest few\nentries, newest first, each as its action key, the acting User (id and name, `null` for an\nentry with no actor — a failed sign-in has none), and when it happened. It is emphatically\n**not** the Phase 7 Audit Log *Report*: there is no filter, no date range, no pagination and\nno export, because a Card is fixed, scoped and summary while a Report is filterable,\nparameterised and cross-cutting (spec §Glossary). Phase 7 builds the Report beside this Card,\nnot out of it.\n\nAn empty Audit Log returns an empty list and the SPA says so in words — a fresh installation\nwith nothing recorded yet is a legitimate state, never an error.\n\nGated on the R09/R10 Role by the `admin` middleware; every other role, and every\nunauthenticated request, is refused."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    user_count: 24
+                    role_assignment_count: 27
+                    recent_activity:
+                      -
+                        id: 91
+                        action: student.admitted
+                        actor_user_id: 7
+                        actor_name: 'Dr. Dean'
+                        at: '2026-08-10T09:15:00+00:00'
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      user_count:
+                        type: integer
+                        example: 24
+                      role_assignment_count:
+                        type: integer
+                        example: 27
+                      recent_activity:
+                        type: array
+                        example:
+                          - id: 91
+                            action: student.admitted
+                            actor_user_id: 7
+                            actor_name: 'Dr. Dean'
+                            at: '2026-08-10T09:15:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 91
+                            action:
+                              type: string
+                              example: student.admitted
+                            actor_user_id:
+                              type: integer
+                              example: 7
+                            actor_name:
+                              type: string
+                              example: 'Dr. Dean'
+                            at:
+                              type: string
+                              example: '2026-08-10T09:15:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Administration
+      security: []
   /api/v1/admission-cycles/open:
     get:
       summary: 'List currently-open Admission Cycles.'
@@ -2581,6 +2663,54 @@ paths:
                   example: 2
               required:
                 - interview_slot_id
+      security: []
+  /api/v1/admissions/cards/my-application:
+    get:
+      summary: 'My Application Card.'
+      operationId: myApplicationCard
+      description: "Where the acting Applicant's Application stands: its current status and when it entered that\nstatus. The SPA renders the status as a chip and picks the \"what happens next\" copy from the\nstatus itself, which is why the status travels as its enum value and never as a sentence —\nthe next action is a rendering of a state the domain already has, not a new fact about it.\n\nThe Applicant owns one Application per Cycle, so the most recent is theirs — the same rule\nthe applicant wizard's `ResolvesCurrentApplication` applies, but resolved here to **null**\nrather than to its 404: a user with no Application at all, possible between account creation\nand the first draft and true of every non-applicant, gets `{\"data\": null}` and the Card's\nempty state, because an Applicant who has not started is a legitimate state and not an error.\nThat `null` deliberately gets no `@response` scenario of its own: a scalar-null `data` beside\nan object one makes Scribe emit a *union* response type, and the generated client then cannot\nread the payload at all.\n\nGated on `application.view_status` (§3.2 — Applicant / Student Affairs / Dean) and inherently\nscoped on top of that: it reads the acting user's own Application and takes no id, so another\napplicant's is unreachable from it.\n\nThe SPA nonetheless gates the Card on the **Applicant Role**, not on that Permission: an\nadministrator inherits it (ADR-0008) and holds no Application, so a Permission-gated Card\nwould sit permanently empty on their Dashboard. The Permission decides who may *ask*; holding\nan Application decides who has anything to see."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    status: under_sa_review
+                    status_entered_at: '2026-07-10T10:00:00+00:00'
+                    finalized_at: '2026-07-10T10:00:00+00:00'
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: under_sa_review
+                      status_entered_at:
+                        type: string
+                        example: '2026-07-10T10:00:00+00:00'
+                      finalized_at:
+                        type: string
+                        example: '2026-07-10T10:00:00+00:00'
+                    description: "The acting Applicant's latest Application, or null when none exists."
+                    nullable: true
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - data
+                  - meta
+      tags:
+        - Admissions
       security: []
   /api/v1/interviews/assigned:
     get:
@@ -4598,6 +4728,102 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/admissions/cards/screening-queue:
+    get:
+      summary: 'Screening Queue Card.'
+      operationId: screeningQueueCard
+      description: "How much screening work is waiting: how many Applications are pending, **how many of those\nare overdue**, and the oldest few with their age — closing SRS FR-ADM-005.5, which has been\nunbuilt since Phase 2 because there was no dashboard to display it on.\n\nAging is the business-day count since the Application entered review (the Egyptian\nFriday/Saturday weekend does not count) and the threshold is the configured screening SLA —\nboth read from {@see ReviewSla}, the same seam the `admissions:flag-overdue` command uses, so\nthis Card and that notification always agree. Neither is stored: the age is recomputed on\nevery read from the timeline.\n\n**Overdue is a count and a visual distinction, nothing more.** It blocks nothing, changes no\nstatus and appends no timeline row, exactly as the existing flag-and-notify command does not.\n\n`sla_days` travels with the counts so the SPA can say *why* something is overdue without\nhard-coding the university's threshold. An empty queue returns zeros and an empty list, and\nthe SPA renders the shared empty state rather than a bare `0`.\n\nGated on `application.screen` (§3.2 — Student Affairs / Dean).\n\nThe empty queue is described above rather than given its own `@response` scenario, for the same\nreason the Card above has only one: an empty `applications` list beside a populated one makes\nScribe emit a union response type the generated client cannot read."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    pending_count: 6
+                    overdue_count: 2
+                    sla_days: 5
+                    applications:
+                      -
+                        id: 1
+                        status: under_sa_review
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        age_days: 7
+                        is_overdue: true
+                        review_entered_at: '2026-07-10T10:00:00+00:00'
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      pending_count:
+                        type: integer
+                        example: 6
+                      overdue_count:
+                        type: integer
+                        example: 2
+                      sla_days:
+                        type: integer
+                        example: 5
+                      applications:
+                        type: array
+                        example:
+                          - id: 1
+                            status: under_sa_review
+                            name_en: 'Sara Applicant'
+                            name_ar: 'سارة المتقدمة'
+                            age_days: 7
+                            is_overdue: true
+                            review_entered_at: '2026-07-10T10:00:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            status:
+                              type: string
+                              example: under_sa_review
+                            name_en:
+                              type: string
+                              example: 'Sara Applicant'
+                            name_ar:
+                              type: string
+                              example: 'سارة المتقدمة'
+                            age_days:
+                              type: integer
+                              example: 7
+                            is_overdue:
+                              type: boolean
+                              example: true
+                            review_entered_at:
+                              type: string
+                              example: '2026-07-10T10:00:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
   /api/v1/dean/applications:
     get:
       summary: 'Dean review queue.'
@@ -5245,6 +5471,51 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/admissions/cards/admission-decisions:
+    get:
+      summary: 'Admission Decisions Card.'
+      operationId: admissionDecisionsCard
+      description: "How many Applications are waiting on the acting Dean's decision, linking into the decisions\nqueue. Admissions decisions are the last step before an Applicant becomes a Student, and\nuntil now nothing told a Dean that applicants were waiting on them.\n\nThe count is **scoped to the Dean's own Faculty** and the scope is not re-derived here: the\nCard reads {@see ResolvesQueuePrograms::awaitingDecisionQueue()}, the same faculty-scoped\nderivation the decisions queue itself lists, so the Card and that screen can never disagree\nabout what a Dean is responsible for and one Dean's Card never counts another Faculty's\nApplications. A Dean with no assigned Faculty counts nothing, which is the existing rule for\nevery Dean surface rather than a new one.\n\nFaculty scoping resolves `application → primary_program_id → facultyId` through the\nCatalog\\Public facade (ADR-0012), which SQL cannot express across the module seam, so the\nqueue is materialised and counted — the same trade the Screening Queue Card documents, and\nbounded the same way: by the work actually waiting on one reviewer.\n\nAn administrator sees the queue unscoped (ADR-0015), consistent with the screen; they are\nnot shown this Card, because a Dashboard for an administrator is the administration set\nrather than the union of every queue they inherit (ADR-0024).\n\nGated on `applicant.decide` (§3.2 — Dean only). Zero waiting is zero, and the SPA renders\nthe shared empty state rather than a bare `0`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    pending_count: 3
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      pending_count:
+                        type: integer
+                        example: 3
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
   '/api/v1/documents/{document_ulid}':
     get:
       summary: 'Stream a document.'
@@ -6239,6 +6510,97 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/calendar/cards/semester-windows:
+    get:
+      summary: 'Semester and Open Windows Card.'
+      operationId: semesterAndOpenWindowsCard
+      description: "The live Semester, which of its period windows are open right now, and the next date due.\nThe Semester is the one **running** (start ≤ now ≤ end), or — when no term is running —\nthe one whose registration window is open, which is the term an administrator is\nconfiguring. `open_windows` is a list because the windows overlap: registration may still\nbe open past the semester start, while `current_period` names the single phase the\nSemester reads as. Every field is `null`/empty when no Semester is live at all, so the\nCard renders its empty state rather than an error.\n\nGated on `calendar.manage` (§3.2 — Student Affairs / Dean; administrators inherit it).\n\nThe empty case is described above rather than given its own `@response` scenario: a second\n200 whose body is a *different shape* — nulls where the first has objects — makes Scribe emit\na union response type, and the generated Orval client then cannot read either branch. Same\nshape, several scenarios is fine; different shapes are not."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    semester:
+                      id: 1
+                      term: Fall
+                      year: 2026
+                      name_en: 'Fall 2026'
+                      name_ar: 'خريف 2026'
+                    current_period: add_drop
+                    open_windows:
+                      - registration
+                      - add_drop
+                    next_deadline:
+                      window: add_drop
+                      at: '2026-09-14T00:00:00+00:00'
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      semester:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          term:
+                            type: string
+                            example: Fall
+                          year:
+                            type: integer
+                            example: 2026
+                          name_en:
+                            type: string
+                            example: 'Fall 2026'
+                          name_ar:
+                            type: string
+                            example: 'خريف 2026'
+                      current_period:
+                        type: string
+                        example: add_drop
+                      open_windows:
+                        type: array
+                        example:
+                          - registration
+                          - add_drop
+                        items:
+                          type: string
+                      next_deadline:
+                        type: object
+                        properties:
+                          window:
+                            type: string
+                            example: add_drop
+                          at:
+                            type: string
+                            example: '2026-09-14T00:00:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Calendar
+      security: []
   /api/v1/catalog/tree:
     get:
       summary: 'The catalog browse tree.'
@@ -6373,6 +6735,55 @@ paths:
                                     items:
                                       type: object
                                       properties: { id: { type: integer, example: 1 }, code: { type: string, example: MSC-CE }, name_en: { type: string, example: 'MSc in Computer Engineering' }, name_ar: { type: string, example: 'ماجستير في هندسة الحاسوب' }, degree_level: { type: string, example: MSc }, is_active: { type: boolean, example: true }, categories: { type: array, example: [{ category: Preparatory, required_ch: 6, courses: [{ id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }] }], items: { type: object, properties: { category: { type: string, example: Preparatory }, required_ch: { type: integer, example: 6 }, courses: { type: array, example: [{ id: 10, code: PRE401, name_en: 'English for Academic Purposes', name_ar: 'الإنجليزية للأغراض الأكاديمية', level: 400, is_active: true }], items: { type: object, properties: { id: { type: integer, example: 10 }, code: { type: string, example: PRE401 }, name_en: { type: string, example: 'English for Academic Purposes' }, name_ar: { type: string, example: 'الإنجليزية للأغراض الأكاديمية' }, level: { type: integer, example: 400 }, is_active: { type: boolean, example: true } } } } } } } }
+      tags:
+        - Catalog
+      security: []
+  /api/v1/catalog/cards/summary:
+    get:
+      summary: 'Catalog Summary Card.'
+      operationId: catalogSummaryCard
+      description: "How many Programs and Courses are **active** — the answer to \"is the catalog populated?\"\nwithout a navigation, linking into the catalog itself. Both are aggregate `COUNT`s, never a\nmaterialised collection counted in PHP, so the Card costs two scalar queries however large\nthe catalog grows. A catalog with nothing active returns zeros and the SPA renders the\nshared empty state rather than a bare `0`.\n\nGated on `catalog.manage` (§3.2 — Department Head / Dean; administrators inherit it)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    active_program_count: 6
+                    active_course_count: 42
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      active_program_count:
+                        type: integer
+                        example: 6
+                      active_course_count:
+                        type: integer
+                        example: 42
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
       tags:
         - Catalog
       security: []
@@ -11680,6 +12091,95 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/enrollment/cards/my-registration:
+    get:
+      summary: 'My Registration Card.'
+      operationId: myRegistrationCard
+      description: "The acting Student's current-semester registration at a glance: the credit hours they are\ncarrying with the **6–12 bounds alongside them** — so the number is anchored rather than\nleft to be judged — the period that is currently open, and the date it closes. The SPA sends\nthe Student to whichever surface that period actually allows, so the Dashboard never\noffers an action the server would refuse.\n\nThe Semester is the one **running** now, or — before the term starts — the one open for\nregistration, which is the Semester a Student is registering into. Period state is read from\nADR-0018's derived windows and never from a stored flag; the bounds come from the existing\n{@see CreditHoursValidator}'s configuration, so the Card cannot disagree with what the cart\nwill enforce. `period_ends_at` is null when no window is open (`closed`), because that is a\nperiod rather than a window and giving it a closing date would be a fiction.\n\nGated on `courses.register_self` (§3.2, Student only) and scoped to the acting user's own\nStudent anchor — there is no id parameter, so another Student's load is unreachable from it.\n\nThe no-semester-live case is described above rather than given its own `@response` scenario: a\nsecond 200 whose body is a *different shape* — a null Semester where the first has an object —\nmakes Scribe emit a union response type, and the generated Orval client then cannot read\neither branch."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    semester:
+                      id: 1
+                      term: Fall
+                      year: 2026
+                      name_en: 'Fall 2026'
+                      name_ar: 'خريف 2026'
+                    current_period: add_drop
+                    period_ends_at: '2026-09-14T00:00:00+00:00'
+                    credit_hours: 9
+                    min_credit_hours: 6
+                    max_credit_hours: 12
+                    enrollment_count: 3
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      semester:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          term:
+                            type: string
+                            example: Fall
+                          year:
+                            type: integer
+                            example: 2026
+                          name_en:
+                            type: string
+                            example: 'Fall 2026'
+                          name_ar:
+                            type: string
+                            example: 'خريف 2026'
+                      current_period:
+                        type: string
+                        example: add_drop
+                      period_ends_at:
+                        type: string
+                        example: '2026-09-14T00:00:00+00:00'
+                      credit_hours:
+                        type: integer
+                        example: 9
+                      min_credit_hours:
+                        type: integer
+                        example: 6
+                      max_credit_hours:
+                        type: integer
+                        example: 12
+                      enrollment_count:
+                        type: integer
+                        example: 3
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record to register with.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record to register with.'
+      tags:
+        - Enrollment
+      security: []
   /api/v1/registration/on-behalf/students:
     get:
       summary: 'The students the composer may register on behalf of.'
@@ -13466,6 +13966,93 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/enrollment/cards/advisee-requests:
+    get:
+      summary: 'Advisee Requests Card.'
+      operationId: adviseeRequestsCard
+      description: "The registration requests waiting on the acting reviewer: how many are Pending, how many\nadvisees they hold, and the oldest few by student name — linking into the advisor queue,\nwhich until now was discoverable only by opening it.\n\nScoped by the one trait the queue itself uses ({@see ScopesToAdvisees}): an **Advisor** sees\nonly their **live** advisee set, resolved at call time, so the Card follows advisor\nreassignment exactly as the queue does; **Student Affairs** and an administrator review\nunscoped, since scoping them to \"their advisees\" would show nothing and their remit is to\nunblock any request. `advisee_count` is therefore null for an unscoped reviewer — they hold\nno advisees, which is not the same fact as holding none.\n\nGated on `registration.approve` (§3.2 — Advisor / Student Affairs).\n\nThe empty queue is described above rather than given its own `@response` scenario: an empty\n`requests` list beside a populated one makes Scribe emit a union response type the generated\nclient cannot read."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    pending_count: 2
+                    advisee_count: 7
+                    requests:
+                      -
+                        id: 1
+                        student_id: 5
+                        student_name: 'Sara Student'
+                        university_id: 2026-MSC-CE-0001
+                        course_count: 2
+                        submitted_at: '2026-08-02T09:00:00+00:00'
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      pending_count:
+                        type: integer
+                        example: 2
+                      advisee_count:
+                        type: integer
+                        example: 7
+                      requests:
+                        type: array
+                        example:
+                          - id: 1
+                            student_id: 5
+                            student_name: 'Sara Student'
+                            university_id: 2026-MSC-CE-0001
+                            course_count: 2
+                            submitted_at: '2026-08-02T09:00:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            student_id:
+                              type: integer
+                              example: 5
+                            student_name:
+                              type: string
+                              example: 'Sara Student'
+                            university_id:
+                              type: string
+                              example: 2026-MSC-CE-0001
+                            course_count:
+                              type: integer
+                              example: 2
+                            submitted_at:
+                              type: string
+                              example: '2026-08-02T09:00:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Enrollment
+      security: []
   /api/v1/offerings/mine:
     get:
       summary: 'The signed-in Instructor''s offerings ("My Offerings").'
@@ -15638,6 +16225,219 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/grading/cards/grade-sheets:
+    get:
+      summary: 'My Grade Sheets Card.'
+      operationId: myGradeSheetsCard
+      description: "The acting user's teaching load for their current term and what it owes: the Offerings, how\nmany of their Grade Sheets are **not yet Finalized**, and which are past the Semester's\nGrade-Submission Deadline with nothing finalized. `offerings` carries the first few rows so\nthe Card links into each Offering's Sheet, while the counts are over the whole term.\n\nThe overdue flag is a **nudge, not a gate**: nothing here is blocked, changed or\nauto-actioned by it — this is a second surface for the flag phase 4 ticket 09 already\nraises, read from the same derived predicate.\n\nWhose Offerings, exactly, is the rule the Grade Sheets screen already applies: an\nInstructor's own, or — for a **central-entry** user, `grades.enter` without\n`grades.finalize`, which by §3.2 is Student Affairs — every Offering, because grades\narriving on paper belong to Offerings the records office does not teach. `meta.scope` says\nwhich list came back (`own` / `central`), exactly as that screen's endpoint does.\n\nThe term is derived from the Offerings themselves — the latest-starting Semester the user\nteaches in that has already begun — because grades are keyed in *after* a term ends, when\nno Semester is running and the marks are still owed. A user who teaches nothing, or only in\nterms still ahead, gets a null Semester and the Card's empty state rather than an error.\n\nGated on `grades.enter` (§3.2 — Instructor / Student Affairs).\n\nThe empty case is described above rather than given its own `@response` scenario: a second 200\nwhose body is a *different shape* — nulls and empty lists where the first has objects — makes\nScribe emit a union response type, and the generated Orval client then cannot read either\nbranch."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    semester:
+                      id: 2
+                      term: Fall
+                      year: 2026
+                      name_en: 'Fall 2026'
+                      name_ar: 'خريف 2026'
+                    grade_submission_deadline_at: '2027-01-10T00:00:00+00:00'
+                    offering_count: 2
+                    unfinalized_count: 1
+                    overdue_count: 1
+                    offerings:
+                      -
+                        offering_id: 3
+                        sheet_status: Draft
+                        is_overdue: true
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                          department_id: 1
+                  meta:
+                    scope: own
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      semester:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          term:
+                            type: string
+                            example: Fall
+                          year:
+                            type: integer
+                            example: 2026
+                          name_en:
+                            type: string
+                            example: 'Fall 2026'
+                          name_ar:
+                            type: string
+                            example: 'خريف 2026'
+                      grade_submission_deadline_at:
+                        type: string
+                        example: '2027-01-10T00:00:00+00:00'
+                      offering_count:
+                        type: integer
+                        example: 2
+                      unfinalized_count:
+                        type: integer
+                        example: 1
+                      overdue_count:
+                        type: integer
+                        example: 1
+                      offerings:
+                        type: array
+                        example:
+                          -
+                            offering_id: 3
+                            sheet_status: Draft
+                            is_overdue: true
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                              department_id: 1
+                        items:
+                          type: object
+                          properties:
+                            offering_id:
+                              type: integer
+                              example: 3
+                            sheet_status:
+                              type: string
+                              example: Draft
+                            is_overdue:
+                              type: boolean
+                              example: true
+                            course:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                code:
+                                  type: string
+                                  example: DEP501
+                                name_en:
+                                  type: string
+                                  example: 'Advanced Algorithms'
+                                name_ar:
+                                  type: string
+                                  example: 'خوارزميات متقدمة'
+                                level:
+                                  type: integer
+                                  example: 500
+                                total_ch:
+                                  type: integer
+                                  example: 3
+                                research_type:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                is_active:
+                                  type: boolean
+                                  example: true
+                                department_id:
+                                  type: integer
+                                  example: 1
+                  meta:
+                    type: object
+                    properties:
+                      scope:
+                        type: string
+                        example: own
+                    description: 'Card metadata, including the resolved scope.'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Grading
+      security: []
+  /api/v1/grading/cards/incompletes:
+    get:
+      summary: 'Outstanding Incompletes Card.'
+      operationId: outstandingIncompletesCard
+      description: "How many Incompletes the acting Instructor has declared that are still waiting on the\noutstanding mark, and **when the nearest one is due** — the Card that earns its place by\npreventing real harm, since an Incomplete left unresolved past its deadline is converted to\na Fail Withdrawal by the one state-changing scheduled command in the system. Surfacing the\nnearest deadline on sign-in gives the Instructor the chance to resolve it first.\n\nThe set is the same one the resolution screen lists — both read\n{@see OutstandingIncompleteQueue} — so the Card can never count something the screen behind\nit does not show.\n\nThe deadline is **derived, never stored**: the following Semester's start plus the\nconfigured offset, read through {@see IncompleteDeadlineResolver} on every request\n(ADR-0018), so correcting a Semester's `starts_at` moves every outstanding deadline with it\nand this Card with them. The resolver is asked once per Enrollment Semester rather than once\nper Incomplete, since a term's answer is the same for every Incomplete declared in it.\n\n`without_deadline_count` is the case the conversion command already handles explicitly and\nthis Card must not paper over: an Incomplete whose following Semester **does not exist yet**\nhas no computable deadline. It is counted and reported as having none, never given a\nfabricated one, and it never errors the Card — an admin's omission in the Calendar does not\nhide an Instructor's work from them.\n\nGated on `grades.enter` (§3.2 — Instructor / Student Affairs). A central-entry user teaches\nno Offerings of their own, so they get the empty state, exactly as the resolution screen\nalready shows them."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    outstanding_count: 2
+                    nearest_deadline: '2026-11-03T00:00:00+00:00'
+                    without_deadline_count: 1
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      outstanding_count:
+                        type: integer
+                        example: 2
+                      nearest_deadline:
+                        type: string
+                        example: '2026-11-03T00:00:00+00:00'
+                      without_deadline_count:
+                        type: integer
+                        example: 1
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Grading
+      security: []
   '/api/v1/grading/sheets/{grade_sheet_id}/sign':
     post:
       summary: 'Sign the Sheet.'
@@ -16352,6 +17152,131 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/grading/cards/sheets-awaiting-review:
+    get:
+      summary: 'Sheets Awaiting Review Card.'
+      operationId: sheetsAwaitingReviewCard
+      description: "The Department Head's review queue at a glance: how many Submitted Grade Sheets are waiting\non them and which Offerings the oldest few belong to, linking into the review screen — so an\nInstructor blocked on a Head becomes visible to that Head on sign-in.\n\nThe Permission opens the Card; the **assignment** scopes its contents, exactly as the review\nqueue itself works. Both read the one seam ({@see DepartmentHeadSheetQueue}), so this Card\ncounts precisely what that queue would show — including the case that is easy to miss: a\nHead assigned **university-wide** reaches the department-less Preparatory Sheets (ADR-0010)\nand a Department-scoped Head does not. A Department with no Head assigned is on nobody's\nCard, and that is not an error.\n\nGated on `grades.finalize`, which Instructors hold too (§3.2) — an Instructor who heads no\nDepartment therefore gets an empty queue rather than a 403, because the assignment, not the\nPermission, is what fills it.\n\nThe empty queue is described above rather than given its own `@response` scenario, for the\nsame reason as the Card above: an empty `sheets` list beside a populated one makes Scribe emit\na union response type the generated client cannot read."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    pending_count: 2
+                    sheets:
+                      -
+                        id: 4
+                        course_offering_id: 3
+                        kind: Initial
+                        signed_at: '2026-08-10T09:00:00+00:00'
+                        course:
+                          id: 1
+                          code: DEP501
+                          name_en: 'Advanced Algorithms'
+                          name_ar: 'خوارزميات متقدمة'
+                          level: 500
+                          total_ch: 3
+                          research_type: null
+                          is_active: true
+                          department_id: 1
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      pending_count:
+                        type: integer
+                        example: 2
+                      sheets:
+                        type: array
+                        example:
+                          -
+                            id: 4
+                            course_offering_id: 3
+                            kind: Initial
+                            signed_at: '2026-08-10T09:00:00+00:00'
+                            course:
+                              id: 1
+                              code: DEP501
+                              name_en: 'Advanced Algorithms'
+                              name_ar: 'خوارزميات متقدمة'
+                              level: 500
+                              total_ch: 3
+                              research_type: null
+                              is_active: true
+                              department_id: 1
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            course_offering_id:
+                              type: integer
+                              example: 3
+                            kind:
+                              type: string
+                              example: Initial
+                            signed_at:
+                              type: string
+                              example: '2026-08-10T09:00:00+00:00'
+                            course:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                code:
+                                  type: string
+                                  example: DEP501
+                                name_en:
+                                  type: string
+                                  example: 'Advanced Algorithms'
+                                name_ar:
+                                  type: string
+                                  example: 'خوارزميات متقدمة'
+                                level:
+                                  type: integer
+                                  example: 500
+                                total_ch:
+                                  type: integer
+                                  example: 3
+                                research_type:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                is_active:
+                                  type: boolean
+                                  example: true
+                                department_id:
+                                  type: integer
+                                  example: 1
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Grading
+      security: []
   /api/v1/grading/my-grades:
     get:
       summary: 'My Grades.'
@@ -16619,6 +17544,83 @@ paths:
                                     type: string
                                     example: null
                                     nullable: true
+        403:
+          description: 'no student record'
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'You do not have a student record.'
+                properties:
+                  message:
+                    type: string
+                    example: 'You do not have a student record.'
+      tags:
+        - Grading
+      security: []
+  /api/v1/grading/cards/academic-record:
+    get:
+      summary: 'My Academic Record Card.'
+      operationId: myAcademicRecordCard
+      description: "The three numbers a Student's Dashboard shows: the CGPA, the latest Semester's GPA, and\nthe credit hours earned so far. `cgpa` and `latest_semester_gpa` are **null — never\n0.00** — before any CGPA-counting Grade has been finalized, so the SPA renders a dash and\n\"not yet calculated\" is never mistaken for \"you scored zero\".\n\nGated on `grades.view_own` (§3.2, Student only) and scoped to the acting user's own Student\nanchor: there is no id parameter, so another Student's record is unreachable from it."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    cgpa: 3.42
+                    latest_semester:
+                      id: 3
+                      term: Fall
+                      year: 2025
+                      name_en: 'Fall 2025'
+                      name_ar: 'خريف 2025'
+                    latest_semester_gpa: 3.67
+                    earned_credit_hours: 12
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      cgpa:
+                        type: number
+                        example: 3.42
+                      latest_semester:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          term:
+                            type: string
+                            example: Fall
+                          year:
+                            type: integer
+                            example: 2025
+                          name_en:
+                            type: string
+                            example: 'Fall 2025'
+                          name_ar:
+                            type: string
+                            example: 'خريف 2025'
+                      latest_semester_gpa:
+                        type: number
+                        example: 3.67
+                      earned_credit_hours:
+                        type: integer
+                        example: 12
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: 'no student record'
           content:

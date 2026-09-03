@@ -457,6 +457,86 @@ round). **§5's GPA/CGPA agenda is closed by this phase** — see below.
   the student sees their letter, Semester GPA and CGPA; the conversion command runs and the
   deferred student's Incomplete has become a Fail Withdrawal.
 
+### Phase 4.5 — Dashboards (SRS §2.3, FR-ADM-005.5)
+A **composition slice** inserted between Phase 4 and Phase 5, exactly as Phase 0.5 was inserted
+between Phase 0 and Phase 1 — Phases 5, 6 and 7 keep their numbers and order. It exists because
+SRS §2.3's "role-based dashboards for all user types" is a scope bullet **this ROADMAP never
+assigned to a phase**: four phases of domain machinery had shipped and every one of them was
+reachable only by navigating into it, while the authenticated Dashboard was still Phase 0's
+wall of raw permission chips. The composition rule is recorded in
+[ADR-0024](./adr/0024-permission-composed-dashboard-cards.md); the two glossary entries
+(*Dashboard*, *Dashboard Card*) are in [CONTEXT.md](../CONTEXT.md).
+
+- **The composition rule (ADR-0024):** a Dashboard is composed from the acting **User's own
+  access**, never selected by a single Role, and there is **no "view as role" switch** — a User
+  holding several Roles sees the **union** of their Cards on one page. This deliberately departs
+  from the wording of [SRS §2.3](./SRS.md) and [architecture.md](./architecture.md) ("each role
+  sees a tailored dashboard"), because the system already models a User as holding many Roles
+  whose Permissions union, and the side nav has been built this way since Phase 0.5.
+- **The gates:** Permission by default; **Role for a persona Card** whose data hangs off a record
+  the acting user may not possess (a Student anchor, an Applicant's Application) — the existing
+  convention since Phase 2, not a new mechanism, since an administrator inherits every Permission
+  under [ADR-0008](./adr/0008-rbac-enums-static-matrix.md) and holds none of those records.
+  **Administrators get an explicit Card set**, not the union: Administration plus the two
+  configuration Cards, and no queue or persona Card.
+- **Twelve Cards**, each drawn only from a feature that had already shipped, each owned by the
+  module that owns its data: My Application, Screening Queue (closing **SRS FR-ADM-005.5**, never
+  built since Phase 2), Admission Decisions, My Registration, Advisee Requests, My Grade Sheets,
+  Sheets Awaiting Review, My Academic Record, Outstanding Incompletes, Semester & Open Windows,
+  Catalog Summary, Administration. **A Card exists because a feature shipped it** — Permission is
+  a Card's gate, never its trigger, so the eight Permissions whose features arrive in Phases 5 and
+  6 contribute no Card and no placeholder.
+- **API:** **one read-only endpoint per Card**, namespaced under its owning module's own `Public`
+  route file and **independently authorized** by its own `can:` (or role) gate — the client's
+  choice of what to request is never the security boundary. Standard `{data, meta}` envelope,
+  **typed domain values only** (ids, codes, enum values, counts, dates) and never pre-rendered
+  display strings, so the SPA renders bilingually from the payload as Notifications does. Counts
+  are aggregate queries; every derived figure (period state, Incomplete deadlines, GPA/CGPA) is
+  read from the derivation that already owns it — never recomputed, never cached.
+- **No new module:** a Dashboard is a view, not a bounded context, and owns no domain language
+  ([ADR-0002](./adr/0002-modular-monolith-seams.md)) — so **no new deptrac edge** either.
+- **Frontend:** the Dashboard **moves out of the auth feature into the app shell** (the route
+  stays `/`), because `eslint-plugin-boundaries` forbids a feature importing another feature —
+  the same reason the permission-filtered side nav lives there. Each Card component lives in the
+  feature that owns its data and the shell composes them from a **declarative
+  permission-to-Card registry** beside the existing nav table. New shared
+  **`<DashboardCard>`** (title, count, rows, empty/loading/error states, action link) encoding the
+  design rules and **no Card names**, the `<StatusChip>` discipline. Cards **fetch and fail
+  independently**. The permission-chip wall is gone; a slim identity header keeps name, roles and
+  the Student's University ID ([ADR-0013](./adr/0013-acceptance-handoff-student-anchor.md)).
+  **No new frontend dependency** — charts explicitly rejected (no chart tokens exist, and RTL +
+  dark + axe would all need inventing for roughly one sparkline).
+- **Seeder:** the canonical `rNN@` accounts were authorization fixtures carrying no data, which is
+  invisible while every screen is a list you navigate into and glaring the moment the Dashboard
+  is made of counts. `r01@` gains a Draft Application, `r02@` becomes a real Student with two
+  graded Semesters (a computable CGPA), `r03@` gains advisees with a pending request, and
+  **`multi@` gains both advisees and Course
+  Offerings** — the one account that demonstrates the composition rule. Still deterministic,
+  idempotent, and inside the reserved `student.*` namespace.
+- **DoD:** Pest feature tests per Card endpoint (authorized payload, **403 for the missing gate**,
+  scoping, empty case) — no unit tests, because the phase adds no domain rule; Vitest + RTL on the
+  page (which Cards render **and which do not**, incl. the multi-role union and the administrator
+  set) and on `<DashboardCard>`'s states; **`dashboard.spec.ts`**, the headline smoke, signing in
+  as seven seeded accounts and asserting each Card set presence *and* absence, with `multi@`'s
+  union and the absence of any role switcher as its central assertion; **axe on the Dashboard
+  across light/dark × EN/AR**. Also **fixed app-wide**: `MuiLink`'s default primary colour was the
+  vivid brand red, ~3.8:1 on the dark surface — the first screen dense enough in links for a
+  dark-mode scan to catch it (design-system.md §12 already named the accessible shade).
+- **Constraint, borrowed from Phase 0.5:** **no new migration, Permission, Role, module or domain
+  rule.** Anything wanting a migration was out of scope by definition.
+- **Deferred:** Cards for features that have not shipped — Academic Standing and the Credit-Hour
+  Summary (Phase 5), transcripts (Phase 6) — each arriving with its own phase, so the Dashboard
+  grows with the system; charts and any new frontend dependency; Card personalisation (reorder,
+  hide, pin, per-user layout); real-time updates (no websocket, ADR-0005); caching the Card
+  payloads; global search (still deferred from Phase 0.5); renaming the four existing `*Panel`
+  components to free the word "Panel"; mobile-specific dashboard layouts beyond the responsive
+  behaviour the design system already gives. **Recorded, not fixed:** deptrac's `App` layer lists
+  five module `Public` layers but neither Admissions nor Notifications, though Phase 2 records
+  adding those edges.
+- **Demo:** sign in as `multi@` and see one page carrying the advisee queue *and* the ungraded
+  grade sheets, with no role switcher anywhere; then as `r09@` and see an administrator's own
+  page rather than everyone else's work queues.
+
 ### Phase 5 — Academic Standing + Credit-Hour Summary + Exemption/Transfer/Waiver (SRS §4.8, §4.5, §4.6)
 - **Derived read models** (on-demand): per-category Credit-Hour Summary (Appendix D
   counting) and Academic Standing (Good/Warning/Probation/Termination-Pending),
@@ -476,6 +556,15 @@ round). **§5's GPA/CGPA agenda is closed by this phase** — see below.
 - **Demo:** view an unofficial transcript; SA issues an official one.
 
 ### Phase 7 — Reporting & polish (SRS §4.12)
+**Keeps its position after Phases 5 and 6.** Three of its eight reports — **Academic Standing,
+Graduation Readiness and Termination** — read models **Phase 5 has not built**, so it cannot be
+pulled forward; that finding is what produced Phase 4.5 (the surface actually wanted was SRS
+§2.3's dashboards, which no phase owned). A **Report is not a Card**: a Card is fixed, scoped to
+the acting user and summary, while a Report is filterable, parameterised and cross-student —
+Phase 4.5's Catalog Summary Card and this phase's enrollment summary report are different
+objects, and the distinction is recorded in [CONTEXT.md](../CONTEXT.md) so it is not
+re-litigated here.
+
 - **Reporting module:** the 8 read-only cross-module reports (enrollment summary,
   application pipeline, GPA distribution, standing, graduation readiness, termination,
   audit log, course registration).

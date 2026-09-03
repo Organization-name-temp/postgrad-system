@@ -5,10 +5,6 @@
  * authority (ADR-0008). Lives in `shared` so any feature can gate on a role without
  * reaching into another feature (eslint-plugin-boundaries).
  *
- * Only the roles the UI actually gates on live here. `ADMIN_ROLES` is the pair that
- * opens the Administration surface (System / Super Administrator) — the first
- * role-gated (not permission-gated) surface, ticket 08.
- *
  * `applicant`, `student` and `instructor` gate the **persona** nav items — "My
  * application", "My registration", "My interviews" — on the user's actual Role, not on
  * an inherited Permission, so an admin (who holds every Permission, ADR-0008) does not
@@ -19,11 +15,16 @@
 export const ROLE = {
   applicant: 'R01',
   student: 'R02',
+  advisor: 'R03',
   instructor: 'R04',
   studentAffairs: 'R05',
   departmentHead: 'R06',
+  dean: 'R07',
+  council: 'R08',
   systemAdmin: 'R09',
   superAdmin: 'R10',
 } as const
 
-export const ADMIN_ROLES: readonly string[] = [ROLE.systemAdmin, ROLE.superAdmin]
+export type RoleCode = (typeof ROLE)[keyof typeof ROLE]
+
+export const ADMIN_ROLES: readonly RoleCode[] = [ROLE.systemAdmin, ROLE.superAdmin]

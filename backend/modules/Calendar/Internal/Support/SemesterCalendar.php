@@ -20,6 +20,16 @@ use Modules\Calendar\Public\SemesterSummary;
  */
 final class SemesterCalendar
 {
+    /** @var array<string, string> */
+    private const DEADLINES = [
+        'registration_closes_at' => 'registrationClosesAt',
+        'add_drop_ends_at' => 'addDropEndsAt',
+        'late_add_ends_at' => 'lateAddEndsAt',
+        'withdrawal_deadline_at' => 'withdrawalDeadlineAt',
+        'ends_at' => 'endsAt',
+        'grade_submission_deadline_at' => 'gradeSubmissionDeadlineAt',
+    ];
+
     public function __construct(
         public readonly CarbonInterface $startsAt,
         public readonly CarbonInterface $endsAt,
@@ -161,5 +171,63 @@ final class SemesterCalendar
             $now->lessThan($this->registrationOpensAt) => 'upcoming',
             default => 'closed',
         };
+    }
+
+    /**
+     * When the period {@see self::currentPeriod()} reports **closes** — the deadline a Student or an
+     * administrator is actually working against — or null when the current period is not a window
+     * that closes: `upcoming` has not opened yet and `closed` has nothing left to close.
+     *
+     * Matched on the period label rather than re-testing the predicates, so it inherits the
+     * precedence above for free and the two answers can never disagree about which window is live.
+     * It lives here, beside the phase vocabulary, for the reason ADR-0018 gives: a consumer must
+     * never re-derive a period answer, and phase 4.5's Dashboard Cards are the second and third
+     * consumers to need this one.
+     */
+    public function currentPeriodEndsAt(CarbonInterface $now): ?CarbonInterface
+    {
+        return match ($this->currentPeriod($now)) {
+            'withdrawal' => $this->withdrawalDeadlineAt,
+            'late_add' => $this->lateAddEndsAt,
+            'add_drop' => $this->addDropEndsAt,
+            'registration' => $this->registrationClosesAt,
+            default => null,
+        };
+    }
+
+    /**
+     * Every registration/change window open at the given moment, in lifecycle order.
+     *
+     * @return list<string>
+     */
+    public function openWindows(CarbonInterface $now): array
+    {
+        return array_values(array_filter([
+            $this->isRegistrationOpen($now) ? 'registration' : null,
+            $this->isInAddDropPeriod($now) ? 'add_drop' : null,
+            $this->isInLateAddPeriod($now) ? 'late_add' : null,
+            $this->isInWithdrawalPeriod($now) ? 'withdrawal' : null,
+        ]));
+    }
+
+    /**
+     * The nearest date strictly after the given moment, with the source field that owns it.
+     *
+     * @return ?array{key: string, at: CarbonInterface}
+     */
+    public function nextDeadline(CarbonInterface $now): ?array
+    {
+        $next = null;
+
+        foreach (self::DEADLINES as $key => $property) {
+            /** @var CarbonInterface $at */
+            $at = $this->{$property};
+
+            if ($at->greaterThan($now) && ($next === null || $at->lessThan($next['at']))) {
+                $next = ['key' => $key, 'at' => $at];
+            }
+        }
+
+        return $next;
     }
 }

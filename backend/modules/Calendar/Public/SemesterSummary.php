@@ -95,6 +95,29 @@ final readonly class SemesterSummary
         return $this->calendar()->currentPeriod($now);
     }
 
+    /**
+     * When the period {@see self::currentPeriod()} reports closes, or null when the current period
+     * is not a window that closes (`upcoming`/`closed`) — the deadline a consumer shows beside the
+     * period name. Phase 4.5's Dashboard Cards read it from here rather than picking the matching
+     * date out of the eight above themselves, so no consumer re-derives which window is live.
+     */
+    public function currentPeriodEndsAt(CarbonInterface $now): ?CarbonInterface
+    {
+        return $this->calendar()->currentPeriodEndsAt($now);
+    }
+
+    /** @return list<string> */
+    public function openWindows(CarbonInterface $now): array
+    {
+        return $this->calendar()->openWindows($now);
+    }
+
+    /** @return ?array{key: string, at: CarbonInterface} */
+    public function nextDeadline(CarbonInterface $now): ?array
+    {
+        return $this->calendar()->nextDeadline($now);
+    }
+
     private function calendar(): SemesterCalendar
     {
         return new SemesterCalendar(

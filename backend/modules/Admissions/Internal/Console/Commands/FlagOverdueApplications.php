@@ -3,9 +3,8 @@
 namespace Modules\Admissions\Internal\Console\Commands;
 
 use Illuminate\Console\Command;
-use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Models\Application;
-use Modules\Admissions\Internal\Support\BusinessDays;
+use Modules\Admissions\Internal\Support\ReviewSla;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\Contracts\DeanAssignments;
 use Modules\Identity\Public\Contracts\Directory;
@@ -23,9 +22,11 @@ use Modules\Notifications\Public\Enums\NotificationType;
  * only by human action.
  *
  * Age is derived on demand — the business days (Egyptian Fri/Sat weekend excluded) since
- * the timeline entry into the stage, via {@see BusinessDays} — and never stored, so each
- * run re-reads the current state. Re-running therefore re-notifies anything still
- * overdue; that is intended for a hand-run reminder (there is no sent-marker to keep).
+ * the timeline entry into the stage — and never stored, so each run re-reads the current
+ * state. Re-running therefore re-notifies anything still overdue; that is intended for a
+ * hand-run reminder (there is no sent-marker to keep). Both the arithmetic and the
+ * per-stage threshold come from {@see ReviewSla}, the seam the Screening Queue Dashboard
+ * Card reads too (phase 4.5), so a Card can never disagree with a notification.
  *
  * Cross-module reads stay behind the Public facades (ADR-0012): reviewers through
  * Identity's {@see Directory}/{@see DeanAssignments}, an application's Faculty through
@@ -66,10 +67,7 @@ class FlagOverdueApplications extends Command
             return 0;
         }
 
-        $overdue = $this->overdueIn(
-            ApplicationStatus::UnderSAReview,
-            (int) config('admissions.sa_screening_sla_days'),
-        );
+        $overdue = $this->overdueIn(ReviewSla::screening());
 
         foreach ($overdue as [$application, $ageDays]) {
             foreach ($recipients as $recipient) {
@@ -92,10 +90,7 @@ class FlagOverdueApplications extends Command
      */
     private function flagDeanReviewOverdue(Notifier $notifier, DeanAssignments $assignments, ProgramCatalog $catalog): int
     {
-        $overdue = $this->overdueIn(
-            ApplicationStatus::UnderDeanReview,
-            (int) config('admissions.dean_review_sla_days'),
-        );
+        $overdue = $this->overdueIn(ReviewSla::deanReview());
 
         $flagged = 0;
 
@@ -137,33 +132,29 @@ class FlagOverdueApplications extends Command
     }
 
     /**
-     * The applications resting in `$status` whose business-day age since entering it
-     * exceeds `$slaDays`, each paired with that age. Aging is derived from the loaded
-     * timeline (never stored), so the relation is eager-loaded.
+     * The applications resting in the SLA's stage whose business-day age since entering it exceeds
+     * its threshold, each paired with that age. Both rules — the business-day arithmetic and the
+     * configured threshold — come from {@see ReviewSla}, the one seam the Screening Queue Dashboard
+     * Card reads too, so a Card and this notification can never disagree. Aging is derived from the
+     * loaded timeline (never stored), so the relation is eager-loaded.
      *
      * @return list<array{0: Application, 1: int}>
      */
-    private function overdueIn(ApplicationStatus $status, int $slaDays): array
+    private function overdueIn(ReviewSla $sla): array
     {
         $applications = Application::query()
             ->with('statusTransitions')
-            ->where('status', $status)
+            ->where('status', $sla->status)
             ->orderBy('id')
             ->get();
 
         $overdue = [];
 
         foreach ($applications as $application) {
-            $enteredAt = $application->enteredStatusAt($status);
+            $ageDays = $sla->ageInDaysOf($application, now());
 
-            if ($enteredAt === null) {
-                continue;
-            }
-
-            $ageDays = BusinessDays::between($enteredAt, now());
-
-            if ($ageDays > $slaDays) {
-                $overdue[] = [$application, $ageDays];
+            if ($sla->isOverdue($ageDays)) {
+                $overdue[] = [$application, (int) $ageDays];
             }
         }
 

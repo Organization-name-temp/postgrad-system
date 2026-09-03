@@ -234,6 +234,25 @@ it('returns null for an enrollment id that does not exist', function () {
     expect(enrollmentRecords()->findEnrollment(999_999))->toBeNull();
 });
 
+it('resolves several enrollments at once, keyed by id, dropping the ids that resolve to nothing', function () {
+    // The `findMany` shape the Catalog facades already use (phase 4.5, ticket 08): a caller
+    // holding a set of enrollment ids resolves them in one read rather than in a loop.
+    $offering = erOffering(User::factory()->create()->id);
+    $regular = erEnroll($offering, CourseStatus::Regular);
+    $incomplete = erEnroll($offering, CourseStatus::Incomplete);
+
+    $summaries = enrollmentRecords()->findManyEnrollments([$regular->id, $incomplete->id, 999_999]);
+
+    expect(array_keys($summaries))->toEqualCanonicalizing([$regular->id, $incomplete->id])
+        ->and($summaries[$regular->id])->toBeInstanceOf(EnrollmentSummary::class)
+        // Unfiltered by gradability, exactly as findEnrollment() is.
+        ->and($summaries[$incomplete->id]->courseStatus)->toBe('Incomplete');
+});
+
+it('resolves no enrollments for an empty id list', function () {
+    expect(enrollmentRecords()->findManyEnrollments([]))->toBe([]);
+});
+
 // ---------------------------------------------------------------------------
 // enrollmentsForStudent — the CGPA tally's whole input (ticket 04)
 // ---------------------------------------------------------------------------

@@ -10,7 +10,6 @@ use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\OfferingSummary;
 use Modules\Grading\Internal\Enums\GradeSheetKind;
-use Modules\Grading\Internal\Enums\GradeSheetStatus;
 use Modules\Grading\Internal\Events\GradeFinalized;
 use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
 use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
@@ -18,6 +17,7 @@ use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Grading\Internal\Support\CurrentGradeLookup;
+use Modules\Grading\Internal\Support\DepartmentHeadSheetQueue;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
@@ -58,51 +58,19 @@ class DepartmentHeadReviewController
      */
     public function queue(
         Request $request,
-        EnrollmentRecords $enrollments,
-        CourseCatalog $courses,
-        DepartmentHeadAssignments $heads,
+        DepartmentHeadSheetQueue $queue,
         Directory $directory,
     ): JsonResponse {
-        $userId = $this->actingUserId($request);
+        // The Department scope — including the university-wide Head's reach over the
+        // department-less Preparatory Sheets — is resolved once, in the seam the Sheets Awaiting
+        // Review Dashboard Card reads too (phase 4.5, ticket 05), so a Card can never count
+        // something this queue would not show.
+        ['sheets' => $mine, 'offerings' => $offeringsById, 'courses' => $coursesById] =
+            $queue->forHead($this->actingUserId($request));
 
-        $sheets = GradeSheet::query()
-            ->where('status', GradeSheetStatus::Submitted)
-            ->orderBy('signed_at')
-            ->orderBy('id')
-            ->get();
-
-        if ($sheets->isEmpty()) {
+        if ($mine->isEmpty()) {
             return response()->json(['data' => []]);
         }
-
-        $offeringsById = [];
-        foreach ($sheets->pluck('course_offering_id')->unique() as $offeringId) {
-            $offeringsById[(int) $offeringId] = $enrollments->findOffering((int) $offeringId);
-        }
-
-        $courseIds = array_values(array_unique(array_filter(array_map(
-            fn (?OfferingSummary $offering): ?int => $offering?->courseId,
-            $offeringsById,
-        ))));
-        $coursesById = $courses->findMany($courseIds);
-
-        // One headsForDepartment() call per distinct Department across the whole queue, not
-        // per Sheet — a Head typically covers one Department, so this is usually a single call.
-        $headsCache = [];
-        $mine = $sheets->filter(function (GradeSheet $sheet) use (&$headsCache, $offeringsById, $coursesById, $heads, $userId): bool {
-            $offering = $offeringsById[(int) $sheet->course_offering_id] ?? null;
-            $course = $offering === null ? null : ($coursesById[$offering->courseId] ?? null);
-            if ($course === null) {
-                return false;
-            }
-
-            $cacheKey = $course->departmentId ?? -1;
-            if (! array_key_exists($cacheKey, $headsCache)) {
-                $headsCache[$cacheKey] = $heads->headsForDepartment($course->departmentId);
-            }
-
-            return in_array($userId, $headsCache[$cacheKey], true);
-        })->values();
 
         $instructors = $directory->findMany(array_values(array_unique(array_map(
             fn (GradeSheet $sheet): int => $offeringsById[(int) $sheet->course_offering_id]->instructorId,

@@ -35,6 +35,6 @@ export function usePermissions(): UsePermissions {
     hasPermission: (permission) => permissions.includes(permission),
     roles,
     hasRole: (role) => roles.includes(role),
-    isAdmin: roles.some((role) => ADMIN_ROLES.includes(role)),
+    isAdmin: roles.some((role) => ADMIN_ROLES.some((adminRole) => adminRole === role)),
   }
 }

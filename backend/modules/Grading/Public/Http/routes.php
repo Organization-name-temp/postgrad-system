@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Grading\Internal\Http\Controllers\DashboardCardController;
 use Modules\Grading\Internal\Http\Controllers\DepartmentHeadReviewController;
 use Modules\Grading\Internal\Http\Controllers\GradeSheetController;
 use Modules\Grading\Internal\Http\Controllers\IncompleteController;
@@ -70,6 +71,20 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
     Route::get('/grading/incompletes', [IncompleteController::class, 'outstanding']);
     Route::get('/grading/incompletes/{incomplete}/resolution', [IncompleteController::class, 'resolution'])
         ->whereNumber('incomplete');
+
+    // The My Grade Sheets Dashboard Card (phase 4.5, ticket 05) — the current teaching term's
+    // Offerings, how many Sheets are not yet Finalized, and the passed-deadline flag, summarised
+    // for the Dashboard and linking into the screens above. It reuses this group's gate and
+    // the same own-versus-central list rule the offerings endpoint applies.
+    Route::get('/grading/cards/grade-sheets', [DashboardCardController::class, 'gradeSheets']);
+
+    // The Outstanding Incompletes Dashboard Card (phase 4.5, ticket 08) — how many Incompletes
+    // are still waiting on their mark and when the nearest is due, linking into the resolution
+    // screen above. Same gate, same set (OutstandingIncompleteQueue), and the same derived
+    // deadline: an unresolved Incomplete converts to a Fail Withdrawal when its deadline passes,
+    // so the Card exists to reach the Instructor before that command does.
+    Route::get('/grading/cards/incompletes', [DashboardCardController::class, 'incompletes'])
+        ->middleware('role:R04');
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
@@ -91,12 +106,25 @@ Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
         ->whereNumber('grade_sheet');
     Route::post('/grading/department-head/sheets/{grade_sheet}/return', [DepartmentHeadReviewController::class, 'returnSheet'])
         ->whereNumber('grade_sheet');
+
+    // The Sheets Awaiting Review Dashboard Card (phase 4.5, ticket 05) — the same queue's count
+    // and oldest few, summarised for the Dashboard. The capability is shared with Instructors,
+    // so the Role gate narrows this Card to the Department Head persona.
+    Route::get('/grading/cards/sheets-awaiting-review', [DashboardCardController::class, 'sheetsAwaitingReview'])
+        ->middleware('role:R06');
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {
     // The acting Student's own academic record — Semester GPAs and the CGPA prominently
     // (ticket 04). No id param: always the acting user's own Student anchor.
     Route::get('/grading/my-grades', [MyGradesController::class, 'index']);
+
+    // The My Academic Record Dashboard Card (phase 4.5, ticket 01) — the same record's three
+    // headline numbers, summarised for the Dashboard and linking into the screen above.
+    // Independently authorized here rather than trusting the SPA's choice of what to request
+    // (ADR-0024): the client composes Cards from the acting user's access as a UX mirror only.
+    Route::get('/grading/cards/academic-record', [DashboardCardController::class, 'academicRecord'])
+        ->middleware('role:R02');
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.view_student'])->group(function () {

@@ -4,23 +4,19 @@ namespace Database\Seeders;
 
 use Database\Seeders\Concerns\SeedsAcademicWorld;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Calendar\Public\Enums\Term;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
-use Modules\Enrollment\Internal\Enums\RegistrationKind;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
-use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Enums\Weekday;
 use Modules\Enrollment\Internal\Models\AttendanceMark;
 use Modules\Enrollment\Internal\Models\ClassSession;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\OfferingMeeting;
-use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Support\SessionSchedule;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -210,36 +206,6 @@ class EnrollmentSeeder extends Seeder
                 ],
                 ['ends_at' => $descriptor['ends_at'], 'cancelled_at' => null],
             );
-        }
-    }
-
-    /**
-     * A Pending Initial request resting in the Advisor's queue (idempotent — one Pending per
-     * student+semester). Backdated a couple of days so the queue's oldest-first order reads
-     * sensibly on seed day.
-     *
-     * @param  list<array{offering: CourseOffering, mode: RegistrationMode}>  $lines
-     */
-    private function pendingRequest(int $studentId, Semester $semester, array $lines): void
-    {
-        if (RegistrationRequest::hasPendingFor($studentId, (int) $semester->getKey())) {
-            return;
-        }
-
-        $request = RegistrationRequest::create([
-            'student_id' => $studentId,
-            'semester_id' => $semester->getKey(),
-            'kind' => RegistrationKind::Initial,
-            'status' => RegistrationStatus::Pending,
-        ]);
-        $request->forceFill(['created_at' => Carbon::now()->subDays(2)])->save();
-
-        foreach ($lines as $line) {
-            $request->lines()->create([
-                'course_offering_id' => $line['offering']->getKey(),
-                'mode' => $line['mode'],
-                'decision' => null,
-            ]);
         }
     }
 

@@ -5,6 +5,25 @@ export const en = {
     appName: 'Postgraduate Registration System',
     logOut: 'Log out',
     loading: 'Loading…',
+    actions: {
+      retry: 'Retry',
+    },
+    roles: {
+      R01: 'Applicant',
+      R02: 'Student',
+      R03: 'Academic Advisor',
+      R04: 'Instructor',
+      R05: 'Student Affairs Staff',
+      R06: 'Department Head',
+      R07: 'Dean of Faculty',
+      R08: 'Education & Academic Affairs Council',
+      R09: 'System Administrator',
+      R10: 'Super Administrator',
+    },
+    terms: {
+      Fall: 'Fall',
+      Spring: 'Spring',
+    },
     apiStatus: 'API status: {{status}}',
     language: {
       label: 'Language',
@@ -61,6 +80,15 @@ export const en = {
     menu: {
       account: 'Account menu',
     },
+    // The Dashboard is the app shell's own page (phase 4.5, ticket 01) — it composes Cards
+    // from many features, so its chrome lives in `common` while each Card's copy stays in
+    // its owning feature's namespace.
+    dashboard: {
+      title: 'Dashboard',
+      universityId: 'University ID',
+      enrollmentTerm: 'Enrolled {{term}}',
+      noCards: 'There is nothing waiting for you here yet.',
+    },
   },
   auth: {
     login: {
@@ -73,17 +101,23 @@ export const en = {
       noAccount: 'New applicant?',
       register: 'Start an application',
     },
-    dashboard: {
-      title: 'Dashboard',
-      roles: 'Roles',
-      permissions: 'Permissions',
-      studentSection: 'Student record',
-      universityId: 'University ID',
-      enrollmentTerm: 'Enrollment term',
-    },
   },
   catalog: {
     status: { active: 'Active', inactive: 'Inactive' },
+    // Catalog's Dashboard Card (phase 4.5, ticket 06). Each Card's copy lives in the namespace
+    // of the feature that owns its data, per Card, EN + AR together.
+    cards: {
+      summary: {
+        title: 'Catalog',
+        programs: 'Active programs',
+        courses: 'Active courses',
+        // The whole point of the Card is to reveal an unpopulated catalog, so it says so in
+        // words rather than showing a pair of bare zeros.
+        empty: 'Nothing is active in the catalog yet.',
+        action: 'Browse the catalog',
+        loadError: 'Could not load the catalog summary.',
+      },
+    },
     tree: {
       title: 'Browse catalog',
       search: 'Search programs and courses',
@@ -285,6 +319,62 @@ export const en = {
     },
   },
   admissions: {
+    // Admissions' Dashboard Cards (phase 4.5, ticket 03). Each Card's copy lives in the namespace
+    // of the feature that owns its data, per Card, EN + AR together.
+    cards: {
+      myApplication: {
+        title: 'My application',
+        // What happens next, per status — the one question the Card exists to answer: is the
+        // university holding things up, or am I? Keyed on the status the server sends as an enum
+        // value, so the Arabic is a first-class translation rather than a re-layout of English.
+        next: {
+          draft: 'Finish your application and submit it for review.',
+          submitted: 'Verify your email address to move your application forward.',
+          email_verified: 'Choose your programs and finalize your application.',
+          under_sa_review:
+            'Student Affairs is reviewing your application. Nothing is needed from you.',
+          sa_approved: 'Your application is being forwarded to the faculty dean.',
+          returned_for_revision: 'Your reviewer has asked for changes — address them and resubmit.',
+          under_dean_review: 'The faculty dean is reviewing your application.',
+          interview_scheduled: 'Confirm your interview, or reschedule it once if you need to.',
+          interview_completed: 'Your interview is done. The dean’s decision comes next.',
+          accepted: 'You have been accepted. Watch for your enrollment details.',
+          conditionally_accepted:
+            'You have a conditional offer — meet its conditions to confirm it.',
+          waitlisted: 'You are on the waiting list. You will be told if a place opens.',
+          rejected: 'Your application was not successful this cycle.',
+        },
+        since: 'In this status since {{date}}',
+        empty: 'You have not started an application yet.',
+        action: 'View my application',
+        loadError: 'Could not load your application.',
+      },
+      screeningQueue: {
+        title: 'Screening queue',
+        pending: '{{count}} application waiting',
+        pending_other: '{{count}} applications waiting',
+        // Overdue is information only: it says how long the SLA allows, and blocks nothing.
+        overdue: '{{count}} past the {{days}}-day review target',
+        overdue_other: '{{count}} past the {{days}}-day review target',
+        rowWaiting: 'waiting {{count}} business day',
+        rowWaiting_other: 'waiting {{count}} business days',
+        rowOverdue: 'overdue — {{count}} business day',
+        rowOverdue_other: 'overdue — {{count}} business days',
+        empty: 'Nothing is waiting to be screened. You are up to date.',
+        action: 'Open the screening queue',
+        loadError: 'Could not load the screening queue.',
+      },
+      // The Dean's decision Card (phase 4.5, ticket 08) — the last step before an applicant
+      // becomes a student, and the count is faculty-scoped on the server.
+      admissionDecisions: {
+        title: 'Admission decisions',
+        pending: '{{count}} application awaiting your decision',
+        pending_other: '{{count}} applications awaiting your decision',
+        empty: 'No applications are waiting on your decision. You are up to date.',
+        action: 'Open the decisions queue',
+        loadError: 'Could not load the decisions queue.',
+      },
+    },
     register: {
       title: 'Start your application',
       intro:
@@ -709,6 +799,77 @@ export const en = {
     },
   },
   admin: {
+    // The Semester & Open Windows Dashboard Card (phase 4.5, ticket 06). It lives in the admin
+    // namespace because Semester management is the admin feature's screen, though Calendar owns
+    // the data and serves the endpoint.
+    cards: {
+      semesterWindows: {
+        title: 'Semester and open windows',
+        // Every window name, so the SPA renders the server's window keys bilingually rather
+        // than being sent a pre-rendered label.
+        windows: {
+          registration: 'Registration open',
+          add_drop: 'Add/drop open',
+          late_add: 'Late-add open',
+          withdrawal: 'Withdrawal open',
+        },
+        noOpenWindows: 'No window is open',
+        deadlines: {
+          registration: 'Registration closes',
+          add_drop: 'Add/drop ends',
+          late_add: 'Late-add ends',
+          withdrawal: 'Withdrawal deadline',
+          semester_end: 'Semester ends',
+          grade_submission: 'Grades due',
+        },
+        nextDeadline: 'Next: {{window}} — {{date}}',
+        noNextDeadline: 'No dates remain on this semester.',
+        empty: 'No semester is running, and none is open for registration.',
+        action: 'Manage semesters',
+        loadError: 'Could not load the semester summary.',
+      },
+      // The Administration Card (phase 4.5, ticket 07) — the one Card an administrator's Dashboard
+      // page is *about*. A Card, not the Phase 7 Audit Log Report: no filter, no range, no export.
+      administration: {
+        title: 'Administration',
+        users: 'Users',
+        // Deliberately a second number: a user may hold several roles, which is the fact the
+        // whole permission-composed dashboard rests on.
+        roleAssignments: 'Role assignments',
+        recentActivity: 'Recent activity',
+        entry: '{{action}} — {{actor}} · {{date}}',
+        noActor: 'No signed-in user',
+        noActivity: 'Nothing has been recorded in the audit log yet.',
+        // Every audit action is sent as its key and labelled here, exactly as notification types
+        // are — an action with no label yet falls back to its key rather than to a blank.
+        actions: {
+          login: 'Signed in',
+          logout: 'Signed out',
+          login_failed: 'Failed sign-in',
+          student: { admitted: 'Student admitted' },
+          department_head: {
+            assigned: 'Department head assigned',
+            unassigned: 'Department head unassigned',
+          },
+          registration: { decided_by_admin: 'Registration decided by an administrator' },
+          interview: {
+            evaluation_recorded_by_admin: 'Interview evaluation recorded by an administrator',
+          },
+          attendance: {
+            recorded_by_admin: 'Attendance recorded by an administrator',
+            session_updated_by_admin: 'Class session updated by an administrator',
+          },
+          grade: {
+            sheet_opened_centrally: 'Grade sheet opened centrally',
+            entered_centrally: 'Grade entered centrally',
+            incomplete_declared_centrally: 'Incomplete declared centrally',
+            correction_finalized: 'Grade correction finalized',
+          },
+        },
+        action: 'Manage assignments',
+        loadError: 'Could not load the administration summary.',
+      },
+    },
     cycles: {
       title: 'Admission cycles',
       new: 'New cycle',
@@ -889,6 +1050,47 @@ export const en = {
   enrollment: {
     mustRetake: {
       label: 'Must retake',
+    },
+    // Enrollment's Dashboard Cards (phase 4.5, ticket 04). Each Card's copy lives in the namespace
+    // of the feature that owns its data, per Card, EN + AR together.
+    cards: {
+      myRegistration: {
+        title: 'My registration',
+        creditHours: '{{count}} credit hour',
+        creditHours_other: '{{count}} credit hours',
+        // The bounds travel with the number so the load is legible rather than left to be judged.
+        bounds: 'of the {{min}}–{{max}} allowed',
+        // Said in words: "0 credit hours" is the bare zero the empty-state rule forbids, and the
+        // open period below is what the Student needs in order to do something about it.
+        nothingRegistered: 'You have not registered for any courses this semester.',
+        // Every period name, so the SPA renders the server's period key bilingually. Short labels
+        // for the Card; the schedule screen keeps its own fuller sentences.
+        periods: {
+          upcoming: 'Registration not open yet',
+          registration: 'Registration open',
+          add_drop: 'Add/drop open',
+          late_add: 'Late-add open',
+          withdrawal: 'Withdrawal open',
+          closed: 'No changes open',
+        },
+        closes: 'closes {{date}}',
+        register: 'Go to registration',
+        schedule: 'View my schedule',
+        empty: 'No semester is open for registration yet.',
+        loadError: 'Could not load your registration.',
+      },
+      adviseeRequests: {
+        title: 'Advisee requests',
+        pending: '{{count}} request awaiting you',
+        pending_other: '{{count}} requests awaiting you',
+        advisees: 'across {{count}} advisee',
+        advisees_other: 'across {{count}} advisees',
+        courseCount: '· {{count}} course',
+        courseCount_other: '· {{count}} courses',
+        empty: 'No registration requests are waiting on you. You are up to date.',
+        action: 'Open the advisor queue',
+        loadError: 'Could not load the advisee requests.',
+      },
     },
     registration: {
       title: 'Course registration',
@@ -1354,6 +1556,66 @@ export const en = {
       },
       incompleteDeadline: 'Resolve by {{date}}',
       incompleteNoDeadline: 'Resolution deadline not yet set',
+    },
+    // Grading's Dashboard Cards (phase 4.5). Each Card's copy lives in the namespace of the
+    // feature that owns its data, per Card, EN + AR together.
+    cards: {
+      academicRecord: {
+        title: 'My academic record',
+        cgpa: 'CGPA',
+        semesterGpa: 'Latest semester GPA',
+        // A fresh record is a dash, never 0.00 — "not yet calculated" must never read as
+        // "you scored zero".
+        dash: '—',
+        latestSemester: 'Latest semester: {{semester}}',
+        earnedCreditHours: '{{count}} credit hour earned so far',
+        earnedCreditHours_other: '{{count}} credit hours earned so far',
+        nothingFinalized: 'No grades have been finalized yet.',
+        action: 'View my grades',
+        loadError: 'Could not load your academic record.',
+      },
+      gradeSheets: {
+        title: 'My grade sheets',
+        unfinalized: '{{count}} sheet not yet finalized',
+        unfinalized_other: '{{count}} sheets not yet finalized',
+        thisTerm: '{{semester}} · {{count}} offering',
+        thisTerm_other: '{{semester}} · {{count}} offerings',
+        // A nudge, never a gate: past the deadline an offering with no finalized sheet is flagged,
+        // and nothing about it is blocked or changed.
+        overdue: '{{count}} past the submission deadline',
+        overdue_other: '{{count}} past the submission deadline',
+        pastDeadline: 'Past deadline',
+        unknownCourse: 'Course unavailable',
+        empty: 'You have nothing to grade this term.',
+        action: 'Open my grade sheets',
+        loadError: 'Could not load your grade sheets.',
+      },
+      sheetsAwaitingReview: {
+        title: 'Sheets awaiting review',
+        pending: '{{count}} sheet awaiting you',
+        pending_other: '{{count}} sheets awaiting you',
+        unknownCourse: 'Course unavailable',
+        empty: 'No grade sheets are waiting on your review. You are up to date.',
+        action: 'Open the review queue',
+        loadError: 'Could not load the review queue.',
+      },
+      // The Incompletes Card (phase 4.5, ticket 08). Its deadline copy carries the whole point of
+      // the Card: an unresolved Incomplete converts to a Fail Withdrawal once its deadline passes.
+      outstandingIncompletes: {
+        title: 'Outstanding Incompletes',
+        outstanding: '{{count}} Incomplete still outstanding',
+        outstanding_other: '{{count}} Incompletes still outstanding',
+        nearestDeadline: 'Nearest resolution deadline: {{date}}',
+        // Derived, never stored: with no following semester on the calendar there is no date to
+        // show, and inventing one would be worse than saying so.
+        noDeadlineAtAll:
+          'No resolution deadline yet — the following semester is not on the calendar.',
+        withoutDeadline: '{{count}} with no deadline yet',
+        withoutDeadline_other: '{{count}} with no deadline yet',
+        empty: 'You have no outstanding Incompletes. You are up to date.',
+        action: 'Resolve Incompletes',
+        loadError: 'Could not load your outstanding Incompletes.',
+      },
     },
     oversight: {
       title: 'Student Grades',

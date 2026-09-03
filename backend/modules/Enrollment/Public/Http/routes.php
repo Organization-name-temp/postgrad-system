@@ -60,7 +60,7 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
     Route::post('/registration/enrollments/{enrollment}/withdrawal', [ScheduleChangeController::class, 'withdraw'])->whereNumber('enrollment');
 
     // The My Registration Dashboard Card (phase 4.5, ticket 04) — this Semester's credit-hour load
-    // against the 6–12 bounds, the open period and the date it closes, summarised for the landing
+    // against the 6–12 bounds, the open period and the date it closes, summarised for the Dashboard
     // page. It carries no id param, so it always reads the acting user's own Student anchor, and it
     // is independently authorized here rather than trusting the SPA's choice of what to request
     // (ADR-0024): the client composes Cards as a UX mirror only.

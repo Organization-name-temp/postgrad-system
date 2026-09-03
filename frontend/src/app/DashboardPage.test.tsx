@@ -87,7 +87,15 @@ describe('DashboardPage — the identity header', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument()
     expect(screen.getByText('Layla Samir')).toBeInTheDocument()
-    expect(screen.getByText('R02 · Student')).toBeInTheDocument()
+    const roleChip = screen
+      .getByText((_, element) =>
+        Boolean(
+          element?.classList.contains('MuiChip-label') && element.textContent === 'R02 · Student',
+        ),
+      )
+      .closest('.MuiChip-root')
+    expect(roleChip).toHaveTextContent('R02 · Student')
+    expect(roleChip?.querySelector('[dir="ltr"]')).toHaveTextContent('R02')
     // The Phase-0 permission wall is gone — the page is a product, not a debugging tool.
     expect(screen.queryByText('grades.view_own')).not.toBeInTheDocument()
     expect(screen.queryByText('courses.register_self')).not.toBeInTheDocument()
@@ -130,7 +138,15 @@ describe('DashboardPage — the identity header', () => {
     )
     renderDashboard()
 
-    expect(screen.getByText('R02 · طالب')).toBeInTheDocument()
+    const roleChip = screen
+      .getByText((_, element) =>
+        Boolean(
+          element?.classList.contains('MuiChip-label') && element.textContent === 'R02 · طالب',
+        ),
+      )
+      .closest('.MuiChip-root')
+    expect(roleChip).toHaveTextContent('R02 · طالب')
+    expect(roleChip?.querySelector('[dir="ltr"]')).toHaveTextContent('R02')
     expect(screen.getByText('التحق في الخريف')).toBeInTheDocument()
     expect(screen.queryByText(/Student|Fall/)).not.toBeInTheDocument()
   })
@@ -225,5 +241,6 @@ describe('DashboardPage — card composition (ADR-0024)', () => {
     renderDashboard()
 
     expect(screen.getByText('There is nothing waiting for you here yet.')).toBeInTheDocument()
+    expect(screen.getByTestId('InboxOutlinedIcon')).toBeInTheDocument()
   })
 })

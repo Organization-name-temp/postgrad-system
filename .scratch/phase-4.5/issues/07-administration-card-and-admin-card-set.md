@@ -13,7 +13,7 @@ step into any surface when needed, not so their home screen becomes ten other pe
 queues.
 
 Ticket 01 built the admin branch in the registry and left the admin set empty, so an
-administrator has been landing on a correct but deliberately blank dashboard throughout
+administrator has been seeing a correct but deliberately blank Dashboard throughout
 tickets 03–06. This ticket fills it. Nothing built in tickets 03–06 needs revisiting — the
 Cards those tickets registered were never admin-set members, which is exactly why the branch
 shipped first.

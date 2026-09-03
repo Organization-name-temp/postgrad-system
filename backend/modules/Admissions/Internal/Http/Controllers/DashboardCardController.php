@@ -3,6 +3,7 @@
 namespace Modules\Admissions\Internal\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Knuckles\Scribe\Attributes\ResponseField;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Resources\DashboardCardResource;
 use Modules\Admissions\Internal\Models\Application;
@@ -61,7 +62,9 @@ class DashboardCardController
      * Gated on `applicant.decide` (§3.2 — Dean only). Zero waiting is zero, and the SPA renders
      * the shared empty state rather than a bare `0`.
      *
-     * @response 200 {"data": {"pending_count": 3}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"pending_count": 3}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function admissionDecisions(
@@ -101,8 +104,16 @@ class DashboardCardController
      * would sit permanently empty on their Dashboard. The Permission decides who may *ask*; holding
      * an Application decides who has anything to see.
      *
-     * @response 200 {"data": {"id": 1, "status": "under_sa_review", "status_entered_at": "2026-07-10T10:00:00+00:00", "finalized_at": "2026-07-10T10:00:00+00:00"}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"id": 1, "status": "under_sa_review", "status_entered_at": "2026-07-10T10:00:00+00:00", "finalized_at": "2026-07-10T10:00:00+00:00"}, "meta": {}}
      */
+    #[ResponseField(
+        name: 'data',
+        type: 'object',
+        description: "The acting Applicant's latest Application, or null when none exists.",
+        nullable: true,
+    )]
     public function myApplication(Request $request): DashboardCardResource
     {
         $application = Application::query()
@@ -149,7 +160,9 @@ class DashboardCardController
      * reason the Card above has only one: an empty `applications` list beside a populated one makes
      * Scribe emit a union response type the generated client cannot read.
      *
-     * @response 200 {"data": {"pending_count": 6, "overdue_count": 2, "sla_days": 5, "applications": [{"id": 1, "status": "under_sa_review", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "age_days": 7, "is_overdue": true, "review_entered_at": "2026-07-10T10:00:00+00:00"}]}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"pending_count": 6, "overdue_count": 2, "sla_days": 5, "applications": [{"id": 1, "status": "under_sa_review", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "age_days": 7, "is_overdue": true, "review_entered_at": "2026-07-10T10:00:00+00:00"}]}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function screeningQueue(): DashboardCardResource

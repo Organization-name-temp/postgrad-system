@@ -54,7 +54,11 @@ export function AdviseeRequestsCard() {
           {requests.map((request) => (
             <Typography key={request.id} component="li" variant="body2">
               <Link component={RouterLink} to={`/advising/${request.id}`} variant="body2">
-                {request.student_name ?? request.university_id}
+                {request.student_name ?? (
+                  <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>
+                    {request.university_id}
+                  </span>
+                )}
               </Link>{' '}
               <Typography component="span" variant="body2" color="text.secondary">
                 {t('cards.adviseeRequests.courseCount', { count: request.course_count ?? 0 })}

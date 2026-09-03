@@ -118,6 +118,16 @@ describe('MyGradeSheetsCard', () => {
     expect(screen.queryByText(/0 sheets/)).not.toBeInTheDocument()
   })
 
+  it('renders the empty state when the academic term exists but has no scoped offerings', () => {
+    mockedQuery.mockReturnValue(
+      queryResult(payload({ offering_count: 0, unfinalized_count: 0, offerings: [] })),
+    )
+    renderCard()
+
+    expect(screen.getByText('You have nothing to grade this term.')).toBeInTheDocument()
+    expect(screen.queryByText(/0 sheets/)).not.toBeInTheDocument()
+  })
+
   it('renders its own error state when the summary cannot be loaded', () => {
     mockedQuery.mockReturnValue(queryResult({ isError: true }))
     renderCard()

@@ -828,7 +828,7 @@ export const en = {
         action: 'Manage semesters',
         loadError: 'Could not load the semester summary.',
       },
-      // The Administration Card (phase 4.5, ticket 07) — the one Card an administrator's landing
+      // The Administration Card (phase 4.5, ticket 07) — the one Card an administrator's Dashboard
       // page is *about*. A Card, not the Phase 7 Audit Log Report: no filter, no range, no export.
       administration: {
         title: 'Administration',

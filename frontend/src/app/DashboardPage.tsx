@@ -1,4 +1,5 @@
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../features/auth/useAuth'
 import { dashboardCards } from './dashboardCards'
@@ -59,7 +60,12 @@ export function DashboardPage() {
             <Typography variant="h6" component="p">
               {user.name}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              dir="ltr"
+              sx={{ unicodeBidi: 'isolate' }}
+            >
               {user.email}
             </Typography>
           </Box>
@@ -69,7 +75,7 @@ export function DashboardPage() {
               <Typography variant="overline" color="text.secondary">
                 {t('dashboard.universityId')}
               </Typography>
-              <Typography variant="body1" component="p">
+              <Typography variant="body1" component="p" dir="ltr" sx={{ unicodeBidi: 'isolate' }}>
                 {student.university_id}
               </Typography>
               {student.enrollment_term && (
@@ -93,7 +99,14 @@ export function DashboardPage() {
               // one back to support.
               <Chip
                 key={role.code}
-                label={`${role.code} · ${t(`roles.${role.code}`, { defaultValue: role.code })}`}
+                label={
+                  <span>
+                    <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>
+                      {role.code}
+                    </span>{' '}
+                    · {t(`roles.${role.code}`, { defaultValue: role.code })}
+                  </span>
+                }
                 size="small"
                 variant="outlined"
               />
@@ -103,7 +116,10 @@ export function DashboardPage() {
       </Paper>
 
       {visible.length === 0 && (
-        <Typography color="text.secondary">{t('dashboard.noCards')}</Typography>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', color: 'text.secondary' }}>
+          <InboxOutlinedIcon aria-hidden="true" />
+          <Typography color="inherit">{t('dashboard.noCards')}</Typography>
+        </Stack>
       )}
 
       {/* CSS grid rather than MUI's Grid: the Cards are equal-width and self-contained, so

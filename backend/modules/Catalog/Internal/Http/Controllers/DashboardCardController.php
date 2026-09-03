@@ -31,7 +31,9 @@ class DashboardCardController
      *
      * Gated on `catalog.manage` (§3.2 — Department Head / Dean; administrators inherit it).
      *
-     * @response 200 {"data": {"active_program_count": 6, "active_course_count": 42}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"active_program_count": 6, "active_course_count": 42}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function catalogSummary(): DashboardCardResource

@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 
 /*
 | The Administration Dashboard Card (phase 4.5, ticket 07) — the one Card an administrator's
-| landing page is about: how many Users and Role assignments exist, over the most recent Audit Log
+| Dashboard is about: how many Users and Role assignments exist, over the most recent Audit Log
 | activity.
 |
 | It closes the phase's single deliberate exception to the composition rule, so the authority

@@ -3,6 +3,7 @@
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Modules\Admissions\Internal\Models\Application;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Calendar\Public\Enums\Term;
 use Modules\Catalog\Internal\Models\Course;
@@ -34,6 +35,16 @@ function rasUser(string $email): User
 {
     return User::query()->where('email', $email)->firstOrFail();
 }
+
+it('gives r01@ a real Application for the Applicant Card', function () {
+    $this->seed(DatabaseSeeder::class);
+
+    Sanctum::actingAs(rasUser('r01@ejust.test'));
+    $this->getJson('/api/v1/admissions/cards/my-application')
+        ->assertOk()
+        ->assertJsonPath('data.status', 'draft')
+        ->assertJsonPath('meta', []);
+});
 
 it('makes r02@ a real student whose CGPA and latest semester GPA are both computable', function () {
     $this->seed(DatabaseSeeder::class);
@@ -175,6 +186,7 @@ it('seeds the role accounts idempotently', function () {
     $this->seed(DatabaseSeeder::class);
 
     $before = [
+        'applications' => Application::query()->count(),
         'students' => Student::query()->count(),
         'offerings' => CourseOffering::query()->count(),
         'requests' => RegistrationRequest::query()->count(),
@@ -185,6 +197,7 @@ it('seeds the role accounts idempotently', function () {
 
     $this->seed(DatabaseSeeder::class);
 
+    expect(Application::query()->count())->toBe($before['applications']);
     expect(Student::query()->count())->toBe($before['students']);
     expect(CourseOffering::query()->count())->toBe($before['offerings']);
     expect(RegistrationRequest::query()->count())->toBe($before['requests']);

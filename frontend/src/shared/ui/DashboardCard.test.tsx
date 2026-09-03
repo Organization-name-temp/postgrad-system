@@ -103,10 +103,9 @@ describe('DashboardCard', () => {
       />,
     )
 
-    expect(screen.getByRole('link', { name: /View my grades/ })).toHaveAttribute(
-      'href',
-      '/grading/my-grades',
-    )
+    const action = screen.getByRole('link', { name: /View my grades/ })
+    expect(action).toHaveAttribute('href', '/grading/my-grades')
+    expect(getComputedStyle(action).minHeight).toBe('44px')
   })
 
   it('renders no link when no action is supplied', () => {

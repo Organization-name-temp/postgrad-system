@@ -59,7 +59,9 @@ class DashboardCardController
      * Gated on the R09/R10 Role by the `admin` middleware; every other role, and every
      * unauthenticated request, is refused.
      *
-     * @response 200 {"data": {"user_count": 24, "role_assignment_count": 27, "recent_activity": [{"id": 91, "action": "student.admitted", "actor_user_id": 7, "actor_name": "Dr. Dean", "at": "2026-08-10T09:15:00+00:00"}]}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"user_count": 24, "role_assignment_count": 27, "recent_activity": [{"id": 91, "action": "student.admitted", "actor_user_id": 7, "actor_name": "Dr. Dean", "at": "2026-08-10T09:15:00+00:00"}]}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function administration(): DashboardCardResource

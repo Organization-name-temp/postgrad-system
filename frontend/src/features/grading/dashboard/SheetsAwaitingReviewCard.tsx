@@ -45,9 +45,16 @@ export function SheetsAwaitingReviewCard() {
           {sheets.map((sheet) => (
             <Typography key={sheet.id} component="li" variant="body2">
               <Link component={RouterLink} to={`/grading/review/${sheet.id}`} variant="body2">
-                {sheet.course
-                  ? `${sheet.course.code} · ${pickLocaleName(sheet.course, i18n.language)}`
-                  : t('cards.sheetsAwaitingReview.unknownCourse')}
+                {sheet.course ? (
+                  <>
+                    <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>
+                      {sheet.course.code}
+                    </span>{' '}
+                    · {pickLocaleName(sheet.course, i18n.language)}
+                  </>
+                ) : (
+                  t('cards.sheetsAwaitingReview.unknownCourse')
+                )}
               </Link>
             </Typography>
           ))}

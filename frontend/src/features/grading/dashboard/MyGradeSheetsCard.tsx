@@ -41,7 +41,7 @@ export function MyGradeSheetsCard() {
       onRetry={() => void refetch()}
       // Nothing to grade this term: not a zero to stare at, but the honest answer that no term of
       // theirs is currently owed marks.
-      isEmpty={!semester}
+      isEmpty={!semester || offerings.length === 0}
       emptyText={t('cards.gradeSheets.empty')}
       action={{ to: '/grading', label: t('cards.gradeSheets.action') }}
       count={
@@ -83,9 +83,16 @@ export function MyGradeSheetsCard() {
                 to={`/grading/offerings/${offering.offering_id}`}
                 variant="body2"
               >
-                {offering.course
-                  ? `${offering.course.code} · ${pickLocaleName(offering.course, i18n.language)}`
-                  : t('cards.gradeSheets.unknownCourse')}
+                {offering.course ? (
+                  <>
+                    <span dir="ltr" style={{ unicodeBidi: 'isolate' }}>
+                      {offering.course.code}
+                    </span>{' '}
+                    · {pickLocaleName(offering.course, i18n.language)}
+                  </>
+                ) : (
+                  t('cards.gradeSheets.unknownCourse')
+                )}
               </Link>
               {offering.is_overdue && (
                 <StatusChip

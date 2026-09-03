@@ -6,6 +6,8 @@ use Database\Seeders\Concerns\SeedsAcademicWorld;
 use Database\Seeders\Concerns\SeedsGradedHistory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
+use Modules\Admissions\Internal\Models\AdmissionCycle;
+use Modules\Admissions\Internal\Models\Application;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Program;
@@ -33,8 +35,10 @@ use Modules\Identity\Public\StudentSummary;
  * rendered zeros beside it, and the difference would read as broken code rather than an empty
  * account.
  *
- * Three accounts need it:
+ * Four accounts need it:
  *
+ * - **`r01`** owns a Draft Application in the open Cycle, so the Applicant Card demonstrates a
+ *   real state rather than its legitimate no-Application empty state.
  * - **`r02`** becomes an actual Student — minted through the same `Identity\Public::admit()`
  *   seam the live accept uses (ADR-0013), which swaps R01 → R02 and so leaves its canonical role
  *   set exactly as it was — with Enrollments across two completed Semesters and finalized
@@ -89,10 +93,12 @@ class RoleAccountSeeder extends Seeder
         $hoda = User::query()->where('email', 'interviewer.hoda@ejust.test')->firstOrFail();
         $ceHead = User::query()->where('email', 'r06@ejust.test')->firstOrFail();
 
+        $r01 = User::query()->where('email', 'r01@ejust.test')->firstOrFail();
         $r02 = User::query()->where('email', 'r02@ejust.test')->firstOrFail();
         $r03 = User::query()->where('email', 'r03@ejust.test')->firstOrFail();
         $multi = User::query()->where('email', 'multi@ejust.test')->firstOrFail();
 
+        $this->seedCanonicalApplicant($r01);
         $this->seedCanonicalStudent($r02, $amina, $program, $adam, $semesters, $hoda, $ceHead);
 
         // r03@'s advisees register for the term that is currently open, so their pending request
@@ -110,6 +116,26 @@ class RoleAccountSeeder extends Seeder
         ], $program, $adam, $semesters);
 
         $this->seedInstructorOfferings($multi, $semesters['Spring 2026'], $multiAdvisees);
+    }
+
+    /** Give the canonical Applicant a real, idempotent Draft in the currently open Cycle. */
+    private function seedCanonicalApplicant(User $applicant): void
+    {
+        $cycle = AdmissionCycle::query()
+            ->where('is_active', true)
+            ->where('opens_at', '<=', now())
+            ->where('closes_at', '>=', now())
+            ->latest('id')
+            ->first();
+
+        if ($cycle === null) {
+            return;
+        }
+
+        Application::query()->firstOrCreate(
+            ['user_id' => $applicant->getKey(), 'admission_cycle_id' => $cycle->getKey()],
+            ['name_en' => $applicant->name, 'name_ar' => 'متقدم تجريبي'],
+        );
     }
 
     /**

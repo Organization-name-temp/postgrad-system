@@ -508,8 +508,9 @@ wall of raw permission chips. The composition rule is recorded in
   dark + axe would all need inventing for roughly one sparkline).
 - **Seeder:** the canonical `rNN@` accounts were authorization fixtures carrying no data, which is
   invisible while every screen is a list you navigate into and glaring the moment the Dashboard
-  is made of counts. `r02@` becomes a real Student with two graded Semesters (a computable CGPA),
-  `r03@` gains advisees with a pending request, and **`multi@` gains both advisees and Course
+  is made of counts. `r01@` gains a Draft Application, `r02@` becomes a real Student with two
+  graded Semesters (a computable CGPA), `r03@` gains advisees with a pending request, and
+  **`multi@` gains both advisees and Course
   Offerings** — the one account that demonstrates the composition rule. Still deterministic,
   idempotent, and inside the reserved `student.*` namespace.
 - **DoD:** Pest feature tests per Card endpoint (authorized payload, **403 for the missing gate**,

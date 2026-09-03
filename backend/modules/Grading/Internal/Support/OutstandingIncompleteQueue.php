@@ -54,7 +54,7 @@ final readonly class OutstandingIncompleteQueue
             ->orderBy('id')
             ->get();
 
-        // One facade read for the whole set, not one per Incomplete: this seam is on the landing
+        // One facade read for the whole set, not one per Incomplete: this seam is on the Dashboard
         // page of every user holding `grades.enter`, so the loop that was acceptable on a screen
         // someone opens deliberately is not acceptable here.
         $byEnrollmentId = $this->enrollments->findManyEnrollments(

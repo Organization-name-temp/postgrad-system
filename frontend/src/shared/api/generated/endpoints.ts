@@ -193,8 +193,15 @@ export type AdministrationCard200Data = {
   recent_activity?: AdministrationCard200DataRecentActivityItem[];
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type AdministrationCard200Meta = { [key: string]: unknown };
+
 export type AdministrationCard200 = {
   data?: AdministrationCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: AdministrationCard200Meta;
 };
 
 export type AdministrationCard403 = {
@@ -824,15 +831,30 @@ export type RescheduleMyInterview422 = {
   errors?: RescheduleMyInterview422Errors;
 };
 
+/**
+ * The acting Applicant's latest Application, or null when none exists.
+ * @nullable
+ */
 export type MyApplicationCard200Data = {
   id?: number;
   status?: string;
   status_entered_at?: string;
   finalized_at?: string;
-};
+} | null;
+
+/**
+ * Card metadata (empty for this Card).
+ */
+export type MyApplicationCard200Meta = { [key: string]: unknown };
 
 export type MyApplicationCard200 = {
-  data?: MyApplicationCard200Data;
+  /**
+     * The acting Applicant's latest Application, or null when none exists.
+     * @nullable
+     */
+  data: MyApplicationCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: MyApplicationCard200Meta;
 };
 
 export type InterviewsAssignedToMe200DataItemSlotInterviewer = {
@@ -1433,8 +1455,15 @@ export type ScreeningQueueCard200Data = {
   applications?: ScreeningQueueCard200DataApplicationsItem[];
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type ScreeningQueueCard200Meta = { [key: string]: unknown };
+
 export type ScreeningQueueCard200 = {
   data?: ScreeningQueueCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: ScreeningQueueCard200Meta;
 };
 
 export type ScreeningQueueCard403 = {
@@ -1633,8 +1662,15 @@ export type AdmissionDecisionsCard200Data = {
   pending_count?: number;
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type AdmissionDecisionsCard200Meta = { [key: string]: unknown };
+
 export type AdmissionDecisionsCard200 = {
   data?: AdmissionDecisionsCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: AdmissionDecisionsCard200Meta;
 };
 
 export type AdmissionDecisionsCard403 = {
@@ -1939,8 +1975,15 @@ export type SemesterAndOpenWindowsCard200Data = {
   next_deadline?: SemesterAndOpenWindowsCard200DataNextDeadline;
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type SemesterAndOpenWindowsCard200Meta = { [key: string]: unknown };
+
 export type SemesterAndOpenWindowsCard200 = {
   data?: SemesterAndOpenWindowsCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: SemesterAndOpenWindowsCard200Meta;
 };
 
 export type SemesterAndOpenWindowsCard403 = {
@@ -2003,8 +2046,15 @@ export type CatalogSummaryCard200Data = {
   active_course_count?: number;
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type CatalogSummaryCard200Meta = { [key: string]: unknown };
+
 export type CatalogSummaryCard200 = {
   data?: CatalogSummaryCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: CatalogSummaryCard200Meta;
 };
 
 export type CatalogSummaryCard403 = {
@@ -3535,8 +3585,15 @@ export type MyRegistrationCard200Data = {
   enrollment_count?: number;
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type MyRegistrationCard200Meta = { [key: string]: unknown };
+
 export type MyRegistrationCard200 = {
   data?: MyRegistrationCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: MyRegistrationCard200Meta;
 };
 
 export type MyRegistrationCard403 = {
@@ -4057,8 +4114,15 @@ export type AdviseeRequestsCard200Data = {
   requests?: AdviseeRequestsCard200DataRequestsItem[];
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type AdviseeRequestsCard200Meta = { [key: string]: unknown };
+
 export type AdviseeRequestsCard200 = {
   data?: AdviseeRequestsCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: AdviseeRequestsCard200Meta;
 };
 
 export type AdviseeRequestsCard403 = {
@@ -4742,13 +4806,17 @@ export type MyGradeSheetsCard200Data = {
   offerings?: MyGradeSheetsCard200DataOfferingsItem[];
 };
 
+/**
+ * Card metadata, including the resolved scope.
+ */
 export type MyGradeSheetsCard200Meta = {
   scope?: string;
 };
 
 export type MyGradeSheetsCard200 = {
   data?: MyGradeSheetsCard200Data;
-  meta?: MyGradeSheetsCard200Meta;
+  /** Card metadata, including the resolved scope. */
+  meta: MyGradeSheetsCard200Meta;
 };
 
 export type MyGradeSheetsCard403 = {
@@ -4761,8 +4829,15 @@ export type OutstandingIncompletesCard200Data = {
   without_deadline_count?: number;
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type OutstandingIncompletesCard200Meta = { [key: string]: unknown };
+
 export type OutstandingIncompletesCard200 = {
   data?: OutstandingIncompletesCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: OutstandingIncompletesCard200Meta;
 };
 
 export type OutstandingIncompletesCard403 = {
@@ -5007,8 +5082,15 @@ export type SheetsAwaitingReviewCard200Data = {
   sheets?: SheetsAwaitingReviewCard200DataSheetsItem[];
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type SheetsAwaitingReviewCard200Meta = { [key: string]: unknown };
+
 export type SheetsAwaitingReviewCard200 = {
   data?: SheetsAwaitingReviewCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: SheetsAwaitingReviewCard200Meta;
 };
 
 export type SheetsAwaitingReviewCard403 = {
@@ -5098,8 +5180,15 @@ export type MyAcademicRecordCard200Data = {
   earned_credit_hours?: number;
 };
 
+/**
+ * Card metadata (empty for this Card).
+ */
+export type MyAcademicRecordCard200Meta = { [key: string]: unknown };
+
 export type MyAcademicRecordCard200 = {
   data?: MyAcademicRecordCard200Data;
+  /** Card metadata (empty for this Card). */
+  meta: MyAcademicRecordCard200Meta;
 };
 
 export type MyAcademicRecordCard403 = {

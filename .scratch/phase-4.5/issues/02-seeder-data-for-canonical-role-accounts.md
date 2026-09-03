@@ -1,7 +1,8 @@
 # 02 — Seeder: data for the canonical role accounts
 
-**What to build:** Signing in as any canonical `rNN@ejust.test` account shows a populated,
-representative system rather than an empty one.
+**What to build:** Signing in as any canonical account whose Phase 4.5 Dashboard has a Card shows
+representative data. R08 intentionally demonstrates the no-Card state because no Council feature
+has shipped yet.
 
 Today the canonical role accounts are **authorization fixtures**: they exist to prove the
 §3.2 permission matrix, and several of them own no records at all. Every persona with a
@@ -28,10 +29,12 @@ is independent of ticket 01 — the two run in parallel.
 
 **Status:** ready-for-agent
 
+- [ ] `r01@` owns a Draft Application in the open Cycle, so My Application is populated.
 - [ ] `r02@` is a Student with Enrollments across the seeded Semesters and finalized Grades, so a CGPA and at least one Semester GPA are computable for them.
 - [ ] `r03@` is an Advisor holding advisees, with at least one registration request genuinely pending their approval.
 - [ ] `multi@` holds **both** advisees with a pending request **and** Course Offerings with an unfinalized Grade Sheet, so its dashboard shows the union of two roles' work.
 - [ ] The canonical accounts already carrying data — Instructor, Student Affairs, Department Head, Dean — keep it, and their existing relationships are not disturbed.
+- [ ] `r08@` renders the intentional no-Card Dashboard state until a Council feature ships.
 - [ ] Seeders stay **deterministic and idempotent**, and every window remains a relative offset from seed time so the seeded world never goes stale.
 - [ ] The reserved persona namespace is still reserved: the Playwright suites' own data cannot collide with seeded records.
 - [ ] `migrate:fresh --seed` runs clean from an empty database, and every existing Phase 0–4 Playwright smoke still passes against the extended seed — this ticket must not perturb a single existing assertion.

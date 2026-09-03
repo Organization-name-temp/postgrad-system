@@ -38,7 +38,9 @@ class DashboardCardController
      * a union response type, and the generated Orval client then cannot read either branch. Same
      * shape, several scenarios is fine; different shapes are not.
      *
-     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "current_period": "add_drop", "open_windows": ["registration", "add_drop"], "next_deadline": {"window": "add_drop", "at": "2026-09-14T00:00:00+00:00"}}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "current_period": "add_drop", "open_windows": ["registration", "add_drop"], "next_deadline": {"window": "add_drop", "at": "2026-09-14T00:00:00+00:00"}}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function semesterWindows(SemesterWindowsCardBuilder $card): DashboardCardResource

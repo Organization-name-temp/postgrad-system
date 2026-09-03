@@ -642,6 +642,7 @@ paths:
                         actor_user_id: 7
                         actor_name: 'Dr. Dean'
                         at: '2026-08-10T09:15:00+00:00'
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -678,6 +679,12 @@ paths:
                             at:
                               type: string
                               example: '2026-08-10T09:15:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -2676,6 +2683,7 @@ paths:
                     status: under_sa_review
                     status_entered_at: '2026-07-10T10:00:00+00:00'
                     finalized_at: '2026-07-10T10:00:00+00:00'
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -2692,6 +2700,15 @@ paths:
                       finalized_at:
                         type: string
                         example: '2026-07-10T10:00:00+00:00'
+                    description: "The acting Applicant's latest Application, or null when none exists."
+                    nullable: true
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - data
+                  - meta
       tags:
         - Admissions
       security: []
@@ -4738,6 +4755,7 @@ paths:
                         age_days: 7
                         is_overdue: true
                         review_entered_at: '2026-07-10T10:00:00+00:00'
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -4785,6 +4803,12 @@ paths:
                             review_entered_at:
                               type: string
                               example: '2026-07-10T10:00:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -5463,6 +5487,7 @@ paths:
                 example:
                   data:
                     pending_count: 3
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -5470,6 +5495,12 @@ paths:
                       pending_count:
                         type: integer
                         example: 3
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -6507,6 +6538,7 @@ paths:
                     next_deadline:
                       window: add_drop
                       at: '2026-09-14T00:00:00+00:00'
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -6548,6 +6580,12 @@ paths:
                           at:
                             type: string
                             example: '2026-09-14T00:00:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -6717,6 +6755,7 @@ paths:
                   data:
                     active_program_count: 6
                     active_course_count: 42
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -6727,6 +6766,12 @@ paths:
                       active_course_count:
                         type: integer
                         example: 42
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -12073,6 +12118,7 @@ paths:
                     min_credit_hours: 6
                     max_credit_hours: 12
                     enrollment_count: 3
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -12113,6 +12159,12 @@ paths:
                       enrollment_count:
                         type: integer
                         example: 3
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: 'no student record'
           content:
@@ -13939,6 +13991,7 @@ paths:
                         university_id: 2026-MSC-CE-0001
                         course_count: 2
                         submitted_at: '2026-08-02T09:00:00+00:00'
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -13979,6 +14032,12 @@ paths:
                             submitted_at:
                               type: string
                               example: '2026-08-02T09:00:00+00:00'
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -16308,6 +16367,9 @@ paths:
                       scope:
                         type: string
                         example: own
+                    description: 'Card metadata, including the resolved scope.'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -16341,6 +16403,7 @@ paths:
                     outstanding_count: 2
                     nearest_deadline: '2026-11-03T00:00:00+00:00'
                     without_deadline_count: 1
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -16354,6 +16417,12 @@ paths:
                       without_deadline_count:
                         type: integer
                         example: 1
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -17115,6 +17184,7 @@ paths:
                           research_type: null
                           is_active: true
                           department_id: 1
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -17186,6 +17256,12 @@ paths:
                                 department_id:
                                   type: integer
                                   example: 1
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: ''
           content:
@@ -17507,6 +17583,7 @@ paths:
                       name_ar: 'خريف 2025'
                     latest_semester_gpa: 3.67
                     earned_credit_hours: 12
+                  meta: {}
                 properties:
                   data:
                     type: object
@@ -17538,6 +17615,12 @@ paths:
                       earned_credit_hours:
                         type: integer
                         example: 12
+                  meta:
+                    type: object
+                    properties: {}
+                    description: 'Card metadata (empty for this Card).'
+                required:
+                  - meta
         403:
           description: 'no student record'
           content:

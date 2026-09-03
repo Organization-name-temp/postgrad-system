@@ -166,7 +166,7 @@ export const dashboardCards: DashboardCardEntry[] = [
   },
 
   // Administration (phase 4.5, ticket 07) — User and role-assignment counts over recent Audit Log
-  // activity: the page an administrator's landing screen is *about*, and the phase's one
+  // activity: what an administrator's Dashboard is *about*, and the phase's one
   // deliberate exception to the composition rule. The only Card exclusive to the administration
   // set, so it is the case `adminSet` + `roles: ADMIN_ROLES` describes: the flag is what an
   // administrator sees, and the Role gate is what refuses it to everyone else — including the

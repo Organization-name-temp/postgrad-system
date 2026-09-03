@@ -11,7 +11,7 @@
 ## Problem Statement
 
 Four phases have shipped real domain machinery — Admissions, Catalog, Enrollment, Grading —
-and **every one of them is reachable only by navigating into it.** The authenticated landing
+and **every one of them is reachable only by navigating into it.** The authenticated Dashboard
 page is still the Phase-0 walking-skeleton stub: it renders the signed-in user's name, email,
 role chips, and a wall of every effective permission as chips. That page is a developer's
 authorization fixture, and it is the first thing every user of every role sees on every login.
@@ -113,7 +113,7 @@ Readiness, Termination) depend on read models Phase 5 has not built yet.
 
 **Instructor (R04)**
 
-26. As an Instructor, I want to see my Course Offerings for the current semester, so that my teaching load is visible on landing.
+26. As an Instructor, I want to see my Course Offerings for the current semester, so that my teaching load is visible on the Dashboard.
 27. As an Instructor, I want to know which of my Grade Sheets are not yet finalized, so that I can tell what still needs my attention.
 28. As an Instructor, I want to be told when a grade-submission deadline has passed for one of my Offerings, so that the existing flag reaches me without my going looking for it.
 29. As an Instructor, I want my outstanding Incompletes and the nearest resolution deadline, so that I can resolve them before they convert to Fail Withdrawals.
@@ -146,7 +146,7 @@ Readiness, Termination) depend on read models Phase 5 has not built yet.
 
 **Demonstrability and correctness**
 
-44. As the developer demonstrating the system, I want every canonical `rNN@` account to carry representative data, so that I can sign in as any role live without landing on an empty page.
+44. As the developer demonstrating the system, I want every canonical account whose Phase 4.5 Dashboard has a Card to carry representative data; R08's empty Dashboard is itself representative because no Council feature has shipped yet.
 45. As the developer demonstrating the system, I want `multi@` to hold both advisees and Offerings, so that the multi-role composition is actually demonstrable on the one account built to prove it.
 46. As the developer, I want each Card's API endpoint independently authorized, so that the client's choice of what to request is never the security boundary.
 47. As the developer, I want a test that asserts the *absence* of Cards a user should not see, so that a permission regression fails the build rather than leaking a surface.
@@ -271,9 +271,10 @@ and Tier 3 (12).
 
 ### Seeder
 
-- Extend the existing seeders so the canonical role accounts carry representative data: `r02@` a
-  Student with Enrollments and finalized Grades, `r03@` an Advisor with advisees and at least one
-  pending registration request.
+- Extend the existing seeders so the canonical role accounts carry representative data: `r01@`
+  owns a Draft Application, `r02@` is a Student with Enrollments and finalized Grades, and `r03@`
+  is an Advisor with advisees and at least one pending registration request. R08 intentionally
+  demonstrates the no-Card state until a Council feature ships.
 - **`multi@` receives both advisees and Course Offerings**, making the multi-role union
   demonstrable on the one account built to prove it.
 - Seeders remain deterministic and idempotent, with every window a relative offset from seed time,

@@ -61,7 +61,9 @@ class DashboardCardController
      * makes Scribe emit a union response type, and the generated Orval client then cannot read
      * either branch.
      *
-     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "current_period": "add_drop", "period_ends_at": "2026-09-14T00:00:00+00:00", "credit_hours": 9, "min_credit_hours": 6, "max_credit_hours": 12, "enrollment_count": 3}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "current_period": "add_drop", "period_ends_at": "2026-09-14T00:00:00+00:00", "credit_hours": 9, "min_credit_hours": 6, "max_credit_hours": 12, "enrollment_count": 3}, "meta": {}}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
      */
     public function myRegistration(
@@ -136,7 +138,9 @@ class DashboardCardController
      * `requests` list beside a populated one makes Scribe emit a union response type the generated
      * client cannot read.
      *
-     * @response 200 {"data": {"pending_count": 2, "advisee_count": 7, "requests": [{"id": 1, "student_id": 5, "student_name": "Sara Student", "university_id": "2026-MSC-CE-0001", "course_count": 2, "submitted_at": "2026-08-02T09:00:00+00:00"}]}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"pending_count": 2, "advisee_count": 7, "requests": [{"id": 1, "student_id": 5, "student_name": "Sara Student", "university_id": "2026-MSC-CE-0001", "course_count": 2, "submitted_at": "2026-08-02T09:00:00+00:00"}]}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function adviseeRequests(

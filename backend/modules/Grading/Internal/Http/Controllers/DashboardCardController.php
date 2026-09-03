@@ -66,6 +66,8 @@ class DashboardCardController
      * Scribe emit a union response type, and the generated Orval client then cannot read either
      * branch.
      *
+     * @responseField meta object required Card metadata, including the resolved scope.
+     *
      * @response 200 {"data": {"semester": {"id": 2, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "grade_submission_deadline_at": "2027-01-10T00:00:00+00:00", "offering_count": 2, "unfinalized_count": 1, "overdue_count": 1, "offerings": [{"offering_id": 3, "sheet_status": "Draft", "is_overdue": true, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}}]}, "meta": {"scope": "own"}}
      * @response 403 {"message": "This action is unauthorized."}
      */
@@ -107,7 +109,9 @@ class DashboardCardController
      * same reason as the Card above: an empty `sheets` list beside a populated one makes Scribe emit
      * a union response type the generated client cannot read.
      *
-     * @response 200 {"data": {"pending_count": 2, "sheets": [{"id": 4, "course_offering_id": 3, "kind": "Initial", "signed_at": "2026-08-10T09:00:00+00:00", "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}}]}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"pending_count": 2, "sheets": [{"id": 4, "course_offering_id": 3, "kind": "Initial", "signed_at": "2026-08-10T09:00:00+00:00", "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}}]}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function sheetsAwaitingReview(Request $request, DepartmentHeadSheetQueue $queue): DashboardCardResource
@@ -162,7 +166,9 @@ class DashboardCardController
      * no Offerings of their own, so they get the empty state, exactly as the resolution screen
      * already shows them.
      *
-     * @response 200 {"data": {"outstanding_count": 2, "nearest_deadline": "2026-11-03T00:00:00+00:00", "without_deadline_count": 1}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"outstanding_count": 2, "nearest_deadline": "2026-11-03T00:00:00+00:00", "without_deadline_count": 1}, "meta": {}}
      * @response 403 {"message": "This action is unauthorized."}
      */
     public function incompletes(
@@ -212,7 +218,9 @@ class DashboardCardController
      * Gated on `grades.view_own` (§3.2, Student only) and scoped to the acting user's own Student
      * anchor: there is no id parameter, so another Student's record is unreachable from it.
      *
-     * @response 200 {"data": {"cgpa": 3.42, "latest_semester": {"id": 3, "term": "Fall", "year": 2025, "name_en": "Fall 2025", "name_ar": "خريف 2025"}, "latest_semester_gpa": 3.67, "earned_credit_hours": 12}}
+     * @responseField meta object required Card metadata (empty for this Card).
+     *
+     * @response 200 {"data": {"cgpa": 3.42, "latest_semester": {"id": 3, "term": "Fall", "year": 2025, "name_en": "Fall 2025", "name_ar": "خريف 2025"}, "latest_semester_gpa": 3.67, "earned_credit_hours": 12}, "meta": {}}
      * @response 403 scenario="no student record" {"message": "You do not have a student record."}
      */
     public function academicRecord(

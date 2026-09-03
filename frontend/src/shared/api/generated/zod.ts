@@ -178,7 +178,10 @@ export const AdministrationCardResponse = zod.object({
   "actor_name": zod.string().optional(),
   "at": zod.string().optional()
 })).optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -699,7 +702,10 @@ export const MyApplicationCardResponse = zod.object({
   "status": zod.string().optional(),
   "status_entered_at": zod.string().optional(),
   "finalized_at": zod.string().optional()
-}).optional()
+}).nullable().describe('The acting Applicant\'s latest Application, or null when none exists.'),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -1254,7 +1260,10 @@ export const ScreeningQueueCardResponse = zod.object({
   "is_overdue": zod.boolean().optional(),
   "review_entered_at": zod.string().optional()
 })).optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -1454,7 +1463,10 @@ export const RecordTheFinalDecisionResponse = zod.union([zod.object({
 export const AdmissionDecisionsCardResponse = zod.object({
   "data": zod.object({
   "pending_count": zod.number().optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -1778,7 +1790,10 @@ export const SemesterAndOpenWindowsCardResponse = zod.object({
   "window": zod.string().optional(),
   "at": zod.string().optional()
 }).optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -1843,7 +1858,10 @@ export const CatalogSummaryCardResponse = zod.object({
   "data": zod.object({
   "active_program_count": zod.number().optional(),
   "active_course_count": zod.number().optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -3337,7 +3355,10 @@ export const MyRegistrationCardResponse = zod.object({
   "min_credit_hours": zod.number().optional(),
   "max_credit_hours": zod.number().optional(),
   "enrollment_count": zod.number().optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -3805,7 +3826,10 @@ export const AdviseeRequestsCardResponse = zod.object({
   "course_count": zod.number().optional(),
   "submitted_at": zod.string().optional()
 })).optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -4461,7 +4485,7 @@ export const MyGradeSheetsCardResponse = zod.object({
 }).optional(),
   "meta": zod.object({
   "scope": zod.string().optional()
-}).optional()
+}).describe('Card metadata, including the resolved scope.')
 })
 
 
@@ -4498,7 +4522,10 @@ export const OutstandingIncompletesCardResponse = zod.object({
   "outstanding_count": zod.number().optional(),
   "nearest_deadline": zod.string().optional(),
   "without_deadline_count": zod.number().optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -4734,7 +4761,10 @@ export const SheetsAwaitingReviewCardResponse = zod.object({
   "department_id": zod.number().optional()
 }).optional()
 })).optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 
@@ -4812,7 +4842,10 @@ export const MyAcademicRecordCardResponse = zod.object({
 }).optional(),
   "latest_semester_gpa": zod.number().optional(),
   "earned_credit_hours": zod.number().optional()
-}).optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).describe('Card metadata (empty for this Card).')
 })
 
 

@@ -8,6 +8,7 @@ describe('DashboardFigure', () => {
 
     expect(screen.getByText('Active courses').tagName).toBe('DT')
     expect(screen.getByText('42').tagName).toBe('DD')
+    expect(screen.getByText('42')).toHaveAttribute('dir', 'ltr')
     expect(container.querySelector('dl')).toBeInTheDocument()
   })
 })

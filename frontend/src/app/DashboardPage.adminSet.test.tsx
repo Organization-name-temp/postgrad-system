@@ -145,6 +145,26 @@ describe('DashboardPage — the administrator’s Card set, against the real reg
     expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(ADMINISTRATION_SET.length)
   })
 
+  it.each(['R09', 'R10'] as const)('renders the exact administration set for %s', (role) => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        user: {
+          name: role,
+          email: `${role.toLowerCase()}@ejust.test`,
+          roles: [{ code: role, name: role }],
+        },
+        roles: [role],
+        hasRole: (candidate: string) => candidate === role,
+      }),
+    )
+    renderDashboard()
+
+    const titles = screen
+      .queryAllByRole('heading', { level: 2 })
+      .map((heading) => heading.textContent)
+    expect(titles.sort()).toEqual([...ADMINISTRATION_SET].sort())
+  })
+
   it('withholds the Administration Card from a non-administrator holding every permission a role can', () => {
     // Nothing in the §3.2 matrix opens this Card: it gates on the Role, and no Permission
     // substitutes for it — which is what the server's `admin` middleware enforces too.

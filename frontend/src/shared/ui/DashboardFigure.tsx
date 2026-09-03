@@ -16,7 +16,8 @@ export function DashboardFigure({ label, value }: DashboardFigureProps) {
       <Typography
         component="dd"
         variant="h4"
-        sx={{ m: 0, fontFeatureSettings: '"tnum" 1', fontWeight: 700 }}
+        dir="ltr"
+        sx={{ m: 0, fontFeatureSettings: '"tnum" 1', fontWeight: 700, unicodeBidi: 'isolate' }}
       >
         {value}
       </Typography>

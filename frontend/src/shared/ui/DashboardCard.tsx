@@ -136,7 +136,13 @@ export function DashboardCard({
           component={RouterLink}
           to={action.to}
           variant="body2"
-          sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, alignSelf: 'flex-start' }}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            alignSelf: 'flex-start',
+            minHeight: 44,
+          }}
         >
           {action.label}
           {/* Logical rotation so the arrow points into the reading direction in RTL. */}

@@ -28,9 +28,9 @@ describe('DashboardCard', () => {
 
     const heading = screen.getByRole('heading', { level: 2, name: 'Screening queue' })
     expect(heading).toHaveClass('MuiTypography-h5')
-    expect(getComputedStyle(screen.getByRole('region', { name: 'Screening queue' })).borderRadius).toBe(
-      'calc(1.5 * var(--mui-shape-borderRadius))',
-    )
+    expect(
+      getComputedStyle(screen.getByRole('region', { name: 'Screening queue' })).borderRadius,
+    ).toBe('calc(1.5 * var(--mui-shape-borderRadius))')
     expect(Number(theme.shape.borderRadius) * 1.5).toBe(12)
   })
 

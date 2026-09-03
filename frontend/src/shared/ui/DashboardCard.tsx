@@ -113,11 +113,7 @@ export function DashboardCard({
         )}
 
         {!isPending && !isError && isEmpty && (
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ alignItems: 'center', color: 'text.secondary' }}
-          >
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', color: 'text.secondary' }}>
             <InboxOutlinedIcon aria-hidden="true" fontSize="small" />
             <Typography variant="body2" color="inherit">
               {emptyText}

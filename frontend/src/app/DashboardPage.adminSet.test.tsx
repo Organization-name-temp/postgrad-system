@@ -70,11 +70,7 @@ const ROLE_CARD_CASES = [
     ['Screening queue', 'Advisee requests', 'My grade sheets', 'Semester and open windows'],
     ['application.screen', 'registration.approve', 'grades.enter', 'calendar.manage'],
   ],
-  [
-    'R06',
-    ['Sheets awaiting review', 'Catalog'],
-    ['grades.finalize', 'catalog.manage'],
-  ],
+  ['R06', ['Sheets awaiting review', 'Catalog'], ['grades.finalize', 'catalog.manage']],
   [
     'R07',
     ['Screening queue', 'Admission decisions', 'Semester and open windows', 'Catalog'],
@@ -196,19 +192,29 @@ describe('DashboardPage — the administrator’s Card set, against the real reg
     expect(screen.getByRole('heading', { level: 2, name: 'Catalog' })).toBeInTheDocument()
   })
 
-  it.each(ROLE_CARD_CASES)('renders the exact Dashboard Card set for %s', (role, expected, permissions) => {
-    mockedUseAuth.mockReturnValue(
-      authState({
-        user: { name: role, email: `${role.toLowerCase()}@ejust.test`, roles: [{ code: role, name: role }] },
-        roles: [role],
-        hasRole: (candidate: string) => candidate === role,
-        hasPermission: (permission: string) => permissions.some((candidate) => candidate === permission),
-        isAdmin: false,
-      }),
-    )
-    renderDashboard()
+  it.each(ROLE_CARD_CASES)(
+    'renders the exact Dashboard Card set for %s',
+    (role, expected, permissions) => {
+      mockedUseAuth.mockReturnValue(
+        authState({
+          user: {
+            name: role,
+            email: `${role.toLowerCase()}@ejust.test`,
+            roles: [{ code: role, name: role }],
+          },
+          roles: [role],
+          hasRole: (candidate: string) => candidate === role,
+          hasPermission: (permission: string) =>
+            permissions.some((candidate) => candidate === permission),
+          isAdmin: false,
+        }),
+      )
+      renderDashboard()
 
-    const titles = screen.queryAllByRole('heading', { level: 2 }).map((heading) => heading.textContent)
-    expect(titles).toEqual(expected)
-  })
+      const titles = screen
+        .queryAllByRole('heading', { level: 2 })
+        .map((heading) => heading.textContent)
+      expect(titles).toEqual(expected)
+    },
+  )
 })

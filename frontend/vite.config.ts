@@ -1,28 +1,33 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // The SPA and API share one origin in dev: the browser talks only to Vite
 // (5173), which proxies /api and /sanctum to Laravel (8000). Same-origin means
 // Sanctum's cookie/CSRF session auth works without cross-origin config (Q10).
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 5173,
-    // Fail loudly if 5173 is taken instead of silently drifting to 5174+, whose
-    // origin isn't in SANCTUM_STATEFUL_DOMAINS — that mismatch makes Sanctum skip
-    // the session and login 500s with "Session store not set on request" (Q10).
-    strictPort: true,
-    proxy: {
-      '/api': { target: 'http://127.0.0.1:8000', changeOrigin: true },
-      '/sanctum': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const devPort = Number(env.VITE_DEV_PORT || 5173)
+  const apiTarget = env.VITE_API_TARGET || 'http://127.0.0.1:8000'
+
+  return {
+    plugins: [react()],
+    server: {
+      port: devPort,
+      // Fail loudly if the selected port is taken instead of silently drifting
+      // to an origin that Sanctum does not consider stateful.
+      strictPort: true,
+      proxy: {
+        '/api': { target: apiTarget, changeOrigin: true },
+        '/sanctum': { target: apiTarget, changeOrigin: true },
+      },
     },
-  },
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: './src/test/setup.ts',
-    // e2e/ is Playwright's; keep it out of the Vitest run.
-    exclude: ['**/node_modules/**', '**/e2e/**'],
-  },
+    test: {
+      environment: 'jsdom',
+      globals: true,
+      setupFiles: './src/test/setup.ts',
+      // e2e/ is Playwright's; keep it out of the Vitest run.
+      exclude: ['**/node_modules/**', '**/e2e/**'],
+    },
+  }
 })

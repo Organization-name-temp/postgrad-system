@@ -33,7 +33,7 @@ mid-flow.
   costs, and any surprise the migration produced.
 - **The four new ADRs re-read against the code.** If an implementation diverged from a decision, the
   ADR is amended or superseded — never left quietly wrong. ADR-0025's zero-outbound-edge claim and
-  ADR-0028's parity obligation are the two most worth verifying by hand.
+  ADR-0028's batch/single result parity are the two most worth verifying by hand.
 - **CONTEXT.md** checked: `Report`, `Export` and the amended `Dashboard Card` should describe what
   shipped.
 - **Anything found and not fixed is recorded**, in the ROADMAP's Deferred list, the way Phase 4.5

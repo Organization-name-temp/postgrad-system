@@ -28,7 +28,7 @@ This ticket establishes everything the four later Reports fill in.
   list and the §3.2 matrix agree precisely. Dean scope applies to the Report exactly as it applies
   to the queue behind it.
 
-**Blocked by:** 02 — Query contract foundation; 04 — Aggregate facades; 05 — Chart primitive;
+**Blocked by:** 02 — Query contract foundation; 04 — Batched owner-facade derivation; 05 — Chart primitive;
 06 — Admissions and Catalog lists on the contract.
 
 **Status:** ready-for-agent

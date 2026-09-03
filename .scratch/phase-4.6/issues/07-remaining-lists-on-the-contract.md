@@ -17,20 +17,33 @@ department-head pickers.
 **Notifications:** already paginated — aligned to the shared envelope so there is no second shape
 left in the API.
 
+**Export coverage:** `/semesters/export`, `/semesters/{semester_id}/offerings/export`,
+`/registration/queue/export`, `/offerings/{offering}/register/export`, `/offerings/mine/export`,
+`/grading/offerings/export`, `/grading/department-head/sheets/export`,
+`/grading/incompletes/export`, `/grading/students/export`,
+`/admin/faculty-dean-assignments/export`, and `/admin/department-head-assignments/export`.
+Personal collections (`/registration/requests`, `/registration/schedule`,
+`/registration/eligible-courses`, per-student/on-behalf eligible-course and schedule reads,
+`/grading/my-grades`, `/notifications`) are excluded because they duplicate a single person's
+already-visible record without serving a staff workflow. Instructor/advisor/dean/department-head and
+on-behalf-student pickers are excluded to prevent directory extraction. Tests prove every excluded
+`/export` route is absent.
+
 Three things that are genuinely new here rather than copied from ticket 06:
 
 - **Derived-value filters land for the first time**, which is why this batch depends on ticket 04.
-  CGPA range and attendance percentage become real `WHERE` and `ORDER BY` clauses through the batch
-  and aggregate facade methods — not a PHP loop behind a pagination that would then be a lie.
+  CGPA range and attendance percentage use batched owner-facade results, with filtering and sorting
+  completed before in-memory slicing — never a per-row facade loop or post-pagination filter.
 - **Filterable-if-and-only-if-readable stops being theoretical.** CGPA is the permission-sensitive
   field the rule was written for: an Instructor who may list their roster but not read CGPAs must
   not be able to send `cgpa_min` and read `meta.total`. The allowlist here is genuinely a function
   of the actor, and the negative case must be asserted.
-- **The four personal one-screen lists** — My Grades, my schedule, my Offerings, my registration —
+- **The personal one-screen lists** — My Grades, my schedule, my Offerings, my registration, and
+  the corresponding personal eligibility/notification collections —
   adopt the envelope but gain **no visible filter control**. One shape in the API, proportionate UI.
 
-**Blocked by:** 02 — Query contract foundation; 03 — Export foundation; 04 — Aggregate facades +
-parity test.
+**Blocked by:** 02 — Query contract foundation; 03 — Export foundation; 04 — Batched owner-facade
+derivation + result parity.
 
 **Status:** ready-for-agent
 
@@ -38,19 +51,24 @@ parity test.
       collection remains anywhere in the API**
 - [ ] Each declares filter, sort and `q` allowlists, actor-aware where fields are
       permission-sensitive
-- [ ] CGPA range filtering and sorting work through the ticket-04 aggregates, in SQL, with
-      pagination that reflects the true matching set
+- [ ] CGPA range filtering and sorting use ticket 04's batched owner facade; filtering and sorting
+      finish before in-memory page slicing, with truthful totals and page boundaries
 - [ ] Attendance percentage filtering works the same way
+- [ ] Student lookup supports partial University-ID matching, and every bilingual search normalizes
+      Arabic on both sides
+- [ ] Academic Standing is not a Phase 4.6 filter; it remains deferred to Phase 5
 - [ ] A user who may list a set but not read CGPAs cannot filter or sort by it — asserted as a
       **negative** test, not only a positive one
 - [ ] Advisor, Department Head and Instructor scopes stay base constraints; out-of-scope filter
       values return empty pages
-- [ ] Work surfaces gain `<FilterBar>` with URL state and an `/export` sibling with an Audit Log
-      entry; the four personal lists gain the envelope and no filter control
+- [ ] Every named export sibling exists with `<FilterBar>` URL state, authenticated Axios
+      fetch-to-blob, and an Audit Log entry; every named exclusion returns 404
 - [ ] Notifications is aligned to the shared envelope
 - [ ] Every migrated endpoint adds its row to the cross-module contract test dataset, which now
       covers the whole API
 - [ ] Existing Pest tests across these modules updated to the new envelope with their original
       authorization assertions intact
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both `api:check` gates pass
+- [ ] Sort is comma-separated and multi-column; every endpoint documents each `@queryParam`, keeps
+      model-bound `@urlParam ... Example:`, and regenerates deterministic OpenAPI/Orval artifacts
 - [ ] `composer gate` and `npm run gate` green

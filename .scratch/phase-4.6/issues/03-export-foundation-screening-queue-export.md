@@ -34,8 +34,9 @@ This establishes the export half of the platform, and every later export is a co
   names, National IDs, dates of birth, addresses and GPAs now exists outside the system. It also
   extends the Audit Log from authentication events into the sensitive-data category CONTEXT.md
   anticipated.
-- **`<DataToolbar>` gains the export control**, which is simply a link to the current URL's query
-  string with `/export` — so it cannot drift from what is on screen.
+- **`<DataToolbar>` gains the export control.** It derives `/export` plus the current query string,
+  requests it through the authenticated Axios client, and downloads the returned in-memory blob.
+  A bare link is forbidden because it bypasses the configured private API client.
 
 **Blocked by:** 02 — Query contract foundation + the screening queue filtered end to end.
 
@@ -56,7 +57,8 @@ This establishes the export half of the platform, and every later export is a co
       row count
 - [ ] One export is verified **end to end** by reading the produced file back with openspout's
       reader — headers, a typed National-ID cell, and RTL on the Arabic sheet
-- [ ] The export control in `<DataToolbar>` derives its href from the current query string
+- [ ] The export control derives its request from the current query string, uses authenticated Axios,
+      downloads an in-memory blob, and is not rendered as a bare export link
 - [ ] Scribe documents a single binary response; `openapi.yaml` and the Orval client are
       regenerated and committed
 - [ ] `composer gate` and `npm run gate` green

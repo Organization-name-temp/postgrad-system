@@ -27,7 +27,7 @@ Phase 0.5, unused. This ticket answers the other half rather than waiving it.
   drift. That assertion is the reason the affordance stays honest as charts change.
 - **Colour is never the only signal** — axis and legend text always present, per §14.
 
-**Blocked by:** None — can start immediately, in parallel with 01 and 04.
+**Blocked by:** None — can start immediately in parallel with ticket 01; ticket 04 follows 01.
 
 **Status:** ready-for-agent
 

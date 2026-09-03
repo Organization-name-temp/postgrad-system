@@ -21,8 +21,9 @@ moving the Report to Identity.
 
 Two further points:
 
-- **Attendance Analytics is scoped by assignment, exactly as the register is** — an Instructor sees
-  their own Offerings, a Department Head their Department, Student Affairs and Dean all. Attendance
+- **Attendance Analytics is scoped exactly as the ordinary register surface** — an Instructor sees
+  owned Offerings, an Advisor sees advisees, and R09/R10 use the existing administrative override.
+  Department Head, Student Affairs, Dean, and Council receive no new attendance surface. Attendance
   remains **flag-and-inform only**; nothing here changes a Course Status, and the at-risk figure is
   the same derived 75% threshold the Phase 3 register already uses. It is not recomputed.
 - **All three gate on `grades.view_student`**, which ADR-0026 records as doing the work of a "may
@@ -43,8 +44,10 @@ Two further points:
       existing 75% threshold, and session cancellation rates
 - [ ] The at-risk threshold and attendance percentage are read from the existing derivation, not
       recomputed; no Course Status is changed by anything here
-- [ ] Attendance Analytics is assignment-scoped: Instructor to own Offerings, Department Head to
-      Department, Student Affairs and Dean to all
+- [ ] Attendance Analytics is scoped to Instructor-owned Offerings, Advisor advisees, and the R09/R10
+      override; Department Head, Student Affairs, Dean, and Council receive 403
+- [ ] Enrollment Summary and Course Registration Summary apply the equivalent existing
+      Student/Offering scope for each viewer role
 - [ ] All three gate on `grades.view_student` and return 403 without it
 - [ ] All three take parameters through the shared `<FilterBar>` with URL state
 - [ ] Each chart carries its "View as table" disclosure with a Vitest series-match assertion
@@ -52,4 +55,5 @@ Two further points:
       and that list exports
 - [ ] No new deptrac edge is added
 - [ ] Pest covers each Report's authorized payload, 403, scoping and empty case
+- [ ] Every supported role has in-scope and out-of-scope rows proving filters only narrow its base
 - [ ] `composer gate` and `npm run gate` green

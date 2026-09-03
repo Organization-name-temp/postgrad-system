@@ -18,8 +18,9 @@ or keep in step with the schema.
    reading of.
 2. **Confirm → apply.** The **whole file lands in one transaction, or none of it does.** A typo on
    row 400 never leaves the Catalog in a state matching neither the file nor what the administrator
-   started with. The batch writes **a single `catalog_versions` snapshot** (ADR-0011), so the
-   version history reads as one deliberate act rather than four hundred.
+   started with. Every created or updated Course writes its own ADR-0011 version snapshot. One
+   Identity Audit Log event records the import identifier, actor, source filename, counts, and
+   transaction outcome, so the transaction remains one auditable act.
 
 Details that will bite if missed:
 
@@ -35,6 +36,9 @@ Details that will bite if missed:
 - **Gated on `catalog.manage`**, the Permission that already governs Catalog writes. No new
   Permission — this is a bulk path to an authorized action, not a new one.
 - **Import is only for Courses.** No other resource, and no import through the export route.
+- **ADR-0005 defers malware scanning in this localhost learning build.** MIME, size, workbook
+  structure, bilingual names, enum values, and credit-hour arithmetic are still validated before
+  preview; the private upload is deleted after confirmation or expiry.
 
 **Blocked by:** 03 — Export foundation; 06 — Admissions and Catalog lists on the contract.
 
@@ -46,9 +50,12 @@ Details that will bite if missed:
       confirms the Catalog is unchanged
 - [ ] A confirm call applies the whole file in one transaction; a file with one invalid row changes
       nothing at all
-- [ ] An applied batch writes exactly **one** `catalog_versions` snapshot, not one per row
+- [ ] Every created or updated Course writes exactly one `catalog_versions` snapshot
+- [ ] One Audit Log entry records the import identifier, actor, filename, create/update/reject
+      counts, and committed or rolled-back outcome
 - [ ] The file is held on the private local disk under a ULID between the calls, per the ADR-0016
-      pattern
+      pattern, and deleted after confirmation or expiry
+- [ ] MIME, size, and workbook structure are validated; ADR-0005's malware-scan deferral is stated
 - [ ] Rows missing either the English or the Arabic name are rejected with that reason
 - [ ] The credit-hour invariant and the level enums are enforced identically to the single-Course
       form

@@ -10,10 +10,9 @@ GPA read model answer a question about a population rather than a person.
 
 - **Owned by Grading**, which owns the GPA/CGPA read model (ADR-0020) and already holds granted
   edges to Catalog, Identity, Enrollment and Calendar. Zero new deptrac edges.
-- **Every figure comes from ticket 04's aggregate**, in one SQL query, under the parity obligation.
-  The distribution must not re-derive the arithmetic: the whole point of ADR-0020 is that the
-  credit-weighted formula lives in exactly one place, and ADR-0028 accepts a second *implementation*
-  only because a test asserts the two agree.
+- **Every figure comes from ticket 04's batched owner facade.** The distribution does not re-derive
+  the arithmetic: ADR-0020 keeps the credit-weighted formula in one PHP calculator, and ADR-0028
+  batches its inputs without cross-module SQL.
 - **Bands follow the grading scale** (ADR-0021), and the rendering follows `design-system.md` §14:
   a sequential single-hue ramp for intensity rather than a categorical set, and axis and legend text
   always present so colour is never the only signal.
@@ -48,6 +47,10 @@ GPA read model answer a question about a population rather than a person.
       row count matches the band's figure
 - [ ] Gated on `grades.view_student`, returning 403 without it
 - [ ] A Department Head sees only their Department and a Dean only their Faculty
+- [ ] Advisor sees only advisees; Instructor sees only the teaching roster; Student Affairs and
+      Council are unscoped only as allowed by the existing Student-Grades screen; R09/R10 use the
+      explicit override
+- [ ] Every supported role has in-scope and out-of-scope rows proving filters only narrow its base
 - [ ] Pest covers the authorized payload, the 403, the scoping, the `null`-CGPA case and the empty
       case
 - [ ] `composer gate` and `npm run gate` green

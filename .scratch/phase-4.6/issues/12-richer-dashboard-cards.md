@@ -31,7 +31,7 @@ Two things from ADR-0024 are unchanged and still load-bearing:
 The composition rule is untouched: still the union of a user's Cards, still no role switcher, still
 an explicit administration set.
 
-**Blocked by:** 04 — Aggregate facades + parity test; 05 — Chart primitive + View as table.
+**Blocked by:** 04 — Batched owner-facade derivation + result parity; 05 — Chart primitive + View as table.
 
 **Status:** ready-for-agent
 

@@ -15,6 +15,13 @@ advisor and interviewer pickers.
 
 **Catalog collections:** Courses, Programs, Departments and Faculties.
 
+**Export coverage:** `/dean/applications/export`, `/dean/decisions/export`,
+`/applications/awaiting-interview/export`, `/interviews/export`, `/interview-slots/export`,
+`/admission-cycles/export`, `/courses/export`, `/programs/export`, `/departments/export`, and
+`/faculties/export`. The `/dean/advisors` and `/interview-slots/interviewers` pickers are explicit
+data-minimization exclusions: they exist only to select an assignee and must not become staff-directory
+downloads; tests prove those export routes do not exist.
+
 Two things to get right rather than copy blindly:
 
 - **Scope stays a base constraint.** The Dean's Faculty scope is applied by the controller before
@@ -27,13 +34,16 @@ Two things to get right rather than copy blindly:
 Pickers adopt the contract too — the API keeps **one** response shape — but they get a type-ahead
 rather than the full filter bar, and a 100-row default.
 
-**Blocked by:** 02 — Query contract foundation; 03 — Export foundation.
+**Blocked by:** 02 — Query contract foundation; 03 — Export foundation; 04 — batched owner-facade
+derivation used by derived queue values.
 
 **Status:** ready-for-agent
 
 - [ ] Every Admissions and Catalog collection endpoint returns the paginated envelope
 - [ ] Each declares a filter allowlist, a sort allowlist and its `q` field list, actor-aware
       wherever a field is permission-sensitive
+- [ ] Sort accepts comma-separated fields with independent descending markers; search normalizes
+      Arabic on both sides
 - [ ] Courses filter by Department, level, credit hours, Research Type and active state; `CSE5`
       matches `CSE511`
 - [ ] Programs, Departments and Faculties filter and search bilingually
@@ -41,11 +51,13 @@ rather than the full filter bar, and a 100-row default.
       out-of-faculty filter value returns an empty page
 - [ ] Work surfaces gain `<FilterBar>` with URL state; pickers gain a type-ahead and a 100-row
       default
-- [ ] Each work surface gains its `/export` sibling with a canonical column set and an Audit Log
-      entry
+- [ ] Every named export sibling above exists with a canonical column set, authenticated
+      fetch-to-blob UI, and an Audit Log entry; the two excluded picker routes return 404
 - [ ] The Courses export column set is the shape ticket 16 will accept as an import template
 - [ ] Every migrated endpoint adds its row to the cross-module contract test dataset
 - [ ] Existing Admissions and Catalog Pest tests are updated to the new envelope and still assert
       their original authorization behaviour
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both `api:check` gates pass
+- [ ] Every endpoint documents each `@queryParam`, preserves model-bound `@urlParam ... Example:`,
+      and regenerates deterministic OpenAPI/Orval artifacts
 - [ ] `composer gate` and `npm run gate` green

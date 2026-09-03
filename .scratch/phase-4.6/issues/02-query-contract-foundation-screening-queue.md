@@ -20,8 +20,9 @@ later list is a fill. It establishes, once and in one place:
   binds that spec to a builder. This is what lets the parser be tested exhaustively without a
   database, and it is the seam the unit tests attach to. If the parser touches Eloquent, the
   normalisation and operator tests quietly become slow feature tests.
-- **The flat wire syntax** — `?status=a,b&age_days_min=7&q=…&sort=-age_days&page=2&per_page=25`.
-  Comma-separated multi-values, `_min`/`_max` range suffixes, leading `-` for descending sort.
+- **The flat wire syntax** — `?status=a,b&age_days_min=7&q=…&sort=-age_days,name&page=2&per_page=25`.
+  Comma-separated multi-values, `_min`/`_max` range suffixes, and comma-separated multi-column sort
+  with a leading `-` on each descending field.
   Flat names generate readable types through Scribe → OpenAPI → Orval; bracket syntax would not.
 - **The always-paginated envelope.** Never conditional — two `@response 200` shapes on one operation
   generate a TypeScript union the Orval client cannot read, and this project has hit that before.
@@ -55,7 +56,8 @@ later list is a fill. It establishes, once and in one place:
       and **no outbound edge**; a deliberate violation fails `deptrac analyse`
 - [ ] The parser is a pure function of input + allowlist producing an immutable spec, unit-tested
       with **no database**
-- [ ] Unit tests cover multi-value parsing, `_min`/`_max` ranges, sort parsing and rejection of
+- [ ] Unit tests cover multi-value parsing, `_min`/`_max` ranges, comma-separated multi-column sort
+      with independent descending markers, effective allowlists, and rejection of
       unknown fields, `per_page` clamping, and every Arabic normalisation fold
 - [ ] The screening queue filters on Application Status, Program, Admission Cycle and derived age
 - [ ] `q` searches the declared fields across `_en` and `_ar`; `احمد` finds `أحمد` and a partial
@@ -70,5 +72,7 @@ later list is a fill. It establishes, once and in one place:
 - [ ] The cross-module contract test exists with the screening queue as its first dataset row
 - [ ] `openapi.yaml` and the Orval client are regenerated **and committed**; both `api:check` gates
       pass
+- [ ] Every query parameter has an explicit Scribe `@queryParam`; every model-bound route retains
+      its `@urlParam ... Example:` annotation so generated examples stay deterministic
 - [ ] Vitest covers `<FilterBar>` states and the URL-state round trip
 - [ ] `composer gate` and `npm run gate` green

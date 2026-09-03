@@ -83,7 +83,8 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
     // screen above. Same gate, same set (OutstandingIncompleteQueue), and the same derived
     // deadline: an unresolved Incomplete converts to a Fail Withdrawal when its deadline passes,
     // so the Card exists to reach the Instructor before that command does.
-    Route::get('/grading/cards/incompletes', [DashboardCardController::class, 'incompletes']);
+    Route::get('/grading/cards/incompletes', [DashboardCardController::class, 'incompletes'])
+        ->middleware('role:R04');
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
@@ -107,10 +108,10 @@ Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
         ->whereNumber('grade_sheet');
 
     // The Sheets Awaiting Review Dashboard Card (phase 4.5, ticket 05) — the same queue's count
-    // and oldest few, summarised for the landing page. The gate is shared with the Instructor's
-    // signature above, so an Instructor who heads no Department reaches it and finds it empty:
-    // the Department assignment, not the permission, is what fills a Head's queue.
-    Route::get('/grading/cards/sheets-awaiting-review', [DashboardCardController::class, 'sheetsAwaitingReview']);
+    // and oldest few, summarised for the landing page. The capability is shared with Instructors,
+    // so the Role gate narrows this Card to the Department Head persona.
+    Route::get('/grading/cards/sheets-awaiting-review', [DashboardCardController::class, 'sheetsAwaitingReview'])
+        ->middleware('role:R06');
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {
@@ -122,7 +123,8 @@ Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {
     // headline numbers, summarised for the landing page and linking into the screen above.
     // Independently authorized here rather than trusting the SPA's choice of what to request
     // (ADR-0024): the client composes Cards from the acting user's access as a UX mirror only.
-    Route::get('/grading/cards/academic-record', [DashboardCardController::class, 'academicRecord']);
+    Route::get('/grading/cards/academic-record', [DashboardCardController::class, 'academicRecord'])
+        ->middleware('role:R02');
 });
 
 Route::middleware(['auth:sanctum', 'can:grades.view_student'])->group(function () {

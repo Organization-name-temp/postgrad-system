@@ -64,7 +64,8 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
     // page. It carries no id param, so it always reads the acting user's own Student anchor, and it
     // is independently authorized here rather than trusting the SPA's choice of what to request
     // (ADR-0024): the client composes Cards as a UX mirror only.
-    Route::get('/enrollment/cards/my-registration', [DashboardCardController::class, 'myRegistration']);
+    Route::get('/enrollment/cards/my-registration', [DashboardCardController::class, 'myRegistration'])
+        ->middleware('role:R02');
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {

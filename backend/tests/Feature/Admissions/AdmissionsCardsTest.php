@@ -107,12 +107,11 @@ it('returns a null payload for an applicant who has not started an application',
     acMyApplicationCard()->assertOk()->assertJsonPath('data', null);
 });
 
-it('returns a null payload for an administrator, who has no application to show', function () {
-    // R09 inherits `application.view_status` (ADR-0008) and holds no Application — the reason this
-    // Card gates on the **Role** in the SPA rather than on that Permission.
+it('refuses an administrator who inherits the permission but is not an applicant', function () {
+    // R09 inherits `application.view_status` (ADR-0008), but this is an R01 persona Card.
     actingAsRole(Role::SystemAdmin);
 
-    acMyApplicationCard()->assertOk()->assertJsonPath('data', null);
+    acMyApplicationCard()->assertForbidden();
 });
 
 it('refuses a user who does not hold application.view_status', function () {

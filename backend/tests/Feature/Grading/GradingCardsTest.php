@@ -292,9 +292,8 @@ it('counts only submitted rounds, not drafts or sheets already finalized', funct
     gcReviewCard()->assertOk()->assertJsonPath('data.pending_count', 0);
 });
 
-it('gives an instructor who heads no department an empty queue rather than a 403', function () {
-    // Instructor and Department Head both hold grades.finalize (§3.2), so the Permission opens the
-    // Card and the assignment is what fills it.
+it('refuses an instructor who shares the permission but is not a department head', function () {
+    // Instructor and Department Head both hold grades.finalize (§3.2), but review is R06 work.
     $instructor = gcInstructor();
     $department = Department::factory()->create();
     gcDeptHead($department->id);
@@ -303,7 +302,7 @@ it('gives an instructor who heads no department an empty queue rather than a 403
 
     Sanctum::actingAs($instructor);
 
-    gcReviewCard()->assertOk()->assertJsonPath('data.pending_count', 0);
+    gcReviewCard()->assertForbidden();
 });
 
 it('refuses a user who does not hold grades.finalize', function () {

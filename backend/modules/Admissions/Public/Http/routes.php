@@ -91,12 +91,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // authorized** rather than to inherit its group's. `application.view_status` is the §3.2
     // permission for exactly this read (Applicant / Student Affairs / Dean).
     //
-    // The gate is not the whole story, which is why the SPA gates the Card on the Applicant Role:
-    // an administrator inherits the Permission (ADR-0008) and holds no Application, so the endpoint
-    // answers them with a null payload rather than a 403 — an Applicant who has not started their
-    // first draft is the same legitimate state, and it must not read as an error.
+    // This is an Applicant-persona Card, so the Role gate narrows administrators and other roles
+    // that inherit or share the underlying capability.
     Route::get('/admissions/cards/my-application', [DashboardCardController::class, 'myApplication'])
-        ->middleware('can:application.view_status');
+        ->middleware(['can:application.view_status', 'role:R01']);
 });
 
 // Interviewer evaluation (ticket 09). Sanctum-authed but **not** permission-gated: an

@@ -198,17 +198,16 @@ it('is empty rather than erroring for an Instructor with nothing outstanding', f
         ->assertJsonPath('data.nearest_deadline', null);
 });
 
-it('is empty for a central-entry user, who teaches no Offerings of their own', function () {
+it('refuses a central-entry user who shares the permission but is not an instructor', function () {
     $instructor = oicInstructor();
     $spring = oicSemester('2026-02-01');
     oicSemester('2026-09-01');
     oicIncomplete($instructor, $spring);
 
-    // Student Affairs holds `grades.enter` (§3.2), so the Card opens for them — and shows the
-    // empty state, exactly as the resolution screen it links into already does.
+    // Student Affairs holds `grades.enter` (§3.2), but this work belongs only to R04.
     actingAsRole(Role::StudentAffairs);
 
-    oicCard()->assertOk()->assertJsonPath('data.outstanding_count', 0);
+    oicCard()->assertForbidden();
 });
 
 // ---------------------------------------------------------------------------

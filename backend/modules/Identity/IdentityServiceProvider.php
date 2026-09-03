@@ -13,6 +13,7 @@ use Modules\Identity\Internal\Directory\EloquentDirectory;
 use Modules\Identity\Internal\Enrollment\EloquentStudentDirectory;
 use Modules\Identity\Internal\Enrollment\EloquentStudentEnrollment;
 use Modules\Identity\Internal\Http\Middleware\EnsureAdministrator;
+use Modules\Identity\Internal\Http\Middleware\EnsureRole;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Internal\Registration\EloquentApplicantRegistrar;
 use Modules\Identity\Internal\Registration\EloquentEmailVerifier;
@@ -46,9 +47,10 @@ class IdentityServiceProvider extends ServiceProvider
 
         $this->registerPermissionGates();
 
-        // The Administration surface (ticket 08) is gated by role, not permission
-        // (ADR-0008 intact — no new permission). This alias is the only role gate.
+        // Persona-specific surfaces are narrowed by role as well as capability without
+        // extending the fixed permission matrix (ADR-0008).
         $router->aliasMiddleware('admin', EnsureAdministrator::class);
+        $router->aliasMiddleware('role', EnsureRole::class);
 
         // The module owns its /api/v1 routes (ADR-0002).
         Route::middleware('api')

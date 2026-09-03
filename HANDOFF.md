@@ -147,7 +147,7 @@ password for every account: `password`.
    sequenced **before** Phase 5 for one reason: it changes the
    response envelope of every collection endpoint, so Phases 5–7 are born filterable rather than
    retrofitted. Two things to know going in — the envelope change forces an `openapi.yaml` + Orval
-   regeneration across ~25 endpoints (both `api:check` gates are `git diff --exit-code`), and
+   regeneration across every named collection endpoint (both `api:check` gates are `git diff --exit-code`), and
    `backend/support/` is the project's **first shared backend code**, so `deptrac.yaml` gains a
    layer with seven inbound and **zero** outbound edges.
 2. **Then Phase 5** (SRS §4.8, §4.5, §4.6 — Academic Standing, Credit-Hour Summary,

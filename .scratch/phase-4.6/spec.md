@@ -220,7 +220,7 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 - A **collection endpoint** returns independently filterable rows. Nested aggregate/history read
   models (`/catalog/tree`, an Application timeline, Course/Program versions, Program curriculum)
   describe one parent object and retain their complete response; they are not paginated or exported.
-- `openapi.yaml` and the generated Orval client **regenerate across roughly twenty-five endpoints**.
+- `openapi.yaml` and the generated Orval client **regenerate across every named collection endpoint**.
   Both `composer api:check` and `npm run api:check` are `git diff --exit-code` gates, so this is
   part of the work and not a follow-up. Scribe documents each filter as a `@queryParam`; every
   model-bound route keeps its explicit `@urlParam … Example:` or the drift check flakes.
@@ -440,7 +440,7 @@ columns from `database/migrations` only, so anything a module migration adds nee
 - **Two risks worth naming at ticket-planning time.** First, the seeded cohort growing to 150–250
   Students will move count-based assertions in existing Pest and Playwright tests — a wide, boring,
   easily-underestimated job. Second, the envelope change forces an `openapi.yaml` and Orval
-  regeneration across ~25 endpoints, and both `api:check` gates only mean anything once the
+  regeneration across every named collection endpoint, and both `api:check` gates only mean anything once the
   generated files are committed.
 - **`@mui/x-charts` version alignment with the installed MUI X major is asserted, not verified.**
   Check it at install before the ADR reads as established fact.

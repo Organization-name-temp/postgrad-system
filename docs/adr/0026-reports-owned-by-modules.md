@@ -39,13 +39,15 @@ by Enrollment**, which already reads both Catalog and Identity.
 
 ## What gates a Report
 
-**Each Report is gated on the existing Permission that already authorizes reading its underlying
-data**, so a Report can never reveal anything its source screens do not. No new Permission is
+**By default, a Report is gated on the existing Permission that already authorizes reading its
+underlying data**, so a Report can never reveal anything its source screens do not. Attendance is
+the assignment/advisee-scoped exception because ADR-0019 defines no attendance Permission; Audit
+Log is the R09/R10 role-gated exception, following Administration Card precedent. No new Permission is
 added: the enum's own docblock calls the set "university bylaws, not runtime-editable"
 ([ADR-0008](0008-rbac-enums-static-matrix.md)), and SRS §4.12 supplies no permission names to
 transcribe — only a table of roles.
 
-Two rules decide which Permission:
+Two rules decide the default Permission when one exists:
 
 1. **A Report is gated by the Permission authorizing its underlying data**, so it discloses nothing
    its source screens do not.

@@ -644,7 +644,7 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   table-matches-series; **one comprehensive Playwright smoke** (the Phase-2 multi-flow precedent)
   — filter a queue → export it → open Analytics → drill a chart segment back into that filtered
   queue — plus **axe on Analytics across light/dark × EN/AR**. `openapi.yaml` and the Orval client
-  regenerate across ~25 endpoints; both `api:check` gates make that non-optional.
+  regenerate across every named collection endpoint; both `api:check` gates make that non-optional.
 - **Deferred:** saved/named filters; cross-filtering between charts; client-side pivoting or an
   ad-hoc report builder; caching report aggregates and materialising any derived value (ADR-0028);
   real-time updates (no websocket, ADR-0005); `pg_trgm` indexes; scheduled or emailed reports (no

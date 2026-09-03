@@ -7,7 +7,7 @@ rather than an accident: [deptrac.yaml](../../backend/deptrac.yaml) grants no mo
 `App\`, every `Internal` is sealed, and everything crossing a seam is a DTO through a `Public`
 facade ([ADR-0002](0002-modular-monolith-seams.md),
 [ADR-0012](0012-cross-module-reads-by-id-and-dto.md)). Phase 4.6 breaks that property on purpose,
-because it needs **one** filter/sort/paginate/search parser used by roughly twenty-five endpoints
+because it needs **one** filter/sort/paginate/search parser used by every named collection endpoint
 across seven modules, and that parser is security-relevant (see the allowlist rule below). Seven
 hand-copied versions of a security-relevant parser is the worst available outcome.
 
@@ -36,7 +36,11 @@ what a Program is has been written in the wrong place.
 - **Every effective sort is total and deterministic.** After validated user-selected fields, the
   endpoint appends its stable unique key (normally `id`) unless already present. SQL and derived
   in-memory sorting use the identical sequence, so ties cannot duplicate or omit rows between pages.
-- **Every collection endpoint is always paginated** — `{data, links, meta}`, unconditionally. A
+- **Every independently filterable collection endpoint is always paginated** — `{data, links,
+  meta}`, unconditionally. Nested aggregate/history read models such as the complete Catalog tree,
+  one Application's timeline, Course/Program version history, and one Program's curriculum describe
+  a parent aggregate rather than independently filterable rows; they retain their complete response
+  and do not receive an export sibling. A
   conditional envelope (plain array without `?page=`, paginated with it) would put two response
   shapes on one operation, which is precisely the failure this project already hit once: two
   `@response 200` scenarios of different shapes generate a TypeScript union the Orval client cannot
@@ -100,8 +104,8 @@ answer to "your applications in that Faculty".
 
 ## Consequences
 
-- **The response envelope changes on every collection endpoint.** That is a breaking change
-  touching ~25 Pest feature tests, the list components, `openapi.yaml` and the generated Orval
+- **The response envelope changes on every independently filterable collection endpoint.** That is
+  a breaking change touching the corresponding Pest feature tests, list components, `openapi.yaml`, and generated Orval
   client — and both `composer api:check` and `npm run api:check` are `git diff --exit-code` gates,
   so the regeneration is not optional.
 - Every filter, search, sort, and pagination input is documented with `@queryParam`; model-bound

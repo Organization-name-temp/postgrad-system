@@ -26,10 +26,14 @@ Two further points:
   Department Head, Student Affairs, Dean, and Council receive no new attendance surface. Attendance
   remains **flag-and-inform only**; nothing here changes a Course Status, and the at-risk figure is
   the same derived 75% threshold the Phase 3 register already uses. It is not recomputed.
-- **All three gate on `grades.view_student`**, which ADR-0026 records as doing the work of a "may
-  read student academic records" Permission that §3.2 does not have. Its holders exclude Student and
+- **Enrollment Summary and Course Registration Summary gate on `grades.view_student`**, which
+  ADR-0026 records as doing the work of a "may read student academic records" Permission that §3.2
+  does not have. Its holders exclude Student and
   Applicant, and each Report's gate is at least as strong as the list it drills into — Course
   Registration Summary is only counts per Offering, but it drills into a roster.
+- **Attendance has its own narrower authorization:** an authenticated Instructor must own the
+  Offering, an Advisor is limited to advisees, and R09/R10 use the explicit administrative override.
+  Holding `grades.view_student` alone never grants the Attendance Report.
 
 For Enrollment Summary and Course Registration Summary, the base scope is explicit: Advisor sees
 advisees, Instructor sees assigned teaching rosters/Offerings, Department Head sees assigned
@@ -54,7 +58,8 @@ Student-Grades view, and R09/R10 use the administrative override. Parameters onl
 - [ ] Enrollment Summary and Course Registration Summary scope Advisor to advisees, Instructor to
       assigned rosters/Offerings, Department Head to Departments, Dean to Faculties, Student Affairs
       and Council to their existing unscoped view, and R09/R10 to the administrative override
-- [ ] All three gate on `grades.view_student` and return 403 without it
+- [ ] Enrollment Summary and Course Registration Summary gate on `grades.view_student`; Attendance
+      enforces its narrower assignment/advisee/R09-R10 authorization independently
 - [ ] All three take parameters through the shared `<FilterBar>` with URL state
 - [ ] Each chart carries its "View as table" disclosure with a Vitest series-match assertion
 - [ ] Each drills into the corresponding filtered list, whose row count matches the segment figure,

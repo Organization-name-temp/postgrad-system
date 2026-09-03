@@ -563,6 +563,8 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   (never conditional — two response shapes on one operation generate a TS union Orval cannot read),
   25 rows default / 100 for pickers / **hard cap 100**. "Every row" is `/export`, which is what
   makes the cap right rather than merely tolerable.
+  Nested aggregate/history read models (Catalog tree, timeline, version history, curriculum) remain
+  complete parent-object responses and are not treated as pageable/exportable collections.
 - **Free-text `q`** — case-insensitive substring over a per-resource declared field list across
   **both `_en` and `_ar`** columns, Arabic **normalised on both sides** (alef forms → `ا`, `ى`→`ي`,
   `ة`→`ه`, diacritics stripped). Chosen over Postgres full-text, which gives Arabic no stemming
@@ -577,8 +579,8 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   **canonical column set per resource server-rendered in the actor's locale** with RTL sheets for
   Arabic — the one recorded exception to ADR-0024's typed-values-only rule, because a spreadsheet
   has no client to render for. Authorized by the **list's own gate and scope**, adding no
-  Permission (the Central Grade Entry reasoning), intersected with the actor's readable-field
-  allowlist, and **always written to the Audit Log** with
+  Permission (the Central Grade Entry reasoning), projected through a separate actor-aware export
+  column contract, and **always written to the Audit Log** with
   actor, resource, criteria and row count: the new fact is not that data was read but that it left.
   Export is a List capability: every migrated collection gets a sibling unless its ticket records
   a security exclusion, Reports export through drill-through, and the SPA downloads through the

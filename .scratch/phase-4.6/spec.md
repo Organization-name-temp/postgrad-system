@@ -216,7 +216,10 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 
 - **Every collection endpoint adopts the contract**, including pickers and personal lists, so the
   API has one response shape. UI investment is tiered: the full `<FilterBar>` on the work surfaces,
-  a type-ahead on pickers, no visible control on the four single-screen personal lists.
+  a type-ahead on pickers, and no visible control on single-screen personal lists.
+- A **collection endpoint** returns independently filterable rows. Nested aggregate/history read
+  models (`/catalog/tree`, an Application timeline, Course/Program versions, Program curriculum)
+  describe one parent object and retain their complete response; they are not paginated or exported.
 - `openapi.yaml` and the generated Orval client **regenerate across roughly twenty-five endpoints**.
   Both `composer api:check` and `npm run api:check` are `git diff --exit-code` gates, so this is
   part of the work and not a follow-up. Scribe documents each filter as a `@queryParam`; every
@@ -242,8 +245,9 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   ADR-0024's typed-values-only rule — a spreadsheet has no renderer, so the export endpoint is the
   one place in this API where the server produces display strings. The column set is canonical and
   **not** the grid's current columns: the client is never the authority on what an export contains,
-  which is also what keeps the column chooser honest. It is intersected with the actor's effective
-  readable-field allowlist, so a richer export never reveals a field that actor cannot read.
+  which is also what keeps the column chooser honest. Each module supplies a separate actor-aware
+  export projection (not the filter/sort allowlist), so readable-but-unfilterable fields may remain
+  while a richer export never reveals a field that actor cannot read.
 - **Authorized by the mirrored list's own `can:` gate and row-level scope**, adding no Permission —
   it reveals nothing the user could not already read, so this is the plain reading of the §3.2
   matrix rather than a new power (the Central Grade Entry precedent). **Every export writes an

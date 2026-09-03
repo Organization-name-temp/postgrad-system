@@ -14,14 +14,18 @@ interviewer assigned-work list, Dean review queue and decision worklist (both fa
 awaiting-interview worklist, booked interviews, interview-slot pool, Admission Cycles, and the
 advisor and interviewer pickers.
 
-**Catalog collections:** the Catalog tree, Courses and Course version history, Programs and Program
-curriculum/version history, Departments, and Faculties.
+**Catalog collections:** Courses, Programs, Departments, and Faculties.
+
+Nested aggregate/history read models are not collection endpoints for this contract:
+`/catalog/tree` must continue returning the complete hierarchy needed by the tree UI;
+`/applications/{application}/timeline`, `/courses/{course}/versions`,
+`/programs/{program}/curriculum`, and `/programs/{program}/versions` describe one parent aggregate
+and remain whole. They receive neither pagination nor export routes. This representation-based
+exception is distinct from excluding an otherwise filterable collection for security reasons.
 
 **Export coverage:** `/dean/applications/export`, `/dean/decisions/export`,
 `/applications/awaiting-interview/export`, `/interviews/export`, `/interview-slots/export`,
-`/admission-cycles/export`, `/interviews/assigned/export`, `/catalog/tree/export`, `/courses/export`,
-`/courses/{course}/versions/export`, `/programs/export`,
-`/programs/{program}/curriculum/export`, `/programs/{program}/versions/export`,
+`/admission-cycles/export`, `/interviews/assigned/export`, `/courses/export`, `/programs/export`,
 `/departments/export`, and `/faculties/export`. The unauthenticated `/admission-cycles/open` lookup
 is excluded to avoid adding an unauthenticated bulk-scraping route. The applicant-owned
 `/application/interview/slots` picker is excluded to prevent exporting interviewer/capacity data
@@ -47,7 +51,9 @@ derivation used by derived queue values.
 **Status:** ready-for-agent
 
 - [ ] Every Admissions and Catalog collection named above returns the paginated envelope, including
-      public/personal lookups, hierarchical Catalog reads, curricula, and version histories
+      public and personal lookup collections
+- [ ] The Catalog tree, Application timeline, Course/Program version histories, and Program
+      curriculum retain their complete parent-aggregate response and have no `/export` route
 - [ ] Each declares a filter allowlist, a sort allowlist and its `q` field list, actor-aware
       wherever a field is permission-sensitive
 - [ ] Sort accepts comma-separated fields with independent descending markers; search normalizes

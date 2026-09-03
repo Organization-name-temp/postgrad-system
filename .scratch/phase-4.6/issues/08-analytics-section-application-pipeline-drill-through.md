@@ -6,7 +6,7 @@ sees the Application Pipeline: how many Applications sit at each status, the con
 between stages, and where Applicants are being lost rather than only how many remain. They click
 the bar for one status and land on **exactly those Applications**, filtered — and export them.
 
-This ticket establishes everything the four later Reports fill in.
+This ticket establishes everything the five later Reports fill in.
 
 - **A Report is a first-class term now** (CONTEXT.md), and this is the first one: parameterised,
   cross-record, and drillable. The mechanical line against a Dashboard Card is that **a Card takes

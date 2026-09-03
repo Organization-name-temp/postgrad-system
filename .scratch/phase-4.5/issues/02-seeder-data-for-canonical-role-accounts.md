@@ -11,7 +11,7 @@ instead. Specifically, `r02@` holds no Enrollments or Grades, `r03@` advises nob
 multi-role path — has neither advisees nor Offerings.**
 
 That was invisible for four phases, because every screen was a list you navigate *into*.
-It becomes glaring the moment the landing page is made of counts: an Instructor's dashboard
+It becomes glaring the moment the Dashboard is made of counts: an Instructor's dashboard
 would render rich while an Advisor's renders zeros beside it, and the difference would read
 as broken code rather than an empty account.
 

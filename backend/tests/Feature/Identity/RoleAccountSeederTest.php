@@ -73,7 +73,32 @@ it('gives r03@ advisees with a request genuinely pending their approval', functi
             ->where('status', RegistrationStatus::Pending)
             ->count(),
     )->toBeGreaterThanOrEqual(1);
+
+    Sanctum::actingAs(rasUser('r03@ejust.test'));
+    $this->getJson('/api/v1/enrollment/cards/advisee-requests')
+        ->assertOk()
+        ->assertJsonPath('data.pending_count', 1)
+        ->assertJsonCount(1, 'data.requests');
 });
+
+it('gives each operational role a non-empty primary Dashboard Card through HTTP', function (
+    string $email,
+    string $endpoint,
+    string $nonEmptyPath,
+) {
+    $this->seed(DatabaseSeeder::class);
+
+    Sanctum::actingAs(rasUser($email));
+    $response = $this->getJson($endpoint)->assertOk();
+
+    expect($response->json($nonEmptyPath))->toBeGreaterThan(0);
+})->with([
+    'instructor grade sheets' => ['r04@ejust.test', '/api/v1/grading/cards/grade-sheets', 'data.offering_count'],
+    'student affairs screening' => ['r05@ejust.test', '/api/v1/admissions/cards/screening-queue', 'data.pending_count'],
+    'department-head review' => ['r06@ejust.test', '/api/v1/grading/cards/sheets-awaiting-review', 'data.pending_count'],
+    'dean decisions' => ['r07@ejust.test', '/api/v1/admissions/cards/admission-decisions', 'data.pending_count'],
+    'system administration' => ['r09@ejust.test', '/api/v1/admin/cards/administration', 'data.user_count'],
+]);
 
 it('gives multi@ both halves of its two roles, so the composition rule is demonstrable', function () {
     $this->seed(DatabaseSeeder::class);
@@ -104,6 +129,15 @@ it('gives multi@ both halves of its two roles, so the composition rule is demons
         ->whereNot('status', GradeSheetStatus::Finalized)
         ->count();
     expect($unfinalized)->toBeGreaterThanOrEqual(1);
+
+    Sanctum::actingAs($multi);
+    $this->getJson('/api/v1/enrollment/cards/advisee-requests')
+        ->assertOk()
+        ->assertJsonPath('data.pending_count', 1);
+    $this->getJson('/api/v1/grading/cards/grade-sheets')
+        ->assertOk()
+        ->assertJsonPath('meta.scope', 'own')
+        ->assertJsonPath('data.offering_count', 2);
 });
 
 it('leaves the phase-3 and phase-4 worlds it builds on undisturbed', function () {

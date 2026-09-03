@@ -43,4 +43,4 @@ respectively, and which administrators inherit. Nothing is added to the matrix.
 - [ ] Vitest + RTL covers each Card's non-trivial rendering.
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both drift checks clean.
 - [ ] No new migration, Permission, Role or module is introduced.
-- [ ] `composer gate` and `npm run gate` both green; the landing page still passes axe with no serious or critical violations.
+- [ ] `composer gate` and `npm run gate` both green; the Dashboard still passes axe with no serious or critical violations.

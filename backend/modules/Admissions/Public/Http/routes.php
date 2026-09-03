@@ -84,7 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/application/interview/reschedule', [ApplicantInterviewController::class, 'reschedule']);
 
     // The My Application Dashboard Card (phase 4.5, ticket 03) — where the acting applicant's
-    // Application stands, summarised for the landing page and linking into the status timeline it
+    // Application stands, summarised for the Dashboard and linking into the status timeline it
     // sits above. Like the wizard routes above it acts on the signed-in applicant's own Application
     // implicitly, so there is no id with which to reach another applicant's; unlike them it also
     // carries its own `can:` gate, because ADR-0024 asks every Card endpoint to be **independently
@@ -174,7 +174,7 @@ Route::middleware(['auth:sanctum', 'can:applicant.decide'])->group(function () {
     Route::post('/dean/applications/{application}/decide', [FinalDecisionController::class, 'decide'])->whereNumber('application');
 
     // The Admission Decisions Dashboard Card (phase 4.5, ticket 08) — the same worklist's count,
-    // faculty-scoped by the same derivation, summarised for the landing page and linking into the
+    // faculty-scoped by the same derivation, summarised for the Dashboard and linking into the
     // queue above. It shares this group's `applicant.decide` gate, so a Dean's Card and a Dean's
     // queue are opened by exactly the same authority.
     Route::get('/admissions/cards/admission-decisions', [DashboardCardController::class, 'admissionDecisions']);

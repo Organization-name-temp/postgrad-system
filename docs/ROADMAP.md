@@ -462,7 +462,7 @@ A **composition slice** inserted between Phase 4 and Phase 5, exactly as Phase 0
 between Phase 0 and Phase 1 — Phases 5, 6 and 7 keep their numbers and order. It exists because
 SRS §2.3's "role-based dashboards for all user types" is a scope bullet **this ROADMAP never
 assigned to a phase**: four phases of domain machinery had shipped and every one of them was
-reachable only by navigating into it, while the authenticated landing page was still Phase 0's
+reachable only by navigating into it, while the authenticated Dashboard was still Phase 0's
 wall of raw permission chips. The composition rule is recorded in
 [ADR-0024](./adr/0024-permission-composed-dashboard-cards.md); the two glossary entries
 (*Dashboard*, *Dashboard Card*) are in [CONTEXT.md](../CONTEXT.md).
@@ -495,7 +495,7 @@ wall of raw permission chips. The composition rule is recorded in
   read from the derivation that already owns it — never recomputed, never cached.
 - **No new module:** a Dashboard is a view, not a bounded context, and owns no domain language
   ([ADR-0002](./adr/0002-modular-monolith-seams.md)) — so **no new deptrac edge** either.
-- **Frontend:** the landing page **moves out of the auth feature into the app shell** (the route
+- **Frontend:** the Dashboard **moves out of the auth feature into the app shell** (the route
   stays `/`), because `eslint-plugin-boundaries` forbids a feature importing another feature —
   the same reason the permission-filtered side nav lives there. Each Card component lives in the
   feature that owns its data and the shell composes them from a **declarative
@@ -507,7 +507,7 @@ wall of raw permission chips. The composition rule is recorded in
   **No new frontend dependency** — charts explicitly rejected (no chart tokens exist, and RTL +
   dark + axe would all need inventing for roughly one sparkline).
 - **Seeder:** the canonical `rNN@` accounts were authorization fixtures carrying no data, which is
-  invisible while every screen is a list you navigate into and glaring the moment the landing page
+  invisible while every screen is a list you navigate into and glaring the moment the Dashboard
   is made of counts. `r02@` becomes a real Student with two graded Semesters (a computable CGPA),
   `r03@` gains advisees with a pending request, and **`multi@` gains both advisees and Course
   Offerings** — the one account that demonstrates the composition rule. Still deterministic,
@@ -517,7 +517,7 @@ wall of raw permission chips. The composition rule is recorded in
   page (which Cards render **and which do not**, incl. the multi-role union and the administrator
   set) and on `<DashboardCard>`'s states; **`dashboard.spec.ts`**, the headline smoke, signing in
   as seven seeded accounts and asserting each Card set presence *and* absence, with `multi@`'s
-  union and the absence of any role switcher as its central assertion; **axe on the landing page
+  union and the absence of any role switcher as its central assertion; **axe on the Dashboard
   across light/dark × EN/AR**. Also **fixed app-wide**: `MuiLink`'s default primary colour was the
   vivid brand red, ~3.8:1 on the dark surface — the first screen dense enough in links for a
   dark-mode scan to catch it (design-system.md §12 already named the accessible shade).

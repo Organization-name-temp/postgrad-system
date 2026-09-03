@@ -3303,7 +3303,7 @@ export const WithdrawFromACoursewithdrawalPeriodResponse = zod.object({
  * The acting Student's current-semester registration at a glance: the credit hours they are
  * carrying with the **6–12 bounds alongside them** — so the number is anchored rather than
  * left to be judged — the period that is currently open, and the date it closes. The SPA sends
- * the Student to whichever surface that period actually allows, so the landing page never
+ * the Student to whichever surface that period actually allows, so the Dashboard never
  * offers an action the server would refuse.
  *
  * The Semester is the one **running** now, or — before the term starts — the one open for
@@ -4791,7 +4791,7 @@ export const MyGradesResponse = zod.object({
 
 
 /**
- * The three numbers a Student's landing page shows: the CGPA, the latest Semester's GPA, and
+ * The three numbers a Student's Dashboard shows: the CGPA, the latest Semester's GPA, and
  * the credit hours earned so far. `cgpa` and `latest_semester_gpa` are **null — never
  * 0.00** — before any CGPA-counting Grade has been finalized, so the SPA renders a dash and
  * "not yet calculated" is never mistaken for "you scored zero".

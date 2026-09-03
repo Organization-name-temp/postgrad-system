@@ -48,4 +48,4 @@ Rows reuse `<StatusChip>` so the Cards read continuously with the screens they l
 - [ ] Vitest + RTL covers each Card's non-trivial rendering, including the empty and overdue states.
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both drift checks clean.
 - [ ] No new migration, Permission, Role or module is introduced.
-- [ ] `composer gate` and `npm run gate` both green; the landing page still passes axe with no serious or critical violations.
+- [ ] `composer gate` and `npm run gate` both green; the Dashboard still passes axe with no serious or critical violations.

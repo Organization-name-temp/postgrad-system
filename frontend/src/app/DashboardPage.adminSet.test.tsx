@@ -19,7 +19,7 @@ import type { UseAuth } from '../features/auth/useAuth'
 | Absence is asserted as firmly as presence, and that is the point. R09/R10 hold **every** Permission
 | in the §3.2 matrix (ADR-0008), so a Card that forgot its Role gate, or an admin branch that fell
 | back to the union, would silently stack ten other people's work queues onto an administrator's
-| landing page. That is a regression a test must fail on, not one a reviewer must notice.
+| Dashboard. That is a regression a test must fail on, not one a reviewer must notice.
 |
 | Every Card owns a generated query hook, so the whole generated module is stubbed: each hook
 | answers "loaded, empty" and each real Card renders its own real title. The stubs are derived from

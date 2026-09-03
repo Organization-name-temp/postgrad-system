@@ -12,7 +12,7 @@ use Modules\Identity\Internal\Models\UserRole;
  * @group Administration
  *
  * Identity's Dashboard Card (phase 4.5, ADR-0024) — the one Card a System or Super Administrator's
- * landing page is *about*: running the system. It closes the phase's single deliberate exception to
+ * Dashboard is *about*: running the system. It closes the phase's single deliberate exception to
  * the composition rule. R09 and R10 hold every Permission in the §3.2 matrix (ADR-0008), so a naive
  * permission-union Dashboard would stack every Card in the system onto one page; holding every
  * Permission is an **authorization fact**, not a description of an administrator's job, so an

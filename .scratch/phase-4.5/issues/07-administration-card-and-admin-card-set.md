@@ -46,4 +46,4 @@ members of the admin set).
 - [ ] Vitest + RTL asserts the administrator's Card set is **exactly** the Administration Card plus the two configuration Cards — asserting the absence of the queue and persona Cards as firmly as the presence of these three.
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both drift checks clean.
 - [ ] No new migration, Permission, Role or module is introduced.
-- [ ] `composer gate` and `npm run gate` both green; the landing page still passes axe with no serious or critical violations.
+- [ ] `composer gate` and `npm run gate` both green; the Dashboard still passes axe with no serious or critical violations.

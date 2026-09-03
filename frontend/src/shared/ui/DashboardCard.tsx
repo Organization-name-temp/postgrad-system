@@ -44,7 +44,7 @@ export interface DashboardCardProps {
  *
  * A11y: the Card is a labelled `section` (a named region in the a11y tree), so a
  * screen-reader user can jump between Cards; the title is an `h2` under the page's `h1`,
- * so the landing page's heading outline stays a single flat level. Lives in `shared/ui`
+ * so the Dashboard's heading outline stays a single flat level. Lives in `shared/ui`
  * and imports no feature or domain code.
  */
 export function DashboardCard({

@@ -173,7 +173,7 @@ export function createAppTheme(lang: string): Theme {
           //
           // Found by the phase 4.5 Dashboard axe scan (ticket 09) rather than invented here: a
           // Card is made of links — each row links into its record and every Card links into the
-          // surface behind it — so the landing page is the first screen dense enough in links for
+          // surface behind it — so the Dashboard is the first screen dense enough in links for
           // a dark-mode scan to catch this. It is an app-wide defect, so it is fixed app-wide.
           //
           // `color` is defaulted to `primary` by Link itself before styleOverrides run, so an

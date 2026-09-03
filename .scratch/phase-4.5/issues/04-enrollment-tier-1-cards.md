@@ -6,7 +6,7 @@ A **Student** lands and sees their current-semester registration at a glance: to
 registered credit hours against the 6–12 limits, **which period is currently open**
 (registration, add/drop, late-add, or withdrawal), and when it closes. The Card links to
 whichever surface that period actually allows — the registration cart while registration is
-open, My Schedule once it is not — so the landing page takes the Student to the action
+open, My Schedule once it is not — so the Dashboard takes the Student to the action
 available to them rather than to a screen that will refuse them.
 
 An **Advisor** lands and sees the registration requests waiting on their approval: the
@@ -46,4 +46,4 @@ frontend's shared access helper already documents. Advisee Requests gates on the
 - [ ] Vitest + RTL covers each Card's non-trivial rendering, including the period-dependent link target.
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both drift checks clean.
 - [ ] No new migration, Permission, Role or module is introduced.
-- [ ] `composer gate` and `npm run gate` both green; the landing page still passes axe with no serious or critical violations.
+- [ ] `composer gate` and `npm run gate` both green; the Dashboard still passes axe with no serious or critical violations.

@@ -20,7 +20,7 @@ mirror; the Pest tests prove the authority. Only a real login exercises both at 
 [ADR-0014](../../../docs/adr/0014-client-validation-mirrors-server-rules.md) makes the client
 an explicit mirror of server rules, and verifying a mirror means testing both faces.
 
-axe runs on the landing page across **light/dark × EN/AR**, not one combination, because the
+axe runs on the Dashboard across **light/dark × EN/AR**, not one combination, because the
 dashboard is now the most-viewed screen in the application and the one every user meets first.
 
 The suite is **serial by configuration and must stay that way** — it shares one database and
@@ -45,9 +45,9 @@ Cards; 07 — Administration Card; 08 — Remaining Cards.
 - [ ] The `r09@` assertion proves the admin set: the Administration and configuration Cards, and explicitly not the queue or persona Cards.
 - [ ] The Student assertion proves a persona Card renders with a real CGPA value, not a placeholder.
 - [ ] The spec runs against a fresh seed and is re-runnable — it depends on ticket 02's seeded accounts, not on data it creates itself.
-- [ ] axe runs on the landing page across light/dark × EN/AR with no serious or critical violations in any combination.
+- [ ] axe runs on the Dashboard across light/dark × EN/AR with no serious or critical violations in any combination.
 - [ ] The Playwright suite remains **serial by configuration**; nothing in this ticket makes it parallel.
-- [ ] Every existing Phase 0–4 smoke still passes unchanged, including the Phase-0 headline smoke that asserts the dashboard heading across the landing page's move and rewrite.
+- [ ] Every existing Phase 0–4 smoke still passes unchanged, including the Phase-0 headline smoke that asserts the dashboard heading across the Dashboard's move and rewrite.
 - [ ] ROADMAP.md gains a §3 Phase 4.5 section in the established format, recording what the phase built and its Deferred list.
 - [ ] ROADMAP.md's Phase 7 section records that Academic Standing, Graduation Readiness and Termination depend on Phase 5's read models, and that Phase 7 keeps its position after Phases 5 and 6.
 - [ ] HANDOFF.md is corrected: Phase 4 is merged to `main`, and the immediate next steps reflect Phase 4.5 rather than Phase 5.

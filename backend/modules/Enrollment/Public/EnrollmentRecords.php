@@ -98,7 +98,7 @@ interface EnrollmentRecords
      *
      * The caller that forced it is the Outstanding Incompletes Dashboard Card: an Incomplete
      * carries no Offering column, so "is this one mine?" can only be answered through its
-     * Enrollment, and asking one at a time put an N+1 on the landing page of every user holding
+     * Enrollment, and asking one at a time put an N+1 on the Dashboard of every user holding
      * `grades.enter`.
      *
      * @param  list<int>  $enrollmentIds

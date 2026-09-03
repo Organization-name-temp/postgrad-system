@@ -29,7 +29,7 @@ use Modules\Identity\Public\StudentSummary;
  * permission matrix, and several own no records at all — every persona with a real footprint
  * lives under the named `advisor.*` / `student.*` namespace instead. That was invisible for four
  * phases, because every screen was a list you navigate *into*. It becomes glaring the moment the
- * landing page is made of counts: an Instructor's Dashboard would render rich while an Advisor's
+ * Dashboard is made of counts: an Instructor's Dashboard would render rich while an Advisor's
  * rendered zeros beside it, and the difference would read as broken code rather than an empty
  * account.
  *
@@ -78,7 +78,7 @@ class RoleAccountSeeder extends Seeder
         $semesters = Semester::query()->get()->keyBy(
             fn (Semester $semester): string => "{$semester->term->value} {$semester->year}",
         );
-        foreach (['Fall 2024', 'Spring 2025', 'Fall 2025', 'Fall 2026'] as $required) {
+        foreach (['Fall 2024', 'Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'] as $required) {
             if (! $semesters->has($required)) {
                 return;
             }
@@ -109,7 +109,7 @@ class RoleAccountSeeder extends Seeder
             ['Tamer Fouad', 'تامر فؤاد', 'Male'],
         ], $program, $adam, $semesters);
 
-        $this->seedInstructorOfferings($multi, $semesters['Fall 2025'], $multiAdvisees);
+        $this->seedInstructorOfferings($multi, $semesters['Spring 2026'], $multiAdvisees);
     }
 
     /**
@@ -231,11 +231,11 @@ class RoleAccountSeeder extends Seeder
     }
 
     /**
-     * The Instructor half of `multi@`: two Fall 2025 Offerings of its own, one carrying a
+     * The Instructor half of `multi@`: two Spring 2026 Offerings of its own, one carrying a
      * **Draft** Grade Sheet over a real roster and one never opened at all — so its "still to
      * grade" count is genuine on both counts.
      *
-     * Fall 2025 is deliberate: it has finished, so grades are enterable, but its
+     * Spring 2026 is deliberate: it is the latest started Semester selected by the Card and its
      * grade-submission deadline is still ahead, so nothing here reads as late and the Phase-4
      * late-flagging demo keeps its single intended subject. **Draft**, not Submitted, so the
      * Department Head's review queue is likewise untouched.
@@ -244,27 +244,27 @@ class RoleAccountSeeder extends Seeder
      */
     private function seedInstructorOfferings(User $instructor, Semester $semester, array $roster): void
     {
-        $courses = Course::query()->whereIn('code', ['CSE511', 'DEP501'])->get()->keyBy('code');
+        $courses = Course::query()->whereIn('code', ['CSE532', 'DEP502'])->get()->keyBy('code');
         if ($courses->count() < 2) {
             return;
         }
 
-        // Neither Course is offered in Fall 2025 by an earlier seeder, so these are new
+        // Neither Course is offered in Spring 2026 by an earlier seeder, so these are new
         // Offerings rather than a second Offering of an existing one.
-        $cse511 = $this->offering($semester, $courses['CSE511'], $instructor, 30, [[Weekday::Monday, '12:00', '14:00']]);
-        $dep501 = $this->offering($semester, $courses['DEP501'], $instructor, 40, [[Weekday::Sunday, '12:00', '14:00']]);
+        $cse532 = $this->offering($semester, $courses['CSE532'], $instructor, 30, [[Weekday::Monday, '12:00', '14:00']]);
+        $dep502 = $this->offering($semester, $courses['DEP502'], $instructor, 40, [[Weekday::Sunday, '12:00', '14:00']]);
 
         foreach ($roster as $student) {
             $this->enrollViaApprovedRequest($student->studentId, (int) $instructor->getKey(), $semester, [
-                $this->line($cse511, EnrollmentClassification::Core, 3),
-                $this->line($dep501, EnrollmentClassification::Preparatory, 1),
+                $this->line($cse532, EnrollmentClassification::Core, 3),
+                $this->line($dep502, EnrollmentClassification::Preparatory, 1),
             ]);
         }
 
-        // One Sheet opened and left Draft; DEP501 keeps no Sheet at all, because a lazy first
+        // One Sheet opened and left Draft; DEP502 keeps no Sheet at all, because a lazy first
         // open is what creates one (ADR-0023) and an Offering nobody has opened yet is the other
         // half of what an Instructor still has to do.
-        $this->sheet($cse511, GradeSheetKind::Initial, GradeSheetStatus::Draft);
+        $this->sheet($cse532, GradeSheetKind::Initial, GradeSheetStatus::Draft);
     }
 
     /**

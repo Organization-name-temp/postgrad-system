@@ -43,7 +43,7 @@ class DashboardCardController
      * The acting Student's current-semester registration at a glance: the credit hours they are
      * carrying with the **6–12 bounds alongside them** — so the number is anchored rather than
      * left to be judged — the period that is currently open, and the date it closes. The SPA sends
-     * the Student to whichever surface that period actually allows, so the landing page never
+     * the Student to whichever surface that period actually allows, so the Dashboard never
      * offers an action the server would refuse.
      *
      * The Semester is the one **running** now, or — before the term starts — the one open for

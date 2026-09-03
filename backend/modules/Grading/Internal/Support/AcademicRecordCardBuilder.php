@@ -4,7 +4,7 @@ namespace Modules\Grading\Internal\Support;
 
 /**
  * The My Academic Record Dashboard Card's payload (phase 4.5, ticket 01): the three numbers a
- * Student's landing page shows — CGPA, the latest Semester's GPA, and the credit hours actually
+ * Student's Dashboard shows — CGPA, the latest Semester's GPA, and the credit hours actually
  * earned so far.
  *
  * It **reads** ADR-0020's on-demand derivation and derives nothing of its own, as ADR-0024

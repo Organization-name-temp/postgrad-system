@@ -4,7 +4,7 @@ import { useAuth } from '../features/auth/useAuth'
 import { dashboardCards } from './dashboardCards'
 
 /**
- * The Dashboard (ADR-0024): the authenticated landing surface, composed of Dashboard Cards
+ * The Dashboard (ADR-0024): the authenticated entry screen, composed of Dashboard Cards
  * drawn from the modules that own their data and selected by the acting User's **own access**
  * — never by a single Role, and with no "view as role" switch. A User holding several Roles
  * sees the union of their Cards on one page.

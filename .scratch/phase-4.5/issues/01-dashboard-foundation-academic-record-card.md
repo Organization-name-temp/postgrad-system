@@ -3,7 +3,7 @@
 **What to build:** A Student signs in and lands on a real dashboard. Above the fold is a
 slim identity header — their name, their roles, and their University ID — and below it a
 single Card showing their **CGPA and latest Semester GPA as numbers**, linking into My
-Grades. The wall of raw permission chips that has stood on the landing page since Phase 0
+Grades. The wall of raw permission chips that has stood on the Dashboard since Phase 0
 is gone.
 
 This is the phase's tracer bullet: it is the only ticket that cuts the entire path, and
@@ -13,7 +13,7 @@ every Card after it is a small fill. It establishes, in one place and once:
   empty-state slot, error state, action link. It encodes the design *rules* and **no Card
   names**, exactly as `<StatusChip>` does. Every later Card inherits its empty state, so
   "nothing outstanding" reads as *"you're all caught up"* and never as a bare `0`.
-- the landing page **moved out of the auth feature and into the app shell**. This is not
+- the Dashboard **moved out of the auth feature and into the app shell**. This is not
   cosmetic: `eslint-plugin-boundaries` forbids a feature importing another feature, so a
   page that composes Cards from many features cannot live in one. The route stays `/`.
 - the **declarative permission-to-Card registry**, sitting beside the existing nav table and
@@ -56,7 +56,7 @@ See [the spec](../spec.md) for the full Card inventory and the composition rule.
 **Status:** ready-for-agent
 
 - [ ] A shared, presentational `<DashboardCard>` exists with title, count, rows, empty-state, error and action-link slots. It carries no Card names and no domain vocabulary, following the `<StatusChip>` precedent.
-- [ ] The authenticated landing page lives in the app shell, still routed at `/`, and composes Cards from the registry. The old feature-owned page is deleted, not left orphaned.
+- [ ] The authenticated Dashboard lives in the app shell, still routed at `/`, and composes Cards from the registry. The old feature-owned page is deleted, not left orphaned.
 - [ ] The permission-chip wall is removed. A slim identity header retains the user's name, roles, and — for a Student — the University ID block placed there by [ADR-0013](../../../docs/adr/0013-acceptance-handoff-student-anchor.md).
 - [ ] The Card registry is a declarative table beside the existing nav table, expressing all three gate kinds: single Permission, Role, and admin-set membership. No selection function is introduced.
 - [ ] A User holding R09 or R10 sees **only** admin-set Cards — an empty grid at this point — and never the union of everything they inherit.
@@ -65,9 +65,9 @@ See [the spec](../spec.md) for the full Card inventory and the composition rule.
 - [ ] The Card endpoint is authorized on the server independently of what the client chose to request; a user without the gate gets 403.
 - [ ] Cards fetch and fail independently: one Card erroring renders that Card's error state and leaves the rest of the grid intact.
 - [ ] Bilingual EN + AR for every new string, in its own feature namespace. No English-only placeholder copy.
-- [ ] Pest feature tests cover the endpoint's payload for a seeded Student, the 403, and the null-CGPA case. Vitest + RTL covers `<DashboardCard>`'s states (populated, empty, error, with and without a link) and the landing page's registry filtering, asserting Card **absence** as well as presence — including a persona Card correctly withheld from an administrator who inherits its Permission.
+- [ ] Pest feature tests cover the endpoint's payload for a seeded Student, the 403, and the null-CGPA case. Vitest + RTL covers `<DashboardCard>`'s states (populated, empty, error, with and without a link) and the Dashboard's registry filtering, asserting Card **absence** as well as presence — including a persona Card correctly withheld from an administrator who inherits its Permission.
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both drift checks clean.
 - [ ] [CONTEXT.md](../../../CONTEXT.md) gains **Dashboard** and **Dashboard Card**, including the Card-versus-Report distinction so Phase 7 does not re-litigate it.
 - [ ] **ADR-0024** records the composition rule and, explicitly, why the code departs from SRS §2.3 and architecture.md's "each role sees a tailored dashboard".
 - [ ] No new migration, Permission, Role or module is introduced.
-- [ ] `composer gate` and `npm run gate` both green; the landing page passes axe with no serious or critical violations.
+- [ ] `composer gate` and `npm run gate` both green; the Dashboard passes axe with no serious or critical violations.

@@ -19,7 +19,7 @@ authorization fixture, and it is the first thing every user of every role sees o
 - **A Student Affairs officer** has no idea how much work is waiting. SRS FR-ADM-005.5 requires
   a pending-application count with aging on their dashboard; it has never been built, so the
   only way to learn that six applications are overdue is to open the screening queue and count.
-- **An Instructor** cannot tell from the landing page that a grade sheet is unsigned, that a
+- **An Instructor** cannot tell from the Dashboard that a grade sheet is unsigned, that a
   submission deadline has passed, or that an Incomplete is about to convert to a Fail
   Withdrawal — all facts the Grading module already knows.
 - **A Student** cannot see their CGPA without navigating to My Grades. The single number the
@@ -32,21 +32,21 @@ authorization fixture, and it is the first thing every user of every role sees o
   gets no acknowledgement of that at all. Nothing in the app is composed from a user's full
   permission set except the side nav.
 - **"Dashboard" is undefined in the ubiquitous language** while meaning three different things
-  across the project's own documents: the SRS §2.3 role-based landing pages, the SRS §4.12
+  across the project's own documents: the SRS §2.3 role-based Dashboards, the SRS §4.12
   reporting module, and the SRS FR-ADM-005.5 Student Affairs operational view. The word appears
   in [CONTEXT.md](../../CONTEXT.md) not at all.
 - **The seeded demo world cannot demonstrate any of this.** The canonical `r01@…r10@` accounts
   are authorization fixtures: `r02@` (Student), `r03@` (Advisor) and `multi@` carry no data at
   all, because every persona with real records lives under the named `advisor.*` / `student.*`
   namespace. That was invisible while every screen was a list you navigate *into*; it becomes
-  glaring the moment the landing page is made of counts.
+  glaring the moment the Dashboard is made of counts.
 
 The result is a system whose parts all work and which **presents itself as an unfinished
 prototype** at the exact moment a first-time viewer forms their impression of it.
 
 ## Solution
 
-Build the **Dashboard**: the authenticated landing surface, composed of **Dashboard Cards** —
+Build the **Dashboard**: the authenticated entry screen, composed of **Dashboard Cards** —
 small, scoped summaries drawn from the modules that already own their data, selected by the
 acting user's own access, and each linking into the full surface behind it.
 
@@ -74,35 +74,35 @@ Readiness, Termination) depend on read models Phase 5 has not built yet.
 
 ## User Stories
 
-**The landing surface**
+**The Dashboard**
 
 1. As any authenticated User, I want the page I land on after signing in to summarise the work waiting for me, so that I know what to do without navigating through menus first.
-2. As any authenticated User, I want each summary to link into the full screen behind it, so that the landing page is a starting point rather than a dead end.
+2. As any authenticated User, I want each summary to link into the full screen behind it, so that the Dashboard is a starting point rather than a dead end.
 3. As any authenticated User, I want to see only the summaries relevant to what I am allowed to do, so that the page is not padded with surfaces I cannot open.
 4. As any authenticated User, I want a summary with nothing outstanding to tell me I am up to date, so that an empty state reads as good news rather than as a broken screen.
-5. As any authenticated User, I want the landing page to stop showing me a list of my raw permission strings, so that the application looks like a product rather than a debugging tool.
-6. As any authenticated User, I want my name and roles to remain visible on the landing page, so that I can confirm which account I am signed in as.
-7. As a Student, I want my University ID to stay visible on the landing page, so that the identifier I need for every administrative interaction is always to hand.
+5. As any authenticated User, I want the Dashboard to stop showing me a list of my raw permission strings, so that the application looks like a product rather than a debugging tool.
+6. As any authenticated User, I want my name and roles to remain visible on the Dashboard, so that I can confirm which account I am signed in as.
+7. As a Student, I want my University ID to stay visible on the Dashboard, so that the identifier I need for every administrative interaction is always to hand.
 8. As a User holding several Roles, I want one page showing the union of everything I am responsible for, so that I never have to switch personas to see my own work.
 9. As a User holding several Roles, I want no "view as role" control to exist, so that there is no hidden mode in which I might be looking at an incomplete picture.
-10. As any authenticated User, I want the landing page rendered in my chosen language with correct direction, so that Arabic is a first-class experience rather than a translation of an English layout.
-11. As a User of assistive technology, I want the landing page to meet WCAG 2.1 AA, so that the most-visited screen in the application is usable by me.
-12. As any authenticated User, I want one failing summary not to blank the whole page, so that a single broken query does not cost me the entire landing surface.
+10. As any authenticated User, I want the Dashboard rendered in my chosen language with correct direction, so that Arabic is a first-class experience rather than a translation of an English layout.
+11. As a User of assistive technology, I want the Dashboard to meet WCAG 2.1 AA, so that the most-visited screen in the application is usable by me.
+12. As any authenticated User, I want one failing summary not to blank the whole page, so that a single broken query does not cost me the entire Dashboard.
 
 **Applicant (R01)**
 
-13. As an Applicant, I want my application's current status on my landing page, so that I know where I stand without opening the application itself.
+13. As an Applicant, I want my application's current status on my Dashboard, so that I know where I stand without opening the application itself.
 14. As an Applicant, I want to be told what I must do next, so that I am not left guessing whether the university or I am holding things up.
 15. As an Applicant, I want a link straight into my application timeline, so that I can read the full history when the summary is not enough.
 
 **Student (R02)**
 
-16. As a Student, I want my CGPA on my landing page, so that the number my degree depends on is the first thing I see.
+16. As a Student, I want my CGPA on my Dashboard, so that the number my degree depends on is the first thing I see.
 17. As a Student, I want my most recent Semester GPA beside my CGPA, so that I can tell whether I am improving.
 18. As a Student with no graded Enrollment yet, I want my CGPA to render as a dash rather than 0.00, so that "not yet calculated" is never mistaken for "you scored zero".
 19. As a Student, I want my current-semester registered credit hours summarised, so that I can see at a glance whether I am within the 6–12 CH limits.
 20. As a Student, I want to know which registration period is currently open and when it closes, so that I do not miss an add/drop or withdrawal deadline.
-21. As a Student, I want a link into my registration cart or my schedule depending on what is open, so that the landing page takes me to the action that is actually available.
+21. As a Student, I want a link into my registration cart or my schedule depending on what is open, so that the Dashboard takes me to the action that is actually available.
 
 **Advisor (R03)**
 
@@ -120,7 +120,7 @@ Readiness, Termination) depend on read models Phase 5 has not built yet.
 
 **Student Affairs (R05)**
 
-30. As a Student Affairs officer, I want the count of applications pending screening on my landing page, so that SRS FR-ADM-005.5 is finally satisfied.
+30. As a Student Affairs officer, I want the count of applications pending screening on my Dashboard, so that SRS FR-ADM-005.5 is finally satisfied.
 31. As a Student Affairs officer, I want overdue applications distinguished from merely pending ones, so that the screening SLA is visible rather than notional.
 32. As a Student Affairs officer, I want to see the oldest waiting applications by name and age, so that I can start with the most urgent.
 33. As a Student Affairs officer, I want my grade-entry surface summarised too, so that central grade entry is reachable from the same page as my admissions work.
@@ -138,7 +138,7 @@ Readiness, Termination) depend on read models Phase 5 has not built yet.
 
 **System / Super Administrator (R09, R10)**
 
-39. As a System Administrator, I want a landing page about running the system, so that I am not shown every other role's work queue merely because I inherit every Permission.
+39. As a System Administrator, I want a Dashboard about running the system, so that I am not shown every other role's work queue merely because I inherit every Permission.
 40. As a System Administrator, I want counts of users and role assignments, so that I can see the shape of the system at a glance.
 41. As a System Administrator, I want recent Audit Log activity summarised, so that security-relevant events are visible without opening a report.
 42. As a System Administrator, I want the active Semester and which registration windows are open, so that I can confirm the calendar is configured as intended.
@@ -242,7 +242,7 @@ and Tier 3 (12).
   may compose anything — and it mirrors the API rule exactly: *owner supplies the Card, shell
   arranges it.* The direct precedent is the existing permission-filtered side nav, which already
   lives in the app shell for the same reason.
-- **The landing page moves out of the auth feature into the app shell.** As a feature it cannot
+- **The Dashboard moves out of the auth feature into the app shell.** As a feature it cannot
   import other features, so it cannot compose Cards. The route stays `/`.
 - **The permission-chip wall is removed.** A slim identity header (name, roles, and the Student's
   University ID block placed there by [ADR-0013](../../docs/adr/0013-acceptance-handoff-student-anchor.md))
@@ -284,7 +284,7 @@ and Tier 3 (12).
 
 Two entries are added to [CONTEXT.md](../../CONTEXT.md):
 
-- **Dashboard** — the authenticated landing surface, composed from the acting User's access rather
+- **Dashboard** — the authenticated entry screen, composed from the acting User's access rather
   than selected by a single Role; a User holding several Roles sees the union of their Cards on one
   page, and there is no "view as role" switch.
 - **Dashboard Card** — one summary on the Dashboard, owned by the module whose data it summarises,
@@ -323,7 +323,7 @@ changing a demo.
    Prior art: the existing Admissions, Enrollment and Grading feature suites, which already
    establish the authenticate-as-persona-then-assert-payload pattern and the 403 assertions.
 
-2. **Vitest + RTL on the landing page** — the composition mirror. Mocks the auth hook and asserts,
+2. **Vitest + RTL on the Dashboard** — the composition mirror. Mocks the auth hook and asserts,
    for a given access set, which Cards render **and which do not**. Absence is asserted as hard as
    presence. Cases: each single-role persona; the **multi-role union**; the administrator set
    (Administration plus configuration Cards, and explicitly *not* the queue or persona Cards); and
@@ -340,7 +340,7 @@ changing a demo.
    data. Signs in as five accounts and asserts each one's Card set, presence and absence:
    a `student.*` persona; `r03@`; `r04@`; **`multi@`** (the union, on one page, with no role
    switcher — the single most important assertion in the phase); and `r09@` (the administration set
-   only). axe runs on the landing page across light/dark × EN/AR, since it is now the most-viewed
+   only). axe runs on the Dashboard across light/dark × EN/AR, since it is now the most-viewed
    screen in the application.
 
    The suite is **serial by configuration and must stay that way** — it shares one database and one
@@ -356,7 +356,7 @@ nav is already tested this way.
 no selection function to unit-test. The table is the specification, and seam 2 reads it.
 
 The existing Phase-0 headline smoke asserts the dashboard heading and must continue to pass across
-the landing page's move and rewrite.
+the Dashboard's move and rewrite.
 
 ## Out of Scope
 

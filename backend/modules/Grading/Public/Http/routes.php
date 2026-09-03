@@ -74,7 +74,7 @@ Route::middleware(['auth:sanctum', 'can:grades.enter'])->group(function () {
 
     // The My Grade Sheets Dashboard Card (phase 4.5, ticket 05) — the current teaching term's
     // Offerings, how many Sheets are not yet Finalized, and the passed-deadline flag, summarised
-    // for the landing page and linking into the screens above. It reuses this group's gate and
+    // for the Dashboard and linking into the screens above. It reuses this group's gate and
     // the same own-versus-central list rule the offerings endpoint applies.
     Route::get('/grading/cards/grade-sheets', [DashboardCardController::class, 'gradeSheets']);
 
@@ -108,7 +108,7 @@ Route::middleware(['auth:sanctum', 'can:grades.finalize'])->group(function () {
         ->whereNumber('grade_sheet');
 
     // The Sheets Awaiting Review Dashboard Card (phase 4.5, ticket 05) — the same queue's count
-    // and oldest few, summarised for the landing page. The capability is shared with Instructors,
+    // and oldest few, summarised for the Dashboard. The capability is shared with Instructors,
     // so the Role gate narrows this Card to the Department Head persona.
     Route::get('/grading/cards/sheets-awaiting-review', [DashboardCardController::class, 'sheetsAwaitingReview'])
         ->middleware('role:R06');
@@ -120,7 +120,7 @@ Route::middleware(['auth:sanctum', 'can:grades.view_own'])->group(function () {
     Route::get('/grading/my-grades', [MyGradesController::class, 'index']);
 
     // The My Academic Record Dashboard Card (phase 4.5, ticket 01) — the same record's three
-    // headline numbers, summarised for the landing page and linking into the screen above.
+    // headline numbers, summarised for the Dashboard and linking into the screen above.
     // Independently authorized here rather than trusting the SPA's choice of what to request
     // (ADR-0024): the client composes Cards from the acting user's access as a UX mirror only.
     Route::get('/grading/cards/academic-record', [DashboardCardController::class, 'academicRecord'])

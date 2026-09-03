@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
     Route::patch('/semesters/{semester}', [SemesterController::class, 'update'])->whereNumber('semester');
 
     // The Semester & Open Windows Dashboard Card (phase 4.5, ticket 06) — the live Semester and
-    // which of its windows are open, summarised for the landing page and linking into the
+    // which of its windows are open, summarised for the Dashboard and linking into the
     // management screen above. Independently authorized here rather than trusting the SPA's
     // choice of what to request (ADR-0024): the client composes Cards as a UX mirror only.
     Route::get('/calendar/cards/semester-windows', [DashboardCardController::class, 'semesterWindows']);

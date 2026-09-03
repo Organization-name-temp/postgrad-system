@@ -44,12 +44,7 @@ const ALL_CARDS = Object.keys(CARDS) as CardKey[]
 
 // `multi@`'s union, named once: the Card-set test asserts it, and the axe scans below wait for
 // exactly this many Cards to have resolved before scanning.
-const MULTI_CARDS: CardKey[] = [
-  'adviseeRequests',
-  'myGradeSheets',
-  'sheetsAwaitingReview',
-  'outstandingIncompletes',
-]
+const MULTI_CARDS: CardKey[] = ['adviseeRequests', 'myGradeSheets', 'outstandingIncompletes']
 
 // The canonical role accounts (shared dev password). Each carries a real footprint since ticket
 // 02, so these dashboards render populated rather than as a wall of zeros.
@@ -206,7 +201,7 @@ test.describe('the Dashboard composes Cards from the acting user’s access (ADR
     await expect(record.getByText('—')).toHaveCount(0)
     await expect(record.getByText(/credit hours? earned so far/)).toBeVisible()
 
-    // The University ID stays on the landing page (ADR-0013), above the grid.
+    // The University ID stays on the Dashboard (ADR-0013), above the grid.
     await expect(page.getByText('University ID')).toBeVisible()
   })
 
@@ -223,14 +218,13 @@ test.describe('the Dashboard composes Cards from the acting user’s access (ADR
     await expect(requests.getByText('Hana Reda')).toHaveCount(0)
   })
 
-  test('an Instructor sees the three grading Cards and nothing from admissions', async ({
+  test('an Instructor sees their two grading Cards and nothing from admissions', async ({
     page,
   }) => {
     await loginInEnglish(page, INSTRUCTOR)
 
-    // `grades.finalize` is an Instructor Permission too (§3.2), so the review Card is theirs —
-    // holding no Department assignment, they get its empty state rather than a 403.
-    await expectCardSet(page, ['myGradeSheets', 'sheetsAwaitingReview', 'outstandingIncompletes'])
+    // The Incomplete queue belongs to the Instructor persona; sheet review belongs only to R06.
+    await expectCardSet(page, ['myGradeSheets', 'outstandingIncompletes'])
   })
 
   test('a Dean sees the admissions and configuration Cards their Faculty scope gives them', async ({
@@ -267,7 +261,7 @@ test.describe('the Dashboard composes Cards from the acting user’s access (ADR
     // The Instructor half, at the same time and without navigating: an Offering of its own,
     // linking into that Offering's Grade Sheet.
     const sheets = page.getByRole('region', { name: CARDS.myGradeSheets })
-    await expect(sheets.getByRole('link', { name: /CSE511/ })).toBeVisible()
+    await expect(sheets.getByRole('link', { name: /CSE532/ })).toBeVisible()
 
     await expectNoRoleSwitcher(page)
 
@@ -292,7 +286,7 @@ test.describe('the Dashboard holds WCAG AA', () => {
   // across all four combos rather than one. `multi@` is the subject because its grid is the
   // richest: four Cards carrying counts, linked rows and status chips.
   for (const { scheme, lang, dir } of COMBOS) {
-    test(`the landing page passes axe in ${scheme} / ${lang}`, async ({ page }, testInfo) => {
+    test(`the Dashboard passes axe in ${scheme} / ${lang}`, async ({ page }, testInfo) => {
       // Pre-set the colour scheme (the pre-paint script reads it) before the first paint.
       await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
 

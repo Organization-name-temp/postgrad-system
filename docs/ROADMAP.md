@@ -537,6 +537,128 @@ wall of raw permission chips. The composition rule is recorded in
   grade sheets, with no role switcher anywhere; then as `r09@` and see an administrator's own
   page rather than everyone else's work queues.
 
+### Phase 4.6 — Query, Filter, Export & Reports (SRS §4.12, FR-PCM-003.5, NFR-PRF-010)
+A **platform-plus-analytics slice**, inserted between Phase 4.5 and Phase 5 for one structural
+reason: it changes the shape of **every list endpoint in the system**, and doing that before
+Phases 5, 6 and 7 means their lists are *born* filterable and exportable rather than retrofitted
+twice. It also closes five of SRS §4.12's eight reports, which turns out to be possible now — the
+ROADMAP's claim that Phase 7 could not be pulled forward is true of only **three** of its reports
+(Standing, Graduation Readiness, Termination), the ones needing Phase 5's read models. The four
+hard-to-reverse choices are in [ADR-0025](./adr/0025-support-layer-query-contract.md) (the Support
+layer, the paginated envelope, filterable-iff-readable),
+[ADR-0026](./adr/0026-reports-owned-by-modules.md) (report ownership + gates),
+[ADR-0027](./adr/0027-export-sibling-route-audited.md) (export) and
+[ADR-0028](./adr/0028-aggregate-facades-sql-php-parity.md) (batched owner-facade derivation);
+[ADR-0024](./adr/0024-permission-composed-dashboard-cards.md) is **amended** for what
+a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Export**.
+
+- **A shared `Support` layer** (ADR-0025) — the project's first shared backend code, under
+  `backend/support/`, declared to deptrac as its own layer with **zero outbound edges** and
+  `*_Internal → Support` granted for every module. It is the backend mirror of `shared/ui`:
+  the query rules and **no domain names**. Deliberately *not* a module — it owns no domain
+  language, which is the objection ADR-0024 raised against a Dashboard module.
+- **One query contract on every collection endpoint** — flat params
+  (`?status=a,b&cgpa_min=3&q=…&sort=-cgpa,name&page=2&per_page=25`), including comma-separated
+  multi-column sort plus a stable unique-key tie-breaker, and an **always-paginated** envelope
+  (never conditional — two response shapes on one operation generate a TS union Orval cannot read),
+  25 rows default / 100 for pickers / **hard cap 100**. "Every row" is `/export`, which is what
+  makes the cap right rather than merely tolerable.
+  Nested aggregate/history read models (Catalog tree, timeline, version history, curriculum) remain
+  complete parent-object responses and are not treated as pageable/exportable collections.
+- **Free-text `q`** — case-insensitive substring over a per-resource declared field list across
+  **both `_en` and `_ar`** columns, Arabic **normalised on both sides** (alef forms → `ا`, `ى`→`ي`,
+  `ة`→`ه`, diacritics stripped). Chosen over Postgres full-text, which gives Arabic no stemming
+  (no dictionary) and cannot match `CSE5` against `CSE511`. `pg_trgm` recorded as the later
+  optimization, as §1 records Redis caching.
+- **Filterable iff readable** (ADR-0025) — a field is filterable/sortable only if the actor may
+  **read** it, because `?cgpa_min=` plus `meta.total` is a CGPA oracle. Row-level scope stays a
+  base query constraint the client never supplies; filters narrow within it and never widen it, and
+  an out-of-scope value returns an empty page rather than a probeable 422.
+- **Export** (ADR-0027) — `GET /{resource}/export` beside each list, same query string, **true
+  `.xlsx` via `openspout`** (a 14-digit National ID stays text instead of `2.9001E+13`), a
+  **canonical column set per resource server-rendered in the actor's locale** with RTL sheets for
+  Arabic — the one recorded exception to ADR-0024's typed-values-only rule, because a spreadsheet
+  has no client to render for. Authorized by the **list's own gate and scope**, adding no
+  Permission (the Central Grade Entry reasoning), projected through a separate actor-aware export
+  column contract, and **always written to the Audit Log** with
+  actor, resource, criteria and row count: the new fact is not that data was read but that it left.
+  Export is a List capability: every migrated collection gets a sibling unless its ticket records
+  a security exclusion, Reports export through drill-through, and the SPA downloads through the
+  authenticated Axios client into an in-memory blob rather than a bare link.
+- **Derived values are batched through their owner** (ADR-0028) — candidate IDs/DTOs cross existing
+  `Public` facades in bounded batches, owners bulk-read only their own tables, and the existing PHP
+  calculators remain the single arithmetic implementation. Derived filtering and sorting happen
+  before in-memory page slicing; stored fields still paginate in SQL. Batch-versus-single parity
+  over the seeded cohort proves the facade shapes agree without cross-module joins or duplicate SQL.
+- **Six Reports, each owned by the module owning its spine data** (ADR-0026), the SPA composing one
+  Analytics section — *owner supplies, shell arranges*, ADR-0024's rule a third time, at the cost
+  of **zero new deptrac edges**: Application Pipeline (Admissions), Enrollment Summary + Course
+  Registration Summary + **Attendance Analytics** (Enrollment — an ADR-0019 extension §4.12 never
+  listed), GPA Distribution (Grading), Audit Log (Identity — also the system's **first audit read
+  surface**). Gated on the nearest data-read Permission, at least as strong as the list each drills
+  into; every divergence from §4.12's role table is listed in the ADR.
+- **Charts** — `@mui/x-charts` (same MUI X family as the installed tree view, so it inherits the
+  theme, CSS variables, dark mode and the `direction` flip), drawing on
+  [design-system.md](./design-system.md) **§14's already-written chart palette**. Every chart is
+  `role="img"` plus a **"View as table"** disclosure rendering the identical series, with Vitest
+  asserting the two cannot drift — the reason Phase 4.5 rejected charts (RTL + dark + axe unproven)
+  is answered rather than waived.
+- **Interactivity = parameters + drill-through** — a Report's parameters ride the same filter bar
+  the grids use, and a chart segment **navigates to the filtered list behind it**, which exports.
+  Filter/sort/page state lives in the **URL**, so a view is bookmarkable and shareable and the
+  export action fetches the same query string from `/export` through authenticated Axios.
+- **Frontend:** new `shared/ui` `<FilterBar>`, `<DataToolbar>`, pagination and a URL-state hook —
+  the query rules and **no domain names**, the `<StatusChip>`/`<DashboardCard>` discipline —
+  rendering into the plain MUI `<Table>` already in use (`@mui/x-data-grid` **still** not adopted:
+  with filtering, sorting and paging server-side the grid is dumb, and the community tier's
+  single-criterion filter panel is the thing being replaced). Plus a **column chooser** (screen
+  only — never the file), a **print stylesheet** for Reports, and **global search** finally filling
+  its Phase-0.5 app-bar slot as a **client-side fan-out** over each permitted module's own list
+  endpoint at `?q=&per_page=5`, independently authorized and independently failing exactly as
+  Cards are.
+- **Richer Cards** (ADR-0024 amendment) — figures, term-over-term deltas and at most one chart over
+  the acting user's own data. **A Card takes no parameter**; the moment it would, it is a Report.
+- **Bulk course import** — closes **SRS FR-PCM-003.5**, deferred since Phase 1 and cheap now that
+  the spreadsheet library is paid for: upload → **dry-run preview** (rows to create/update/reject,
+  with per-row per-column reasons, writing nothing) → confirm applies the **whole file in one
+  transaction or none**, writing one ADR-0011 version snapshot for every Course created or changed
+  plus one Identity Audit Log event for the import transaction. The uploaded file is held on the private
+  local disk under a ULID between the two calls, the
+  [ADR-0016](./adr/0016-private-document-serving.md) pattern. The courses **export is the import
+  template**, so the loop is export → edit → preview → apply. Gated on `catalog.manage`; both EN
+  and AR names required per row, as the Catalog demands. MIME, size, workbook structure, enum, and
+  credit-hour validation are mandatory; the importer recognizes both canonical English and Arabic
+  header/enum dictionaries for round trips. Malware scanning remains explicitly deferred by ADR-0005.
+- **Seeder:** every named persona **untouched** (the smokes assert against them), with a
+  deterministic generated cohort of ~150–250 Students layered on top — spread across Programs,
+  terms, grades and attendance from a fixed seed, in the reserved namespace — so a distribution has
+  shape and pagination actually pages. Existing count-based assertions are audited as part of the
+  change.
+- **DoD:** the contract proven **exhaustively once** as `Support` unit tests (operators, sorting,
+  paging, Arabic normalisation), then a shared **Pest dataset** of `(endpoint, actor, expected
+  scope)` driving four assertions across every filterable endpoint — unknown fields rejected, scope
+  composes with filter, actor-aware fields stay hidden, `meta` correct — so a new endpoint is one
+  dataset row; **batch-versus-single parity** for derived facade results; one `.xlsx` read back end-to-end
+  with openspout's reader (headers, a typed National-ID cell, RTL on the Arabic sheet) and row
+  generators asserted for the rest; Vitest on `<FilterBar>`, URL state and every chart's
+  table-matches-series; **one comprehensive Playwright smoke** (the Phase-2 multi-flow precedent)
+  — filter a queue → export it → open Analytics → drill a chart segment back into that filtered
+  queue — plus **axe on Analytics across light/dark × EN/AR**. `openapi.yaml` and the Orval client
+  regenerate across every named collection endpoint; both `api:check` gates make that non-optional.
+- **Deferred:** saved/named filters; cross-filtering between charts; client-side pivoting or an
+  ad-hoc report builder; caching report aggregates and materialising any derived value (ADR-0028);
+  real-time updates (no websocket, ADR-0005); `pg_trgm` indexes; scheduled or emailed reports (no
+  email); PDF export of Reports (Phase 6 owns Browsershot, and only optionally); Card
+  personalisation (still, from Phase 4.5); the **three Phase-5-dependent reports** — Academic
+  Standing, Graduation Readiness, Termination — which stay Phase 7. **Recorded, not fixed** (still,
+  from Phase 4.5): deptrac's `App` layer is missing its `Admissions` and `Notifications` edges —
+  and this phase does *not* force the fix, because global search is a client-side fan-out rather
+  than a server-side composition.
+- **Demo:** open the screening queue, narrow it by Program and applicant age and search an Arabic
+  name unaccented, export the result and open it in Excel with the National ID intact; then open
+  Analytics, read the GPA distribution for a Program, click the band below 3.0 and land on exactly
+  those students, filtered — and export them too.
+
 ### Phase 5 — Academic Standing + Credit-Hour Summary + Exemption/Transfer/Waiver (SRS §4.8, §4.5, §4.6)
 - **Derived read models** (on-demand): per-category Credit-Hour Summary (Appendix D
   counting) and Academic Standing (Good/Warning/Probation/Termination-Pending),
@@ -546,6 +668,15 @@ wall of raw permission chips. The composition rule is recorded in
   window), waiver (level 400+, ≥80% coverage). None affect CGPA.
 - **Termination workflow:** flags → notify → Dept. Council recommends → Academic Affairs
   Council decides → notify.
+- **Inherited from Phase 4.6, not revisited:** every list this phase adds is born on the `Support`
+  query contract ([ADR-0025](./adr/0025-support-layer-query-contract.md)) — paginated envelope, an
+  actor-aware filterable-iff-readable allowlist, and a `/export` sibling
+  ([ADR-0027](./adr/0027-export-sibling-route-audited.md)) — and any derived value it wants to
+  filter, sort or chart on arrives as a batch/aggregate method on its own module's `Public` facade
+  through the owner-local batch contract ([ADR-0028](./adr/0028-aggregate-facades-sql-php-parity.md)). This
+  phase also ships **its own Dashboard Cards** (Academic Standing, Credit-Hour Summary) as part of
+  its own work, per ADR-0024 — one row in `frontend/src/app/dashboardCards.tsx`, one component
+  inside its own feature, one `can:`-gated read endpoint in its own module.
 - **Demo:** finalize a grade → the Student's CH Summary and Standing update automatically.
 
 ### Phase 6 — Records & Transcript (SRS §4.9)
@@ -556,20 +687,25 @@ wall of raw permission chips. The composition rule is recorded in
 - **Demo:** view an unofficial transcript; SA issues an official one.
 
 ### Phase 7 — Reporting & polish (SRS §4.12)
-**Keeps its position after Phases 5 and 6.** Three of its eight reports — **Academic Standing,
-Graduation Readiness and Termination** — read models **Phase 5 has not built**, so it cannot be
-pulled forward; that finding is what produced Phase 4.5 (the surface actually wanted was SRS
-§2.3's dashboards, which no phase owned). A **Report is not a Card**: a Card is fixed, scoped to
-the acting user and summary, while a Report is filterable, parameterised and cross-student —
-Phase 4.5's Catalog Summary Card and this phase's enrollment summary report are different
-objects, and the distinction is recorded in [CONTEXT.md](../CONTEXT.md) so it is not
-re-litigated here.
+**Keeps its position after Phases 5 and 6, and is now much smaller than it was.** The original
+reasoning held that Phase 7 could not be pulled forward because three of its eight reports —
+**Academic Standing, Graduation Readiness and Termination** — read models Phase 5 has not built.
+That was true of those three and of **no others**, which is what Phase 4.6 acted on: it built the
+query/export platform and **five** of the eight (application pipeline, enrollment summary, course
+registration summary, GPA distribution, audit log) plus an attendance report §4.12 never listed.
+The earlier finding that Phase 7 was mis-positioned produced Phase 4.5; this one produced Phase 4.6.
 
-- **Reporting module:** the 8 read-only cross-module reports (enrollment summary,
-  application pipeline, GPA distribution, standing, graduation readiness, termination,
-  audit log, course registration).
+There is **no Reporting module** — [ADR-0026](./adr/0026-reports-owned-by-modules.md) records why,
+departing from this line's own earlier wording: each Report lives in the module owning its spine
+data and the SPA composes one Analytics section. **A Report is not a Card**, and both are now
+first-class terms in [CONTEXT.md](../CONTEXT.md) with a mechanical test between them — *if it
+needs a parameter, it is a Report* — so this is not re-litigated here.
+
+- **The three remaining reports**, each owned by the Phase 5 module that owns its read model and
+  each arriving with the Card, filter contract and export the platform already provides: Academic
+  Standing, Graduation Readiness, Termination.
 - i18n polish pass (Arabic coverage, RTL layout audit) and any deferred niceties.
-- **Demo:** run reports; full EN↔AR toggle across the app.
+- **Demo:** run the standing and graduation-readiness reports; full EN↔AR toggle across the app.
 
 ---
 

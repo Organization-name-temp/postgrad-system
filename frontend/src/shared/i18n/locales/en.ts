@@ -8,6 +8,22 @@ export const en = {
     actions: {
       retry: 'Retry',
     },
+    roles: {
+      R01: 'Applicant',
+      R02: 'Student',
+      R03: 'Academic Advisor',
+      R04: 'Instructor',
+      R05: 'Student Affairs Staff',
+      R06: 'Department Head',
+      R07: 'Dean of Faculty',
+      R08: 'Education & Academic Affairs Council',
+      R09: 'System Administrator',
+      R10: 'Super Administrator',
+    },
+    terms: {
+      Fall: 'Fall',
+      Spring: 'Spring',
+    },
     apiStatus: 'API status: {{status}}',
     language: {
       label: 'Language',

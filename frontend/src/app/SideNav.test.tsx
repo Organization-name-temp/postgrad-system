@@ -128,7 +128,7 @@ describe('SideNav — persona gating (ticket 11)', () => {
       authState({
         hasPermission: () => true,
         isAdmin: true,
-        hasRole: (r) => ADMIN_ROLES.includes(r),
+        hasRole: (r) => ADMIN_ROLES.some((adminRole) => adminRole === r),
       }),
     )
     const { container } = renderRealNav()

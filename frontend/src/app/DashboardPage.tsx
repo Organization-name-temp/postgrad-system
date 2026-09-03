@@ -74,7 +74,11 @@ export function DashboardPage() {
               </Typography>
               {student.enrollment_term && (
                 <Typography variant="body2" color="text.secondary">
-                  {t('dashboard.enrollmentTerm', { term: student.enrollment_term })}
+                  {t('dashboard.enrollmentTerm', {
+                    term: t(`terms.${student.enrollment_term}`, {
+                      defaultValue: student.enrollment_term,
+                    }),
+                  })}
                 </Typography>
               )}
             </Box>
@@ -89,7 +93,7 @@ export function DashboardPage() {
               // one back to support.
               <Chip
                 key={role.code}
-                label={`${role.code} · ${role.name}`}
+                label={`${role.code} · ${t(`roles.${role.code}`, { defaultValue: role.code })}`}
                 size="small"
                 variant="outlined"
               />

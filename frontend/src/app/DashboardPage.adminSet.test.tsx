@@ -60,6 +60,29 @@ const EVERYTHING_ELSE = [
   'My academic record',
 ]
 
+const ROLE_CARD_CASES = [
+  ['R01', ['My application'], []],
+  ['R02', ['My registration', 'My academic record'], []],
+  ['R03', ['Advisee requests'], ['registration.approve']],
+  ['R04', ['My grade sheets', 'Outstanding Incompletes'], ['grades.enter', 'grades.finalize']],
+  [
+    'R05',
+    ['Screening queue', 'Advisee requests', 'My grade sheets', 'Semester and open windows'],
+    ['application.screen', 'registration.approve', 'grades.enter', 'calendar.manage'],
+  ],
+  [
+    'R06',
+    ['Sheets awaiting review', 'Catalog'],
+    ['grades.finalize', 'catalog.manage'],
+  ],
+  [
+    'R07',
+    ['Screening queue', 'Admission decisions', 'Semester and open windows', 'Catalog'],
+    ['application.screen', 'applicant.decide', 'calendar.manage', 'catalog.manage'],
+  ],
+  ['R08', [], []],
+] as const
+
 function authState(overrides: Partial<UseAuth>): UseAuth {
   return {
     user: {
@@ -74,7 +97,7 @@ function authState(overrides: Partial<UseAuth>): UseAuth {
     // would produce a ten-Card page under a naive union.
     hasPermission: () => true,
     roles: ['R09'],
-    hasRole: (role: string) => ADMIN_ROLES.includes(role),
+    hasRole: (role: string) => ADMIN_ROLES.some((adminRole) => adminRole === role),
     isAdmin: true,
     isLoggingIn: false,
     loginError: undefined,
@@ -171,5 +194,21 @@ describe('DashboardPage — the administrator’s Card set, against the real reg
       screen.getByRole('heading', { level: 2, name: 'Semester and open windows' }),
     ).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: 'Catalog' })).toBeInTheDocument()
+  })
+
+  it.each(ROLE_CARD_CASES)('renders the exact Dashboard Card set for %s', (role, expected, permissions) => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        user: { name: role, email: `${role.toLowerCase()}@ejust.test`, roles: [{ code: role, name: role }] },
+        roles: [role],
+        hasRole: (candidate: string) => candidate === role,
+        hasPermission: (permission: string) => permissions.some((candidate) => candidate === permission),
+        isAdmin: false,
+      }),
+    )
+    renderDashboard()
+
+    const titles = screen.queryAllByRole('heading', { level: 2 }).map((heading) => heading.textContent)
+    expect(titles).toEqual(expected)
   })
 })

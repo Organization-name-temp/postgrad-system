@@ -25,3 +25,5 @@ export const PERMISSION = {
   manageCatalog: 'catalog.manage',
   manageCalendar: 'calendar.manage',
 } as const
+
+export type PermissionCode = (typeof PERMISSION)[keyof typeof PERMISSION]

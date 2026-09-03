@@ -12,7 +12,9 @@ import { SheetsAwaitingReviewCard } from '../features/grading/dashboard/SheetsAw
 import { AdministrationCard } from '../features/admin/dashboard/AdministrationCard'
 import { SemesterWindowsCard } from '../features/admin/dashboard/SemesterWindowsCard'
 import { PERMISSION } from '../shared/access/permissions'
+import type { PermissionCode } from '../shared/access/permissions'
 import { ADMIN_ROLES, ROLE } from '../shared/access/roles'
+import type { RoleCode } from '../shared/access/roles'
 
 export interface DashboardCardEntry {
   /** Stable identity for the grid's React key and for tests to name a Card by. */
@@ -23,7 +25,7 @@ export interface DashboardCardEntry {
    */
   component: ComponentType
   /** Effective permission required to see this Card — the default gate. */
-  permission?: string
+  permission?: PermissionCode
   /**
    * Role codes any of which reveals the Card — the **persona** gate. A Card whose data hangs
    * off a record the acting user may not possess (a Student anchor, an Applicant's
@@ -31,7 +33,7 @@ export interface DashboardCardEntry {
    * ADR-0008, or it would render broken for them. The existing nav convention, applied to
    * Cards (ADR-0024).
    */
-  roles?: readonly string[]
+  roles?: readonly RoleCode[]
   /**
    * Membership of the **administration set**: the only Cards a System/Super Administrator
    * (R09/R10) sees. Holding every Permission is an authorization fact, not a description of
@@ -120,23 +122,21 @@ export const dashboardCards: DashboardCardEntry[] = [
   },
 
   // Sheets Awaiting Review (phase 4.5, ticket 05) — the Department Head's review queue,
-  // scoped by the Head↔Department assignment server-side. Gated on `grades.finalize`, which
-  // Instructors hold too (§3.2) — they see the Card's empty state, because the assignment,
-  // not the Permission, is what fills it.
+  // scoped by the Head↔Department assignment server-side. This persona Card is R06-only even
+  // though Instructors share the underlying `grades.finalize` capability.
   {
     key: 'sheetsAwaitingReview',
     component: SheetsAwaitingReviewCard,
-    permission: PERMISSION.finalizeGrades,
+    roles: [ROLE.departmentHead],
   },
 
   // Outstanding Incompletes (phase 4.5, ticket 08) — how many Incompletes are still waiting on
-  // their mark and when the nearest is due. Shares `grades.enter` with My Grade Sheets: a
-  // central-entry user teaches nothing of their own and sees the empty state, exactly as the
-  // resolution screen already shows them.
+  // their mark and when the nearest is due. This persona Card is R04-only even though Student
+  // Affairs shares the underlying `grades.enter` capability for central entry.
   {
     key: 'outstandingIncompletes',
     component: OutstandingIncompletesCard,
-    permission: PERMISSION.enterGrades,
+    roles: [ROLE.instructor],
   },
 
   // My Academic Record (phase 4.5, ticket 01) — CGPA, latest Semester GPA, earned credit

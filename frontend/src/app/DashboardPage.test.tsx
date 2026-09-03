@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import '../shared/i18n/config' // initialise i18next so useTranslation works
+import i18n from '../shared/i18n/config'
 import { DashboardPage } from './DashboardPage'
 import type { DashboardCardEntry } from './dashboardCards'
 import { ADMIN_ROLES, ROLE } from '../shared/access/roles'
@@ -69,6 +69,7 @@ function renderDashboard() {
 
 describe('DashboardPage — the identity header', () => {
   beforeEach(() => vi.clearAllMocks())
+  afterEach(() => void i18n.changeLanguage('en'))
 
   it('shows the name, the roles held, and no wall of permission chips', () => {
     mockedUseAuth.mockReturnValue(
@@ -113,6 +114,25 @@ describe('DashboardPage — the identity header', () => {
     renderDashboard()
 
     expect(screen.queryByText('University ID')).not.toBeInTheDocument()
+  })
+
+  it('translates role codes and enrollment terms instead of rendering backend English', async () => {
+    await i18n.changeLanguage('ar')
+    mockedUseAuth.mockReturnValue(
+      authState({
+        user: {
+          name: 'Layla Samir',
+          email: 'layla@ejust.test',
+          roles: [{ code: 'R02', name: 'Student' }],
+          student: { university_id: '2026CE0001', enrollment_term: 'Fall' },
+        },
+      }),
+    )
+    renderDashboard()
+
+    expect(screen.getByText('R02 · طالب')).toBeInTheDocument()
+    expect(screen.getByText('التحق في الخريف')).toBeInTheDocument()
+    expect(screen.queryByText(/Student|Fall/)).not.toBeInTheDocument()
   })
 })
 
@@ -173,7 +193,7 @@ describe('DashboardPage — card composition (ADR-0024)', () => {
       authState({
         hasPermission: () => true,
         isAdmin: true,
-        hasRole: (r) => ADMIN_ROLES.includes(r),
+        hasRole: (r) => ADMIN_ROLES.some((adminRole) => adminRole === r),
       }),
     )
     renderDashboard()
@@ -192,7 +212,7 @@ describe('DashboardPage — card composition (ADR-0024)', () => {
       authState({
         hasPermission: () => true,
         isAdmin: true,
-        hasRole: (r) => ADMIN_ROLES.includes(r),
+        hasRole: (r) => ADMIN_ROLES.some((adminRole) => adminRole === r),
       }),
     )
     renderDashboard()

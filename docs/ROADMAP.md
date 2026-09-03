@@ -548,8 +548,8 @@ hard-to-reverse choices are in [ADR-0025](./adr/0025-support-layer-query-contrac
 layer, the paginated envelope, filterable-iff-readable),
 [ADR-0026](./adr/0026-reports-owned-by-modules.md) (report ownership + gates),
 [ADR-0027](./adr/0027-export-sibling-route-audited.md) (export) and
-[ADR-0028](./adr/0028-aggregate-facades-sql-php-parity.md) (aggregate facades + the parity
-obligation); [ADR-0024](./adr/0024-permission-composed-dashboard-cards.md) is **amended** for what
+[ADR-0028](./adr/0028-aggregate-facades-sql-php-parity.md) (batched owner-facade derivation);
+[ADR-0024](./adr/0024-permission-composed-dashboard-cards.md) is **amended** for what
 a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Export**.
 
 - **A shared `Support` layer** (ADR-0025) — the project's first shared backend code, under
@@ -578,11 +578,14 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   has no client to render for. Authorized by the **list's own gate and scope**, adding no
   Permission (the Central Grade Entry reasoning), and **always written to the Audit Log** with
   actor, resource, criteria and row count: the new fact is not that data was read but that it left.
-- **Derived values become aggregates** (ADR-0028) — batch/aggregate methods on each owner's
-  existing `Public` facade (`cgpaForMany`, distributions, attendance, pipeline), one SQL query
-  each, using the window functions §1 chose Postgres for. No migration, no cache, seam unchanged;
-  the cost is the GPA arithmetic existing in PHP *and* SQL, held together by a **parity test** over
-  rounding, supersession across a Fall→Spring boundary, and `null`-not-`0.00`.
+  Export is a List capability: every migrated collection gets a sibling unless its ticket records
+  a security exclusion, Reports export through drill-through, and the SPA downloads through the
+  authenticated Axios client into an in-memory blob rather than a bare link.
+- **Derived values are batched through their owner** (ADR-0028) — candidate IDs/DTOs cross existing
+  `Public` facades in bounded batches, owners bulk-read only their own tables, and the existing PHP
+  calculators remain the single arithmetic implementation. Derived filtering and sorting happen
+  before in-memory page slicing; stored fields still paginate in SQL. Batch-versus-single parity
+  over the seeded cohort proves the facade shapes agree without cross-module joins or duplicate SQL.
 - **Six Reports, each owned by the module owning its spine data** (ADR-0026), the SPA composing one
   Analytics section — *owner supplies, shell arranges*, ADR-0024's rule a third time, at the cost
   of **zero new deptrac edges**: Application Pipeline (Admissions), Enrollment Summary + Course
@@ -599,7 +602,7 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
 - **Interactivity = parameters + drill-through** — a Report's parameters ride the same filter bar
   the grids use, and a chart segment **navigates to the filtered list behind it**, which exports.
   Filter/sort/page state lives in the **URL**, so a view is bookmarkable and shareable and the
-  export link is the same query string with `/export`.
+  export action fetches the same query string from `/export` through authenticated Axios.
 - **Frontend:** new `shared/ui` `<FilterBar>`, `<DataToolbar>`, pagination and a URL-state hook —
   the query rules and **no domain names**, the `<StatusChip>`/`<DashboardCard>` discipline —
   rendering into the plain MUI `<Table>` already in use (`@mui/x-data-grid` **still** not adopted:
@@ -614,12 +617,13 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
 - **Bulk course import** — closes **SRS FR-PCM-003.5**, deferred since Phase 1 and cheap now that
   the spreadsheet library is paid for: upload → **dry-run preview** (rows to create/update/reject,
   with per-row per-column reasons, writing nothing) → confirm applies the **whole file in one
-  transaction or none**, writing a single `catalog_versions` snapshot for the batch
-  ([ADR-0011](./adr/0011-catalog-version-snapshots.md)). The uploaded file is held on the private
+  transaction or none**, writing one ADR-0011 version snapshot for every Course created or changed
+  plus one Identity Audit Log event for the import transaction. The uploaded file is held on the private
   local disk under a ULID between the two calls, the
   [ADR-0016](./adr/0016-private-document-serving.md) pattern. The courses **export is the import
   template**, so the loop is export → edit → preview → apply. Gated on `catalog.manage`; both EN
-  and AR names required per row, as the Catalog demands.
+  and AR names required per row, as the Catalog demands. MIME, size, workbook structure, enum, and
+  credit-hour validation are mandatory; malware scanning remains explicitly deferred by ADR-0005.
 - **Seeder:** every named persona **untouched** (the smokes assert against them), with a
   deterministic generated cohort of ~150–250 Students layered on top — spread across Programs,
   terms, grades and attendance from a fixed seed, in the reserved namespace — so a distribution has
@@ -629,7 +633,7 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   paging, Arabic normalisation), then a shared **Pest dataset** of `(endpoint, actor, expected
   scope)` driving four assertions across every filterable endpoint — unknown fields rejected, scope
   composes with filter, actor-aware fields stay hidden, `meta` correct — so a new endpoint is one
-  dataset row; the **SQL↔PHP parity test** for every aggregate; one `.xlsx` read back end-to-end
+  dataset row; **batch-versus-single parity** for derived facade results; one `.xlsx` read back end-to-end
   with openspout's reader (headers, a typed National-ID cell, RTL on the Arabic sheet) and row
   generators asserted for the rest; Vitest on `<FilterBar>`, URL state and every chart's
   table-matches-series; **one comprehensive Playwright smoke** (the Phase-2 multi-flow precedent)
@@ -664,7 +668,7 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   actor-aware filterable-iff-readable allowlist, and a `/export` sibling
   ([ADR-0027](./adr/0027-export-sibling-route-audited.md)) — and any derived value it wants to
   filter, sort or chart on arrives as a batch/aggregate method on its own module's `Public` facade
-  under the parity obligation ([ADR-0028](./adr/0028-aggregate-facades-sql-php-parity.md)). This
+  through the owner-local batch contract ([ADR-0028](./adr/0028-aggregate-facades-sql-php-parity.md)). This
   phase also ships **its own Dashboard Cards** (Academic Standing, Credit-Hour Summary) as part of
   its own work, per ADR-0024 — one row in `frontend/src/app/dashboardCards.tsx`, one component
   inside its own feature, one `can:`-gated read endpoint in its own module.

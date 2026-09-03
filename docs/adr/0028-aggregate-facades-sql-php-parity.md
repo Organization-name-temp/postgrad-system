@@ -1,83 +1,60 @@
-# Derived values become batch and aggregate methods on their owner's `Public` facade, and the arithmetic is duplicated into SQL under a parity test
+# Derived values use batched owner facades and one authoritative calculator
 
 **Status:** accepted
 
-"Derived, never stored" is this project's house rule, and it is load-bearing: period state,
-attendance percentage, Incomplete deadlines, grade supersession and GPA/CGPA are all recomputed on
-read, nothing is cached ([ADR-0005](0005-localhost-learning-build.md) — no Redis), and so nothing
-can drift. [ADR-0020](0020-grading-owns-gpa-read-model.md) put the GPA arithmetic in exactly one
-place, `Grading`'s `GpaCalculator`, behind `GradingRecords`.
+"Derived, never stored" is this project's house rule. Period state, attendance percentage,
+Incomplete deadlines, grade supersession, and GPA/CGPA are recomputed from authoritative rows, so
+they cannot drift. [ADR-0020](0020-grading-owns-gpa-read-model.md) accordingly puts GPA arithmetic in
+`Grading`'s `GpaCalculator`, behind `GradingRecords`.
 
-Phase 4.6 asks three things of those derived values that the current shape cannot give:
+Phase 4.6 needs derived values for cohorts: GPA Distribution, derived filters and sorts, and richer
+Dashboard Cards. Calling a single-record facade once per row would create N+1 cross-module reads.
+Implementing the arithmetic again in cross-module SQL would violate both the single-owner rule and
+[ADR-0012](0012-cross-module-reads-by-id-and-dto.md), because module tables may not be joined behind
+another module's facade.
 
-- **GPA Distribution** needs every Student's CGPA in a Program at once. `GradingRecords::cgpaFor()`
-  takes **one** student id and crosses two module seams per call.
-- **Filtering and sorting** on CGPA, attendance percentage, queue age or open seats needs the value
-  available to `ORDER BY` and `WHERE`. You cannot paginate on a number that only exists after a PHP
-  loop — the page you return would be a page of the wrong set.
-- **Cards** want figures like "advisees below 3.0", which is the same problem in miniature.
+## Decision
 
-**Decision: each owning module grows batch and aggregate methods on the `Public` facade it already
-publishes — `cgpaForMany(array $studentIds)`, `cgpaDistributionFor(...)`, attendance and enrollment
-equivalents — each implemented as a single SQL query using the window functions this project chose
-Postgres for** (ROADMAP §1: "so the GPA/standing window-function math stays honest"). No migration,
-no cache, no materialised view, and the seam is unchanged: consumers still ask the owner, exactly as
-[ADR-0012](0012-cross-module-reads-by-id-and-dto.md) requires. It continues a pattern already set —
-`GradingRecords::gradesFor(array $enrollmentIds)` is already a batch read.
+Each owning module extends its existing `Public` facade with batch methods such as
+`cgpaForMany(array $studentIds)`. A batch operation:
 
-## The cost, named
+1. obtains candidate IDs and immutable DTOs from other modules through their `Public` facades, in
+   bounded batches;
+2. queries only tables owned by the calculating module, in bulk;
+3. invokes the existing owner-local PHP calculator for each candidate;
+4. filters and sorts the completed derived result before slicing the requested page.
 
-**The GPA arithmetic now exists twice**: once in PHP, in `GpaCalculator`, and once in SQL. That
-cuts against ADR-0020's whole purpose, so it is worth being precise about why it is acceptable here
-when a cache would not be.
+Stored-column filters and sorts remain database queries and paginate in SQL. Only a request involving
+a derived value materializes its already-authorized candidate set in memory. This is an accepted
+localhost-build tradeoff: pagination metadata remains truthful because filtering and sorting happen
+before slicing, while the arithmetic and module boundaries remain authoritative.
 
-A cache's failure mode is **drift in time**: a second write path forgets to invalidate, and the
-stored value silently disagrees with the truth for as long as nobody looks. That failure mode does
-not exist here. Both implementations read the same authoritative rows at the same instant and store
-nothing, so they cannot disagree about *when*. They can only disagree about *what* — a difference in
-code — and a difference in code is exactly what a test catches.
-
-**So the duplication is accepted under a parity obligation.** A test runs both implementations over
-the seeded cohort and asserts they agree, covering the three places the arithmetic is subtle:
-
-- accumulation in **integer hundredths** and rounding **half-up to two decimals exactly once**,
-  including a case that rounds *across* the 3.0 threshold ([ADR-0021](0021-grading-scale-uniform-bands.md));
-- **supersession** — among a Course's Attempts only the chronologically latest by the Semester's
-  `starts_at` counts, across a Fall→Spring boundary;
-- the **`null` vs `0.00`** distinction for a Student with no CGPA-counting graded Enrollment.
-
-This is the same shape of argument [ADR-0022](0022-grade-outcome-pushed-to-enrollment.md) made for
-the duplicated `earned` bit: a deliberate duplication, accepted for a stated reason, with the
-mechanism that stops it drifting spelled out.
+Batch behavior is proved against the existing single-record facade over the deterministic seeded
+cohort. The parity test covers accumulation and rounding, supersession across Semesters, and the
+`null` versus `0.00` distinction. It compares two call shapes that share one calculator; it does not
+authorize a second SQL implementation of the academic rule.
 
 ## Considered options
 
-- **Batch and aggregate facade methods (chosen).** Keeps derived-never-stored, keeps ADR-0005's
-  no-cache, keeps ADR-0012's seam, needs no migration, and makes derived values first-class in
-  `WHERE` and `ORDER BY`. Costs one duplicated arithmetic under a parity test.
-- **Materialise a read model (rejected).** A `student_metrics` table or Postgres materialised view
-  refreshed on `GradeFinalized` would make every derived value an ordinary indexed column — by far
-  the best performance and the simplest queries. Rejected because it reintroduces exactly the drift
-  ADR-0005 removed, needs a migration and a refresh command in a build with no scheduler, and
-  ROADMAP §1 already records caching as a **documented later optimization** rather than a thing to
-  reach for at the first inconvenience.
-- **Derive in PHP and filter in memory (rejected).** One arithmetic, correct by construction.
-  Rejected because pagination becomes a lie: you load the whole candidate set to page it, so `meta`
-  describes a set you already paid for in full.
-- **Refuse derived filters (rejected).** Filters restricted to stored columns is cheap and
-  impossible to get wrong — and removes GPA Distribution, "students below 3.0" and every attendance
-  filter, which is most of the analytical value Phase 4.6 exists to add.
+- **Batched owner-facade computation (chosen).** Avoids N+1 reads, preserves module seams, and keeps
+  one implementation of each academic rule. It deliberately materializes scoped candidates for
+  derived filtering in this localhost build.
+- **A cross-module SQL implementation (rejected).** It would join another module's tables and
+  duplicate academic arithmetic, contradicting ADR-0012 and ADR-0020.
+- **A stored read model (deferred).** An indexed projection would scale further, but introduces a
+  refresh path and drift risk that ADR-0005 intentionally excludes. It may later replace the
+  internal batch strategy without changing the facade.
+- **Refuse derived filters (rejected).** This would remove much of Phase 4.6's analytical value.
 
 ## Consequences
 
-- **Every new derived filter needs its SQL twin and a parity case.** That is the standing tax of
-  this decision, and it is the thing to weigh before adding one.
-- **The parity test is a gate, not documentation.** If it is ever deleted or skipped, this ADR has
-  been reversed silently.
-- **Prefer extending the facade over reimplementing.** A consumer needing a different shape of the
-  same figure adds a method to the owner; deriving GPA outside `Grading` is a regression of
-  ADR-0020, and the fact that the SQL now exists makes that temptation stronger, not weaker.
-- Phase 5 inherits this: Academic Standing and the Credit-Hour Summary must consume these facade
-  methods rather than re-deriving, and if they need their own aggregates they add them to their own
-  owner under the same parity obligation.
-- ADR-0005's no-cache stands unqualified. Nothing in this decision stores a derived value anywhere.
+- Consumers request derived values from their owner and never reimplement them.
+- Candidate acquisition is batched and scoped before calculation; no per-row cross-module calls are
+  allowed.
+- Derived filters and sorts occur before in-memory pagination. Stored fields continue to filter,
+  sort, and paginate in SQL.
+- Tests assert batch-versus-single result parity over the seeded cohort and verify truthful totals,
+  ordering, and page boundaries after derived filtering.
+- Phase 5 consumes the same facades for Academic Standing and Credit-Hour Summary rather than
+  re-deriving their inputs.
+- A future stored projection is an optimization behind this interface, not a contract change.

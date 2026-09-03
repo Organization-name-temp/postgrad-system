@@ -92,7 +92,7 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 4. As a Student Affairs officer, I want to search by partial National ID or University ID, so that a half-remembered number from a phone call is enough to find the record.
 5. As a Dean, I want my Faculty's Applications filtered by degree level and decision state, so that I can work MSc and PhD decisions separately.
 6. As a Dean, I want a filter I apply to be unable to reach another Faculty's Applications, so that my scope is a property of the system rather than of my restraint.
-7. As an Advisor, I want to filter my advisee list by Academic Standing and CGPA range, so that I can find the students who need me before their next registration.
+7. As an Advisor, I want to filter my advisee list by CGPA range, so that I can find the students who need me before their next registration. Academic Standing remains Phase 5 scope.
 8. As an Advisor, I want to filter registration requests by Semester and status, so that last term's decided requests stop crowding this term's pending ones.
 9. As an Instructor, I want to filter my roster by Course Status and attendance percentage, so that I can see who is at risk on an Audit Enrollment without reading every row.
 10. As a Department Head, I want to filter the grade-sheet queue by Semester, sheet kind and state, so that I can find the Correction rounds among the Initial ones.
@@ -153,7 +153,7 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 53. As a catalog administrator, I want an import to apply completely or not at all, so that a typo on row 400 never leaves the Catalog in a state matching neither the file nor what I started with.
 54. As a catalog administrator, I want the Courses export to be a valid import template, so that the round trip is export, edit, preview, apply.
 55. As a catalog administrator, I want an import to require both English and Arabic names on every row, so that bulk loading cannot create Courses the Arabic interface renders blank.
-56. As a catalog administrator, I want an applied import recorded as one versioned Catalog change, so that the version history reads as one deliberate act rather than four hundred.
+56. As a catalog administrator, I want each changed Course versioned and the import transaction audited once, so that Course history stays valid while the batch remains one deliberate act.
 
 **Security and integrity**
 
@@ -201,9 +201,9 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   fragment against a Course code or a partial National ID. No ranking is offered.
 - **Filterable if and only if readable.** An endpoint's allowlist is a function of the acting user
   wherever a field is permission-sensitive (CGPA, National ID, Mark, later Academic Standing);
-  non-sensitive fields stay static. A field absent from the effective allowlist is **ignored**, not
-  honoured and not an error. This closes an inference channel: `?cgpa_min=` plus `meta.total` is a
-  CGPA oracle for anyone who can list the rows.
+  non-sensitive fields stay static. A known actor-hidden field absent from the effective allowlist
+  is **ignored**, not honoured and not an error; an unknown field name is rejected. This closes an
+  inference channel: `?cgpa_min=` plus `meta.total` is a CGPA oracle for anyone who can list the rows.
 - **Scope and filters compose one way.** Row-level scope — the Dean's Faculty, the Advisor's
   advisees, the Department Head's Department, the Instructor's Offerings — is a base query
   constraint the controller applies and the client never supplies. Filters narrow within it and can
@@ -226,6 +226,9 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   string**, parsed by the same `Support` code, so the file and the grid cannot disagree. It is
   **uncapped and streamed**, which is what makes the 100-row page cap correct rather than merely
   tolerable.
+- **Export belongs to Lists.** Every filterable collection, including personal collections and
+  pickers, receives a sibling route unless its endpoint ticket names a specific data-minimization
+  reason and asserts the route is absent. Reports export by drilling into the corresponding List.
 - **True `.xlsx` via `openspout/openspout`** — a streaming writer at constant memory, wrapped in one
   `Support` class that takes a column definition and a row generator. All required PHP extensions
   (`zip`, `xmlreader`, `xmlwriter`, `mbstring`) are present on the Herd runtime. CSV is rejected on
@@ -246,19 +249,16 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 
 ### Aggregates and derived values (ADR-0028)
 
-- Each owning module grows **batch and aggregate methods on its existing `Public` facade** —
-  `cgpaForMany(array $studentIds)` and a distribution method on `GradingRecords`, attendance and
-  enrollment equivalents on `EnrollmentRecords`, pipeline aggregation in Admissions — each **one SQL
-  query** using window functions. No migration, no cache, no materialised view; the seam is
-  unchanged and consumers still ask the owner (ADR-0012). This continues an existing pattern:
-  `gradesFor(array $enrollmentIds)` is already a batch read.
-- **The GPA arithmetic consequently exists twice**, in `GpaCalculator` and in SQL. Accepted under a
-  **parity obligation**: a test asserts the two agree over the seeded cohort, covering accumulation
-  in integer hundredths with half-up rounding to two decimals applied exactly once (including a case
-  that rounds *across* the 3.0 threshold), supersession by the Semester's `starts_at` across a
-  Fall→Spring boundary, and the `null`-not-`0.00` case. The reason this is safer than a cache: both
-  read the same authoritative rows at the same instant, so they cannot drift *in time* — only in
-  code, which a test catches.
+- Each owner grows **batch methods on its existing `Public` facade**. Candidate IDs and immutable
+  DTOs cross module seams in bounded batches; the owner bulk-reads only its own tables and invokes
+  its existing PHP calculator. No consumer joins another module's tables or reimplements academic
+  arithmetic.
+- Stored-column filters and sorts remain SQL-paginated. For a derived filter or sort, the complete
+  authorized candidate result is calculated, filtered, and sorted before the requested page is
+  sliced in memory, keeping `meta.total` and page boundaries truthful.
+- A **batch-versus-single parity test** covers the seeded cohort, including rounding across 3.0,
+  supersession across Fall→Spring, and `null` rather than `0.00`. Both call shapes share the same
+  calculator; there is no SQL/PHP arithmetic duplication.
 
 ### Reports (ADR-0026)
 
@@ -271,14 +271,14 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   which also builds the system's first audit read surface). **Enrollment Summary is owned by
   Enrollment, not Identity** — Identity is the one module with no outbound edges and must not gain
   one for a view.
-- **Gates: the nearest data-read Permission, at least as strong as the list the Report drills
-  into.** Aggregation is not a weakening argument, because every chart segment links to identifying
-  rows. `grades.view_student` gates four of the six and is doing the work of a "may read student
-  academic records" permission §3.2 lacks; its holders exclude Student and Applicant, which
-  `catalog.view` and `standing.monitor` would not. Audit Log role-gates on the administrator pair,
-  the AdministrationCard precedent. Attendance Analytics is additionally assignment-scoped, as the
-  register is. No Permission is added — ADR-0008 calls the set bylaws, and §4.12 supplies role
-  lists, not permission names. Every divergence from §4.12's table is enumerated in ADR-0026.
+- **Gates mirror ordinary-screen scope.** Application Pipeline is unscoped for Student Affairs and
+  Faculty-scoped for Deans. GPA Distribution starts from the Student-Grades scope: Advisor advisees,
+  Instructor teaching roster, Department Head Departments, Dean Faculties, and the existing
+  unscoped Student Affairs/Council or administrator override. Enrollment and Registration summaries
+  use equivalent existing Student/Offering scopes. Attendance Analytics is only Instructor-owned
+  Offerings, Advisor advisees, and R09/R10 override; it does not grant Department Head, Student
+  Affairs, Dean, or Council a new attendance surface. Filters only narrow, and every role has
+  in-scope and out-of-scope tests.
 - **Parameters and drill-through.** A Report's parameters ride the same query contract as the grids;
   a chart segment navigates to the filtered list behind it, which exports. No cross-filtering
   between charts and no client-side pivoting.
@@ -297,8 +297,9 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   with a concise label plus a "View as table" disclosure** rendering the identical series as a real
   table with scoped headers. Version alignment with the installed MUI X major is to be **verified at
   install**.
-- **URL is the single source of truth** for filter, sort and page state. Drill-through is therefore
-  an ordinary link, and the export control is the same query string with `/export`.
+- **URL is the single source of truth** for filter, sort and page state. Drill-through is an
+  ordinary link. Export uses the same query string with `/export`, fetched through the authenticated
+  Axios client and downloaded from an in-memory blob; bare export links are forbidden.
 - **A column chooser** affects the screen only and never the file. **A print stylesheet** renders a
   Report cleanly on paper with no PDF dependency.
 - **Global search** fills the Phase-0.5 app-bar slot as a **client-side fan-out**: the shell calls
@@ -314,13 +315,16 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 
 - Closes **SRS FR-PCM-003.5**. Two calls: **upload → dry-run preview** returning rows to create,
   rows to update, and rows rejected with per-row per-column reasons, **writing nothing**; then
-  **confirm → apply the whole file in one transaction or none**, writing a **single
-  `catalog_versions` snapshot for the batch** (ADR-0011).
+  **confirm → apply the whole file in one transaction or none**. Every created or updated Course
+  writes its own ADR-0011 version snapshot, while one Identity Audit Log event records the import
+  identifier, actor, source filename, counts, and transaction outcome.
 - The uploaded file is held on the private local disk under a ULID between the two calls, reusing
   the ADR-0016 pattern rather than persisting a parsed preview.
 - Gated on `catalog.manage`. Both English and Arabic names are required per row, as the Catalog
   demands. **The Courses export is the import template**, so the loop is export → edit → preview →
-  apply.
+  apply. MIME, size, workbook structure, enum values, and credit-hour arithmetic are validated;
+  ADR-0005 explicitly defers malware scanning, and the private file is deleted after confirmation
+  or expiry.
 
 ### Seeder
 
@@ -352,10 +356,9 @@ Phase 4.5 by asserting Card presence *and* absence.
    global search fans out over.
 2. **`Public` facade seam** — `tests/Feature/<Module>/*RecordsTest.php`, an **existing** seam with
    direct prior art in `Feature/Grading/GradingRecordsTest.php` and
-   `Feature/Enrollment/EnrollmentRecordsTest.php`. This is where the **SQL↔PHP parity test** lives:
-   it calls both the single-student and batch forms over the seeded cohort and asserts equality, plus
-   the three subtle cases named above. **If this test is ever deleted or skipped, ADR-0028 has been
-   reversed silently.**
+   `Feature/Enrollment/EnrollmentRecordsTest.php`. This is where **batch-versus-single parity** lives:
+   it calls both facade forms over the seeded cohort and asserts equal results, plus the three subtle
+   cases named above, truthful totals, ordering, and slicing after derived filtering.
 3. **Pure unit seam** — `tests/Unit/Support/`, one **new directory under an existing convention**
    (prior art: `Unit/Grading/GpaCalculatorTest`, `Unit/Enrollment/CreditHoursValidatorTest`,
    `Unit/Admissions/BusinessDaysTest`). Proves the parser exhaustively with no database: operator and
@@ -420,7 +423,7 @@ columns from `database/migrations` only, so anything a module migration adds nee
 - **Sequencing is load-bearing and not a preference.** This phase changes the response envelope of
   every collection endpoint. Placing it before Phase 5 means Phases 5, 6 and 7 are born filterable
   and exportable; placing it after means every list those phases build is migrated a second time.
-  Phase 4.5's manual review gate and its PR to `main` should land **before** this phase starts.
+  Phase 4.5's review gate and PR to `main` were prerequisites and are now satisfied.
 - **This is the largest phase yet — roughly 18–20 tickets against Phase 4.5's nine**, and it grew
   during design when bulk import, the column chooser and the print view were pulled in. The DoD's
   "one Playwright smoke per phase" is honoured through one comprehensive multi-flow smoke rather

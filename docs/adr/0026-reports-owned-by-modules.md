@@ -60,24 +60,24 @@ absorbed silently:
 | Report | Gate | §4.12 says | Divergence |
 |---|---|---|---|
 | Application Pipeline | `application.screen` | SA, Dean | none — exact |
-| GPA Distribution | `grades.view_student` | SA, Dean, DH | also reaches Advisor, Instructor, Council |
-| Enrollment Summary | `grades.view_student` | SA, Dean, DH, SysAdmin | also reaches Advisor, Instructor, Council |
-| Course Registration Summary | `grades.view_student` | SA, Advisor, DH | also reaches Instructor, Dean, Council |
-| Attendance Analytics | `grades.view_student` | not in §4.12 | an [ADR-0019](0019-attendance-session-register.md) extension |
+| GPA Distribution | `grades.view_student` | SA, Dean, DH | ordinary Student-Grades scope only |
+| Enrollment Summary | `grades.view_student` | SA, Dean, DH, SysAdmin | equivalent Student/Offering scope only |
+| Course Registration Summary | `grades.view_student` | SA, Advisor, DH | equivalent Student/Offering scope only |
+| Attendance Analytics | assignment scope or `ADMIN_ROLES` | not in §4.12 | Instructor, Advisor, R09/R10 only |
 | Audit Log | `ADMIN_ROLES` (R09/R10) | SysAdmin, Super Admin | none — role-gated, the AdministrationCard precedent |
 
-**`grades.view_student` gates four of the six, and it is doing the work of a permission §3.2 does
-not have: "may read student academic records".** Its holders — Advisor, Instructor, Student
-Affairs, Department Head, Dean, Council — are exactly the staff who may already open an individual
-student's record, and notably exclude Student and Applicant, which `catalog.view` and
-`standing.monitor` would not. Every divergence above is therefore in the same direction: a Report
-reaches *more staff* than §4.12 lists, and **no one who could not already read the same facts one
-student at a time**. The alternative — inventing a `reports.view` case — was rejected under
-[ADR-0008](0008-rbac-enums-static-matrix.md); if a future report makes this stretch untenable, this
-is the paragraph to revisit.
+Holding a Permission is necessary but does not erase the ordinary screen's row scope. GPA
+Distribution starts from the Student-Grades scope: Advisor to advisees, Instructor to teaching
+roster, Department Head to assigned Departments, Dean to assigned Faculties, and Student Affairs
+and Council unscoped only where that screen already grants it. Administrators use their explicit
+override. Enrollment and Course Registration summaries apply their equivalent existing
+Student/Offering scopes. Every role gets positive and negative scope tests, and Report filters may
+only narrow that base set.
 
-Attendance Analytics is additionally scoped by assignment, as the register itself is: an Instructor
-sees their own Offerings, a Department Head their Department, Student Affairs and Dean all.
+Attendance Analytics follows the narrower register surface in ADR-0019: Instructor to owned
+Offerings, Advisor to advisees, and R09/R10 through the existing administrative override.
+Department Head, Student Affairs, Dean, and Council have no ordinary attendance surface, so the
+Report does not grant them one.
 
 Row-level scope applies to a Report exactly as it applies to the list behind it: a Dean's Pipeline
 is their Faculty's, a Department Head's grade distribution is their Department's

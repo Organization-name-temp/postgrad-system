@@ -29,8 +29,9 @@ what a Program is has been written in the wrong place.
 ## The contract
 
 - **Flat query parameters**, not bracketed or nested:
-  `?status=under_sa_review,sa_approved&cgpa_min=3&q=أحمد&sort=-cgpa&page=2&per_page=25`.
-  Flat names generate clean, readable types through Scribe → OpenAPI → Orval; bracket syntax
+  `?status=under_sa_review,sa_approved&cgpa_min=3&q=أحمد&sort=-cgpa,name&page=2&per_page=25`.
+  Multi-value filters and multi-column sort are comma-separated; each descending sort field has a
+  leading `-`. Flat names generate clean, readable types through Scribe → OpenAPI → Orval; bracket syntax
   generates `deepObject` parameters and awkward TypeScript for no gain here.
 - **Every collection endpoint is always paginated** — `{data, links, meta}`, unconditionally. A
   conditional envelope (plain array without `?page=`, paginated with it) would put two response
@@ -60,7 +61,9 @@ disclosure purposes, **equivalent to reading it**.
 
 So an endpoint's allowlist is a small function of the actor, not a static array, wherever a field
 is permission-sensitive (CGPA, National ID, Mark, later Academic Standing). Non-sensitive fields
-stay static. A field absent from the effective allowlist is **ignored**, never honoured.
+stay static. A known but actor-hidden field absent from the effective allowlist is **ignored**, never
+honoured, so its presence cannot reveal the actor's access. An unknown field is rejected as a bad
+contract request.
 
 **Row-level scope and filters are different things and compose in one direction only.** Scope — the
 Dean's Faculty, the Advisor's advisees, the Department Head's Department, the Instructor's
@@ -98,6 +101,9 @@ answer to "your applications in that Faculty".
   touching ~25 Pest feature tests, the list components, `openapi.yaml` and the generated Orval
   client — and both `composer api:check` and `npm run api:check` are `git diff --exit-code` gates,
   so the regeneration is not optional.
+- Every filter, search, sort, and pagination input is documented with `@queryParam`; model-bound
+  routes retain explicit `@urlParam ... Example:` annotations so Scribe examples and the generated
+  OpenAPI/Orval contract remain deterministic.
 - **Testing is contract-once plus a shared dataset.** Operators, sorting, paging and Arabic
   normalisation are proven exhaustively as `Support` unit tests. A shared Pest dataset of
   `(endpoint, actor, expected scope)` then drives four assertions across every filterable endpoint —

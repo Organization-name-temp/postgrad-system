@@ -66,6 +66,15 @@ dates of birth, addresses and GPAs now exists outside the system. It also extend
 from authentication events toward the "sensitive-data CRUD later" [CONTEXT.md](../../CONTEXT.md)
 anticipated — the first non-auth category it carries.
 
+Export is therefore a **List capability**, not a separate Report capability. Every filterable
+collection receives a sibling export unless its endpoint ticket records a specific data-minimization
+reason for exclusion and proves that no route exists. Reports export through drill-through to the
+corresponding filtered List.
+
+The SPA requests the sibling route through the authenticated Axios client, receives an in-memory
+blob, and initiates the browser download from that blob. A bare link is forbidden because it bypasses
+the configured client behavior and the private-download pattern in ADR-0016.
+
 ## Consequences
 
 - **The Audit Log becomes the record of PII egress**, and the Audit Log Report

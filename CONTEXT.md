@@ -394,10 +394,11 @@ _Avoid_: analytics dashboard, analytical dashboard, role dashboard (Dashboard me
 authenticated landing surface and nothing else); query; view.
 
 **Export**:
-A file rendering of one filtered list or Report, carrying a canonical column set decided by the
+A file rendering of one filtered List, carrying a canonical column set decided by the
 system rather than by whoever requested it, rendered in the requester's language, and recorded in
 the Audit Log because the data leaves. An Export is authorised by the same access as the list it
-mirrors — it is a copy of what the requester could already read, not a new power. Distinct from
+mirrors — it is a copy of what the requester could already read, not a new power. Reports export by
+drilling into their corresponding filtered List. Distinct from
 issuing an official **Transcript**, which is a sealed, verifiable document about one Student that
 only Student Affairs may issue.
 _Avoid_: download, report file, extract, dump.

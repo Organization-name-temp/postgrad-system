@@ -3,7 +3,6 @@
 namespace Modules\Grading\Internal\Support;
 
 use Modules\Calendar\Public\AcademicCalendar;
-use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\OfferingSummary;
 use Modules\Grading\Internal\Enums\GradeSheetKind;
@@ -15,11 +14,9 @@ use Modules\Grading\Internal\Models\GradeSheet;
  * load for their current term, how much of it is **not yet Finalized**, and which Offerings are
  * past their Grade-Submission Deadline with nothing finalized.
  *
- * "Their current term" is derived here from the Offerings themselves — the **latest-starting
- * Semester they teach in that has already started** — rather than from the running Semester,
- * because grades are keyed in *after* a term ends, when no Semester is running and an Instructor
- * still owes the marks for the one that just finished. It is one rule with no branch, and it reads
- * only the Semester's own dates (ADR-0018), deriving nothing new.
+ * "The current term for academic work" is resolved by Calendar as the latest-starting Semester
+ * that has begun. This keeps grading work visible after teaching ends without making Grading
+ * derive Calendar's selection rule from the acting user's Offerings.
  *
  * The overdue flag is a **nudge, not a gate**: past the deadline an Offering with no Finalized
  * Sheet is flagged and nothing is blocked or changed (phase 4 ticket 09). This Card is a second
@@ -52,12 +49,7 @@ final readonly class GradeSheetsCardBuilder
      */
     public function build(array $offerings): array
     {
-        $semesters = $this->calendar->findMany(array_values(array_unique(array_map(
-            fn (OfferingSummary $offering): int => $offering->semesterId,
-            $offerings,
-        ))));
-
-        $semester = $this->currentTeachingTerm($offerings, $semesters);
+        $semester = $this->calendar->currentForAcademicWork();
 
         if ($semester === null) {
             return [
@@ -76,7 +68,7 @@ final readonly class GradeSheetsCardBuilder
         ));
 
         $deadlinePassed = $semester->hasGradeSubmissionDeadlinePassed(now());
-        $statuses = $this->initialSheetStatuses($current);
+        $statuses = $this->actionableSheetStatuses($current);
         $resolvedCourses = $this->courses->findMany(array_values(array_unique(array_map(
             fn (OfferingSummary $offering): int => $offering->courseId,
             $current,
@@ -118,41 +110,14 @@ final readonly class GradeSheetsCardBuilder
     }
 
     /**
-     * The Semester the Card is about: the latest-starting one among `$offerings` whose term has
-     * already begun. Null when the user teaches nothing, or only in terms still ahead — both of
-     * which render the Card's empty state rather than an error.
-     *
-     * @param  list<OfferingSummary>  $offerings
-     * @param  array<int, SemesterSummary>  $semesters
-     */
-    private function currentTeachingTerm(array $offerings, array $semesters): ?SemesterSummary
-    {
-        $now = now();
-        $current = null;
-
-        foreach ($offerings as $offering) {
-            $semester = $semesters[$offering->semesterId] ?? null;
-
-            if ($semester === null || $semester->startsAt->greaterThan($now)) {
-                continue;
-            }
-
-            if ($current === null || $semester->startsAt->greaterThan($current->startsAt)) {
-                $current = $semester;
-            }
-        }
-
-        return $current;
-    }
-
-    /**
-     * Each Offering's Initial-round status, keyed by Offering id — the same round the Grade Sheets
-     * screen reports, read from Grading's own table in one query rather than one per Offering.
+     * Each Offering's actionable-round status, keyed by Offering id. The newest open follow-up
+     * takes precedence over a finalized Initial round; otherwise the Initial round describes the
+     * Offering. Every round is loaded in one owner-local query rather than one per Offering.
      *
      * @param  list<OfferingSummary>  $offerings
      * @return array<int, GradeSheetStatus>
      */
-    private function initialSheetStatuses(array $offerings): array
+    private function actionableSheetStatuses(array $offerings): array
     {
         $offeringIds = array_map(fn (OfferingSummary $offering): int => $offering->id, $offerings);
 
@@ -161,12 +126,21 @@ final readonly class GradeSheetsCardBuilder
         }
 
         return GradeSheet::query()
-            ->where('kind', GradeSheetKind::Initial)
             ->whereIn('course_offering_id', $offeringIds)
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->get()
-            ->mapWithKeys(fn (GradeSheet $sheet): array => [
-                (int) $sheet->course_offering_id => $sheet->status,
-            ])
+            ->groupBy('course_offering_id')
+            ->map(function ($sheets): ?GradeSheetStatus {
+                /** @var GradeSheet|null $sheet */
+                $sheet = $sheets->first(
+                    fn (GradeSheet $candidate): bool => $candidate->status !== GradeSheetStatus::Finalized,
+                ) ?? $sheets->first(
+                    fn (GradeSheet $candidate): bool => $candidate->kind === GradeSheetKind::Initial,
+                );
+
+                return $sheet?->status;
+            })
             ->all();
     }
 }

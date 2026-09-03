@@ -215,3 +215,24 @@ it('has no closing date for a period that is not an open window', function () {
         ->and($cal->currentPeriodEndsAt(Carbon::parse('2026-12-10 00:00')))->toBeNull() // closed, running
         ->and($cal->currentPeriodEndsAt(Carbon::parse('2026-12-21 00:00')))->toBeNull(); // ended
 });
+
+it('lists every open window when registration overlaps add-drop', function () {
+    $cal = calendar();
+
+    expect($cal->openWindows(Carbon::parse('2026-09-03 00:00')))
+        ->toBe(['registration', 'add_drop']);
+});
+
+it('finds the nearest future deadline and names its source field', function () {
+    $cal = calendar();
+
+    $next = $cal->nextDeadline(Carbon::parse('2026-09-03 00:00'));
+
+    expect($next)->not->toBeNull()
+        ->and($next['key'])->toBe('registration_closes_at')
+        ->and($next['at']->toDateString())->toBe('2026-09-05');
+});
+
+it('has no next deadline after every semester date has passed', function () {
+    expect(calendar()->nextDeadline(Carbon::parse('2027-01-11 00:00')))->toBeNull();
+});

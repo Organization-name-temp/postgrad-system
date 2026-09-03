@@ -106,6 +106,18 @@ final readonly class SemesterSummary
         return $this->calendar()->currentPeriodEndsAt($now);
     }
 
+    /** @return list<string> */
+    public function openWindows(CarbonInterface $now): array
+    {
+        return $this->calendar()->openWindows($now);
+    }
+
+    /** @return ?array{key: string, at: CarbonInterface} */
+    public function nextDeadline(CarbonInterface $now): ?array
+    {
+        return $this->calendar()->nextDeadline($now);
+    }
+
     private function calendar(): SemesterCalendar
     {
         return new SemesterCalendar(

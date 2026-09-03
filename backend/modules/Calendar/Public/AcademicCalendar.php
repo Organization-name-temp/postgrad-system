@@ -54,6 +54,12 @@ interface AcademicCalendar
     public function running(): ?SemesterSummary;
 
     /**
+     * The latest Semester that has begun, including a recently ended term whose
+     * academic work (such as grade submission) is still being completed.
+     */
+    public function currentForAcademicWork(): ?SemesterSummary;
+
+    /**
      * The Semester whose `starts_at` is the earliest one **after** the given Semester's own —
      * never by (year, term), since Fall precedes the following Spring (the same ordering rule
      * Grading's CGPA supersession follows). `null` when `$semesterId` does not exist, or when

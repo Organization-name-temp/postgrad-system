@@ -20,6 +20,16 @@ use Modules\Calendar\Public\SemesterSummary;
  */
 final class SemesterCalendar
 {
+    /** @var array<string, string> */
+    private const DEADLINES = [
+        'registration_closes_at' => 'registrationClosesAt',
+        'add_drop_ends_at' => 'addDropEndsAt',
+        'late_add_ends_at' => 'lateAddEndsAt',
+        'withdrawal_deadline_at' => 'withdrawalDeadlineAt',
+        'ends_at' => 'endsAt',
+        'grade_submission_deadline_at' => 'gradeSubmissionDeadlineAt',
+    ];
+
     public function __construct(
         public readonly CarbonInterface $startsAt,
         public readonly CarbonInterface $endsAt,
@@ -183,5 +193,41 @@ final class SemesterCalendar
             'registration' => $this->registrationClosesAt,
             default => null,
         };
+    }
+
+    /**
+     * Every registration/change window open at the given moment, in lifecycle order.
+     *
+     * @return list<string>
+     */
+    public function openWindows(CarbonInterface $now): array
+    {
+        return array_values(array_filter([
+            $this->isRegistrationOpen($now) ? 'registration' : null,
+            $this->isInAddDropPeriod($now) ? 'add_drop' : null,
+            $this->isInLateAddPeriod($now) ? 'late_add' : null,
+            $this->isInWithdrawalPeriod($now) ? 'withdrawal' : null,
+        ]));
+    }
+
+    /**
+     * The nearest date strictly after the given moment, with the source field that owns it.
+     *
+     * @return ?array{key: string, at: CarbonInterface}
+     */
+    public function nextDeadline(CarbonInterface $now): ?array
+    {
+        $next = null;
+
+        foreach (self::DEADLINES as $key => $property) {
+            /** @var CarbonInterface $at */
+            $at = $this->{$property};
+
+            if ($at->greaterThan($now) && ($next === null || $at->lessThan($next['at']))) {
+                $next = ['key' => $key, 'at' => $at];
+            }
+        }
+
+        return $next;
     }
 }

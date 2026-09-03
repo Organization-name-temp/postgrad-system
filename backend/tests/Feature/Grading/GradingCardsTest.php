@@ -6,6 +6,7 @@ use Modules\Calendar\Internal\Models\Semester;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Enrollment\Internal\Models\CourseOffering;
+use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Identity\Internal\Models\DepartmentHeadAssignment;
@@ -115,6 +116,29 @@ it('reports an unstarted round as a null status rather than omitting the offerin
         ->assertJsonPath('data.unfinalized_count', 1)
         ->assertJsonPath('data.offerings.0.offering_id', $offering->id)
         ->assertJsonPath('data.offerings.0.sheet_status', null);
+});
+
+it('shows the newest unfinalized follow-up round as the actionable sheet', function () {
+    $instructor = gcInstructor();
+    $semester = Semester::factory()->running()->create();
+    $offering = gcOffering($instructor, $semester);
+
+    GradeSheet::factory()->inStatus(GradeSheetStatus::Finalized)->create([
+        'course_offering_id' => $offering->id,
+        'kind' => GradeSheetKind::Initial,
+        'created_at' => now()->subDay(),
+    ]);
+    GradeSheet::factory()->inStatus(GradeSheetStatus::Draft)->create([
+        'course_offering_id' => $offering->id,
+        'kind' => GradeSheetKind::Correction,
+        'created_at' => now(),
+    ]);
+
+    Sanctum::actingAs($instructor);
+
+    gcSheetsCard()->assertOk()
+        ->assertJsonPath('data.unfinalized_count', 1)
+        ->assertJsonPath('data.offerings.0.sheet_status', GradeSheetStatus::Draft->value);
 });
 
 it('reads the current teaching term from the offerings, so a finished term is still shown', function () {

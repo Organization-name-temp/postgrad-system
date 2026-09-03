@@ -2,10 +2,8 @@
 
 namespace Modules\Calendar\Internal\Support;
 
-use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Modules\Calendar\Public\AcademicCalendar;
-use Modules\Calendar\Public\SemesterSummary;
 
 /**
  * The Semester & Open Windows Dashboard Card's payload (phase 4.5, ticket 06): which Semester is
@@ -27,22 +25,14 @@ use Modules\Calendar\Public\SemesterSummary;
  */
 final readonly class SemesterWindowsCardBuilder
 {
-    /**
-     * The dates an administrator's "what is next?" ranks over, as `key => the SemesterSummary
-     * property holding it`: each change window's close, the term's own end, and the
-     * grade-submission deadline that follows it (phase 4 ticket 09).
-     *
-     * This is a *deadline* list rather than a restatement of the period vocabulary — "when does the
-     * live window close?" is a different question, and one {@see SemesterSummary::currentPeriodEndsAt()}
-     * answers rather than this map.
-     */
-    private const DEADLINES = [
-        'registration' => 'registrationClosesAt',
-        'add_drop' => 'addDropEndsAt',
-        'late_add' => 'lateAddEndsAt',
-        'withdrawal' => 'withdrawalDeadlineAt',
-        'semester_end' => 'endsAt',
-        'grade_submission' => 'gradeSubmissionDeadlineAt',
+    /** @var array<string, string> */
+    private const DEADLINE_WINDOWS = [
+        'registration_closes_at' => 'registration',
+        'add_drop_ends_at' => 'add_drop',
+        'late_add_ends_at' => 'late_add',
+        'withdrawal_deadline_at' => 'withdrawal',
+        'ends_at' => 'semester_end',
+        'grade_submission_deadline_at' => 'grade_submission',
     ];
 
     public function __construct(private AcademicCalendar $calendar) {}
@@ -81,50 +71,29 @@ final readonly class SemesterWindowsCardBuilder
                 'name_ar' => $semester->nameAr,
             ],
             'current_period' => $semester->currentPeriod($now),
-            'open_windows' => $this->openWindows($semester, $now),
-            'next_deadline' => $this->nextDeadline($semester, $now),
+            'open_windows' => $semester->openWindows($now),
+            'next_deadline' => $this->formatDeadline($semester->nextDeadline($now)),
         ];
     }
 
     /**
-     * The window keys open at `$now` — plural on purpose: registration may still be open past the
-     * semester start, so it overlaps add/drop. `currentPeriod()` names the single phase the Semester
-     * reads as; this says everything that is actually open, read from the Semester's own predicates.
-     *
-     * @return list<string>
-     */
-    private function openWindows(SemesterSummary $semester, CarbonInterface $now): array
-    {
-        return array_values(array_filter([
-            $semester->isRegistrationOpen($now) ? 'registration' : null,
-            $semester->isInAddDropPeriod($now) ? 'add_drop' : null,
-            $semester->isInLateAddPeriod($now) ? 'late_add' : null,
-            $semester->isInWithdrawalPeriod($now) ? 'withdrawal' : null,
-        ]));
-    }
-
-    /**
-     * The soonest date still ahead, as `window => when`, or null once every date on this Semester
-     * has passed (a finished term still shown because nothing newer is live yet).
-     *
+     * @param  ?array{key: string, at: CarbonInterface}  $deadline
      * @return ?array{window: string, at: string}
      */
-    private function nextDeadline(SemesterSummary $semester, CarbonInterface $now): ?array
+    private function formatDeadline(?array $deadline): ?array
     {
-        $upcoming = null;
-
-        foreach (self::DEADLINES as $window => $property) {
-            /** @var CarbonImmutable $at */
-            $at = $semester->{$property};
-
-            if ($at->greaterThan($now) && ($upcoming === null || $at->lessThan($upcoming['at']))) {
-                $upcoming = ['window' => $window, 'at' => $at];
-            }
+        if ($deadline === null) {
+            return null;
         }
 
-        return $upcoming === null ? null : [
-            'window' => $upcoming['window'],
-            'at' => $upcoming['at']->toIso8601String(),
+        $window = self::DEADLINE_WINDOWS[$deadline['key']] ?? null;
+        if ($window === null) {
+            throw new \LogicException("Unknown Semester deadline key [{$deadline['key']}].");
+        }
+
+        return [
+            'window' => $window,
+            'at' => $deadline['at']->toIso8601String(),
         ];
     }
 }

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useMyAcademicRecordCard } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { DashboardCard } from '../../../shared/ui/DashboardCard'
+import { DashboardFigure } from '../../../shared/ui/DashboardFigure'
 import { tabularNums } from '../../../app/theme/fonts'
 
 /** A GPA figure to two decimals, or the dash — a fresh record is never `0.00`. */
@@ -26,7 +27,7 @@ function gpaDisplay(value: number | null | undefined, dash: string): string {
  */
 export function AcademicRecordCard() {
   const { t, i18n } = useTranslation('grading')
-  const { data, isPending, isError } = useMyAcademicRecordCard()
+  const { data, isPending, isError, refetch } = useMyAcademicRecordCard()
   const record = data?.data
   const dash = t('cards.academicRecord.dash')
 
@@ -41,11 +42,15 @@ export function AcademicRecordCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.academicRecord.loadError')}
+      onRetry={() => void refetch()}
       action={{ to: '/grading/my-grades', label: t('cards.academicRecord.action') }}
       count={
         <Stack direction="row" spacing={4} sx={{ flexWrap: 'wrap' }}>
-          <Figure label={t('cards.academicRecord.cgpa')} value={gpaDisplay(record?.cgpa, dash)} />
-          <Figure
+          <DashboardFigure
+            label={t('cards.academicRecord.cgpa')}
+            value={gpaDisplay(record?.cgpa, dash)}
+          />
+          <DashboardFigure
             label={t('cards.academicRecord.semesterGpa')}
             value={gpaDisplay(record?.latest_semester_gpa, dash)}
           />
@@ -73,19 +78,5 @@ export function AcademicRecordCard() {
         </Stack>
       }
     />
-  )
-}
-
-/** One labelled figure — the label above, the number given the weight below it. */
-function Figure({ label, value }: { label: string; value: string }) {
-  return (
-    <Stack spacing={0}>
-      <Typography variant="overline" color="text.secondary">
-        {label}
-      </Typography>
-      <Typography variant="h4" component="p" sx={{ ...tabularNums, fontWeight: 700 }}>
-        {value}
-      </Typography>
-    </Stack>
   )
 }

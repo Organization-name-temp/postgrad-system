@@ -25,7 +25,7 @@ import { tabularNums } from '../../../app/theme/fonts'
  */
 export function MyGradeSheetsCard() {
   const { t, i18n } = useTranslation('grading')
-  const { data, isPending, isError } = useMyGradeSheetsCard()
+  const { data, isPending, isError, refetch } = useMyGradeSheetsCard()
   const card = data?.data
   const semester = card?.semester
   const offerings = card?.offerings ?? []
@@ -38,6 +38,7 @@ export function MyGradeSheetsCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.gradeSheets.loadError')}
+      onRetry={() => void refetch()}
       // Nothing to grade this term: not a zero to stare at, but the honest answer that no term of
       // theirs is currently owed marks.
       isEmpty={!semester}

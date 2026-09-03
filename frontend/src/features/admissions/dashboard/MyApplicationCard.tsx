@@ -24,7 +24,7 @@ import { toApplicationStatus } from '../applicationStatus'
  */
 export function MyApplicationCard() {
   const { t, i18n } = useTranslation('admissions')
-  const { data, isPending, isError } = useMyApplicationCard()
+  const { data, isPending, isError, refetch } = useMyApplicationCard()
   const application = data?.data ?? null
   const status = toApplicationStatus(application?.status)
 
@@ -34,6 +34,7 @@ export function MyApplicationCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.myApplication.loadError')}
+      onRetry={() => void refetch()}
       // No Application yet — the state between creating an account and starting the first draft. A
       // legitimate state, so it reads as an invitation rather than as a failure.
       isEmpty={application === null}

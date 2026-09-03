@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { MemoryRouter } from 'react-router-dom'
 import '../../../shared/i18n/config' // initialise i18next so useTranslation works
@@ -67,7 +68,11 @@ describe('ScreeningQueueCard', () => {
     // Overdue is distinguished from merely pending, and says what the target is.
     expect(screen.getByText('2 past the 5-day review target')).toBeInTheDocument()
     expect(screen.getByText('Sara Applicant')).toBeInTheDocument()
-    expect(screen.getByText('overdue — 7 business days')).toBeInTheDocument()
+    const overdueText = screen.getByText('overdue — 7 business days')
+    const warningDark = document.createElement('span')
+    warningDark.style.color = theme.palette.warning.dark
+    expect(overdueText).toBeInTheDocument()
+    expect(getComputedStyle(overdueText).color).toBe(warningDark.style.color)
     expect(screen.getByText('waiting 2 business days')).toBeInTheDocument()
   })
 
@@ -138,10 +143,13 @@ describe('ScreeningQueueCard', () => {
     )
   })
 
-  it('renders its own error state when the summary cannot be loaded', () => {
-    mockedQuery.mockReturnValue(queryResult({ isError: true }))
+  it('renders its own error state and retries when the summary cannot be loaded', async () => {
+    const refetch = vi.fn()
+    mockedQuery.mockReturnValue(queryResult({ isError: true, refetch }))
     renderCard()
 
     expect(screen.getByRole('alert')).toHaveTextContent('Could not load the screening queue.')
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(refetch).toHaveBeenCalledOnce()
   })
 })

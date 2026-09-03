@@ -4,6 +4,9 @@ export const ar = {
     appName: 'نظام تسجيل الدراسات العليا',
     logOut: 'تسجيل الخروج',
     loading: 'جارٍ التحميل…',
+    actions: {
+      retry: 'إعادة المحاولة',
+    },
     apiStatus: 'حالة الواجهة البرمجية: {{status}}',
     language: {
       label: 'اللغة',

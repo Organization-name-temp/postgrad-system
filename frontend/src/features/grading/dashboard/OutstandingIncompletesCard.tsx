@@ -27,7 +27,7 @@ import { tabularNums } from '../../../app/theme/fonts'
  */
 export function OutstandingIncompletesCard() {
   const { t, i18n } = useTranslation('grading')
-  const { data, isPending, isError } = useOutstandingIncompletesCard()
+  const { data, isPending, isError, refetch } = useOutstandingIncompletesCard()
   const card = data?.data
   const outstanding = card?.outstanding_count ?? 0
   const withoutDeadline = card?.without_deadline_count ?? 0
@@ -39,6 +39,7 @@ export function OutstandingIncompletesCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.outstandingIncompletes.loadError')}
+      onRetry={() => void refetch()}
       // Nothing outstanding reads as good news, never as a bare 0.
       isEmpty={outstanding === 0}
       emptyText={t('cards.outstandingIncompletes.empty')}

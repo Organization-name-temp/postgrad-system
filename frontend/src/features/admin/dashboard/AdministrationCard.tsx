@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAdministrationCard } from '../../../shared/api/generated/endpoints'
 import { formatDate } from '../../../shared/datetime'
 import { DashboardCard } from '../../../shared/ui/DashboardCard'
-import { tabularNums } from '../../../app/theme/fonts'
+import { DashboardFigure } from '../../../shared/ui/DashboardFigure'
 
 /**
  * Administration (Dashboard Card 12, ADR-0024): the shape of the system at a glance — how many
@@ -27,7 +27,7 @@ import { tabularNums } from '../../../app/theme/fonts'
  */
 export function AdministrationCard() {
   const { t, i18n } = useTranslation('admin')
-  const { data, isPending, isError } = useAdministrationCard()
+  const { data, isPending, isError, refetch } = useAdministrationCard()
   const card = data?.data
   const users = card?.user_count ?? 0
   const roleAssignments = card?.role_assignment_count ?? 0
@@ -39,11 +39,15 @@ export function AdministrationCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.administration.loadError')}
+      onRetry={() => void refetch()}
       action={{ to: '/admin/assignments', label: t('cards.administration.action') }}
       count={
         <Stack direction="row" spacing={4} sx={{ flexWrap: 'wrap' }}>
-          <Figure label={t('cards.administration.users')} value={users} />
-          <Figure label={t('cards.administration.roleAssignments')} value={roleAssignments} />
+          <DashboardFigure label={t('cards.administration.users')} value={users} />
+          <DashboardFigure
+            label={t('cards.administration.roleAssignments')}
+            value={roleAssignments}
+          />
         </Stack>
       }
       rows={
@@ -76,19 +80,5 @@ export function AdministrationCard() {
         </Stack>
       }
     />
-  )
-}
-
-/** One labelled count — the label above, the number given the weight below it. */
-function Figure({ label, value }: { label: string; value: number }) {
-  return (
-    <Stack spacing={0}>
-      <Typography variant="overline" color="text.secondary">
-        {label}
-      </Typography>
-      <Typography variant="h4" component="p" sx={{ ...tabularNums, fontWeight: 700 }}>
-        {value}
-      </Typography>
-    </Stack>
   )
 }

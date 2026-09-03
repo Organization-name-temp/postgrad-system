@@ -21,7 +21,7 @@ import { StatusChip } from '../../../shared/ui/StatusChip'
  */
 export function SemesterWindowsCard() {
   const { t, i18n } = useTranslation('admin')
-  const { data, isPending, isError } = useSemesterAndOpenWindowsCard()
+  const { data, isPending, isError, refetch } = useSemesterAndOpenWindowsCard()
   const card = data?.data
   const semester = card?.semester
   const openWindows = card?.open_windows ?? []
@@ -33,6 +33,7 @@ export function SemesterWindowsCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.semesterWindows.loadError')}
+      onRetry={() => void refetch()}
       // No Semester running and none open for registration: a real configuration state, and
       // "no windows are open" is the honest reading of it rather than an error or a blank.
       isEmpty={!semester}

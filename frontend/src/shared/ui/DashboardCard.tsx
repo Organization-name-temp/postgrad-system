@@ -1,7 +1,9 @@
-import { Alert, Box, Link, Paper, Skeleton, Stack, Typography } from '@mui/material'
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import { Alert, Box, Button, Link, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import { useId } from 'react'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link as RouterLink } from 'react-router-dom'
 
 export interface DashboardCardProps {
@@ -24,6 +26,7 @@ export interface DashboardCardProps {
   isPending?: boolean
   isError?: boolean
   errorText?: string
+  onRetry?: () => void
   /** Where the Card links into. A Card is a starting point, never a dead end. */
   action?: { to: string; label: string }
 }
@@ -53,9 +56,11 @@ export function DashboardCard({
   isPending = false,
   isError = false,
   errorText,
+  onRetry,
   action,
 }: DashboardCardProps) {
   const titleId = useId()
+  const { t } = useTranslation('common')
 
   return (
     <Paper
@@ -63,9 +68,16 @@ export function DashboardCard({
       variant="outlined"
       aria-labelledby={titleId}
       aria-busy={isPending}
-      sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}
+      sx={{
+        p: 3,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1.5,
+        borderRadius: 1.5,
+      }}
     >
-      <Typography id={titleId} variant="subtitle1" component="h2" sx={{ fontWeight: 600 }}>
+      <Typography id={titleId} variant="h5" component="h2">
         {title}
       </Typography>
 
@@ -75,18 +87,42 @@ export function DashboardCard({
             section is what a screen reader reads; the skeletons themselves are decoration. */}
         {isPending && (
           <Stack spacing={1}>
-            <Skeleton variant="text" width="45%" sx={{ fontSize: '2rem' }} />
+            <Skeleton
+              variant="text"
+              width="45%"
+              sx={(theme) => ({ fontSize: theme.typography.h4.fontSize })}
+            />
             <Skeleton variant="text" width="75%" />
             <Skeleton variant="text" width="55%" />
           </Stack>
         )}
 
-        {!isPending && isError && <Alert severity="error">{errorText}</Alert>}
+        {!isPending && isError && (
+          <Alert
+            severity="error"
+            action={
+              onRetry ? (
+                <Button color="inherit" size="small" onClick={onRetry}>
+                  {t('actions.retry')}
+                </Button>
+              ) : undefined
+            }
+          >
+            {errorText}
+          </Alert>
+        )}
 
         {!isPending && !isError && isEmpty && (
-          <Typography variant="body2" color="text.secondary">
-            {emptyText}
-          </Typography>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ alignItems: 'center', color: 'text.secondary' }}
+          >
+            <InboxOutlinedIcon aria-hidden="true" fontSize="small" />
+            <Typography variant="body2" color="inherit">
+              {emptyText}
+            </Typography>
+          </Stack>
         )}
 
         {!isPending && !isError && !isEmpty && (

@@ -18,7 +18,7 @@ import { tabularNums } from '../../../app/theme/fonts'
  */
 export function AdviseeRequestsCard() {
   const { t } = useTranslation('enrollment')
-  const { data, isPending, isError } = useAdviseeRequestsCard()
+  const { data, isPending, isError, refetch } = useAdviseeRequestsCard()
   const card = data?.data
   const pending = card?.pending_count ?? 0
   const adviseeCount = card?.advisee_count
@@ -30,6 +30,7 @@ export function AdviseeRequestsCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.adviseeRequests.loadError')}
+      onRetry={() => void refetch()}
       // Nothing waiting on them reads as good news, never as a bare 0.
       isEmpty={pending === 0}
       emptyText={t('cards.adviseeRequests.empty')}

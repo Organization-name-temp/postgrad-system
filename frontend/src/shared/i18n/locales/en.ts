@@ -5,6 +5,9 @@ export const en = {
     appName: 'Postgraduate Registration System',
     logOut: 'Log out',
     loading: 'Loading…',
+    actions: {
+      retry: 'Retry',
+    },
     apiStatus: 'API status: {{status}}',
     language: {
       label: 'Language',

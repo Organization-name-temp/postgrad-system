@@ -19,7 +19,7 @@ import { tabularNums } from '../../../app/theme/fonts'
  */
 export function SheetsAwaitingReviewCard() {
   const { t, i18n } = useTranslation('grading')
-  const { data, isPending, isError } = useSheetsAwaitingReviewCard()
+  const { data, isPending, isError, refetch } = useSheetsAwaitingReviewCard()
   const card = data?.data
   const pending = card?.pending_count ?? 0
   const sheets = card?.sheets ?? []
@@ -30,6 +30,7 @@ export function SheetsAwaitingReviewCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.sheetsAwaitingReview.loadError')}
+      onRetry={() => void refetch()}
       // Nothing waiting reads as good news, never as a bare 0.
       isEmpty={pending === 0}
       emptyText={t('cards.sheetsAwaitingReview.empty')}

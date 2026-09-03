@@ -20,7 +20,7 @@ import { tabularNums } from '../../../app/theme/fonts'
  */
 export function AdmissionDecisionsCard() {
   const { t } = useTranslation('admissions')
-  const { data, isPending, isError } = useAdmissionDecisionsCard()
+  const { data, isPending, isError, refetch } = useAdmissionDecisionsCard()
   const pending = data?.data?.pending_count ?? 0
 
   return (
@@ -29,6 +29,7 @@ export function AdmissionDecisionsCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.admissionDecisions.loadError')}
+      onRetry={() => void refetch()}
       // Nothing awaiting a decision reads as good news, never as a bare 0.
       isEmpty={pending === 0}
       emptyText={t('cards.admissionDecisions.empty')}

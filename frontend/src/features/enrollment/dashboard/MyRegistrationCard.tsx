@@ -33,7 +33,7 @@ const CART_PERIODS = ['registration', 'late_add']
  */
 export function MyRegistrationCard() {
   const { t, i18n } = useTranslation('enrollment')
-  const { data, isPending, isError } = useMyRegistrationCard()
+  const { data, isPending, isError, refetch } = useMyRegistrationCard()
   const card = data?.data
   const semester = card?.semester
   const period = card?.current_period
@@ -48,6 +48,7 @@ export function MyRegistrationCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.myRegistration.loadError')}
+      onRetry={() => void refetch()}
       // No term running and none open for registration: there is nothing to register into yet, and
       // saying so beats showing a 0 that looks like a mistake.
       isEmpty={!semester}

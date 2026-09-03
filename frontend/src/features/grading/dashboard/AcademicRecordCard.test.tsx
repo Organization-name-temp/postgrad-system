@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { MemoryRouter } from 'react-router-dom'
 import '../../../shared/i18n/config' // initialise i18next so useTranslation works
@@ -83,10 +84,13 @@ describe('AcademicRecordCard', () => {
     )
   })
 
-  it('renders its own error state when the summary cannot be loaded', () => {
-    mockedQuery.mockReturnValue(queryResult({ isError: true }))
+  it('renders its own error state and retries when the summary cannot be loaded', async () => {
+    const refetch = vi.fn()
+    mockedQuery.mockReturnValue(queryResult({ isError: true, refetch }))
     renderCard()
 
     expect(screen.getByRole('alert')).toHaveTextContent('Could not load your academic record.')
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(refetch).toHaveBeenCalledOnce()
   })
 })

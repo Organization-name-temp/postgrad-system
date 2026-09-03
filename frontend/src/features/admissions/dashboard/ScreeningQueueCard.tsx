@@ -25,7 +25,7 @@ import { tabularNums } from '../../../app/theme/fonts'
  */
 export function ScreeningQueueCard() {
   const { t, i18n } = useTranslation('admissions')
-  const { data, isPending, isError } = useScreeningQueueCard()
+  const { data, isPending, isError, refetch } = useScreeningQueueCard()
   const card = data?.data
   const pending = card?.pending_count ?? 0
   const overdue = card?.overdue_count ?? 0
@@ -37,6 +37,7 @@ export function ScreeningQueueCard() {
       isPending={isPending}
       isError={isError}
       errorText={t('cards.screeningQueue.loadError')}
+      onRetry={() => void refetch()}
       // An empty queue reads as good news, never as a bare 0.
       isEmpty={pending === 0}
       emptyText={t('cards.screeningQueue.empty')}
@@ -80,8 +81,14 @@ export function ScreeningQueueCard() {
                 variant="body2"
                 // Never colour alone (WCAG 1.4.1): the age text says how long it has waited and the
                 // overdue rows carry their own word for it.
-                color={application.is_overdue ? 'warning.main' : 'text.secondary'}
-                sx={tabularNums}
+                sx={(theme) => ({
+                  ...tabularNums,
+                  color: application.is_overdue
+                    ? theme.palette.mode === 'light'
+                      ? theme.palette.warning.dark
+                      : theme.palette.warning.main
+                    : theme.palette.text.secondary,
+                })}
               >
                 {application.is_overdue
                   ? t('cards.screeningQueue.rowOverdue', { count: application.age_days ?? 0 })

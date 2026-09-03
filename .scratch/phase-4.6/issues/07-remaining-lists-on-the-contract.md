@@ -24,8 +24,9 @@ left in the API.
 `/admin/faculty-dean-assignments/export`, and `/admin/department-head-assignments/export`.
 Personal collections (`/registration/requests`, `/registration/schedule`,
 `/registration/eligible-courses`, per-student/on-behalf eligible-course and schedule reads,
-`/grading/my-grades`, `/notifications`) are excluded because they duplicate a single person's
-already-visible record without serving a staff workflow. Instructor/advisor/dean/department-head and
+`/grading/my-grades`, `/notifications`) are excluded to minimize persistent copies of one person's
+sensitive academic, schedule, eligibility, or notification data outside the system when no staff
+bulk workflow requires them. Instructor/advisor/dean/department-head and
 on-behalf-student pickers are excluded to prevent directory extraction. Tests prove every excluded
 `/export` route is absent.
 
@@ -71,4 +72,6 @@ derivation + result parity.
 - [ ] `openapi.yaml` and the Orval client regenerated and committed; both `api:check` gates pass
 - [ ] Sort is comma-separated and multi-column; every endpoint documents each `@queryParam`, keeps
       model-bound `@urlParam ... Example:`, and regenerates deterministic OpenAPI/Orval artifacts
+- [ ] Every endpoint appends its stable unique key to the effective SQL or in-memory sort unless
+      already selected; adjacent pages neither duplicate nor omit tied rows
 - [ ] `composer gate` and `npm run gate` green

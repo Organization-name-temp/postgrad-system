@@ -60,7 +60,8 @@ Details that will bite if missed:
 - [ ] The credit-hour invariant and the level enums are enforced identically to the single-Course
       form
 - [ ] A file produced by the Courses export imports cleanly with no edits — the round trip is
-      asserted by a test
+      asserted in English and Arabic; the importer maps both canonical header and enum-label
+      dictionaries and rejects mixed or unknown labels
 - [ ] Gated on `catalog.manage`, returning 403 without it; no new Permission is added
 - [ ] `openapi.yaml` and the Orval client regenerated and committed
 - [ ] `composer gate` and `npm run gate` green

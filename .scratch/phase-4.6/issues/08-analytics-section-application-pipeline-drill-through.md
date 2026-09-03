@@ -26,7 +26,7 @@ This ticket establishes everything the four later Reports fill in.
 - **The gate is `application.screen`**, the Permission that already authorizes reading the queue —
   an exact match to what SRS §4.12 asks for, and the only one of the six Reports where the SRS role
   list and the §3.2 matrix agree precisely. Dean scope applies to the Report exactly as it applies
-  to the queue behind it.
+  to the queue behind it; Student Affairs uses the queue's existing unscoped view.
 
 **Blocked by:** 02 — Query contract foundation; 04 — Batched owner-facade derivation; 05 — Chart primitive;
 06 — Admissions and Catalog lists on the contract.
@@ -42,9 +42,13 @@ This ticket establishes everything the four later Reports fill in.
 - [ ] The chart uses the `shared/ui` primitive and carries its "View as table" disclosure
 - [ ] Clicking a segment navigates to the Applications list pre-filtered to exactly that segment,
       and the row count matches the segment's figure
+- [ ] The matching "View as table" row offers the same drill-through as a keyboard-operable link
+      and lands on the identical filtered URL
 - [ ] The list drilled into is exportable with the segment's filters applied
 - [ ] The endpoint is gated on `application.screen` and returns 403 without it
 - [ ] A Dean's Report is faculty-scoped by the same derivation as their queue
+- [ ] Student Affairs sees the complete unscoped cohort; Dean tests include in-scope and
+      out-of-scope rows, and both roles prove filters only narrow their base scope
 - [ ] Payload carries typed domain values only — no pre-rendered display strings
 - [ ] Pest covers the authorized payload, the 403, the scoping and the empty case
 - [ ] `openapi.yaml` and the Orval client regenerated and committed

@@ -45,14 +45,18 @@ spreadsheet has no renderer.** There is no client downstream of an `.xlsx` file 
 `under_sa_review` into "Under SA Review" or "قيد مراجعة شؤون الطلاب". The export endpoint is the
 only place in this API where the server renders text, and it is the only place with no client.
 
-The column set is **canonical, not the grid's current columns**. The client is never the authority
+The column set is **canonical, not the grid's current columns**, but it is intersected with the
+actor's effective readable-field allowlist from ADR-0025. A richer canonical export may include a
+column only when that actor may read it; the export route cannot turn list access into CGPA,
+National-ID, Mark, or other field access. The client is never the authority
 on what an export contains — which is also what keeps the column chooser honest: choosing columns
 changes the screen and never the file, so a shared export cannot silently omit a column its
 recipient expected.
 
 ## What authorizes it
 
-**An export is authorized by exactly the `can:` gate and row-level scope of the list it mirrors**,
+**An export is authorized by exactly the `can:` gate, row-level scope, and effective readable-field
+allowlist of the list it mirrors**,
 and adds no new Permission. It reveals nothing the user could not already read on screen, so
 inventing an export Permission would edit a matrix [ADR-0008](0008-rbac-enums-static-matrix.md)
 calls university bylaws in order to restrict something already permitted. This is the **Central

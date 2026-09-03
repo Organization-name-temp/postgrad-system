@@ -31,6 +31,11 @@ Two further points:
   Applicant, and each Report's gate is at least as strong as the list it drills into — Course
   Registration Summary is only counts per Offering, but it drills into a roster.
 
+For Enrollment Summary and Course Registration Summary, the base scope is explicit: Advisor sees
+advisees, Instructor sees assigned teaching rosters/Offerings, Department Head sees assigned
+Departments, Dean sees assigned Faculties, Student Affairs and Council use their existing unscoped
+Student-Grades view, and R09/R10 use the administrative override. Parameters only narrow that set.
+
 **Blocked by:** 07 — Remaining lists on the contract; 08 — Analytics section + Application Pipeline
 + drill-through.
 
@@ -46,8 +51,9 @@ Two further points:
       recomputed; no Course Status is changed by anything here
 - [ ] Attendance Analytics is scoped to Instructor-owned Offerings, Advisor advisees, and the R09/R10
       override; Department Head, Student Affairs, Dean, and Council receive 403
-- [ ] Enrollment Summary and Course Registration Summary apply the equivalent existing
-      Student/Offering scope for each viewer role
+- [ ] Enrollment Summary and Course Registration Summary scope Advisor to advisees, Instructor to
+      assigned rosters/Offerings, Department Head to Departments, Dean to Faculties, Student Affairs
+      and Council to their existing unscoped view, and R09/R10 to the administrative override
 - [ ] All three gate on `grades.view_student` and return 403 without it
 - [ ] All three take parameters through the shared `<FilterBar>` with URL state
 - [ ] Each chart carries its "View as table" disclosure with a Vitest series-match assertion

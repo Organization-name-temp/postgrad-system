@@ -48,5 +48,5 @@ an explicit administration set.
 - [ ] Cards still fetch and fail independently; one Card erroring leaves the grid intact
 - [ ] `DashboardPage` tests still assert which Cards render **and which do not**, including the
       multi-role union and the administrator set
-- [ ] axe passes on the landing page across light/dark × EN/AR with the new chart content
+- [ ] axe passes on the Dashboard across light/dark × EN/AR with the new chart content
 - [ ] `composer gate` and `npm run gate` green

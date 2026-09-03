@@ -143,8 +143,8 @@ password for every account: `password`.
    `/to-issues` → `/tdd` per ticket → `/code-review`. It is designed but not built: the ROADMAP §3
    section and [ADR-0025](docs/adr/0025-support-layer-query-contract.md)–
    [0028](docs/adr/0028-aggregate-facades-sql-php-parity.md) are written, ADR-0024 carries a Phase-4.6
-   amendment, and CONTEXT.md has the new **Report** and **Export** entries. It is the largest phase
-   yet (~18–20 tickets) and it is sequenced **before** Phase 5 for one reason: it changes the
+   amendment, and CONTEXT.md has the new **Report** and **Export** entries. Its 17 tickets are
+   sequenced **before** Phase 5 for one reason: it changes the
    response envelope of every collection endpoint, so Phases 5–7 are born filterable rather than
    retrofitted. Two things to know going in — the envelope change forces an `openapi.yaml` + Orval
    regeneration across ~25 endpoints (both `api:check` gates are `git diff --exit-code`), and

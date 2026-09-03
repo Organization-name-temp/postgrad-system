@@ -51,6 +51,8 @@ This establishes the export half of the platform, and every later export is a co
       sheet
 - [ ] The column set is defined server-side per resource and is unaffected by anything the client
       sends
+- [ ] The canonical columns are intersected with the actor's readable-field allowlist; a user who
+      may list rows cannot export a hidden National ID, CGPA, Mark, or equivalent field
 - [ ] The route is refused with 403 to a user who cannot open the list it mirrors, and its rows are
       scoped identically
 - [ ] Every successful export writes one Audit Log entry with actor, resource, filter criteria and

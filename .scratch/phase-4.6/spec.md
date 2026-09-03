@@ -76,8 +76,9 @@ a chart segment navigates to the filtered list behind it — which is itself exp
 loop: **one contract drives grid, Report parameters, drill-through and Export, so a bar and the rows
 it stands for cannot disagree.**
 
-Around those two: derived values become batch and aggregate methods on their owners' existing
-`Public` facades so they are expressible in `WHERE` and `ORDER BY` at all; Dashboard Cards grow
+Around those two: derived values become batch methods on their owners' existing `Public` facades;
+the authorized result is filtered and sorted before page slicing when a derived value is involved.
+Dashboard Cards grow
 figures, deltas and a sparkline over their own user's data; the app-bar search slot is finally
 filled by a client-side fan-out over the new per-module search; and bulk Course import closes
 FR-PCM-003.5 now that the spreadsheet library is paid for.
@@ -126,7 +127,7 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 32. As a Student Affairs officer, I want the Enrollment Summary — Students per Program, Faculty and degree level — so that I can answer a ministry return without counting by hand.
 33. As a Department Head, I want the Course Registration Summary — Enrollments per Course Offering against capacity — so that I can plan next term's Offerings from evidence.
 34. As an Instructor, I want attendance analytics across my Offerings, so that I can see which of my sessions lose the room.
-35. As a Department Head, I want attendance analytics across my Department, so that an at-risk pattern is visible before it becomes individual Fail Withdrawals.
+35. As an Advisor, I want attendance analytics across my advisees, so that an at-risk pattern is visible before it becomes individual Fail Withdrawals.
 36. As a System Administrator, I want to browse and filter the Audit Log by actor, event type and date range, so that seven years of retained security events are actually usable.
 37. As any Report viewer, I want to click a chart segment and land on exactly the records behind it, so that "twelve students below 3.0" is answerable with "which twelve".
 38. As any Report viewer, I want the list I drilled into to be exportable, so that analysis ends in something I can act on.
@@ -140,8 +141,8 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 **Dashboard Cards**
 
 45. As a Student, I want my Card to show my CGPA against the 3.0 graduation minimum and my trend across Semesters, so that I know where I stand and not only what I scored.
-46. As an Advisor, I want my Card to show how many advisees are below the threshold alongside my pending requests, so that my landing page reflects the part of my job that is not a queue.
-47. As an Instructor, I want my Card to show the grade spread of the Offering I most recently finalized, so that I learn something from my landing page.
+46. As an Advisor, I want my Card to show how many advisees are below the threshold alongside my pending requests, so that my Dashboard reflects the part of my job that is not a queue.
+47. As an Instructor, I want my Card to show the grade spread of the Offering I most recently finalized, so that I learn something from my Dashboard.
 48. As a Student Affairs officer, I want my Card to show this Cycle's applications against the last, so that a count has context.
 49. As a user of any role, I want my Cards to remain about my own work, so that the Dashboard stays a summary of what is waiting for me and does not become a report I have to read.
 50. As a user holding several Roles, I want the union of my Cards on one page with no role switcher, so that Phase 4.5's composition rule still holds after the Cards get richer.
@@ -166,7 +167,7 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 
 61. As a maintainer, I want the query contract to exist once rather than seven times, so that a change to the allowlist rule cannot be applied to six modules and missed in the seventh.
 62. As a maintainer, I want the shared layer to be incapable of referencing a module, so that "shared" cannot quietly become "knows about everything".
-63. As a maintainer, I want the SQL and PHP forms of the GPA arithmetic asserted equal by a test, so that a duplication accepted for performance cannot become a disagreement about grades.
+63. As a maintainer, I want batched and single-record facade results asserted equal over the seeded cohort, so that batching cannot change an academic result.
 64. As a maintainer, I want Phases 5, 6 and 7 to inherit filtering and export automatically, so that this migration happens exactly once.
 65. As a reviewer running the demo, I want enough seeded Students for a distribution to have shape and a list to actually paginate, so that the review gate judges the feature rather than the fixture.
 
@@ -187,7 +188,8 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
 - **Wire syntax is flat**, never bracketed:
   `?status=under_sa_review,sa_approved&cgpa_min=3&q=…&sort=-cgpa&page=2&per_page=25`.
   Multi-value filters are comma-separated; range filters use `_min`/`_max` suffixes; sort takes a
-  leading `-` for descending and accepts a comma-separated list.
+  leading `-` for descending and accepts a comma-separated list. Each endpoint appends a stable
+  unique-key tie-breaker to the effective sort for deterministic SQL and in-memory pagination.
 - **The envelope is always paginated** — `{data, links, meta}` on every collection endpoint,
   unconditionally. A conditional envelope would put two `@response 200` shapes on one operation and
   generate a TypeScript union the Orval client cannot read; this project has hit that before.
@@ -240,7 +242,8 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   ADR-0024's typed-values-only rule — a spreadsheet has no renderer, so the export endpoint is the
   one place in this API where the server produces display strings. The column set is canonical and
   **not** the grid's current columns: the client is never the authority on what an export contains,
-  which is also what keeps the column chooser honest.
+  which is also what keeps the column chooser honest. It is intersected with the actor's effective
+  readable-field allowlist, so a richer export never reveals a field that actor cannot read.
 - **Authorized by the mirrored list's own `can:` gate and row-level scope**, adding no Permission —
   it reveals nothing the user could not already read, so this is the plain reading of the §3.2
   matrix rather than a new power (the Central Grade Entry precedent). **Every export writes an
@@ -295,7 +298,8 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   the theme, CSS variables, dark mode and the `direction` flip `AppThemeProvider` already performs;
   series colours come from `design-system.md` §14's existing palette. **Every chart is `role="img"`
   with a concise label plus a "View as table" disclosure** rendering the identical series as a real
-  table with scoped headers. Version alignment with the installed MUI X major is to be **verified at
+  table with scoped headers. Each table row exposes the same drill-through as a keyboard-operable
+  link; chart pointer interaction is never the only route. Version alignment with the installed MUI X major is to be **verified at
   install**.
 - **URL is the single source of truth** for filter, sort and page state. Drill-through is an
   ordinary link. Export uses the same query string with `/export`, fetched through the authenticated
@@ -324,7 +328,8 @@ FR-PCM-003.5 now that the spreadsheet library is paid for.
   demands. **The Courses export is the import template**, so the loop is export → edit → preview →
   apply. MIME, size, workbook structure, enum values, and credit-hour arithmetic are validated;
   ADR-0005 explicitly defers malware scanning, and the private file is deleted after confirmation
-  or expiry.
+  or expiry. The importer recognizes the canonical English and Arabic header/enum dictionaries,
+  rejecting mixed or unknown labels, so exports from either locale round-trip deterministically.
 
 ### Seeder
 
@@ -424,7 +429,7 @@ columns from `database/migrations` only, so anything a module migration adds nee
   every collection endpoint. Placing it before Phase 5 means Phases 5, 6 and 7 are born filterable
   and exportable; placing it after means every list those phases build is migrated a second time.
   Phase 4.5's review gate and PR to `main` were prerequisites and are now satisfied.
-- **This is the largest phase yet — roughly 18–20 tickets against Phase 4.5's nine**, and it grew
+- **This is the largest phase yet — 17 tickets against Phase 4.5's nine**, and it grew
   during design when bulk import, the column chooser and the print view were pulled in. The DoD's
   "one Playwright smoke per phase" is honoured through one comprehensive multi-flow smoke rather
   than by relaxing the rule.

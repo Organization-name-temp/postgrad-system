@@ -38,7 +38,7 @@ the wire, and on both sides it is forced by the seam checker rather than merely 
   unchanged.)
 - **SPA** — a Card component lives in the feature that owns its data, and only the app shell
   composes. `eslint-plugin-boundaries` forbids a feature importing another feature, which is also
-  why the landing page **moved out of the auth feature into the app shell**; the route stays `/`.
+  why the Dashboard **moved out of the auth feature into the app shell**; the route stays `/`.
 
 *Owner supplies the Card, shell arranges it* — the rule the permission-filtered side nav already
 follows.
@@ -89,8 +89,8 @@ and no placeholder, and each of those phases adds its own Card as part of its ow
   scoping, or a bounded preview, the Card may reuse and count that set instead of issuing a second
   query solely for the number.
 - **A Card is not a Report.** A Card is fixed, scoped to the acting user, and summary; a Report
-  (SRS §4.12, Phase 7) is filterable, parameterised and cross-student. Catalog Summary and Phase
-  7's Enrollment Summary report are different objects. Recorded here so Phase 7 does not
+  (SRS §4.12, beginning in Phase 4.6) is filterable, parameterised and cross-student. Catalog
+  Summary and Phase 4.6's Enrollment Summary report are different objects. Recorded here so later phases do not
   re-litigate it.
 - **The term is "Dashboard Card", never "Panel".** `InterviewPanel`, `CurriculumPanel`,
   `VersionHistoryPanel` and `CartPanel` already ship using "Panel" as a generic word for a

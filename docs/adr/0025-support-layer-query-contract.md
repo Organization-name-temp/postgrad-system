@@ -33,6 +33,9 @@ what a Program is has been written in the wrong place.
   Multi-value filters and multi-column sort are comma-separated; each descending sort field has a
   leading `-`. Flat names generate clean, readable types through Scribe → OpenAPI → Orval; bracket syntax
   generates `deepObject` parameters and awkward TypeScript for no gain here.
+- **Every effective sort is total and deterministic.** After validated user-selected fields, the
+  endpoint appends its stable unique key (normally `id`) unless already present. SQL and derived
+  in-memory sorting use the identical sequence, so ties cannot duplicate or omit rows between pages.
 - **Every collection endpoint is always paginated** — `{data, links, meta}`, unconditionally. A
   conditional envelope (plain array without `?page=`, paginated with it) would put two response
   shapes on one operation, which is precisely the failure this project already hit once: two

@@ -59,6 +59,8 @@ later list is a fill. It establishes, once and in one place:
 - [ ] Unit tests cover multi-value parsing, `_min`/`_max` ranges, comma-separated multi-column sort
       with independent descending markers, effective allowlists, and rejection of
       unknown fields, `per_page` clamping, and every Arabic normalisation fold
+- [ ] Equal selected sort values fall back to the endpoint's stable unique key; adjacent-page tests
+      prove ties cannot duplicate or omit rows
 - [ ] The screening queue filters on Application Status, Program, Admission Cycle and derived age
 - [ ] `q` searches the declared fields across `_en` and `_ar`; `احمد` finds `أحمد` and a partial
       National ID matches

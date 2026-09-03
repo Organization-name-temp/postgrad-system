@@ -558,7 +558,8 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   the query rules and **no domain names**. Deliberately *not* a module — it owns no domain
   language, which is the objection ADR-0024 raised against a Dashboard module.
 - **One query contract on every collection endpoint** — flat params
-  (`?status=a,b&cgpa_min=3&q=…&sort=-cgpa&page=2&per_page=25`), an **always-paginated** envelope
+  (`?status=a,b&cgpa_min=3&q=…&sort=-cgpa,name&page=2&per_page=25`), including comma-separated
+  multi-column sort plus a stable unique-key tie-breaker, and an **always-paginated** envelope
   (never conditional — two response shapes on one operation generate a TS union Orval cannot read),
   25 rows default / 100 for pickers / **hard cap 100**. "Every row" is `/export`, which is what
   makes the cap right rather than merely tolerable.
@@ -576,7 +577,8 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   **canonical column set per resource server-rendered in the actor's locale** with RTL sheets for
   Arabic — the one recorded exception to ADR-0024's typed-values-only rule, because a spreadsheet
   has no client to render for. Authorized by the **list's own gate and scope**, adding no
-  Permission (the Central Grade Entry reasoning), and **always written to the Audit Log** with
+  Permission (the Central Grade Entry reasoning), intersected with the actor's readable-field
+  allowlist, and **always written to the Audit Log** with
   actor, resource, criteria and row count: the new fact is not that data was read but that it left.
   Export is a List capability: every migrated collection gets a sibling unless its ticket records
   a security exclusion, Reports export through drill-through, and the SPA downloads through the
@@ -623,7 +625,8 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   [ADR-0016](./adr/0016-private-document-serving.md) pattern. The courses **export is the import
   template**, so the loop is export → edit → preview → apply. Gated on `catalog.manage`; both EN
   and AR names required per row, as the Catalog demands. MIME, size, workbook structure, enum, and
-  credit-hour validation are mandatory; malware scanning remains explicitly deferred by ADR-0005.
+  credit-hour validation are mandatory; the importer recognizes both canonical English and Arabic
+  header/enum dictionaries for round trips. Malware scanning remains explicitly deferred by ADR-0005.
 - **Seeder:** every named persona **untouched** (the smokes assert against them), with a
   deterministic generated cohort of ~150–250 Students layered on top — spread across Programs,
   terms, grades and attendance from a fixed seed, in the reserved namespace — so a distribution has

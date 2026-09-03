@@ -24,7 +24,7 @@ Details:
   the allowlist is authorization. Conflating them would either weaken the security rule or make the
   chooser silently change results.
 
-**Blocked by:** 02 — Query contract foundation + the screening queue filtered end to end.
+**Blocked by:** 02 — Query contract foundation; 03 — Export foundation.
 
 **Status:** ready-for-agent
 

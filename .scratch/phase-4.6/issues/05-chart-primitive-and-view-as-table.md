@@ -39,6 +39,8 @@ Phase 0.5, unused. This ticket answers the other half rather than waiving it.
 - [ ] Charts render correctly in light and dark, and in EN and AR with the layout flipped
 - [ ] Every chart is `role="img"` with a concise label and a working "View as table" disclosure
 - [ ] Vitest asserts the rendered table's cells equal the series passed to the chart
+- [ ] Every drillable table row exposes a keyboard-operable link equivalent to its chart segment;
+      pointer interaction is never the only drill-through path
 - [ ] Axis and legend text are always present, so colour is never the only signal
 - [ ] The `/style` gallery renders bar, line and pie across light/dark × EN/AR as living reference
 - [ ] `@axe-core/playwright` passes on `/style` in all four combinations

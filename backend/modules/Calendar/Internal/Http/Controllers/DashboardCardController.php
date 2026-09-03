@@ -2,7 +2,7 @@
 
 namespace Modules\Calendar\Internal\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
+use Modules\Calendar\Internal\Http\Resources\DashboardCardResource;
 use Modules\Calendar\Internal\Support\SemesterWindowsCardBuilder;
 
 /**
@@ -41,8 +41,8 @@ class DashboardCardController
      * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026"}, "current_period": "add_drop", "open_windows": ["registration", "add_drop"], "next_deadline": {"window": "add_drop", "at": "2026-09-14T00:00:00+00:00"}}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function semesterWindows(SemesterWindowsCardBuilder $card): JsonResponse
+    public function semesterWindows(SemesterWindowsCardBuilder $card): DashboardCardResource
     {
-        return response()->json(['data' => $card->build()]);
+        return new DashboardCardResource($card->build());
     }
 }

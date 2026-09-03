@@ -34,6 +34,8 @@ it('counts the active programs and courses, excluding the deactivated ones', fun
     actingAsRole(Role::DepartmentHead); // holds catalog.manage (§3.2)
 
     csccCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.active_program_count', 2)
         ->assertJsonPath('data.active_course_count', 3);
 });

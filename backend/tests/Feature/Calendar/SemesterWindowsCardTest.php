@@ -37,6 +37,8 @@ it('names the running semester, the windows open on it, and the next date due', 
     actingAsRole(Role::StudentAffairs); // holds calendar.manage (§3.2)
 
     swcCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         // The Semester travels as domain data — id, term, year and both names — never as a
         // pre-rendered label, so the SPA renders it bilingually (the Notifications rule).
         ->assertJsonPath('data.semester.id', $running->id)

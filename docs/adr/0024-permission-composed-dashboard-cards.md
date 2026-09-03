@@ -84,6 +84,10 @@ and no placeholder, and each of those phases adds its own Card as part of its ow
 - **Typed domain values only.** A Card payload carries ids, codes, enum values, counts and dates —
   **never pre-rendered display strings** — because the SPA renders bilingually from the data,
   exactly as Notifications does.
+- **Counts respect ownership seams.** Owner-local scalar sets use database aggregate queries.
+  When rows must already be materialised for business-day arithmetic, cross-module Public-facade
+  scoping, or a bounded preview, the Card may reuse and count that set instead of issuing a second
+  query solely for the number.
 - **A Card is not a Report.** A Card is fixed, scoped to the acting user, and summary; a Report
   (SRS §4.12, Phase 7) is filterable, parameterised and cross-student. Catalog Summary and Phase
   7's Enrollment Summary report are different objects. Recorded here so Phase 7 does not

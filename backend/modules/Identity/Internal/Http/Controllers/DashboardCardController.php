@@ -2,8 +2,8 @@
 
 namespace Modules\Identity\Internal\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Modules\Identity\Internal\Http\Middleware\EnsureAdministrator;
+use Modules\Identity\Internal\Http\Resources\DashboardCardResource;
 use Modules\Identity\Internal\Models\AuditLog;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Internal\Models\UserRole;
@@ -62,7 +62,7 @@ class DashboardCardController
      * @response 200 {"data": {"user_count": 24, "role_assignment_count": 27, "recent_activity": [{"id": 91, "action": "student.admitted", "actor_user_id": 7, "actor_name": "Dr. Dean", "at": "2026-08-10T09:15:00+00:00"}]}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function administration(): JsonResponse
+    public function administration(): DashboardCardResource
     {
         // Newest first, with the id as the tie-break: the log is written with an explicit
         // created_at and several entries can share a second, so ordering on the timestamp alone
@@ -77,22 +77,20 @@ class DashboardCardController
             ->whereIn('id', $recent->pluck('actor_user_id')->filter()->unique()->values()->all())
             ->pluck('name', 'id');
 
-        return response()->json([
-            'data' => [
-                'user_count' => User::query()->count(),
-                'role_assignment_count' => UserRole::query()->count(),
-                'recent_activity' => $recent->map(function (AuditLog $entry) use ($actorNames): array {
-                    $actorId = $entry->actor_user_id === null ? null : (int) $entry->actor_user_id;
+        return new DashboardCardResource([
+            'user_count' => User::query()->count(),
+            'role_assignment_count' => UserRole::query()->count(),
+            'recent_activity' => $recent->map(function (AuditLog $entry) use ($actorNames): array {
+                $actorId = $entry->actor_user_id === null ? null : (int) $entry->actor_user_id;
 
-                    return [
-                        'id' => (int) $entry->getKey(),
-                        'action' => $entry->action,
-                        'actor_user_id' => $actorId,
-                        'actor_name' => $actorId === null ? null : $actorNames->get($actorId),
-                        'at' => $entry->created_at?->toIso8601String(),
-                    ];
-                })->values()->all(),
-            ],
+                return [
+                    'id' => (int) $entry->getKey(),
+                    'action' => $entry->action,
+                    'actor_user_id' => $actorId,
+                    'actor_name' => $actorId === null ? null : $actorNames->get($actorId),
+                    'at' => $entry->created_at?->toIso8601String(),
+                ];
+            })->values()->all(),
         ]);
     }
 }

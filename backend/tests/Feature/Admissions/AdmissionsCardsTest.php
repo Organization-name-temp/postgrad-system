@@ -82,6 +82,8 @@ it('returns the acting applicant’s current status as a typed value, with when 
     Sanctum::actingAs($applicant);
 
     acMyApplicationCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.id', (int) $application->getKey())
         // The status travels as its enum value, never as a sentence: the SPA renders the chip and
         // picks the "what happens next" copy from it.
@@ -150,6 +152,8 @@ it('counts the applications pending screening and distinguishes the overdue ones
     actingAsRole(Role::StudentAffairs);
 
     acScreeningCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.pending_count', 3)
         ->assertJsonPath('data.overdue_count', 2)
         // The threshold travels with the counts so the SPA can say *why* without hard-coding it.

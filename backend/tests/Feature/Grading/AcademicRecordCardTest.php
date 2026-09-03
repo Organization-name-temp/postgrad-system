@@ -98,7 +98,9 @@ it('returns the CGPA, the latest semester GPA and the earned credit hours as typ
     arcGrade(arcEnroll(arcOffering($newer), $student), 92.0); // A — 4.00 points over 3 CH, earned
 
     Sanctum::actingAs($student->user);
-    $response = arcCard()->assertOk();
+    $response = arcCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', []);
 
     // 3.50 over both terms; the newest term alone is the 4.00. A whole-number GPA round-trips
     // through JSON as a bare integer (the MyGrades precedent) — JSON carries no int/float

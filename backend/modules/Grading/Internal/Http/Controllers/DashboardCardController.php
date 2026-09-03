@@ -3,10 +3,10 @@
 namespace Modules\Grading\Internal\Http\Controllers;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Grading\Internal\Http\Concerns\AuthorizesGradeEntry;
+use Modules\Grading\Internal\Http\Resources\DashboardCardResource;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Support\AcademicRecordCardBuilder;
 use Modules\Grading\Internal\Support\DepartmentHeadSheetQueue;
@@ -73,16 +73,16 @@ class DashboardCardController
         Request $request,
         EnrollmentRecords $enrollments,
         GradeSheetsCardBuilder $card,
-    ): JsonResponse {
+    ): DashboardCardResource {
         $central = $this->actingAsCentralEntry($request);
         $offerings = $central
             ? $enrollments->allOfferings()
             : $enrollments->offeringsTaughtBy($this->actingUserId($request));
 
-        return response()->json([
-            'data' => $card->build($offerings),
-            'meta' => ['scope' => $central ? 'central' : 'own'],
-        ]);
+        return new DashboardCardResource(
+            $card->build($offerings),
+            ['scope' => $central ? 'central' : 'own'],
+        );
     }
 
     /**
@@ -110,7 +110,7 @@ class DashboardCardController
      * @response 200 {"data": {"pending_count": 2, "sheets": [{"id": 4, "course_offering_id": 3, "kind": "Initial", "signed_at": "2026-08-10T09:00:00+00:00", "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true, "department_id": 1}}]}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function sheetsAwaitingReview(Request $request, DepartmentHeadSheetQueue $queue): JsonResponse
+    public function sheetsAwaitingReview(Request $request, DepartmentHeadSheetQueue $queue): DashboardCardResource
     {
         ['sheets' => $mine, 'offerings' => $offerings, 'courses' => $courses] =
             $queue->forHead($this->actingUserId($request));
@@ -127,11 +127,9 @@ class DashboardCardController
             ];
         })->values()->all();
 
-        return response()->json([
-            'data' => [
-                'pending_count' => $mine->count(),
-                'sheets' => $rows,
-            ],
+        return new DashboardCardResource([
+            'pending_count' => $mine->count(),
+            'sheets' => $rows,
         ]);
     }
 
@@ -171,7 +169,7 @@ class DashboardCardController
         Request $request,
         OutstandingIncompleteQueue $queue,
         IncompleteDeadlineResolver $deadlines,
-    ): JsonResponse {
+    ): DashboardCardResource {
         ['incompletes' => $outstanding, 'enrollments' => $enrollmentsByIncomplete] =
             $queue->forInstructor($this->actingUserId($request));
 
@@ -196,12 +194,10 @@ class DashboardCardController
             }
         }
 
-        return response()->json([
-            'data' => [
-                'outstanding_count' => count($outstanding),
-                'nearest_deadline' => $nearest?->toIso8601String(),
-                'without_deadline_count' => $withoutDeadline,
-            ],
+        return new DashboardCardResource([
+            'outstanding_count' => count($outstanding),
+            'nearest_deadline' => $nearest?->toIso8601String(),
+            'without_deadline_count' => $withoutDeadline,
         ]);
     }
 
@@ -223,10 +219,10 @@ class DashboardCardController
         Request $request,
         StudentDirectory $students,
         AcademicRecordCardBuilder $card,
-    ): JsonResponse {
+    ): DashboardCardResource {
         $student = $this->actingStudent($request, $students);
 
-        return response()->json(['data' => $card->forStudent($student->studentId)]);
+        return new DashboardCardResource($card->forStudent($student->studentId));
     }
 
     /**

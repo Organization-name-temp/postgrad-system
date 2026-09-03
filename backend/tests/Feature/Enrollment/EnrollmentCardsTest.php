@@ -115,6 +115,8 @@ it('totals the current semester’s credit hours and states the 6–12 bounds al
     Sanctum::actingAs($student->user);
 
     ecRegistrationCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.semester.id', $semester->id)
         ->assertJsonPath('data.semester.name_en', $semester->name_en)
         ->assertJsonPath('data.credit_hours', 6)
@@ -240,6 +242,8 @@ it('counts the pending requests waiting on the advisor, with the oldest few name
     Sanctum::actingAs($advisor);
 
     ecAdviseeCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.pending_count', 1)
         ->assertJsonPath('data.advisee_count', 1)
         ->assertJsonCount(1, 'data.requests')

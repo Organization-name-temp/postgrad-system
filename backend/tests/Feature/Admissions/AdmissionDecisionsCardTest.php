@@ -74,7 +74,10 @@ it('counts the applications awaiting the Dean’s decision', function () {
 
     Sanctum::actingAs(adeccDean($faculty));
 
-    adeccCard()->assertOk()->assertJsonPath('data.pending_count', 3);
+    adeccCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
+        ->assertJsonPath('data.pending_count', 3);
 });
 
 it('counts exactly what the decisions queue lists, never a second definition of “waiting”', function () {

@@ -2,12 +2,12 @@
 
 namespace Modules\Enrollment\Internal\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesStudent;
 use Modules\Enrollment\Internal\Http\Concerns\ScopesToAdvisees;
+use Modules\Enrollment\Internal\Http\Resources\DashboardCardResource;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
@@ -68,7 +68,7 @@ class DashboardCardController
         Request $request,
         StudentDirectory $students,
         AcademicCalendar $calendar,
-    ): JsonResponse {
+    ): DashboardCardResource {
         $student = $this->actingStudent($request, $students);
         $limits = CreditHoursValidator::fromConfig();
 
@@ -76,7 +76,7 @@ class DashboardCardController
         $semester = $calendar->running() ?? $calendar->openForRegistration();
 
         if ($semester === null) {
-            return response()->json(['data' => [
+            return new DashboardCardResource([
                 'semester' => null,
                 'current_period' => null,
                 'period_ends_at' => null,
@@ -84,7 +84,7 @@ class DashboardCardController
                 'min_credit_hours' => $limits->minCreditHours,
                 'max_credit_hours' => $limits->maxCreditHours,
                 'enrollment_count' => 0,
-            ]]);
+            ]);
         }
 
         $active = Enrollment::query()
@@ -94,7 +94,7 @@ class DashboardCardController
 
         $now = now();
 
-        return response()->json(['data' => [
+        return new DashboardCardResource([
             // The Semester's identity only — deliberately not the schedule screen's full payload,
             // which carries all eight window dates a Card has no use for.
             'semester' => [
@@ -113,7 +113,7 @@ class DashboardCardController
             'min_credit_hours' => $limits->minCreditHours,
             'max_credit_hours' => $limits->maxCreditHours,
             'enrollment_count' => $active->clone()->count(),
-        ]]);
+        ]);
     }
 
     /**
@@ -143,7 +143,7 @@ class DashboardCardController
         Request $request,
         StudentDirectory $students,
         Directory $directory,
-    ): JsonResponse {
+    ): DashboardCardResource {
         $userId = (int) $request->user()?->getAuthIdentifier();
         $scope = $this->adviseeScope($userId, $directory, $students);
 
@@ -163,11 +163,11 @@ class DashboardCardController
             ->limit(self::ROW_LIMIT)
             ->get();
 
-        return response()->json(['data' => [
+        return new DashboardCardResource([
             'pending_count' => $pendingCount,
             'advisee_count' => $scope === null ? null : count($scope),
             'requests' => $this->requestRows($oldest, $students, $directory),
-        ]]);
+        ]);
     }
 
     /**

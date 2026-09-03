@@ -87,7 +87,7 @@ it('shows this term’s offerings, the count not yet finalized, and links into e
     gcSheet($pending, GradeSheetStatus::Draft);
 
     Sanctum::actingAs($instructor);
-    $response = gcSheetsCard()->assertOk();
+    $response = gcSheetsCard()->assertOk()->assertJsonStructure(['data', 'meta']);
 
     $response->assertJsonPath('data.semester.id', $semester->id)
         ->assertJsonPath('data.semester.name_en', $semester->name_en)
@@ -242,6 +242,8 @@ it('counts the submitted sheets routed to the acting head, with the oldest few',
     Sanctum::actingAs($head);
 
     gcReviewCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.pending_count', 1)
         ->assertJsonCount(1, 'data.sheets')
         ->assertJsonPath('data.sheets.0.id', (int) $sheet->getKey())

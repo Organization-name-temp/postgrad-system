@@ -102,6 +102,8 @@ it('counts the outstanding Incompletes and gives the nearest derived deadline', 
     Sanctum::actingAs($instructor);
 
     oicCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.outstanding_count', 2)
         ->assertJsonPath('data.without_deadline_count', 0)
         ->assertJsonPath('data.nearest_deadline', Carbon::parse('2026-11-03')->toIso8601String());

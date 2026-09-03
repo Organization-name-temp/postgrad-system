@@ -2,7 +2,7 @@
 
 namespace Modules\Catalog\Internal\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
+use Modules\Catalog\Internal\Http\Resources\DashboardCardResource;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Program;
 
@@ -34,13 +34,11 @@ class DashboardCardController
      * @response 200 {"data": {"active_program_count": 6, "active_course_count": 42}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function catalogSummary(): JsonResponse
+    public function catalogSummary(): DashboardCardResource
     {
-        return response()->json([
-            'data' => [
-                'active_program_count' => Program::query()->where('is_active', true)->count(),
-                'active_course_count' => Course::query()->where('is_active', true)->count(),
-            ],
+        return new DashboardCardResource([
+            'active_program_count' => Program::query()->where('is_active', true)->count(),
+            'active_course_count' => Course::query()->where('is_active', true)->count(),
         ]);
     }
 }

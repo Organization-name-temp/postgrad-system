@@ -52,6 +52,8 @@ it('counts the users and the role assignments they hold between them', function 
     User::factory()->create(); // holds nothing at all
 
     adcCard()->assertOk()
+        ->assertJsonStructure(['data', 'meta'])
+        ->assertJsonPath('meta', [])
         ->assertJsonPath('data.user_count', 3)
         ->assertJsonPath('data.role_assignment_count', 3); // the admin's one + the multi-role two
 });

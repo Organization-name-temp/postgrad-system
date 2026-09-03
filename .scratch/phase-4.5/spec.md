@@ -228,9 +228,12 @@ and Tier 3 (12).
   therefore the Orval hook name) and an explicit `@response`. None of these routes take a model-bound
   parameter, so the `@urlParam` determinism rule does not apply — but the generated client must be
   regenerated and committed, or both `api:check` gates fail.
-- Counts are computed with aggregate queries, not by materialising and counting collections.
-  Derived values (period state, attendance, Incomplete deadlines, GPA/CGPA) are read from the
-  existing on-demand derivations and never recomputed or cached — the standing house rule.
+- Owner-local scalar counts are computed with aggregate queries rather than needlessly
+  materialising collections. A Card may count an already-required materialised set when the rows
+  are needed for business-day arithmetic, a cross-module Public-facade scope, or a bounded preview;
+  it must not add a second query merely to count those same rows. Derived values (period state,
+  attendance, Incomplete deadlines, GPA/CGPA) are read from the existing on-demand derivations and
+  never recomputed or cached — the standing house rule.
 
 ### Frontend structure
 

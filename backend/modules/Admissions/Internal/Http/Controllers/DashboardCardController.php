@@ -2,9 +2,9 @@
 
 namespace Modules\Admissions\Internal\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
+use Modules\Admissions\Internal\Http\Resources\DashboardCardResource;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Support\ReviewSla;
 use Modules\Catalog\Public\ProgramCatalog;
@@ -69,10 +69,10 @@ class DashboardCardController
         DeanAssignments $assignments,
         ProgramCatalog $catalog,
         Directory $directory,
-    ): JsonResponse {
+    ): DashboardCardResource {
         $queue = $this->awaitingDecisionQueue($request, $assignments, $catalog, $directory);
 
-        return response()->json(['data' => ['pending_count' => $queue->count()]]);
+        return new DashboardCardResource(['pending_count' => $queue->count()]);
     }
 
     /**
@@ -103,7 +103,7 @@ class DashboardCardController
      *
      * @response 200 {"data": {"id": 1, "status": "under_sa_review", "status_entered_at": "2026-07-10T10:00:00+00:00", "finalized_at": "2026-07-10T10:00:00+00:00"}}
      */
-    public function myApplication(Request $request): JsonResponse
+    public function myApplication(Request $request): DashboardCardResource
     {
         $application = Application::query()
             ->with('statusTransitions')
@@ -112,15 +112,15 @@ class DashboardCardController
             ->first();
 
         if ($application === null) {
-            return response()->json(['data' => null]);
+            return new DashboardCardResource(null);
         }
 
-        return response()->json(['data' => [
+        return new DashboardCardResource([
             'id' => (int) $application->getKey(),
             'status' => $application->status->value,
             'status_entered_at' => $application->enteredStatusAt($application->status)?->toIso8601String(),
             'finalized_at' => $application->finalized_at?->toIso8601String(),
-        ]]);
+        ]);
     }
 
     /**
@@ -152,7 +152,7 @@ class DashboardCardController
      * @response 200 {"data": {"pending_count": 6, "overdue_count": 2, "sla_days": 5, "applications": [{"id": 1, "status": "under_sa_review", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "age_days": 7, "is_overdue": true, "review_entered_at": "2026-07-10T10:00:00+00:00"}]}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function screeningQueue(): JsonResponse
+    public function screeningQueue(): DashboardCardResource
     {
         $sla = ReviewSla::screening();
 
@@ -178,12 +178,12 @@ class DashboardCardController
 
         $overdue = array_filter($aged, fn (array $row): bool => $sla->isOverdue($row['age_days']));
 
-        return response()->json(['data' => [
+        return new DashboardCardResource([
             'pending_count' => $waiting->count(),
             'overdue_count' => count($overdue),
             'sla_days' => $sla->slaDays,
             'applications' => $this->queueRows(array_slice($this->oldestFirst($aged), 0, self::ROW_LIMIT), $sla),
-        ]]);
+        ]);
     }
 
     /**

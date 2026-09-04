@@ -68,3 +68,16 @@ Phase 3 need — see ADR-0019).
 - Phase 4 adds its deadline columns by migration; no Phase 3 schema anticipates them.
 - Every period check in Enrollment (submission window, free add/drop, late-add,
   withdrawal) reads the same `Calendar\Public` answers — one authority, no drift.
+- Phase 5 also uses those answers to select a post-Exemption-Revocation Remediation
+  Semester: the current main Semester is a real opportunity only while registration,
+  add/drop, or late-add remains open; afterward the search moves to a later eligible
+  Offering ([ADR-0037](0037-preparatory-termination-checkpoint.md)).
+- Calendar publishes a minimal Public `SemesterChanged` event after a relevant create or
+  date update. It carries the Semester id, not duplicated dates; Enrollment reads the
+  authoritative Public DTO and idempotently reconciles Remediation Obligations. An active
+  assigned remediation checkpoint follows Grade-Submission Deadline extensions until it
+  is evaluated but never shortens after an earlier edit; Enrollment records every edit's
+  official and effective dates and sends the required renewed notification. An evaluated
+  checkpoint is historical and no longer changes. A recovery
+  command covers post-commit handler failure
+  ([ADR-0043](0043-enrollment-owns-remediation-obligations.md)).

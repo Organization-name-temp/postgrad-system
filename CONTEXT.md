@@ -57,9 +57,16 @@ accepted Program's code, and a per-(year, program) sequence. Distinct from the U
 
 **Student anchor**:
 The `Student` record Identity creates at acceptance — 1:1 with a User, holding the
-University ID, the (opaque) Program reference, enrollment term, assigned Advisor, and an
-identity snapshot. It is only the *anchor*; the growing academic record (Enrollments,
-Grades, Credit-Hour Summary, Standing) is owned by later modules and references it by id.
+University ID, the (opaque) Program and admission-time Curriculum Version references,
+enrollment term, assigned Advisor, Student Lifecycle Status, and an identity snapshot. It
+is only the *anchor*; the growing academic record (Enrollments, Grades, Credit-Hour Summary,
+Standing) is owned by later modules and references it by id.
+
+**Student Lifecycle Status**:
+Whether a Student may undertake new academic actions: Active from admission, or Terminated
+after a final Academic Affairs Council decision. A Terminated Student keeps the Student
+Role and read access to their historical academic record but cannot mutate it.
+_Avoid_: Course Status, Academic Standing, enrollment status.
 
 **Audit Log**:
 The append-only record of security- and data-sensitive events (authentication events now;
@@ -160,6 +167,12 @@ taking that Course).
 A Program's set of Curriculum Entries — the Courses it comprises, grouped by Category.
 Editing a Program's Curriculum is a versioned Program change.
 
+**Curriculum Version**:
+The immutable snapshot of a Program and its Curriculum effective at a particular change.
+A Student is bound at admission to one Version, which remains their degree requirements
+unless a future explicit migration changes it.
+_Avoid_: current curriculum (when describing a Student's requirements), study plan.
+
 **Curriculum Entry**:
 The placement of one Course into one Program under one Category (e.g. "CSE511 is Program
 Core in the MSc in Computer Engineering"). The same Course may have Entries in several
@@ -171,6 +184,13 @@ _Avoid_: program course, offering (an offering is a scheduled section — Enroll
 The role a Course plays within a Program, assigned by a Curriculum Entry — one of exactly
 three: Preparatory (6 × 1 CH), Program Core (2 × 3 CH), Research Elective (3 × 3 CH). A
 Category is per-Program, never an intrinsic property of the Course.
+
+**Preparatory Requirement Role**:
+The meaning of one Preparatory Curriculum Entry within a Program: English Language,
+Arabic Language, Japanese Language, Japanese Culture, Key Skills, or Departmental
+Requirement. Each Program has exactly one Preparatory Entry in each Role; Exemption rules
+target Roles rather than Course codes.
+_Avoid_: Preparatory type, exemption code.
 
 ## Calendar
 
@@ -198,7 +218,11 @@ One Course actually being taught in one semester — carrying the Instructor tea
 an optional seat capacity, and its weekly meeting times. A Course is curriculum (what a
 Program comprises); an Offering is operation (what runs this semester). Students register
 into Offerings, so the eligible list for a semester is the Student's Curriculum
-intersected with that semester's Offerings.
+intersected with that semester's Offerings. Capacity is normally a hard ceiling; the
+scoped Department Head may approve a reasoned, audited exception only to place a Student
+into a full Offering for a Must-Retake Obligation. The exception never displaces an
+existing Enrollment. Authorization uses the Department Head Role plus Course-department
+scope, not the ordinary registration-approval Permission and not a new Permission.
 _Avoid_: section, class, timetable slot ("Course Offering" is canonical; rooms and
 physical timetabling are out of scope per SRS §2.4).
 
@@ -206,6 +230,23 @@ physical timetabling are out of scope per SRS §2.4).
 One Student taking one Course Offering — and therefore one Course in one semester —
 carrying a Course Status. The unit of registration and the thing a Grade attaches to.
 _Avoid_: registration (that is the *act* of creating an Enrollment, not the record).
+
+**Registration Request**:
+The Student's submitted batch of proposed Course Offerings for one Semester. It normally
+moves from Pending Advisor to Approved or Rejected. If Advisor recommendation requires a
+full-Offering exception for a Must-Retake Course, it moves to Awaiting Capacity Override
+until every Department Head scoped to a full Offering records a per-Offering decision.
+All approvals create the Enrollments atomically; any denial rejects the unchanged batch.
+If normal seats become available first, the corresponding override requirements cease to
+be active; when none remains, the already-recommended request is revalidated and approved
+automatically. If another requested Offering becomes full while the request waits, its
+own scoped override requirement is added. Earlier decisions for the same request and
+Offering remain recorded and are not duplicated. If a replacement Preparatory Exemption
+releases a Course contained in a still-pending request, the whole unchanged batch is
+rejected rather than silently removing that Course; its review history remains visible.
+Final Termination rejects every still-pending request with an attributed reason while
+preserving its batch, transitions, and capacity-review history.
+_Avoid_: registration (the act), Enrollment (the approved per-Offering record).
 
 **Class Session**:
 One planned meeting of a Course Offering on a specific date, generated from the
@@ -223,8 +264,8 @@ audit-at-risk flag (below 75% on an Audit Enrollment), never an automatic status
 **Course Status**:
 The accounting classification of a single Enrollment, governing how it counts toward the
 transcript, CGPA, and each credit-hour category: Regular, Retake, Audit (AU),
-Withdrawal (W), Fail Withdrawal (FW), Incomplete (I), CGPA Improvement, Transfer, Waive,
-Exempted. (See SRS Appendix D for the counting matrix.)
+Withdrawal (W), Fail Withdrawal (FW), Incomplete (I), or CGPA Improvement. Exemption,
+Transfer, and Waiver are standalone decisions, never Course Statuses.
 
 **Enrollment Classification**:
 How one Enrollment counts for the Student's Program — Preparatory, Core, Internal
@@ -232,7 +273,7 @@ Elective, External Elective, or Research Course — derived at registration time
 Student's Curriculum, the Course level, and the degree level, then kept as a snapshot on
 the Enrollment (later Curriculum edits never re-classify past registrations). Per-Student
 and per-Enrollment; distinct from Course Category, which is the Course's per-Program
-placement in a Curriculum. An External Elective is a course outside the Student's own
+placement in the Student's bound Curriculum Version. An External Elective is a course outside the Student's own
 Curriculum taken from another graduate Program's; a Research Course is the level-700
 course whose Research Type matches the degree (PBL for MSc, Seminar for PhD).
 
@@ -242,26 +283,98 @@ students) or Seminar (taken by PhD students). An intrinsic property of the Cours
 recorded in the Catalog.
 
 **Exemption**:
-Release from a *required Preparatory Course* based on prior qualification (e.g.
-IELTS ≥ 6.5, prior E-JUST study). Reduces the Program's required total. Applied
-automatically on enrollment or requested manually. Does not affect CGPA.
+The standalone decision releasing a Student from one *required Preparatory Course* based
+on a prior qualification (e.g. IELTS ≥ 6.5 or prior E-JUST study). It targets that Course,
+reduces the Program's required total, and does not affect CGPA. It is applied automatically
+at admission acceptance when the accepted Application's evidence proves a configured
+rule, or requested manually to supply or correct evidence for the same rules;
+prior-course equivalence is a Waiver, not an Exemption. For the E-JUST MSc-to-PhD rule,
+"same" means the previous MSc Program and admitted PhD Program belong to the same
+Department; "same track" is not a separate domain concept. Because an Exemption proves
+that the Preparatory requirement did not apply, a later corrected Exemption may release
+that requirement even after a failed or successful Attempt; the Attempt and its Grade
+remain in academic history and CGPA. Earned Credit Hours for that exempted Course remain
+raw history but are excluded from Satisfied Credit Hours while the Exemption is effective.
+Approval does not cancel an existing in-progress Enrollment in the
+released Course: the Student may use ordinary drop or withdrawal rules, or continue and
+receive the normal academic outcome.
 _Avoid_: conflating with Waiver or Transfer — see below.
 
 **Transfer**:
-Credit carried in from a course taken at *another institution* (max 9 CH, min grade B,
-must map to an equivalent Course). Counts toward Required CH but NOT toward CGPA.
+The standalone decision recognizing a course taken at *another institution* (max 9 CH,
+min normalized E-JUST grade B) by mapping it to an equivalent Course in the Student's
+Curriculum. It preserves the source grade as printed and the Department Head's normalized
+Letter Grade, satisfies the mapped requirement without affecting CGPA, and recognizes the
+target Course's credit hours toward the lifetime 9-CH cap. It may be requested through the
+inclusive calendar month after admission. A new Transfer request cannot target a Course
+after the Student has an effective failed for-credit Attempt in that Course.
 
 **Waiver**:
-Excusal from a Course whose content the Student *previously studied* at level 400+ with
-≥80% coverage. Counts toward Required CH but NOT toward CGPA; shown as "Waived".
+The standalone decision excusing a Curriculum Course based on a prior *E-JUST Course* at
+level 400+ that was successfully completed at C+ or higher and has ≥80% content coverage.
+It satisfies that requirement, does not affect CGPA, and is shown as "Waived"; study
+outside E-JUST is evaluated only as a Transfer. A new Waiver request cannot target a
+Course after the Student has an effective failed for-credit Attempt in that Course.
 _Distinction_: Exemption = prep-course release from a qualification; Transfer = external
-credit imported; Waiver = internal course excused by prior study.
+course recognized; Waiver = current course excused by prior E-JUST study.
+
+**Credit Decision Request**:
+A Student's evidence-backed request for one manual Exemption, Transfer, or Waiver. It is
+editable in Draft or Returned for Revision, locked while under review, and carries an
+append-only transition history through the required review stages to Approved or Rejected;
+final approval atomically creates a separate Exemption, Transfer, or Waiver decision. If
+a finalized initial or correction Grade creates an effective failed Attempt in the target
+Course while a Transfer or Waiver request is under review, the system terminally rejects
+that request, records why, and notifies the Student and current reviewers.
+Final Termination likewise rejects every non-terminal Credit Decision Request without
+removing its evidence or transition history.
+_Avoid_: adjustment request, special-status request.
+
+**Revocation**:
+The explicit decision that an approved Exemption, Transfer, or Waiver no longer counts,
+recorded by the same final authority with a reason and timestamp. It never erases or edits
+the original decision; a replacement requires a new Credit Decision Request. If a
+Preparatory Exemption is revoked after the ordinary two-Semester checkpoint, its restored
+requirement receives a Remediation Window through the Grade-Submission Deadline of the
+first main Semester in which its Course has an eligible Offering and the Student can still
+lawfully add it at Revocation time. The current Semester qualifies while registration,
+add/drop, or late-add remains open; after late-add closes, the search moves forward.
+_Avoid_: deletion, cancellation, rollback.
 
 **Credit-Hour Summary**:
-The per-Student, per-Category derived view of Required / Attended / Earned / Remaining /
-Transferred / Waived / Exempted credit hours. Computed from Enrollments, Grades,
-Exemptions, Transfers, and Waivers — not a directly-edited record.
+The per-Student, per-Category derived view of Baseline Required, Adjusted Required,
+Attended, Earned, Transferred, Waived, Exempted, Satisfied, and Remaining credit hours.
+Raw accounting remains visible, while Satisfied is capped at Adjusted Required and
+Remaining cannot fall below zero; the Summary is never a directly edited record.
 _Avoid_: credit ledger, progress table.
+
+**Satisfied Credit Hours**:
+The portion of Adjusted Required Credit Hours fulfilled by earned Enrollments, Transfers,
+or Waivers after matching them to Course targets, capped at that requirement. Earned hours
+from a Course whose target is removed by an effective Exemption remain raw Earned Credit
+Hours but do not also satisfy another requirement. This is the precise meaning of
+“Completed CH” in the SRS; Exemptions reduce the requirement instead of satisfying it.
+_Avoid_: completed credit, earned credit (Earned CH is only one contributor).
+
+**Approaching Graduation**:
+The state of a Student who has more than zero but fewer than six Remaining Credit Hours and
+can satisfy every remaining Course target or category slot with the proposed for-credit
+schedule. Only that completing schedule may fall below the normal 6-CH minimum.
+It is independent of CGPA and Termination Pending: those are Graduation Readiness blockers
+displayed alongside it, not reasons to hide curriculum proximity or prevent the completing
+schedule during Probation or termination due process.
+_Avoid_: final year, nearly finished.
+
+**Graduation Readiness**:
+An advisory derived result stating whether the Student has zero Remaining Credit Hours,
+an authoritative CGPA of at least 3.00, and no actionable Termination Pending Case.
+Academic Warning alone does not prevent readiness. This result neither graduates the
+Student nor changes Student Lifecycle Status; formal graduation remains a separate future
+workflow with any non-course and administrative checks. Its contract returns `ready`,
+Remaining CH, nullable CGPA, a separate Approaching Graduation result, and typed Blockers:
+Remaining Requirements, CGPA Unavailable, CGPA Below Minimum, or Termination Pending.
+Consumers display those facts and never reconstruct readiness.
+_Avoid_: graduated, graduation decision, graduation approval.
 
 ## Grading & standing
 
@@ -313,7 +426,75 @@ One of the at most two for-credit Enrollments a Student may hold in a single Cou
 first is Regular; the second is a Retake if the first earned no credit, or a CGPA
 Improvement if it did. Audit and Withdrawal Enrollments are not Attempts and consume
 nothing. Both Attempts appear on the Transcript, but only the later one counts toward the
-CGPA and earned credit.
+CGPA and earned credit. Passing a different elective may satisfy the same curriculum slot,
+but it never supersedes the original Course's Grade; that Grade remains effective for
+CGPA, Academic Warning, and D/F Termination evaluation.
+
+**Must-Retake Obligation**:
+An effective below-C+ outcome in a Preparatory or Core Course that requires the Student
+to prioritize the same Course in a later Semester when it has an eligible Offering. A
+later successful for-credit Attempt clears the obligation. An effective Exemption may
+also release it by proving that the Preparatory requirement did not apply, while a new
+Transfer or Waiver request cannot target the failed Course. The failed Attempt and Grade
+remain in history and CGPA in either case. An Audit Enrollment neither selects nor clears
+the obligation. If none of the Student's obligations is offered, they may continue with
+other registration rather than being blocked by an unavailable Course. When load or
+timetable constraints prevent taking every offered obligation, the required feasible set
+is selected deterministically at the Course level. Preparatory obligations come first,
+ordered by earliest applicable termination/remediation checkpoint, then their origin time
+(the effective failed Grade or Exemption Revocation), then Course code. Core obligations
+follow, ordered by oldest failed Attempt then Course code. The
+system walks that order once and includes each Course only if an eligible Offering fits
+the remaining load and timetable; it does not skip a feasible higher-priority Course to
+maximize Course count, credit hours, or load utilization. The Student selects any
+eligible, non-conflicting Course Offering for each required Course; the Advisor may change
+that Offering but not substitute a lower-priority Course. An
+unrelated Course already in the Student's proposed or approved schedule does not make a
+Must-Retake Course “not offered”: while registration changes remain permitted, that
+unrelated Course must be removed or switched to resolve the conflict. Once all
+modification windows close, the system never auto-drops an Enrollment; the obligation
+carries forward if it could not be added. A full eligible Offering still counts as
+available: after the Advisor recommends the registration, the scoped Department Head may
+approve a reasoned, audited capacity exception for that obligation. No enrolled Student
+is displaced. If several full Offerings belong to different Departments, each owning
+Department Head decides only their Offering; the Registration Request waits for all
+approvals, and any denial rejects the atomic batch. Capacity changes are reconciled
+idempotently: a now-available seat removes that Offering's active exception requirement,
+and the request auto-approves only when its whole batch passes transactional revalidation
+with no exception still needed. Conversely, a requested Offering that newly becomes full
+adds its own Department-scoped requirement before final approval.
+_Avoid_: must-retake flag (the obligation drives registration behaviour, not only display).
+
+**Remediation Obligation**:
+The temporary registration obligation created when a Preparatory Exemption is revoked
+after the ordinary completion checkpoint, owned by Enrollment beside the originating
+Revocation and exposed to AcademicStanding as a Public DTO. It may exist without any prior
+Attempt, so it is not a Must-Retake Obligation. During its Remediation Window it shares
+the same deadline-first Preparatory registration priority, timetable handling, and
+full-Offering Department Head capacity-exception path. It ends when the requirement is
+satisfied, when a replacement Preparatory Exemption closes it as Released By Exemption, or
+when its remediation checkpoint is evaluated; if still unsatisfied then, it becomes
+termination evidence. Released By Exemption is distinct from Course completion: it records
+that corrected evidence proved the requirement did not apply. If no future eligible
+Offering exists, it remains Awaiting
+Offering with no termination checkpoint: it contributes to Remaining CH and blocks Graduation Readiness,
+but cannot trigger termination. The Student, Advisor, and scoped Department Head are
+notified; scheduling a real enrollment opportunity assigns the checkpoint and activates
+registration priority. Enrollment reconciles immediately after local Offering changes and
+after Calendar's Public `SemesterChanged` or Catalog's Public `CourseChanged` signal; each
+signal identifies its owner record rather than copying authoritative facts, and an
+idempotent scoped reconciliation command repairs missed post-commit handling. Until
+evaluation, an assigned remediation
+checkpoint extends when its Semester's authoritative Grade-Submission Deadline moves
+later, but never shortens when that date moves earlier. Each Calendar change and the
+checkpoint outcome are retained in its history and communicated to the Student, Advisor,
+and scoped Department Head. Before the Student enrolls, loss of an institution-provided
+eligible opportunity moves the obligation to another eligible Offering in the same
+Semester, the earliest later lawful Semester, or Awaiting Offering when none exists; the
+change is retained and communicated. Full capacity and Student-created conflicts do not
+count as loss of opportunity. Once an Enrollment exists, that opportunity was used and is
+not reassigned. Evaluation freezes the deadline used for that decision.
+_Avoid_: retake (the Student may never have taken the Course), grace flag.
 
 **CGPA Improvement**:
 The Course Status of a second Attempt at a Course the Student already passed at C+ or
@@ -349,13 +530,57 @@ Semester. Both are always derived from the Grades of CGPA-counting Enrollments, 
 stored. Minimum CGPA for graduation is 3.0.
 
 **Academic Standing**:
-A Student's current classification derived from grades and CGPA: Good Standing,
-Academic Warning, Academic Probation, or Termination Pending.
+A Student's exhaustive current classification derived from effective Grades, CGPA, and
+termination triggers: Not Yet Assessed, Good Standing, Academic Warning, Academic
+Probation, or Termination Pending. Exactly one applies; absence of a CGPA is Not Yet
+Assessed rather than Good Standing or a null value unless a termination trigger is active,
+in which case Termination Pending takes precedence.
+A failed elective therefore remains relevant to Warning and D/F Termination after a
+different elective satisfies the curriculum slot. Only a later successful Attempt in the
+same Course supersedes that Grade; requirement satisfaction is not Grade supersession.
+Academic Warning alone does not block graduation readiness: a Student with every
+curriculum requirement satisfied and CGPA of at least 3.00 is academically ready even
+though the Warning continues to describe their effective Grade history. Good Standing is
+not an additional graduation requirement.
+Termination Pending is different: an actionable open Termination Case temporarily blocks
+graduation readiness. Dismissal or Trigger Cleared removes that block and immediately
+returns readiness to the satisfied-curriculum plus CGPA test.
+
+**Standing Observation**:
+An append-only record that a Student's derived Academic Standing was observed to change,
+used for history and once-only notifications. It is never the source of current Standing,
+which is recalculated from authoritative academic facts.
+_Avoid_: standing snapshot, stored standing, standing override.
 
 **Termination**:
 The workflow that may end a Student's enrollment when termination criteria are met
-(unfinished prep courses within 2 semesters, or grade D in 2+ courses). Decided by the
-Academic Affairs Council.
+(Preparatory requirements still unsatisfied after the second consecutive Semester's
+Grade-Submission Deadline, subject to a valid Incomplete's resolution, or grade D in 2+
+distinct Courses based on their current effective Grades). A successful later Attempt can
+clear the Grade-based trigger. A Student has at most one active case, containing the complete
+set of currently actionable trigger evidence. The currently assigned Advisor assesses a
+flagged case, the Department Head decides whether to recommend termination, and the
+Academic Affairs Council makes the final decision. Advisor scope is live while the case
+awaits that assessment: reassignment removes the former Advisor's authority and gives it to
+the new Advisor. Once recorded, an assessment remains attributed history and reassignment
+does not restart or invalidate the later Department Head/Council stages. If every trigger
+clears first, the case closes as Trigger Cleared; a final
+termination is never reversed automatically. If evidence changes while any trigger remains,
+the old case closes as Evidence Changed and a new case starts again with Advisor assessment;
+earlier reviews remain historical and suppress neither fingerprint. A dismissal suppresses
+only the exact trigger
+evidence reviewed. Preparatory evidence includes the requirement, its ordinary checkpoint
+or Remediation Obligation, and the effective Grade, Withdrawal, credit decision, or
+Revocation facts present—including the explicit absence of an Attempt. A later academic
+fact or new Remediation Obligation is materially changed evidence and may open a new case;
+unchanged non-completion remains suppressed. A Preparatory
+requirement restored by a post-checkpoint Exemption Revocation cannot trigger termination
+until its Remediation Window closes; a valid Incomplete then receives the usual deferral.
+An Awaiting Offering Remediation Obligation has no deadline and cannot become termination
+evidence until an enrollment opportunity is scheduled.
+A final termination and a concurrent corrected Exemption cannot both take effect from stale
+evidence: if the Exemption takes effect first, its cleared evidence prevents termination;
+if termination takes effect first, later academic mutation is blocked.
 
 ## Records
 

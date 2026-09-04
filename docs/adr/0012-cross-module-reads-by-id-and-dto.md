@@ -46,3 +46,8 @@ methods extend the same facade rather than introducing it.
 - Every future cross-module read copies this shape: opaque id on the consumer, a Public
   read DTO from the owner, no FK. The explicit *no-FK* is the point — record it so nobody
   "fixes" the missing constraint later.
+- Phase 5 extends the same authority rule to change signals: Catalog's minimal Public
+  `CourseChanged` event carries only the Course id after activation-state changes.
+  Enrollment consumes the signal, re-reads the current Public DTO, and idempotently
+  reconciles unused remediation opportunities rather than trusting copied Course fields
+  ([ADR-0043](0043-enrollment-owns-remediation-obligations.md)).

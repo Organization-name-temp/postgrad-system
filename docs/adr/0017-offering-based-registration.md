@@ -62,6 +62,10 @@ are read live through the Catalog facade (ADR-0012).
   via the Offering inside the module; cross-module reads stay opaque-id + DTO (ADR-0012).
 - Capacity and time-clash are validated wherever the schedule changes (request approval,
   free adds) — the clash check lives in one seam a real engine could later replace.
+  [ADR-0042](0042-must-retake-courses-have-registration-priority.md) adds the one capacity
+  exception: after Advisor recommendation, the Course's scoped Department Head may give
+  reasoned, audited final approval to exceed capacity for a Must-Retake Obligation. It
+  neither applies to ordinary registration nor displaces an existing Enrollment.
 - A curriculum edit after registration never re-classifies an existing Enrollment; if a
   correction is ever needed it is an explicit administrative action, not a recompute.
 - Phase 4 builds `Enrollment\Public` (offerings + roster read surface) against grading;

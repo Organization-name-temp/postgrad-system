@@ -42,6 +42,11 @@ permission package expecting flexibility the domain does not want.
   re-checks every request. The matrix is never shipped as authority to the client.
 - A user's effective permissions are the **union** across their assigned roles; the
   multi-role path is exercised from Phase 0 by a seeded multi-role user.
+- A narrowly routed workflow stage whose authority is inseparable from a fixed Role and
+  ownership scope need not manufacture a new Permission. Phase 5's full Must-Retake
+  capacity exception is gated directly on Department Head plus Course-department scope
+  ([ADR-0042](0042-must-retake-courses-have-registration-priority.md)); it neither broadens
+  `registration.approve` nor exposes the ordinary registration queue.
 - If the project ever needs genuinely custom, per-user or per-tenant permissions, spatie
   (or a DB matrix) can be introduced then — callers depend on the `Permission` enum and
   the `me` contract, not on how the matrix is stored.

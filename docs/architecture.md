@@ -148,13 +148,13 @@ modules/Enrollment/
 
 | Module | Owns (authoritative data) | Key responsibilities | SRS modules covered |
 |--------|---------------------------|----------------------|---------------------|
-| **Identity & Access** | users, roles, role-assignments, sessions, MFA secrets, audit log | Login, SSO, MFA, RBAC (R01–R10), session listing/termination, audit trail | Security & Auth |
+| **Identity & Access** | users, roles, role-assignments, Student anchors and lifecycle status, sessions, MFA secrets, audit log | Login, SSO, MFA, RBAC (R01–R10), Student operational eligibility, session listing/termination, audit trail | Security & Auth |
 | **Admissions** | applications, documents, screening notes, interviews, decisions | Multi-step application, email verification, document upload, SA→Dean→interview→decision workflow, status tracking | Admission |
 | **Catalog** | faculties, departments, programs, courses, course-categories | Program/course CRUD + versioning, the interactive program tree, equivalencies | Program Management |
-| **Enrollment** | enrollments, registration requests, exemptions, transfers, waivers | Registration + advisor approval, add/drop/withdrawal, CH-limit rules, exemption/transfer/waiver processing | Course Registration, Exemption, Transfer & Waiver |
+| **Enrollment** | enrollments, registration requests, standalone course-targeted exemptions, transfers, waivers, remediation obligations | Registration + advisor approval, add/drop/withdrawal, CH-limit and obligation-priority rules, exemption/transfer/waiver processing, remediation reconciliation ([ADR-0030](adr/0030-credit-decisions-are-not-enrollments.md), [ADR-0043](adr/0043-enrollment-owns-remediation-obligations.md)) | Course Registration, Exemption, Transfer & Waiver |
 | **Grading** | grades, grade sheets | Instructor mark entry, letter-grade mapping, sign/finalize/review, Incomplete handling, **the GPA/CGPA read model** ([ADR-0020](adr/0020-grading-owns-gpa-read-model.md)) | Grading & GPA |
-| **Academic Standing** | standing snapshots, termination cases | Standing classification, termination criteria + workflow | Academic Standing |
-| **Records** | transcript issuances | Transcript generation (official/unofficial), Credit-Hour Summary composition, PDF export | Transcript & Records |
+| **Academic Standing** | standing observations, termination cases | Derived Standing, Credit-Hour Summary, and advisory Graduation Readiness read models; transition notifications; termination criteria + workflow ([ADR-0029](adr/0029-academic-standing-owns-progress-read-models.md), [ADR-0041](adr/0041-standing-observations-not-snapshots.md)) | Academic Standing; Credit-Hour Summary |
+| **Records** | transcript issuances | Transcript generation (official/unofficial), composition from academic-progress facades, PDF export | Transcript & Records |
 
 ### 4.2 Supporting modules
 
@@ -166,9 +166,11 @@ modules/Enrollment/
 
 ### 4.3 The Credit-Hour Summary is derived, not stored
 
-`Enrollment` owns *enrollments* (a Student taking a Course in a semester, each with a **Course Status**). `Grading` owns *grades* attached to those enrollments. `Enrollment` also owns *exemptions / transfers / waivers*.
+`Enrollment` owns *enrollments* (a Student taking a Course in a semester, each with a **Course Status**). `Grading` owns *grades* attached to those enrollments. `Enrollment` also owns *exemptions / transfers / waivers*. A Student's requirements come from the immutable admission-time Curriculum Version referenced by the Identity-owned Student anchor, resolved through `Catalog\Public` ([ADR-0034](adr/0034-students-bind-to-admission-curriculum-version.md)).
 
-The **Credit-Hour Summary** and **Academic Standing** are **read models** computed on demand from those authoritative records using the counting rules in SRS Appendix D. They are cached in Redis and invalidated by domain events (e.g. `GradeFinalized`, `WithdrawalRecorded`). This keeps a single source of truth and avoids the classic bug of a stored balance drifting from the transactions that produced it. It also satisfies the `GPA/CGPA recalculation ≤ 1s` NFR because a recompute touches one Student's rows only.
+Catalog publishes an ID-only Public `CourseChanged` event after Course activation changes. Enrollment consumes it, re-reads authoritative Catalog data, and idempotently reconciles unused remediation opportunities; the existing global/per-Student recovery command handles missed post-commit delivery ([ADR-0043](adr/0043-enrollment-owns-remediation-obligations.md)).
+
+The **Credit-Hour Summary** and **Academic Standing** are **read models** computed on demand from those authoritative records using the counting rules in SRS Appendix D. The `AcademicStanding` module owns both calculations and exposes them through its public facade; `Records` later consumes that facade when composing a Transcript ([ADR-0029](adr/0029-academic-standing-owns-progress-read-models.md)). This keeps a single source of truth and avoids the classic bug of a stored balance drifting from the transactions that produced it. For a determinate remediation checkpoint, AcademicStanding atomically invokes Enrollment's idempotent Public evaluation command with the obligation id and expected deadline; Enrollment remains the only obligation writer and stale Calendar data cannot commit Case effects ([ADR-0043](adr/0043-enrollment-owns-remediation-obligations.md)).
 
 > **Amended by [ADR-0020](adr/0020-grading-owns-gpa-read-model.md) (Phase 4).** The **GPA/CGPA** read model is owned by **`Grading`**, not `Records` — a GPA is grade arithmetic and belongs beside the Grades it is arithmetic over, and `Records` is a document-issuance context that is not born until Phase 6. `Records` composes a transcript *from* `Grading\Public`; it does not recompute the average. The Redis caching described above also remains a documented later optimization rather than the built design: this build has no Redis ([ADR-0005](adr/0005-localhost-learning-build.md)), so the values are computed on demand and cannot drift at all. §9's module map below carries the same amendment.
 
@@ -191,15 +193,21 @@ sequenceDiagram
 
     Note over Adm: Dean/Committee records "Accepted"
     Adm->>Adm: persist AdmissionDecision
-    Adm-->>Id: event AdmissionAccepted
-    Adm-->>Enr: event AdmissionAccepted
-    Adm-->>Ntf: event AdmissionAccepted
-    Id->>Id: mint University ID, role R01→R02, create user
-    Enr->>Enr: create academic record, apply automatic exemptions
+    Adm->>Id: mint University ID, role R01→R02, create Student
+    Id-->>Adm: minted Student identity
+    Note over Adm,Id: Admission decision + Student commit atomically
+    Adm-->>Enr: public AdmissionAccepted event + evidence snapshot
+    Adm-->>Ntf: public AdmissionAccepted event
+    Enr->>Enr: idempotently apply automatic exemptions
     Ntf->>Ntf: send acceptance email + in-app notice
 ```
 
 Representative events: `ApplicationSubmitted`, `EmailVerified`, `AdmissionAccepted`, `RegistrationRequested`, `RegistrationApproved`, `WithdrawalRecorded`, `GradeFinalized`, `IncompleteExpired`, `StandingChanged`, `TerminationRecommended`, `TranscriptIssued`. Every one of these is also an audit-log entry and a potential notification trigger.
+
+`AdmissionAccepted` is an Admissions Public event whose immutable evidence snapshot lets
+Enrollment apply automatic Exemptions without reading Admissions data. It fires after the
+admission/Student transaction commits; an idempotent reconciliation command is the recovery
+path for listener failure ([ADR-0032](adr/0032-public-admission-evidence-event.md)).
 
 ---
 
@@ -307,7 +315,7 @@ graph TB
 | Transfer & Waiver | Enrollment |
 | Grading & GPA | Grading (incl. the GPA/CGPA read model — [ADR-0020](adr/0020-grading-owns-gpa-read-model.md), amending the original "+ Records") |
 | Academic Standing | Academic Standing |
-| Transcript & Records | Records |
+| Transcript & Records | Records + Academic Standing for the Credit-Hour Summary read model ([ADR-0029](adr/0029-academic-standing-owns-progress-read-models.md)) |
 | Notification & Alerts | Notifications |
 | Calendar & Schedule | Calendar |
 | Reporting & Analytics | Reporting |
@@ -318,7 +326,7 @@ graph TB
 
 **Course registration (SRS §4.4.3):** SPA (Enrollment feature) → `POST /api/v1/registrations` → `EnrollmentService` validates CH limits (min 6 / max 12, config-driven), category rules, and prerequisites via `Catalog` facade → persists a *RegistrationRequest* (status Pending) → publishes `RegistrationRequested` → Notifications alerts the Advisor. Advisor approves → `RegistrationApproved` → enrollments created, `Calendar` add/drop window checked → SPA reflects Approved.
 
-**Grade → standing (SRS §4.7, §4.8):** Instructor enters marks → `Grading` maps to letter grade → signs → Dept Head reviews → `GradeFinalized` published → `Academic Standing` recomputes standing for that Student and `Records` invalidates the cached Credit-Hour Summary and CGPA → if termination criteria met, `TerminationRecommended` starts the council workflow.
+**Grade → standing (SRS §4.7, §4.8):** Instructor enters marks → `Grading` maps to letter grade → signs → Dept Head reviews → `GradeFinalized` published → `AcademicStanding` recomputes the Student's Standing and Credit-Hour Summary on demand → if termination criteria are met, a Termination case starts the council workflow. Final termination and replacement Exemption approval serialize through an Identity Public transaction-scoped Student guard acquired before module-owned locks; each revalidates after locking, so commit order resolves the race without stale dual outcomes. Final termination also calls Enrollment's idempotent Public closeout command in the same transaction, rejecting all non-terminal registration and credit-decision requests while preserving history and existing Enrollments/effective decisions ([ADR-0040](adr/0040-termination-pushes-student-lifecycle-status.md)).
 
 **Incomplete lifecycle (SRS §4.7.3):** on `I` grade, scheduler tracks the resolution deadline (10th week of next semester); reminder jobs fire at 4wk/2wk/1wk/1day; if unresolved, scheduler emits `IncompleteExpired` → `Grading` converts to `FW` → standing recomputes.
 

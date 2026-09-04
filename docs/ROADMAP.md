@@ -284,15 +284,19 @@ register — a deliberate SRS extension).
   later; managed under `calendar.manage` beside Semesters. **Enrollments reference the
   Offering, never the Course** — the structural seed for future timetabling/LMS (both
   seeded structurally only; zero placeholder schema; rooms stay out per SRS §2.4).
-- **`CourseStatus` ships complete** (all 10 Appendix-D values + counting matrix encoded as
-  a static matrix), but only **Regular, Retake, Audit, W** are reachable in Phase 3; drop =
-  hard delete, no trace. FW/Incomplete/CGPA-Improvement arrive with Phase 4,
-  Transfer/Waive/Exempted with Phase 5.
+- **`CourseStatus` ships with the Appendix-D values known in Phase 3**, but only **Regular,
+  Retake, Audit, W** are reachable in that phase; drop = hard delete, no trace.
+  FW/Incomplete/CGPA-Improvement arrive with Phase 4. **Amended by
+  [ADR-0030](./adr/0030-credit-decisions-are-not-enrollments.md):** Transfer, Waiver, and
+  Exemption are standalone course-targeted records, not Course Statuses.
 - **Registration workflow:** `RegistrationRequest` = a batch cart (min-6 CH is batch-level;
   no server-side Draft), lines referencing Offerings and carrying requested mode
   Regular/Audit (**Retake is always derived**). Advisor **"modify" = line-item trim, never
-  add**; request statuses Pending/Approved/Rejected; approval mints Enrollments atomically
-  (classification + registration-time total CH snapshotted per line, ADR-0017).
+  add**; Phase 3 request statuses Pending/Approved/Rejected; approval mints Enrollments
+  atomically (classification + registration-time total CH snapshotted per line, ADR-0017).
+  **Amended in Phase 5 by ADR-0042:** existing `Pending` is displayed as “Pending Advisor,”
+  and a full Must-Retake exception adds `AwaitingCapacityOverride` before the Department
+  Head's final Approved/Rejected decision.
 - **Period mechanics** (FR-REG-004): weeks 1–2 free add/drop as direct actions — but only
   *after* an approved initial request (advisor notified, no veto); week 3 = add-only via a
   `LateAdd`-kind request through the advisor; withdrawal self-serve until the deadline
@@ -416,7 +420,8 @@ round). **§5's GPA/CGPA agenda is closed by this phase** — see below.
   `CgpaImprovement` at or above it; registration refused while an earlier Attempt is an
   unresolved Incomplete; a **failed external elective frees** the lifetime external allowance
   (FR-REG-006.4); `RetakeDeriver` renamed **`AttemptDeriver`**. FR-REG-006.5's "must retake" is a
-  **visible marker, not a gate** — the house style throughout.
+  **visible marker, not a gate** in this phase; Phase 5 deliberately adds the enforcement
+  rule in [ADR-0042](./adr/0042-must-retake-courses-have-registration-priority.md).
 - **Calendar gains exactly one column**, the grade-submission deadline
   (`ends_at ≤ deadline`); exam-period/holiday columns stay deferred (ADR-0018 forbids
   anticipatory schema). **Catalog is unchanged.**
@@ -451,7 +456,8 @@ round). **§5's GPA/CGPA agenda is closed by this phase** — see below.
   exemption/transfer/waiver (Phase 5 — `GradeFinalized` is their hook); transcripts and the
   AU/W/FW/I grade-column projection (Phase 6); the GPA-distribution report (Phase 7); grade
   appeals as a student-initiated workflow; assessment components/weights/curves and letter
-  overrides; blocking registration on an outstanding must-retake obligation; caching the CGPA.
+  overrides; blocking registration on an outstanding must-retake obligation (resolved for
+  Phase 5 by ADR-0042); caching the CGPA.
 - **Demo:** an Instructor opens a completed term's grade sheet, marks one student and defers
   another with a reason, and signs; the Department Head reads the distribution and finalizes;
   the student sees their letter, Semester GPA and CGPA; the conversion command runs and the
@@ -660,14 +666,209 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   those students, filtered — and export them too.
 
 ### Phase 5 — Academic Standing + Credit-Hour Summary + Exemption/Transfer/Waiver (SRS §4.8, §4.5, §4.6)
-- **Derived read models** (on-demand): per-category Credit-Hour Summary (Appendix D
-  counting) and Academic Standing (Good/Warning/Probation/Termination-Pending),
-  recomputed on `GradeFinalized`/`WithdrawalRecorded`.
-- **Exemption/Transfer/Waiver** (owned by Enrollment per ADR-0002): automatic exemption
-  rules on enrollment (+ manual workflow), transfer (≤9 CH, min B, equivalency, 1-month
-  window), waiver (level 400+, ≥80% coverage). None affect CGPA.
-- **Termination workflow:** flags → notify → Dept. Council recommends → Academic Affairs
-  Council decides → notify.
+- **`AcademicStanding` module** owns both derived read models ([ADR-0029](./adr/0029-academic-standing-owns-progress-read-models.md)):
+  per-category Credit-Hour Summary (Appendix D counting) and Academic Standing
+  (Not-Yet-Assessed/Good/Warning/Probation/Termination-Pending), computed on demand from the owning
+  modules' public facades. Phase 6 Records consumes this facade rather than recalculating
+  either view. Each Student's requirements come from the admission-time Curriculum Version,
+  never the Program's mutable current Curriculum. Existing Students bind to the latest
+  Version at or before admission, falling back audibly to the earliest available Version
+  when Catalog history starts later ([ADR-0034](./adr/0034-students-bind-to-admission-curriculum-version.md)).
+  Each category exposes raw Baseline/Adjusted Required, Attended, Earned, Transferred,
+  Waived and Exempted CH; Satisfied CH first allocates by Course target so an effective
+  Exemption and later Earned CH for that same Course cannot both advance progress, then is
+  capped at Adjusted Required, while Remaining CH is floored at zero and the Total row sums
+  categories ([ADR-0035](./adr/0035-credit-hour-summary-accounting.md)).
+  The approaching-graduation exception applies only at 1–5 Remaining CH when the proposed
+  for-credit schedule satisfies every remaining target or slot; the facade therefore
+  exposes unsatisfied requirements as well as numeric totals. Approaching Graduation is
+  independent of CGPA and Termination Pending, whose separate blockers remain visible but
+  do not suppress the completing schedule during Probation or due process. The
+  first-semester proxy from
+  Phase 3 is tightened to the same shape: a 1–5 CH load is allowed only in the enrollment
+  Semester and only when it contains every remaining non-exempt Preparatory requirement;
+  with none remaining, the normal floor applies.
+  Standing is exhaustive under [ADR-0036](./adr/0036-exhaustive-academic-standing.md):
+  Termination Pending is evaluated first even without a CGPA; otherwise no finalized
+  CGPA-bearing Grade means Not Yet Assessed, `<3.00` is Probation, `≥3.00` plus any
+  effective Grade below C+ is Warning, and `≥3.00` with all effective Grades at least C+
+  is Good. Probation caps the total Semester load, including Audit, at the configured
+  minimum CH; Termination Pending uses the same ceiling while due process continues, and
+  the two approved below-minimum exceptions remain available. Only final termination blocks
+  registration mutations. Append-only Standing Observations checkpoint actual changes for
+  once-only adverse and recovery notifications, but never answer current Standing reads;
+  idempotent event handlers and the manually run
+  `academic-standing:reconcile {student?}` command share one per-Student service. A global
+  run evaluates time-based ordinary/remediation checkpoints for every active Student; a
+  scoped run repairs one Student. The service opens or clears Termination Cases, appends
+  Standing Observations and once-only notifications, and reads without converting
+  Grading-owned Incompletes. A determinate remediation evaluation atomically calls
+  Enrollment's idempotent Public command with the obligation id and expected effective
+  deadline; a stale deadline rolls back the Case/Standing effects for reload, while a valid
+  Incomplete leaves the obligation active. Standing/readiness GETs remain side-effect free
+  ([ADR-0041](./adr/0041-standing-observations-not-snapshots.md)).
+  Passing a different elective may satisfy its curriculum slot but never supersedes the
+  original Course's Grade: that Grade remains in CGPA, Warning, and any D/F termination
+  evidence until a successful later Attempt in the same Course supersedes it. Warning
+  alone does not block graduation readiness when every curriculum requirement is
+  satisfied and CGPA is at least 3.00; Good Standing is not an extra graduation condition.
+  An actionable Termination Pending Case temporarily blocks readiness until dismissal or
+  Trigger Cleared, which immediately restores the normal calculation.
+  Graduation Readiness is an advisory derived result only: Phase 5 does not create a
+  Graduated lifecycle value, mutate Student state, or invent a formal graduation approval
+  workflow and its non-course/administrative checks. Its Public contract returns the
+  authoritative boolean plus Remaining CH, nullable CGPA, the separate Approaching
+  Graduation result, and a closed typed blocker set (remaining requirements, unavailable
+  CGPA, below-minimum CGPA, termination pending); Approaching remains a curriculum-proximity
+  result even when one of those blockers exists, and consumers never reconstruct either.
+- **Must-retake priority:** an effective below-C+ Preparatory/Core outcome creates a
+  Must-Retake Obligation. Eligible Offerings for those obligations take priority over
+  unrelated for-credit Courses: all must be selected when they fit the dynamic ceiling;
+  when load or timetable constraints prevent that, the required feasible set is chosen
+  deterministically: Preparatory obligations by earliest termination/remediation
+  checkpoint, origin time, then Course code, followed by Core obligations by oldest failed
+  Attempt then Course code,
+  greedily including each Course only if an eligible Offering fits the remaining load and
+  timetable; a feasible higher-priority Course is never skipped to optimize Course count,
+  credit hours, or capacity use. This fixes the required Courses, while the Student may
+  select any eligible non-conflicting Offering for each and the Advisor may change the
+  Offering without changing the Course. When no obligation is
+  offered, other registration remains possible. An unrelated scheduled Course never makes
+  an obligation unavailable: it must be removed or switched while modifications remain
+  open. After those windows close, no Enrollment is auto-dropped and any unselected
+  obligation carries forward. A full eligible Offering still counts as available: the
+  Advisor recommends, then the Course's scoped Department Head may finally approve a
+  mandatory-reason, audited capacity exception for the required retake only, without
+  displacing anyone. That endpoint uses the Department Head Role plus Course-department
+  scope—not `registration.approve` and not a new Permission—so it exposes no ordinary
+  registration queue. The exceptional state path is `Pending` (“Pending Advisor”) →
+  `AwaitingCapacityOverride` → `Approved`/`Rejected`; ordinary requests skip the new state.
+  Every full Offering gets its own decision from that Course's scoped Department Head; the
+  request waits for all approvals, while any denial rejects the unchanged batch. Only
+  unanimous approval atomically mints Enrollments after final revalidation. Audit neither
+  satisfies nor clears the rule. Idempotent capacity reconciliation retires an active
+  exception requirement when a normal seat becomes available, preserves its history, and
+  auto-approves the already-recommended request only when no exception remains and the
+  entire batch passes transactional revalidation; if another requested Offering newly
+  fills while the request waits, reconciliation adds its own scoped requirement without
+  duplicating an existing decision. It does not reserve seats. Enrollment revalidates the
+  rule at every registration approval boundary
+  ([ADR-0042](./adr/0042-must-retake-courses-have-registration-priority.md)).
+- **Exemption/Transfer/Waiver** (owned by Enrollment per ADR-0002) are standalone,
+  course-targeted records rather than synthetic Enrollments ([ADR-0030](./adr/0030-credit-decisions-are-not-enrollments.md)):
+  an idempotent listener consumes the Public `AdmissionAccepted` exemption-evidence snapshot
+  and creates approved automatic Preparatory Exemptions before first registration; a
+  per-Student reconciliation command recovers post-commit listener failures
+  ([ADR-0032](./adr/0032-public-admission-evidence-event.md)). A manual workflow handles
+  missing or corrected evidence under those same rules; transfer (≤9 CH, min B,
+  equivalency, with its inclusive calendar-month request window starting at admission
+  acceptance) preserves the external grade and has the Department Head record its
+  normalized E-JUST Letter Grade for the B-or-higher gate. The lifetime 9-CH cap and
+  Transferred CH use target Curriculum Course hours, revalidated transactionally at final
+  approval; source hours remain evidence only, and Revocation frees the recognized hours.
+  Waiver is restricted to a prior E-JUST Course at level 400+ completed at C+ or higher,
+  with Department Head-verified coverage ≥80%; an official E-JUST transcript may prove a
+  legacy record absent from PRS, while external study cannot bypass Transfer rules. A new
+  Transfer or Waiver request cannot target a Course after an effective failed Attempt.
+  Corrected Exemption evidence may still release a Preparatory requirement after a failed
+  or successful Attempt because it proves that the requirement did not apply; the Attempt,
+  Grade, raw Earned CH, and CGPA effect remain, while the same Course's Earned CH is excluded
+  from target-matched Satisfied progress. If a finalized initial or correction
+  Grade creates the failure while a Transfer/Waiver request is under review, an idempotent
+  handler terminally rejects it with an attributed system transition and notifies the
+  Student and current reviewers. None of the decisions affect CGPA.
+  Automatic rules target the six semantic Preparatory Requirement Roles on each
+  Program's Curriculum, including its departmental Key Skills Entry, rather than hard-coded
+  Course ids ([ADR-0031](./adr/0031-preparatory-requirement-roles.md)). Applications capture
+  a structured previous E-JUST Program when applicable; the MSc-to-PhD rule requires the
+  previous and admitted Programs to belong to the same Department. Manual Exemptions end
+  with the Department Head; Transfers and Waivers proceed through Advisor recommendation,
+  Department Head verification, and Academic Affairs Council final decision, using the
+  fixed Roles rather than introducing Department/Faculty Council Roles
+  ([ADR-0033](./adr/0033-credit-workflows-use-fixed-roles.md)). Manual requests begin as
+  editable Drafts, lock during review, support return-for-revision with all earlier reviews
+  invalidated on resubmission, and retain an append-only transition history; Approved and
+  Rejected are terminal. Final approval atomically creates a separate immutable academic
+  decision linked to the request; automatic Exemptions create decisions directly, and only
+  effective decisions feed the Credit-Hour Summary. Decisions are never edited or deleted:
+  the same final authority may append a reasoned Revocation, and any replacement takes a
+  new request through full review. Automatic-Exemption reconciliation likewise appends
+  changes rather than rewriting history. If a Preparatory Exemption is revoked after the
+  ordinary completion checkpoint, that restored requirement becomes a distinct Remediation
+  Obligation through the
+  Grade-Submission Deadline of the first main Semester in which its Course has an eligible
+  Offering and the Student can still add it at Revocation time—the current Semester counts
+  only through late-add—before it can trigger termination; while active it shares the
+  Must-Retake
+  deadline-first Preparatory priority, timetable, and full-capacity workflow without
+  implying a prior Attempt, and a valid Incomplete at the checkpoint defers normally. With
+  no future eligible Offering it remains `AwaitingOffering` without a termination
+  checkpoint: Remaining CH/readiness still change, Student/Advisor/scoped Department Head
+  are notified, and reconciliation later assigns the deadline and activates priority.
+  Enrollment reconciles immediately after local Offering changes, Calendar's minimal
+  Public `SemesterChanged` signal, and Catalog's minimal Public `CourseChanged` signal for
+  activation changes. Both events carry only their owner id; Enrollment re-reads the
+  authoritative Public DTO, with
+  `enrollment:reconcile-remediation {student?}` as idempotent recovery. Enrollment owns this
+  durable obligation beside the Revocation and exposes its
+  state/checkpoint DTO to AcademicStanding, preserving the one-way dependency
+  ([ADR-0043](./adr/0043-enrollment-owns-remediation-obligations.md)). An assigned active
+  checkpoint extends when that Semester's Grade-Submission Deadline moves later but is
+  never shortened by an earlier edit. Every edit records the official and retained
+  effective dates in an append-only transition and renews the
+  Student/Advisor/scoped-Department-Head notification; after evaluation, its decision
+  deadline is frozen. Before Enrollment, institution-controlled loss of the qualifying
+  Course/Offering opportunity reassigns to another eligible same-Semester Offering, then
+  the earliest later lawful opportunity, else `AwaitingOffering`; the transition is
+  retained and notified. Full capacity and Student-created conflicts do not qualify, while
+  an existing Enrollment proves the opportunity was used. If a replacement Preparatory
+  Exemption is approved first, the same
+  Enrollment transaction closes an active or `AwaitingOffering` obligation as
+  `ReleasedByExemption`, distinguishing corrected applicability evidence from Course
+  completion. That transaction also terminally rejects any `Pending` or
+  `AwaitingCapacityOverride` atomic Registration Request containing the released Course,
+  preserves its capacity-review history, and notifies the Student/current reviewers; it
+  never silently removes the line, so a newly validated batch must be submitted. Its
+  academic-change event clears matching evidence from a non-final Termination Case under
+  normal reconciliation, but never reverses final termination. If the request already
+  produced an in-progress Enrollment, approval leaves it unchanged: ordinary
+  drop/withdrawal/grading applies, its eventual Attempt and Grade remain in history and
+  CGPA, and the Credit-Hour Summary exposes raw Earned/Exempted facts while excluding that
+  Course's Earned CH from target-matched Satisfied progress before applying the cap.
+- **Termination workflow:** the Preparatory non-completion trigger is evaluated after the
+  enrollment cohort's second consecutive Semester Grade-Submission Deadline, with a valid
+  Incomplete deferred until resolution or expiry ([ADR-0037](./adr/0037-preparatory-termination-checkpoint.md));
+  the Grade trigger counts D/F effective Grades in two distinct Courses and clears a Course
+  after successful remediation ([ADR-0038](./adr/0038-termination-uses-effective-grades.md));
+  flags → notify → assigned Advisor assesses → scoped Department Head recommends or
+  dismisses → Academic Affairs Council terminates or dismisses → notify
+  ([ADR-0039](./adr/0039-termination-recommendation-stages.md)). Pending Advisor scope and
+  queues resolve the live assignment; reassignment transfers authority, while an already
+  recorded attributed assessment remains valid and the later-stage Case does not restart.
+  Subsequent Advisor notifications target the current Advisor. Each Student has at most one
+  non-terminal Case, transactionally aggregating all actionable Preparatory and D/F
+  components; concurrent reconciliation cannot create parallel workflows. If all triggers clear
+  before the final decision, the Case closes automatically as Trigger Cleared; a later
+  trigger creates a new Case. If the fingerprint changes while some trigger remains, the
+  old Case atomically closes as `EvidenceChanged` and a fresh Advisor-stage Case opens; old
+  reviews remain history, neither fingerprint is suppressed, the normal new-Case
+  notification is sent, and unchanged Termination Pending creates no duplicate Standing
+  Observation. Department Head or Council dismissal suppresses the exact
+  deterministic trigger-evidence fingerprint and lets Standing fall through. Preparatory
+  components include requirement id, ordinary/remediation checkpoint identity, and current
+  Grade/Withdrawal/decision/Revocation evidence ids—including explicit no-Attempt—so later
+  authoritative evidence may open a new Case while unchanged non-completion stays
+  suppressed. A final termination atomically pushes `Terminated` onto the
+  Identity-owned Student Lifecycle Status while retaining R02 and historical read access;
+  Enrollment's idempotent Public closeout command system-rejects every non-terminal
+  Registration and Credit Decision Request in the same transaction, retaining evidence,
+  reviews, capacity decisions, existing Enrollments, and effective decisions; new academic
+  mutations are blocked, and reinstatement is never inferred automatically. Final
+  termination and replacement Exemption approval acquire one
+  transaction-scoped Identity-owned Student guard before other module locks and revalidate:
+  Exemption-first clears the evidence, termination-first blocks approval, and stale outcomes
+  cannot both commit
+  ([ADR-0040](./adr/0040-termination-pushes-student-lifecycle-status.md)).
 - **Inherited from Phase 4.6, not revisited:** every list this phase adds is born on the `Support`
   query contract ([ADR-0025](./adr/0025-support-layer-query-contract.md)) — paginated envelope, an
   actor-aware filterable-iff-readable allowlist, and a `/export` sibling
@@ -703,7 +904,12 @@ needs a parameter, it is a Report* — so this is not re-litigated here.
 
 - **The three remaining reports**, each owned by the Phase 5 module that owns its read model and
   each arriving with the Card, filter contract and export the platform already provides: Academic
-  Standing, Graduation Readiness, Termination.
+  Standing, Graduation Readiness, Termination. Graduation Readiness derives satisfied
+  curriculum plus CGPA ≥ 3.00 independently of Standing, so Warning alone does not exclude
+  an otherwise ready Student; an actionable Termination Pending Case temporarily excludes
+  them until dismissal or Trigger Cleared. The report consumes Phase 5's advisory result;
+  it does not perform or imply formal graduation, and renders the owner's typed blockers
+  rather than deriving its own explanations.
 - i18n polish pass (Arabic coverage, RTL layout audit) and any deferred niceties.
 - **Demo:** run the standing and graduation-readiness reports; full EN↔AR toggle across the app.
 
@@ -744,8 +950,10 @@ asked and what was decided:
    nothing.
 5. **Incomplete → FW** → Incomplete excluded from CGPA *and* Earned CH until resolved, and
    counted in the Semester it was originally taken once it is; **FW excluded permanently**.
-6. **Transfer / Waive / Exempted** → confirmed: Required CH yes, CGPA no — already encoded in
-   Phase 3's Appendix-D matrix; the workflows themselves stay Phase 5.
+6. **Transfer / Waive / Exempted** → confirmed: their accounting effect counts toward
+   requirement completion and never CGPA. **Amended by [ADR-0030](./adr/0030-credit-decisions-are-not-enrollments.md):**
+   these are standalone course-targeted records, not Enrollment Course Statuses; their
+   workflows stay Phase 5.
 7. **Rounding / precision** → accumulate `Σ(points × 100 × CH)` in **integer hundredths** (no
    float drift), divide, then **round half-up to two decimals exactly once** — and that single
    figure is authoritative for display *and* for every threshold test (graduation `≥ 3.0`,

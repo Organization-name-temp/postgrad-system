@@ -79,6 +79,8 @@ class EloquentStudentDirectory implements StudentDirectory
             userId: $student->user_id,
             universityId: $student->university_id,
             programId: $student->program_id,
+            curriculumVersionId: $student->curriculum_version_id,
+            curriculumVersionBindingSource: $student->curriculum_version_binding_source,
             enrollmentTerm: $student->enrollment_term,
             admissionCycleId: $student->admission_cycle_id,
             advisorId: $student->advisor_id,

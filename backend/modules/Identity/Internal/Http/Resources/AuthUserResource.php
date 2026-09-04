@@ -18,7 +18,8 @@ use Modules\Identity\Public\Enums\Role;
  * Once a user holds the Student role (R02), `student` carries their `Student` anchor
  * — University ID, program, enrollment term, advisor — resolved through the
  * Identity\Public {@see StudentDirectory} facade (ADR-0013), so a newly-admitted user
- * sees their student identity on sign-in. It is `null` for everyone else.
+ * sees their student identity and governing Curriculum Version on sign-in. It is
+ * `null` for everyone else.
  *
  * @mixin User
  */

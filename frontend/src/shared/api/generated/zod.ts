@@ -2690,7 +2690,8 @@ export const LogOutResponse = zod.looseObject({
  * permissions); the SPA's authority source for route guards. Once the user holds
  * the Student role (R02), `student` carries their `Student` anchor — University ID,
  * program, enrollment term, advisor — so a newly-admitted user sees their student
- * identity on sign-in (ADR-0013); it is `null` for everyone who is not a Student.
+ * identity on sign-in (ADR-0013), including the opaque admission-time Curriculum
+ * Version binding (ADR-0034); it is `null` for everyone who is not a Student.
  * @summary Current user.
  */
 export const CurrentUserResponse = zod.object({
@@ -2707,6 +2708,8 @@ export const CurrentUserResponse = zod.object({
   "student": zod.object({
   "university_id": zod.string().optional(),
   "program_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "curriculum_version_binding_source": zod.string().optional(),
   "enrollment_term": zod.string().optional(),
   "admission_cycle_id": zod.number().optional(),
   "advisor_id": zod.number().optional(),

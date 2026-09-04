@@ -4,11 +4,14 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\Catalog\Internal\Enums\ResearchType;
+use Modules\Catalog\Internal\Enums\VersionSubject;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\CourseLevel;
 use Modules\Catalog\Public\Enums\DegreeLevel;
@@ -25,7 +28,7 @@ use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
  */
 class CatalogSeeder extends Seeder
 {
-    public function run(): void
+    public function run(CatalogVersionRecorder $versions): void
     {
         // Three Faculties (FR-PCM-002). FoE is fully built; BAS and CSIT stay shallow.
         $foe = $this->faculty('FoE', 'Faculty of Engineering', 'كلية الهندسة');
@@ -57,6 +60,20 @@ class CatalogSeeder extends Seeder
             $this->department($csit, 'IT', 'Information Technology', 'تكنولوجيا المعلومات'),
             'MSC-IT', 'MSc in Information Technology', 'ماجستير العلوم في تكنولوجيا المعلومات', $sharedPrep,
         );
+
+        // Seeder writes bypass the HTTP management actions that normally record
+        // Catalog history. Give each seeded Program one complete, post-curriculum
+        // snapshot so seeded admissions can bind to a real Curriculum Version.
+        Program::query()->each(function (Program $program) use ($versions): void {
+            $hasVersion = CatalogVersion::query()
+                ->where('subject_type', VersionSubject::Program->value)
+                ->where('subject_id', $program->id)
+                ->exists();
+
+            if (! $hasVersion) {
+                $versions->recordProgram($program, 'created');
+            }
+        });
     }
 
     /**

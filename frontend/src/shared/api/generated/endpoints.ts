@@ -2819,6 +2819,8 @@ export type CurrentUser200DataRolesItem = {
 export type CurrentUser200DataStudent = {
   university_id?: string;
   program_id?: number;
+  curriculum_version_id?: number;
+  curriculum_version_binding_source?: string;
   enrollment_term?: string;
   admission_cycle_id?: number;
   advisor_id?: number;
@@ -13131,7 +13133,8 @@ export const useLogOut = <TError = unknown,
  * permissions); the SPA's authority source for route guards. Once the user holds
  * the Student role (R02), `student` carries their `Student` anchor — University ID,
  * program, enrollment term, advisor — so a newly-admitted user sees their student
- * identity on sign-in (ADR-0013); it is `null` for everyone who is not a Student.
+ * identity on sign-in (ADR-0013), including the opaque admission-time Curriculum
+ * Version binding (ADR-0034); it is `null` for everyone who is not a Student.
  * @summary Current user.
  */
 export const currentUser = (

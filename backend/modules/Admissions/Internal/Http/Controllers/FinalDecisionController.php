@@ -2,6 +2,7 @@
 
 namespace Modules\Admissions\Internal\Http\Controllers;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -201,30 +202,48 @@ class FinalDecisionController
         StudentEnrollment $enrollment,
         Directory $directory,
     ): JsonResource {
-        $programId = $application->primary_program_id;
-        $program = $programId === null ? null : $catalog->find($programId);
+        $result = DB::transaction(function () use (
+            $application,
+            $actorId,
+            $advisorId,
+            $catalog,
+            $enrollment,
+            $directory,
+        ) {
+            $programId = $application->primary_program_id;
+            $program = $programId === null ? null : $catalog->find($programId);
 
-        if ($program === null) {
-            throw ValidationException::withMessages(['action' => __('admissions.decision.no_program')]);
-        }
+            if ($program === null) {
+                throw ValidationException::withMessages(['action' => __('admissions.decision.no_program')]);
+            }
 
-        $resolvedAdvisorId = $this->resolveAdvisor($advisorId, $enrollment, $directory);
-        $cycle = $application->admissionCycle()->firstOrFail();
+            $admittedAt = CarbonImmutable::now();
+            $curriculumVersion = $catalog->curriculumVersionEffectiveAt($program->id, $admittedAt);
+            if ($curriculumVersion === null) {
+                throw ValidationException::withMessages(['action' => __('admissions.decision.no_curriculum_version')]);
+            }
 
-        $command = new AdmitStudent(
-            userId: (int) $application->user_id,
-            actorUserId: $actorId,
-            programId: $program->id,
-            programCode: $program->code,
-            admissionYear: (int) $cycle->year,
-            enrollmentTerm: $cycle->intake_term->value.' '.$cycle->year,
-            admissionCycleId: (int) $application->admission_cycle_id,
-            advisorId: $resolvedAdvisorId,
-            identity: $application->identitySnapshot(),
-        );
+            $resolvedAdvisorId = $this->resolveAdvisor($advisorId, $enrollment, $directory);
+            $cycle = $application->admissionCycle()->firstOrFail();
 
-        // The status change and the mint commit together inside the model (ADR-0013).
-        $result = $application->accept($actorId, $enrollment, $command);
+            $command = new AdmitStudent(
+                userId: (int) $application->user_id,
+                actorUserId: $actorId,
+                programId: $program->id,
+                programCode: $program->code,
+                curriculumVersionId: $curriculumVersion->id,
+                admissionYear: (int) $cycle->year,
+                enrollmentTerm: $cycle->intake_term->value.' '.$cycle->year,
+                admissionCycleId: (int) $application->admission_cycle_id,
+                advisorId: $resolvedAdvisorId,
+                admittedAt: $admittedAt,
+                identity: $application->identitySnapshot(),
+            );
+
+            // Application::accept joins this transaction, so version resolution, status,
+            // Student anchor and role swap commit or roll back as one decision.
+            return $application->accept($actorId, $enrollment, $command);
+        });
 
         // Side-effect only, after the mint commits: the acceptance notification (ADR-0013).
         Event::dispatch(new AdmissionAccepted(

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Modules\Identity\Public\Enums\CurriculumVersionBindingSource;
 use Modules\Identity\Public\StudentSummary;
 
 /**
@@ -23,6 +24,8 @@ use Modules\Identity\Public\StudentSummary;
  * @property int $user_id
  * @property string $university_id
  * @property int $program_id
+ * @property int $curriculum_version_id
+ * @property CurriculumVersionBindingSource $curriculum_version_binding_source
  * @property string $enrollment_term
  * @property int $admission_cycle_id
  * @property int $advisor_id
@@ -46,6 +49,8 @@ class Student extends Model
         'user_id',
         'university_id',
         'program_id',
+        'curriculum_version_id',
+        'curriculum_version_binding_source',
         'enrollment_term',
         'admission_cycle_id',
         'advisor_id',
@@ -64,6 +69,8 @@ class Student extends Model
         return [
             'user_id' => 'integer',
             'program_id' => 'integer',
+            'curriculum_version_id' => 'integer',
+            'curriculum_version_binding_source' => CurriculumVersionBindingSource::class,
             'admission_cycle_id' => 'integer',
             'advisor_id' => 'integer',
             'date_of_birth' => 'date',

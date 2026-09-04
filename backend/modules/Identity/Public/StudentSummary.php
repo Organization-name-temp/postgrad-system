@@ -4,6 +4,7 @@ namespace Modules\Identity\Public;
 
 use Illuminate\Support\Carbon;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Enums\CurriculumVersionBindingSource;
 
 /**
  * A read-only view of the `Student` anchor for consumers outside Identity
@@ -23,6 +24,8 @@ final readonly class StudentSummary
         public int $userId,
         public string $universityId,
         public int $programId,
+        public int $curriculumVersionId,
+        public CurriculumVersionBindingSource $curriculumVersionBindingSource,
         public string $enrollmentTerm,
         public int $admissionCycleId,
         public int $advisorId,
@@ -33,13 +36,15 @@ final readonly class StudentSummary
      * The public array shape for the `/me` payload — the single home for how a
      * Student anchor is exposed to the SPA.
      *
-     * @return array{university_id: string, program_id: int, enrollment_term: string, admission_cycle_id: int, advisor_id: int, admitted_at: string}
+     * @return array{university_id: string, program_id: int, curriculum_version_id: int, curriculum_version_binding_source: string, enrollment_term: string, admission_cycle_id: int, advisor_id: int, admitted_at: string}
      */
     public function toArray(): array
     {
         return [
             'university_id' => $this->universityId,
             'program_id' => $this->programId,
+            'curriculum_version_id' => $this->curriculumVersionId,
+            'curriculum_version_binding_source' => $this->curriculumVersionBindingSource->value,
             'enrollment_term' => $this->enrollmentTerm,
             'admission_cycle_id' => $this->admissionCycleId,
             'advisor_id' => $this->advisorId,

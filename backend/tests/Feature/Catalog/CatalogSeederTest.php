@@ -2,6 +2,7 @@
 
 use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Faculty;
@@ -111,4 +112,23 @@ it('seeds idempotently', function () {
 
     expect(Faculty::count())->toBe($faculties);
     expect(Course::count())->toBe($courses);
+});
+
+it('gives every seeded Program an idempotent full Curriculum Version', function () {
+    $this->seed(CatalogSeeder::class);
+
+    Program::query()->each(function (Program $program): void {
+        $versions = CatalogVersion::query()
+            ->where('subject_type', 'program')
+            ->where('subject_id', $program->id)
+            ->get();
+
+        expect($versions)->toHaveCount(1)
+            ->and($versions->firstOrFail()->snapshot['curriculum'])->not->toBeEmpty();
+    });
+
+    $versionCount = CatalogVersion::query()->where('subject_type', 'program')->count();
+    $this->seed(CatalogSeeder::class);
+
+    expect(CatalogVersion::query()->where('subject_type', 'program')->count())->toBe($versionCount);
 });

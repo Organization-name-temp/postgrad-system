@@ -87,6 +87,10 @@ export const en = {
       title: 'Dashboard',
       universityId: 'University ID',
       enrollmentTerm: 'Enrolled {{term}}',
+      curriculumVersion: 'Curriculum Version',
+      curriculumVersionValue: 'Version #<id>{{id}}</id>',
+      curriculumVersionFallback:
+        'This record uses the earliest available version because Catalog history starts after admission.',
       noCards: 'There is nothing waiting for you here yet.',
     },
   },

@@ -83,6 +83,10 @@ export const ar = {
       title: 'لوحة التحكم',
       universityId: 'الرقم الجامعي',
       enrollmentTerm: 'التحق في {{term}}',
+      curriculumVersion: 'إصدار الخطة الدراسية',
+      curriculumVersionValue: 'الإصدار رقم <id>{{id}}</id>',
+      curriculumVersionFallback:
+        'يستخدم هذا السجل أقدم إصدار متاح لأن سجل الدليل الأكاديمي يبدأ بعد القبول.',
       noCards: 'لا يوجد ما ينتظرك هنا بعد.',
     },
   },

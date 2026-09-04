@@ -1,16 +1,24 @@
 <?php
 
+use Carbon\CarbonInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Catalog\Internal\Enums\VersionSubject;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Catalog\Public\ProgramCurriculumVersion;
+use Modules\Catalog\Public\ProgramSummary;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
@@ -43,6 +51,13 @@ function decidableApplication(Faculty $faculty, array $overrides = []): array
     $program = Program::factory()->create([
         'department_id' => $department->id,
         'degree_level' => DegreeLevel::MSc,
+    ]);
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 1,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => now()->subMinute(),
     ]);
     $application = Application::factory()->interviewScheduled()->create(array_merge([
         'status' => ApplicationStatus::InterviewCompleted,
@@ -140,6 +155,141 @@ it('surfaces the University ID and Student role on /me after acceptance', functi
         ->assertJsonPath('data.student.advisor_id', fn ($value) => is_int($value));
 });
 
+it('binds the accepted Student to the Program Curriculum Version effective at admission', function () {
+    $admittedAt = Carbon::parse('2026-09-04 10:00:00');
+    $this->travelTo($admittedAt);
+
+    $faculty = Faculty::factory()->create();
+    [$application, $applicant, $program] = decidableApplication($faculty);
+    decisionAdvisor();
+
+    CatalogVersion::query()
+        ->where('subject_type', VersionSubject::Program->value)
+        ->where('subject_id', $program->id)
+        ->delete();
+
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 1,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt->copy()->subDay(),
+    ]);
+    $effective = CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 2,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt,
+    ]);
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 3,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt->copy()->addSecond(),
+    ]);
+
+    Sanctum::actingAs(decidingDean($faculty));
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertOk();
+
+    $this->assertDatabaseHas('students', [
+        'user_id' => $applicant->id,
+        'curriculum_version_id' => $effective->id,
+        'curriculum_version_binding_source' => 'admission_time',
+    ]);
+
+    Sanctum::actingAs(User::findOrFail($applicant->id));
+    $this->getJson('/api/v1/me')
+        ->assertOk()
+        ->assertJsonPath('data.student.curriculum_version_id', (int) $effective->id)
+        ->assertJsonPath('data.student.curriculum_version_binding_source', 'admission_time');
+});
+
+it('resolves the admission Curriculum Version inside the acceptance transaction', function () {
+    $faculty = Faculty::factory()->create();
+    [$application] = decidableApplication($faculty);
+    decisionAdvisor();
+
+    $transaction = (object) [
+        'baseline' => DB::transactionLevel(),
+        'level' => 0,
+    ];
+    $catalog = app(ProgramCatalog::class);
+    app()->instance(ProgramCatalog::class, new class($catalog, $transaction) implements ProgramCatalog
+    {
+        public function __construct(
+            private readonly ProgramCatalog $catalog,
+            private readonly object $transaction,
+        ) {}
+
+        public function find(int $id): ?ProgramSummary
+        {
+            return $this->catalog->find($id);
+        }
+
+        public function findMany(array $ids): array
+        {
+            return $this->catalog->findMany($ids);
+        }
+
+        public function curriculumVersionEffectiveAt(int $programId, CarbonInterface $at): ?ProgramCurriculumVersion
+        {
+            $this->transaction->level = DB::transactionLevel();
+
+            return $this->catalog->curriculumVersionEffectiveAt($programId, $at);
+        }
+
+        public function earliestCurriculumVersion(int $programId): ?ProgramCurriculumVersion
+        {
+            return $this->catalog->earliestCurriculumVersion($programId);
+        }
+    });
+
+    Sanctum::actingAs(decidingDean($faculty));
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertOk();
+
+    expect($transaction->level)->toBeGreaterThan($transaction->baseline);
+});
+
+it('rejects acceptance atomically when the Program has no usable Curriculum Version', function () {
+    $faculty = Faculty::factory()->create();
+    [$application, $applicant, $program] = decidableApplication($faculty);
+    decisionAdvisor();
+    CatalogVersion::query()
+        ->where('subject_type', VersionSubject::Program->value)
+        ->where('subject_id', $program->id)
+        ->delete();
+    Sanctum::actingAs(decidingDean($faculty));
+
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('action')
+        ->assertJsonPath(
+            'errors.action.0',
+            'The selected program has no Curriculum Version available for admission.',
+        );
+
+    expect($application->fresh()->status)->toBe(ApplicationStatus::InterviewCompleted)
+        ->and($applicant->fresh()->hasRole(Role::Applicant))->toBeTrue()
+        ->and($applicant->fresh()->hasRole(Role::Student))->toBeFalse();
+    $this->assertDatabaseMissing('students', ['user_id' => $applicant->id]);
+    $this->assertDatabaseMissing('audit_log', ['action' => 'student.admitted']);
+
+    $this->postJson(
+        "/api/v1/dean/applications/{$application->id}/decide",
+        ['action' => 'accept'],
+        ['Accept-Language' => 'ar'],
+    )
+        ->assertUnprocessable()
+        ->assertJsonPath(
+            'errors.action.0',
+            'لا يحتوي البرنامج المحدد على إصدار خطة دراسية متاح للقبول.',
+        );
+});
+
 it('dispatches the AdmissionAccepted event on acceptance', function () {
     Event::fake([AdmissionAccepted::class]);
 
@@ -160,6 +310,13 @@ it('mints per-(year, program) University IDs that increment and are unique', fun
     $faculty = Faculty::factory()->create();
     $department = Department::factory()->create(['faculty_id' => $faculty->id]);
     $program = Program::factory()->create(['department_id' => $department->id, 'degree_level' => DegreeLevel::MSc]);
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 1,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => now()->subMinute(),
+    ]);
     // One shared Cycle, so both admissions land in the same (year, program) bucket and
     // the sequence increments rather than restarting.
     $cycle = AdmissionCycle::factory()->open()->create();

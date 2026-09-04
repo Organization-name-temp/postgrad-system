@@ -9535,7 +9535,7 @@ paths:
     get:
       summary: 'Current user.'
       operationId: currentUser
-      description: "The authenticated user + roles (and, from ticket 05, effective\npermissions); the SPA's authority source for route guards. Once the user holds\nthe Student role (R02), `student` carries their `Student` anchor — University ID,\nprogram, enrollment term, advisor — so a newly-admitted user sees their student\nidentity on sign-in (ADR-0013); it is `null` for everyone who is not a Student."
+      description: "The authenticated user + roles (and, from ticket 05, effective\npermissions); the SPA's authority source for route guards. Once the user holds\nthe Student role (R02), `student` carries their `Student` anchor — University ID,\nprogram, enrollment term, advisor — so a newly-admitted user sees their student\nidentity on sign-in (ADR-0013), including the opaque admission-time Curriculum\nVersion binding (ADR-0034); it is `null` for everyone who is not a Student."
       parameters: []
       responses:
         200:
@@ -9566,6 +9566,8 @@ paths:
                     student:
                       university_id: 2026-MSC-CE-0001
                       program_id: 1
+                      curriculum_version_id: 12
+                      curriculum_version_binding_source: admission_time
                       enrollment_term: 'Fall 2026'
                       admission_cycle_id: 1
                       advisor_id: 3
@@ -9622,6 +9624,12 @@ paths:
                           program_id:
                             type: integer
                             example: 1
+                          curriculum_version_id:
+                            type: integer
+                            example: 12
+                          curriculum_version_binding_source:
+                            type: string
+                            example: admission_time
                           enrollment_term:
                             type: string
                             example: 'Fall 2026'

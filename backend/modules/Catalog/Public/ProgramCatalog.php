@@ -2,6 +2,7 @@
 
 namespace Modules\Catalog\Public;
 
+use Carbon\CarbonInterface;
 use Modules\Catalog\CatalogServiceProvider;
 
 /**
@@ -35,4 +36,13 @@ interface ProgramCatalog
      * @return array<int, ProgramSummary>
      */
     public function findMany(array $ids): array;
+
+    /**
+     * The latest immutable Program Curriculum Version effective at or before the
+     * supplied timestamp, or `null` when the Program has no such history.
+     */
+    public function curriculumVersionEffectiveAt(int $programId, CarbonInterface $at): ?ProgramCurriculumVersion;
+
+    /** The earliest immutable Program Curriculum Version, for deterministic legacy fallback. */
+    public function earliestCurriculumVersion(int $programId): ?ProgramCurriculumVersion;
 }

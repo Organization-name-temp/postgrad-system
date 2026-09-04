@@ -10,6 +10,7 @@ use Modules\Identity\Internal\Assignments\EloquentDeanAssignments;
 use Modules\Identity\Internal\Assignments\EloquentDepartmentHeadAssignments;
 use Modules\Identity\Internal\Audit\EloquentAuditLogger;
 use Modules\Identity\Internal\Directory\EloquentDirectory;
+use Modules\Identity\Internal\Enrollment\EloquentStudentCurriculumBindings;
 use Modules\Identity\Internal\Enrollment\EloquentStudentDirectory;
 use Modules\Identity\Internal\Enrollment\EloquentStudentEnrollment;
 use Modules\Identity\Internal\Http\Middleware\EnsureAdministrator;
@@ -23,6 +24,7 @@ use Modules\Identity\Public\Contracts\DeanAssignments;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\EmailVerifier;
+use Modules\Identity\Public\Contracts\StudentCurriculumBindings;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\Contracts\StudentEnrollment;
 use Modules\Identity\Public\Enums\Permission;
@@ -39,6 +41,7 @@ class IdentityServiceProvider extends ServiceProvider
         $this->app->bind(Directory::class, EloquentDirectory::class);
         $this->app->bind(StudentEnrollment::class, EloquentStudentEnrollment::class);
         $this->app->bind(StudentDirectory::class, EloquentStudentDirectory::class);
+        $this->app->bind(StudentCurriculumBindings::class, EloquentStudentCurriculumBindings::class);
     }
 
     public function boot(Router $router): void

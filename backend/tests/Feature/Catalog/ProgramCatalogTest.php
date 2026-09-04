@@ -1,11 +1,15 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Modules\Catalog\Internal\Enums\VersionSubject;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Catalog\Public\ProgramCurriculumVersion;
 use Modules\Catalog\Public\ProgramSummary;
 
 uses(RefreshDatabase::class);
@@ -68,4 +72,40 @@ it('resolves several ids at once, keyed by id, omitting the missing ones', funct
 
 it('returns an empty array when asked for no ids', function () {
     expect(programCatalog()->findMany([]))->toBe([]);
+});
+
+it('resolves the latest Program Curriculum Version effective at a timestamp', function () {
+    $program = Program::factory()->create();
+    $admittedAt = Carbon::parse('2026-09-04 10:00:00');
+
+    $older = CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 1,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt->copy()->subDay(),
+    ]);
+    $effective = CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 2,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt,
+    ]);
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 3,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt->copy()->addSecond(),
+    ]);
+
+    $version = programCatalog()->curriculumVersionEffectiveAt($program->id, $admittedAt);
+
+    expect($version)->toBeInstanceOf(ProgramCurriculumVersion::class)
+        ->and($version->id)->toBe((int) $effective->id)
+        ->and($version->programId)->toBe((int) $program->id)
+        ->and($version->versionNo)->toBe(2)
+        ->and($version->changedAt->equalTo($admittedAt))->toBeTrue()
+        ->and($version->id)->not->toBe((int) $older->id);
 });

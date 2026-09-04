@@ -25,6 +25,7 @@ use Modules\Admissions\Internal\Models\InterviewSlot;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\AdmitStudent;
@@ -409,15 +410,24 @@ class AdmissionsSeeder extends Seeder
         string $nationalId,
         Gender $gender,
     ): void {
+        $admittedAt = Carbon::now()->toImmutable();
+        $curriculumVersion = app(ProgramCatalog::class)
+            ->curriculumVersionEffectiveAt((int) $program->getKey(), $admittedAt);
+        if ($curriculumVersion === null) {
+            throw new \RuntimeException("Seed Program {$program->code} has no Curriculum Version.");
+        }
+
         $result = app(StudentEnrollment::class)->admit(new AdmitStudent(
             userId: (int) $application->user_id,
             actorUserId: $deanId,
             programId: $program->getKey(),
             programCode: $program->code,
+            curriculumVersionId: $curriculumVersion->id,
             admissionYear: (int) $cycle->year,
             enrollmentTerm: $cycle->intake_term->value.' '.$cycle->year,
             admissionCycleId: $cycle->getKey(),
             advisorId: $advisorId,
+            admittedAt: $admittedAt,
             identity: new StudentIdentity(
                 nameEn: $nameEn,
                 nameAr: $nameAr,

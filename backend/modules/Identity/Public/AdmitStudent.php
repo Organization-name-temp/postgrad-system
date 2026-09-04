@@ -2,6 +2,7 @@
 
 namespace Modules\Identity\Public;
 
+use Carbon\CarbonImmutable;
 use Modules\Identity\Public\Contracts\StudentEnrollment;
 
 /**
@@ -25,10 +26,12 @@ final readonly class AdmitStudent
         public ?int $actorUserId,
         public int $programId,
         public string $programCode,
+        public int $curriculumVersionId,
         public int $admissionYear,
         public string $enrollmentTerm,
         public int $admissionCycleId,
         public int $advisorId,
+        public CarbonImmutable $admittedAt,
         public StudentIdentity $identity,
     ) {}
 }

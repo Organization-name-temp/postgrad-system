@@ -2,9 +2,14 @@
 
 namespace Modules\Catalog\Internal\Support;
 
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Modules\Catalog\CatalogServiceProvider;
+use Modules\Catalog\Internal\Enums\VersionSubject;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Catalog\Public\ProgramCurriculumVersion;
 use Modules\Catalog\Public\ProgramSummary;
 
 /**
@@ -40,6 +45,45 @@ class EloquentProgramCatalog implements ProgramCatalog
             ->get()
             ->mapWithKeys(fn (Program $program): array => [$program->getKey() => $this->toSummary($program)])
             ->all();
+    }
+
+    public function curriculumVersionEffectiveAt(int $programId, CarbonInterface $at): ?ProgramCurriculumVersion
+    {
+        $version = CatalogVersion::query()
+            ->where('subject_type', VersionSubject::Program->value)
+            ->where('subject_id', $programId)
+            ->where('changed_at', '<=', $at)
+            ->orderByDesc('changed_at')
+            ->orderByDesc('version_no')
+            ->first();
+
+        return $this->toCurriculumVersion($version);
+    }
+
+    public function earliestCurriculumVersion(int $programId): ?ProgramCurriculumVersion
+    {
+        $version = CatalogVersion::query()
+            ->where('subject_type', VersionSubject::Program->value)
+            ->where('subject_id', $programId)
+            ->orderBy('changed_at')
+            ->orderBy('version_no')
+            ->first();
+
+        return $this->toCurriculumVersion($version);
+    }
+
+    private function toCurriculumVersion(?CatalogVersion $version): ?ProgramCurriculumVersion
+    {
+        if ($version === null) {
+            return null;
+        }
+
+        return new ProgramCurriculumVersion(
+            id: (int) $version->getKey(),
+            programId: $version->subject_id,
+            versionNo: $version->version_no,
+            changedAt: CarbonImmutable::instance($version->changed_at),
+        );
     }
 
     private function toSummary(Program $program): ProgramSummary

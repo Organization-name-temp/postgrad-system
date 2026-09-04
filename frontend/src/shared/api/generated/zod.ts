@@ -280,6 +280,18 @@ export const MyApplicationResponse = zod.object({
   "graduation_cgpa": zod.string().optional(),
   "gpa_scale": zod.string().optional(),
   "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "previous_ejust_program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
   "applying_for_degree": zod.string().optional(),
   "english_test": zod.string().optional(),
   "english_score": zod.string().optional(),
@@ -352,6 +364,7 @@ export const SaveStep1partialBody = zod.object({
   "graduation_cgpa": zod.number().optional().describe('Graduation CGPA.'),
   "gpa_scale": zod.string().optional().describe('One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'),
   "is_ejust_graduate": zod.boolean().optional().describe('Whether the applicant graduated from E-JUST.'),
+  "previous_ejust_program_id": zod.number().optional().describe('Previous E-JUST MSc Program; required for an E-JUST MSc graduate.'),
   "applying_for_degree": zod.string().optional().describe('Degree applied for; one of MSc, PhD.'),
   "english_test": zod.string().optional().describe('English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'),
   "english_score": zod.number().optional().describe('Score for the chosen test; required unless the test is None.'),
@@ -398,6 +411,7 @@ export const SubmitStep1Body = zod.object({
   "graduation_cgpa": zod.number().describe('Graduation CGPA.'),
   "gpa_scale": zod.string().describe('One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100.'),
   "is_ejust_graduate": zod.boolean().describe('Whether the applicant graduated from E-JUST.'),
+  "previous_ejust_program_id": zod.number().optional().describe('Previous E-JUST MSc Program; required for an E-JUST MSc graduate.'),
   "applying_for_degree": zod.string().describe('Degree applied for; one of MSc, PhD.'),
   "english_test": zod.string().describe('English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None.'),
   "english_score": zod.number().optional().describe('Score for the chosen test; required unless the test is None.'),
@@ -2636,6 +2650,28 @@ export const DeactivateACourseResponse = zod.object({
   "total_ch": zod.number().optional(),
   "is_active": zod.boolean().optional()
 }).optional()
+})
+
+
+/**
+ * The acting Student's immutable automatic Preparatory Exemption decisions,
+ * available before composing a Registration Request.
+ * @summary My effective Exemptions.
+ */
+export const MyEffectiveExemptionsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "source": zod.string().optional(),
+  "reason_codes": zod.array(zod.string()).optional(),
+  "admission_application_id": zod.number().optional(),
+  "approved_at": zod.string().optional()
+})).optional()
 })
 
 

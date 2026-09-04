@@ -3,9 +3,14 @@
 namespace Modules\Catalog\Internal\Support;
 
 use Modules\Catalog\CatalogServiceProvider;
+use Modules\Catalog\Internal\Enums\VersionSubject;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
+use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Catalog\Public\CurriculumEntrySummary;
+use Modules\Catalog\Public\Enums\CourseCategory;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 
 /**
  * The Eloquent-backed {@see CurriculumCatalog}. It reads Catalog's own
@@ -33,6 +38,50 @@ class EloquentCurriculumCatalog implements CurriculumCatalog
                 ),
             ])
             ->all();
+    }
+
+    /** @return list<BoundCurriculumEntrySummary> */
+    public function entriesForVersion(int $curriculumVersionId): array
+    {
+        $version = CatalogVersion::query()->find($curriculumVersionId);
+        if ($version === null || $version->subject_type !== VersionSubject::Program) {
+            return [];
+        }
+
+        $curriculum = $version->snapshot['curriculum'] ?? [];
+        if (! is_array($curriculum)) {
+            return [];
+        }
+
+        $entries = [];
+        foreach ($curriculum as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $category = CourseCategory::tryFrom((string) ($row['category'] ?? ''));
+            if ($category === null) {
+                continue;
+            }
+
+            $roleValue = $row['preparatory_requirement_role'] ?? null;
+            $entries[] = new BoundCurriculumEntrySummary(
+                curriculumVersionId: (int) $version->getKey(),
+                programId: $version->subject_id,
+                courseId: (int) ($row['course_id'] ?? 0),
+                courseCode: (string) ($row['course_code'] ?? ''),
+                // Preparatory Courses are fixed at 1 CH; snapshots recorded before
+                // this field was introduced therefore remain deterministic.
+                totalCh: (int) ($row['course_total_ch'] ?? ($category === CourseCategory::Preparatory ? 1 : 0)),
+                category: $category,
+                preparatoryRequirementRole: is_string($roleValue)
+                    ? PreparatoryRequirementRole::tryFrom($roleValue)
+                    : null,
+                ordinal: (int) ($row['ordinal'] ?? 0),
+            );
+        }
+
+        return $entries;
     }
 
     /**

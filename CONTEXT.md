@@ -59,8 +59,12 @@ accepted Program's code, and a per-(year, program) sequence. Distinct from the U
 The `Student` record Identity creates at acceptance — 1:1 with a User, holding the
 University ID, the (opaque) Program and admission-time Curriculum Version references,
 enrollment term, assigned Advisor, Student Lifecycle Status, and an identity snapshot. It
-is only the *anchor*; the growing academic record (Enrollments, Grades, Credit-Hour Summary,
-Standing) is owned by later modules and references it by id.
+also holds a typed immutable admission-evidence recovery receipt: Identity stores this
+narrow acceptance-time snapshot opaquely so Enrollment can recover wholly missed
+post-commit exemption handling through `StudentDirectory`; it is not mutable Admissions
+state or an Exemption decision. The Student is only the *anchor*; the growing academic
+record (Enrollments, Grades, Credit-Hour Summary, Standing) is owned by later modules and
+references it by id.
 
 **Student Lifecycle Status**:
 Whether a Student may undertake new academic actions: Active from admission, or Terminated

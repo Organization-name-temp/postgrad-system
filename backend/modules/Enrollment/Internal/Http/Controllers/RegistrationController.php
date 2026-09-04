@@ -34,6 +34,7 @@ use Modules\Enrollment\Internal\Http\Resources\RegistrationRequestResource;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
+use Modules\Enrollment\Internal\Support\AutomaticExemptionReadiness;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
@@ -109,8 +110,10 @@ class RegistrationController
         CourseCatalog $courses,
         Directory $directory,
         EligibilityResolver $eligibility,
+        AutomaticExemptionReadiness $exemptionReadiness,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
+        $exemptionReadiness->ensureReconciled($student);
         $target = $this->resolveRegistrationTarget($calendar);
 
         // No submittable window (neither registration nor late-add) — nothing to classify.
@@ -158,8 +161,10 @@ class RegistrationController
         Directory $directory,
         EligibilityResolver $eligibility,
         Notifier $notifier,
+        AutomaticExemptionReadiness $exemptionReadiness,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
+        $exemptionReadiness->ensureReconciled($student);
 
         $target = $this->resolveRegistrationTarget($calendar);
         if ($target === null) {
@@ -498,9 +503,11 @@ class RegistrationController
         AcademicCalendar $calendar,
         CourseCatalog $courses,
         EligibilityResolver $eligibility,
+        AutomaticExemptionReadiness $exemptionReadiness,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
         $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
+        $exemptionReadiness->ensureReconciled($student);
 
         $target = $this->resolveRegistrationTarget($calendar);
         if ($target === null) {
@@ -547,9 +554,11 @@ class RegistrationController
         CourseCatalog $courses,
         EligibilityResolver $eligibility,
         Notifier $notifier,
+        AutomaticExemptionReadiness $exemptionReadiness,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
         $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
+        $exemptionReadiness->ensureReconciled($student);
 
         $target = $this->resolveRegistrationTarget($calendar);
         if ($target === null) {

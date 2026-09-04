@@ -49,6 +49,7 @@ class EloquentStudentEnrollment implements StudentEnrollment
             'date_of_birth' => $command->identity->dateOfBirth,
             'nationality' => $command->identity->nationality,
             'gender' => $command->identity->gender,
+            'admission_evidence' => $command->admissionEvidence?->toArray(),
             'admitted_at' => $command->admittedAt,
         ]);
 

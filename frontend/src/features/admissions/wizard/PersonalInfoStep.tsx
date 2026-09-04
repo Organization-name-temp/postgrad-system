@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutlineRounded'
 import {
   Alert,
   Autocomplete,
@@ -20,6 +21,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
   getMyApplicationQueryKey,
+  useListPrograms,
   useSaveStep1partial,
   useSubmitStep1,
 } from '../../../shared/api/generated/endpoints'
@@ -29,6 +31,7 @@ import type {
   SubmitStep1Body,
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage, apiFieldErrors } from '../../../shared/api/errors'
+import { pickLocaleName } from '../../../shared/i18n/localeName'
 import {
   APPLYING_DEGREES,
   ENGLISH_SCORE_RANGES,
@@ -79,6 +82,10 @@ function seed(application: MyApplication200Data | undefined): PersonalInfoValues
     graduation_certificate_name: application?.graduation_certificate_name ?? '',
     graduation_date: application?.graduation_date ?? '',
     previous_degree: application?.previous_degree ?? '',
+    previous_ejust_program_id:
+      application?.previous_ejust_program_id != null
+        ? String(application.previous_ejust_program_id)
+        : '',
     previous_major: application?.previous_major ?? '',
     graduation_gpa: application?.graduation_gpa != null ? String(application.graduation_gpa) : '',
     graduation_cgpa:
@@ -110,6 +117,12 @@ function toSubmitBody(form: PersonalInfoValues): SubmitStep1Body {
     graduation_certificate_name: form.graduation_certificate_name,
     graduation_date: form.graduation_date,
     previous_degree: form.previous_degree,
+    previous_ejust_program_id:
+      form.is_ejust_graduate &&
+      form.previous_degree === 'MSc' &&
+      form.previous_ejust_program_id !== ''
+        ? Number(form.previous_ejust_program_id)
+        : undefined,
     previous_major: form.previous_major,
     graduation_gpa: Number(form.graduation_gpa),
     graduation_cgpa: Number(form.graduation_cgpa),
@@ -163,6 +176,13 @@ function toPartialBody(form: PersonalInfoValues): SaveStep1partialBody {
   if (form.english_score !== '' && form.english_test !== ENGLISH_TEST_NONE) {
     body.english_score = Number(form.english_score)
   }
+  if (
+    form.is_ejust_graduate &&
+    form.previous_degree === 'MSc' &&
+    form.previous_ejust_program_id !== ''
+  ) {
+    body.previous_ejust_program_id = Number(form.previous_ejust_program_id)
+  }
   return body
 }
 
@@ -187,6 +207,10 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
 
   const submit = useSubmitStep1()
   const save = useSaveStep1partial()
+  const programsQuery = useListPrograms()
+  const previousEjustPrograms = (programsQuery.data?.data ?? []).filter(
+    (program) => program.degree_level === 'MSc' && program.is_active,
+  )
 
   // The schema carries the live translator, so its messages are localized; rebuilt
   // when the language changes. Typed to the all-string form state (the Zod enum
@@ -347,6 +371,8 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
   )
 
   const englishTest = watch('english_test')
+  const previousDegree = watch('previous_degree')
+  const isEjustGraduate = watch('is_ejust_graduate')
   const scoreDisabled = englishTest === ENGLISH_TEST_NONE
   // A proactive range hint for the score, driven by the chosen test (an IELTS reads
   // "0–9"), falling back to the presence rule when no real test is picked.
@@ -515,6 +541,72 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
         {text('graduation_certificate_name', { required: true })}
         {text('graduation_date', { type: 'date', required: true })}
         {select('previous_degree', PREVIOUS_DEGREES, 'personalInfo.degrees')}
+        {isEjustGraduate && previousDegree === 'MSc' && (
+          <Controller
+            control={control}
+            name="previous_ejust_program_id"
+            render={({ field, fieldState }) => (
+              <Stack spacing={1}>
+                <Autocomplete
+                  options={previousEjustPrograms}
+                  value={
+                    previousEjustPrograms.find((program) => String(program.id) === field.value) ??
+                    null
+                  }
+                  getOptionLabel={(program) =>
+                    pickLocaleName(program, i18n.language, program.code ?? '')
+                  }
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  onChange={(_event, program) =>
+                    field.onChange(program?.id ? String(program.id) : '')
+                  }
+                  onBlur={field.onBlur}
+                  loading={programsQuery.isPending}
+                  loadingText={t('personalInfo.programsLoading')}
+                  noOptionsText={t('personalInfo.noMscPrograms')}
+                  fullWidth
+                  renderInput={(params) => {
+                    const message = fieldState.error?.message
+
+                    return (
+                      <TextField
+                        {...params}
+                        label={t('personalInfo.fields.previous_ejust_program_id')}
+                        required
+                        error={Boolean(message)}
+                        helperText={
+                          message ? (
+                            <Box
+                              component="span"
+                              role="alert"
+                              aria-live="polite"
+                              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}
+                            >
+                              <ErrorOutlineIcon aria-hidden="true" fontSize="inherit" />
+                              {message}
+                            </Box>
+                          ) : undefined
+                        }
+                      />
+                    )
+                  }}
+                />
+                {programsQuery.isError && (
+                  <Alert
+                    severity="error"
+                    action={
+                      <Button color="inherit" onClick={() => void programsQuery.refetch()}>
+                        {t('personalInfo.programsRetry')}
+                      </Button>
+                    }
+                  >
+                    {t('personalInfo.programsLoadError')}
+                  </Alert>
+                )}
+              </Stack>
+            )}
+          />
+        )}
         {text('previous_major', { required: true })}
         {/* The scale comes first: it drives (and unlocks) the GPA/CGPA fields below. */}
         <Controller

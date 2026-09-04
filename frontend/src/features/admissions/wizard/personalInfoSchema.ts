@@ -43,6 +43,7 @@ export interface PersonalInfoValues {
   graduation_certificate_name: string
   graduation_date: string
   previous_degree: string
+  previous_ejust_program_id: string
   previous_major: string
   graduation_gpa: string
   graduation_cgpa: string
@@ -152,6 +153,7 @@ export function buildPersonalInfoSchema(t: Translator) {
       graduation_certificate_name: text(255),
       graduation_date: pastDate(true),
       previous_degree: choice(PREVIOUS_DEGREES),
+      previous_ejust_program_id: z.string(),
       previous_major: text(200),
       graduation_gpa: number(),
       graduation_cgpa: number(),
@@ -164,6 +166,18 @@ export function buildPersonalInfoSchema(t: Translator) {
       native_arabic_speaker: z.boolean(),
     })
     .superRefine((values, ctx) => {
+      if (
+        values.is_ejust_graduate &&
+        values.previous_degree === 'MSc' &&
+        values.previous_ejust_program_id === ''
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['previous_ejust_program_id'],
+          message: t('validation.previousEjustProgramRequired'),
+        })
+      }
+
       // The identifier must match the chosen Identification Type's format — 14 digits
       // for a National ID, 6–9 alphanumeric for a Passport (mirrors the server).
       const id = values.national_id.trim()

@@ -331,6 +331,8 @@ export const en = {
         'Your Incomplete resolution deadline is coming up in {{days_remaining}} day(s).',
       incompleteConverted: 'Your unresolved Incomplete became a Fail Withdrawal.',
       gradesOverdue: 'Grades for {{course_code}} are past the submission deadline.',
+      automaticExemptionApplied:
+        'An automatic preparatory exemption was applied for {{course_code}}.',
       fallback: 'You have a new notification.',
     },
   },
@@ -684,6 +686,7 @@ export const en = {
         graduation_certificate_name: 'Graduation certificate',
         graduation_date: 'Graduation date',
         previous_degree: 'Previous degree',
+        previous_ejust_program_id: 'Previous E-JUST MSc Program',
         previous_major: 'Previous major',
         graduation_gpa: 'Graduation GPA',
         graduation_cgpa: 'Graduation CGPA',
@@ -702,6 +705,10 @@ export const en = {
       gpaHelp: 'On this scale, enter a value from 0 to {{max}}.',
       gpaScaleFirst: 'Choose your GPA scale first.',
       phoneHelp: 'Enter your number without the country code.',
+      programsLoadError: 'Could not load E-JUST MSc Programs. Please try again.',
+      programsLoading: 'Loading E-JUST MSc Programs',
+      noMscPrograms: 'No E-JUST MSc Programs are available.',
+      programsRetry: 'Retry',
       saveContinue: 'Save & continue',
       saveLater: 'Save & finish later',
       back: 'Back',
@@ -724,6 +731,7 @@ export const en = {
       passport: 'A passport is 6–9 letters or digits.',
       phone: 'Enter a valid phone number for the selected country.',
       nationality: 'Choose a country from the list.',
+      previousEjustProgramRequired: 'Choose your previous E-JUST MSc Program.',
     },
     verify: {
       title: 'Verify your email',
@@ -1117,6 +1125,31 @@ export const en = {
       empty: 'There are no courses available for you to register in this semester yet.',
       loading: 'Loading your eligible courses',
       loadError: 'Could not load your eligible courses. Please try again.',
+    },
+    exemptions: {
+      title: 'Preparatory exemptions',
+      intro:
+        'These exemptions were applied automatically from your accepted admission evidence and already count toward your bound curriculum.',
+      loadError: 'Could not load your preparatory exemptions. Please try again.',
+      pending: 'Your admission exemptions are still being reconciled. Retry before registering.',
+      loading: 'Loading your preparatory exemptions',
+      empty: 'No automatic preparatory exemptions were applied.',
+      retry: 'Retry',
+      items: {
+        EnglishLanguage: '<code>{{course}}</code> — English · <hours>{{count}} CH</hours>',
+        ArabicLanguage: '<code>{{course}}</code> — Arabic language · <hours>{{count}} CH</hours>',
+        JapaneseLanguage:
+          '<code>{{course}}</code> — Japanese language · <hours>{{count}} CH</hours>',
+        JapaneseCulture: '<code>{{course}}</code> — Japanese culture · <hours>{{count}} CH</hours>',
+        KeySkills: '<code>{{course}}</code> — Key skills · <hours>{{count}} CH</hours>',
+        DepartmentalRequirement:
+          '<code>{{course}}</code> — Departmental requirement · <hours>{{count}} CH</hours>',
+      },
+      reasons: {
+        english_proficiency: 'English proficiency evidence met the exemption threshold.',
+        same_department_ejust_msc: 'Your previous E-JUST MSc Program is in the same Department.',
+        ejust_bsc: 'Your E-JUST BSc evidence qualifies for this exemption.',
+      },
     },
     classifications: {
       Preparatory: 'Preparatory courses',

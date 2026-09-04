@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\AttendanceController;
 use Modules\Enrollment\Internal\Http\Controllers\DashboardCardController;
+use Modules\Enrollment\Internal\Http\Controllers\ExemptionDecisionController;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
@@ -66,6 +67,10 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
     // (ADR-0024): the client composes Cards as a UX mirror only.
     Route::get('/enrollment/cards/my-registration', [DashboardCardController::class, 'myRegistration'])
         ->middleware('role:R02');
+});
+
+Route::middleware(['auth:sanctum', 'can:exemption.submit', 'role:R02'])->group(function () {
+    Route::get('/credit-decisions/exemptions', [ExemptionDecisionController::class, 'index']);
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {

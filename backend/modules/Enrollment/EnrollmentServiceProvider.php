@@ -2,8 +2,12 @@
 
 namespace Modules\Enrollment;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
+use Modules\Enrollment\Internal\Console\Commands\ReconcileAutomaticExemptions;
+use Modules\Enrollment\Internal\Listeners\ApplyAutomaticPreparatoryExemptions;
 use Modules\Enrollment\Internal\Support\EloquentEnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentRecords;
 
@@ -32,6 +36,12 @@ class EnrollmentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
+
+        Event::listen(AdmissionAccepted::class, ApplyAutomaticPreparatoryExemptions::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([ReconcileAutomaticExemptions::class]);
+        }
 
         // The module owns its /api/v1 routes (ADR-0002). Authorization gates are
         // already registered from the §3.2 matrix by Identity (ADR-0008); Enrollment

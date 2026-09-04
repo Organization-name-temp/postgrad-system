@@ -30,6 +30,7 @@ final readonly class StudentSummary
         public int $admissionCycleId,
         public int $advisorId,
         public Carbon $admittedAt,
+        public ?AdmissionEvidenceSnapshot $admissionEvidence = null,
     ) {}
 
     /**

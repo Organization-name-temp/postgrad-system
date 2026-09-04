@@ -3,6 +3,7 @@
 namespace Modules\Identity\Internal\Enrollment;
 
 use Modules\Identity\Internal\Models\Student;
+use Modules\Identity\Public\AdmissionEvidenceSnapshot;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
 
@@ -85,6 +86,9 @@ class EloquentStudentDirectory implements StudentDirectory
             admissionCycleId: $student->admission_cycle_id,
             advisorId: $student->advisor_id,
             admittedAt: $student->admitted_at,
+            admissionEvidence: $student->admission_evidence === null
+                ? null
+                : AdmissionEvidenceSnapshot::fromArray($student->admission_evidence),
         );
     }
 }

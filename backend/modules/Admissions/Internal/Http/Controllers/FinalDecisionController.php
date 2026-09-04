@@ -12,13 +12,14 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
-use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Concerns\ScopesToDeanFaculty;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Internal\Support\AdmissionAcceptanceEvidenceFactory;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\AdmitStudent;
 use Modules\Identity\Public\Contracts\DeanAssignments;
@@ -139,6 +140,7 @@ class FinalDecisionController
         StudentEnrollment $enrollment,
         Directory $directory,
         Notifier $notifier,
+        AdmissionAcceptanceEvidenceFactory $evidenceFactory,
     ): JsonResource {
         $validated = $request->validate([
             'action' => ['required', 'string', Rule::in(['accept', 'conditional', 'waitlist', 'reject'])],
@@ -158,7 +160,7 @@ class FinalDecisionController
         if ($validated['action'] === 'accept') {
             $advisorId = $request->filled('advisor_id') ? (int) $request->input('advisor_id') : null;
 
-            return $this->accept($application, $actorId, $advisorId, $catalog, $enrollment, $directory);
+            return $this->accept($application, $actorId, $advisorId, $catalog, $enrollment, $directory, $evidenceFactory);
         }
 
         // The held (conditional/waitlist) and terminal-reject outcomes: a guarded status
@@ -201,6 +203,7 @@ class FinalDecisionController
         ProgramCatalog $catalog,
         StudentEnrollment $enrollment,
         Directory $directory,
+        AdmissionAcceptanceEvidenceFactory $evidenceFactory,
     ): JsonResource {
         $result = DB::transaction(function () use (
             $application,
@@ -209,6 +212,7 @@ class FinalDecisionController
             $catalog,
             $enrollment,
             $directory,
+            $evidenceFactory,
         ) {
             $programId = $application->primary_program_id;
             $program = $programId === null ? null : $catalog->find($programId);
@@ -225,6 +229,7 @@ class FinalDecisionController
 
             $resolvedAdvisorId = $this->resolveAdvisor($advisorId, $enrollment, $directory);
             $cycle = $application->admissionCycle()->firstOrFail();
+            $evidenceFacts = $evidenceFactory->facts($application, $program);
 
             $command = new AdmitStudent(
                 userId: (int) $application->user_id,
@@ -238,22 +243,27 @@ class FinalDecisionController
                 advisorId: $resolvedAdvisorId,
                 admittedAt: $admittedAt,
                 identity: $application->identitySnapshot(),
+                admissionEvidence: $evidenceFacts,
             );
 
             // Application::accept joins this transaction, so version resolution, status,
             // Student anchor and role swap commit or roll back as one decision.
-            return $application->accept($actorId, $enrollment, $command);
+            return [
+                $application->accept($actorId, $enrollment, $command),
+                $evidenceFacts,
+            ];
         });
+
+        [$admittedStudent, $evidenceFacts] = $result;
 
         // Side-effect only, after the mint commits: the acceptance notification (ADR-0013).
         Event::dispatch(new AdmissionAccepted(
-            userId: (int) $application->user_id,
-            applicationId: (int) $application->getKey(),
-            universityId: $result->universityId,
+            evidence: $evidenceFactory->fromFacts($admittedStudent->studentId, $evidenceFacts),
+            universityId: $admittedStudent->universityId,
         ));
 
         return (new ApplicationResource($application))
-            ->additional(['meta' => ['university_id' => $result->universityId]]);
+            ->additional(['meta' => ['university_id' => $admittedStudent->universityId]]);
     }
 
     /**

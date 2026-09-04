@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Catalog\Internal\Models\Department;
+use Modules\Catalog\Internal\Models\Faculty;
+use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\Enums\DegreeLevel;
 
 uses(RefreshDatabase::class);
 
@@ -135,6 +139,47 @@ it('refuses to submit Step 1 until the snapshot is complete', function () {
     test()->postJson('/api/v1/application/submit', ['name_en' => 'Sara Applicant'])
         ->assertStatus(422)
         ->assertJsonValidationErrors(['name_ar', 'national_id', 'gender', 'previous_degree']);
+});
+
+it('captures a structured previous E-JUST MSc Program for exemption evidence', function () {
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    $faculty = Faculty::factory()->create();
+    $department = Department::factory()->create(['faculty_id' => $faculty->id]);
+    $previousProgram = Program::factory()->create([
+        'department_id' => $department->id,
+        'degree_level' => DegreeLevel::MSc,
+    ]);
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'is_ejust_graduate' => true,
+        'previous_degree' => 'MSc',
+        'applying_for_degree' => 'PhD',
+        'previous_ejust_program_id' => $previousProgram->id,
+    ]))
+        ->assertOk()
+        ->assertJsonPath('data.previous_ejust_program_id', $previousProgram->id)
+        ->assertJsonPath('data.previous_ejust_program.id', $previousProgram->id);
+
+    $this->assertDatabaseHas('applications', [
+        'user_id' => $user->id,
+        'previous_ejust_program_id' => $previousProgram->id,
+    ]);
+});
+
+it('requires a valid MSc Program when an E-JUST MSc graduate submits', function () {
+    [$user] = draftApplicant();
+    Sanctum::actingAs($user);
+
+    test()->postJson('/api/v1/application/submit', snapshotPayload([
+        'is_ejust_graduate' => true,
+        'previous_degree' => 'MSc',
+        'applying_for_degree' => 'PhD',
+        'previous_ejust_program_id' => null,
+    ]))
+        ->assertStatus(422)
+        ->assertJsonValidationErrors('previous_ejust_program_id');
 });
 
 it('rejects a National ID that is not exactly 14 digits', function () {

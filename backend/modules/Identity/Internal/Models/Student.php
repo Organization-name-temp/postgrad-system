@@ -35,6 +35,7 @@ use Modules\Identity\Public\StudentSummary;
  * @property Carbon $date_of_birth
  * @property string $nationality
  * @property string $gender
+ * @property array<string, mixed>|null $admission_evidence
  * @property Carbon $admitted_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -60,6 +61,7 @@ class Student extends Model
         'date_of_birth',
         'nationality',
         'gender',
+        'admission_evidence',
         'admitted_at',
     ];
 
@@ -75,6 +77,7 @@ class Student extends Model
             'advisor_id' => 'integer',
             'date_of_birth' => 'date',
             'admitted_at' => 'datetime',
+            'admission_evidence' => 'array',
         ];
     }
 

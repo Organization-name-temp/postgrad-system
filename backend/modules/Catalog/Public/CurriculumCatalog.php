@@ -35,6 +35,14 @@ interface CurriculumCatalog
     public function entriesForProgram(int $programId): array;
 
     /**
+     * The entries frozen into one immutable Program Curriculum Version. A missing
+     * or non-Program version yields an empty list.
+     *
+     * @return list<BoundCurriculumEntrySummary>
+     */
+    public function entriesForVersion(int $curriculumVersionId): array;
+
+    /**
      * For each given Course id, the ids of the **active graduate** Programs whose
      * Curriculum contains it — the lookup behind the External-Elective test (BR-24, BR-26).
      * A Course id with no such Program is absent from the result. All Programs are

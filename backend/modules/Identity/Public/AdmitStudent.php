@@ -33,5 +33,6 @@ final readonly class AdmitStudent
         public int $advisorId,
         public CarbonImmutable $admittedAt,
         public StudentIdentity $identity,
+        public ?AdmissionEvidenceSnapshot $admissionEvidence = null,
     ) {}
 }

@@ -24,6 +24,7 @@ use Modules\Notifications\Public\Enums\NotificationType;
  * @property int $user_id
  * @property NotificationType $type
  * @property array<string, mixed>|null $data
+ * @property string|null $deduplication_key
  * @property Carbon|null $read_at
  * @property Carbon $created_at
  */
@@ -40,6 +41,7 @@ class Notification extends Model
         'user_id',
         'type',
         'data',
+        'deduplication_key',
         'read_at',
         'created_at',
     ];

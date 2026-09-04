@@ -14,6 +14,7 @@ return [
         'gpa_above_scale' => 'لا يمكن أن يتجاوز المعدل الحد الأقصى للمقياس المختار وهو :ceiling.',
         'english_score_out_of_range' => 'يجب أن تكون درجة :test بين :min و :max.',
         'english_score_not_allowed' => 'الاختبار المحدد لا يتطلب درجة.',
+        'invalid_previous_ejust_program' => 'اختر برنامج ماجستير سابقًا صالحًا في الجامعة المصرية اليابانية.',
     ],
     'documents' => [
         'locked' => 'لم يعد من الممكن تغيير مستندات هذا الطلب.',

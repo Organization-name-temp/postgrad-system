@@ -22,4 +22,11 @@ interface Notifier
      * @param  array<string, mixed>  $payload  Data the SPA interpolates when rendering the type.
      */
     public function notify(int $userId, NotificationType $type, array $payload = []): void;
+
+    /**
+     * Enqueue at most once for the caller-owned stable idempotency key.
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    public function notifyOnce(int $userId, NotificationType $type, string $key, array $payload = []): void;
 }

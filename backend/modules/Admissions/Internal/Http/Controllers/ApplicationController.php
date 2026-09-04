@@ -20,6 +20,7 @@ use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Support\IsoCountries;
 use Modules\Admissions\Internal\Verification\EmailVerificationLink;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\Contracts\EmailVerifier;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -44,7 +45,7 @@ class ApplicationController
      * Step-1 snapshot (fields the applicant has not yet provided come back null),
      * so the SPA can render and resume the wizard at the right step.
      *
-     * @response 200 {"data": {"id": 1, "status": "email_verified", "admission_cycle_id": 1, "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "id_type": "national_id", "phone": "+201000000000", "date_of_birth": "1998-05-20", "nationality": "EG", "gender": "Female", "address_country": "Egypt", "address_city": "Alexandria", "address_street": "15 Corniche Road", "previous_university": "Cairo University", "graduation_certificate_name": "BSc in Computer Science", "graduation_date": "2020-07-01", "previous_degree": "BSc", "previous_major": "Computer Science", "graduation_gpa": "3.50", "graduation_cgpa": "3.45", "gpa_scale": "4.0", "is_ejust_graduate": false, "applying_for_degree": "MSc", "english_test": "IELTS", "english_score": "7.50", "native_arabic_speaker": true, "submitted_at": "2026-07-14T10:00:00+00:00", "primary_program_id": 1, "alternative_program_id": 2, "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "alternative_program": {"id": 2, "code": "MSC-EE", "name_en": "MSc in Electrical Engineering", "name_ar": "ماجستير الهندسة الكهربية", "degree_level": "MSc", "department_name_en": "Electrical Engineering", "department_name_ar": "الهندسة الكهربية", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": null, "documents": [{"id": "01ARZ3NDEKTSV4RRFFQ69G5FAV", "document_type": "graduation_certificate", "original_filename": "certificate.pdf", "mime": "application/pdf", "size_bytes": 24576, "uploaded_at": "2026-07-14T10:00:00+00:00", "download_url": "http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV"}]}}
+     * @response 200 {"data": {"id": 1, "status": "email_verified", "admission_cycle_id": 1, "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "id_type": "national_id", "phone": "+201000000000", "date_of_birth": "1998-05-20", "nationality": "EG", "gender": "Female", "address_country": "Egypt", "address_city": "Alexandria", "address_street": "15 Corniche Road", "previous_university": "E-JUST", "graduation_certificate_name": "MSc in Computer Engineering", "graduation_date": "2020-07-01", "previous_degree": "MSc", "previous_major": "Computer Engineering", "graduation_gpa": "3.50", "graduation_cgpa": "3.45", "gpa_scale": "4.0", "is_ejust_graduate": true, "previous_ejust_program_id": 1, "previous_ejust_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "applying_for_degree": "PhD", "english_test": "IELTS", "english_score": "7.50", "native_arabic_speaker": true, "submitted_at": "2026-07-14T10:00:00+00:00", "primary_program_id": 2, "alternative_program_id": 3, "primary_program": {"id": 2, "code": "PHD-CE", "name_en": "PhD in Computer Engineering", "name_ar": "دكتوراه هندسة الحاسوب", "degree_level": "PhD", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "alternative_program": {"id": 3, "code": "PHD-EE", "name_en": "PhD in Electrical Engineering", "name_ar": "دكتوراه الهندسة الكهربية", "degree_level": "PhD", "department_name_en": "Electrical Engineering", "department_name_ar": "الهندسة الكهربية", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": null, "documents": [{"id": "01ARZ3NDEKTSV4RRFFQ69G5FAV", "document_type": "graduation_certificate", "original_filename": "certificate.pdf", "mime": "application/pdf", "size_bytes": 24576, "uploaded_at": "2026-07-14T10:00:00+00:00", "download_url": "http://localhost/api/v1/documents/01ARZ3NDEKTSV4RRFFQ69G5FAV"}]}}
      * @response 401 {"message": "Unauthenticated."}
      * @response 404 {"message": "No application found."}
      */
@@ -82,6 +83,7 @@ class ApplicationController
      * @bodyParam graduation_cgpa number Graduation CGPA. Example: 3.45
      * @bodyParam gpa_scale string One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100. Example: 4.0
      * @bodyParam is_ejust_graduate boolean Whether the applicant graduated from E-JUST. Example: false
+     * @bodyParam previous_ejust_program_id integer Previous E-JUST MSc Program; required for an E-JUST MSc graduate. Example: 1
      * @bodyParam applying_for_degree string Degree applied for; one of MSc, PhD. Example: MSc
      * @bodyParam english_test string English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. Example: IELTS
      * @bodyParam english_score number Score for the chosen test; required unless the test is None. Example: 7.5
@@ -99,7 +101,8 @@ class ApplicationController
             throw new ConflictHttpException(__('admissions.application.not_editable'));
         }
 
-        $application->update($request->validate($this->snapshotRules($request, $application, required: false)));
+        $validated = $request->validate($this->snapshotRules($request, $application, required: false));
+        $application->update($this->normalizePreviousEjustProgram($application, $validated));
 
         return new ApplicationResource($application);
     }
@@ -134,6 +137,7 @@ class ApplicationController
      * @bodyParam graduation_cgpa number required Graduation CGPA. Example: 3.45
      * @bodyParam gpa_scale string required One of 4.0, 4.3, 5.0, 6.0, 7.0, 10.0, 100. Example: 4.0
      * @bodyParam is_ejust_graduate boolean required Whether the applicant graduated from E-JUST. Example: false
+     * @bodyParam previous_ejust_program_id integer Previous E-JUST MSc Program; required for an E-JUST MSc graduate. Example: 1
      * @bodyParam applying_for_degree string required Degree applied for; one of MSc, PhD. Example: MSc
      * @bodyParam english_test string required English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. Example: IELTS
      * @bodyParam english_score number Score for the chosen test; required unless the test is None. Example: 7.5
@@ -152,7 +156,8 @@ class ApplicationController
             throw new ConflictHttpException(__('admissions.application.already_submitted'));
         }
 
-        $application->fill($request->validate($this->snapshotRules($request, $application, required: true)));
+        $validated = $request->validate($this->snapshotRules($request, $application, required: true));
+        $application->fill($this->normalizePreviousEjustProgram($application, $validated));
 
         // Identity owns email verification; a User whose email is already verified
         // (e.g. re-applying in a later Cycle) skips straight to EmailVerified.
@@ -341,6 +346,24 @@ class ApplicationController
             'graduation_cgpa' => [$presence, 'numeric', 'min:0', 'max:100', $this->withinGpaScale($request)],
             'gpa_scale' => [$presence, Rule::enum(GpaScale::class)],
             'is_ejust_graduate' => [$presence, 'boolean'],
+            'previous_ejust_program_id' => [
+                $required
+                    ? Rule::requiredIf(fn (): bool => $request->boolean('is_ejust_graduate')
+                        && $request->input('previous_degree') === PreviousDegree::MSc->value)
+                    : 'sometimes',
+                'nullable',
+                'integer',
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if ($value === null) {
+                        return;
+                    }
+
+                    $program = app(ProgramCatalog::class)->find((int) $value);
+                    if ($program === null || $program->degreeLevel !== DegreeLevel::MSc) {
+                        $fail(__('admissions.application.invalid_previous_ejust_program'));
+                    }
+                },
+            ],
             'applying_for_degree' => [$presence, Rule::enum(DegreeLevel::class)],
             'english_test' => [$presence, Rule::enum(EnglishTest::class)],
             // A score is required for any real test, forbidden semantics for None
@@ -355,6 +378,26 @@ class ApplicationController
             ),
             'native_arabic_speaker' => [$presence, 'boolean'],
         ];
+    }
+
+    /**
+     * Keep stale Catalog evidence out of the snapshot when the applicant says the
+     * prior award was not an E-JUST MSc. Partial saves merge against current values.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function normalizePreviousEjustProgram(Application $application, array $validated): array
+    {
+        $isEjust = (bool) ($validated['is_ejust_graduate'] ?? $application->is_ejust_graduate);
+        $degree = $validated['previous_degree'] ?? $application->previous_degree;
+        $degreeValue = $degree instanceof PreviousDegree ? $degree->value : $degree;
+
+        if (! $isEjust || $degreeValue !== PreviousDegree::MSc->value) {
+            $validated['previous_ejust_program_id'] = null;
+        }
+
+        return $validated;
     }
 
     /**

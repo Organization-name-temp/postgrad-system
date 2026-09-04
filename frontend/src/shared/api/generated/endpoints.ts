@@ -273,6 +273,18 @@ export type VerifyEmailsignedLink403 = {
   message?: string;
 };
 
+export type MyApplication200DataPreviousEjustProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
 export type MyApplication200DataPrimaryProgram = {
   id?: number;
   code?: string;
@@ -331,6 +343,8 @@ export type MyApplication200Data = {
   graduation_cgpa?: string;
   gpa_scale?: string;
   is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  previous_ejust_program?: MyApplication200DataPreviousEjustProgram;
   applying_for_degree?: string;
   english_test?: string;
   english_score?: string;
@@ -398,6 +412,8 @@ export type SaveStep1partialBody = {
   gpa_scale?: string;
   /** Whether the applicant graduated from E-JUST. */
   is_ejust_graduate?: boolean;
+  /** Previous E-JUST MSc Program; required for an E-JUST MSc graduate. */
+  previous_ejust_program_id?: number;
   /** Degree applied for; one of MSc, PhD. */
   applying_for_degree?: string;
   /** English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. */
@@ -473,6 +489,8 @@ export type SubmitStep1Body = {
   gpa_scale: string;
   /** Whether the applicant graduated from E-JUST. */
   is_ejust_graduate: boolean;
+  /** Previous E-JUST MSc Program; required for an E-JUST MSc graduate. */
+  previous_ejust_program_id?: number;
   /** Degree applied for; one of MSc, PhD. */
   applying_for_degree: string;
   /** English test; one of IELTS, TOEFL iBT, TOEFL PBT, PTE, Cambridge C1, Cambridge C2, Cambridge B2, Duolingo, None. */
@@ -2765,6 +2783,32 @@ export type DeactivateACourse200Data = {
 
 export type DeactivateACourse200 = {
   data?: DeactivateACourse200Data;
+};
+
+export type MyEffectiveExemptions200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  source?: string;
+  reason_codes?: string[];
+  admission_application_id?: number;
+  approved_at?: string;
+};
+
+export type MyEffectiveExemptions200 = {
+  data?: MyEffectiveExemptions200DataItem[];
+};
+
+export type MyEffectiveExemptions403 = {
+  message?: string;
+};
+
+export type MyEffectiveExemptions409 = {
+  message?: string;
 };
 
 export type ServiceHealthCheck200Data = {
@@ -12902,6 +12946,101 @@ export const useDeactivateACourse = <TError = unknown,
       > => {
       return useMutation(getDeactivateACourseMutationOptions(options), queryClient);
     }
+
+/**
+ * The acting Student's immutable automatic Preparatory Exemption decisions,
+ * available before composing a Registration Request.
+ * @summary My effective Exemptions.
+ */
+export const myEffectiveExemptions = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyEffectiveExemptions200>(
+      {url: `/api/v1/credit-decisions/exemptions`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyEffectiveExemptionsQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/exemptions`
+    ] as const;
+    }
+
+
+export const getMyEffectiveExemptionsQueryOptions = <TData = Awaited<ReturnType<typeof myEffectiveExemptions>>, TError = MyEffectiveExemptions403 | MyEffectiveExemptions409>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveExemptions>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyEffectiveExemptionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myEffectiveExemptions>>> = ({ signal }) => myEffectiveExemptions(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myEffectiveExemptions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyEffectiveExemptionsQueryResult = NonNullable<Awaited<ReturnType<typeof myEffectiveExemptions>>>
+export type MyEffectiveExemptionsQueryError = MyEffectiveExemptions403 | MyEffectiveExemptions409
+
+
+export function useMyEffectiveExemptions<TData = Awaited<ReturnType<typeof myEffectiveExemptions>>, TError = MyEffectiveExemptions403 | MyEffectiveExemptions409>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveExemptions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myEffectiveExemptions>>,
+          TError,
+          Awaited<ReturnType<typeof myEffectiveExemptions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyEffectiveExemptions<TData = Awaited<ReturnType<typeof myEffectiveExemptions>>, TError = MyEffectiveExemptions403 | MyEffectiveExemptions409>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveExemptions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myEffectiveExemptions>>,
+          TError,
+          Awaited<ReturnType<typeof myEffectiveExemptions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyEffectiveExemptions<TData = Awaited<ReturnType<typeof myEffectiveExemptions>>, TError = MyEffectiveExemptions403 | MyEffectiveExemptions409>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveExemptions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My effective Exemptions.
+ */
+
+export function useMyEffectiveExemptions<TData = Awaited<ReturnType<typeof myEffectiveExemptions>>, TError = MyEffectiveExemptions403 | MyEffectiveExemptions409>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveExemptions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyEffectiveExemptionsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * A public, unauthenticated liveness probe used by the SPA to confirm the

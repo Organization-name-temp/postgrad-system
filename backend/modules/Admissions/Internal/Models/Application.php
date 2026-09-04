@@ -61,6 +61,7 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * @property ?string $graduation_cgpa
  * @property ?GpaScale $gpa_scale
  * @property ?bool $is_ejust_graduate
+ * @property ?int $previous_ejust_program_id
  * @property ?DegreeLevel $applying_for_degree
  * @property ?EnglishTest $english_test
  * @property ?string $english_score
@@ -110,6 +111,7 @@ class Application extends Model
         'graduation_cgpa',
         'gpa_scale',
         'is_ejust_graduate',
+        'previous_ejust_program_id',
         'applying_for_degree',
         'english_test',
         'english_score',
@@ -153,6 +155,7 @@ class Application extends Model
             'graduation_cgpa' => 'decimal:2',
             'english_score' => 'decimal:2',
             'is_ejust_graduate' => 'boolean',
+            'previous_ejust_program_id' => 'integer',
             'native_arabic_speaker' => 'boolean',
             'primary_program_id' => 'integer',
             'alternative_program_id' => 'integer',

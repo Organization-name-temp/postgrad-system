@@ -14,6 +14,8 @@ tags:
     description: "\nManage Semesters — the academic term (Fall/Spring + year) the university runs\n(ADR-0018, FR-CAL-001), the single authority every later Phase-3/4 record reads\nfrom. Creating and editing require the calendar.manage permission (Student\nAffairs / Dean / SysAdmin); reading is open to any authenticated user who needs\nthe calendar. A Semester's period state (registration open, running, …) is\nderived from its dates, never a stored flag; the period dates — the five\nregistration windows plus the grade-submission deadline that closes them (phase 4\nticket 09) — must be ordered (ADR-0018) and (term, year) is unique. Semesters are\nedited in place, never hard-deleted (no delete verb → 405)."
   - name: Catalog
     description: "\nThe catalog browse tree — the whole academic hierarchy (Faculty → Department →\nProgram → Category → Course) in a single read-model payload so the front end can\nrender and search it client-side without chatty per-node requests (FR-PCM-002,\nspec §API). Every node carries both language names; Course nodes carry their\nactive status so retired courses read accessibly. Reading requires catalog.view —\nthe catalog is universally browsable (ADR-0008). \"University\" is a synthetic root\nthe SPA prepends; it is not an entity, so it is not in this payload."
+  - name: 'Credit Decisions'
+    description: ''
   - name: Endpoints
     description: ''
   - name: Enrollment
@@ -953,23 +955,17 @@ paths:
                     address_country: Egypt
                     address_city: Alexandria
                     address_street: '15 Corniche Road'
-                    previous_university: 'Cairo University'
-                    graduation_certificate_name: 'BSc in Computer Science'
+                    previous_university: E-JUST
+                    graduation_certificate_name: 'MSc in Computer Engineering'
                     graduation_date: '2020-07-01'
-                    previous_degree: BSc
-                    previous_major: 'Computer Science'
+                    previous_degree: MSc
+                    previous_major: 'Computer Engineering'
                     graduation_gpa: '3.50'
                     graduation_cgpa: '3.45'
                     gpa_scale: '4.0'
-                    is_ejust_graduate: false
-                    applying_for_degree: MSc
-                    english_test: IELTS
-                    english_score: '7.50'
-                    native_arabic_speaker: true
-                    submitted_at: '2026-07-14T10:00:00+00:00'
-                    primary_program_id: 1
-                    alternative_program_id: 2
-                    primary_program:
+                    is_ejust_graduate: true
+                    previous_ejust_program_id: 1
+                    previous_ejust_program:
                       id: 1
                       code: MSC-CE
                       name_en: 'MSc in Computer Engineering'
@@ -979,12 +975,29 @@ paths:
                       department_name_ar: 'هندسة الحاسوب'
                       faculty_name_en: 'Faculty of Engineering'
                       faculty_name_ar: 'كلية الهندسة'
-                    alternative_program:
+                    applying_for_degree: PhD
+                    english_test: IELTS
+                    english_score: '7.50'
+                    native_arabic_speaker: true
+                    submitted_at: '2026-07-14T10:00:00+00:00'
+                    primary_program_id: 2
+                    alternative_program_id: 3
+                    primary_program:
                       id: 2
-                      code: MSC-EE
-                      name_en: 'MSc in Electrical Engineering'
-                      name_ar: 'ماجستير الهندسة الكهربية'
-                      degree_level: MSc
+                      code: PHD-CE
+                      name_en: 'PhD in Computer Engineering'
+                      name_ar: 'دكتوراه هندسة الحاسوب'
+                      degree_level: PhD
+                      department_name_en: 'Computer Engineering'
+                      department_name_ar: 'هندسة الحاسوب'
+                      faculty_name_en: 'Faculty of Engineering'
+                      faculty_name_ar: 'كلية الهندسة'
+                    alternative_program:
+                      id: 3
+                      code: PHD-EE
+                      name_en: 'PhD in Electrical Engineering'
+                      name_ar: 'دكتوراه الهندسة الكهربية'
+                      degree_level: PhD
                       department_name_en: 'Electrical Engineering'
                       department_name_ar: 'الهندسة الكهربية'
                       faculty_name_en: 'Faculty of Engineering'
@@ -1047,19 +1060,19 @@ paths:
                         example: '15 Corniche Road'
                       previous_university:
                         type: string
-                        example: 'Cairo University'
+                        example: E-JUST
                       graduation_certificate_name:
                         type: string
-                        example: 'BSc in Computer Science'
+                        example: 'MSc in Computer Engineering'
                       graduation_date:
                         type: string
                         example: '2020-07-01'
                       previous_degree:
                         type: string
-                        example: BSc
+                        example: MSc
                       previous_major:
                         type: string
-                        example: 'Computer Science'
+                        example: 'Computer Engineering'
                       graduation_gpa:
                         type: string
                         example: '3.50'
@@ -1071,29 +1084,11 @@ paths:
                         example: '4.0'
                       is_ejust_graduate:
                         type: boolean
-                        example: false
-                      applying_for_degree:
-                        type: string
-                        example: MSc
-                      english_test:
-                        type: string
-                        example: IELTS
-                      english_score:
-                        type: string
-                        example: '7.50'
-                      native_arabic_speaker:
-                        type: boolean
                         example: true
-                      submitted_at:
-                        type: string
-                        example: '2026-07-14T10:00:00+00:00'
-                      primary_program_id:
+                      previous_ejust_program_id:
                         type: integer
                         example: 1
-                      alternative_program_id:
-                        type: integer
-                        example: 2
-                      primary_program:
+                      previous_ejust_program:
                         type: object
                         properties:
                           id:
@@ -1123,7 +1118,28 @@ paths:
                           faculty_name_ar:
                             type: string
                             example: 'كلية الهندسة'
-                      alternative_program:
+                      applying_for_degree:
+                        type: string
+                        example: PhD
+                      english_test:
+                        type: string
+                        example: IELTS
+                      english_score:
+                        type: string
+                        example: '7.50'
+                      native_arabic_speaker:
+                        type: boolean
+                        example: true
+                      submitted_at:
+                        type: string
+                        example: '2026-07-14T10:00:00+00:00'
+                      primary_program_id:
+                        type: integer
+                        example: 2
+                      alternative_program_id:
+                        type: integer
+                        example: 3
+                      primary_program:
                         type: object
                         properties:
                           id:
@@ -1131,16 +1147,46 @@ paths:
                             example: 2
                           code:
                             type: string
-                            example: MSC-EE
+                            example: PHD-CE
                           name_en:
                             type: string
-                            example: 'MSc in Electrical Engineering'
+                            example: 'PhD in Computer Engineering'
                           name_ar:
                             type: string
-                            example: 'ماجستير الهندسة الكهربية'
+                            example: 'دكتوراه هندسة الحاسوب'
                           degree_level:
                             type: string
-                            example: MSc
+                            example: PhD
+                          department_name_en:
+                            type: string
+                            example: 'Computer Engineering'
+                          department_name_ar:
+                            type: string
+                            example: 'هندسة الحاسوب'
+                          faculty_name_en:
+                            type: string
+                            example: 'Faculty of Engineering'
+                          faculty_name_ar:
+                            type: string
+                            example: 'كلية الهندسة'
+                      alternative_program:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          code:
+                            type: string
+                            example: PHD-EE
+                          name_en:
+                            type: string
+                            example: 'PhD in Electrical Engineering'
+                          name_ar:
+                            type: string
+                            example: 'دكتوراه الهندسة الكهربية'
+                          degree_level:
+                            type: string
+                            example: PhD
                           department_name_en:
                             type: string
                             example: 'Electrical Engineering'
@@ -1377,6 +1423,10 @@ paths:
                   type: boolean
                   description: 'Whether the applicant graduated from E-JUST.'
                   example: false
+                previous_ejust_program_id:
+                  type: integer
+                  description: 'Previous E-JUST MSc Program; required for an E-JUST MSc graduate.'
+                  example: 1
                 applying_for_degree:
                   type: string
                   description: 'Degree applied for; one of MSc, PhD.'
@@ -1591,6 +1641,10 @@ paths:
                   type: boolean
                   description: 'Whether the applicant graduated from E-JUST.'
                   example: false
+                previous_ejust_program_id:
+                  type: integer
+                  description: 'Previous E-JUST MSc Program; required for an E-JUST MSc graduate.'
+                  example: 1
                 applying_for_degree:
                   type: string
                   description: 'Degree applied for; one of MSc, PhD.'
@@ -9351,6 +9405,117 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/credit-decisions/exemptions:
+    get:
+      summary: 'My effective Exemptions.'
+      operationId: myEffectiveExemptions
+      description: "The acting Student's immutable automatic Preparatory Exemption decisions,\navailable before composing a Registration Request."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      student_id: 1
+                      curriculum_version_id: 12
+                      target_course_id: 8
+                      target_course_code: PRE401
+                      preparatory_requirement_role: EnglishLanguage
+                      credit_hours: 1
+                      source: automatic
+                      reason_codes:
+                        - english_proficiency
+                      admission_application_id: 5
+                      approved_at: '2026-09-04T10:00:00+00:00'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        student_id: 1
+                        curriculum_version_id: 12
+                        target_course_id: 8
+                        target_course_code: PRE401
+                        preparatory_requirement_role: EnglishLanguage
+                        credit_hours: 1
+                        source: automatic
+                        reason_codes:
+                          - english_proficiency
+                        admission_application_id: 5
+                        approved_at: '2026-09-04T10:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 1
+                        curriculum_version_id:
+                          type: integer
+                          example: 12
+                        target_course_id:
+                          type: integer
+                          example: 8
+                        target_course_code:
+                          type: string
+                          example: PRE401
+                        preparatory_requirement_role:
+                          type: string
+                          example: EnglishLanguage
+                        credit_hours:
+                          type: integer
+                          example: 1
+                        source:
+                          type: string
+                          example: automatic
+                        reason_codes:
+                          type: array
+                          example:
+                            - english_proficiency
+                          items:
+                            type: string
+                        admission_application_id:
+                          type: integer
+                          example: 5
+                        approved_at:
+                          type: string
+                          example: '2026-09-04T10:00:00+00:00'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Your admission exemptions are still being reconciled. Retry before composing registration.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Your admission exemptions are still being reconciled. Retry before composing registration.'
+      tags:
+        - 'Credit Decisions'
+      security: []
   /api/v1/health:
     get:
       summary: 'Service health check.'

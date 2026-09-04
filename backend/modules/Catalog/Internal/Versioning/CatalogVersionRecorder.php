@@ -90,6 +90,7 @@ class CatalogVersionRecorder
                 ->map(fn (CurriculumEntry $entry): array => [
                     'course_id' => $entry->course_id,
                     'course_code' => $entry->course->code,
+                    'course_total_ch' => $entry->course->total_ch,
                     'category' => $entry->category->value,
                     'preparatory_requirement_role' => $entry->preparatory_requirement_role?->value,
                     'ordinal' => $entry->ordinal,

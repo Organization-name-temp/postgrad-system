@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Admissions\Internal\Console\Commands\FlagOverdueApplications;
 use Modules\Admissions\Internal\Console\Commands\SendInterviewReminders;
-use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Listeners\SendAcceptanceNotification;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
 
 class AdmissionsServiceProvider extends ServiceProvider
 {

@@ -136,6 +136,7 @@ deptrac:
       - Enrollment_Internal
     Enrollment_Internal:
       - Enrollment_Public
+      - Admissions_Public
       - Identity_Public
       - Catalog_Public
       - Calendar_Public

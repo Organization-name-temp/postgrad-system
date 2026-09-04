@@ -12,15 +12,30 @@ event-driven handoff and couple Admissions to a later module.
 **Decision: Admissions publishes `AdmissionAccepted` as a `Public` event carrying an
 immutable exemption-evidence DTO.** The payload contains the minted Student id, User id,
 Application id, admitted Program id, previous degree, previous E-JUST Program id when
-applicable, and English-test type and score. Enrollment handles the event idempotently and
-creates the approved automatic Exemptions from that snapshot. It never queries the
-Application or imports Admissions internals.
+applicable, acceptance-time Program degree/Department semantics, and English-test type and
+score. Enrollment handles the event idempotently and creates the approved automatic
+Exemptions from that snapshot. It never queries the Application or imports Admissions
+internals.
 
 The event remains a post-commit side effect: admission acceptance and Student creation are
 already durable when listeners run. Because a listener failure therefore cannot roll those
 facts back, Enrollment also provides an idempotent reconciliation command for one accepted
 Student. Retrying the event or running reconciliation converges on the same one Exemption
 per Student and target Course; neither creates duplicates.
+
+To recover even when no post-commit listener starts, the acceptance transaction also
+freezes the same facts on the Identity-owned Student anchor as a typed
+`Identity\Public\AdmissionEvidenceSnapshot`. Identity persists this value opaquely and
+does not interpret or expose it in the `/me` representation. Enrollment may read it only
+through `StudentDirectory` to recreate its missing receipt; after that, Enrollment remains
+the sole owner of exemption decisions and reconciliation. Generic/seed-only Student mints
+may omit the snapshot, but the reconciliation command fails observably rather than
+silently succeeding when neither receipt nor anchor exists.
+
+Enrollment records reconciliation completion on its local receipt. While an accepted
+Student has an admission snapshot but no completed receipt, the exemption read and every
+eligible-course/cart composition entry point fail with a retryable conflict. Reads never
+trigger reconciliation; the standalone command remains the explicit repair path.
 
 ## Considered options
 

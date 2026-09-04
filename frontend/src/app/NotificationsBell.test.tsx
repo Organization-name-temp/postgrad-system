@@ -134,4 +134,24 @@ describe('NotificationsBell', () => {
     // Only that one is marked read → the count drops from 3 to 2.
     await waitFor(() => expect(bell).toHaveAccessibleName(/2 unread/i))
   })
+
+  it('renders the automatic exemption notification from its typed payload', async () => {
+    const user = userEvent.setup()
+    srv.unread = 1
+    srv.rows = [
+      {
+        id: 4,
+        type: 'exemption.automatically_applied',
+        data: { course_code: 'ENG-PREP-X' },
+        read_at: null,
+        created_at: '2026-09-04T10:00:00+00:00',
+      },
+    ]
+    renderBell()
+
+    await user.click(screen.getByRole('button', { name: /open notifications/i }))
+    expect(
+      await screen.findByText(/automatic preparatory exemption.*ENG-PREP-X/i),
+    ).toBeInTheDocument()
+  })
 })

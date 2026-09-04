@@ -27,6 +27,7 @@ return [
         'english_score_out_of_range' => 'The :test score must be between :min and :max.',
         // Raised when a score is supplied for the "None" test, which carries no score.
         'english_score_not_allowed' => 'The selected test does not take a score.',
+        'invalid_previous_ejust_program' => 'Choose a valid previous E-JUST MSc Program.',
     ],
     'documents' => [
         'locked' => 'Documents can no longer be changed for this application.',

@@ -58,6 +58,9 @@ enum NotificationType: string
     /** The applicant was accepted and became a Student. Payload: `university_id`. */
     case ApplicationAccepted = 'application.accepted';
 
+    /** An admission rule released one Preparatory requirement. */
+    case AutomaticExemptionApplied = 'exemption.automatically_applied';
+
     /**
      * A Student (or staff on their behalf) submitted a registration for the advisor's
      * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds

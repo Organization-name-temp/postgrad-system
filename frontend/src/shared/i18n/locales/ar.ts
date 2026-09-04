@@ -316,6 +316,7 @@ export const ar = {
         'يقترب الموعد النهائي لتسوية "غير مكتمل" الخاص بك خلال {{days_remaining}} يوم/أيام.',
       incompleteConverted: 'تحوّلت درجتك "غير مكتمل" غير المسوّاة إلى انسحاب بالرسوب.',
       gradesOverdue: 'تجاوزت درجات مقرر {{course_code}} موعد التسليم.',
+      automaticExemptionApplied: 'طُبّق إعفاء تلقائي من المقرر التمهيدي {{course_code}}.',
       fallback: 'لديك إشعار جديد.',
     },
   },
@@ -652,6 +653,7 @@ export const ar = {
         graduation_certificate_name: 'شهادة التخرج',
         graduation_date: 'تاريخ التخرج',
         previous_degree: 'الدرجة السابقة',
+        previous_ejust_program_id: 'برنامج الماجستير السابق في الجامعة المصرية اليابانية',
         previous_major: 'التخصص السابق',
         graduation_gpa: 'المعدل عند التخرج',
         graduation_cgpa: 'المعدل التراكمي',
@@ -670,6 +672,10 @@ export const ar = {
       gpaHelp: 'على هذا المقياس، أدخل قيمة من 0 إلى {{max}}.',
       gpaScaleFirst: 'اختر مقياس المعدل التراكمي أولًا.',
       phoneHelp: 'أدخل رقمك دون رمز الدولة.',
+      programsLoadError: 'تعذّر تحميل برامج الماجستير بالجامعة المصرية اليابانية. حاول مرة أخرى.',
+      programsLoading: 'جارٍ تحميل برامج الماجستير بالجامعة المصرية اليابانية',
+      noMscPrograms: 'لا توجد برامج ماجستير متاحة بالجامعة المصرية اليابانية.',
+      programsRetry: 'إعادة المحاولة',
       saveContinue: 'حفظ ومتابعة',
       saveLater: 'حفظ وإكمال لاحقًا',
       back: 'رجوع',
@@ -692,6 +698,7 @@ export const ar = {
       passport: 'جواز السفر مكوّن من 6 إلى 9 أحرف أو أرقام.',
       phone: 'أدخل رقم هاتف صحيحًا للدولة المحددة.',
       nationality: 'اختر دولة من القائمة.',
+      previousEjustProgramRequired: 'اختر برنامج الماجستير السابق في الجامعة المصرية اليابانية.',
     },
     verify: {
       title: 'أكّد بريدك الإلكتروني',
@@ -1057,6 +1064,36 @@ export const ar = {
       empty: 'لا توجد مقررات متاحة لتسجيلها في هذا الفصل بعد.',
       loading: 'جارٍ تحميل المقررات المتاحة لك',
       loadError: 'تعذّر تحميل المقررات المتاحة لك. يُرجى المحاولة مرة أخرى.',
+    },
+    exemptions: {
+      title: 'الإعفاءات من المقررات التمهيدية',
+      intro:
+        'طُبّقت هذه الإعفاءات تلقائيًا استنادًا إلى أدلة طلب القبول المقبول، وهي محسوبة بالفعل ضمن خطتك الدراسية المرتبطة.',
+      loadError: 'تعذّر تحميل إعفاءاتك من المقررات التمهيدية. يُرجى المحاولة مرة أخرى.',
+      pending: 'لا تزال إعفاءات القبول قيد التسوية. أعد المحاولة قبل التسجيل.',
+      loading: 'جارٍ تحميل إعفاءاتك من المقررات التمهيدية',
+      empty: 'لم تُطبّق أي إعفاءات تلقائية من المقررات التمهيدية.',
+      retry: 'إعادة المحاولة',
+      items: {
+        EnglishLanguage:
+          'اللغة الإنجليزية — <code>{{course}}</code> · <hours>{{count}} ساعة معتمدة</hours>',
+        ArabicLanguage:
+          'اللغة العربية — <code>{{course}}</code> · <hours>{{count}} ساعة معتمدة</hours>',
+        JapaneseLanguage:
+          'اللغة اليابانية — <code>{{course}}</code> · <hours>{{count}} ساعة معتمدة</hours>',
+        JapaneseCulture:
+          'الثقافة اليابانية — <code>{{course}}</code> · <hours>{{count}} ساعة معتمدة</hours>',
+        KeySkills:
+          'المهارات الأساسية — <code>{{course}}</code> · <hours>{{count}} ساعة معتمدة</hours>',
+        DepartmentalRequirement:
+          'متطلب القسم — <code>{{course}}</code> · <hours>{{count}} ساعة معتمدة</hours>',
+      },
+      reasons: {
+        english_proficiency: 'استوفت أدلة إتقان اللغة الإنجليزية حد الإعفاء.',
+        same_department_ejust_msc:
+          'برنامج الماجستير السابق في الجامعة المصرية اليابانية تابع للقسم نفسه.',
+        ejust_bsc: 'تؤهلك شهادة البكالوريوس من الجامعة المصرية اليابانية لهذا الإعفاء.',
+      },
     },
     classifications: {
       Preparatory: 'المقررات التمهيدية',

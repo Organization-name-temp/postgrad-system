@@ -66,6 +66,9 @@ export const en = {
       outstandingIncompletes: 'Outstanding Incompletes',
       gradeReview: 'Grade review',
       myGrades: 'My Grades',
+      manualExemptions: 'My exemption requests',
+      exemptionAdvisorQueue: 'Exemption recommendations',
+      exemptionHeadQueue: 'Exemption decisions',
       assignments: 'Faculty deans',
       departmentHeads: 'Department heads',
       sections: {
@@ -333,8 +336,21 @@ export const en = {
       gradesOverdue: 'Grades for {{course_code}} are past the submission deadline.',
       automaticExemptionApplied:
         'An automatic preparatory exemption was applied for {{course_code}}.',
+      manualExemptionSubmitted:
+        'A manual exemption request for {{course_code}} is awaiting your review.',
+      manualExemptionReturned:
+        'Your exemption request for {{course_code}} was returned for revision.',
+      manualExemptionReturned_advisor:
+        "An advisee's exemption request for {{course_code}} was returned for revision.",
+      manualExemptionRecommended:
+        'An exemption request for {{course_code}} was recommended for your decision.',
+      manualExemptionDecided:
+        'Your exemption request for {{course_code}} was decided: {{outcome}}.',
+      manualExemptionDecided_advisor:
+        "An advisee's exemption request for {{course_code}} was decided: {{outcome}}.",
       fallback: 'You have a new notification.',
     },
+    outcomes: { Approved: 'Approved', Rejected: 'Rejected' },
   },
   admissions: {
     // Admissions' Dashboard Cards (phase 4.5, ticket 03). Each Card's copy lives in the namespace
@@ -1149,6 +1165,114 @@ export const en = {
         english_proficiency: 'English proficiency evidence met the exemption threshold.',
         same_department_ejust_msc: 'Your previous E-JUST MSc Program is in the same Department.',
         ejust_bsc: 'Your E-JUST BSc evidence qualifies for this exemption.',
+      },
+    },
+    manualExemptions: {
+      title: 'Manual exemption requests',
+      intro:
+        'Supply missing or corrected evidence for a Preparatory requirement. Approval releases the requirement without erasing any Attempt or Grade.',
+      newDraft: 'New Draft',
+      myRequests: 'My requests',
+      target: 'Preparatory requirement',
+      targetOption: '<code>{{code}}</code> — {{role}}',
+      englishScore: 'English score',
+      englishTest: 'English test',
+      evidenceBasis: 'Evidence basis',
+      previousDegree: 'Previous degree',
+      previousProgramId: 'Previous E-JUST Program ID',
+      bases: {
+        english: 'English proficiency',
+        ejustBsc: 'Previous E-JUST BSc',
+        ejustMsc: 'Same-Department E-JUST MSc',
+      },
+      studentNote: 'Student note',
+      reviewerReason: 'Review reason',
+      saveDraft: 'Save Draft',
+      saveChanges: 'Save changes',
+      submit: 'Submit to Advisor',
+      resubmit: 'Resubmit to Advisor',
+      saveBeforeResubmit: 'Save a revised evidence version before resubmitting.',
+      abandon: 'Abandon Draft',
+      abandonConfirm:
+        'Abandon the Draft for <code>{{course}}</code>? It becomes terminal and cannot be submitted; its history will remain available.',
+      export: 'Export XLSX',
+      search: 'Search requests',
+      loading: 'Loading exemption requests',
+      required: 'This field is required.',
+      tooLong: 'Use 2,000 characters or fewer.',
+      invalidEnglishScore: 'Enter a score within the selected test range.',
+      requiredField: '{{label}} (required)',
+      reviewerReasonHelp: 'Required when returning or rejecting a request.',
+      programsLoading: 'Loading E-JUST MSc Programs',
+      programsLoadError: 'Could not load E-JUST MSc Programs.',
+      noMscPrograms: 'No E-JUST MSc Programs are available.',
+      inactiveProgram: '{{program}} (Inactive)',
+      retry: 'Retry',
+      cancel: 'Cancel',
+      confirmAbandon: 'Abandon Draft',
+      confirmReject: 'Reject request',
+      rejectConfirm:
+        'Reject the Exemption request for <code>{{course}}</code>? This cannot be undone.',
+      loadError: 'Could not load exemption requests. Please try again.',
+      actionError:
+        'The request changed or this action is no longer available. Refresh and try again.',
+      saveError: 'Could not save this Draft. Check the evidence and try again.',
+      empty:
+        'No manual exemption requests yet. Start a Draft when evidence is missing or needs correction.',
+      revision: 'Revision {{count}}',
+      requestMeta: '{{role}} · <number>{{revision}}</number>',
+      history: 'Request history',
+      previousReview: '{{action}} — previous revision; review invalidated',
+      evidenceSummary: {
+        english: '<code>{{test}}</code>: <number>{{score}}</number>',
+        previousDegree: 'Previous degree: <code>{{degree}}</code>',
+        previousDegreeAndProgram:
+          'Previous degree: <code>{{degree}}</code> · Program: <number>{{program}}</number>',
+      },
+      status: {
+        Draft: 'Draft',
+        PendingAdvisor: 'Pending Advisor',
+        PendingDepartmentHead: 'Pending Department Head',
+        Returned: 'Returned for revision',
+        Approved: 'Approved',
+        Rejected: 'Rejected',
+        Abandoned: 'Abandoned',
+      },
+      roles: {
+        EnglishLanguage: 'English language',
+        ArabicLanguage: 'Arabic language',
+        JapaneseLanguage: 'Japanese language',
+        JapaneseCulture: 'Japanese culture',
+        KeySkills: 'Key skills',
+        DepartmentalRequirement: 'Departmental requirement',
+      },
+      actions: {
+        draft_created: 'Draft created',
+        submitted: 'Submitted to Advisor',
+        recommended_by_advisor: 'Advisor recommended',
+        returned_by_advisor: 'Advisor returned',
+        rejected_by_advisor: 'Advisor rejected',
+        returned_by_department_head: 'Department Head returned',
+        rejected_by_department_head: 'Department Head rejected',
+        approved_by_department_head: 'Department Head approved',
+        abandoned: 'Draft abandoned',
+      },
+      review: {
+        recommend: 'Recommend',
+        approve: 'Approve',
+        return: 'Return for revision',
+        reject: 'Reject',
+      },
+      queue: {
+        advisor: {
+          title: 'Exemption recommendations',
+          intro: 'Review requests for your current advisees.',
+        },
+        departmentHead: {
+          title: 'Exemption decisions',
+          intro: 'Make the final decision for Preparatory Courses in your current scope.',
+        },
+        empty: 'No exemption requests are waiting in your scope.',
       },
     },
     classifications: {

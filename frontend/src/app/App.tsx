@@ -28,6 +28,8 @@ import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
 import { DepartmentHeadsPage } from '../features/admin/assignments/DepartmentHeadsPage'
 import { RegistrationPage } from '../features/enrollment/registration/RegistrationPage'
 import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
+import { ManualExemptionsPage } from '../features/enrollment/exemptions/ManualExemptionsPage'
+import { ExemptionReviewQueuePage } from '../features/enrollment/exemptions/ExemptionReviewQueuePage'
 import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
 import { RegistrationReviewPage } from '../features/enrollment/advising/RegistrationReviewPage'
 import { StudentSchedulePage } from '../features/enrollment/advising/StudentSchedulePage'
@@ -93,6 +95,7 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
                   <Route path="/registration" element={<RegistrationPage />} />
                   <Route path="/schedule" element={<SchedulePage />} />
+                  <Route path="/exemptions" element={<ManualExemptionsPage />} />
                 </Route>
                 {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
                     Persona-guarded to R02 — an admin inheriting grades.view_own has no Student
@@ -143,6 +146,16 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.departmentHead]} />}>
                   <Route path="/grading/review" element={<DepartmentHeadQueuePage />} />
                   <Route path="/grading/review/:sheetId" element={<DepartmentHeadSheetPage />} />
+                  <Route
+                    path="/exemptions/department-head"
+                    element={<ExemptionReviewQueuePage stage="departmentHead" />}
+                  />
+                </Route>
+                <Route element={<RequireAuth roles={[ROLE.advisor]} />}>
+                  <Route
+                    path="/exemptions/advisor"
+                    element={<ExemptionReviewQueuePage stage="advisor" />}
+                  />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to

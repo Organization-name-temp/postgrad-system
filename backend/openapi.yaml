@@ -22,6 +22,10 @@ tags:
     description: "\nCourse Offering management (ADR-0017, ticket 03) — \"what actually runs this\nsemester.\" An administrator holding `calendar.manage` (Student Affairs / Dean;\nSysAdmin inherits) populates a Semester with Offerings: one Catalog Course taught in\nthat Semester, carrying an assigned Instructor, an optional seat capacity, and one or\nmore weekly meeting times. This is the record Phase-4 grading's Instructor→Course\nlink is born from.\n\nThe Semester, Course and Instructor are referenced by opaque id (no cross-module\nforeign key, ADR-0012); each is validated through its module's Public facade — the\nCourse through {@see CourseCatalog}, the Instructor (a faculty R04 User) through the\nIdentity\\Public {@see Directory}, the Semester through\n{@see AcademicCalendar}. One Course runs at most once per\nSemester (unique), an Offering's own meetings may not overlap each other (the\ninterval-overlap seam), and an Offering is deletable only while nothing references it."
   - name: Grading
     description: "\nThe **Grade Sheet** — the Instructor's mark-entry surface (ADR-0023, ticket 01). A Sheet is\none submission round for one Course Offering, created **lazily** the first time it is opened\nrather than eagerly at semester end, and it lists one line per **gradable** Enrollment:\nAudit and Withdrawn Enrollments are on the roster but never lines, so an Instructor is never\nasked for a mark that cannot exist.\n\nEntry is gated on `grades.enter`, but the permission is not authority over a *particular*\nSheet — that comes from the Offering assignment, or from being a central-entry user (ticket\n09: `grades.enter` without `grades.finalize`, which by §3.2 is Student Affairs), both checked\nby {@see AuthorizesGradeEntry}. Every central write to someone else's Sheet is audited; an\nInstructor's own is not. The §3.2 matrix itself is untouched throughout.\n\nOne Mark, 0–100 with two decimals, is entered per line, and the Letter Grade and GPA points\nare **derived from the ADR-0021 scale and frozen onto the Grade** — so a later change to the\nscale never rewrites a grade already given, and there is no letter override to make\n`letter == scale(mark)` anything but an invariant. Each mark saves on its own, not as a\nbatch (the Phase-2 per-step-save precedent), so a long roster survives a closed tab.\n\nNothing here signs, reviews or finalizes: ticket 03 builds the Instructor signature and the\nDepartment-Head review that turn a Draft round into part of the academic record, and no\nStudent can see anything until it does."
+  - name: 'Manual Exemption Review'
+    description: ''
+  - name: 'Manual Exemptions'
+    description: ''
   - name: Notifications
     description: "\nA signed-in user's own in-app notifications — the data behind the shell's bell\n(ticket 02). Every endpoint is scoped to the authenticated user by\n{@see Notification::scopeForUser()}, so no request can list, count, or mutate\nanother user's notifications (a foreign id simply is not found → 404). Content\nis a type + payload; the SPA renders it bilingually, so nothing here is\nlocalised server-side."
 paths:
@@ -9409,7 +9413,7 @@ paths:
     get:
       summary: 'My effective Exemptions.'
       operationId: myEffectiveExemptions
-      description: "The acting Student's immutable automatic Preparatory Exemption decisions,\navailable before composing a Registration Request."
+      description: "The acting Student's immutable automatic and manual Preparatory Exemption\ndecisions, available before composing a Registration Request."
       parameters: []
       responses:
         200:
@@ -9432,7 +9436,22 @@ paths:
                       reason_codes:
                         - english_proficiency
                       admission_application_id: 5
+                      manual_request_id: null
                       approved_at: '2026-09-04T10:00:00+00:00'
+                    -
+                      id: 2
+                      student_id: 1
+                      curriculum_version_id: 12
+                      target_course_id: 9
+                      target_course_code: DEP501
+                      preparatory_requirement_role: DepartmentalRequirement
+                      credit_hours: 1
+                      source: manual
+                      reason_codes:
+                        - ejust_bsc
+                      admission_application_id: null
+                      manual_request_id: 17
+                      approved_at: '2026-09-05T10:00:00+00:00'
                 properties:
                   data:
                     type: array
@@ -9449,7 +9468,22 @@ paths:
                         reason_codes:
                           - english_proficiency
                         admission_application_id: 5
+                        manual_request_id: null
                         approved_at: '2026-09-04T10:00:00+00:00'
+                      -
+                        id: 2
+                        student_id: 1
+                        curriculum_version_id: 12
+                        target_course_id: 9
+                        target_course_code: DEP501
+                        preparatory_requirement_role: DepartmentalRequirement
+                        credit_hours: 1
+                        source: manual
+                        reason_codes:
+                          - ejust_bsc
+                        admission_application_id: null
+                        manual_request_id: 17
+                        approved_at: '2026-09-05T10:00:00+00:00'
                     items:
                       type: object
                       properties:
@@ -9486,6 +9520,13 @@ paths:
                         admission_application_id:
                           type: integer
                           example: 5
+                          description: 'Source admission Application for an automatic decision.'
+                          nullable: true
+                        manual_request_id:
+                          type: integer
+                          example: null
+                          description: 'Source manual Exemption request for a manual decision.'
+                          nullable: true
                         approved_at:
                           type: string
                           example: '2026-09-04T10:00:00+00:00'
@@ -9737,6 +9778,7 @@ paths:
                       admission_cycle_id: 1
                       advisor_id: 3
                       admitted_at: '2026-07-15T10:00:00+00:00'
+                      lifecycle_status: Active
                 properties:
                   data:
                     type: object
@@ -9807,6 +9849,9 @@ paths:
                           admitted_at:
                             type: string
                             example: '2026-07-15T10:00:00+00:00'
+                          lifecycle_status:
+                            type: string
+                            example: Active
         401:
           description: ''
           content:
@@ -18322,6 +18367,4246 @@ paths:
         name: student_id
         description: "The target Student anchor's id."
         example: 5
+        required: true
+        schema:
+          type: integer
+  /api/v1/credit-decisions/exemption-requests/advisor-queue:
+    get:
+      summary: 'Advisor manual Exemption queue.'
+      operationId: advisorManualExemptionQueue
+      description: ''
+      parameters:
+        -
+          in: query
+          name: target_course_id
+          description: 'Comma-separated positive Target Course IDs.'
+          example: '5,6'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Target Course IDs.'
+            example: '5,6'
+        -
+          in: query
+          name: student_id
+          description: 'Comma-separated positive Student anchor IDs.'
+          example: '10,11'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Student anchor IDs.'
+            example: '10,11'
+        -
+          in: query
+          name: q
+          description: 'Student, University-ID, or Course-code search.'
+          example: أحمد
+          required: false
+          schema:
+            type: string
+            description: 'Student, University-ID, or Course-code search.'
+            example: أحمد
+        -
+          in: query
+          name: sort
+          description: ''
+          example: submitted_at
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: submitted_at
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      student_id: 10
+                      curriculum_version_id: 3
+                      target_course_id: 5
+                      target_course_code: PRE401
+                      preparatory_requirement_role: EnglishLanguage
+                      credit_hours: 1
+                      evidence:
+                        english_test: IELTS
+                        english_score: 7
+                        previous_degree: MSc
+                        is_ejust_graduate: true
+                        previous_ejust_program_id: 2
+                        document_ids:
+                          - 41
+                          - 42
+                      student_note: 'Corrected report'
+                      created_at: '2026-09-04T09:00:00+00:00'
+                      updated_at: '2026-09-04T10:00:00+00:00'
+                      status: PendingAdvisor
+                      revision: 1
+                      editable: false
+                      terminal: false
+                      submitted_at: '2026-09-04T09:30:00+00:00'
+                      transitions:
+                        -
+                          id: 1
+                          from_status: null
+                          to_status: Draft
+                          action: draft_created
+                          actor_user_id: 12
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:00:00+00:00'
+                        -
+                          id: 2
+                          from_status: Draft
+                          to_status: PendingAdvisor
+                          action: submitted
+                          actor_user_id: 12
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:30:00+00:00'
+                      decision: null
+                      student:
+                        student_id: 10
+                        university_id: 2026-CSE-0001
+                        name: 'Sara Student'
+                  links:
+                    first: null
+                    last: null
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    from: 1
+                    last_page: 1
+                    path: 'http://localhost/api/v1/credit-decisions/exemption-requests/advisor-queue'
+                    per_page: 25
+                    to: 1
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        student_id: 10
+                        curriculum_version_id: 3
+                        target_course_id: 5
+                        target_course_code: PRE401
+                        preparatory_requirement_role: EnglishLanguage
+                        credit_hours: 1
+                        evidence:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        student_note: 'Corrected report'
+                        created_at: '2026-09-04T09:00:00+00:00'
+                        updated_at: '2026-09-04T10:00:00+00:00'
+                        status: PendingAdvisor
+                        revision: 1
+                        editable: false
+                        terminal: false
+                        submitted_at: '2026-09-04T09:30:00+00:00'
+                        transitions:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:30:00+00:00'
+                        decision: null
+                        student:
+                          student_id: 10
+                          university_id: 2026-CSE-0001
+                          name: 'Sara Student'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 10
+                        curriculum_version_id:
+                          type: integer
+                          example: 3
+                        target_course_id:
+                          type: integer
+                          example: 5
+                        target_course_code:
+                          type: string
+                          example: PRE401
+                        preparatory_requirement_role:
+                          type: string
+                          example: EnglishLanguage
+                        credit_hours:
+                          type: integer
+                          example: 1
+                        evidence:
+                          type: object
+                          properties:
+                            english_test:
+                              type: string
+                              example: IELTS
+                            english_score:
+                              type: integer
+                              example: 7
+                            previous_degree:
+                              type: string
+                              example: MSc
+                            is_ejust_graduate:
+                              type: boolean
+                              example: true
+                            previous_ejust_program_id:
+                              type: integer
+                              example: 2
+                            document_ids:
+                              type: array
+                              example:
+                                - 41
+                                - 42
+                              items:
+                                type: integer
+                        student_note:
+                          type: string
+                          example: 'Corrected report'
+                          nullable: true
+                        created_at:
+                          type: string
+                          example: '2026-09-04T09:00:00+00:00'
+                        updated_at:
+                          type: string
+                          example: '2026-09-04T10:00:00+00:00'
+                        status:
+                          type: string
+                          example: PendingAdvisor
+                        revision:
+                          type: integer
+                          example: 1
+                        editable:
+                          type: boolean
+                          example: false
+                        terminal:
+                          type: boolean
+                          example: false
+                        submitted_at:
+                          type: string
+                          example: '2026-09-04T09:30:00+00:00'
+                          nullable: true
+                        transitions:
+                          type: array
+                          example:
+                            -
+                              id: 1
+                              from_status: null
+                              to_status: Draft
+                              action: draft_created
+                              actor_user_id: 12
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:00:00+00:00'
+                            -
+                              id: 2
+                              from_status: Draft
+                              to_status: PendingAdvisor
+                              action: submitted
+                              actor_user_id: 12
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:30:00+00:00'
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              from_status:
+                                type: string
+                                example: null
+                                nullable: true
+                              to_status:
+                                type: string
+                                example: Draft
+                              action:
+                                type: string
+                                example: draft_created
+                              actor_user_id:
+                                type: integer
+                                example: 12
+                              reason:
+                                type: string
+                                example: null
+                                nullable: true
+                              revision:
+                                type: integer
+                                example: 1
+                              evidence_snapshot:
+                                type: object
+                                properties:
+                                  english_test:
+                                    type: string
+                                    example: IELTS
+                                  english_score:
+                                    type: integer
+                                    example: 7
+                                  previous_degree:
+                                    type: string
+                                    example: MSc
+                                  is_ejust_graduate:
+                                    type: boolean
+                                    example: true
+                                  previous_ejust_program_id:
+                                    type: integer
+                                    example: 2
+                                  document_ids:
+                                    type: array
+                                    example:
+                                      - 41
+                                      - 42
+                                    items:
+                                      type: integer
+                              current_revision:
+                                type: boolean
+                                example: true
+                              created_at:
+                                type: string
+                                example: '2026-09-04T09:00:00+00:00'
+                        decision:
+                          type: object
+                          example: null
+                          description: 'The immutable effective decision when the request was approved.'
+                          nullable: true
+                        student:
+                          type: object
+                          properties:
+                            student_id:
+                              type: integer
+                              example: 10
+                            university_id:
+                              type: string
+                              example: 2026-CSE-0001
+                            name:
+                              type: string
+                              example: 'Sara Student'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: null
+                        nullable: true
+                      last:
+                        type: string
+                        example: null
+                        nullable: true
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      from:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      path:
+                        type: string
+                        example: 'http://localhost/api/v1/credit-decisions/exemption-requests/advisor-queue'
+                      per_page:
+                        type: integer
+                        example: 25
+                      to:
+                        type: integer
+                        example: 1
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - 'Manual Exemption Review'
+      security: []
+  /api/v1/credit-decisions/exemption-requests/advisor-queue/export:
+    get:
+      summary: 'Export Advisor Exemption queue.'
+      operationId: exportAdvisorExemptionQueue
+      description: ''
+      parameters:
+        -
+          in: query
+          name: target_course_id
+          description: 'Comma-separated positive Target Course IDs.'
+          example: '5,6'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Target Course IDs.'
+            example: '5,6'
+        -
+          in: query
+          name: student_id
+          description: 'Comma-separated positive Student anchor IDs.'
+          example: '10,11'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Student anchor IDs.'
+            example: '10,11'
+        -
+          in: query
+          name: q
+          description: 'Student, University-ID, or Course-code search.'
+          example: PRE
+          required: false
+          schema:
+            type: string
+            description: 'Student, University-ID, or Course-code search.'
+            example: PRE
+        -
+          in: query
+          name: sort
+          description: ''
+          example: submitted_at
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: submitted_at
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - 'Manual Exemption Review'
+      security: []
+  '/api/v1/credit-decisions/exemption-requests/{exemption_request_id}/advisor-decision':
+    post:
+      summary: "Advisor action on a current advisee's request."
+      operationId: advisorActionOnACurrentAdviseesRequest
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 10
+                    curriculum_version_id: 3
+                    target_course_id: 5
+                    target_course_code: PRE401
+                    preparatory_requirement_role: EnglishLanguage
+                    credit_hours: 1
+                    evidence:
+                      english_test: IELTS
+                      english_score: 7
+                      previous_degree: MSc
+                      is_ejust_graduate: true
+                      previous_ejust_program_id: 2
+                      document_ids:
+                        - 41
+                        - 42
+                    student_note: 'Corrected report'
+                    created_at: '2026-09-04T09:00:00+00:00'
+                    updated_at: '2026-09-04T10:00:00+00:00'
+                    status: PendingDepartmentHead
+                    revision: 1
+                    editable: false
+                    terminal: false
+                    submitted_at: '2026-09-04T09:30:00+00:00'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Draft
+                        action: draft_created
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:00:00+00:00'
+                      -
+                        id: 2
+                        from_status: Draft
+                        to_status: PendingAdvisor
+                        action: submitted
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:30:00+00:00'
+                      -
+                        id: 3
+                        from_status: PendingAdvisor
+                        to_status: PendingDepartmentHead
+                        action: recommended_by_advisor
+                        actor_user_id: 14
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:45:00+00:00'
+                    decision: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 10
+                      curriculum_version_id:
+                        type: integer
+                        example: 3
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      preparatory_requirement_role:
+                        type: string
+                        example: EnglishLanguage
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      evidence:
+                        type: object
+                        properties:
+                          english_test:
+                            type: string
+                            example: IELTS
+                          english_score:
+                            type: integer
+                            example: 7
+                          previous_degree:
+                            type: string
+                            example: MSc
+                          is_ejust_graduate:
+                            type: boolean
+                            example: true
+                          previous_ejust_program_id:
+                            type: integer
+                            example: 2
+                          document_ids:
+                            type: array
+                            example:
+                              - 41
+                              - 42
+                            items:
+                              type: integer
+                      student_note:
+                        type: string
+                        example: 'Corrected report'
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-09-04T09:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-09-04T10:00:00+00:00'
+                      status:
+                        type: string
+                        example: PendingDepartmentHead
+                      revision:
+                        type: integer
+                        example: 1
+                      editable:
+                        type: boolean
+                        example: false
+                      terminal:
+                        type: boolean
+                        example: false
+                      submitted_at:
+                        type: string
+                        example: '2026-09-04T09:30:00+00:00'
+                        nullable: true
+                      transitions:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:30:00+00:00'
+                          -
+                            id: 3
+                            from_status: PendingAdvisor
+                            to_status: PendingDepartmentHead
+                            action: recommended_by_advisor
+                            actor_user_id: 14
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:45:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Draft
+                            action:
+                              type: string
+                              example: draft_created
+                            actor_user_id:
+                              type: integer
+                              example: 12
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            revision:
+                              type: integer
+                              example: 1
+                            evidence_snapshot:
+                              type: object
+                              properties:
+                                english_test:
+                                  type: string
+                                  example: IELTS
+                                english_score:
+                                  type: integer
+                                  example: 7
+                                previous_degree:
+                                  type: string
+                                  example: MSc
+                                is_ejust_graduate:
+                                  type: boolean
+                                  example: true
+                                previous_ejust_program_id:
+                                  type: integer
+                                  example: 2
+                                document_ids:
+                                  type: array
+                                  example:
+                                    - 41
+                                    - 42
+                                  items:
+                                    type: integer
+                            current_revision:
+                              type: boolean
+                              example: true
+                            created_at:
+                              type: string
+                              example: '2026-09-04T09:00:00+00:00'
+                      decision:
+                        type: object
+                        example: null
+                        description: 'The immutable effective decision when the request was approved.'
+                        nullable: true
+      tags:
+        - 'Manual Exemption Review'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: 'recommend, return, or reject.'
+                  example: recommend
+                reason:
+                  type: string
+                  description: 'Required for return/reject.'
+                  example: 'Upload a readable score report.'
+                expected_revision:
+                  type: integer
+                  description: ''
+                  example: 1
+                action_id:
+                  type: string
+                  description: 'Retry-stable UUID.'
+                  example: c63e0602-5eb5-44a9-a8dd-056da2ae03ea
+              required:
+                - action
+                - expected_revision
+                - action_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: exemption_request_id
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/credit-decisions/exemption-requests/department-head-queue:
+    get:
+      summary: 'Department Head manual Exemption queue.'
+      operationId: departmentHeadManualExemptionQueue
+      description: 'Uses the same query contract as the Advisor queue.'
+      parameters:
+        -
+          in: query
+          name: target_course_id
+          description: 'Comma-separated positive Target Course IDs.'
+          example: '5,6'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Target Course IDs.'
+            example: '5,6'
+        -
+          in: query
+          name: student_id
+          description: 'Comma-separated positive Student anchor IDs.'
+          example: '10,11'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Student anchor IDs.'
+            example: '10,11'
+        -
+          in: query
+          name: q
+          description: 'Student, University-ID, or Course-code search.'
+          example: PRE
+          required: false
+          schema:
+            type: string
+            description: 'Student, University-ID, or Course-code search.'
+            example: PRE
+        -
+          in: query
+          name: sort
+          description: ''
+          example: submitted_at
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: submitted_at
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      student_id: 10
+                      curriculum_version_id: 3
+                      target_course_id: 5
+                      target_course_code: PRE401
+                      preparatory_requirement_role: EnglishLanguage
+                      credit_hours: 1
+                      evidence:
+                        english_test: IELTS
+                        english_score: 7
+                        previous_degree: MSc
+                        is_ejust_graduate: true
+                        previous_ejust_program_id: 2
+                        document_ids:
+                          - 41
+                          - 42
+                      student_note: 'Corrected report'
+                      created_at: '2026-09-04T09:00:00+00:00'
+                      updated_at: '2026-09-04T10:00:00+00:00'
+                      status: PendingDepartmentHead
+                      revision: 1
+                      editable: false
+                      terminal: false
+                      submitted_at: '2026-09-04T09:30:00+00:00'
+                      transitions:
+                        -
+                          id: 1
+                          from_status: null
+                          to_status: Draft
+                          action: draft_created
+                          actor_user_id: 12
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:00:00+00:00'
+                        -
+                          id: 2
+                          from_status: Draft
+                          to_status: PendingAdvisor
+                          action: submitted
+                          actor_user_id: 12
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:30:00+00:00'
+                        -
+                          id: 3
+                          from_status: PendingAdvisor
+                          to_status: PendingDepartmentHead
+                          action: recommended_by_advisor
+                          actor_user_id: 14
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:45:00+00:00'
+                      decision: null
+                      student:
+                        student_id: 10
+                        university_id: 2026-CSE-0001
+                        name: 'Sara Student'
+                  links:
+                    first: null
+                    last: null
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    from: 1
+                    last_page: 1
+                    path: 'http://localhost/api/v1/credit-decisions/exemption-requests/department-head-queue'
+                    per_page: 25
+                    to: 1
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        student_id: 10
+                        curriculum_version_id: 3
+                        target_course_id: 5
+                        target_course_code: PRE401
+                        preparatory_requirement_role: EnglishLanguage
+                        credit_hours: 1
+                        evidence:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        student_note: 'Corrected report'
+                        created_at: '2026-09-04T09:00:00+00:00'
+                        updated_at: '2026-09-04T10:00:00+00:00'
+                        status: PendingDepartmentHead
+                        revision: 1
+                        editable: false
+                        terminal: false
+                        submitted_at: '2026-09-04T09:30:00+00:00'
+                        transitions:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:30:00+00:00'
+                          -
+                            id: 3
+                            from_status: PendingAdvisor
+                            to_status: PendingDepartmentHead
+                            action: recommended_by_advisor
+                            actor_user_id: 14
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:45:00+00:00'
+                        decision: null
+                        student:
+                          student_id: 10
+                          university_id: 2026-CSE-0001
+                          name: 'Sara Student'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 10
+                        curriculum_version_id:
+                          type: integer
+                          example: 3
+                        target_course_id:
+                          type: integer
+                          example: 5
+                        target_course_code:
+                          type: string
+                          example: PRE401
+                        preparatory_requirement_role:
+                          type: string
+                          example: EnglishLanguage
+                        credit_hours:
+                          type: integer
+                          example: 1
+                        evidence:
+                          type: object
+                          properties:
+                            english_test:
+                              type: string
+                              example: IELTS
+                            english_score:
+                              type: integer
+                              example: 7
+                            previous_degree:
+                              type: string
+                              example: MSc
+                            is_ejust_graduate:
+                              type: boolean
+                              example: true
+                            previous_ejust_program_id:
+                              type: integer
+                              example: 2
+                            document_ids:
+                              type: array
+                              example:
+                                - 41
+                                - 42
+                              items:
+                                type: integer
+                        student_note:
+                          type: string
+                          example: 'Corrected report'
+                          nullable: true
+                        created_at:
+                          type: string
+                          example: '2026-09-04T09:00:00+00:00'
+                        updated_at:
+                          type: string
+                          example: '2026-09-04T10:00:00+00:00'
+                        status:
+                          type: string
+                          example: PendingDepartmentHead
+                        revision:
+                          type: integer
+                          example: 1
+                        editable:
+                          type: boolean
+                          example: false
+                        terminal:
+                          type: boolean
+                          example: false
+                        submitted_at:
+                          type: string
+                          example: '2026-09-04T09:30:00+00:00'
+                          nullable: true
+                        transitions:
+                          type: array
+                          example:
+                            -
+                              id: 1
+                              from_status: null
+                              to_status: Draft
+                              action: draft_created
+                              actor_user_id: 12
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:00:00+00:00'
+                            -
+                              id: 2
+                              from_status: Draft
+                              to_status: PendingAdvisor
+                              action: submitted
+                              actor_user_id: 12
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:30:00+00:00'
+                            -
+                              id: 3
+                              from_status: PendingAdvisor
+                              to_status: PendingDepartmentHead
+                              action: recommended_by_advisor
+                              actor_user_id: 14
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:45:00+00:00'
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              from_status:
+                                type: string
+                                example: null
+                                nullable: true
+                              to_status:
+                                type: string
+                                example: Draft
+                              action:
+                                type: string
+                                example: draft_created
+                              actor_user_id:
+                                type: integer
+                                example: 12
+                              reason:
+                                type: string
+                                example: null
+                                nullable: true
+                              revision:
+                                type: integer
+                                example: 1
+                              evidence_snapshot:
+                                type: object
+                                properties:
+                                  english_test:
+                                    type: string
+                                    example: IELTS
+                                  english_score:
+                                    type: integer
+                                    example: 7
+                                  previous_degree:
+                                    type: string
+                                    example: MSc
+                                  is_ejust_graduate:
+                                    type: boolean
+                                    example: true
+                                  previous_ejust_program_id:
+                                    type: integer
+                                    example: 2
+                                  document_ids:
+                                    type: array
+                                    example:
+                                      - 41
+                                      - 42
+                                    items:
+                                      type: integer
+                              current_revision:
+                                type: boolean
+                                example: true
+                              created_at:
+                                type: string
+                                example: '2026-09-04T09:00:00+00:00'
+                        decision:
+                          type: object
+                          example: null
+                          description: 'The immutable effective decision when the request was approved.'
+                          nullable: true
+                        student:
+                          type: object
+                          properties:
+                            student_id:
+                              type: integer
+                              example: 10
+                            university_id:
+                              type: string
+                              example: 2026-CSE-0001
+                            name:
+                              type: string
+                              example: 'Sara Student'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: null
+                        nullable: true
+                      last:
+                        type: string
+                        example: null
+                        nullable: true
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      from:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      path:
+                        type: string
+                        example: 'http://localhost/api/v1/credit-decisions/exemption-requests/department-head-queue'
+                      per_page:
+                        type: integer
+                        example: 25
+                      to:
+                        type: integer
+                        example: 1
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - 'Manual Exemption Review'
+      security: []
+  /api/v1/credit-decisions/exemption-requests/department-head-queue/export:
+    get:
+      summary: 'Export Department Head Exemption queue.'
+      operationId: exportDepartmentHeadExemptionQueue
+      description: ''
+      parameters:
+        -
+          in: query
+          name: target_course_id
+          description: 'Comma-separated positive Target Course IDs.'
+          example: '5,6'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Target Course IDs.'
+            example: '5,6'
+        -
+          in: query
+          name: student_id
+          description: 'Comma-separated positive Student anchor IDs.'
+          example: '10,11'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Student anchor IDs.'
+            example: '10,11'
+        -
+          in: query
+          name: q
+          description: 'Student, University-ID, or Course-code search.'
+          example: PRE
+          required: false
+          schema:
+            type: string
+            description: 'Student, University-ID, or Course-code search.'
+            example: PRE
+        -
+          in: query
+          name: sort
+          description: ''
+          example: submitted_at
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: submitted_at
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - 'Manual Exemption Review'
+      security: []
+  '/api/v1/credit-decisions/exemption-requests/{exemption_request_id}/department-head-decision':
+    post:
+      summary: 'Scoped Department Head final action.'
+      operationId: scopedDepartmentHeadFinalAction
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 10
+                    curriculum_version_id: 3
+                    target_course_id: 5
+                    target_course_code: PRE401
+                    preparatory_requirement_role: EnglishLanguage
+                    credit_hours: 1
+                    evidence:
+                      english_test: IELTS
+                      english_score: 7
+                      previous_degree: MSc
+                      is_ejust_graduate: true
+                      previous_ejust_program_id: 2
+                      document_ids:
+                        - 41
+                        - 42
+                    student_note: 'Corrected report'
+                    created_at: '2026-09-04T09:00:00+00:00'
+                    updated_at: '2026-09-04T10:00:00+00:00'
+                    status: Approved
+                    revision: 1
+                    editable: false
+                    terminal: true
+                    submitted_at: '2026-09-04T09:30:00+00:00'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Draft
+                        action: draft_created
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:00:00+00:00'
+                      -
+                        id: 2
+                        from_status: Draft
+                        to_status: PendingAdvisor
+                        action: submitted
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:30:00+00:00'
+                      -
+                        id: 3
+                        from_status: PendingAdvisor
+                        to_status: PendingDepartmentHead
+                        action: recommended_by_advisor
+                        actor_user_id: 14
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:45:00+00:00'
+                      -
+                        id: 4
+                        from_status: PendingDepartmentHead
+                        to_status: Approved
+                        action: approved_by_department_head
+                        actor_user_id: 16
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T10:00:00+00:00'
+                    decision:
+                      id: 4
+                      student_id: 10
+                      curriculum_version_id: 3
+                      target_course_id: 5
+                      target_course_code: PRE401
+                      preparatory_requirement_role: EnglishLanguage
+                      credit_hours: 1
+                      source: manual
+                      reason_codes:
+                        - english_proficiency
+                      admission_application_id: null
+                      manual_request_id: 1
+                      approved_at: '2026-09-04T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 10
+                      curriculum_version_id:
+                        type: integer
+                        example: 3
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      preparatory_requirement_role:
+                        type: string
+                        example: EnglishLanguage
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      evidence:
+                        type: object
+                        properties:
+                          english_test:
+                            type: string
+                            example: IELTS
+                          english_score:
+                            type: integer
+                            example: 7
+                          previous_degree:
+                            type: string
+                            example: MSc
+                          is_ejust_graduate:
+                            type: boolean
+                            example: true
+                          previous_ejust_program_id:
+                            type: integer
+                            example: 2
+                          document_ids:
+                            type: array
+                            example:
+                              - 41
+                              - 42
+                            items:
+                              type: integer
+                      student_note:
+                        type: string
+                        example: 'Corrected report'
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-09-04T09:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-09-04T10:00:00+00:00'
+                      status:
+                        type: string
+                        example: Approved
+                      revision:
+                        type: integer
+                        example: 1
+                      editable:
+                        type: boolean
+                        example: false
+                      terminal:
+                        type: boolean
+                        example: true
+                      submitted_at:
+                        type: string
+                        example: '2026-09-04T09:30:00+00:00'
+                        nullable: true
+                      transitions:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:30:00+00:00'
+                          -
+                            id: 3
+                            from_status: PendingAdvisor
+                            to_status: PendingDepartmentHead
+                            action: recommended_by_advisor
+                            actor_user_id: 14
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:45:00+00:00'
+                          -
+                            id: 4
+                            from_status: PendingDepartmentHead
+                            to_status: Approved
+                            action: approved_by_department_head
+                            actor_user_id: 16
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T10:00:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Draft
+                            action:
+                              type: string
+                              example: draft_created
+                            actor_user_id:
+                              type: integer
+                              example: 12
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            revision:
+                              type: integer
+                              example: 1
+                            evidence_snapshot:
+                              type: object
+                              properties:
+                                english_test:
+                                  type: string
+                                  example: IELTS
+                                english_score:
+                                  type: integer
+                                  example: 7
+                                previous_degree:
+                                  type: string
+                                  example: MSc
+                                is_ejust_graduate:
+                                  type: boolean
+                                  example: true
+                                previous_ejust_program_id:
+                                  type: integer
+                                  example: 2
+                                document_ids:
+                                  type: array
+                                  example:
+                                    - 41
+                                    - 42
+                                  items:
+                                    type: integer
+                            current_revision:
+                              type: boolean
+                              example: true
+                            created_at:
+                              type: string
+                              example: '2026-09-04T09:00:00+00:00'
+                      decision:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          student_id:
+                            type: integer
+                            example: 10
+                          curriculum_version_id:
+                            type: integer
+                            example: 3
+                          target_course_id:
+                            type: integer
+                            example: 5
+                          target_course_code:
+                            type: string
+                            example: PRE401
+                          preparatory_requirement_role:
+                            type: string
+                            example: EnglishLanguage
+                          credit_hours:
+                            type: integer
+                            example: 1
+                          source:
+                            type: string
+                            example: manual
+                          reason_codes:
+                            type: array
+                            example:
+                              - english_proficiency
+                            items:
+                              type: string
+                          admission_application_id:
+                            type: integer
+                            example: null
+                            nullable: true
+                          manual_request_id:
+                            type: integer
+                            example: 1
+                          approved_at:
+                            type: string
+                            example: '2026-09-04T10:00:00+00:00'
+                        description: 'The immutable effective decision when the request was approved.'
+                        nullable: true
+      tags:
+        - 'Manual Exemption Review'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: 'approve, return, or reject.'
+                  example: approve
+                reason:
+                  type: string
+                  description: 'Required for return/reject.'
+                  example: 'Evidence is incomplete.'
+                expected_revision:
+                  type: integer
+                  description: ''
+                  example: 1
+                action_id:
+                  type: string
+                  description: 'Retry-stable UUID.'
+                  example: c482238d-e722-4a61-9c97-aaf4aa7a441f
+              required:
+                - action
+                - expected_revision
+                - action_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: exemption_request_id
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/credit-decisions/exemption-requests/targets:
+    get:
+      summary: 'My bound Preparatory Exemption targets.'
+      operationId: myBoundPreparatoryExemptionTargets
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      target_course_id: 5
+                      target_course_code: PRE401
+                      preparatory_requirement_role: EnglishLanguage
+                      credit_hours: 1
+                      already_exempt: false
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - target_course_id: 5
+                        target_course_code: PRE401
+                        preparatory_requirement_role: EnglishLanguage
+                        credit_hours: 1
+                        already_exempt: false
+                    items:
+                      type: object
+                      properties:
+                        target_course_id:
+                          type: integer
+                          example: 5
+                        target_course_code:
+                          type: string
+                          example: PRE401
+                        preparatory_requirement_role:
+                          type: string
+                          example: EnglishLanguage
+                        credit_hours:
+                          type: integer
+                          example: 1
+                        already_exempt:
+                          type: boolean
+                          example: false
+      tags:
+        - 'Manual Exemptions'
+      security: []
+  /api/v1/credit-decisions/exemption-requests:
+    get:
+      summary: 'My manual Exemption requests.'
+      operationId: myManualExemptionRequests
+      description: ''
+      parameters:
+        -
+          in: query
+          name: status
+          description: 'Comma-separated request statuses.'
+          example: 'Draft,Returned'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated request statuses.'
+            example: 'Draft,Returned'
+        -
+          in: query
+          name: target_course_id
+          description: 'Comma-separated positive Target Curriculum Course IDs.'
+          example: '5,6'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Target Curriculum Course IDs.'
+            example: '5,6'
+        -
+          in: query
+          name: q
+          description: 'Course-code search.'
+          example: PRE
+          required: false
+          schema:
+            type: string
+            description: 'Course-code search.'
+            example: PRE
+        -
+          in: query
+          name: sort
+          description: 'Comma-separated fields; prefix descending fields with -.'
+          example: '-updated_at'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated fields; prefix descending fields with -.'
+            example: '-updated_at'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Rows per page, capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Rows per page, capped at 100.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      student_id: 10
+                      curriculum_version_id: 3
+                      target_course_id: 5
+                      target_course_code: PRE401
+                      preparatory_requirement_role: EnglishLanguage
+                      credit_hours: 1
+                      evidence:
+                        english_test: IELTS
+                        english_score: 7
+                        previous_degree: MSc
+                        is_ejust_graduate: true
+                        previous_ejust_program_id: 2
+                        document_ids:
+                          - 41
+                          - 42
+                      student_note: 'Corrected report'
+                      created_at: '2026-09-04T09:00:00+00:00'
+                      updated_at: '2026-09-04T10:00:00+00:00'
+                      status: Approved
+                      revision: 1
+                      editable: false
+                      terminal: true
+                      submitted_at: '2026-09-04T09:30:00+00:00'
+                      transitions:
+                        -
+                          id: 1
+                          from_status: null
+                          to_status: Draft
+                          action: draft_created
+                          actor_user_id: 12
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:00:00+00:00'
+                        -
+                          id: 2
+                          from_status: Draft
+                          to_status: PendingAdvisor
+                          action: submitted
+                          actor_user_id: 12
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:30:00+00:00'
+                        -
+                          id: 3
+                          from_status: PendingAdvisor
+                          to_status: PendingDepartmentHead
+                          action: recommended_by_advisor
+                          actor_user_id: 14
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T09:45:00+00:00'
+                        -
+                          id: 4
+                          from_status: PendingDepartmentHead
+                          to_status: Approved
+                          action: approved_by_department_head
+                          actor_user_id: 16
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T10:00:00+00:00'
+                      decision:
+                        id: 4
+                        student_id: 10
+                        curriculum_version_id: 3
+                        target_course_id: 5
+                        target_course_code: PRE401
+                        preparatory_requirement_role: EnglishLanguage
+                        credit_hours: 1
+                        source: manual
+                        reason_codes:
+                          - english_proficiency
+                        admission_application_id: null
+                        manual_request_id: 1
+                        approved_at: '2026-09-04T10:00:00+00:00'
+                  links:
+                    first: null
+                    last: null
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    from: 1
+                    last_page: 1
+                    path: 'http://localhost/api/v1/credit-decisions/exemption-requests'
+                    per_page: 25
+                    to: 1
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        student_id: 10
+                        curriculum_version_id: 3
+                        target_course_id: 5
+                        target_course_code: PRE401
+                        preparatory_requirement_role: EnglishLanguage
+                        credit_hours: 1
+                        evidence:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        student_note: 'Corrected report'
+                        created_at: '2026-09-04T09:00:00+00:00'
+                        updated_at: '2026-09-04T10:00:00+00:00'
+                        status: Approved
+                        revision: 1
+                        editable: false
+                        terminal: true
+                        submitted_at: '2026-09-04T09:30:00+00:00'
+                        transitions:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:30:00+00:00'
+                          -
+                            id: 3
+                            from_status: PendingAdvisor
+                            to_status: PendingDepartmentHead
+                            action: recommended_by_advisor
+                            actor_user_id: 14
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:45:00+00:00'
+                          -
+                            id: 4
+                            from_status: PendingDepartmentHead
+                            to_status: Approved
+                            action: approved_by_department_head
+                            actor_user_id: 16
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T10:00:00+00:00'
+                        decision:
+                          id: 4
+                          student_id: 10
+                          curriculum_version_id: 3
+                          target_course_id: 5
+                          target_course_code: PRE401
+                          preparatory_requirement_role: EnglishLanguage
+                          credit_hours: 1
+                          source: manual
+                          reason_codes:
+                            - english_proficiency
+                          admission_application_id: null
+                          manual_request_id: 1
+                          approved_at: '2026-09-04T10:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 10
+                        curriculum_version_id:
+                          type: integer
+                          example: 3
+                        target_course_id:
+                          type: integer
+                          example: 5
+                        target_course_code:
+                          type: string
+                          example: PRE401
+                        preparatory_requirement_role:
+                          type: string
+                          example: EnglishLanguage
+                        credit_hours:
+                          type: integer
+                          example: 1
+                        evidence:
+                          type: object
+                          properties:
+                            english_test:
+                              type: string
+                              example: IELTS
+                            english_score:
+                              type: integer
+                              example: 7
+                            previous_degree:
+                              type: string
+                              example: MSc
+                            is_ejust_graduate:
+                              type: boolean
+                              example: true
+                            previous_ejust_program_id:
+                              type: integer
+                              example: 2
+                            document_ids:
+                              type: array
+                              example:
+                                - 41
+                                - 42
+                              items:
+                                type: integer
+                        student_note:
+                          type: string
+                          example: 'Corrected report'
+                          nullable: true
+                        created_at:
+                          type: string
+                          example: '2026-09-04T09:00:00+00:00'
+                        updated_at:
+                          type: string
+                          example: '2026-09-04T10:00:00+00:00'
+                        status:
+                          type: string
+                          example: Approved
+                        revision:
+                          type: integer
+                          example: 1
+                        editable:
+                          type: boolean
+                          example: false
+                        terminal:
+                          type: boolean
+                          example: true
+                        submitted_at:
+                          type: string
+                          example: '2026-09-04T09:30:00+00:00'
+                          nullable: true
+                        transitions:
+                          type: array
+                          example:
+                            -
+                              id: 1
+                              from_status: null
+                              to_status: Draft
+                              action: draft_created
+                              actor_user_id: 12
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:00:00+00:00'
+                            -
+                              id: 2
+                              from_status: Draft
+                              to_status: PendingAdvisor
+                              action: submitted
+                              actor_user_id: 12
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:30:00+00:00'
+                            -
+                              id: 3
+                              from_status: PendingAdvisor
+                              to_status: PendingDepartmentHead
+                              action: recommended_by_advisor
+                              actor_user_id: 14
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T09:45:00+00:00'
+                            -
+                              id: 4
+                              from_status: PendingDepartmentHead
+                              to_status: Approved
+                              action: approved_by_department_head
+                              actor_user_id: 16
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T10:00:00+00:00'
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              from_status:
+                                type: string
+                                example: null
+                                nullable: true
+                              to_status:
+                                type: string
+                                example: Draft
+                              action:
+                                type: string
+                                example: draft_created
+                              actor_user_id:
+                                type: integer
+                                example: 12
+                              reason:
+                                type: string
+                                example: null
+                                nullable: true
+                              revision:
+                                type: integer
+                                example: 1
+                              evidence_snapshot:
+                                type: object
+                                properties:
+                                  english_test:
+                                    type: string
+                                    example: IELTS
+                                  english_score:
+                                    type: integer
+                                    example: 7
+                                  previous_degree:
+                                    type: string
+                                    example: MSc
+                                  is_ejust_graduate:
+                                    type: boolean
+                                    example: true
+                                  previous_ejust_program_id:
+                                    type: integer
+                                    example: 2
+                                  document_ids:
+                                    type: array
+                                    example:
+                                      - 41
+                                      - 42
+                                    items:
+                                      type: integer
+                              current_revision:
+                                type: boolean
+                                example: true
+                              created_at:
+                                type: string
+                                example: '2026-09-04T09:00:00+00:00'
+                        decision:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            student_id:
+                              type: integer
+                              example: 10
+                            curriculum_version_id:
+                              type: integer
+                              example: 3
+                            target_course_id:
+                              type: integer
+                              example: 5
+                            target_course_code:
+                              type: string
+                              example: PRE401
+                            preparatory_requirement_role:
+                              type: string
+                              example: EnglishLanguage
+                            credit_hours:
+                              type: integer
+                              example: 1
+                            source:
+                              type: string
+                              example: manual
+                            reason_codes:
+                              type: array
+                              example:
+                                - english_proficiency
+                              items:
+                                type: string
+                            admission_application_id:
+                              type: integer
+                              example: null
+                              nullable: true
+                            manual_request_id:
+                              type: integer
+                              example: 1
+                            approved_at:
+                              type: string
+                              example: '2026-09-04T10:00:00+00:00'
+                          description: 'The immutable effective decision when the request was approved.'
+                          nullable: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: null
+                        nullable: true
+                      last:
+                        type: string
+                        example: null
+                        nullable: true
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      from:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      path:
+                        type: string
+                        example: 'http://localhost/api/v1/credit-decisions/exemption-requests'
+                      per_page:
+                        type: integer
+                        example: 25
+                      to:
+                        type: integer
+                        example: 1
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - 'Manual Exemptions'
+      security: []
+    post:
+      summary: 'Create a manual Exemption Draft.'
+      operationId: createAManualExemptionDraft
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 10
+                    curriculum_version_id: 3
+                    target_course_id: 5
+                    target_course_code: PRE401
+                    preparatory_requirement_role: EnglishLanguage
+                    credit_hours: 1
+                    evidence:
+                      english_test: IELTS
+                      english_score: 7
+                      previous_degree: MSc
+                      is_ejust_graduate: true
+                      previous_ejust_program_id: 2
+                      document_ids:
+                        - 41
+                        - 42
+                    student_note: 'Corrected report'
+                    created_at: '2026-09-04T09:00:00+00:00'
+                    updated_at: '2026-09-04T10:00:00+00:00'
+                    status: Draft
+                    revision: 1
+                    editable: true
+                    terminal: false
+                    submitted_at: null
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Draft
+                        action: draft_created
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:00:00+00:00'
+                    decision: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 10
+                      curriculum_version_id:
+                        type: integer
+                        example: 3
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      preparatory_requirement_role:
+                        type: string
+                        example: EnglishLanguage
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      evidence:
+                        type: object
+                        properties:
+                          english_test:
+                            type: string
+                            example: IELTS
+                          english_score:
+                            type: integer
+                            example: 7
+                          previous_degree:
+                            type: string
+                            example: MSc
+                          is_ejust_graduate:
+                            type: boolean
+                            example: true
+                          previous_ejust_program_id:
+                            type: integer
+                            example: 2
+                          document_ids:
+                            type: array
+                            example:
+                              - 41
+                              - 42
+                            items:
+                              type: integer
+                      student_note:
+                        type: string
+                        example: 'Corrected report'
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-09-04T09:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-09-04T10:00:00+00:00'
+                      status:
+                        type: string
+                        example: Draft
+                      revision:
+                        type: integer
+                        example: 1
+                      editable:
+                        type: boolean
+                        example: true
+                      terminal:
+                        type: boolean
+                        example: false
+                      submitted_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      transitions:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Draft
+                            action:
+                              type: string
+                              example: draft_created
+                            actor_user_id:
+                              type: integer
+                              example: 12
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            revision:
+                              type: integer
+                              example: 1
+                            evidence_snapshot:
+                              type: object
+                              properties:
+                                english_test:
+                                  type: string
+                                  example: IELTS
+                                english_score:
+                                  type: integer
+                                  example: 7
+                                previous_degree:
+                                  type: string
+                                  example: MSc
+                                is_ejust_graduate:
+                                  type: boolean
+                                  example: true
+                                previous_ejust_program_id:
+                                  type: integer
+                                  example: 2
+                                document_ids:
+                                  type: array
+                                  example:
+                                    - 41
+                                    - 42
+                                  items:
+                                    type: integer
+                            current_revision:
+                              type: boolean
+                              example: true
+                            created_at:
+                              type: string
+                              example: '2026-09-04T09:00:00+00:00'
+                      decision:
+                        type: object
+                        example: null
+                        description: 'The immutable effective decision when the request was approved.'
+                        nullable: true
+      tags:
+        - 'Manual Exemptions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                target_course_id:
+                  type: integer
+                  description: "A Preparatory Course in the Student's bound Curriculum."
+                  example: 5
+                evidence:
+                  type: object
+                  description: 'Structured corrected or missing qualification evidence.'
+                  example: []
+                  properties:
+                    english_test:
+                      type: string
+                      description: ''
+                      example: IELTS
+                    english_score:
+                      type: number
+                      description: ''
+                      example: 7.0
+                    previous_degree:
+                      type: string
+                      description: ''
+                      example: MSc
+                    is_ejust_graduate:
+                      type: boolean
+                      description: ''
+                      example: true
+                    previous_ejust_program_id:
+                      type: integer
+                      description: ''
+                      example: 2
+                    document_ids:
+                      type: array
+                      description: 'Supporting document IDs.'
+                      example:
+                        - 41
+                        - 42
+                      items:
+                        type: integer
+                student_note:
+                  type: string
+                  description: 'Student explanation.'
+                  example: 'Corrected score report.'
+              required:
+                - target_course_id
+                - evidence
+      security: []
+  /api/v1/credit-decisions/exemption-requests/export:
+    get:
+      summary: 'Export my manual Exemptions.'
+      operationId: exportMyManualExemptions
+      description: ''
+      parameters:
+        -
+          in: query
+          name: status
+          description: 'Comma-separated request statuses.'
+          example: 'Draft,Returned'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated request statuses.'
+            example: 'Draft,Returned'
+        -
+          in: query
+          name: target_course_id
+          description: 'Comma-separated positive Target Curriculum Course IDs.'
+          example: '5,6'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated positive Target Curriculum Course IDs.'
+            example: '5,6'
+        -
+          in: query
+          name: q
+          description: 'Course-code search.'
+          example: PRE
+          required: false
+          schema:
+            type: string
+            description: 'Course-code search.'
+            example: PRE
+        -
+          in: query
+          name: sort
+          description: ''
+          example: '-updated_at'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '-updated_at'
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - 'Manual Exemptions'
+      security: []
+  '/api/v1/credit-decisions/exemption-requests/{exemption_request_id}':
+    get:
+      summary: 'View one of my manual Exemption requests.'
+      operationId: viewOneOfMyManualExemptionRequests
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 10
+                    curriculum_version_id: 3
+                    target_course_id: 5
+                    target_course_code: PRE401
+                    preparatory_requirement_role: EnglishLanguage
+                    credit_hours: 1
+                    evidence:
+                      english_test: IELTS
+                      english_score: 7
+                      previous_degree: MSc
+                      is_ejust_graduate: true
+                      previous_ejust_program_id: 2
+                      document_ids:
+                        - 41
+                        - 42
+                    student_note: 'Corrected report'
+                    created_at: '2026-09-04T09:00:00+00:00'
+                    updated_at: '2026-09-04T10:00:00+00:00'
+                    status: Approved
+                    revision: 1
+                    editable: false
+                    terminal: true
+                    submitted_at: '2026-09-04T09:30:00+00:00'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Draft
+                        action: draft_created
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:00:00+00:00'
+                      -
+                        id: 2
+                        from_status: Draft
+                        to_status: PendingAdvisor
+                        action: submitted
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:30:00+00:00'
+                      -
+                        id: 3
+                        from_status: PendingAdvisor
+                        to_status: PendingDepartmentHead
+                        action: recommended_by_advisor
+                        actor_user_id: 14
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:45:00+00:00'
+                      -
+                        id: 4
+                        from_status: PendingDepartmentHead
+                        to_status: Approved
+                        action: approved_by_department_head
+                        actor_user_id: 16
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T10:00:00+00:00'
+                    decision:
+                      id: 4
+                      student_id: 10
+                      curriculum_version_id: 3
+                      target_course_id: 5
+                      target_course_code: PRE401
+                      preparatory_requirement_role: EnglishLanguage
+                      credit_hours: 1
+                      source: manual
+                      reason_codes:
+                        - english_proficiency
+                      admission_application_id: null
+                      manual_request_id: 1
+                      approved_at: '2026-09-04T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 10
+                      curriculum_version_id:
+                        type: integer
+                        example: 3
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      preparatory_requirement_role:
+                        type: string
+                        example: EnglishLanguage
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      evidence:
+                        type: object
+                        properties:
+                          english_test:
+                            type: string
+                            example: IELTS
+                          english_score:
+                            type: integer
+                            example: 7
+                          previous_degree:
+                            type: string
+                            example: MSc
+                          is_ejust_graduate:
+                            type: boolean
+                            example: true
+                          previous_ejust_program_id:
+                            type: integer
+                            example: 2
+                          document_ids:
+                            type: array
+                            example:
+                              - 41
+                              - 42
+                            items:
+                              type: integer
+                      student_note:
+                        type: string
+                        example: 'Corrected report'
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-09-04T09:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-09-04T10:00:00+00:00'
+                      status:
+                        type: string
+                        example: Approved
+                      revision:
+                        type: integer
+                        example: 1
+                      editable:
+                        type: boolean
+                        example: false
+                      terminal:
+                        type: boolean
+                        example: true
+                      submitted_at:
+                        type: string
+                        example: '2026-09-04T09:30:00+00:00'
+                        nullable: true
+                      transitions:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:30:00+00:00'
+                          -
+                            id: 3
+                            from_status: PendingAdvisor
+                            to_status: PendingDepartmentHead
+                            action: recommended_by_advisor
+                            actor_user_id: 14
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:45:00+00:00'
+                          -
+                            id: 4
+                            from_status: PendingDepartmentHead
+                            to_status: Approved
+                            action: approved_by_department_head
+                            actor_user_id: 16
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T10:00:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Draft
+                            action:
+                              type: string
+                              example: draft_created
+                            actor_user_id:
+                              type: integer
+                              example: 12
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            revision:
+                              type: integer
+                              example: 1
+                            evidence_snapshot:
+                              type: object
+                              properties:
+                                english_test:
+                                  type: string
+                                  example: IELTS
+                                english_score:
+                                  type: integer
+                                  example: 7
+                                previous_degree:
+                                  type: string
+                                  example: MSc
+                                is_ejust_graduate:
+                                  type: boolean
+                                  example: true
+                                previous_ejust_program_id:
+                                  type: integer
+                                  example: 2
+                                document_ids:
+                                  type: array
+                                  example:
+                                    - 41
+                                    - 42
+                                  items:
+                                    type: integer
+                            current_revision:
+                              type: boolean
+                              example: true
+                            created_at:
+                              type: string
+                              example: '2026-09-04T09:00:00+00:00'
+                      decision:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          student_id:
+                            type: integer
+                            example: 10
+                          curriculum_version_id:
+                            type: integer
+                            example: 3
+                          target_course_id:
+                            type: integer
+                            example: 5
+                          target_course_code:
+                            type: string
+                            example: PRE401
+                          preparatory_requirement_role:
+                            type: string
+                            example: EnglishLanguage
+                          credit_hours:
+                            type: integer
+                            example: 1
+                          source:
+                            type: string
+                            example: manual
+                          reason_codes:
+                            type: array
+                            example:
+                              - english_proficiency
+                            items:
+                              type: string
+                          admission_application_id:
+                            type: integer
+                            example: null
+                            nullable: true
+                          manual_request_id:
+                            type: integer
+                            example: 1
+                          approved_at:
+                            type: string
+                            example: '2026-09-04T10:00:00+00:00'
+                        description: 'The immutable effective decision when the request was approved.'
+                        nullable: true
+      tags:
+        - 'Manual Exemptions'
+      security: []
+    patch:
+      summary: 'Revise an editable Draft or Returned request.'
+      operationId: reviseAnEditableDraftOrReturnedRequest
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 10
+                    curriculum_version_id: 3
+                    target_course_id: 5
+                    target_course_code: PRE401
+                    preparatory_requirement_role: EnglishLanguage
+                    credit_hours: 1
+                    evidence:
+                      english_test: IELTS
+                      english_score: 7
+                      previous_degree: MSc
+                      is_ejust_graduate: true
+                      previous_ejust_program_id: 2
+                      document_ids:
+                        - 41
+                        - 42
+                    student_note: 'Corrected report'
+                    created_at: '2026-09-04T09:00:00+00:00'
+                    updated_at: '2026-09-04T10:00:00+00:00'
+                    status: Returned
+                    revision: 2
+                    editable: true
+                    terminal: false
+                    submitted_at: '2026-09-04T09:30:00+00:00'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Draft
+                        action: draft_created
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: false
+                        created_at: '2026-09-04T09:00:00+00:00'
+                      -
+                        id: 2
+                        from_status: Draft
+                        to_status: PendingAdvisor
+                        action: submitted
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: false
+                        created_at: '2026-09-04T09:30:00+00:00'
+                      -
+                        id: 3
+                        from_status: PendingAdvisor
+                        to_status: Returned
+                        action: returned_by_advisor
+                        actor_user_id: 14
+                        reason: 'Upload a readable score report.'
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: false
+                        created_at: '2026-09-04T09:45:00+00:00'
+                    decision: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 10
+                      curriculum_version_id:
+                        type: integer
+                        example: 3
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      preparatory_requirement_role:
+                        type: string
+                        example: EnglishLanguage
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      evidence:
+                        type: object
+                        properties:
+                          english_test:
+                            type: string
+                            example: IELTS
+                          english_score:
+                            type: integer
+                            example: 7
+                          previous_degree:
+                            type: string
+                            example: MSc
+                          is_ejust_graduate:
+                            type: boolean
+                            example: true
+                          previous_ejust_program_id:
+                            type: integer
+                            example: 2
+                          document_ids:
+                            type: array
+                            example:
+                              - 41
+                              - 42
+                            items:
+                              type: integer
+                      student_note:
+                        type: string
+                        example: 'Corrected report'
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-09-04T09:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-09-04T10:00:00+00:00'
+                      status:
+                        type: string
+                        example: Returned
+                      revision:
+                        type: integer
+                        example: 2
+                      editable:
+                        type: boolean
+                        example: true
+                      terminal:
+                        type: boolean
+                        example: false
+                      submitted_at:
+                        type: string
+                        example: '2026-09-04T09:30:00+00:00'
+                        nullable: true
+                      transitions:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: false
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: false
+                            created_at: '2026-09-04T09:30:00+00:00'
+                          -
+                            id: 3
+                            from_status: PendingAdvisor
+                            to_status: Returned
+                            action: returned_by_advisor
+                            actor_user_id: 14
+                            reason: 'Upload a readable score report.'
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: false
+                            created_at: '2026-09-04T09:45:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Draft
+                            action:
+                              type: string
+                              example: draft_created
+                            actor_user_id:
+                              type: integer
+                              example: 12
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            revision:
+                              type: integer
+                              example: 1
+                            evidence_snapshot:
+                              type: object
+                              properties:
+                                english_test:
+                                  type: string
+                                  example: IELTS
+                                english_score:
+                                  type: integer
+                                  example: 7
+                                previous_degree:
+                                  type: string
+                                  example: MSc
+                                is_ejust_graduate:
+                                  type: boolean
+                                  example: true
+                                previous_ejust_program_id:
+                                  type: integer
+                                  example: 2
+                                document_ids:
+                                  type: array
+                                  example:
+                                    - 41
+                                    - 42
+                                  items:
+                                    type: integer
+                            current_revision:
+                              type: boolean
+                              example: false
+                            created_at:
+                              type: string
+                              example: '2026-09-04T09:00:00+00:00'
+                      decision:
+                        type: object
+                        example: null
+                        description: 'The immutable effective decision when the request was approved.'
+                        nullable: true
+      tags:
+        - 'Manual Exemptions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expected_revision:
+                  type: integer
+                  description: ''
+                  example: 1
+                student_note:
+                  type: string
+                  description: 'Student explanation.'
+                  example: architecto
+                  nullable: true
+                evidence:
+                  type: object
+                  description: 'Structured qualification evidence.'
+                  example: []
+                  properties:
+                    english_test:
+                      type: string
+                      description: ''
+                      example: IELTS
+                    english_score:
+                      type: number
+                      description: ''
+                      example: 7.0
+                    previous_degree:
+                      type: string
+                      description: ''
+                      example: MSc
+                    is_ejust_graduate:
+                      type: boolean
+                      description: ''
+                      example: true
+                    previous_ejust_program_id:
+                      type: integer
+                      description: ''
+                      example: 2
+                    document_ids:
+                      type: array
+                      description: 'Supporting document IDs.'
+                      example:
+                        - 41
+                        - 42
+                      items:
+                        type: integer
+              required:
+                - expected_revision
+      security: []
+    delete:
+      summary: 'Abandon a Draft request.'
+      operationId: abandonADraftRequest
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 10
+                    curriculum_version_id: 3
+                    target_course_id: 5
+                    target_course_code: PRE401
+                    preparatory_requirement_role: EnglishLanguage
+                    credit_hours: 1
+                    evidence:
+                      english_test: IELTS
+                      english_score: 7
+                      previous_degree: MSc
+                      is_ejust_graduate: true
+                      previous_ejust_program_id: 2
+                      document_ids:
+                        - 41
+                        - 42
+                    student_note: 'Corrected report'
+                    created_at: '2026-09-04T09:00:00+00:00'
+                    updated_at: '2026-09-04T10:00:00+00:00'
+                    status: Abandoned
+                    revision: 1
+                    editable: false
+                    terminal: true
+                    submitted_at: null
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Draft
+                        action: draft_created
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:00:00+00:00'
+                      -
+                        id: 2
+                        from_status: Draft
+                        to_status: Abandoned
+                        action: abandoned
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:15:00+00:00'
+                    decision: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 10
+                      curriculum_version_id:
+                        type: integer
+                        example: 3
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      preparatory_requirement_role:
+                        type: string
+                        example: EnglishLanguage
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      evidence:
+                        type: object
+                        properties:
+                          english_test:
+                            type: string
+                            example: IELTS
+                          english_score:
+                            type: integer
+                            example: 7
+                          previous_degree:
+                            type: string
+                            example: MSc
+                          is_ejust_graduate:
+                            type: boolean
+                            example: true
+                          previous_ejust_program_id:
+                            type: integer
+                            example: 2
+                          document_ids:
+                            type: array
+                            example:
+                              - 41
+                              - 42
+                            items:
+                              type: integer
+                      student_note:
+                        type: string
+                        example: 'Corrected report'
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-09-04T09:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-09-04T10:00:00+00:00'
+                      status:
+                        type: string
+                        example: Abandoned
+                      revision:
+                        type: integer
+                        example: 1
+                      editable:
+                        type: boolean
+                        example: false
+                      terminal:
+                        type: boolean
+                        example: true
+                      submitted_at:
+                        type: string
+                        example: null
+                        nullable: true
+                      transitions:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: Abandoned
+                            action: abandoned
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:15:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Draft
+                            action:
+                              type: string
+                              example: draft_created
+                            actor_user_id:
+                              type: integer
+                              example: 12
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            revision:
+                              type: integer
+                              example: 1
+                            evidence_snapshot:
+                              type: object
+                              properties:
+                                english_test:
+                                  type: string
+                                  example: IELTS
+                                english_score:
+                                  type: integer
+                                  example: 7
+                                previous_degree:
+                                  type: string
+                                  example: MSc
+                                is_ejust_graduate:
+                                  type: boolean
+                                  example: true
+                                previous_ejust_program_id:
+                                  type: integer
+                                  example: 2
+                                document_ids:
+                                  type: array
+                                  example:
+                                    - 41
+                                    - 42
+                                  items:
+                                    type: integer
+                            current_revision:
+                              type: boolean
+                              example: true
+                            created_at:
+                              type: string
+                              example: '2026-09-04T09:00:00+00:00'
+                      decision:
+                        type: object
+                        example: null
+                        description: 'The immutable effective decision when the request was approved.'
+                        nullable: true
+      tags:
+        - 'Manual Exemptions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expected_revision:
+                  type: integer
+                  description: ''
+                  example: 1
+              required:
+                - expected_revision
+      security: []
+    parameters:
+      -
+        in: path
+        name: exemption_request_id
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/credit-decisions/exemption-requests/{exemption_request_id}/submit':
+    post:
+      summary: 'Submit or resubmit an Exemption request.'
+      operationId: submitOrResubmitAnExemptionRequest
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 10
+                    curriculum_version_id: 3
+                    target_course_id: 5
+                    target_course_code: PRE401
+                    preparatory_requirement_role: EnglishLanguage
+                    credit_hours: 1
+                    evidence:
+                      english_test: IELTS
+                      english_score: 7
+                      previous_degree: MSc
+                      is_ejust_graduate: true
+                      previous_ejust_program_id: 2
+                      document_ids:
+                        - 41
+                        - 42
+                    student_note: 'Corrected report'
+                    created_at: '2026-09-04T09:00:00+00:00'
+                    updated_at: '2026-09-04T10:00:00+00:00'
+                    status: PendingAdvisor
+                    revision: 1
+                    editable: false
+                    terminal: false
+                    submitted_at: '2026-09-04T09:30:00+00:00'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Draft
+                        action: draft_created
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:00:00+00:00'
+                      -
+                        id: 2
+                        from_status: Draft
+                        to_status: PendingAdvisor
+                        action: submitted
+                        actor_user_id: 12
+                        reason: null
+                        revision: 1
+                        evidence_snapshot:
+                          english_test: IELTS
+                          english_score: 7
+                          previous_degree: MSc
+                          is_ejust_graduate: true
+                          previous_ejust_program_id: 2
+                          document_ids:
+                            - 41
+                            - 42
+                        current_revision: true
+                        created_at: '2026-09-04T09:30:00+00:00'
+                    decision: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 10
+                      curriculum_version_id:
+                        type: integer
+                        example: 3
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      preparatory_requirement_role:
+                        type: string
+                        example: EnglishLanguage
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      evidence:
+                        type: object
+                        properties:
+                          english_test:
+                            type: string
+                            example: IELTS
+                          english_score:
+                            type: integer
+                            example: 7
+                          previous_degree:
+                            type: string
+                            example: MSc
+                          is_ejust_graduate:
+                            type: boolean
+                            example: true
+                          previous_ejust_program_id:
+                            type: integer
+                            example: 2
+                          document_ids:
+                            type: array
+                            example:
+                              - 41
+                              - 42
+                            items:
+                              type: integer
+                      student_note:
+                        type: string
+                        example: 'Corrected report'
+                        nullable: true
+                      created_at:
+                        type: string
+                        example: '2026-09-04T09:00:00+00:00'
+                      updated_at:
+                        type: string
+                        example: '2026-09-04T10:00:00+00:00'
+                      status:
+                        type: string
+                        example: PendingAdvisor
+                      revision:
+                        type: integer
+                        example: 1
+                      editable:
+                        type: boolean
+                        example: false
+                      terminal:
+                        type: boolean
+                        example: false
+                      submitted_at:
+                        type: string
+                        example: '2026-09-04T09:30:00+00:00'
+                        nullable: true
+                      transitions:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            from_status: null
+                            to_status: Draft
+                            action: draft_created
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:00:00+00:00'
+                          -
+                            id: 2
+                            from_status: Draft
+                            to_status: PendingAdvisor
+                            action: submitted
+                            actor_user_id: 12
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T09:30:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Draft
+                            action:
+                              type: string
+                              example: draft_created
+                            actor_user_id:
+                              type: integer
+                              example: 12
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            revision:
+                              type: integer
+                              example: 1
+                            evidence_snapshot:
+                              type: object
+                              properties:
+                                english_test:
+                                  type: string
+                                  example: IELTS
+                                english_score:
+                                  type: integer
+                                  example: 7
+                                previous_degree:
+                                  type: string
+                                  example: MSc
+                                is_ejust_graduate:
+                                  type: boolean
+                                  example: true
+                                previous_ejust_program_id:
+                                  type: integer
+                                  example: 2
+                                document_ids:
+                                  type: array
+                                  example:
+                                    - 41
+                                    - 42
+                                  items:
+                                    type: integer
+                            current_revision:
+                              type: boolean
+                              example: true
+                            created_at:
+                              type: string
+                              example: '2026-09-04T09:00:00+00:00'
+                      decision:
+                        type: object
+                        example: null
+                        description: 'The immutable effective decision when the request was approved.'
+                        nullable: true
+      tags:
+        - 'Manual Exemptions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expected_revision:
+                  type: integer
+                  description: ''
+                  example: 1
+                action_id:
+                  type: string
+                  description: 'A retry-stable UUID.'
+                  example: 98e597dd-8267-4bc1-934e-91f8324e0ec1
+              required:
+                - expected_revision
+                - action_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: exemption_request_id
+        description: ''
+        example: 1
         required: true
         schema:
           type: integer

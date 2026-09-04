@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { AxiosRequestConfig } from 'axios'
-import '../shared/i18n/config' // initialise i18next so useTranslation works
+import i18n from '../shared/i18n/config'
 import { NotificationsBell } from './NotificationsBell'
 
 interface Row {
@@ -64,7 +64,8 @@ function renderBell() {
 }
 
 describe('NotificationsBell', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('en')
     srv.unread = 3
     srv.rows = [
       {
@@ -153,5 +154,39 @@ describe('NotificationsBell', () => {
     expect(
       await screen.findByText(/automatic preparatory exemption.*ENG-PREP-X/i),
     ).toBeInTheDocument()
+  })
+
+  it('addresses Department Head outcomes to the Advisor in English and Arabic', async () => {
+    const user = userEvent.setup()
+    srv.unread = 2
+    srv.rows = [
+      {
+        id: 5,
+        type: 'exemption.request_decided',
+        data: { course_code: 'PRE401', outcome: 'Approved', audience: 'advisor' },
+        read_at: null,
+        created_at: '2026-09-04T10:00:00+00:00',
+      },
+      {
+        id: 6,
+        type: 'exemption.request_returned',
+        data: { course_code: 'PRE402', audience: 'advisor' },
+        read_at: null,
+        created_at: '2026-09-04T09:00:00+00:00',
+      },
+    ]
+    renderBell()
+
+    await user.click(screen.getByRole('button', { name: /open notifications/i }))
+    expect(
+      await screen.findByText(/an advisee's exemption request.*PRE401.*approved/i),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/an advisee's exemption request.*PRE402.*returned/i),
+    ).toBeInTheDocument()
+
+    await i18n.changeLanguage('ar')
+    expect(await screen.findByText(/طلب إعفاء لأحد طلابك.*PRE401.*مقبول/)).toBeInTheDocument()
+    expect(await screen.findByText(/طلب إعفاء لأحد طلابك.*PRE402.*للتعديل/)).toBeInTheDocument()
   })
 })

@@ -61,6 +61,18 @@ enum NotificationType: string
     /** An admission rule released one Preparatory requirement. */
     case AutomaticExemptionApplied = 'exemption.automatically_applied';
 
+    /** A Student submitted or resubmitted a manual Exemption request. */
+    case ManualExemptionSubmitted = 'exemption.request_submitted';
+
+    /** A reviewer returned a manual Exemption request to the Student. */
+    case ManualExemptionReturned = 'exemption.request_returned';
+
+    /** An Advisor recommended a request to its scoped Department Head. */
+    case ManualExemptionRecommended = 'exemption.request_recommended';
+
+    /** A reviewer recorded a terminal manual Exemption outcome. */
+    case ManualExemptionDecided = 'exemption.request_decided';
+
     /**
      * A Student (or staff on their behalf) submitted a registration for the advisor's
      * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds

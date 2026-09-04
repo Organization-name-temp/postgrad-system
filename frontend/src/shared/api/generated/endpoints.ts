@@ -2795,7 +2795,16 @@ export type MyEffectiveExemptions200DataItem = {
   credit_hours?: number;
   source?: string;
   reason_codes?: string[];
-  admission_application_id?: number;
+  /**
+     * Source admission Application for an automatic decision.
+     * @nullable
+     */
+  admission_application_id?: number | null;
+  /**
+     * Source manual Exemption request for a manual decision.
+     * @nullable
+     */
+  manual_request_id?: number | null;
   approved_at?: string;
 };
 
@@ -2869,6 +2878,7 @@ export type CurrentUser200DataStudent = {
   admission_cycle_id?: number;
   advisor_id?: number;
   admitted_at?: string;
+  lifecycle_status?: string;
 };
 
 export type CurrentUser200Data = {
@@ -5386,6 +5396,1051 @@ export type OneStudentsGradeRecordForAScopedReviewer403 = {
 
 export type OneStudentsGradeRecordForAScopedReviewer404 = {
   message?: string;
+};
+
+export type AdvisorManualExemptionQueueParams = {
+/**
+ * Comma-separated positive Target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive Student anchor IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, or Course-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type AdvisorManualExemptionQueue200DataItemEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type AdvisorManualExemptionQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type AdvisorManualExemptionQueue200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AdvisorManualExemptionQueue200DataItemTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type AdvisorManualExemptionQueue200DataItemDecision = { [key: string]: unknown } | null;
+
+export type AdvisorManualExemptionQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type AdvisorManualExemptionQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: AdvisorManualExemptionQueue200DataItemEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: AdvisorManualExemptionQueue200DataItemTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: AdvisorManualExemptionQueue200DataItemDecision;
+  student?: AdvisorManualExemptionQueue200DataItemStudent;
+};
+
+export type AdvisorManualExemptionQueue200Links = {
+  /** @nullable */
+  first?: string | null;
+  /** @nullable */
+  last?: string | null;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type AdvisorManualExemptionQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type AdvisorManualExemptionQueue200 = {
+  data?: AdvisorManualExemptionQueue200DataItem[];
+  links?: AdvisorManualExemptionQueue200Links;
+  meta?: AdvisorManualExemptionQueue200Meta;
+};
+
+export type ExportAdvisorExemptionQueueParams = {
+/**
+ * Comma-separated positive Target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive Student anchor IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, or Course-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type AdvisorActionOnACurrentAdviseesRequestBody = {
+  /** recommend, return, or reject. */
+  action: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type AdvisorActionOnACurrentAdviseesRequest200DataEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type AdvisorActionOnACurrentAdviseesRequest200DataTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type AdvisorActionOnACurrentAdviseesRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AdvisorActionOnACurrentAdviseesRequest200DataTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type AdvisorActionOnACurrentAdviseesRequest200DataDecision = { [key: string]: unknown } | null;
+
+export type AdvisorActionOnACurrentAdviseesRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: AdvisorActionOnACurrentAdviseesRequest200DataEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: AdvisorActionOnACurrentAdviseesRequest200DataTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: AdvisorActionOnACurrentAdviseesRequest200DataDecision;
+};
+
+export type AdvisorActionOnACurrentAdviseesRequest200 = {
+  data?: AdvisorActionOnACurrentAdviseesRequest200Data;
+};
+
+export type DepartmentHeadManualExemptionQueueParams = {
+/**
+ * Comma-separated positive Target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive Student anchor IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, or Course-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type DepartmentHeadManualExemptionQueue200DataItemEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type DepartmentHeadManualExemptionQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type DepartmentHeadManualExemptionQueue200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: DepartmentHeadManualExemptionQueue200DataItemTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type DepartmentHeadManualExemptionQueue200DataItemDecision = { [key: string]: unknown } | null;
+
+export type DepartmentHeadManualExemptionQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type DepartmentHeadManualExemptionQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: DepartmentHeadManualExemptionQueue200DataItemEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: DepartmentHeadManualExemptionQueue200DataItemTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: DepartmentHeadManualExemptionQueue200DataItemDecision;
+  student?: DepartmentHeadManualExemptionQueue200DataItemStudent;
+};
+
+export type DepartmentHeadManualExemptionQueue200Links = {
+  /** @nullable */
+  first?: string | null;
+  /** @nullable */
+  last?: string | null;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type DepartmentHeadManualExemptionQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type DepartmentHeadManualExemptionQueue200 = {
+  data?: DepartmentHeadManualExemptionQueue200DataItem[];
+  links?: DepartmentHeadManualExemptionQueue200Links;
+  meta?: DepartmentHeadManualExemptionQueue200Meta;
+};
+
+export type ExportDepartmentHeadExemptionQueueParams = {
+/**
+ * Comma-separated positive Target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive Student anchor IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, or Course-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type ScopedDepartmentHeadFinalActionBody = {
+  /** approve, return, or reject. */
+  action: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type ScopedDepartmentHeadFinalAction200DataEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type ScopedDepartmentHeadFinalAction200DataTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type ScopedDepartmentHeadFinalAction200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ScopedDepartmentHeadFinalAction200DataTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type ScopedDepartmentHeadFinalAction200DataDecision = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  source?: string;
+  reason_codes?: string[];
+  /** @nullable */
+  admission_application_id?: number | null;
+  manual_request_id?: number;
+  approved_at?: string;
+} | null;
+
+export type ScopedDepartmentHeadFinalAction200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: ScopedDepartmentHeadFinalAction200DataEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: ScopedDepartmentHeadFinalAction200DataTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: ScopedDepartmentHeadFinalAction200DataDecision;
+};
+
+export type ScopedDepartmentHeadFinalAction200 = {
+  data?: ScopedDepartmentHeadFinalAction200Data;
+};
+
+export type MyBoundPreparatoryExemptionTargets200DataItem = {
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  already_exempt?: boolean;
+};
+
+export type MyBoundPreparatoryExemptionTargets200 = {
+  data?: MyBoundPreparatoryExemptionTargets200DataItem[];
+};
+
+export type MyManualExemptionRequestsParams = {
+/**
+ * Comma-separated request statuses.
+ */
+status?: string;
+/**
+ * Comma-separated positive Target Curriculum Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Course-code search.
+ */
+q?: string;
+/**
+ * Comma-separated fields; prefix descending fields with -.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Rows per page, capped at 100.
+ */
+per_page?: number;
+};
+
+export type MyManualExemptionRequests200DataItemEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type MyManualExemptionRequests200DataItemTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type MyManualExemptionRequests200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: MyManualExemptionRequests200DataItemTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type MyManualExemptionRequests200DataItemDecision = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  source?: string;
+  reason_codes?: string[];
+  /** @nullable */
+  admission_application_id?: number | null;
+  manual_request_id?: number;
+  approved_at?: string;
+} | null;
+
+export type MyManualExemptionRequests200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: MyManualExemptionRequests200DataItemEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: MyManualExemptionRequests200DataItemTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: MyManualExemptionRequests200DataItemDecision;
+};
+
+export type MyManualExemptionRequests200Links = {
+  /** @nullable */
+  first?: string | null;
+  /** @nullable */
+  last?: string | null;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type MyManualExemptionRequests200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type MyManualExemptionRequests200 = {
+  data?: MyManualExemptionRequests200DataItem[];
+  links?: MyManualExemptionRequests200Links;
+  meta?: MyManualExemptionRequests200Meta;
+};
+
+/**
+ * Structured corrected or missing qualification evidence.
+ */
+export type CreateAManualExemptionDraftBodyEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  /** Supporting document IDs. */
+  document_ids?: number[];
+};
+
+export type CreateAManualExemptionDraftBody = {
+  /** A Preparatory Course in the Student's bound Curriculum. */
+  target_course_id: number;
+  /** Structured corrected or missing qualification evidence. */
+  evidence: CreateAManualExemptionDraftBodyEvidence;
+  /** Student explanation. */
+  student_note?: string;
+};
+
+export type CreateAManualExemptionDraft201DataEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type CreateAManualExemptionDraft201DataTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type CreateAManualExemptionDraft201DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: CreateAManualExemptionDraft201DataTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type CreateAManualExemptionDraft201DataDecision = { [key: string]: unknown } | null;
+
+export type CreateAManualExemptionDraft201Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: CreateAManualExemptionDraft201DataEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: CreateAManualExemptionDraft201DataTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: CreateAManualExemptionDraft201DataDecision;
+};
+
+export type CreateAManualExemptionDraft201 = {
+  data?: CreateAManualExemptionDraft201Data;
+};
+
+export type ExportMyManualExemptionsParams = {
+/**
+ * Comma-separated request statuses.
+ */
+status?: string;
+/**
+ * Comma-separated positive Target Curriculum Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Course-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type ViewOneOfMyManualExemptionRequests200DataEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type ViewOneOfMyManualExemptionRequests200DataTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type ViewOneOfMyManualExemptionRequests200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ViewOneOfMyManualExemptionRequests200DataTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type ViewOneOfMyManualExemptionRequests200DataDecision = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  source?: string;
+  reason_codes?: string[];
+  /** @nullable */
+  admission_application_id?: number | null;
+  manual_request_id?: number;
+  approved_at?: string;
+} | null;
+
+export type ViewOneOfMyManualExemptionRequests200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: ViewOneOfMyManualExemptionRequests200DataEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: ViewOneOfMyManualExemptionRequests200DataTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: ViewOneOfMyManualExemptionRequests200DataDecision;
+};
+
+export type ViewOneOfMyManualExemptionRequests200 = {
+  data?: ViewOneOfMyManualExemptionRequests200Data;
+};
+
+/**
+ * Structured qualification evidence.
+ */
+export type ReviseAnEditableDraftOrReturnedRequestBodyEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  /** Supporting document IDs. */
+  document_ids?: number[];
+};
+
+export type ReviseAnEditableDraftOrReturnedRequestBody = {
+  expected_revision: number;
+  /**
+     * Student explanation.
+     * @nullable
+     */
+  student_note?: string | null;
+  /** Structured qualification evidence. */
+  evidence?: ReviseAnEditableDraftOrReturnedRequestBodyEvidence;
+};
+
+export type ReviseAnEditableDraftOrReturnedRequest200DataEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type ReviseAnEditableDraftOrReturnedRequest200DataTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type ReviseAnEditableDraftOrReturnedRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ReviseAnEditableDraftOrReturnedRequest200DataTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type ReviseAnEditableDraftOrReturnedRequest200DataDecision = { [key: string]: unknown } | null;
+
+export type ReviseAnEditableDraftOrReturnedRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: ReviseAnEditableDraftOrReturnedRequest200DataEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: ReviseAnEditableDraftOrReturnedRequest200DataTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: ReviseAnEditableDraftOrReturnedRequest200DataDecision;
+};
+
+export type ReviseAnEditableDraftOrReturnedRequest200 = {
+  data?: ReviseAnEditableDraftOrReturnedRequest200Data;
+};
+
+export type AbandonADraftRequestBody = {
+  expected_revision: number;
+};
+
+export type AbandonADraftRequest200DataEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type AbandonADraftRequest200DataTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type AbandonADraftRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AbandonADraftRequest200DataTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type AbandonADraftRequest200DataDecision = { [key: string]: unknown } | null;
+
+export type AbandonADraftRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: AbandonADraftRequest200DataEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: AbandonADraftRequest200DataTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: AbandonADraftRequest200DataDecision;
+};
+
+export type AbandonADraftRequest200 = {
+  data?: AbandonADraftRequest200Data;
+};
+
+export type SubmitOrResubmitAnExemptionRequestBody = {
+  expected_revision: number;
+  /** A retry-stable UUID. */
+  action_id: string;
+};
+
+export type SubmitOrResubmitAnExemptionRequest200DataEvidence = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type SubmitOrResubmitAnExemptionRequest200DataTransitionsItemEvidenceSnapshot = {
+  english_test?: string;
+  english_score?: number;
+  previous_degree?: string;
+  is_ejust_graduate?: boolean;
+  previous_ejust_program_id?: number;
+  document_ids?: number[];
+};
+
+export type SubmitOrResubmitAnExemptionRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: SubmitOrResubmitAnExemptionRequest200DataTransitionsItemEvidenceSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective decision when the request was approved.
+ * @nullable
+ */
+export type SubmitOrResubmitAnExemptionRequest200DataDecision = { [key: string]: unknown } | null;
+
+export type SubmitOrResubmitAnExemptionRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  evidence?: SubmitOrResubmitAnExemptionRequest200DataEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  transitions?: SubmitOrResubmitAnExemptionRequest200DataTransitionsItem[];
+  /**
+     * The immutable effective decision when the request was approved.
+     * @nullable
+     */
+  decision?: SubmitOrResubmitAnExemptionRequest200DataDecision;
+};
+
+export type SubmitOrResubmitAnExemptionRequest200 = {
+  data?: SubmitOrResubmitAnExemptionRequest200Data;
 };
 
 export type ListMyNotifications200DataItemData = {
@@ -12948,8 +14003,8 @@ export const useDeactivateACourse = <TError = unknown,
     }
 
 /**
- * The acting Student's immutable automatic Preparatory Exemption decisions,
- * available before composing a Registration Request.
+ * The acting Student's immutable automatic and manual Preparatory Exemption
+ * decisions, available before composing a Registration Request.
  * @summary My effective Exemptions.
  */
 export const myEffectiveExemptions = (
@@ -17539,6 +18594,1155 @@ export function useOneStudentsGradeRecordForAScopedReviewer<TData = Awaited<Retu
 
 
 
+
+/**
+ * @summary Advisor manual Exemption queue.
+ */
+export const advisorManualExemptionQueue = (
+    params?: AdvisorManualExemptionQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorManualExemptionQueue200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/advisor-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorManualExemptionQueueQueryKey = (params?: AdvisorManualExemptionQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests/advisor-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdvisorManualExemptionQueueQueryOptions = <TData = Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError = unknown>(params?: AdvisorManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdvisorManualExemptionQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisorManualExemptionQueue>>> = ({ signal }) => advisorManualExemptionQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdvisorManualExemptionQueueQueryResult = NonNullable<Awaited<ReturnType<typeof advisorManualExemptionQueue>>>
+export type AdvisorManualExemptionQueueQueryError = unknown
+
+
+export function useAdvisorManualExemptionQueue<TData = Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError = unknown>(
+ params: undefined |  AdvisorManualExemptionQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorManualExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof advisorManualExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorManualExemptionQueue<TData = Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError = unknown>(
+ params?: AdvisorManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorManualExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof advisorManualExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorManualExemptionQueue<TData = Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError = unknown>(
+ params?: AdvisorManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Advisor manual Exemption queue.
+ */
+
+export function useAdvisorManualExemptionQueue<TData = Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError = unknown>(
+ params?: AdvisorManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorManualExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdvisorManualExemptionQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Advisor Exemption queue.
+ */
+export const exportAdvisorExemptionQueue = (
+    params?: ExportAdvisorExemptionQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/exemption-requests/advisor-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportAdvisorExemptionQueueQueryKey = (params?: ExportAdvisorExemptionQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests/advisor-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportAdvisorExemptionQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError = unknown>(params?: ExportAdvisorExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportAdvisorExemptionQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>> = ({ signal }) => exportAdvisorExemptionQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportAdvisorExemptionQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>>
+export type ExportAdvisorExemptionQueueQueryError = unknown
+
+
+export function useExportAdvisorExemptionQueue<TData = Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError = unknown>(
+ params: undefined |  ExportAdvisorExemptionQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdvisorExemptionQueue<TData = Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError = unknown>(
+ params?: ExportAdvisorExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdvisorExemptionQueue<TData = Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError = unknown>(
+ params?: ExportAdvisorExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Advisor Exemption queue.
+ */
+
+export function useExportAdvisorExemptionQueue<TData = Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError = unknown>(
+ params?: ExportAdvisorExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportAdvisorExemptionQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Advisor action on a current advisee's request.
+ */
+export const advisorActionOnACurrentAdviseesRequest = (
+    exemptionRequestId: number,
+    advisorActionOnACurrentAdviseesRequestBody: AdvisorActionOnACurrentAdviseesRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorActionOnACurrentAdviseesRequest200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/${exemptionRequestId}/advisor-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: advisorActionOnACurrentAdviseesRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorActionOnACurrentAdviseesRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnACurrentAdviseesRequest>>, TError,{exemptionRequestId: number;data: AdvisorActionOnACurrentAdviseesRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnACurrentAdviseesRequest>>, TError,{exemptionRequestId: number;data: AdvisorActionOnACurrentAdviseesRequestBody}, TContext> => {
+
+const mutationKey = ['advisorActionOnACurrentAdviseesRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof advisorActionOnACurrentAdviseesRequest>>, {exemptionRequestId: number;data: AdvisorActionOnACurrentAdviseesRequestBody}> = (props) => {
+          const {exemptionRequestId,data} = props ?? {};
+
+          return  advisorActionOnACurrentAdviseesRequest(exemptionRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdvisorActionOnACurrentAdviseesRequestMutationResult = NonNullable<Awaited<ReturnType<typeof advisorActionOnACurrentAdviseesRequest>>>
+    export type AdvisorActionOnACurrentAdviseesRequestMutationBody = AdvisorActionOnACurrentAdviseesRequestBody
+    export type AdvisorActionOnACurrentAdviseesRequestMutationError = unknown
+
+    /**
+ * @summary Advisor action on a current advisee's request.
+ */
+export const useAdvisorActionOnACurrentAdviseesRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnACurrentAdviseesRequest>>, TError,{exemptionRequestId: number;data: AdvisorActionOnACurrentAdviseesRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof advisorActionOnACurrentAdviseesRequest>>,
+        TError,
+        {exemptionRequestId: number;data: AdvisorActionOnACurrentAdviseesRequestBody},
+        TContext
+      > => {
+      return useMutation(getAdvisorActionOnACurrentAdviseesRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * Uses the same query contract as the Advisor queue.
+ * @summary Department Head manual Exemption queue.
+ */
+export const departmentHeadManualExemptionQueue = (
+    params?: DepartmentHeadManualExemptionQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DepartmentHeadManualExemptionQueue200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/department-head-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getDepartmentHeadManualExemptionQueueQueryKey = (params?: DepartmentHeadManualExemptionQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests/department-head-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDepartmentHeadManualExemptionQueueQueryOptions = <TData = Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError = unknown>(params?: DepartmentHeadManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDepartmentHeadManualExemptionQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>> = ({ signal }) => departmentHeadManualExemptionQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DepartmentHeadManualExemptionQueueQueryResult = NonNullable<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>>
+export type DepartmentHeadManualExemptionQueueQueryError = unknown
+
+
+export function useDepartmentHeadManualExemptionQueue<TData = Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError = unknown>(
+ params: undefined |  DepartmentHeadManualExemptionQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentHeadManualExemptionQueue<TData = Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError = unknown>(
+ params?: DepartmentHeadManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentHeadManualExemptionQueue<TData = Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError = unknown>(
+ params?: DepartmentHeadManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Department Head manual Exemption queue.
+ */
+
+export function useDepartmentHeadManualExemptionQueue<TData = Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError = unknown>(
+ params?: DepartmentHeadManualExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadManualExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDepartmentHeadManualExemptionQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Department Head Exemption queue.
+ */
+export const exportDepartmentHeadExemptionQueue = (
+    params?: ExportDepartmentHeadExemptionQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/exemption-requests/department-head-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportDepartmentHeadExemptionQueueQueryKey = (params?: ExportDepartmentHeadExemptionQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests/department-head-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportDepartmentHeadExemptionQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError = unknown>(params?: ExportDepartmentHeadExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportDepartmentHeadExemptionQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>> = ({ signal }) => exportDepartmentHeadExemptionQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportDepartmentHeadExemptionQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>>
+export type ExportDepartmentHeadExemptionQueueQueryError = unknown
+
+
+export function useExportDepartmentHeadExemptionQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError = unknown>(
+ params: undefined |  ExportDepartmentHeadExemptionQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDepartmentHeadExemptionQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDepartmentHeadExemptionQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Department Head Exemption queue.
+ */
+
+export function useExportDepartmentHeadExemptionQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadExemptionQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadExemptionQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportDepartmentHeadExemptionQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Scoped Department Head final action.
+ */
+export const scopedDepartmentHeadFinalAction = (
+    exemptionRequestId: number,
+    scopedDepartmentHeadFinalActionBody: ScopedDepartmentHeadFinalActionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScopedDepartmentHeadFinalAction200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/${exemptionRequestId}/department-head-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: scopedDepartmentHeadFinalActionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getScopedDepartmentHeadFinalActionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scopedDepartmentHeadFinalAction>>, TError,{exemptionRequestId: number;data: ScopedDepartmentHeadFinalActionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof scopedDepartmentHeadFinalAction>>, TError,{exemptionRequestId: number;data: ScopedDepartmentHeadFinalActionBody}, TContext> => {
+
+const mutationKey = ['scopedDepartmentHeadFinalAction'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scopedDepartmentHeadFinalAction>>, {exemptionRequestId: number;data: ScopedDepartmentHeadFinalActionBody}> = (props) => {
+          const {exemptionRequestId,data} = props ?? {};
+
+          return  scopedDepartmentHeadFinalAction(exemptionRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScopedDepartmentHeadFinalActionMutationResult = NonNullable<Awaited<ReturnType<typeof scopedDepartmentHeadFinalAction>>>
+    export type ScopedDepartmentHeadFinalActionMutationBody = ScopedDepartmentHeadFinalActionBody
+    export type ScopedDepartmentHeadFinalActionMutationError = unknown
+
+    /**
+ * @summary Scoped Department Head final action.
+ */
+export const useScopedDepartmentHeadFinalAction = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scopedDepartmentHeadFinalAction>>, TError,{exemptionRequestId: number;data: ScopedDepartmentHeadFinalActionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scopedDepartmentHeadFinalAction>>,
+        TError,
+        {exemptionRequestId: number;data: ScopedDepartmentHeadFinalActionBody},
+        TContext
+      > => {
+      return useMutation(getScopedDepartmentHeadFinalActionMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary My bound Preparatory Exemption targets.
+ */
+export const myBoundPreparatoryExemptionTargets = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyBoundPreparatoryExemptionTargets200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/targets`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyBoundPreparatoryExemptionTargetsQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests/targets`
+    ] as const;
+    }
+
+
+export const getMyBoundPreparatoryExemptionTargetsQueryOptions = <TData = Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyBoundPreparatoryExemptionTargetsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>> = ({ signal }) => myBoundPreparatoryExemptionTargets(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyBoundPreparatoryExemptionTargetsQueryResult = NonNullable<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>>
+export type MyBoundPreparatoryExemptionTargetsQueryError = unknown
+
+
+export function useMyBoundPreparatoryExemptionTargets<TData = Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>,
+          TError,
+          Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyBoundPreparatoryExemptionTargets<TData = Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>,
+          TError,
+          Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyBoundPreparatoryExemptionTargets<TData = Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My bound Preparatory Exemption targets.
+ */
+
+export function useMyBoundPreparatoryExemptionTargets<TData = Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myBoundPreparatoryExemptionTargets>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyBoundPreparatoryExemptionTargetsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My manual Exemption requests.
+ */
+export const myManualExemptionRequests = (
+    params?: MyManualExemptionRequestsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyManualExemptionRequests200>(
+      {url: `/api/v1/credit-decisions/exemption-requests`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getMyManualExemptionRequestsQueryKey = (params?: MyManualExemptionRequestsParams,) => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMyManualExemptionRequestsQueryOptions = <TData = Awaited<ReturnType<typeof myManualExemptionRequests>>, TError = unknown>(params?: MyManualExemptionRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myManualExemptionRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyManualExemptionRequestsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myManualExemptionRequests>>> = ({ signal }) => myManualExemptionRequests(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myManualExemptionRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyManualExemptionRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof myManualExemptionRequests>>>
+export type MyManualExemptionRequestsQueryError = unknown
+
+
+export function useMyManualExemptionRequests<TData = Awaited<ReturnType<typeof myManualExemptionRequests>>, TError = unknown>(
+ params: undefined |  MyManualExemptionRequestsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myManualExemptionRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myManualExemptionRequests>>,
+          TError,
+          Awaited<ReturnType<typeof myManualExemptionRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyManualExemptionRequests<TData = Awaited<ReturnType<typeof myManualExemptionRequests>>, TError = unknown>(
+ params?: MyManualExemptionRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myManualExemptionRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myManualExemptionRequests>>,
+          TError,
+          Awaited<ReturnType<typeof myManualExemptionRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyManualExemptionRequests<TData = Awaited<ReturnType<typeof myManualExemptionRequests>>, TError = unknown>(
+ params?: MyManualExemptionRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myManualExemptionRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My manual Exemption requests.
+ */
+
+export function useMyManualExemptionRequests<TData = Awaited<ReturnType<typeof myManualExemptionRequests>>, TError = unknown>(
+ params?: MyManualExemptionRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myManualExemptionRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyManualExemptionRequestsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create a manual Exemption Draft.
+ */
+export const createAManualExemptionDraft = (
+    createAManualExemptionDraftBody: CreateAManualExemptionDraftBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAManualExemptionDraft201>(
+      {url: `/api/v1/credit-decisions/exemption-requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAManualExemptionDraftBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAManualExemptionDraftMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAManualExemptionDraft>>, TError,{data: CreateAManualExemptionDraftBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAManualExemptionDraft>>, TError,{data: CreateAManualExemptionDraftBody}, TContext> => {
+
+const mutationKey = ['createAManualExemptionDraft'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAManualExemptionDraft>>, {data: CreateAManualExemptionDraftBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAManualExemptionDraft(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAManualExemptionDraftMutationResult = NonNullable<Awaited<ReturnType<typeof createAManualExemptionDraft>>>
+    export type CreateAManualExemptionDraftMutationBody = CreateAManualExemptionDraftBody
+    export type CreateAManualExemptionDraftMutationError = unknown
+
+    /**
+ * @summary Create a manual Exemption Draft.
+ */
+export const useCreateAManualExemptionDraft = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAManualExemptionDraft>>, TError,{data: CreateAManualExemptionDraftBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAManualExemptionDraft>>,
+        TError,
+        {data: CreateAManualExemptionDraftBody},
+        TContext
+      > => {
+      return useMutation(getCreateAManualExemptionDraftMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Export my manual Exemptions.
+ */
+export const exportMyManualExemptions = (
+    params?: ExportMyManualExemptionsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/exemption-requests/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportMyManualExemptionsQueryKey = (params?: ExportMyManualExemptionsParams,) => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportMyManualExemptionsQueryOptions = <TData = Awaited<ReturnType<typeof exportMyManualExemptions>>, TError = unknown>(params?: ExportMyManualExemptionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyManualExemptions>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportMyManualExemptionsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportMyManualExemptions>>> = ({ signal }) => exportMyManualExemptions(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportMyManualExemptions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportMyManualExemptionsQueryResult = NonNullable<Awaited<ReturnType<typeof exportMyManualExemptions>>>
+export type ExportMyManualExemptionsQueryError = unknown
+
+
+export function useExportMyManualExemptions<TData = Awaited<ReturnType<typeof exportMyManualExemptions>>, TError = unknown>(
+ params: undefined |  ExportMyManualExemptionsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyManualExemptions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportMyManualExemptions>>,
+          TError,
+          Awaited<ReturnType<typeof exportMyManualExemptions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportMyManualExemptions<TData = Awaited<ReturnType<typeof exportMyManualExemptions>>, TError = unknown>(
+ params?: ExportMyManualExemptionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyManualExemptions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportMyManualExemptions>>,
+          TError,
+          Awaited<ReturnType<typeof exportMyManualExemptions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportMyManualExemptions<TData = Awaited<ReturnType<typeof exportMyManualExemptions>>, TError = unknown>(
+ params?: ExportMyManualExemptionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyManualExemptions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export my manual Exemptions.
+ */
+
+export function useExportMyManualExemptions<TData = Awaited<ReturnType<typeof exportMyManualExemptions>>, TError = unknown>(
+ params?: ExportMyManualExemptionsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyManualExemptions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportMyManualExemptionsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary View one of my manual Exemption requests.
+ */
+export const viewOneOfMyManualExemptionRequests = (
+    exemptionRequestId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ViewOneOfMyManualExemptionRequests200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/${exemptionRequestId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getViewOneOfMyManualExemptionRequestsQueryKey = (exemptionRequestId: number,) => {
+    return [
+    `/api/v1/credit-decisions/exemption-requests/${exemptionRequestId}`
+    ] as const;
+    }
+
+
+export const getViewOneOfMyManualExemptionRequestsQueryOptions = <TData = Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError = unknown>(exemptionRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getViewOneOfMyManualExemptionRequestsQueryKey(exemptionRequestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>> = ({ signal }) => viewOneOfMyManualExemptionRequests(exemptionRequestId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: exemptionRequestId !== null && exemptionRequestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ViewOneOfMyManualExemptionRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>>
+export type ViewOneOfMyManualExemptionRequestsQueryError = unknown
+
+
+export function useViewOneOfMyManualExemptionRequests<TData = Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError = unknown>(
+ exemptionRequestId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>,
+          TError,
+          Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewOneOfMyManualExemptionRequests<TData = Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError = unknown>(
+ exemptionRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>,
+          TError,
+          Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewOneOfMyManualExemptionRequests<TData = Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError = unknown>(
+ exemptionRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary View one of my manual Exemption requests.
+ */
+
+export function useViewOneOfMyManualExemptionRequests<TData = Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError = unknown>(
+ exemptionRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyManualExemptionRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getViewOneOfMyManualExemptionRequestsQueryOptions(exemptionRequestId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Revise an editable Draft or Returned request.
+ */
+export const reviseAnEditableDraftOrReturnedRequest = (
+    exemptionRequestId: number,
+    reviseAnEditableDraftOrReturnedRequestBody: ReviseAnEditableDraftOrReturnedRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReviseAnEditableDraftOrReturnedRequest200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/${exemptionRequestId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: reviseAnEditableDraftOrReturnedRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getReviseAnEditableDraftOrReturnedRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableDraftOrReturnedRequest>>, TError,{exemptionRequestId: number;data: ReviseAnEditableDraftOrReturnedRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableDraftOrReturnedRequest>>, TError,{exemptionRequestId: number;data: ReviseAnEditableDraftOrReturnedRequestBody}, TContext> => {
+
+const mutationKey = ['reviseAnEditableDraftOrReturnedRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviseAnEditableDraftOrReturnedRequest>>, {exemptionRequestId: number;data: ReviseAnEditableDraftOrReturnedRequestBody}> = (props) => {
+          const {exemptionRequestId,data} = props ?? {};
+
+          return  reviseAnEditableDraftOrReturnedRequest(exemptionRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviseAnEditableDraftOrReturnedRequestMutationResult = NonNullable<Awaited<ReturnType<typeof reviseAnEditableDraftOrReturnedRequest>>>
+    export type ReviseAnEditableDraftOrReturnedRequestMutationBody = ReviseAnEditableDraftOrReturnedRequestBody
+    export type ReviseAnEditableDraftOrReturnedRequestMutationError = unknown
+
+    /**
+ * @summary Revise an editable Draft or Returned request.
+ */
+export const useReviseAnEditableDraftOrReturnedRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableDraftOrReturnedRequest>>, TError,{exemptionRequestId: number;data: ReviseAnEditableDraftOrReturnedRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reviseAnEditableDraftOrReturnedRequest>>,
+        TError,
+        {exemptionRequestId: number;data: ReviseAnEditableDraftOrReturnedRequestBody},
+        TContext
+      > => {
+      return useMutation(getReviseAnEditableDraftOrReturnedRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Abandon a Draft request.
+ */
+export const abandonADraftRequest = (
+    exemptionRequestId: number,
+    abandonADraftRequestBody: AbandonADraftRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AbandonADraftRequest200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/${exemptionRequestId}`, method: 'DELETE',
+      headers: {'Content-Type': 'application/json', },
+      data: abandonADraftRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAbandonADraftRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof abandonADraftRequest>>, TError,{exemptionRequestId: number;data: AbandonADraftRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof abandonADraftRequest>>, TError,{exemptionRequestId: number;data: AbandonADraftRequestBody}, TContext> => {
+
+const mutationKey = ['abandonADraftRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof abandonADraftRequest>>, {exemptionRequestId: number;data: AbandonADraftRequestBody}> = (props) => {
+          const {exemptionRequestId,data} = props ?? {};
+
+          return  abandonADraftRequest(exemptionRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AbandonADraftRequestMutationResult = NonNullable<Awaited<ReturnType<typeof abandonADraftRequest>>>
+    export type AbandonADraftRequestMutationBody = AbandonADraftRequestBody
+    export type AbandonADraftRequestMutationError = unknown
+
+    /**
+ * @summary Abandon a Draft request.
+ */
+export const useAbandonADraftRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof abandonADraftRequest>>, TError,{exemptionRequestId: number;data: AbandonADraftRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof abandonADraftRequest>>,
+        TError,
+        {exemptionRequestId: number;data: AbandonADraftRequestBody},
+        TContext
+      > => {
+      return useMutation(getAbandonADraftRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Submit or resubmit an Exemption request.
+ */
+export const submitOrResubmitAnExemptionRequest = (
+    exemptionRequestId: number,
+    submitOrResubmitAnExemptionRequestBody: SubmitOrResubmitAnExemptionRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitOrResubmitAnExemptionRequest200>(
+      {url: `/api/v1/credit-decisions/exemption-requests/${exemptionRequestId}/submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitOrResubmitAnExemptionRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitOrResubmitAnExemptionRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitAnExemptionRequest>>, TError,{exemptionRequestId: number;data: SubmitOrResubmitAnExemptionRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitAnExemptionRequest>>, TError,{exemptionRequestId: number;data: SubmitOrResubmitAnExemptionRequestBody}, TContext> => {
+
+const mutationKey = ['submitOrResubmitAnExemptionRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitOrResubmitAnExemptionRequest>>, {exemptionRequestId: number;data: SubmitOrResubmitAnExemptionRequestBody}> = (props) => {
+          const {exemptionRequestId,data} = props ?? {};
+
+          return  submitOrResubmitAnExemptionRequest(exemptionRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitOrResubmitAnExemptionRequestMutationResult = NonNullable<Awaited<ReturnType<typeof submitOrResubmitAnExemptionRequest>>>
+    export type SubmitOrResubmitAnExemptionRequestMutationBody = SubmitOrResubmitAnExemptionRequestBody
+    export type SubmitOrResubmitAnExemptionRequestMutationError = unknown
+
+    /**
+ * @summary Submit or resubmit an Exemption request.
+ */
+export const useSubmitOrResubmitAnExemptionRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitAnExemptionRequest>>, TError,{exemptionRequestId: number;data: SubmitOrResubmitAnExemptionRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitOrResubmitAnExemptionRequest>>,
+        TError,
+        {exemptionRequestId: number;data: SubmitOrResubmitAnExemptionRequestBody},
+        TContext
+      > => {
+      return useMutation(getSubmitOrResubmitAnExemptionRequestMutationOptions(options), queryClient);
+    }
 
 /**
  * Paginated, newest-first. Scoped to the authenticated user.

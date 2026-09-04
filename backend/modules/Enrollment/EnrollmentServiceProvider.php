@@ -9,7 +9,9 @@ use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Enrollment\Internal\Console\Commands\ReconcileAutomaticExemptions;
 use Modules\Enrollment\Internal\Listeners\ApplyAutomaticPreparatoryExemptions;
 use Modules\Enrollment\Internal\Support\EloquentEnrollmentRecords;
+use Modules\Enrollment\Internal\Support\EloquentExemptionDecisions;
 use Modules\Enrollment\Public\EnrollmentRecords;
+use Modules\Enrollment\Public\ExemptionDecisions;
 
 /**
  * The Enrollment domain module (ADR-0017): it owns Course Offerings, Registration Requests,
@@ -31,6 +33,7 @@ class EnrollmentServiceProvider extends ServiceProvider
         // The cross-module read facade (ADR-0012/0017): consumers depend on the
         // Enrollment\Public contract; the Eloquent reader lives in Enrollment\Internal.
         $this->app->bind(EnrollmentRecords::class, EloquentEnrollmentRecords::class);
+        $this->app->bind(ExemptionDecisions::class, EloquentExemptionDecisions::class);
     }
 
     public function boot(): void

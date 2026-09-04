@@ -23,6 +23,7 @@ class ExemptionDecisionResource extends JsonResource
             'source' => $this->source->value,
             'reason_codes' => $this->reason_codes,
             'admission_application_id' => $this->admission_application_id,
+            'manual_request_id' => $this->manual_request_id,
             'approved_at' => $this->approved_at->toIso8601String(),
         ];
     }

@@ -9,7 +9,12 @@ deptrac:
   paths:
     - ./app
     - ./modules
+    - ./support
   layers:
+    - name: Support
+      collectors:
+        - type: classLike
+          value: '^Support\\.*'
     - name: App
       collectors:
         - type: classLike
@@ -83,6 +88,7 @@ deptrac:
       - Identity_Internal
     Identity_Internal:
       - Identity_Public
+      - Support
     # Catalog may reach Identity only through Identity\Public (never Internal).
     Catalog_Public:
       - Catalog_Internal
@@ -90,6 +96,7 @@ deptrac:
     Catalog_Internal:
       - Catalog_Public
       - Identity_Public
+      - Support
     # Admissions (Phase 2) is the first module with multiple cross-module edges.
     # Ticket 01 opened the Identity\Public edge (calendar.manage lives in the §3.2
     # matrix); ticket 06 opens the Catalog\Public edge (program selection reads the
@@ -103,6 +110,7 @@ deptrac:
       - Identity_Public
       - Catalog_Public
       - Notifications_Public
+      - Support
     # Notifications (Phase 2, ticket 02) is cross-cutting: any module may enqueue a
     # notification through Notifications\Public, but Notifications itself reaches
     # only Identity\Public (user ids) and never any other module. The inbound edges
@@ -114,6 +122,7 @@ deptrac:
     Notifications_Internal:
       - Notifications_Public
       - Identity_Public
+      - Support
     # Calendar (Phase 3, ADR-0018) is a supporting module: it owns the Semester and
     # its period windows and depends on no other domain module. Its Public read
     # facade (AcademicCalendar + SemesterSummary) is the only seam consumers touch;
@@ -124,6 +133,7 @@ deptrac:
       - Calendar_Internal
     Calendar_Internal:
       - Calendar_Public
+      - Support
     # Enrollment (Phase 3, ADR-0017) is the domain module course registration hangs
     # off. Ticket 03 opens its first edges: it reads the Semester through Calendar\Public
     # (offerings belong to a Semester), the Course through Catalog\Public (the new
@@ -141,6 +151,7 @@ deptrac:
       - Catalog_Public
       - Calendar_Public
       - Notifications_Public
+      - Support
     # Grading (Phase 4, ADR-0020) owns the Grade, the Grade Sheet and — from ticket 04 —
     # the GPA/CGPA read model. Ticket 01 opened its first edges: it reads the roster and the
     # Offering's routing facts through the newly-shipped Enrollment\Public facade (ADR-0017's
@@ -162,4 +173,5 @@ deptrac:
       - Calendar_Public
       - Enrollment_Public
       - Notifications_Public
+      - Support
     # No rule grants anyone access to another module's *_Internal — that is the seam.

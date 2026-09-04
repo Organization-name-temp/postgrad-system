@@ -5,6 +5,7 @@ namespace Modules\Identity\Public;
 use Illuminate\Support\Carbon;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\Enums\CurriculumVersionBindingSource;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 
 /**
  * A read-only view of the `Student` anchor for consumers outside Identity
@@ -30,6 +31,7 @@ final readonly class StudentSummary
         public int $admissionCycleId,
         public int $advisorId,
         public Carbon $admittedAt,
+        public StudentLifecycleStatus $lifecycleStatus = StudentLifecycleStatus::Active,
         public ?AdmissionEvidenceSnapshot $admissionEvidence = null,
     ) {}
 
@@ -37,7 +39,7 @@ final readonly class StudentSummary
      * The public array shape for the `/me` payload — the single home for how a
      * Student anchor is exposed to the SPA.
      *
-     * @return array{university_id: string, program_id: int, curriculum_version_id: int, curriculum_version_binding_source: string, enrollment_term: string, admission_cycle_id: int, advisor_id: int, admitted_at: string}
+     * @return array{university_id: string, program_id: int, curriculum_version_id: int, curriculum_version_binding_source: string, enrollment_term: string, admission_cycle_id: int, advisor_id: int, admitted_at: string, lifecycle_status: string}
      */
     public function toArray(): array
     {
@@ -50,6 +52,7 @@ final readonly class StudentSummary
             'admission_cycle_id' => $this->admissionCycleId,
             'advisor_id' => $this->advisorId,
             'admitted_at' => $this->admittedAt->toIso8601String(),
+            'lifecycle_status' => $this->lifecycleStatus->value,
         ];
     }
 }

@@ -17,6 +17,12 @@ use Tests\TestCase;
 uses(TestCase::class)->in('Feature');
 
 /**
+ * Shared registry for ADR-0025 collection-contract coverage. Later filterable
+ * endpoint tickets extend this registry rather than inventing ad-hoc assertions.
+ */
+dataset('manual exemption collections', ['student', 'advisor', 'department_head']);
+
+/**
  * Sign in as a fresh user holding the given role. Shared across feature tests
  * (the API is the sole RBAC authority — ADR-0008).
  */

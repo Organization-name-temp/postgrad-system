@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\AttendanceController;
 use Modules\Enrollment\Internal\Http\Controllers\DashboardCardController;
 use Modules\Enrollment\Internal\Http\Controllers\ExemptionDecisionController;
+use Modules\Enrollment\Internal\Http\Controllers\ExemptionRequestController;
+use Modules\Enrollment\Internal\Http\Controllers\ExemptionReviewController;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
@@ -71,6 +73,23 @@ Route::middleware(['auth:sanctum', 'can:courses.register_self'])->group(function
 
 Route::middleware(['auth:sanctum', 'can:exemption.submit', 'role:R02'])->group(function () {
     Route::get('/credit-decisions/exemptions', [ExemptionDecisionController::class, 'index']);
+    Route::get('/credit-decisions/exemption-requests/targets', [ExemptionRequestController::class, 'targets']);
+    Route::get('/credit-decisions/exemption-requests', [ExemptionRequestController::class, 'index']);
+    Route::get('/credit-decisions/exemption-requests/export', [ExemptionRequestController::class, 'export']);
+    Route::post('/credit-decisions/exemption-requests', [ExemptionRequestController::class, 'store']);
+    Route::get('/credit-decisions/exemption-requests/{exemption_request}', [ExemptionRequestController::class, 'show'])->whereNumber('exemption_request');
+    Route::patch('/credit-decisions/exemption-requests/{exemption_request}', [ExemptionRequestController::class, 'update'])->whereNumber('exemption_request');
+    Route::delete('/credit-decisions/exemption-requests/{exemption_request}', [ExemptionRequestController::class, 'destroy'])->whereNumber('exemption_request');
+    Route::post('/credit-decisions/exemption-requests/{exemption_request}/submit', [ExemptionRequestController::class, 'submit'])->whereNumber('exemption_request');
+});
+
+Route::middleware(['auth:sanctum', 'can:exemption.approve'])->group(function () {
+    Route::get('/credit-decisions/exemption-requests/advisor-queue', [ExemptionReviewController::class, 'advisorQueue'])->middleware('role:R03');
+    Route::get('/credit-decisions/exemption-requests/advisor-queue/export', [ExemptionReviewController::class, 'advisorExport'])->middleware('role:R03');
+    Route::post('/credit-decisions/exemption-requests/{exemption_request}/advisor-decision', [ExemptionReviewController::class, 'advisorDecision'])->whereNumber('exemption_request')->middleware('role:R03');
+    Route::get('/credit-decisions/exemption-requests/department-head-queue', [ExemptionReviewController::class, 'departmentHeadQueue'])->middleware('role:R06');
+    Route::get('/credit-decisions/exemption-requests/department-head-queue/export', [ExemptionReviewController::class, 'departmentHeadExport'])->middleware('role:R06');
+    Route::post('/credit-decisions/exemption-requests/{exemption_request}/department-head-decision', [ExemptionReviewController::class, 'departmentHeadDecision'])->whereNumber('exemption_request')->middleware('role:R06');
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {

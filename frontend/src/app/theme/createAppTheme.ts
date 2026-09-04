@@ -17,6 +17,18 @@ declare module '@mui/material/styles' {
   interface PaletteOptions {
     focusRing?: string
   }
+  interface Shape {
+    radiusSm: string
+    radiusMd: string
+    radiusLg: string
+    radiusPill: string
+  }
+  interface ShapeOptions {
+    radiusSm?: string
+    radiusMd?: string
+    radiusLg?: string
+    radiusPill?: string
+  }
 }
 
 // One mapper for both schemes — the shapes are identical except dark status
@@ -101,7 +113,13 @@ export function createAppTheme(lang: string): Theme {
       dark: { palette: toPalette('dark', semantic.dark) },
     },
     spacing: space,
-    shape: { borderRadius: radius.md },
+    shape: {
+      borderRadius: radius.md,
+      radiusSm: `${radius.sm}px`,
+      radiusMd: `${radius.md}px`,
+      radiusLg: `${radius.lg}px`,
+      radiusPill: `${radius.pill}px`,
+    },
     shadows,
     typography: {
       fontFamily: family,

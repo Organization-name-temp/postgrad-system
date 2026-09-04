@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Modules\Identity\Public\Enums\CurriculumVersionBindingSource;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Identity\Public\StudentSummary;
 
 /**
@@ -29,6 +30,7 @@ use Modules\Identity\Public\StudentSummary;
  * @property string $enrollment_term
  * @property int $admission_cycle_id
  * @property int $advisor_id
+ * @property StudentLifecycleStatus $lifecycle_status
  * @property string $name_en
  * @property string $name_ar
  * @property string $national_id
@@ -55,6 +57,7 @@ class Student extends Model
         'enrollment_term',
         'admission_cycle_id',
         'advisor_id',
+        'lifecycle_status',
         'name_en',
         'name_ar',
         'national_id',
@@ -75,6 +78,7 @@ class Student extends Model
             'curriculum_version_binding_source' => CurriculumVersionBindingSource::class,
             'admission_cycle_id' => 'integer',
             'advisor_id' => 'integer',
+            'lifecycle_status' => StudentLifecycleStatus::class,
             'date_of_birth' => 'date',
             'admitted_at' => 'datetime',
             'admission_evidence' => 'array',

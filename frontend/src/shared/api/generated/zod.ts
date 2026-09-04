@@ -2654,8 +2654,8 @@ export const DeactivateACourseResponse = zod.object({
 
 
 /**
- * The acting Student's immutable automatic Preparatory Exemption decisions,
- * available before composing a Registration Request.
+ * The acting Student's immutable automatic and manual Preparatory Exemption
+ * decisions, available before composing a Registration Request.
  * @summary My effective Exemptions.
  */
 export const MyEffectiveExemptionsResponse = zod.object({
@@ -2669,7 +2669,8 @@ export const MyEffectiveExemptionsResponse = zod.object({
   "credit_hours": zod.number().optional(),
   "source": zod.string().optional(),
   "reason_codes": zod.array(zod.string()).optional(),
-  "admission_application_id": zod.number().optional(),
+  "admission_application_id": zod.number().nullish().describe('Source admission Application for an automatic decision.'),
+  "manual_request_id": zod.number().nullish().describe('Source manual Exemption request for a manual decision.'),
   "approved_at": zod.string().optional()
 })).optional()
 })
@@ -2749,7 +2750,8 @@ export const CurrentUserResponse = zod.object({
   "enrollment_term": zod.string().optional(),
   "admission_cycle_id": zod.number().optional(),
   "advisor_id": zod.number().optional(),
-  "admitted_at": zod.string().optional()
+  "admitted_at": zod.string().optional(),
+  "lifecycle_status": zod.string().optional()
 }).optional()
 }).optional()
 })
@@ -5018,6 +5020,794 @@ export const OneStudentsGradeRecordForAScopedReviewerResponse = zod.object({
   "incomplete_deadline": zod.string().nullish()
 })).optional()
 })).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Advisor manual Exemption queue.
+ */
+export const AdvisorManualExemptionQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive Target Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student anchor IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, or Course-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const AdvisorManualExemptionQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.looseObject({
+
+}).nullish().describe('The immutable effective decision when the request was approved.'),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().nullish(),
+  "last": zod.string().nullish(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export Advisor Exemption queue.
+ */
+export const ExportAdvisorExemptionQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive Target Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student anchor IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, or Course-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const ExportAdvisorExemptionQueueResponse = zod.unknown()
+
+
+/**
+ * @summary Advisor action on a current advisee's request.
+ */
+export const AdvisorActionOnACurrentAdviseesRequestParams = zod.object({
+  "exemption_request_id": zod.number()
+})
+
+export const AdvisorActionOnACurrentAdviseesRequestBody = zod.object({
+  "action": zod.string().describe('recommend, return, or reject.'),
+  "reason": zod.string().optional().describe('Required for return\/reject.'),
+  "expected_revision": zod.number(),
+  "action_id": zod.string().describe('Retry-stable UUID.')
+})
+
+export const AdvisorActionOnACurrentAdviseesRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.looseObject({
+
+}).nullish().describe('The immutable effective decision when the request was approved.')
+}).optional()
+})
+
+
+/**
+ * Uses the same query contract as the Advisor queue.
+ * @summary Department Head manual Exemption queue.
+ */
+export const DepartmentHeadManualExemptionQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive Target Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student anchor IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, or Course-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const DepartmentHeadManualExemptionQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.looseObject({
+
+}).nullish().describe('The immutable effective decision when the request was approved.'),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().nullish(),
+  "last": zod.string().nullish(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export Department Head Exemption queue.
+ */
+export const ExportDepartmentHeadExemptionQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive Target Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student anchor IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, or Course-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const ExportDepartmentHeadExemptionQueueResponse = zod.unknown()
+
+
+/**
+ * @summary Scoped Department Head final action.
+ */
+export const ScopedDepartmentHeadFinalActionParams = zod.object({
+  "exemption_request_id": zod.number()
+})
+
+export const ScopedDepartmentHeadFinalActionBody = zod.object({
+  "action": zod.string().describe('approve, return, or reject.'),
+  "reason": zod.string().optional().describe('Required for return\/reject.'),
+  "expected_revision": zod.number(),
+  "action_id": zod.string().describe('Retry-stable UUID.')
+})
+
+export const ScopedDepartmentHeadFinalActionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "source": zod.string().optional(),
+  "reason_codes": zod.array(zod.string()).optional(),
+  "admission_application_id": zod.number().nullish(),
+  "manual_request_id": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).nullish().describe('The immutable effective decision when the request was approved.')
+}).optional()
+})
+
+
+/**
+ * @summary My bound Preparatory Exemption targets.
+ */
+export const MyBoundPreparatoryExemptionTargetsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "already_exempt": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * @summary My manual Exemption requests.
+ */
+export const MyManualExemptionRequestsQueryParams = zod.object({
+  "status": zod.string().optional().describe('Comma-separated request statuses.'),
+  "target_course_id": zod.string().optional().describe('Comma-separated positive Target Curriculum Course IDs.'),
+  "q": zod.string().optional().describe('Course-code search.'),
+  "sort": zod.string().optional().describe('Comma-separated fields; prefix descending fields with -.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Rows per page, capped at 100.')
+})
+
+export const MyManualExemptionRequestsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "source": zod.string().optional(),
+  "reason_codes": zod.array(zod.string()).optional(),
+  "admission_application_id": zod.number().nullish(),
+  "manual_request_id": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).nullish().describe('The immutable effective decision when the request was approved.')
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().nullish(),
+  "last": zod.string().nullish(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Create a manual Exemption Draft.
+ */
+export const CreateAManualExemptionDraftBody = zod.object({
+  "target_course_id": zod.number().describe('A Preparatory Course in the Student\'s bound Curriculum.'),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional().describe('Supporting document IDs.')
+}).describe('Structured corrected or missing qualification evidence.'),
+  "student_note": zod.string().optional().describe('Student explanation.')
+})
+
+export const CreateAManualExemptionDraftResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.looseObject({
+
+}).nullish().describe('The immutable effective decision when the request was approved.')
+}).optional()
+})
+
+
+/**
+ * @summary Export my manual Exemptions.
+ */
+export const ExportMyManualExemptionsQueryParams = zod.object({
+  "status": zod.string().optional().describe('Comma-separated request statuses.'),
+  "target_course_id": zod.string().optional().describe('Comma-separated positive Target Curriculum Course IDs.'),
+  "q": zod.string().optional().describe('Course-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const ExportMyManualExemptionsResponse = zod.unknown()
+
+
+/**
+ * @summary View one of my manual Exemption requests.
+ */
+export const ViewOneOfMyManualExemptionRequestsParams = zod.object({
+  "exemption_request_id": zod.number()
+})
+
+export const ViewOneOfMyManualExemptionRequestsResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "source": zod.string().optional(),
+  "reason_codes": zod.array(zod.string()).optional(),
+  "admission_application_id": zod.number().nullish(),
+  "manual_request_id": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).nullish().describe('The immutable effective decision when the request was approved.')
+}).optional()
+})
+
+
+/**
+ * @summary Revise an editable Draft or Returned request.
+ */
+export const ReviseAnEditableDraftOrReturnedRequestParams = zod.object({
+  "exemption_request_id": zod.number()
+})
+
+export const ReviseAnEditableDraftOrReturnedRequestBody = zod.object({
+  "expected_revision": zod.number(),
+  "student_note": zod.string().nullish().describe('Student explanation.'),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional().describe('Supporting document IDs.')
+}).optional().describe('Structured qualification evidence.')
+})
+
+export const ReviseAnEditableDraftOrReturnedRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.looseObject({
+
+}).nullish().describe('The immutable effective decision when the request was approved.')
+}).optional()
+})
+
+
+/**
+ * @summary Abandon a Draft request.
+ */
+export const AbandonADraftRequestParams = zod.object({
+  "exemption_request_id": zod.number()
+})
+
+export const AbandonADraftRequestBody = zod.object({
+  "expected_revision": zod.number()
+})
+
+export const AbandonADraftRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.looseObject({
+
+}).nullish().describe('The immutable effective decision when the request was approved.')
+}).optional()
+})
+
+
+/**
+ * @summary Submit or resubmit an Exemption request.
+ */
+export const SubmitOrResubmitAnExemptionRequestParams = zod.object({
+  "exemption_request_id": zod.number()
+})
+
+export const SubmitOrResubmitAnExemptionRequestBody = zod.object({
+  "expected_revision": zod.number(),
+  "action_id": zod.string().describe('A retry-stable UUID.')
+})
+
+export const SubmitOrResubmitAnExemptionRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "evidence": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "english_test": zod.string().optional(),
+  "english_score": zod.number().optional(),
+  "previous_degree": zod.string().optional(),
+  "is_ejust_graduate": zod.boolean().optional(),
+  "previous_ejust_program_id": zod.number().optional(),
+  "document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.looseObject({
+
+}).nullish().describe('The immutable effective decision when the request was approved.')
 }).optional()
 })
 

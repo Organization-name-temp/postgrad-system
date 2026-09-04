@@ -21,12 +21,23 @@ use Modules\Enrollment\Internal\Enums\ExemptionSource;
  * @property ExemptionSource $source
  * @property list<string> $reason_codes
  * @property array<string, mixed> $source_evidence
- * @property int $admission_application_id
+ * @property int|null $admission_application_id
+ * @property int|null $manual_request_id
  * @property Carbon $approved_at
  */
 class ExemptionDecision extends Model
 {
     public $timestamps = false;
+
+    protected static function booted(): void
+    {
+        static::updating(static function (): never {
+            throw new \LogicException('Effective Exemption decisions are immutable.');
+        });
+        static::deleting(static function (): never {
+            throw new \LogicException('Effective Exemption decisions are immutable.');
+        });
+    }
 
     /** @var list<string> */
     protected $fillable = [
@@ -40,6 +51,7 @@ class ExemptionDecision extends Model
         'reason_codes',
         'source_evidence',
         'admission_application_id',
+        'manual_request_id',
         'approved_at',
     ];
 
@@ -56,6 +68,7 @@ class ExemptionDecision extends Model
             'reason_codes' => 'array',
             'source_evidence' => 'array',
             'admission_application_id' => 'integer',
+            'manual_request_id' => 'integer',
             'approved_at' => 'datetime',
         ];
     }

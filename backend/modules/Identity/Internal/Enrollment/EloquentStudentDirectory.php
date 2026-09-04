@@ -3,7 +3,6 @@
 namespace Modules\Identity\Internal\Enrollment;
 
 use Modules\Identity\Internal\Models\Student;
-use Modules\Identity\Public\AdmissionEvidenceSnapshot;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
 
@@ -14,6 +13,8 @@ use Modules\Identity\Public\StudentSummary;
  */
 class EloquentStudentDirectory implements StudentDirectory
 {
+    public function __construct(private readonly StudentSummaryMapper $summaries) {}
+
     public function find(int $userId): ?StudentSummary
     {
         return $this->toSummary(Student::query()->where('user_id', $userId)->first());
@@ -71,24 +72,6 @@ class EloquentStudentDirectory implements StudentDirectory
 
     private function toSummary(?Student $student): ?StudentSummary
     {
-        if ($student === null) {
-            return null;
-        }
-
-        return new StudentSummary(
-            studentId: (int) $student->getKey(),
-            userId: $student->user_id,
-            universityId: $student->university_id,
-            programId: $student->program_id,
-            curriculumVersionId: $student->curriculum_version_id,
-            curriculumVersionBindingSource: $student->curriculum_version_binding_source,
-            enrollmentTerm: $student->enrollment_term,
-            admissionCycleId: $student->admission_cycle_id,
-            advisorId: $student->advisor_id,
-            admittedAt: $student->admitted_at,
-            admissionEvidence: $student->admission_evidence === null
-                ? null
-                : AdmissionEvidenceSnapshot::fromArray($student->admission_evidence),
-        );
+        return $this->summaries->fromModel($student);
     }
 }

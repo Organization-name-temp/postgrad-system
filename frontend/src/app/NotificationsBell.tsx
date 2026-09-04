@@ -60,6 +60,10 @@ const TYPE_ALIAS: Record<string, string> = {
   'incomplete.converted': 'incompleteConverted',
   'grades.overdue': 'gradesOverdue',
   'exemption.automatically_applied': 'automaticExemptionApplied',
+  'exemption.request_submitted': 'manualExemptionSubmitted',
+  'exemption.request_returned': 'manualExemptionReturned',
+  'exemption.request_recommended': 'manualExemptionRecommended',
+  'exemption.request_decided': 'manualExemptionDecided',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.
@@ -125,8 +129,15 @@ export function NotificationsBell() {
     const alias = (notification.type && TYPE_ALIAS[notification.type]) || 'fallback'
     // `context` selects a variant key (e.g. enrollmentAdjusted_added) when the payload
     // carries an `action`; i18next ignores it when there is no matching suffixed key.
-    const context = (notification.data as { action?: string } | undefined)?.action
-    return t(`types.${alias}`, { context, ...notification.data })
+    const data = notification.data as
+      { action?: string; outcome?: string; audience?: string } | undefined
+    const context = data?.audience ?? data?.action
+    const localizedOutcome = data?.outcome ? t(`outcomes.${data.outcome}`) : undefined
+    return t(`types.${alias}`, {
+      context,
+      ...notification.data,
+      ...(localizedOutcome ? { outcome: localizedOutcome } : {}),
+    })
   }
 
   const readOne = (notification: ListMyNotifications200DataItem) => {

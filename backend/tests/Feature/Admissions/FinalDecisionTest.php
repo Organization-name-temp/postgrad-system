@@ -322,7 +322,8 @@ it('binds the accepted Student to the Program Curriculum Version effective at ad
     $this->getJson('/api/v1/me')
         ->assertOk()
         ->assertJsonPath('data.student.curriculum_version_id', (int) $effective->id)
-        ->assertJsonPath('data.student.curriculum_version_binding_source', 'admission_time');
+        ->assertJsonPath('data.student.curriculum_version_binding_source', 'admission_time')
+        ->assertJsonPath('data.student.lifecycle_status', 'Active');
 });
 
 it('resolves the admission Curriculum Version inside the acceptance transaction', function () {

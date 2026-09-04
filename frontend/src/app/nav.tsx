@@ -25,6 +25,7 @@ import GradingIcon from '@mui/icons-material/Grading'
 import RateReviewIcon from '@mui/icons-material/RateReview'
 import GradeIcon from '@mui/icons-material/Grade'
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -175,6 +176,27 @@ export const navItems: NavItem[] = [
     icon: <CalendarViewWeekIcon />,
     section: 'enrollment',
     roles: [ROLE.student],
+  },
+  {
+    key: 'manualExemptions',
+    to: '/exemptions',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  {
+    key: 'exemptionAdvisorQueue',
+    to: '/exemptions/advisor',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.advisor],
+  },
+  {
+    key: 'exemptionHeadQueue',
+    to: '/exemptions/department-head',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
   },
   // The Advisor's registration-review queue (ticket 06): approve/trim/reject a Pending
   // request line-by-line. A capability item on registration.approve — held by Advisors

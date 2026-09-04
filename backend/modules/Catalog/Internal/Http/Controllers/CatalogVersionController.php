@@ -29,7 +29,7 @@ class CatalogVersionController
      *
      * @urlParam program_id integer required The ID of the program. Example: 1
      *
-     * @response 200 {"data": [{"id": 1, "version_no": 1, "change_note": "created", "changed_by": 1, "changed_at": "2026-07-12T10:00:00+00:00", "snapshot": {"code": "MSC-CE", "curriculum": [{"course_id": 1, "course_code": "PRE401", "category": "Preparatory", "ordinal": 0}]}}]}
+     * @response 200 {"data": [{"id": 1, "version_no": 1, "change_note": "curriculum_updated", "changed_by": 1, "changed_at": "2026-07-12T10:00:00+00:00", "snapshot": {"code": "MSC-CE", "preparatory_requirements_complete": false, "missing_preparatory_requirement_roles": ["EnglishLanguage", "ArabicLanguage", "JapaneseLanguage", "JapaneseCulture", "DepartmentalRequirement"], "curriculum": [{"course_id": 1, "course_code": "DEP501", "category": "Preparatory", "preparatory_requirement_role": "KeySkills", "ordinal": 0}]}}]}
      */
     public function forProgram(Program $program): AnonymousResourceCollection
     {

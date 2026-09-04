@@ -3,7 +3,10 @@
 use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Catalog\Internal\Models\Course;
+use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Faculty;
+use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 use Modules\Identity\Public\Enums\Role;
 
 uses(RefreshDatabase::class);
@@ -67,6 +70,27 @@ it('links the shared university-wide preparatory courses into every program', fu
     // It is placed in more than one Program — reuse, not duplication.
     $programIds = $pre401->curriculumEntries()->pluck('program_id')->unique();
     expect($programIds->count())->toBeGreaterThan(1);
+});
+
+it('assigns every seeded Program exactly one of each Preparatory Requirement Role', function () {
+    $this->seed(CatalogSeeder::class);
+    $expected = collect(PreparatoryRequirementRole::cases())->map->value->sort()->values()->all();
+
+    Program::query()->with(['curriculumEntries.course'])->get()->each(function (Program $program) use ($expected): void {
+        $preparatory = $program->curriculumEntries
+            ->where('category.value', 'Preparatory');
+
+        expect($preparatory)->toHaveCount(6)
+            ->and($preparatory->pluck('preparatory_requirement_role.value')->sort()->values()->all())
+            ->toBe($expected);
+
+        /** @var CurriculumEntry $keySkills */
+        $keySkills = $preparatory->firstWhere(
+            'preparatory_requirement_role.value',
+            PreparatoryRequirementRole::KeySkills->value,
+        );
+        expect($keySkills->course->department_id)->toBe($program->department_id);
+    });
 });
 
 it('keeps every seeded course credit-hour balanced (L + T + Lab = Total)', function () {

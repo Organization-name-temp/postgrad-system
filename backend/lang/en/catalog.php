@@ -7,4 +7,8 @@
 return [
     'credit_hours_unbalanced' => 'The lecture, tutorial and lab hours must add up to the total.',
     'curriculum_duplicate' => 'This course is already in that category for this program.',
+    'preparatory_role_duplicate' => 'This Preparatory Requirement Role is already assigned in this Program.',
+    'preparatory_role_required' => 'Every Preparatory Curriculum Entry requires a Preparatory Requirement Role.',
+    'key_skills_must_be_departmental' => 'Key Skills must be assigned to a Course owned by this Program’s Department.',
+    'preparatory_role_only_for_preparatory' => 'Only Preparatory Curriculum Entries may have a Preparatory Requirement Role.',
 ];

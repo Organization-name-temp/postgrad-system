@@ -2442,12 +2442,19 @@ export type ListAProgramsCurriculum200DataItem = {
   id?: number;
   program_id?: number;
   category?: string;
+  preparatory_requirement_role?: string;
   ordinal?: number;
   course?: ListAProgramsCurriculum200DataItemCourse;
 };
 
+export type ListAProgramsCurriculum200Meta = {
+  preparatory_requirements_complete?: boolean;
+  missing_preparatory_requirement_roles?: string[];
+};
+
 export type ListAProgramsCurriculum200 = {
   data?: ListAProgramsCurriculum200DataItem[];
+  meta?: ListAProgramsCurriculum200Meta;
 };
 
 export type AddACourseToAProgramsCurriculumBody = {
@@ -2455,6 +2462,11 @@ export type AddACourseToAProgramsCurriculumBody = {
   course_id: number;
   /** One of Preparatory, ProgramCore, ResearchElective. */
   category: string;
+  /**
+     * The semantic role, required for Preparatory and prohibited otherwise. One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement.
+     * @nullable
+     */
+  preparatory_requirement_role?: string | null;
 };
 
 export type AddACourseToAProgramsCurriculum201DataCourse = {
@@ -2475,6 +2487,7 @@ export type AddACourseToAProgramsCurriculum201Data = {
   id?: number;
   program_id?: number;
   category?: string;
+  preparatory_requirement_role?: string;
   ordinal?: number;
   course?: AddACourseToAProgramsCurriculum201DataCourse;
 };
@@ -2492,17 +2505,52 @@ export type AddACourseToAProgramsCurriculum422 = {
   errors?: AddACourseToAProgramsCurriculum422Errors;
 };
 
+export type AssignAPreparatoryRequirementRoleBody = {
+  /** One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement. */
+  preparatory_requirement_role: string;
+};
+
+export type AssignAPreparatoryRequirementRole200DataCourse = {
+  id?: number;
+  department_id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  lecture_ch?: number;
+  tutorial_ch?: number;
+  lab_ch?: number;
+  total_ch?: number;
+  is_active?: boolean;
+};
+
+export type AssignAPreparatoryRequirementRole200Data = {
+  id?: number;
+  program_id?: number;
+  category?: string;
+  preparatory_requirement_role?: string;
+  ordinal?: number;
+  course?: AssignAPreparatoryRequirementRole200DataCourse;
+};
+
+export type AssignAPreparatoryRequirementRole200 = {
+  data?: AssignAPreparatoryRequirementRole200Data;
+};
+
 export type RemoveACurriculumEntryFromAProgram204 = { [key: string]: unknown };
 
 export type ListAProgramsVersionHistory200DataItemSnapshotCurriculumItem = {
   course_id?: number;
   course_code?: string;
   category?: string;
+  preparatory_requirement_role?: string;
   ordinal?: number;
 };
 
 export type ListAProgramsVersionHistory200DataItemSnapshot = {
   code?: string;
+  preparatory_requirements_complete?: boolean;
+  missing_preparatory_requirement_roles?: string[];
   curriculum?: ListAProgramsVersionHistory200DataItemSnapshotCurriculumItem[];
 };
 
@@ -12075,6 +12123,75 @@ export const useAddACourseToAProgramsCurriculum = <TError = AddACourseToAProgram
         TContext
       > => {
       return useMutation(getAddACourseToAProgramsCurriculumMutationOptions(options), queryClient);
+    }
+
+/**
+ * Corrects the semantic role of an existing Preparatory Curriculum Entry.
+ * Category and Course placement are unchanged.
+ * @summary Assign a Preparatory Requirement Role.
+ */
+export const assignAPreparatoryRequirementRole = (
+    programId: number,
+    curriculumEntryId: number,
+    assignAPreparatoryRequirementRoleBody: AssignAPreparatoryRequirementRoleBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AssignAPreparatoryRequirementRole200>(
+      {url: `/api/v1/programs/${programId}/curriculum/${curriculumEntryId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: assignAPreparatoryRequirementRoleBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAssignAPreparatoryRequirementRoleMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignAPreparatoryRequirementRole>>, TError,{programId: number;curriculumEntryId: number;data: AssignAPreparatoryRequirementRoleBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof assignAPreparatoryRequirementRole>>, TError,{programId: number;curriculumEntryId: number;data: AssignAPreparatoryRequirementRoleBody}, TContext> => {
+
+const mutationKey = ['assignAPreparatoryRequirementRole'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignAPreparatoryRequirementRole>>, {programId: number;curriculumEntryId: number;data: AssignAPreparatoryRequirementRoleBody}> = (props) => {
+          const {programId,curriculumEntryId,data} = props ?? {};
+
+          return  assignAPreparatoryRequirementRole(programId,curriculumEntryId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignAPreparatoryRequirementRoleMutationResult = NonNullable<Awaited<ReturnType<typeof assignAPreparatoryRequirementRole>>>
+    export type AssignAPreparatoryRequirementRoleMutationBody = AssignAPreparatoryRequirementRoleBody
+    export type AssignAPreparatoryRequirementRoleMutationError = unknown
+
+    /**
+ * @summary Assign a Preparatory Requirement Role.
+ */
+export const useAssignAPreparatoryRequirementRole = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignAPreparatoryRequirementRole>>, TError,{programId: number;curriculumEntryId: number;data: AssignAPreparatoryRequirementRoleBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof assignAPreparatoryRequirementRole>>,
+        TError,
+        {programId: number;curriculumEntryId: number;data: AssignAPreparatoryRequirementRoleBody},
+        TContext
+      > => {
+      return useMutation(getAssignAPreparatoryRequirementRoleMutationOptions(options), queryClient);
     }
 
 /**

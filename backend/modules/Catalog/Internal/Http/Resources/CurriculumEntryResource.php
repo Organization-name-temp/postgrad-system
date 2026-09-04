@@ -27,6 +27,7 @@ class CurriculumEntryResource extends JsonResource
             'id' => $entry->getKey(),
             'program_id' => $entry->program_id,
             'category' => $entry->category->value,
+            'preparatory_requirement_role' => $entry->preparatory_requirement_role?->value,
             'ordinal' => $entry->ordinal,
             'course' => new CourseResource($entry->course),
         ];

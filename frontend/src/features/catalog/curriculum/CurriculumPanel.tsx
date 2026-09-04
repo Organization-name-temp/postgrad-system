@@ -5,10 +5,14 @@ import {
   Box,
   Button,
   CircularProgress,
+  FormControl,
   IconButton,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -20,6 +24,7 @@ import {
   getListAProgramsCurriculumQueryKey,
   getListAProgramsVersionHistoryQueryKey,
   useAddACourseToAProgramsCurriculum,
+  useAssignAPreparatoryRequirementRole,
   useListAProgramsCurriculum,
   useListCourses,
   useRemoveACurriculumEntryFromAProgram,
@@ -31,6 +36,11 @@ import type {
 import { pickLocaleName } from '../localeName'
 import { COURSE_CATEGORIES } from './courseCategories'
 import type { CourseCategory } from './courseCategories'
+import {
+  isPreparatoryRequirementRole,
+  PREPARATORY_REQUIREMENT_ROLES,
+} from './preparatoryRequirementRoles'
+import type { PreparatoryRequirementRole } from './preparatoryRequirementRoles'
 
 interface CurriculumPanelProps {
   programId: number
@@ -52,12 +62,16 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
 
   const { data, isPending, isError } = useListAProgramsCurriculum(programId)
   const entries = data?.data ?? []
+  const missingRoles = (data?.meta?.missing_preparatory_requirement_roles ?? []).filter(
+    isPreparatoryRequirementRole,
+  )
   const { data: coursesData } = useListCourses()
   const courses = coursesData?.data ?? []
 
   const add = useAddACourseToAProgramsCurriculum()
+  const assignRole = useAssignAPreparatoryRequirementRole()
   const remove = useRemoveACurriculumEntryFromAProgram()
-  const busy = add.isPending || remove.isPending
+  const busy = add.isPending || assignRole.isPending || remove.isPending
 
   const refetch = () => {
     void queryClient.invalidateQueries({ queryKey: getListAProgramsCurriculumQueryKey(programId) })
@@ -68,8 +82,37 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
     })
   }
 
-  const addCourse = (courseId: number, category: CourseCategory) =>
-    add.mutate({ programId, data: { course_id: courseId, category } }, { onSuccess: refetch })
+  const addCourse = (
+    courseId: number,
+    category: CourseCategory,
+    preparatoryRequirementRole?: PreparatoryRequirementRole,
+  ) =>
+    add.mutate(
+      {
+        programId,
+        data: {
+          course_id: courseId,
+          category,
+          ...(preparatoryRequirementRole
+            ? { preparatory_requirement_role: preparatoryRequirementRole }
+            : {}),
+        },
+      },
+      { onSuccess: refetch },
+    )
+
+  const changeRole = (
+    curriculumEntryId: number,
+    preparatoryRequirementRole: PreparatoryRequirementRole,
+  ) =>
+    assignRole.mutate(
+      {
+        programId,
+        curriculumEntryId,
+        data: { preparatory_requirement_role: preparatoryRequirementRole },
+      },
+      { onSuccess: refetch },
+    )
 
   const removeEntry = (curriculumEntryId: number) =>
     remove.mutate({ programId, curriculumEntryId }, { onSuccess: refetch })
@@ -81,9 +124,17 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
       </Typography>
       {isPending && <CircularProgress aria-label={t('curriculum.loading')} />}
       {isError && <Alert severity="error">{t('curriculum.loadError')}</Alert>}
-      {(add.isError || remove.isError) && (
+      {(add.isError || assignRole.isError || remove.isError) && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {t('curriculum.saveError')}
+        </Alert>
+      )}
+
+      {!isPending && !isError && data?.meta?.preparatory_requirements_complete === false && (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          {t('curriculum.missingRoles', {
+            roles: missingRoles.map((role) => t(`curriculum.preparatoryRoles.${role}`)).join(', '),
+          })}
         </Alert>
       )}
 
@@ -98,6 +149,7 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
             canManage={canManage}
             busy={busy}
             onAdd={addCourse}
+            onAssignRole={changeRole}
             onRemove={removeEntry}
           />
         ))}
@@ -111,7 +163,15 @@ interface CategorySectionProps {
   courses: ListCourses200DataItem[]
   canManage: boolean
   busy: boolean
-  onAdd: (courseId: number, category: CourseCategory) => void
+  onAdd: (
+    courseId: number,
+    category: CourseCategory,
+    preparatoryRequirementRole?: PreparatoryRequirementRole,
+  ) => void
+  onAssignRole: (
+    curriculumEntryId: number,
+    preparatoryRequirementRole: PreparatoryRequirementRole,
+  ) => void
   onRemove: (curriculumEntryId: number) => void
 }
 
@@ -123,10 +183,12 @@ function CategorySection({
   canManage,
   busy,
   onAdd,
+  onAssignRole,
   onRemove,
 }: CategorySectionProps) {
   const { t, i18n } = useTranslation('catalog')
   const [selected, setSelected] = useState<ListCourses200DataItem | null>(null)
+  const [selectedRole, setSelectedRole] = useState<PreparatoryRequirementRole | ''>('')
 
   const courseLabel = (course: ListCourses200DataItem) =>
     `${course.code ?? ''} — ${pickLocaleName(course, i18n.language, course.code ?? '')}`
@@ -138,8 +200,13 @@ function CategorySection({
 
   const handleAdd = () => {
     if (selected?.id !== undefined) {
-      onAdd(selected.id, category)
+      onAdd(
+        selected.id,
+        category,
+        category === 'Preparatory' && selectedRole ? selectedRole : undefined,
+      )
       setSelected(null)
+      setSelectedRole('')
     }
   }
 
@@ -160,21 +227,58 @@ function CategorySection({
               key={entry.id}
               secondaryAction={
                 canManage && entry.id !== undefined ? (
-                  <IconButton
-                    edge="end"
-                    size="small"
-                    onClick={() => onRemove(entry.id!)}
-                    disabled={busy}
-                    aria-label={t('curriculum.remove', { code: entry.course?.code ?? '' })}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+                  <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                    {category === 'Preparatory' && (
+                      <FormControl size="small" sx={{ minWidth: 210 }}>
+                        <InputLabel id={`role-${entry.id}-label`}>
+                          {t('curriculum.roleFor', { code: entry.course?.code ?? '' })}
+                        </InputLabel>
+                        <Select
+                          labelId={`role-${entry.id}-label`}
+                          value={entry.preparatory_requirement_role ?? ''}
+                          label={t('curriculum.roleFor', { code: entry.course?.code ?? '' })}
+                          onChange={(event) => {
+                            const role = event.target.value
+                            if (isPreparatoryRequirementRole(role)) {
+                              onAssignRole(entry.id!, role)
+                            }
+                          }}
+                          disabled={busy}
+                        >
+                          {PREPARATORY_REQUIREMENT_ROLES.map((role) => (
+                            <MenuItem key={role} value={role}>
+                              {t(`curriculum.preparatoryRoles.${role}`)}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      onClick={() => onRemove(entry.id!)}
+                      disabled={busy}
+                      aria-label={t('curriculum.remove', { code: entry.course?.code ?? '' })}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Stack>
                 ) : undefined
               }
             >
               <ListItemText
                 primary={entry.course ? courseLabel(entry.course) : ''}
-                secondary={t('curriculum.level', { level: entry.course?.level ?? '' })}
+                secondary={
+                  category === 'Preparatory' &&
+                  isPreparatoryRequirementRole(entry.preparatory_requirement_role)
+                    ? t('curriculum.levelAndRole', {
+                        level: entry.course?.level ?? '',
+                        role: t(
+                          `curriculum.preparatoryRoles.${entry.preparatory_requirement_role}`,
+                        ),
+                      })
+                    : t('curriculum.level', { level: entry.course?.level ?? '' })
+                }
               />
             </ListItem>
           ))}
@@ -194,7 +298,37 @@ function CategorySection({
               <TextField {...params} label={t('curriculum.addCourse')} size="small" />
             )}
           />
-          <Button variant="outlined" onClick={handleAdd} disabled={busy || selected === null}>
+          {category === 'Preparatory' && (
+            <FormControl size="small" sx={{ minWidth: 240 }}>
+              <InputLabel id="new-preparatory-role-label">
+                {t('curriculum.preparatoryRequirementRole')}
+              </InputLabel>
+              <Select
+                labelId="new-preparatory-role-label"
+                value={selectedRole}
+                label={t('curriculum.preparatoryRequirementRole')}
+                onChange={(event) => {
+                  const role = event.target.value
+                  if (isPreparatoryRequirementRole(role)) {
+                    setSelectedRole(role)
+                  }
+                }}
+              >
+                {PREPARATORY_REQUIREMENT_ROLES.map((role) => (
+                  <MenuItem key={role} value={role}>
+                    {t(`curriculum.preparatoryRoles.${role}`)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+          <Button
+            variant="outlined"
+            onClick={handleAdd}
+            disabled={
+              busy || selected === null || (category === 'Preparatory' && selectedRole === '')
+            }
+          >
             {t('curriculum.add')}
           </Button>
         </Stack>

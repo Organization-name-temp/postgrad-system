@@ -28,6 +28,7 @@ class EloquentCurriculumCatalog implements CurriculumCatalog
                     programId: $entry->program_id,
                     courseId: $entry->course_id,
                     category: $entry->category,
+                    preparatoryRequirementRole: $entry->preparatory_requirement_role,
                     ordinal: $entry->ordinal,
                 ),
             ])

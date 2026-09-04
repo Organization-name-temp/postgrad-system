@@ -8102,20 +8102,29 @@ paths:
                     -
                       id: 1
                       program_id: 1
-                      category: ProgramCore
+                      category: Preparatory
+                      preparatory_requirement_role: KeySkills
                       ordinal: 0
                       course:
                         id: 1
                         department_id: 1
                         code: DEP501
-                        name_en: 'Advanced Algorithms'
-                        name_ar: 'خوارزميات متقدمة'
+                        name_en: 'Key Skills'
+                        name_ar: 'المهارات الأساسية'
                         level: 500
-                        lecture_ch: 3
+                        lecture_ch: 1
                         tutorial_ch: 0
                         lab_ch: 0
-                        total_ch: 3
+                        total_ch: 1
                         is_active: true
+                  meta:
+                    preparatory_requirements_complete: false
+                    missing_preparatory_requirement_roles:
+                      - EnglishLanguage
+                      - ArabicLanguage
+                      - JapaneseLanguage
+                      - JapaneseCulture
+                      - DepartmentalRequirement
                 properties:
                   data:
                     type: array
@@ -8123,19 +8132,20 @@ paths:
                       -
                         id: 1
                         program_id: 1
-                        category: ProgramCore
+                        category: Preparatory
+                        preparatory_requirement_role: KeySkills
                         ordinal: 0
                         course:
                           id: 1
                           department_id: 1
                           code: DEP501
-                          name_en: 'Advanced Algorithms'
-                          name_ar: 'خوارزميات متقدمة'
+                          name_en: 'Key Skills'
+                          name_ar: 'المهارات الأساسية'
                           level: 500
-                          lecture_ch: 3
+                          lecture_ch: 1
                           tutorial_ch: 0
                           lab_ch: 0
-                          total_ch: 3
+                          total_ch: 1
                           is_active: true
                     items:
                       type: object
@@ -8148,7 +8158,10 @@ paths:
                           example: 1
                         category:
                           type: string
-                          example: ProgramCore
+                          example: Preparatory
+                        preparatory_requirement_role:
+                          type: string
+                          example: KeySkills
                         ordinal:
                           type: integer
                           example: 0
@@ -8166,16 +8179,16 @@ paths:
                               example: DEP501
                             name_en:
                               type: string
-                              example: 'Advanced Algorithms'
+                              example: 'Key Skills'
                             name_ar:
                               type: string
-                              example: 'خوارزميات متقدمة'
+                              example: 'المهارات الأساسية'
                             level:
                               type: integer
                               example: 500
                             lecture_ch:
                               type: integer
-                              example: 3
+                              example: 1
                             tutorial_ch:
                               type: integer
                               example: 0
@@ -8184,10 +8197,26 @@ paths:
                               example: 0
                             total_ch:
                               type: integer
-                              example: 3
+                              example: 1
                             is_active:
                               type: boolean
                               example: true
+                  meta:
+                    type: object
+                    properties:
+                      preparatory_requirements_complete:
+                        type: boolean
+                        example: false
+                      missing_preparatory_requirement_roles:
+                        type: array
+                        example:
+                          - EnglishLanguage
+                          - ArabicLanguage
+                          - JapaneseLanguage
+                          - JapaneseCulture
+                          - DepartmentalRequirement
+                        items:
+                          type: string
       tags:
         - Catalog
       security: []
@@ -8207,19 +8236,20 @@ paths:
                   data:
                     id: 1
                     program_id: 1
-                    category: ProgramCore
+                    category: Preparatory
+                    preparatory_requirement_role: KeySkills
                     ordinal: 0
                     course:
                       id: 1
                       department_id: 1
                       code: DEP501
-                      name_en: 'Advanced Algorithms'
-                      name_ar: 'خوارزميات متقدمة'
+                      name_en: 'Key Skills'
+                      name_ar: 'المهارات الأساسية'
                       level: 500
-                      lecture_ch: 3
+                      lecture_ch: 1
                       tutorial_ch: 0
                       lab_ch: 0
-                      total_ch: 3
+                      total_ch: 1
                       is_active: true
                 properties:
                   data:
@@ -8233,7 +8263,10 @@ paths:
                         example: 1
                       category:
                         type: string
-                        example: ProgramCore
+                        example: Preparatory
+                      preparatory_requirement_role:
+                        type: string
+                        example: KeySkills
                       ordinal:
                         type: integer
                         example: 0
@@ -8251,16 +8284,16 @@ paths:
                             example: DEP501
                           name_en:
                             type: string
-                            example: 'Advanced Algorithms'
+                            example: 'Key Skills'
                           name_ar:
                             type: string
-                            example: 'خوارزميات متقدمة'
+                            example: 'المهارات الأساسية'
                           level:
                             type: integer
                             example: 500
                           lecture_ch:
                             type: integer
-                            example: 3
+                            example: 1
                           tutorial_ch:
                             type: integer
                             example: 0
@@ -8269,7 +8302,7 @@ paths:
                             example: 0
                           total_ch:
                             type: integer
-                            example: 3
+                            example: 1
                           is_active:
                             type: boolean
                             example: true
@@ -8314,6 +8347,11 @@ paths:
                   type: string
                   description: 'One of Preparatory, ProgramCore, ResearchElective.'
                   example: ProgramCore
+                preparatory_requirement_role:
+                  type: string
+                  description: 'The semantic role, required for Preparatory and prohibited otherwise. One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement.'
+                  example: EnglishLanguage
+                  nullable: true
               required:
                 - course_id
                 - category
@@ -8328,6 +8366,108 @@ paths:
         schema:
           type: integer
   '/api/v1/programs/{program_id}/curriculum/{curriculum_entry_id}':
+    patch:
+      summary: 'Assign a Preparatory Requirement Role.'
+      operationId: assignAPreparatoryRequirementRole
+      description: "Corrects the semantic role of an existing Preparatory Curriculum Entry.\nCategory and Course placement are unchanged."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    program_id: 1
+                    category: Preparatory
+                    preparatory_requirement_role: KeySkills
+                    ordinal: 0
+                    course:
+                      id: 1
+                      department_id: 1
+                      code: DEP501
+                      name_en: 'Key Skills'
+                      name_ar: 'المهارات الأساسية'
+                      level: 500
+                      lecture_ch: 1
+                      tutorial_ch: 0
+                      lab_ch: 0
+                      total_ch: 1
+                      is_active: true
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      program_id:
+                        type: integer
+                        example: 1
+                      category:
+                        type: string
+                        example: Preparatory
+                      preparatory_requirement_role:
+                        type: string
+                        example: KeySkills
+                      ordinal:
+                        type: integer
+                        example: 0
+                      course:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          department_id:
+                            type: integer
+                            example: 1
+                          code:
+                            type: string
+                            example: DEP501
+                          name_en:
+                            type: string
+                            example: 'Key Skills'
+                          name_ar:
+                            type: string
+                            example: 'المهارات الأساسية'
+                          level:
+                            type: integer
+                            example: 500
+                          lecture_ch:
+                            type: integer
+                            example: 1
+                          tutorial_ch:
+                            type: integer
+                            example: 0
+                          lab_ch:
+                            type: integer
+                            example: 0
+                          total_ch:
+                            type: integer
+                            example: 1
+                          is_active:
+                            type: boolean
+                            example: true
+      tags:
+        - Catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preparatory_requirement_role:
+                  type: string
+                  description: 'One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement.'
+                  example: EnglishLanguage
+              required:
+                - preparatory_requirement_role
+      security: []
     delete:
       summary: 'Remove a Curriculum Entry from a Program.'
       operationId: removeACurriculumEntryFromAProgram
@@ -8380,16 +8520,24 @@ paths:
                     -
                       id: 1
                       version_no: 1
-                      change_note: created
+                      change_note: curriculum_updated
                       changed_by: 1
                       changed_at: '2026-07-12T10:00:00+00:00'
                       snapshot:
                         code: MSC-CE
+                        preparatory_requirements_complete: false
+                        missing_preparatory_requirement_roles:
+                          - EnglishLanguage
+                          - ArabicLanguage
+                          - JapaneseLanguage
+                          - JapaneseCulture
+                          - DepartmentalRequirement
                         curriculum:
                           -
                             course_id: 1
-                            course_code: PRE401
+                            course_code: DEP501
                             category: Preparatory
+                            preparatory_requirement_role: KeySkills
                             ordinal: 0
                 properties:
                   data:
@@ -8398,15 +8546,23 @@ paths:
                       -
                         id: 1
                         version_no: 1
-                        change_note: created
+                        change_note: curriculum_updated
                         changed_by: 1
                         changed_at: '2026-07-12T10:00:00+00:00'
                         snapshot:
                           code: MSC-CE
+                          preparatory_requirements_complete: false
+                          missing_preparatory_requirement_roles:
+                            - EnglishLanguage
+                            - ArabicLanguage
+                            - JapaneseLanguage
+                            - JapaneseCulture
+                            - DepartmentalRequirement
                           curriculum:
                             - course_id: 1
-                              course_code: PRE401
+                              course_code: DEP501
                               category: Preparatory
+                              preparatory_requirement_role: KeySkills
                               ordinal: 0
                     items:
                       type: object
@@ -8419,7 +8575,7 @@ paths:
                           example: 1
                         change_note:
                           type: string
-                          example: created
+                          example: curriculum_updated
                         changed_by:
                           type: integer
                           example: 1
@@ -8432,12 +8588,26 @@ paths:
                             code:
                               type: string
                               example: MSC-CE
+                            preparatory_requirements_complete:
+                              type: boolean
+                              example: false
+                            missing_preparatory_requirement_roles:
+                              type: array
+                              example:
+                                - EnglishLanguage
+                                - ArabicLanguage
+                                - JapaneseLanguage
+                                - JapaneseCulture
+                                - DepartmentalRequirement
+                              items:
+                                type: string
                             curriculum:
                               type: array
                               example:
                                 - course_id: 1
-                                  course_code: PRE401
+                                  course_code: DEP501
                                   category: Preparatory
+                                  preparatory_requirement_role: KeySkills
                                   ordinal: 0
                               items:
                                 type: object
@@ -8447,10 +8617,13 @@ paths:
                                     example: 1
                                   course_code:
                                     type: string
-                                    example: PRE401
+                                    example: DEP501
                                   category:
                                     type: string
                                     example: Preparatory
+                                  preparatory_requirement_role:
+                                    type: string
+                                    example: KeySkills
                                   ordinal:
                                     type: integer
                                     example: 0

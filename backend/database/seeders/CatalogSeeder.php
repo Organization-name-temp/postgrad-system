@@ -12,6 +12,7 @@ use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\CourseLevel;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 
 /**
  * Seeds a realistic, bilingual E-JUST catalog so the browse tree, Course detail,
@@ -76,7 +77,7 @@ class CatalogSeeder extends Seeder
 
         // MSc — Core/Elective at level 500, the research course a 700-level PBL.
         $msc = $this->program($ce, 'MSC-CE', 'MSc in Computer Engineering', 'ماجستير العلوم في هندسة الحاسوب', DegreeLevel::MSc);
-        $this->place($msc, CourseCategory::Preparatory, [...$sharedPrep, ...$deptPrep]);
+        $this->placePreparatory($msc, $sharedPrep, $deptPrep);
         $this->place($msc, CourseCategory::ProgramCore, [
             $this->course('CSE511', 'Advanced Algorithms', 'خوارزميات متقدمة', CourseLevel::Master, 3, department: $ce),
             // A lecture + lab breakdown — architecture carries a lab component.
@@ -92,7 +93,7 @@ class CatalogSeeder extends Seeder
 
         // PhD — Core/Elective at level 600, the research course a 700-level Seminar.
         $phd = $this->program($ce, 'PHD-CE', 'PhD in Computer Engineering', 'دكتوراه الفلسفة في هندسة الحاسوب', DegreeLevel::PhD);
-        $this->place($phd, CourseCategory::Preparatory, [...$sharedPrep, ...$deptPrep]);
+        $this->placePreparatory($phd, $sharedPrep, $deptPrep);
         $this->place($phd, CourseCategory::ProgramCore, [
             $this->course('CSE611', 'Advanced Topics in Computing', 'موضوعات متقدمة في الحوسبة', CourseLevel::Doctoral, 3, department: $ce),
             $this->course('CSE612', 'Research Methodology', 'منهجية البحث العلمي', CourseLevel::Doctoral, 3, department: $ce),
@@ -105,11 +106,46 @@ class CatalogSeeder extends Seeder
         ]);
     }
 
-    /** A shallow Program that carries only the shared Preparatory courses. */
+    /** A shallow Program whose six Preparatory requirements are fully semantic. */
     private function preparatoryOnlyProgram(Department $department, string $code, string $nameEn, string $nameAr, array $sharedPrep): void
     {
         $program = $this->program($department, $code, $nameEn, $nameAr, DegreeLevel::MSc);
-        $this->place($program, CourseCategory::Preparatory, $sharedPrep);
+        $departmentalPrep = [
+            $this->course(
+                $department->code.'501',
+                'Key Skills',
+                'المهارات الأساسية',
+                CourseLevel::Master,
+                1,
+                department: $department,
+            ),
+            $this->course(
+                $department->code.'502',
+                'Departmental Requirement',
+                'متطلب قسمي',
+                CourseLevel::Master,
+                1,
+                department: $department,
+            ),
+        ];
+
+        $this->placePreparatory($program, $sharedPrep, $departmentalPrep);
+    }
+
+    /**
+     * Assign the six stable semantic roles without relying on Course codes.
+     *
+     * @param  list<Course>  $sharedPrep
+     * @param  list<Course>  $departmentalPrep
+     */
+    private function placePreparatory(Program $program, array $sharedPrep, array $departmentalPrep): void
+    {
+        $this->place(
+            $program,
+            CourseCategory::Preparatory,
+            [...$sharedPrep, ...$departmentalPrep],
+            PreparatoryRequirementRole::cases(),
+        );
     }
 
     private function faculty(string $code, string $nameEn, string $nameAr): Faculty
@@ -185,17 +221,25 @@ class CatalogSeeder extends Seeder
      * seeder never duplicates a placement (ADR-0010).
      *
      * @param  list<Course>  $courses
+     * @param  list<PreparatoryRequirementRole>  $preparatoryRoles
      */
-    private function place(Program $program, CourseCategory $category, array $courses): void
-    {
+    private function place(
+        Program $program,
+        CourseCategory $category,
+        array $courses,
+        array $preparatoryRoles = [],
+    ): void {
         foreach (array_values($courses) as $ordinal => $course) {
-            CurriculumEntry::firstOrCreate(
+            CurriculumEntry::updateOrCreate(
                 [
                     'program_id' => $program->getKey(),
                     'course_id' => $course->getKey(),
                     'category' => $category->value,
                 ],
-                ['ordinal' => $ordinal],
+                [
+                    'ordinal' => $ordinal,
+                    'preparatory_requirement_role' => $preparatoryRoles[$ordinal] ?? null,
+                ],
             );
         }
     }

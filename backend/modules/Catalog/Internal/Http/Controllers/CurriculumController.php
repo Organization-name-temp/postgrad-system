@@ -7,11 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Modules\Catalog\Internal\Http\Resources\CurriculumEntryResource;
+use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Internal\Support\PreparatoryCurriculumCompleteness;
 use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
 use Modules\Catalog\Public\Enums\CourseCategory;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 
 /**
  * @group Catalog
@@ -24,7 +28,10 @@ use Modules\Catalog\Public\Enums\CourseCategory;
  */
 class CurriculumController
 {
-    public function __construct(private readonly CatalogVersionRecorder $versions) {}
+    public function __construct(
+        private readonly CatalogVersionRecorder $versions,
+        private readonly PreparatoryCurriculumCompleteness $completeness,
+    ) {}
 
     /**
      * List a Program's Curriculum.
@@ -36,7 +43,7 @@ class CurriculumController
      *
      * @urlParam program_id integer required The ID of the program. Example: 1
      *
-     * @response 200 {"data": [{"id": 1, "program_id": 1, "category": "ProgramCore", "ordinal": 0, "course": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}]}
+     * @response 200 {"data": [{"id": 1, "program_id": 1, "category": "Preparatory", "preparatory_requirement_role": "KeySkills", "ordinal": 0, "course": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Key Skills", "name_ar": "المهارات الأساسية", "level": 500, "lecture_ch": 1, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 1, "is_active": true}}], "meta": {"preparatory_requirements_complete": false, "missing_preparatory_requirement_roles": ["EnglishLanguage", "ArabicLanguage", "JapaneseLanguage", "JapaneseCulture", "DepartmentalRequirement"]}}
      */
     public function index(Program $program): AnonymousResourceCollection
     {
@@ -49,7 +56,17 @@ class CurriculumController
             ->sortBy(fn (CurriculumEntry $entry): string => sprintf('%08d %s', $entry->ordinal, $entry->course->code))
             ->values();
 
-        return CurriculumEntryResource::collection($entries);
+        $missingRoles = $this->completeness->missingRoles($program);
+
+        return CurriculumEntryResource::collection($entries)->additional([
+            'meta' => [
+                'preparatory_requirements_complete' => $missingRoles === [],
+                'missing_preparatory_requirement_roles' => array_map(
+                    fn (PreparatoryRequirementRole $role): string => $role->value,
+                    $missingRoles,
+                ),
+            ],
+        ]);
     }
 
     /**
@@ -63,8 +80,9 @@ class CurriculumController
      *
      * @bodyParam course_id integer required The Course to place. Example: 1
      * @bodyParam category string required One of Preparatory, ProgramCore, ResearchElective. Example: ProgramCore
+     * @bodyParam preparatory_requirement_role string The semantic role, required for Preparatory and prohibited otherwise. One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement. Example: EnglishLanguage
      *
-     * @response 201 {"data": {"id": 1, "program_id": 1, "category": "ProgramCore", "ordinal": 0, "course": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}}}
+     * @response 201 {"data": {"id": 1, "program_id": 1, "category": "Preparatory", "preparatory_requirement_role": "KeySkills", "ordinal": 0, "course": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Key Skills", "name_ar": "المهارات الأساسية", "level": 500, "lecture_ch": 1, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 1, "is_active": true}}}
      * @response 422 {"message": "This course is already in that category for this program.", "errors": {"course_id": ["This course is already in that category for this program."]}}
      */
     public function store(Request $request, Program $program): JsonResponse
@@ -79,8 +97,30 @@ class CurriculumController
                     ->where('category', $request->input('category'))),
             ],
             'category' => ['required', Rule::enum(CourseCategory::class)],
+            'preparatory_requirement_role' => [
+                'nullable',
+                'required_if:category,'.CourseCategory::Preparatory->value,
+                'prohibited_unless:category,'.CourseCategory::Preparatory->value,
+                Rule::enum(PreparatoryRequirementRole::class),
+                Rule::unique('curriculum_entries', 'preparatory_requirement_role')
+                    ->where(fn ($query) => $query->where('program_id', $program->getKey())),
+                function (string $attribute, mixed $value, \Closure $fail) use ($request, $program): void {
+                    if ($value !== PreparatoryRequirementRole::KeySkills->value) {
+                        return;
+                    }
+
+                    $course = Course::query()->find($request->integer('course_id'));
+
+                    if ($course?->department_id !== $program->department_id) {
+                        $fail(__('catalog.key_skills_must_be_departmental'));
+                    }
+                },
+            ],
         ], [
             'course_id.unique' => __('catalog.curriculum_duplicate'),
+            'preparatory_requirement_role.required_if' => __('catalog.preparatory_role_required'),
+            'preparatory_requirement_role.prohibited_unless' => __('catalog.preparatory_role_only_for_preparatory'),
+            'preparatory_requirement_role.unique' => __('catalog.preparatory_role_duplicate'),
         ]);
 
         $maxOrdinal = $program->curriculumEntries()
@@ -90,6 +130,7 @@ class CurriculumController
         $entry = $program->curriculumEntries()->create([
             'course_id' => $validated['course_id'],
             'category' => $validated['category'],
+            'preparatory_requirement_role' => $validated['preparatory_requirement_role'] ?? null,
             'ordinal' => $maxOrdinal === null ? 0 : $maxOrdinal + 1,
         ]);
 
@@ -97,6 +138,56 @@ class CurriculumController
         $this->versions->recordProgram($program, 'curriculum_updated');
 
         return (new CurriculumEntryResource($entry->load('course')))->response()->setStatusCode(201);
+    }
+
+    /**
+     * Assign a Preparatory Requirement Role.
+     *
+     * Corrects the semantic role of an existing Preparatory Curriculum Entry.
+     * Category and Course placement are unchanged.
+     *
+     * @urlParam program_id integer required The ID of the program. Example: 1
+     * @urlParam curriculum_entry_id integer required The ID of the curriculum entry. Example: 1
+     *
+     * @bodyParam preparatory_requirement_role string required One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement. Example: EnglishLanguage
+     *
+     * @response 200 {"data": {"id": 1, "program_id": 1, "category": "Preparatory", "preparatory_requirement_role": "KeySkills", "ordinal": 0, "course": {"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Key Skills", "name_ar": "المهارات الأساسية", "level": 500, "lecture_ch": 1, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 1, "is_active": true}}}
+     */
+    public function update(Request $request, Program $program, CurriculumEntry $curriculumEntry): CurriculumEntryResource
+    {
+        abort_unless($curriculumEntry->program_id === $program->getKey(), 404);
+
+        if ($curriculumEntry->category !== CourseCategory::Preparatory) {
+            throw ValidationException::withMessages([
+                'preparatory_requirement_role' => [__('catalog.preparatory_role_only_for_preparatory')],
+            ]);
+        }
+
+        $validated = $request->validate([
+            'preparatory_requirement_role' => [
+                'required',
+                Rule::enum(PreparatoryRequirementRole::class),
+                Rule::unique('curriculum_entries', 'preparatory_requirement_role')
+                    ->where(fn ($query) => $query->where('program_id', $program->getKey()))
+                    ->ignore($curriculumEntry->getKey()),
+                function (string $attribute, mixed $value, \Closure $fail) use ($curriculumEntry, $program): void {
+                    if ($value !== PreparatoryRequirementRole::KeySkills->value) {
+                        return;
+                    }
+
+                    if ($curriculumEntry->course()->value('department_id') !== $program->department_id) {
+                        $fail(__('catalog.key_skills_must_be_departmental'));
+                    }
+                },
+            ],
+        ], [
+            'preparatory_requirement_role.unique' => __('catalog.preparatory_role_duplicate'),
+        ]);
+
+        $curriculumEntry->update($validated);
+        $this->versions->recordProgram($program, 'curriculum_updated');
+
+        return new CurriculumEntryResource($curriculumEntry->load('course'));
     }
 
     /**

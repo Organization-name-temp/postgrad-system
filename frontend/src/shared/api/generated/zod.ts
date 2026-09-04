@@ -2282,6 +2282,7 @@ export const ListAProgramsCurriculumResponse = zod.object({
   "id": zod.number().optional(),
   "program_id": zod.number().optional(),
   "category": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
   "ordinal": zod.number().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
@@ -2296,7 +2297,11 @@ export const ListAProgramsCurriculumResponse = zod.object({
   "total_ch": zod.number().optional(),
   "is_active": zod.boolean().optional()
 }).optional()
-})).optional()
+})).optional(),
+  "meta": zod.object({
+  "preparatory_requirements_complete": zod.boolean().optional(),
+  "missing_preparatory_requirement_roles": zod.array(zod.string()).optional()
+}).optional()
 })
 
 
@@ -2312,7 +2317,8 @@ export const AddACourseToAProgramsCurriculumParams = zod.object({
 
 export const AddACourseToAProgramsCurriculumBody = zod.object({
   "course_id": zod.number().describe('The Course to place.'),
-  "category": zod.string().describe('One of Preparatory, ProgramCore, ResearchElective.')
+  "category": zod.string().describe('One of Preparatory, ProgramCore, ResearchElective.'),
+  "preparatory_requirement_role": zod.string().nullish().describe('The semantic role, required for Preparatory and prohibited otherwise. One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement.')
 })
 
 export const AddACourseToAProgramsCurriculumResponse = zod.object({
@@ -2320,6 +2326,45 @@ export const AddACourseToAProgramsCurriculumResponse = zod.object({
   "id": zod.number().optional(),
   "program_id": zod.number().optional(),
   "category": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "ordinal": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "lecture_ch": zod.number().optional(),
+  "tutorial_ch": zod.number().optional(),
+  "lab_ch": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "is_active": zod.boolean().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Corrects the semantic role of an existing Preparatory Curriculum Entry.
+ * Category and Course placement are unchanged.
+ * @summary Assign a Preparatory Requirement Role.
+ */
+export const AssignAPreparatoryRequirementRoleParams = zod.object({
+  "program_id": zod.number().describe('The ID of the program.'),
+  "curriculum_entry_id": zod.number().describe('The ID of the curriculum entry.')
+})
+
+export const AssignAPreparatoryRequirementRoleBody = zod.object({
+  "preparatory_requirement_role": zod.string().describe('One of EnglishLanguage, ArabicLanguage, JapaneseLanguage, JapaneseCulture, KeySkills, DepartmentalRequirement.')
+})
+
+export const AssignAPreparatoryRequirementRoleResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "program_id": zod.number().optional(),
+  "category": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
   "ordinal": zod.number().optional(),
   "course": zod.object({
   "id": zod.number().optional(),
@@ -2372,10 +2417,13 @@ export const ListAProgramsVersionHistoryResponse = zod.object({
   "changed_at": zod.string().optional(),
   "snapshot": zod.object({
   "code": zod.string().optional(),
+  "preparatory_requirements_complete": zod.boolean().optional(),
+  "missing_preparatory_requirement_roles": zod.array(zod.string()).optional(),
   "curriculum": zod.array(zod.object({
   "course_id": zod.number().optional(),
   "course_code": zod.string().optional(),
   "category": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
   "ordinal": zod.number().optional()
 })).optional()
 }).optional()

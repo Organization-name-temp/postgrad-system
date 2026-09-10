@@ -10,6 +10,9 @@ use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
 use Modules\Enrollment\Internal\Http\Controllers\ScheduleChangeController;
+use Modules\Enrollment\Internal\Http\Controllers\TransferDecisionController;
+use Modules\Enrollment\Internal\Http\Controllers\TransferRequestController;
+use Modules\Enrollment\Internal\Http\Controllers\TransferReviewController;
 
 /*
 | Enrollment routes, mounted under /api/v1 by EnrollmentServiceProvider.
@@ -90,6 +93,30 @@ Route::middleware(['auth:sanctum', 'can:exemption.approve'])->group(function () 
     Route::get('/credit-decisions/exemption-requests/department-head-queue', [ExemptionReviewController::class, 'departmentHeadQueue'])->middleware('role:R06');
     Route::get('/credit-decisions/exemption-requests/department-head-queue/export', [ExemptionReviewController::class, 'departmentHeadExport'])->middleware('role:R06');
     Route::post('/credit-decisions/exemption-requests/{exemption_request}/department-head-decision', [ExemptionReviewController::class, 'departmentHeadDecision'])->whereNumber('exemption_request')->middleware('role:R06');
+});
+
+Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->group(function () {
+    Route::get('/credit-decisions/transfers', [TransferDecisionController::class, 'index']);
+    Route::get('/credit-decisions/transfer-requests/targets', [TransferRequestController::class, 'targets']);
+    Route::get('/credit-decisions/transfer-requests', [TransferRequestController::class, 'index']);
+    Route::get('/credit-decisions/transfer-requests/export', [TransferRequestController::class, 'export']);
+    Route::post('/credit-decisions/transfer-requests', [TransferRequestController::class, 'store']);
+    Route::get('/credit-decisions/transfer-requests/{transfer_request}', [TransferRequestController::class, 'show'])->whereNumber('transfer_request');
+    Route::patch('/credit-decisions/transfer-requests/{transfer_request}', [TransferRequestController::class, 'update'])->whereNumber('transfer_request');
+    Route::delete('/credit-decisions/transfer-requests/{transfer_request}', [TransferRequestController::class, 'destroy'])->whereNumber('transfer_request');
+    Route::post('/credit-decisions/transfer-requests/{transfer_request}/submit', [TransferRequestController::class, 'submit'])->whereNumber('transfer_request');
+});
+
+Route::middleware(['auth:sanctum', 'can:transfer_waiver.approve'])->group(function () {
+    Route::get('/credit-decisions/transfer-requests/advisor-queue', [TransferReviewController::class, 'advisorQueue'])->middleware('role:R03');
+    Route::get('/credit-decisions/transfer-requests/advisor-queue/export', [TransferReviewController::class, 'advisorExport'])->middleware('role:R03');
+    Route::post('/credit-decisions/transfer-requests/{transfer_request}/advisor-decision', [TransferReviewController::class, 'advisorDecision'])->whereNumber('transfer_request')->middleware('role:R03');
+    Route::get('/credit-decisions/transfer-requests/department-head-queue', [TransferReviewController::class, 'departmentHeadQueue'])->middleware('role:R06');
+    Route::get('/credit-decisions/transfer-requests/department-head-queue/export', [TransferReviewController::class, 'departmentHeadExport'])->middleware('role:R06');
+    Route::post('/credit-decisions/transfer-requests/{transfer_request}/department-head-decision', [TransferReviewController::class, 'departmentHeadDecision'])->whereNumber('transfer_request')->middleware('role:R06');
+    Route::get('/credit-decisions/transfer-requests/council-queue', [TransferReviewController::class, 'councilQueue'])->middleware('role:R08');
+    Route::get('/credit-decisions/transfer-requests/council-queue/export', [TransferReviewController::class, 'councilExport'])->middleware('role:R08');
+    Route::post('/credit-decisions/transfer-requests/{transfer_request}/council-decision', [TransferReviewController::class, 'councilDecision'])->whereNumber('transfer_request')->middleware('role:R08');
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {

@@ -73,6 +73,18 @@ enum NotificationType: string
     /** A reviewer recorded a terminal manual Exemption outcome. */
     case ManualExemptionDecided = 'exemption.request_decided';
 
+    /** A Student submitted or resubmitted a Transfer request. */
+    case TransferRequestSubmitted = 'transfer.request_submitted';
+
+    /** A reviewer returned a Transfer request for evidence revision. */
+    case TransferRequestReturned = 'transfer.request_returned';
+
+    /** A Transfer request advanced to its next reviewer. */
+    case TransferRequestAdvanced = 'transfer.request_advanced';
+
+    /** A reviewer recorded a terminal Transfer outcome. */
+    case TransferRequestDecided = 'transfer.request_decided';
+
     /**
      * A Student (or staff on their behalf) submitted a registration for the advisor's
      * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds

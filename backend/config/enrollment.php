@@ -15,6 +15,10 @@ return [
     'min_credit_hours' => (int) env('ENROLLMENT_MIN_CREDIT_HOURS', 6),
     'max_credit_hours' => (int) env('ENROLLMENT_MAX_CREDIT_HOURS', 12),
 
+    // SRS Appendix C / BR-36: effective Transfer decisions recognize target
+    // Curriculum hours and may never exceed this lifetime Student total.
+    'max_transfer_credit_hours' => (int) env('ENROLLMENT_MAX_TRANSFER_CREDIT_HOURS', 9),
+
     // Attendance (ADR-0019, ticket 08). The one attendance rule with SRS backing
     // (Appendix D: an Audit "must attend ≥75%"). An Audit Enrollment whose derived
     // attendance percentage first crosses below this threshold raises the audit-at-risk

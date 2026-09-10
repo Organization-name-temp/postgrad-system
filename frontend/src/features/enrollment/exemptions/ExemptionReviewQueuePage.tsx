@@ -30,13 +30,13 @@ import {
   useDepartmentHeadManualExemptionQueue,
   useScopedDepartmentHeadFinalAction,
 } from '../../../shared/api/generated/endpoints'
-import { downloadBlob } from './downloadBlob'
+import { downloadBlob } from '../credit-decisions/downloadBlob'
 import { ExemptionEvidenceSummary } from './ExemptionEvidenceSummary'
 import { ExemptionStatusChip } from './ExemptionStatusChip'
 import { ExemptionTransitionHistory } from './ExemptionTransitionHistory'
 import { FormErrorText, reviewReasonSchema, type ReviewReasonValues } from './formSchema'
 import type { ReviewerExemptionRequestRow } from './types'
-import { useRetryStableActionId } from './useRetryStableActionId'
+import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 
 export function ExemptionReviewQueuePage({ stage }: { stage: 'advisor' | 'departmentHead' }) {
   const { t } = useTranslation('enrollment')

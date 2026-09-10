@@ -43,7 +43,7 @@ import {
   useSubmitOrResubmitAnExemptionRequest,
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
-import { downloadBlob } from './downloadBlob'
+import { downloadBlob } from '../credit-decisions/downloadBlob'
 import { ExemptionEvidenceSummary } from './ExemptionEvidenceSummary'
 import { ExemptionStatusChip } from './ExemptionStatusChip'
 import { ExemptionTransitionHistory } from './ExemptionTransitionHistory'
@@ -54,7 +54,7 @@ import {
   type EvidenceFormValues,
 } from './formSchema'
 import type { StudentExemptionRequestRow } from './types'
-import { useRetryStableActionId } from './useRetryStableActionId'
+import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 
 function evidencePayload(values: EvidenceFormValues) {
   return values.basis === 'english'

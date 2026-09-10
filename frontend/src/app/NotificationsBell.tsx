@@ -64,6 +64,10 @@ const TYPE_ALIAS: Record<string, string> = {
   'exemption.request_returned': 'manualExemptionReturned',
   'exemption.request_recommended': 'manualExemptionRecommended',
   'exemption.request_decided': 'manualExemptionDecided',
+  'transfer.request_submitted': 'transferSubmitted',
+  'transfer.request_returned': 'transferReturned',
+  'transfer.request_advanced': 'transferAdvanced',
+  'transfer.request_decided': 'transferDecided',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

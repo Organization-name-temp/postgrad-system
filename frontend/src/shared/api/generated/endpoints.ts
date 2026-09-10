@@ -6497,6 +6497,1442 @@ export type MarkOneNotificationRead404 = {
   message?: string;
 };
 
+export type AdvisorTransferQueueParams = {
+target_course_id?: string;
+student_id?: string;
+normalized_grade?: string;
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type AdvisorTransferQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type AdvisorTransferQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type AdvisorTransferQueue200DataItemTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type AdvisorTransferQueue200DataItemTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AdvisorTransferQueue200DataItemTransitionsItemEvidenceSnapshot;
+  review_snapshot?: AdvisorTransferQueue200DataItemTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type AdvisorTransferQueue200DataItemDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type AdvisorTransferQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: AdvisorTransferQueue200DataItemStudent;
+  transitions?: AdvisorTransferQueue200DataItemTransitionsItem[];
+  decision?: AdvisorTransferQueue200DataItemDecision;
+};
+
+export type AdvisorTransferQueue200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type AdvisorTransferQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  links?: unknown[];
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type AdvisorTransferQueue200 = {
+  data?: AdvisorTransferQueue200DataItem[];
+  links?: AdvisorTransferQueue200Links;
+  meta?: AdvisorTransferQueue200Meta;
+};
+
+export type ExportAdvisorTransferQueueParams = {
+target_course_id?: string;
+student_id?: string;
+normalized_grade?: string;
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type AdvisorActionOnTransferRequestBody = {
+  /** recommend, return, or reject. */
+  action: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type AdvisorActionOnTransferRequest200DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type AdvisorActionOnTransferRequest200DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type AdvisorActionOnTransferRequest200DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type AdvisorActionOnTransferRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AdvisorActionOnTransferRequest200DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: AdvisorActionOnTransferRequest200DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type AdvisorActionOnTransferRequest200DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type AdvisorActionOnTransferRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: AdvisorActionOnTransferRequest200DataStudent;
+  transitions?: AdvisorActionOnTransferRequest200DataTransitionsItem[];
+  decision?: AdvisorActionOnTransferRequest200DataDecision;
+};
+
+export type AdvisorActionOnTransferRequest200 = {
+  data?: AdvisorActionOnTransferRequest200Data;
+};
+
+export type DepartmentHeadTransferQueueParams = {
+target_course_id?: string;
+student_id?: string;
+normalized_grade?: string;
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type DepartmentHeadTransferQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type DepartmentHeadTransferQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type DepartmentHeadTransferQueue200DataItemTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type DepartmentHeadTransferQueue200DataItemTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: DepartmentHeadTransferQueue200DataItemTransitionsItemEvidenceSnapshot;
+  review_snapshot?: DepartmentHeadTransferQueue200DataItemTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type DepartmentHeadTransferQueue200DataItemDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type DepartmentHeadTransferQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: DepartmentHeadTransferQueue200DataItemStudent;
+  transitions?: DepartmentHeadTransferQueue200DataItemTransitionsItem[];
+  decision?: DepartmentHeadTransferQueue200DataItemDecision;
+};
+
+export type DepartmentHeadTransferQueue200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type DepartmentHeadTransferQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  links?: unknown[];
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type DepartmentHeadTransferQueue200 = {
+  data?: DepartmentHeadTransferQueue200DataItem[];
+  links?: DepartmentHeadTransferQueue200Links;
+  meta?: DepartmentHeadTransferQueue200Meta;
+};
+
+export type ExportDepartmentHeadTransferQueueParams = {
+target_course_id?: string;
+student_id?: string;
+normalized_grade?: string;
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type ScopedHeadActionOnTransferRequestBody = {
+  /** verify, return, or reject. */
+  action: string;
+  /** Required for verify; one of A+, A, B+, B. */
+  normalized_grade?: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type ScopedHeadActionOnTransferRequest200DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type ScopedHeadActionOnTransferRequest200DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type ScopedHeadActionOnTransferRequest200DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type ScopedHeadActionOnTransferRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ScopedHeadActionOnTransferRequest200DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: ScopedHeadActionOnTransferRequest200DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type ScopedHeadActionOnTransferRequest200DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type ScopedHeadActionOnTransferRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: ScopedHeadActionOnTransferRequest200DataStudent;
+  transitions?: ScopedHeadActionOnTransferRequest200DataTransitionsItem[];
+  decision?: ScopedHeadActionOnTransferRequest200DataDecision;
+};
+
+export type ScopedHeadActionOnTransferRequest200 = {
+  data?: ScopedHeadActionOnTransferRequest200Data;
+};
+
+export type CouncilTransferQueueParams = {
+target_course_id?: string;
+student_id?: string;
+normalized_grade?: string;
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type CouncilTransferQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type CouncilTransferQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type CouncilTransferQueue200DataItemTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type CouncilTransferQueue200DataItemTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: CouncilTransferQueue200DataItemTransitionsItemEvidenceSnapshot;
+  review_snapshot?: CouncilTransferQueue200DataItemTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type CouncilTransferQueue200DataItemDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type CouncilTransferQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: CouncilTransferQueue200DataItemStudent;
+  transitions?: CouncilTransferQueue200DataItemTransitionsItem[];
+  decision?: CouncilTransferQueue200DataItemDecision;
+};
+
+export type CouncilTransferQueue200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type CouncilTransferQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  links?: unknown[];
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type CouncilTransferQueue200 = {
+  data?: CouncilTransferQueue200DataItem[];
+  links?: CouncilTransferQueue200Links;
+  meta?: CouncilTransferQueue200Meta;
+};
+
+export type ExportCouncilTransferQueueParams = {
+target_course_id?: string;
+student_id?: string;
+normalized_grade?: string;
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type CouncilFinalTransferActionBody = {
+  /** approve, return, or reject. */
+  action: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type CouncilFinalTransferAction200DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type CouncilFinalTransferAction200DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type CouncilFinalTransferAction200DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type CouncilFinalTransferAction200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: CouncilFinalTransferAction200DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: CouncilFinalTransferAction200DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type CouncilFinalTransferAction200DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type CouncilFinalTransferAction200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: CouncilFinalTransferAction200DataStudent;
+  transitions?: CouncilFinalTransferAction200DataTransitionsItem[];
+  decision?: CouncilFinalTransferAction200DataDecision;
+};
+
+export type CouncilFinalTransferAction200 = {
+  data?: CouncilFinalTransferAction200Data;
+};
+
+export type MyEffectiveTransferDecisions200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+  transfer_request_id?: number;
+};
+
+export type MyEffectiveTransferDecisions200 = {
+  data?: MyEffectiveTransferDecisions200DataItem[];
+};
+
+export type MyTransferTargets200DataItem = {
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  already_transferred?: boolean;
+};
+
+export type MyTransferTargets200 = {
+  data?: MyTransferTargets200DataItem[];
+};
+
+export type MyTransferRequestsParams = {
+/**
+ * Comma-separated request statuses.
+ */
+status?: string;
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated normalized grades.
+ */
+normalized_grade?: string;
+/**
+ * Course or external-evidence search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type MyTransferRequests200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type MyTransferRequests200DataItemTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type MyTransferRequests200DataItemTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type MyTransferRequests200DataItemTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: MyTransferRequests200DataItemTransitionsItemEvidenceSnapshot;
+  review_snapshot?: MyTransferRequests200DataItemTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type MyTransferRequests200DataItemDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type MyTransferRequests200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: MyTransferRequests200DataItemStudent;
+  transitions?: MyTransferRequests200DataItemTransitionsItem[];
+  decision?: MyTransferRequests200DataItemDecision;
+};
+
+export type MyTransferRequests200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type MyTransferRequests200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  links?: unknown[];
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type MyTransferRequests200 = {
+  data?: MyTransferRequests200DataItem[];
+  links?: MyTransferRequests200Links;
+  meta?: MyTransferRequests200Meta;
+};
+
+export type CreateATransferDraftBody = {
+  /** A Course in the Student's bound Curriculum. */
+  target_course_id: number;
+  /** Exact institution printed on the evidence. */
+  external_institution: string;
+  /** Exact external Course code. */
+  external_course_code: string;
+  /** Exact external Course name. */
+  external_course_name: string;
+  /** Source hours retained only as evidence. */
+  source_credit_hours: number;
+  /** Grade exactly as printed. */
+  external_grade: string;
+  /** Supporting transcript/evidence IDs. */
+  document_ids: number[];
+  /** Student explanation. */
+  student_note?: string;
+};
+
+export type CreateATransferDraft201DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type CreateATransferDraft201DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type CreateATransferDraft201DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type CreateATransferDraft201DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: CreateATransferDraft201DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: CreateATransferDraft201DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type CreateATransferDraft201DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type CreateATransferDraft201Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: CreateATransferDraft201DataStudent;
+  transitions?: CreateATransferDraft201DataTransitionsItem[];
+  decision?: CreateATransferDraft201DataDecision;
+};
+
+export type CreateATransferDraft201 = {
+  data?: CreateATransferDraft201Data;
+};
+
+export type ExportMyTransferRequestsParams = {
+status?: string;
+target_course_id?: string;
+normalized_grade?: string;
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type ViewOneOfMyTransferRequests200DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type ViewOneOfMyTransferRequests200DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type ViewOneOfMyTransferRequests200DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type ViewOneOfMyTransferRequests200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ViewOneOfMyTransferRequests200DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: ViewOneOfMyTransferRequests200DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type ViewOneOfMyTransferRequests200DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type ViewOneOfMyTransferRequests200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: ViewOneOfMyTransferRequests200DataStudent;
+  transitions?: ViewOneOfMyTransferRequests200DataTransitionsItem[];
+  decision?: ViewOneOfMyTransferRequests200DataDecision;
+};
+
+export type ViewOneOfMyTransferRequests200 = {
+  data?: ViewOneOfMyTransferRequests200Data;
+};
+
+export type ReviseAnEditableTransferRequestBody = {
+  expected_revision: number;
+  /**
+     * Student explanation; nullable.
+     * @nullable
+     */
+  student_note?: string | null;
+  /** Exact institution printed on the evidence. */
+  external_institution?: string;
+  /** Exact external Course code. */
+  external_course_code?: string;
+  /** Exact external Course name. */
+  external_course_name?: string;
+  /** Source hours retained only as evidence. */
+  source_credit_hours?: number;
+  /** Grade exactly as printed. */
+  external_grade?: string;
+  /** Supporting transcript/evidence IDs. */
+  document_ids?: number[];
+};
+
+export type ReviseAnEditableTransferRequest200DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type ReviseAnEditableTransferRequest200DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type ReviseAnEditableTransferRequest200DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type ReviseAnEditableTransferRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ReviseAnEditableTransferRequest200DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: ReviseAnEditableTransferRequest200DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type ReviseAnEditableTransferRequest200DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type ReviseAnEditableTransferRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: ReviseAnEditableTransferRequest200DataStudent;
+  transitions?: ReviseAnEditableTransferRequest200DataTransitionsItem[];
+  decision?: ReviseAnEditableTransferRequest200DataDecision;
+};
+
+export type ReviseAnEditableTransferRequest200 = {
+  data?: ReviseAnEditableTransferRequest200Data;
+};
+
+export type AbandonATransferDraftBody = {
+  expected_revision: number;
+};
+
+export type AbandonATransferDraft200DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type AbandonATransferDraft200DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type AbandonATransferDraft200DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type AbandonATransferDraft200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AbandonATransferDraft200DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: AbandonATransferDraft200DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type AbandonATransferDraft200DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type AbandonATransferDraft200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: AbandonATransferDraft200DataStudent;
+  transitions?: AbandonATransferDraft200DataTransitionsItem[];
+  decision?: AbandonATransferDraft200DataDecision;
+};
+
+export type AbandonATransferDraft200 = {
+  data?: AbandonATransferDraft200Data;
+};
+
+export type SubmitOrResubmitATransferRequestBody = {
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type SubmitOrResubmitATransferRequest200DataStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type SubmitOrResubmitATransferRequest200DataTransitionsItemEvidenceSnapshot = {
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+};
+
+export type SubmitOrResubmitATransferRequest200DataTransitionsItemReviewSnapshot = {
+  normalized_grade?: string;
+  target_credit_hours?: number;
+};
+
+export type SubmitOrResubmitATransferRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: SubmitOrResubmitATransferRequest200DataTransitionsItemEvidenceSnapshot;
+  review_snapshot?: SubmitOrResubmitATransferRequest200DataTransitionsItemReviewSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type SubmitOrResubmitATransferRequest200DataDecision = {
+  id?: number;
+  transfer_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  approved_by_user_id?: number;
+  approved_at?: string;
+};
+
+export type SubmitOrResubmitATransferRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_category?: string;
+  target_credit_hours?: number;
+  external_institution?: string;
+  external_course_code?: string;
+  external_course_name?: string;
+  source_credit_hours?: string;
+  external_grade?: string;
+  document_ids?: number[];
+  student_note?: string;
+  normalized_grade?: string;
+  verified_by_user_id?: number;
+  verified_at?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  student?: SubmitOrResubmitATransferRequest200DataStudent;
+  transitions?: SubmitOrResubmitATransferRequest200DataTransitionsItem[];
+  decision?: SubmitOrResubmitATransferRequest200DataDecision;
+};
+
+export type SubmitOrResubmitATransferRequest200 = {
+  data?: SubmitOrResubmitATransferRequest200Data;
+};
+
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
@@ -20059,4 +21495,1500 @@ export const useMarkOneNotificationRead = <TError = MarkOneNotificationRead404,
         TContext
       > => {
       return useMutation(getMarkOneNotificationReadMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Advisor Transfer queue.
+ */
+export const advisorTransferQueue = (
+    params?: AdvisorTransferQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorTransferQueue200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/advisor-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorTransferQueueQueryKey = (params?: AdvisorTransferQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/advisor-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdvisorTransferQueueQueryOptions = <TData = Awaited<ReturnType<typeof advisorTransferQueue>>, TError = unknown>(params?: AdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorTransferQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdvisorTransferQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisorTransferQueue>>> = ({ signal }) => advisorTransferQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof advisorTransferQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdvisorTransferQueueQueryResult = NonNullable<Awaited<ReturnType<typeof advisorTransferQueue>>>
+export type AdvisorTransferQueueQueryError = unknown
+
+
+export function useAdvisorTransferQueue<TData = Awaited<ReturnType<typeof advisorTransferQueue>>, TError = unknown>(
+ params: undefined |  AdvisorTransferQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorTransferQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof advisorTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorTransferQueue<TData = Awaited<ReturnType<typeof advisorTransferQueue>>, TError = unknown>(
+ params?: AdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorTransferQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof advisorTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorTransferQueue<TData = Awaited<ReturnType<typeof advisorTransferQueue>>, TError = unknown>(
+ params?: AdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Advisor Transfer queue.
+ */
+
+export function useAdvisorTransferQueue<TData = Awaited<ReturnType<typeof advisorTransferQueue>>, TError = unknown>(
+ params?: AdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdvisorTransferQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Advisor Transfer queue.
+ */
+export const exportAdvisorTransferQueue = (
+    params?: ExportAdvisorTransferQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/transfer-requests/advisor-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportAdvisorTransferQueueQueryKey = (params?: ExportAdvisorTransferQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/advisor-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportAdvisorTransferQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError = unknown>(params?: ExportAdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportAdvisorTransferQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>> = ({ signal }) => exportAdvisorTransferQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportAdvisorTransferQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>>
+export type ExportAdvisorTransferQueueQueryError = unknown
+
+
+export function useExportAdvisorTransferQueue<TData = Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError = unknown>(
+ params: undefined |  ExportAdvisorTransferQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdvisorTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdvisorTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdvisorTransferQueue<TData = Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError = unknown>(
+ params?: ExportAdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdvisorTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdvisorTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdvisorTransferQueue<TData = Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError = unknown>(
+ params?: ExportAdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Advisor Transfer queue.
+ */
+
+export function useExportAdvisorTransferQueue<TData = Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError = unknown>(
+ params?: ExportAdvisorTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportAdvisorTransferQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Advisor action on Transfer request.
+ */
+export const advisorActionOnTransferRequest = (
+    transferRequestId: number,
+    advisorActionOnTransferRequestBody: AdvisorActionOnTransferRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorActionOnTransferRequest200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}/advisor-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: advisorActionOnTransferRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorActionOnTransferRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnTransferRequest>>, TError,{transferRequestId: number;data: AdvisorActionOnTransferRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnTransferRequest>>, TError,{transferRequestId: number;data: AdvisorActionOnTransferRequestBody}, TContext> => {
+
+const mutationKey = ['advisorActionOnTransferRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof advisorActionOnTransferRequest>>, {transferRequestId: number;data: AdvisorActionOnTransferRequestBody}> = (props) => {
+          const {transferRequestId,data} = props ?? {};
+
+          return  advisorActionOnTransferRequest(transferRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdvisorActionOnTransferRequestMutationResult = NonNullable<Awaited<ReturnType<typeof advisorActionOnTransferRequest>>>
+    export type AdvisorActionOnTransferRequestMutationBody = AdvisorActionOnTransferRequestBody
+    export type AdvisorActionOnTransferRequestMutationError = unknown
+
+    /**
+ * @summary Advisor action on Transfer request.
+ */
+export const useAdvisorActionOnTransferRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnTransferRequest>>, TError,{transferRequestId: number;data: AdvisorActionOnTransferRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof advisorActionOnTransferRequest>>,
+        TError,
+        {transferRequestId: number;data: AdvisorActionOnTransferRequestBody},
+        TContext
+      > => {
+      return useMutation(getAdvisorActionOnTransferRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Department Head Transfer queue.
+ */
+export const departmentHeadTransferQueue = (
+    params?: DepartmentHeadTransferQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DepartmentHeadTransferQueue200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/department-head-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getDepartmentHeadTransferQueueQueryKey = (params?: DepartmentHeadTransferQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/department-head-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDepartmentHeadTransferQueueQueryOptions = <TData = Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError = unknown>(params?: DepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDepartmentHeadTransferQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentHeadTransferQueue>>> = ({ signal }) => departmentHeadTransferQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DepartmentHeadTransferQueueQueryResult = NonNullable<Awaited<ReturnType<typeof departmentHeadTransferQueue>>>
+export type DepartmentHeadTransferQueueQueryError = unknown
+
+
+export function useDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError = unknown>(
+ params: undefined |  DepartmentHeadTransferQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentHeadTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof departmentHeadTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError = unknown>(
+ params?: DepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentHeadTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof departmentHeadTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError = unknown>(
+ params?: DepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Department Head Transfer queue.
+ */
+
+export function useDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError = unknown>(
+ params?: DepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDepartmentHeadTransferQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Department Head Transfer queue.
+ */
+export const exportDepartmentHeadTransferQueue = (
+    params?: ExportDepartmentHeadTransferQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/transfer-requests/department-head-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportDepartmentHeadTransferQueueQueryKey = (params?: ExportDepartmentHeadTransferQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/department-head-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportDepartmentHeadTransferQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError = unknown>(params?: ExportDepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportDepartmentHeadTransferQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>> = ({ signal }) => exportDepartmentHeadTransferQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportDepartmentHeadTransferQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>>
+export type ExportDepartmentHeadTransferQueueQueryError = unknown
+
+
+export function useExportDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError = unknown>(
+ params: undefined |  ExportDepartmentHeadTransferQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Department Head Transfer queue.
+ */
+
+export function useExportDepartmentHeadTransferQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportDepartmentHeadTransferQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Scoped Head action on Transfer request.
+ */
+export const scopedHeadActionOnTransferRequest = (
+    transferRequestId: number,
+    scopedHeadActionOnTransferRequestBody: ScopedHeadActionOnTransferRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScopedHeadActionOnTransferRequest200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}/department-head-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: scopedHeadActionOnTransferRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getScopedHeadActionOnTransferRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scopedHeadActionOnTransferRequest>>, TError,{transferRequestId: number;data: ScopedHeadActionOnTransferRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof scopedHeadActionOnTransferRequest>>, TError,{transferRequestId: number;data: ScopedHeadActionOnTransferRequestBody}, TContext> => {
+
+const mutationKey = ['scopedHeadActionOnTransferRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scopedHeadActionOnTransferRequest>>, {transferRequestId: number;data: ScopedHeadActionOnTransferRequestBody}> = (props) => {
+          const {transferRequestId,data} = props ?? {};
+
+          return  scopedHeadActionOnTransferRequest(transferRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScopedHeadActionOnTransferRequestMutationResult = NonNullable<Awaited<ReturnType<typeof scopedHeadActionOnTransferRequest>>>
+    export type ScopedHeadActionOnTransferRequestMutationBody = ScopedHeadActionOnTransferRequestBody
+    export type ScopedHeadActionOnTransferRequestMutationError = unknown
+
+    /**
+ * @summary Scoped Head action on Transfer request.
+ */
+export const useScopedHeadActionOnTransferRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scopedHeadActionOnTransferRequest>>, TError,{transferRequestId: number;data: ScopedHeadActionOnTransferRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scopedHeadActionOnTransferRequest>>,
+        TError,
+        {transferRequestId: number;data: ScopedHeadActionOnTransferRequestBody},
+        TContext
+      > => {
+      return useMutation(getScopedHeadActionOnTransferRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Council Transfer queue.
+ */
+export const councilTransferQueue = (
+    params?: CouncilTransferQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CouncilTransferQueue200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/council-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getCouncilTransferQueueQueryKey = (params?: CouncilTransferQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/council-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getCouncilTransferQueueQueryOptions = <TData = Awaited<ReturnType<typeof councilTransferQueue>>, TError = unknown>(params?: CouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilTransferQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCouncilTransferQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof councilTransferQueue>>> = ({ signal }) => councilTransferQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof councilTransferQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CouncilTransferQueueQueryResult = NonNullable<Awaited<ReturnType<typeof councilTransferQueue>>>
+export type CouncilTransferQueueQueryError = unknown
+
+
+export function useCouncilTransferQueue<TData = Awaited<ReturnType<typeof councilTransferQueue>>, TError = unknown>(
+ params: undefined |  CouncilTransferQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilTransferQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof councilTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof councilTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCouncilTransferQueue<TData = Awaited<ReturnType<typeof councilTransferQueue>>, TError = unknown>(
+ params?: CouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilTransferQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof councilTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof councilTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCouncilTransferQueue<TData = Awaited<ReturnType<typeof councilTransferQueue>>, TError = unknown>(
+ params?: CouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Council Transfer queue.
+ */
+
+export function useCouncilTransferQueue<TData = Awaited<ReturnType<typeof councilTransferQueue>>, TError = unknown>(
+ params?: CouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCouncilTransferQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Council Transfer queue.
+ */
+export const exportCouncilTransferQueue = (
+    params?: ExportCouncilTransferQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/transfer-requests/council-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportCouncilTransferQueueQueryKey = (params?: ExportCouncilTransferQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/council-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportCouncilTransferQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError = unknown>(params?: ExportCouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportCouncilTransferQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportCouncilTransferQueue>>> = ({ signal }) => exportCouncilTransferQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportCouncilTransferQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportCouncilTransferQueue>>>
+export type ExportCouncilTransferQueueQueryError = unknown
+
+
+export function useExportCouncilTransferQueue<TData = Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError = unknown>(
+ params: undefined |  ExportCouncilTransferQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCouncilTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportCouncilTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCouncilTransferQueue<TData = Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError = unknown>(
+ params?: ExportCouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCouncilTransferQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportCouncilTransferQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCouncilTransferQueue<TData = Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError = unknown>(
+ params?: ExportCouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Council Transfer queue.
+ */
+
+export function useExportCouncilTransferQueue<TData = Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError = unknown>(
+ params?: ExportCouncilTransferQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilTransferQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportCouncilTransferQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Council final Transfer action.
+ */
+export const councilFinalTransferAction = (
+    transferRequestId: number,
+    councilFinalTransferActionBody: CouncilFinalTransferActionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CouncilFinalTransferAction200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}/council-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: councilFinalTransferActionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCouncilFinalTransferActionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof councilFinalTransferAction>>, TError,{transferRequestId: number;data: CouncilFinalTransferActionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof councilFinalTransferAction>>, TError,{transferRequestId: number;data: CouncilFinalTransferActionBody}, TContext> => {
+
+const mutationKey = ['councilFinalTransferAction'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof councilFinalTransferAction>>, {transferRequestId: number;data: CouncilFinalTransferActionBody}> = (props) => {
+          const {transferRequestId,data} = props ?? {};
+
+          return  councilFinalTransferAction(transferRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CouncilFinalTransferActionMutationResult = NonNullable<Awaited<ReturnType<typeof councilFinalTransferAction>>>
+    export type CouncilFinalTransferActionMutationBody = CouncilFinalTransferActionBody
+    export type CouncilFinalTransferActionMutationError = unknown
+
+    /**
+ * @summary Council final Transfer action.
+ */
+export const useCouncilFinalTransferAction = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof councilFinalTransferAction>>, TError,{transferRequestId: number;data: CouncilFinalTransferActionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof councilFinalTransferAction>>,
+        TError,
+        {transferRequestId: number;data: CouncilFinalTransferActionBody},
+        TContext
+      > => {
+      return useMutation(getCouncilFinalTransferActionMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary My effective Transfer decisions.
+ */
+export const myEffectiveTransferDecisions = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyEffectiveTransferDecisions200>(
+      {url: `/api/v1/credit-decisions/transfers`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyEffectiveTransferDecisionsQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/transfers`
+    ] as const;
+    }
+
+
+export const getMyEffectiveTransferDecisionsQueryOptions = <TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyEffectiveTransferDecisionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>> = ({ signal }) => myEffectiveTransferDecisions(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyEffectiveTransferDecisionsQueryResult = NonNullable<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>>
+export type MyEffectiveTransferDecisionsQueryError = unknown
+
+
+export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>,
+          TError,
+          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>,
+          TError,
+          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My effective Transfer decisions.
+ */
+
+export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyEffectiveTransferDecisionsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My Transfer targets.
+ */
+export const myTransferTargets = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyTransferTargets200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/targets`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyTransferTargetsQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/targets`
+    ] as const;
+    }
+
+
+export const getMyTransferTargetsQueryOptions = <TData = Awaited<ReturnType<typeof myTransferTargets>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferTargets>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyTransferTargetsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myTransferTargets>>> = ({ signal }) => myTransferTargets(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myTransferTargets>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyTransferTargetsQueryResult = NonNullable<Awaited<ReturnType<typeof myTransferTargets>>>
+export type MyTransferTargetsQueryError = unknown
+
+
+export function useMyTransferTargets<TData = Awaited<ReturnType<typeof myTransferTargets>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferTargets>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTransferTargets>>,
+          TError,
+          Awaited<ReturnType<typeof myTransferTargets>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTransferTargets<TData = Awaited<ReturnType<typeof myTransferTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferTargets>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTransferTargets>>,
+          TError,
+          Awaited<ReturnType<typeof myTransferTargets>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTransferTargets<TData = Awaited<ReturnType<typeof myTransferTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferTargets>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Transfer targets.
+ */
+
+export function useMyTransferTargets<TData = Awaited<ReturnType<typeof myTransferTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferTargets>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyTransferTargetsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My Transfer requests.
+ */
+export const myTransferRequests = (
+    params?: MyTransferRequestsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyTransferRequests200>(
+      {url: `/api/v1/credit-decisions/transfer-requests`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getMyTransferRequestsQueryKey = (params?: MyTransferRequestsParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMyTransferRequestsQueryOptions = <TData = Awaited<ReturnType<typeof myTransferRequests>>, TError = unknown>(params?: MyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyTransferRequestsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myTransferRequests>>> = ({ signal }) => myTransferRequests(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myTransferRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyTransferRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof myTransferRequests>>>
+export type MyTransferRequestsQueryError = unknown
+
+
+export function useMyTransferRequests<TData = Awaited<ReturnType<typeof myTransferRequests>>, TError = unknown>(
+ params: undefined |  MyTransferRequestsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTransferRequests>>,
+          TError,
+          Awaited<ReturnType<typeof myTransferRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTransferRequests<TData = Awaited<ReturnType<typeof myTransferRequests>>, TError = unknown>(
+ params?: MyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTransferRequests>>,
+          TError,
+          Awaited<ReturnType<typeof myTransferRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTransferRequests<TData = Awaited<ReturnType<typeof myTransferRequests>>, TError = unknown>(
+ params?: MyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Transfer requests.
+ */
+
+export function useMyTransferRequests<TData = Awaited<ReturnType<typeof myTransferRequests>>, TError = unknown>(
+ params?: MyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyTransferRequestsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create a Transfer Draft.
+ */
+export const createATransferDraft = (
+    createATransferDraftBody: CreateATransferDraftBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateATransferDraft201>(
+      {url: `/api/v1/credit-decisions/transfer-requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createATransferDraftBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateATransferDraftMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createATransferDraft>>, TError,{data: CreateATransferDraftBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createATransferDraft>>, TError,{data: CreateATransferDraftBody}, TContext> => {
+
+const mutationKey = ['createATransferDraft'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createATransferDraft>>, {data: CreateATransferDraftBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createATransferDraft(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateATransferDraftMutationResult = NonNullable<Awaited<ReturnType<typeof createATransferDraft>>>
+    export type CreateATransferDraftMutationBody = CreateATransferDraftBody
+    export type CreateATransferDraftMutationError = unknown
+
+    /**
+ * @summary Create a Transfer Draft.
+ */
+export const useCreateATransferDraft = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createATransferDraft>>, TError,{data: CreateATransferDraftBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createATransferDraft>>,
+        TError,
+        {data: CreateATransferDraftBody},
+        TContext
+      > => {
+      return useMutation(getCreateATransferDraftMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Export my Transfer requests.
+ */
+export const exportMyTransferRequests = (
+    params?: ExportMyTransferRequestsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/transfer-requests/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportMyTransferRequestsQueryKey = (params?: ExportMyTransferRequestsParams,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportMyTransferRequestsQueryOptions = <TData = Awaited<ReturnType<typeof exportMyTransferRequests>>, TError = unknown>(params?: ExportMyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyTransferRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportMyTransferRequestsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportMyTransferRequests>>> = ({ signal }) => exportMyTransferRequests(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportMyTransferRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportMyTransferRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof exportMyTransferRequests>>>
+export type ExportMyTransferRequestsQueryError = unknown
+
+
+export function useExportMyTransferRequests<TData = Awaited<ReturnType<typeof exportMyTransferRequests>>, TError = unknown>(
+ params: undefined |  ExportMyTransferRequestsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyTransferRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportMyTransferRequests>>,
+          TError,
+          Awaited<ReturnType<typeof exportMyTransferRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportMyTransferRequests<TData = Awaited<ReturnType<typeof exportMyTransferRequests>>, TError = unknown>(
+ params?: ExportMyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyTransferRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportMyTransferRequests>>,
+          TError,
+          Awaited<ReturnType<typeof exportMyTransferRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportMyTransferRequests<TData = Awaited<ReturnType<typeof exportMyTransferRequests>>, TError = unknown>(
+ params?: ExportMyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyTransferRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export my Transfer requests.
+ */
+
+export function useExportMyTransferRequests<TData = Awaited<ReturnType<typeof exportMyTransferRequests>>, TError = unknown>(
+ params?: ExportMyTransferRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyTransferRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportMyTransferRequestsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary View one of my Transfer requests.
+ */
+export const viewOneOfMyTransferRequests = (
+    transferRequestId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ViewOneOfMyTransferRequests200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getViewOneOfMyTransferRequestsQueryKey = (transferRequestId: number,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/${transferRequestId}`
+    ] as const;
+    }
+
+
+export const getViewOneOfMyTransferRequestsQueryOptions = <TData = Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError = unknown>(transferRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getViewOneOfMyTransferRequestsQueryKey(transferRequestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>> = ({ signal }) => viewOneOfMyTransferRequests(transferRequestId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: transferRequestId !== null && transferRequestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ViewOneOfMyTransferRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>>
+export type ViewOneOfMyTransferRequestsQueryError = unknown
+
+
+export function useViewOneOfMyTransferRequests<TData = Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError = unknown>(
+ transferRequestId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>,
+          TError,
+          Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewOneOfMyTransferRequests<TData = Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError = unknown>(
+ transferRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>,
+          TError,
+          Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewOneOfMyTransferRequests<TData = Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError = unknown>(
+ transferRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary View one of my Transfer requests.
+ */
+
+export function useViewOneOfMyTransferRequests<TData = Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError = unknown>(
+ transferRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyTransferRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getViewOneOfMyTransferRequestsQueryOptions(transferRequestId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Revise an editable Transfer request.
+ */
+export const reviseAnEditableTransferRequest = (
+    transferRequestId: number,
+    reviseAnEditableTransferRequestBody: ReviseAnEditableTransferRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReviseAnEditableTransferRequest200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: reviseAnEditableTransferRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getReviseAnEditableTransferRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableTransferRequest>>, TError,{transferRequestId: number;data: ReviseAnEditableTransferRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableTransferRequest>>, TError,{transferRequestId: number;data: ReviseAnEditableTransferRequestBody}, TContext> => {
+
+const mutationKey = ['reviseAnEditableTransferRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviseAnEditableTransferRequest>>, {transferRequestId: number;data: ReviseAnEditableTransferRequestBody}> = (props) => {
+          const {transferRequestId,data} = props ?? {};
+
+          return  reviseAnEditableTransferRequest(transferRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviseAnEditableTransferRequestMutationResult = NonNullable<Awaited<ReturnType<typeof reviseAnEditableTransferRequest>>>
+    export type ReviseAnEditableTransferRequestMutationBody = ReviseAnEditableTransferRequestBody
+    export type ReviseAnEditableTransferRequestMutationError = unknown
+
+    /**
+ * @summary Revise an editable Transfer request.
+ */
+export const useReviseAnEditableTransferRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableTransferRequest>>, TError,{transferRequestId: number;data: ReviseAnEditableTransferRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reviseAnEditableTransferRequest>>,
+        TError,
+        {transferRequestId: number;data: ReviseAnEditableTransferRequestBody},
+        TContext
+      > => {
+      return useMutation(getReviseAnEditableTransferRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Abandon a Transfer Draft.
+ */
+export const abandonATransferDraft = (
+    transferRequestId: number,
+    abandonATransferDraftBody: AbandonATransferDraftBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AbandonATransferDraft200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}`, method: 'DELETE',
+      headers: {'Content-Type': 'application/json', },
+      data: abandonATransferDraftBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAbandonATransferDraftMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof abandonATransferDraft>>, TError,{transferRequestId: number;data: AbandonATransferDraftBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof abandonATransferDraft>>, TError,{transferRequestId: number;data: AbandonATransferDraftBody}, TContext> => {
+
+const mutationKey = ['abandonATransferDraft'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof abandonATransferDraft>>, {transferRequestId: number;data: AbandonATransferDraftBody}> = (props) => {
+          const {transferRequestId,data} = props ?? {};
+
+          return  abandonATransferDraft(transferRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AbandonATransferDraftMutationResult = NonNullable<Awaited<ReturnType<typeof abandonATransferDraft>>>
+    export type AbandonATransferDraftMutationBody = AbandonATransferDraftBody
+    export type AbandonATransferDraftMutationError = unknown
+
+    /**
+ * @summary Abandon a Transfer Draft.
+ */
+export const useAbandonATransferDraft = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof abandonATransferDraft>>, TError,{transferRequestId: number;data: AbandonATransferDraftBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof abandonATransferDraft>>,
+        TError,
+        {transferRequestId: number;data: AbandonATransferDraftBody},
+        TContext
+      > => {
+      return useMutation(getAbandonATransferDraftMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Submit or resubmit a Transfer request.
+ */
+export const submitOrResubmitATransferRequest = (
+    transferRequestId: number,
+    submitOrResubmitATransferRequestBody: SubmitOrResubmitATransferRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitOrResubmitATransferRequest200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}/submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitOrResubmitATransferRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitOrResubmitATransferRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitATransferRequest>>, TError,{transferRequestId: number;data: SubmitOrResubmitATransferRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitATransferRequest>>, TError,{transferRequestId: number;data: SubmitOrResubmitATransferRequestBody}, TContext> => {
+
+const mutationKey = ['submitOrResubmitATransferRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitOrResubmitATransferRequest>>, {transferRequestId: number;data: SubmitOrResubmitATransferRequestBody}> = (props) => {
+          const {transferRequestId,data} = props ?? {};
+
+          return  submitOrResubmitATransferRequest(transferRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitOrResubmitATransferRequestMutationResult = NonNullable<Awaited<ReturnType<typeof submitOrResubmitATransferRequest>>>
+    export type SubmitOrResubmitATransferRequestMutationBody = SubmitOrResubmitATransferRequestBody
+    export type SubmitOrResubmitATransferRequestMutationError = unknown
+
+    /**
+ * @summary Submit or resubmit a Transfer request.
+ */
+export const useSubmitOrResubmitATransferRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitATransferRequest>>, TError,{transferRequestId: number;data: SubmitOrResubmitATransferRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitOrResubmitATransferRequest>>,
+        TError,
+        {transferRequestId: number;data: SubmitOrResubmitATransferRequestBody},
+        TContext
+      > => {
+      return useMutation(getSubmitOrResubmitATransferRequestMutationOptions(options), queryClient);
     }

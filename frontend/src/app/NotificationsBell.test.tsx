@@ -189,4 +189,33 @@ describe('NotificationsBell', () => {
     expect(await screen.findByText(/طلب إعفاء لأحد طلابك.*PRE401.*مقبول/)).toBeInTheDocument()
     expect(await screen.findByText(/طلب إعفاء لأحد طلابك.*PRE402.*للتعديل/)).toBeInTheDocument()
   })
+
+  it('renders Transfer workflow notifications bilingually from typed payloads', async () => {
+    const user = userEvent.setup()
+    srv.unread = 2
+    srv.rows = [
+      {
+        id: 7,
+        type: 'transfer.request_advanced',
+        data: { course_code: 'CSE501' },
+        read_at: null,
+        created_at: '2026-09-05T10:00:00+00:00',
+      },
+      {
+        id: 8,
+        type: 'transfer.request_decided',
+        data: { course_code: 'CSE502', outcome: 'Approved' },
+        read_at: null,
+        created_at: '2026-09-05T09:00:00+00:00',
+      },
+    ]
+    renderBell()
+
+    await user.click(screen.getByRole('button', { name: /open notifications/i }))
+    expect(await screen.findByText(/CSE501.*advanced/i)).toBeInTheDocument()
+    expect(screen.getByText(/CSE502.*approved/i)).toBeInTheDocument()
+    await i18n.changeLanguage('ar')
+    expect(await screen.findByText(/CSE501.*مراجعتك/)).toBeInTheDocument()
+    expect(screen.getByText(/CSE502.*مقبول/)).toBeInTheDocument()
+  })
 })

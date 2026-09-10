@@ -26,6 +26,8 @@ export const PERMISSION = {
   manageCalendar: 'calendar.manage',
   submitExemption: 'exemption.submit',
   approveExemption: 'exemption.approve',
+  submitTransferWaiver: 'transfer_waiver.submit',
+  approveTransferWaiver: 'transfer_waiver.approve',
 } as const
 
 export type PermissionCode = (typeof PERMISSION)[keyof typeof PERMISSION]

@@ -18,6 +18,7 @@ type Transition = {
 
 export function WaiverTransitionHistory({ transitions }: { transitions?: Transition[] }) {
   const { t, i18n } = useTranslation('enrollment')
+  const locale = i18n.resolvedLanguage?.startsWith('ar') ? 'ar-u-nu-latn' : 'en-u-nu-latn'
 
   return (
     <Stack spacing={1}>
@@ -32,10 +33,12 @@ export function WaiverTransitionHistory({ transitions }: { transitions?: Transit
             </Typography>
             {transition.created_at && (
               <Typography variant="caption" color="text.secondary">
-                {new Intl.DateTimeFormat(i18n.language, {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                }).format(new Date(transition.created_at))}
+                <bdi dir="ltr">
+                  {new Intl.DateTimeFormat(locale, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  }).format(new Date(transition.created_at))}
+                </bdi>
               </Typography>
             )}
             {transition.reason && (

@@ -157,7 +157,7 @@ export function ManualExemptionsPage() {
                     <MenuItem
                       key={target.target_course_id}
                       value={String(target.target_course_id)}
-                      disabled={target.already_exempt}
+                      disabled={target.already_recognized}
                     >
                       <Trans
                         t={t}

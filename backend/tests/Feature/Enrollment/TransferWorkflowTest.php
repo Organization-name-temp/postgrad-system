@@ -11,9 +11,12 @@ use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
+use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Models\TransferRequestTransition;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Internal\Models\WaiverRequest;
 use Modules\Enrollment\Public\TransferDecisions;
 use Modules\Identity\Internal\Models\AuditLog;
 use Modules\Identity\Internal\Models\DepartmentHeadAssignment;
@@ -159,6 +162,63 @@ function transferRequestFor(Student $student, Course $course, TransferRequestSta
         'submitted_at' => $status === TransferRequestStatus::Draft ? null : now(),
     ]);
 }
+
+it('blocks a Transfer target already recognized by Waiver', function () {
+    [$student, $advisor, $head, $council, $course] = transferWorld();
+    $prior = Course::factory()->create([
+        'department_id' => $course->department_id,
+        'code' => 'CSE-411',
+        'level' => 400,
+    ]);
+    $waiverRequest = WaiverRequest::query()->create([
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $course->id,
+        'target_course_code' => $course->code,
+        'credit_hours' => $course->total_ch,
+        'prior_course_id' => $prior->id,
+        'prior_course_code' => $prior->code,
+        'prior_course_level' => 400,
+        'prior_result_source' => 'legacy_transcript',
+        'prior_letter_grade' => 'A',
+        'evidence' => ['official_transcript_document_ids' => [transferTranscriptId()]],
+        'status' => WaiverRequestStatus::Approved,
+        'revision' => 1,
+        'submitted_at' => now(),
+        'coverage_percentage' => 90,
+        'equivalency_note' => 'Equivalent.',
+        'verified_by' => $head->id,
+        'verified_at' => now(),
+    ]);
+    WaiverDecision::query()->create([
+        'waiver_request_id' => $waiverRequest->id,
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $course->id,
+        'target_course_code' => $course->code,
+        'credit_hours' => $course->total_ch,
+        'prior_course_id' => $prior->id,
+        'prior_course_code' => $prior->code,
+        'prior_course_level' => 400,
+        'prior_result_source' => 'legacy_transcript',
+        'prior_letter_grade' => 'A',
+        'coverage_percentage' => 90,
+        'verified_by' => $head->id,
+        'verified_at' => now(),
+        'approved_by' => $council->id,
+        'approved_at' => now(),
+    ]);
+    Sanctum::actingAs($student->user);
+
+    $this->getJson('/api/v1/credit-decisions/transfer-requests/targets')
+        ->assertOk()->assertJsonPath('data.0.already_transferred', true);
+    $id = (int) $this->postJson('/api/v1/credit-decisions/transfer-requests', transferEvidence($course->id))
+        ->assertCreated()->json('data.id');
+    $this->postJson("/api/v1/credit-decisions/transfer-requests/{$id}/submit", [
+        'expected_revision' => 1,
+        'action_id' => '10101010-1010-4010-8010-101010101010',
+    ])->assertConflict();
+});
 
 it('recognizes external study through Advisor Head and Council without creating an Enrollment or Grade', function () {
     [$student, $advisor, $head, $council, $course] = transferWorld();

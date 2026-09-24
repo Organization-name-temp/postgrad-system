@@ -13,6 +13,9 @@ use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
+use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
+use Modules\Enrollment\Internal\Models\TransferDecision;
+use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Support\AutomaticExemptionApplicator;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Public\Enums\Role;
@@ -80,6 +83,60 @@ function publishAcceptanceEvidence(Student $student, array $overrides = []): voi
         universityId: $student->university_id,
     ));
 }
+
+it('does not apply an automatic Exemption to a target already recognized by Transfer', function () {
+    $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
+    $student = studentBoundToAutomaticExemptionVersion($program, [[
+        'course_id' => 499,
+        'course_code' => 'PRE499',
+        'role' => PreparatoryRequirementRole::EnglishLanguage,
+    ]]);
+    $request = TransferRequest::query()->create([
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => 499,
+        'target_course_code' => 'PRE499',
+        'target_category' => CourseCategory::Preparatory,
+        'target_credit_hours' => 1,
+        'external_institution' => 'External University',
+        'external_course_code' => 'ENG-499',
+        'external_course_name' => 'English',
+        'source_credit_hours' => '1.00',
+        'external_grade' => 'A',
+        'document_ids' => ['01ARZ3NDEKTSV4RRFFQ69G5FAV'],
+        'normalized_grade' => 'A',
+        'verified_by_user_id' => $student->user_id,
+        'verified_at' => now(),
+        'status' => TransferRequestStatus::Approved,
+        'revision' => 1,
+        'submitted_at' => now(),
+    ]);
+    TransferDecision::query()->create([
+        'transfer_request_id' => $request->id,
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => 499,
+        'target_course_code' => 'PRE499',
+        'target_category' => CourseCategory::Preparatory,
+        'target_credit_hours' => 1,
+        'external_institution' => 'External University',
+        'external_course_code' => 'ENG-499',
+        'external_course_name' => 'English',
+        'source_credit_hours' => '1.00',
+        'external_grade' => 'A',
+        'document_ids' => ['01ARZ3NDEKTSV4RRFFQ69G5FAV'],
+        'normalized_grade' => 'A',
+        'verified_by_user_id' => $student->user_id,
+        'verified_at' => now(),
+        'approved_by_user_id' => $student->user_id,
+        'approved_at' => now(),
+    ]);
+
+    publishAcceptanceEvidence($student);
+
+    $this->assertDatabaseCount('exemption_decisions', 0);
+    $this->assertDatabaseCount('transfer_decisions', 1);
+});
 
 it('applies and exposes an automatic English Exemption from accepted evidence', function () {
     $department = Department::factory()->create();

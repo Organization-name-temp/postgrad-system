@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Modules\Admissions\Public\AdmissionDocuments;
+use Modules\Admissions\Public\AdmissionDocumentSummary;
 use Modules\Catalog\Internal\Enums\VersionSubject;
 use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Course;
@@ -10,8 +12,11 @@ use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\CourseLevel;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
+use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Internal\Models\TransferDecision;
+use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Internal\Models\WaiverRequest;
 use Modules\Enrollment\Internal\Models\WaiverRequestTransition;
@@ -23,8 +28,31 @@ use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Notifications\Internal\Models\Notification;
 use OpenSpout\Reader\XLSX\Reader;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 uses(RefreshDatabase::class);
+
+function waiverTranscriptId(): string
+{
+    return '01ARZ3NDEKTSV4RRFFQ69G5FAW';
+}
+
+beforeEach(function (): void {
+    app()->instance(AdmissionDocuments::class, new class implements AdmissionDocuments
+    {
+        public function forApplicant(int $userId): array
+        {
+            return [new AdmissionDocumentSummary(waiverTranscriptId(), 'transcript', 'legacy-transcript.pdf')];
+        }
+
+        public function downloadForApplicant(int $userId, string $documentId): ?StreamedResponse
+        {
+            return $documentId === waiverTranscriptId()
+                ? response()->streamDownload(fn () => print 'legacy transcript bytes', 'legacy-transcript.pdf')
+                : null;
+        }
+    });
+});
 
 /** @return array{Student, User, User, User, Course, Course, Enrollment} */
 function waiverWorld(): array
@@ -158,7 +186,7 @@ it('takes a qualifying prior E-JUST result through Advisor Head and Council to a
 });
 
 it('accepts only qualifying official legacy E-JUST results and directs external study to Transfer', function () {
-    [$student, , , , $target, $prior] = waiverWorld();
+    [$student, $advisor, , , $target, $prior] = waiverWorld();
     Sanctum::actingAs($student->user);
 
     $this->postJson('/api/v1/credit-decisions/waiver-requests', [
@@ -168,7 +196,7 @@ it('accepts only qualifying official legacy E-JUST results and directs external 
             'institution' => 'Another University',
             'course_id' => $prior->id,
             'letter_grade' => 'A',
-            'official_transcript_document_ids' => [41],
+            'official_transcript_document_ids' => [waiverTranscriptId()],
         ],
     ])->assertUnprocessable()->assertJsonPath('message', 'Study outside E-JUST must use the Transfer workflow.');
 
@@ -180,10 +208,21 @@ it('accepts only qualifying official legacy E-JUST results and directs external 
                 'institution' => 'E-JUST',
                 'course_id' => $prior->id,
                 'letter_grade' => $grade,
-                'official_transcript_document_ids' => [41],
+                'official_transcript_document_ids' => [waiverTranscriptId()],
             ],
         ])->assertUnprocessable()->assertJsonPath('message', 'The prior E-JUST Course must be level 400 or above and completed at C+ or higher.');
     }
+
+    $this->postJson('/api/v1/credit-decisions/waiver-requests', [
+        'target_course_id' => $target->id,
+        'prior_result' => [
+            'source' => 'legacy_transcript',
+            'institution' => 'E-JUST',
+            'course_id' => $prior->id,
+            'letter_grade' => 'A',
+            'official_transcript_document_ids' => ['01ARZ3NDEKTSV4RRFFQ69G5FAX'],
+        ],
+    ])->assertUnprocessable()->assertJsonPath('message', 'An owned official E-JUST transcript is required for a legacy result.');
 
     $created = $this->postJson('/api/v1/credit-decisions/waiver-requests', [
         'target_course_id' => $target->id,
@@ -192,13 +231,83 @@ it('accepts only qualifying official legacy E-JUST results and directs external 
             'institution' => 'E-JUST',
             'course_id' => $prior->id,
             'letter_grade' => 'C+',
-            'official_transcript_document_ids' => [41],
+            'official_transcript_document_ids' => [waiverTranscriptId()],
         ],
     ])->assertCreated();
 
     expect($created->json('data.prior_course_level'))->toBe(400)
         ->and($created->json('data.prior_letter_grade'))->toBe('C+')
-        ->and($created->json('data.evidence.official_transcript_document_ids'))->toBe([41]);
+        ->and($created->json('data.evidence.official_transcript_document_ids'))->toBe([waiverTranscriptId()]);
+
+    $id = (int) $created->json('data.id');
+    $this->postJson("/api/v1/credit-decisions/waiver-requests/{$id}/submit", [
+        'expected_revision' => 1,
+        'action_id' => '7c3df72d-6158-4263-a6ff-4b76c74eeede',
+    ])->assertOk();
+    $documentUrl = "/api/v1/credit-decisions/waiver-requests/{$id}/evidence-documents/".waiverTranscriptId();
+    Sanctum::actingAs($advisor);
+    $this->getJson('/api/v1/credit-decisions/waiver-requests/advisor-queue')
+        ->assertOk()
+        ->assertJsonPath('data.0.evidence_documents.0.original_filename', 'legacy-transcript.pdf')
+        ->assertJsonPath('data.0.evidence_documents.0.download_url', $documentUrl);
+    $this->get($documentUrl)->assertOk();
+
+    $otherAdvisor = User::factory()->create();
+    $otherAdvisor->assignRole(Role::Advisor);
+    Sanctum::actingAs($otherAdvisor);
+    $this->get($documentUrl)->assertForbidden();
+});
+
+it('blocks a Waiver target already recognized by Transfer', function () {
+    [$student, , $head, $council, $target, $prior, $priorEnrollment] = waiverWorld();
+    $transferRequest = TransferRequest::query()->create([
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $target->id,
+        'target_course_code' => $target->code,
+        'target_category' => CourseCategory::ProgramCore,
+        'target_credit_hours' => $target->total_ch,
+        'external_institution' => 'External University',
+        'external_course_code' => 'EXT-511',
+        'external_course_name' => 'External Course',
+        'source_credit_hours' => '3.00',
+        'external_grade' => 'A',
+        'document_ids' => [waiverTranscriptId()],
+        'normalized_grade' => 'A',
+        'verified_by_user_id' => $head->id,
+        'verified_at' => now(),
+        'status' => TransferRequestStatus::Approved,
+        'revision' => 1,
+        'submitted_at' => now(),
+    ]);
+    TransferDecision::query()->create([
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $target->id,
+        'target_course_code' => $target->code,
+        'target_category' => CourseCategory::ProgramCore,
+        'target_credit_hours' => $target->total_ch,
+        'external_institution' => 'External University',
+        'external_course_code' => 'EXT-511',
+        'external_course_name' => 'External Course',
+        'source_credit_hours' => '3.00',
+        'external_grade' => 'A',
+        'document_ids' => [waiverTranscriptId()],
+        'normalized_grade' => 'A',
+        'verified_by_user_id' => $head->id,
+        'verified_at' => now(),
+        'approved_by_user_id' => $council->id,
+        'approved_at' => now(),
+        'transfer_request_id' => $transferRequest->id,
+    ]);
+    Sanctum::actingAs($student->user);
+
+    $this->getJson('/api/v1/credit-decisions/waiver-requests/targets')
+        ->assertOk()->assertJsonPath('data.0.already_recognized', true);
+    $this->postJson('/api/v1/credit-decisions/waiver-requests', [
+        'target_course_id' => $target->id,
+        'prior_result' => ['source' => 'prs', 'institution' => 'E-JUST', 'enrollment_id' => $priorEnrollment->id],
+    ])->assertConflict();
 });
 
 it('offers bound Curriculum targets and only qualifying PRS prior E-JUST results', function () {

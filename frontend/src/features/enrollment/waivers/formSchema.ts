@@ -7,7 +7,7 @@ export const waiverDraftSchema = z
     prsEnrollmentId: z.string(),
     legacyCourseId: z.string(),
     legacyGrade: z.enum(['', 'A+', 'A', 'B+', 'B', 'C+']),
-    transcriptDocumentIds: z.string(),
+    transcriptDocumentIds: z.array(z.string()),
     note: z.string().max(2000, 'too_long'),
   })
   .superRefine((values, context) => {
@@ -21,8 +21,7 @@ export const waiverDraftSchema = z
       if (!values.legacyGrade) {
         context.addIssue({ code: 'custom', path: ['legacyGrade'], message: 'required' })
       }
-      const ids = documentIds(values.transcriptDocumentIds)
-      if (ids.length === 0) {
+      if (values.transcriptDocumentIds.length === 0) {
         context.addIssue({
           code: 'custom',
           path: ['transcriptDocumentIds'],
@@ -47,13 +46,6 @@ export const headVerificationSchema = waiverReviewSchema.superRefine((values, co
     context.addIssue({ code: 'custom', path: ['equivalencyNote'], message: 'required' })
   }
 })
-
-export function documentIds(value: string): number[] {
-  return value
-    .split(',')
-    .map((part) => Number(part.trim()))
-    .filter((id) => Number.isInteger(id) && id > 0)
-}
 
 export type WaiverDraftValues = z.infer<typeof waiverDraftSchema>
 export type WaiverReviewValues = z.infer<typeof waiverReviewSchema>

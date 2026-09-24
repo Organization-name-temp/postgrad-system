@@ -12,6 +12,8 @@ use Modules\Enrollment\Internal\Enums\ExemptionSource;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\ExemptionRequest;
 use Modules\Enrollment\Internal\Models\ExemptionRequestTransition;
+use Modules\Enrollment\Internal\Models\TransferDecision;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\StudentGuard;
@@ -289,7 +291,9 @@ final class ManualExemptionWorkflow
 
     private function assertNoEffectiveDecision(ExemptionRequest $request): void
     {
-        if (ExemptionDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
+        if (ExemptionDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
+            || TransferDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
+            || WaiverDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
             throw new ConflictHttpException(__('credit_decisions.effective_decision_exists'));
         }
     }

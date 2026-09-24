@@ -3,12 +3,15 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   FormHelperText,
   InputLabel,
   NativeSelect,
@@ -31,22 +34,23 @@ import {
   abandonAWaiverDraft,
   exportMyWaiverRequests,
   getMyWaiverRequestsQueryKey,
-  useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver,
+  openWaiverTranscriptEvidence,
   useCreateAWaiverDraft,
   useListCourses,
-  useMyQualifyingPriorEJUSTResultsRecordedInPRS,
+  useMyQualifyingPRSResults,
   useMyWaiverRequests,
+  useMyWaiverTargets,
+  useMyWaiverTranscriptEvidence,
   useReviseAnEditableWaiverRequest,
   useSubmitOrResubmitAWaiverRequest,
   type ListCourses200DataItem,
-  type MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItem,
+  type MyQualifyingPRSResults200DataItem,
+  type MyWaiverTranscriptEvidence200DataItem,
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
-// Ticket05 is extracting these established credit-decision helpers to the shared
-// enrollment/credit-decisions folder; keep this import easy to retarget at integration.
-import { downloadBlob } from '../exemptions/downloadBlob'
-import { useRetryStableActionId } from '../exemptions/useRetryStableActionId'
-import { documentIds, waiverDraftSchema, type WaiverDraftValues } from './formSchema'
+import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
+import { waiverDraftSchema, type WaiverDraftValues } from './formSchema'
 import type { StudentWaiverRequestRow } from './types'
 import { WaiverEvidenceSummary } from './WaiverEvidenceSummary'
 import { WaiverStatusChip } from './WaiverStatusChip'
@@ -58,9 +62,11 @@ const EMPTY_DRAFT: WaiverDraftValues = {
   prsEnrollmentId: '',
   legacyCourseId: '',
   legacyGrade: '',
-  transcriptDocumentIds: '',
+  transcriptDocumentIds: [],
   note: '',
 }
+
+const isolateLtr = (value: string | number | undefined) => `\u2066${value ?? ''}\u2069`
 
 function priorResult(values: WaiverDraftValues) {
   return values.source === 'prs'
@@ -70,7 +76,7 @@ function priorResult(values: WaiverDraftValues) {
         institution: 'E-JUST',
         course_id: Number(values.legacyCourseId),
         letter_grade: values.legacyGrade,
-        official_transcript_document_ids: documentIds(values.transcriptDocumentIds),
+        official_transcript_document_ids: values.transcriptDocumentIds,
       }
 }
 
@@ -79,8 +85,9 @@ export function WaiversPage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const params = { sort: '-updated_at', page }
-  const targets = useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver()
-  const priorResults = useMyQualifyingPriorEJUSTResultsRecordedInPRS()
+  const targets = useMyWaiverTargets()
+  const priorResults = useMyQualifyingPRSResults()
+  const documents = useMyWaiverTranscriptEvidence()
   const courses = useListCourses()
   const requests = useMyWaiverRequests(params)
   const create = useCreateAWaiverDraft()
@@ -110,8 +117,17 @@ export function WaiversPage() {
   }
 
   const loading =
-    requests.isPending || targets.isPending || priorResults.isPending || courses.isPending
-  const failed = requests.isError || targets.isError || priorResults.isError || courses.isError
+    requests.isPending ||
+    targets.isPending ||
+    priorResults.isPending ||
+    courses.isPending ||
+    documents.isPending
+  const failed =
+    requests.isError ||
+    targets.isError ||
+    priorResults.isError ||
+    courses.isError ||
+    documents.isError
 
   return (
     <Stack spacing={3}>
@@ -135,6 +151,7 @@ export function WaiversPage() {
             targets={targets.data?.data ?? []}
             results={priorResults.data?.data ?? []}
             courses={(courses.data?.data ?? []).filter((course) => (course.level ?? 0) >= 400)}
+            documents={documents.data?.data ?? []}
             locale={i18n.language}
           />
           <Button
@@ -166,8 +183,8 @@ export function WaiversPage() {
 
       {loading && !failed && (
         <Stack spacing={2} aria-label={t('waivers.loading')}>
-          <Skeleton variant="rounded" height={190} />
-          <Skeleton variant="rounded" height={190} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(24) })} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(24) })} />
         </Stack>
       )}
       {failed && (
@@ -181,6 +198,7 @@ export function WaiversPage() {
                 void targets.refetch()
                 void priorResults.refetch()
                 void courses.refetch()
+                void documents.refetch()
               }}
             >
               {t('waivers.retry')}
@@ -206,6 +224,7 @@ export function WaiversPage() {
             row={row}
             results={priorResults.data?.data ?? []}
             courses={(courses.data?.data ?? []).filter((course) => (course.level ?? 0) >= 400)}
+            documents={documents.data?.data ?? []}
             locale={i18n.language}
             onChanged={refresh}
           />
@@ -227,6 +246,7 @@ function WaiverDraftFields({
   targets,
   results,
   courses,
+  documents,
   locale,
   hideTarget = false,
 }: {
@@ -237,8 +257,9 @@ function WaiverDraftFields({
     credit_hours?: number
     already_recognized?: boolean
   }[]
-  results: MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItem[]
+  results: MyQualifyingPRSResults200DataItem[]
   courses: ListCourses200DataItem[]
+  documents: MyWaiverTranscriptEvidence200DataItem[]
   locale: string
   hideTarget?: boolean
 }) {
@@ -269,7 +290,8 @@ function WaiverDraftFields({
               value={target.target_course_id}
               disabled={target.already_recognized}
             >
-              {target.target_course_code} — {target.credit_hours} {t('waivers.ch')}
+              {isolateLtr(target.target_course_code)} — {isolateLtr(target.credit_hours)}{' '}
+              {t('waivers.ch')}
             </option>
           ))}
         </NativeField>
@@ -288,8 +310,8 @@ function WaiverDraftFields({
           <option value="" />
           {results.map((result) => (
             <option key={result.enrollment_id} value={result.enrollment_id}>
-              {result.course?.code} — {pickLocaleName(result.course ?? {}, locale)} (
-              {result.course?.level})
+              {isolateLtr(result.course?.code)} — {pickLocaleName(result.course ?? {}, locale)} (
+              {isolateLtr(result.course?.level)})
             </option>
           ))}
         </NativeField>
@@ -321,13 +343,25 @@ function WaiverDraftFields({
               <option key={grade}>{grade}</option>
             ))}
           </NativeField>
-          <TextField
-            {...form.register('transcriptDocumentIds')}
-            label={t('waivers.transcriptDocuments')}
-            slotProps={{ htmlInput: { dir: 'ltr' } }}
-            error={Boolean(error('transcriptDocumentIds'))}
-            helperText={error('transcriptDocumentIds') ?? t('waivers.transcriptHelp')}
-          />
+          <FormControl error={Boolean(error('transcriptDocumentIds'))} component="fieldset">
+            <Typography component="legend" variant="body2">
+              {t('waivers.transcriptDocuments')}
+            </Typography>
+            <FormGroup>
+              {documents.map((document) => (
+                <FormControlLabel
+                  key={document.id}
+                  control={
+                    <Checkbox {...form.register('transcriptDocumentIds')} value={document.id} />
+                  }
+                  label={<bdi dir="ltr">{document.original_filename ?? document.id}</bdi>}
+                />
+              ))}
+            </FormGroup>
+            <FormHelperText role={error('transcriptDocumentIds') ? 'alert' : undefined}>
+              {error('transcriptDocumentIds') ?? t('waivers.transcriptHelp')}
+            </FormHelperText>
+          </FormControl>
         </>
       )}
       <TextField
@@ -376,12 +410,14 @@ function WaiverRequestCard({
   row,
   results,
   courses,
+  documents,
   locale,
   onChanged,
 }: {
   row: StudentWaiverRequestRow
-  results: MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItem[]
+  results: MyQualifyingPRSResults200DataItem[]
   courses: ListCourses200DataItem[]
+  documents: MyWaiverTranscriptEvidence200DataItem[]
   locale: string
   onChanged: () => Promise<unknown>
 }) {
@@ -390,6 +426,8 @@ function WaiverRequestCard({
   const submit = useSubmitOrResubmitAWaiverRequest()
   const actionIds = useRetryStableActionId()
   const [confirmAbandon, setConfirmAbandon] = useState(false)
+  const [downloadingDocument, setDownloadingDocument] = useState<string>()
+  const [downloadFailed, setDownloadFailed] = useState(false)
   const evidence = row.evidence as typeof row.evidence & { enrollment_id?: number }
   const form = useForm<WaiverDraftValues>({
     resolver: zodResolver(waiverDraftSchema),
@@ -400,7 +438,7 @@ function WaiverRequestCard({
       prsEnrollmentId: String(row.prior_enrollment_id ?? evidence?.enrollment_id ?? ''),
       legacyCourseId: String(row.prior_course_id ?? ''),
       legacyGrade: (row.prior_letter_grade as WaiverDraftValues['legacyGrade']) ?? '',
-      transcriptDocumentIds: evidence?.official_transcript_document_ids?.join(', ') ?? '',
+      transcriptDocumentIds: evidence?.official_transcript_document_ids ?? [],
       note: row.student_note ?? '',
     },
   })
@@ -458,7 +496,7 @@ function WaiverRequestCard({
                 t={t}
                 i18nKey="waivers.requestMeta"
                 values={{ revision, hours: row.credit_hours }}
-                components={{ number: <bdi dir="ltr" /> }}
+                components={{ number: <bdi dir="ltr" />, hours: <bdi dir="ltr" /> }}
               />
             </Typography>
           </Box>
@@ -470,9 +508,30 @@ function WaiverRequestCard({
             source: evidence?.source ?? row.prior_result_source,
             letter_grade: evidence?.letter_grade ?? row.prior_letter_grade,
           }}
+          evidenceDocuments={(evidence?.official_transcript_document_ids ?? []).map(
+            (documentId) => {
+              const metadata = documents.find((document) => document.id === documentId)
+              return {
+                ...metadata,
+                id: documentId,
+                pending: downloadingDocument === documentId,
+                onOpen: () => {
+                  setDownloadFailed(false)
+                  setDownloadingDocument(documentId)
+                  void openWaiverTranscriptEvidence(id, documentId)
+                    .then((blob) =>
+                      downloadBlob(blob, metadata?.original_filename ?? 'transcript.pdf'),
+                    )
+                    .catch(() => setDownloadFailed(true))
+                    .finally(() => setDownloadingDocument(undefined))
+                },
+              }
+            },
+          )}
           priorCourseCode={row.prior_course_code}
           priorCourseLevel={row.prior_course_level}
         />
+        {downloadFailed && <Alert severity="error">{t('waivers.downloadError')}</Alert>}
         {row.student_note && <Typography>{row.student_note}</Typography>}
         {row.head_verification && (
           <Stack spacing={0.5}>
@@ -491,6 +550,7 @@ function WaiverRequestCard({
               targets={[]}
               results={results}
               courses={courses}
+              documents={documents}
               locale={locale}
               hideTarget
             />
@@ -499,8 +559,14 @@ function WaiverRequestCard({
                 {t('waivers.saveChanges')}
               </Button>
               <Button
-                variant="contained"
-                startIcon={<SendIcon />}
+                variant="outlined"
+                startIcon={
+                  <SendIcon
+                    sx={(theme) => ({
+                      transform: theme.direction === 'rtl' ? 'scaleX(-1)' : undefined,
+                    })}
+                  />
+                }
                 disabled={!canSubmit || submit.isPending}
                 onClick={() => void submitRequest()}
               >
@@ -532,6 +598,7 @@ function WaiverRequestCard({
             <Button
               color="error"
               variant="contained"
+              startIcon={<DeleteOutlineIcon />}
               onClick={() => {
                 setConfirmAbandon(false)
                 void abandonAWaiverDraft(id, { expected_revision: revision }).then(onChanged)

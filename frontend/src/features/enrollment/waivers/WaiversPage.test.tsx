@@ -7,13 +7,22 @@ import { createAppTheme } from '../../../app/theme/createAppTheme'
 import i18n from '../../../shared/i18n/config'
 import { WaiversPage } from './WaiversPage'
 
-const api = vi.hoisted(() => ({ calls: [] as AxiosRequestConfig[], requests: [] as unknown[] }))
+const api = vi.hoisted(() => ({
+  calls: [] as AxiosRequestConfig[],
+  requests: [] as unknown[],
+  downloadError: false,
+}))
 
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } }, get: vi.fn() },
   customInstance: (config: AxiosRequestConfig) => {
     api.calls.push(config)
     const url = config.url ?? ''
+    if (url.includes('/evidence-documents/')) {
+      return api.downloadError
+        ? Promise.reject(new Error('download failed'))
+        : Promise.resolve(new Blob(['transcript']))
+    }
     if (url.endsWith('/targets'))
       return Promise.resolve({
         data: [
@@ -39,6 +48,16 @@ vi.mock('../../../shared/api/http', () => ({
               level: 400,
             },
             minimum_result: 'C+',
+          },
+        ],
+      })
+    if (url.endsWith('/evidence-documents'))
+      return Promise.resolve({
+        data: [
+          {
+            id: '01ARZ3NDEKTSV4RRFFQ69G5FAW',
+            type: 'transcript',
+            original_filename: 'legacy-transcript.pdf',
           },
         ],
       })
@@ -75,6 +94,7 @@ function renderPage(locale: 'en' | 'ar' = 'en') {
 beforeEach(async () => {
   api.calls = []
   api.requests = []
+  api.downloadError = false
   await i18n.changeLanguage('en')
 })
 
@@ -106,7 +126,7 @@ it('creates a Waiver Draft from an eligible PRS result and bound Curriculum targ
   )
 })
 
-it('keeps course codes and numeric legacy evidence LTR in the Arabic RTL form', async () => {
+it('keeps course codes, grades, and named legacy evidence LTR in the Arabic RTL form', async () => {
   await i18n.changeLanguage('ar')
   renderPage('ar')
   await screen.findByText(/لا توجد طلبات إعفاء من مقرر/i)
@@ -116,7 +136,7 @@ it('keeps course codes and numeric legacy evidence LTR in the Arabic RTL form', 
   })
   expect(screen.getByLabelText(/رمز المقرر السابق/i)).toHaveAttribute('dir', 'ltr')
   expect(screen.getByLabelText(/تقدير المقرر السابق/i)).toHaveAttribute('dir', 'ltr')
-  expect(screen.getByLabelText(/أرقام مستندات كشف الدرجات الرسمي/i)).toHaveAttribute('dir', 'ltr')
+  expect(screen.getByRole('checkbox', { name: 'legacy-transcript.pdf' })).toBeInTheDocument()
 })
 
 it('shows locked evidence, immutable verification history, and the Council outcome', async () => {
@@ -128,7 +148,10 @@ it('shows locked evidence, immutable verification history, and the Council outco
       prior_course_level: 400,
       prior_result_source: 'legacy_transcript',
       prior_letter_grade: 'B',
-      evidence: { official_transcript_document_ids: [41] },
+      evidence: {
+        source: 'legacy_transcript',
+        official_transcript_document_ids: ['01ARZ3NDEKTSV4RRFFQ69G5FAW'],
+      },
       status: 'Approved',
       revision: 1,
       editable: false,
@@ -154,11 +177,32 @@ it('shows locked evidence, immutable verification history, and the Council outco
   expect(await screen.findByText('85.5%')).toBeInTheDocument()
   expect(screen.getByText('Learning outcomes align.')).toBeInTheDocument()
   expect(screen.getByText(/council approved/i)).toBeInTheDocument()
-  expect(
-    screen
-      .getAllByText((_content, element) =>
-        /official transcript.*41/i.test(element?.textContent ?? ''),
-      )
-      .find((element) => element.tagName === 'P'),
-  ).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'legacy-transcript.pdf' })).toBeInTheDocument()
+})
+
+it('reports a transcript download failure without leaving an unhandled rejection', async () => {
+  api.downloadError = true
+  api.requests = [
+    {
+      id: 7,
+      target_course_code: 'CSE-511',
+      prior_course_code: 'CSE-411',
+      prior_course_level: 400,
+      prior_result_source: 'legacy_transcript',
+      prior_letter_grade: 'B',
+      evidence: {
+        source: 'legacy_transcript',
+        official_transcript_document_ids: ['01ARZ3NDEKTSV4RRFFQ69G5FAW'],
+      },
+      status: 'Approved',
+      revision: 1,
+      editable: false,
+      transitions: [],
+    },
+  ]
+  renderPage()
+
+  fireEvent.click(await screen.findByRole('button', { name: 'legacy-transcript.pdf' }))
+
+  expect(await screen.findByRole('alert')).toHaveTextContent(/could not be downloaded/i)
 })

@@ -12,6 +12,7 @@ use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Models\TransferRequestTransition;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
@@ -388,7 +389,8 @@ final class TransferWorkflow
     private function assertNoEffectiveDecision(TransferRequest $request): void
     {
         if (TransferDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
-            || ExemptionDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
+            || ExemptionDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
+            || WaiverDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
             throw new ConflictHttpException(__('credit_decisions.transfer.effective_decision_exists'));
         }
     }

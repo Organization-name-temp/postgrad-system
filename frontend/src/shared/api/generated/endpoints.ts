@@ -5861,7 +5861,7 @@ export type MyBoundPreparatoryExemptionTargets200DataItem = {
   target_course_code?: string;
   preparatory_requirement_role?: string;
   credit_hours?: number;
-  already_exempt?: boolean;
+  already_recognized?: boolean;
 };
 
 export type MyBoundPreparatoryExemptionTargets200 = {
@@ -7973,7 +7973,7 @@ export type AdvisorWaiverQueue200DataItemEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 /**
@@ -8048,6 +8048,13 @@ export type AdvisorWaiverQueue200DataItemStudent = {
   name?: string;
 };
 
+export type AdvisorWaiverQueue200DataItemEvidenceDocumentsItem = {
+  id?: string;
+  type?: string;
+  original_filename?: string;
+  download_url?: string;
+};
+
 export type AdvisorWaiverQueue200DataItem = {
   id?: number;
   student_id?: number;
@@ -8083,6 +8090,7 @@ export type AdvisorWaiverQueue200DataItem = {
   created_at?: string;
   updated_at?: string;
   student?: AdvisorWaiverQueue200DataItemStudent;
+  evidence_documents?: AdvisorWaiverQueue200DataItemEvidenceDocumentsItem[];
 };
 
 export type AdvisorWaiverQueue200Links = {
@@ -8152,7 +8160,7 @@ export type AdvisorActionOnAWaiverRequest200DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type AdvisorActionOnAWaiverRequest200DataHeadVerification = {
@@ -8272,7 +8280,7 @@ export type DepartmentHeadWaiverQueue200DataItemEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 /**
@@ -8347,6 +8355,13 @@ export type DepartmentHeadWaiverQueue200DataItemStudent = {
   name?: string;
 };
 
+export type DepartmentHeadWaiverQueue200DataItemEvidenceDocumentsItem = {
+  id?: string;
+  type?: string;
+  original_filename?: string;
+  download_url?: string;
+};
+
 export type DepartmentHeadWaiverQueue200DataItem = {
   id?: number;
   student_id?: number;
@@ -8382,6 +8397,7 @@ export type DepartmentHeadWaiverQueue200DataItem = {
   created_at?: string;
   updated_at?: string;
   student?: DepartmentHeadWaiverQueue200DataItemStudent;
+  evidence_documents?: DepartmentHeadWaiverQueue200DataItemEvidenceDocumentsItem[];
 };
 
 export type DepartmentHeadWaiverQueue200Links = {
@@ -8455,7 +8471,7 @@ export type ScopedDepartmentHeadVerification200DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type ScopedDepartmentHeadVerification200DataHeadVerification = {
@@ -8575,7 +8591,7 @@ export type CouncilWaiverQueue200DataItemEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 /**
@@ -8650,6 +8666,13 @@ export type CouncilWaiverQueue200DataItemStudent = {
   name?: string;
 };
 
+export type CouncilWaiverQueue200DataItemEvidenceDocumentsItem = {
+  id?: string;
+  type?: string;
+  original_filename?: string;
+  download_url?: string;
+};
+
 export type CouncilWaiverQueue200DataItem = {
   id?: number;
   student_id?: number;
@@ -8685,6 +8708,7 @@ export type CouncilWaiverQueue200DataItem = {
   created_at?: string;
   updated_at?: string;
   student?: CouncilWaiverQueue200DataItemStudent;
+  evidence_documents?: CouncilWaiverQueue200DataItemEvidenceDocumentsItem[];
 };
 
 export type CouncilWaiverQueue200Links = {
@@ -8754,7 +8778,7 @@ export type AcademicAffairsCouncilFinalDecision200DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type AcademicAffairsCouncilFinalDecision200DataHeadVerification = {
@@ -8844,7 +8868,17 @@ export type AcademicAffairsCouncilFinalDecision200 = {
   data?: AcademicAffairsCouncilFinalDecision200Data;
 };
 
-export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200DataItem = {
+export type MyWaiverTranscriptEvidence200DataItem = {
+  id?: string;
+  type?: string;
+  original_filename?: string;
+};
+
+export type MyWaiverTranscriptEvidence200 = {
+  data?: MyWaiverTranscriptEvidence200DataItem[];
+};
+
+export type MyWaiverTargets200DataItem = {
   target_course_id?: number;
   target_course_code?: string;
   category?: string;
@@ -8852,11 +8886,11 @@ export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200DataItem = {
   already_recognized?: boolean;
 };
 
-export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200 = {
-  data?: CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200DataItem[];
+export type MyWaiverTargets200 = {
+  data?: MyWaiverTargets200DataItem[];
 };
 
-export type MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItemCourse = {
+export type MyQualifyingPRSResults200DataItemCourse = {
   id?: number;
   code?: string;
   name_en?: string;
@@ -8870,14 +8904,14 @@ export type MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItemCourse = {
   department_id?: number | null;
 };
 
-export type MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItem = {
+export type MyQualifyingPRSResults200DataItem = {
   enrollment_id?: number;
-  course?: MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItemCourse;
+  course?: MyQualifyingPRSResults200DataItemCourse;
   minimum_result?: string;
 };
 
-export type MyQualifyingPriorEJUSTResultsRecordedInPRS200 = {
-  data?: MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItem[];
+export type MyQualifyingPRSResults200 = {
+  data?: MyQualifyingPRSResults200DataItem[];
 };
 
 export type MyWaiverRequestsParams = {
@@ -8906,7 +8940,7 @@ export type MyWaiverRequests200DataItemEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 /**
@@ -9061,8 +9095,8 @@ export type CreateAWaiverDraftBodyPriorResult = {
      * @nullable
      */
   letter_grade?: string | null;
-  /** Must be at least 1. */
-  official_transcript_document_ids?: number[];
+  /** Owned official transcript ULIDs for a legacy result. */
+  official_transcript_document_ids?: string[];
 };
 
 export type CreateAWaiverDraftBody = {
@@ -9082,7 +9116,7 @@ export type CreateAWaiverDraft201DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type CreateAWaiverDraft201DataTransitionsItemEvidenceSnapshot = {
@@ -9174,7 +9208,7 @@ export type ViewOneOfMyWaiverRequests200DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type ViewOneOfMyWaiverRequests200DataHeadVerification = {
@@ -9287,8 +9321,8 @@ export type ReviseAnEditableWaiverRequestBodyPriorResult = {
      * @nullable
      */
   letter_grade?: string | null;
-  /** Must be at least 1. */
-  official_transcript_document_ids?: number[];
+  /** Owned official transcript ULIDs for a legacy result. */
+  official_transcript_document_ids?: string[];
 };
 
 export type ReviseAnEditableWaiverRequestBody = {
@@ -9307,7 +9341,7 @@ export type ReviseAnEditableWaiverRequest200DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type ReviseAnEditableWaiverRequest200DataHeadVerification = {
@@ -9406,7 +9440,7 @@ export type AbandonAWaiverDraft200DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type AbandonAWaiverDraft200DataHeadVerification = {
@@ -9507,7 +9541,7 @@ export type SubmitOrResubmitAWaiverRequest200DataEvidence = {
   institution?: string;
   course_id?: number;
   letter_grade?: string;
-  official_transcript_document_ids?: number[];
+  official_transcript_document_ids?: string[];
 };
 
 export type SubmitOrResubmitAWaiverRequest200DataHeadVerification = {
@@ -25622,15 +25656,209 @@ export const useAcademicAffairsCouncilFinalDecision = <TError = unknown,
     }
 
 /**
- * @summary Courses in my bound Curriculum that can be targeted by a Waiver.
+ * @summary My Waiver transcript evidence.
  */
-export const coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver = (
+export const myWaiverTranscriptEvidence = (
 
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200>(
+      return customInstance<MyWaiverTranscriptEvidence200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/evidence-documents`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyWaiverTranscriptEvidenceQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/evidence-documents`
+    ] as const;
+    }
+
+
+export const getMyWaiverTranscriptEvidenceQueryOptions = <TData = Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyWaiverTranscriptEvidenceQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>> = ({ signal }) => myWaiverTranscriptEvidence(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyWaiverTranscriptEvidenceQueryResult = NonNullable<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>>
+export type MyWaiverTranscriptEvidenceQueryError = unknown
+
+
+export function useMyWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Waiver transcript evidence.
+ */
+
+export function useMyWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTranscriptEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyWaiverTranscriptEvidenceQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Open Waiver transcript evidence.
+ */
+export const openWaiverTranscriptEvidence = (
+    waiverRequestId: number,
+    document: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}/evidence-documents/${document}`, method: 'GET',
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenWaiverTranscriptEvidenceQueryKey = (waiverRequestId: number,
+    document: string,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}/evidence-documents/${document}`
+    ] as const;
+    }
+
+
+export const getOpenWaiverTranscriptEvidenceQueryOptions = <TData = Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError = unknown>(waiverRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenWaiverTranscriptEvidenceQueryKey(waiverRequestId,document);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>> = ({ signal }) => openWaiverTranscriptEvidence(waiverRequestId,document, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: waiverRequestId !== null && waiverRequestId !== undefined && document !== null && document !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenWaiverTranscriptEvidenceQueryResult = NonNullable<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>>
+export type OpenWaiverTranscriptEvidenceQueryError = unknown
+
+
+export function useOpenWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError = unknown>(
+ waiverRequestId: number,
+    document: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError = unknown>(
+ waiverRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError = unknown>(
+ waiverRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open Waiver transcript evidence.
+ */
+
+export function useOpenWaiverTranscriptEvidence<TData = Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError = unknown>(
+ waiverRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openWaiverTranscriptEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenWaiverTranscriptEvidenceQueryOptions(waiverRequestId,document,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My Waiver targets.
+ */
+export const myWaiverTargets = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyWaiverTargets200>(
       {url: `/api/v1/credit-decisions/waiver-requests/targets`, method: 'GET', signal
     },
       );
@@ -25639,69 +25867,69 @@ export const coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver = (
 
 
 
-export const getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryKey = () => {
+export const getMyWaiverTargetsQueryKey = () => {
     return [
     `/api/v1/credit-decisions/waiver-requests/targets`
     ] as const;
     }
 
 
-export const getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryOptions = <TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>>, }
+export const getMyWaiverTargetsQueryOptions = <TData = Awaited<ReturnType<typeof myWaiverTargets>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTargets>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getMyWaiverTargetsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>> = ({ signal }) => coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myWaiverTargets>>> = ({ signal }) => myWaiverTargets(signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myWaiverTargets>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryResult = NonNullable<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>>
-export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryError = unknown
+export type MyWaiverTargetsQueryResult = NonNullable<Awaited<ReturnType<typeof myWaiverTargets>>>
+export type MyWaiverTargetsQueryError = unknown
 
 
-export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>> & Pick<
+export function useMyWaiverTargets<TData = Awaited<ReturnType<typeof myWaiverTargets>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTargets>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>,
+          Awaited<ReturnType<typeof myWaiverTargets>>,
           TError,
-          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>
+          Awaited<ReturnType<typeof myWaiverTargets>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>> & Pick<
+export function useMyWaiverTargets<TData = Awaited<ReturnType<typeof myWaiverTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTargets>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>,
+          Awaited<ReturnType<typeof myWaiverTargets>>,
           TError,
-          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>
+          Awaited<ReturnType<typeof myWaiverTargets>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>>, }
+export function useMyWaiverTargets<TData = Awaited<ReturnType<typeof myWaiverTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTargets>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary Courses in my bound Curriculum that can be targeted by a Waiver.
+ * @summary My Waiver targets.
  */
 
-export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>>, }
+export function useMyWaiverTargets<TData = Awaited<ReturnType<typeof myWaiverTargets>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverTargets>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryOptions(options)
+  const queryOptions = getMyWaiverTargetsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -25717,15 +25945,15 @@ export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = 
 /**
  * Only earned results whose Course is level 400 or above are offered. The earned
  * flag is the authoritative Grading-owned C+-or-higher classification.
- * @summary My qualifying prior E-JUST results recorded in PRS.
+ * @summary My qualifying PRS results.
  */
-export const myQualifyingPriorEJUSTResultsRecordedInPRS = (
+export const myQualifyingPRSResults = (
 
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<MyQualifyingPriorEJUSTResultsRecordedInPRS200>(
+      return customInstance<MyQualifyingPRSResults200>(
       {url: `/api/v1/credit-decisions/waiver-requests/prior-results`, method: 'GET', signal
     },
       );
@@ -25734,69 +25962,69 @@ export const myQualifyingPriorEJUSTResultsRecordedInPRS = (
 
 
 
-export const getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryKey = () => {
+export const getMyQualifyingPRSResultsQueryKey = () => {
     return [
     `/api/v1/credit-decisions/waiver-requests/prior-results`
     ] as const;
     }
 
 
-export const getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryOptions = <TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>>, }
+export const getMyQualifyingPRSResultsQueryOptions = <TData = Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getMyQualifyingPRSResultsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>> = ({ signal }) => myQualifyingPriorEJUSTResultsRecordedInPRS(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myQualifyingPRSResults>>> = ({ signal }) => myQualifyingPRSResults(signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type MyQualifyingPriorEJUSTResultsRecordedInPRSQueryResult = NonNullable<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>>
-export type MyQualifyingPriorEJUSTResultsRecordedInPRSQueryError = unknown
+export type MyQualifyingPRSResultsQueryResult = NonNullable<Awaited<ReturnType<typeof myQualifyingPRSResults>>>
+export type MyQualifyingPRSResultsQueryError = unknown
 
 
-export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>> & Pick<
+export function useMyQualifyingPRSResults<TData = Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>,
+          Awaited<ReturnType<typeof myQualifyingPRSResults>>,
           TError,
-          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>
+          Awaited<ReturnType<typeof myQualifyingPRSResults>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>> & Pick<
+export function useMyQualifyingPRSResults<TData = Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>,
+          Awaited<ReturnType<typeof myQualifyingPRSResults>>,
           TError,
-          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>
+          Awaited<ReturnType<typeof myQualifyingPRSResults>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>>, }
+export function useMyQualifyingPRSResults<TData = Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary My qualifying prior E-JUST results recorded in PRS.
+ * @summary My qualifying PRS results.
  */
 
-export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>>, }
+export function useMyQualifyingPRSResults<TData = Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPRSResults>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryOptions(options)
+  const queryOptions = getMyQualifyingPRSResultsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

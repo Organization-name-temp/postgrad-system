@@ -3,12 +3,14 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Support\Facades\DB;
+use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
+use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Internal\Models\WaiverRequest;
 use Modules\Enrollment\Internal\Models\WaiverRequestTransition;
@@ -35,6 +37,7 @@ final class WaiverWorkflow
         private readonly CurriculumCatalog $curricula,
         private readonly CourseCatalog $courses,
         private readonly StudentGuard $studentGuard,
+        private readonly AdmissionDocuments $admissionDocuments,
         private readonly DepartmentHeadAssignments $heads,
         private readonly Directory $directory,
         private readonly Notifier $notifier,
@@ -317,7 +320,11 @@ final class WaiverWorkflow
             if ($course === null || ! in_array($grade, self::ELIGIBLE_GRADES, true)) {
                 throw new UnprocessableEntityHttpException(__('credit_decisions.waiver.prior_result_not_qualifying'));
             }
-            if (! is_array($documents) || $documents === []) {
+            $ownedTranscripts = collect($this->admissionDocuments->forApplicant($student->userId))
+                ->filter(fn ($document): bool => $document->type === 'transcript')
+                ->keyBy(fn ($document): string => $document->id);
+            if (! is_array($documents) || $documents === []
+                || collect($documents)->contains(fn ($id): bool => ! is_string($id) || ! $ownedTranscripts->has($id))) {
                 throw new UnprocessableEntityHttpException(__('credit_decisions.waiver.official_transcript_required'));
             }
 
@@ -355,6 +362,7 @@ final class WaiverWorkflow
     private function assertNoEffectiveDecision(int $studentId, int $targetCourseId): void
     {
         if (ExemptionDecision::query()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()
+            || TransferDecision::query()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()
             || WaiverDecision::query()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()) {
             throw new ConflictHttpException(__('credit_decisions.effective_decision_exists'));
         }

@@ -39,7 +39,7 @@ vi.mock('../../../shared/api/http', () => ({
             target_course_code: 'PRE401',
             preparatory_requirement_role: 'EnglishLanguage',
             credit_hours: 1,
-            already_exempt: false,
+            already_recognized: false,
           },
         ],
       })
@@ -275,7 +275,7 @@ it('localizes an overlength Student note without exposing a translation key', as
   expect(await screen.findByRole('alert')).toHaveTextContent('Use 2,000 characters or fewer.')
 
   await i18n.changeLanguage('ar')
-  expect(await screen.findByRole('alert')).toHaveTextContent('استخدم ٢٠٠٠ حرف أو أقل.')
+  expect(await screen.findByRole('alert')).toHaveTextContent('استخدم 2000 حرف أو أقل.')
 })
 
 it('names the Draft and terminal consequence before abandonment', async () => {

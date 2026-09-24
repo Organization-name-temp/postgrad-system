@@ -15,6 +15,8 @@ use Modules\Enrollment\Internal\Http\Documentation\ManualExemptionResponseExampl
 use Modules\Enrollment\Internal\Http\Resources\ExemptionRequestResource;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\ExemptionRequest;
+use Modules\Enrollment\Internal\Models\TransferDecision;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Internal\Support\ManualExemptionEvidencePresenter;
 use Modules\Enrollment\Internal\Support\ManualExemptionWorkflow;
 use Modules\Identity\Public\Contracts\AuditLogger;
@@ -29,13 +31,19 @@ class ExemptionRequestController
     /**
      * My bound Preparatory Exemption targets.
      *
-     * @response 200 {"data": [{"target_course_id": 5, "target_course_code": "PRE401", "preparatory_requirement_role": "EnglishLanguage", "credit_hours": 1, "already_exempt": false}]}
+     * @response 200 {"data": [{"target_course_id": 5, "target_course_code": "PRE401", "preparatory_requirement_role": "EnglishLanguage", "credit_hours": 1, "already_recognized": false}]}
      */
     public function targets(Request $request, StudentDirectory $students, CurriculumCatalog $curricula): JsonResponse
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
         abort_if($student === null, 403);
-        $existing = ExemptionDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id')->map(fn ($id): int => (int) $id)->all();
+        $existing = ExemptionDecision::query()
+            ->where('student_id', $student->studentId)
+            ->pluck('target_course_id')
+            ->merge(TransferDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(WaiverDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->map(fn ($id): int => (int) $id)
+            ->all();
         $rows = collect($curricula->entriesForVersion($student->curriculumVersionId))
             ->filter(fn ($entry): bool => $entry->category === CourseCategory::Preparatory && $entry->preparatoryRequirementRole !== null)
             ->map(fn ($entry): array => [
@@ -43,7 +51,7 @@ class ExemptionRequestController
                 'target_course_code' => $entry->courseCode,
                 'preparatory_requirement_role' => $entry->preparatoryRequirementRole->value,
                 'credit_hours' => $entry->totalCh,
-                'already_exempt' => in_array($entry->courseId, $existing, true),
+                'already_recognized' => in_array($entry->courseId, $existing, true),
             ])->values()->all();
 
         return response()->json(['data' => $rows]);

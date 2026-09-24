@@ -24,7 +24,20 @@ vi.mock('../../../shared/api/http', () => ({
             status: 'PendingDepartmentHead',
             revision: 2,
             student: { name: 'Sara Student', university_id: '2026-CSE-0001' },
-            evidence: { source: 'prs', institution: 'E-JUST', enrollment_id: 12 },
+            evidence: {
+              source: 'legacy_transcript',
+              institution: 'E-JUST',
+              letter_grade: 'A',
+              official_transcript_document_ids: ['01ARZ3NDEKTSV4RRFFQ69G5FAW'],
+            },
+            evidence_documents: [
+              {
+                id: '01ARZ3NDEKTSV4RRFFQ69G5FAW',
+                original_filename: 'legacy-transcript.pdf',
+                download_url:
+                  '/api/v1/credit-decisions/waiver-requests/9/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW',
+              },
+            ],
             transitions: [],
           },
         ],
@@ -54,6 +67,7 @@ beforeEach(async () => {
 it('requires and submits Department Head equivalency verification at the 80% boundary', async () => {
   renderPage('departmentHead')
   await screen.findByText('Sara Student')
+  expect(screen.getByRole('link', { name: 'legacy-transcript.pdf' })).toBeInTheDocument()
 
   const verify = screen.getByRole('button', { name: /verify for council/i })
   fireEvent.change(screen.getByLabelText(/verified content coverage/i), {

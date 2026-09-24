@@ -13,8 +13,10 @@ use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Http\Documentation\TransferResponseExamples;
 use Modules\Enrollment\Internal\Http\Resources\TransferRequestResource;
+use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\TransferRequest;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Internal\Support\TransferWorkflow;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
@@ -105,7 +107,13 @@ class TransferRequestController
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
         abort_if($student === null, 403);
-        $existing = TransferDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id')->map(fn ($id): int => (int) $id)->all();
+        $existing = ExemptionDecision::query()
+            ->where('student_id', $student->studentId)
+            ->pluck('target_course_id')
+            ->merge(TransferDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(WaiverDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->map(fn ($id): int => (int) $id)
+            ->all();
 
         return response()->json(['data' => collect($curricula->entriesForVersion($student->curriculumVersionId))->map(fn ($entry): array => [
             'target_course_id' => $entry->courseId,

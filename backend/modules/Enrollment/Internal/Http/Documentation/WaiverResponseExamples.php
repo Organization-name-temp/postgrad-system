@@ -12,7 +12,7 @@ final class WaiverResponseExamples
         'prior_letter_grade' => 'C+',
         'evidence' => [
             'source' => 'legacy_transcript', 'institution' => 'E-JUST', 'course_id' => 8,
-            'letter_grade' => 'C+', 'official_transcript_document_ids' => [41],
+            'letter_grade' => 'C+', 'official_transcript_document_ids' => ['01ARZ3NDEKTSV4RRFFQ69G5FAW'],
         ],
         'student_note' => 'Prior E-JUST study evidence.', 'status' => 'Approved', 'revision' => 1,
         'editable' => false, 'terminal' => true, 'submitted_at' => '2026-09-04T09:05:00+00:00',
@@ -59,7 +59,16 @@ final class WaiverResponseExamples
     ];
 
     public const REVIEW_LIST = [
-        'data' => [[...self::APPROVED_DATA, 'student' => ['student_id' => 10, 'university_id' => '2026-CSE-0001', 'name' => 'Sara Student']]],
+        'data' => [[
+            ...self::APPROVED_DATA,
+            'student' => ['student_id' => 10, 'university_id' => '2026-CSE-0001', 'name' => 'Sara Student'],
+            'evidence_documents' => [[
+                'id' => '01ARZ3NDEKTSV4RRFFQ69G5FAW',
+                'type' => 'transcript',
+                'original_filename' => 'transcript.pdf',
+                'download_url' => '/api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW',
+            ]],
+        ]],
         'links' => ['first' => null, 'last' => null, 'prev' => null, 'next' => null],
         'meta' => ['current_page' => 1, 'from' => 1, 'last_page' => 1, 'path' => 'http://localhost/api/v1/credit-decisions/waiver-requests/advisor-queue', 'per_page' => 25, 'to' => 1, 'total' => 1],
     ];

@@ -34,6 +34,10 @@ class WaiverRequestResource extends JsonResource
             'prior_enrollment_id' => $this->prior_enrollment_id,
             'prior_letter_grade' => $this->prior_letter_grade,
             'evidence' => $this->evidence,
+            'evidence_documents' => $this->when(
+                $this->getAttribute('evidence_documents') !== null,
+                $this->getAttribute('evidence_documents'),
+            ),
             'student_note' => $this->student_note,
             'status' => $this->status->value,
             'revision' => $this->revision,

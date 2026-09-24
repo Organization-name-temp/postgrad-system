@@ -9,6 +9,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\Rule;
 use Knuckles\Scribe\Attributes\Response as ResponseAttribute;
 use Knuckles\Scribe\Attributes\ResponseField as ResponseFieldAttribute;
+use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
 use Modules\Enrollment\Internal\Http\Documentation\WaiverResponseExamples;
@@ -29,6 +30,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /** @group Waiver Review */
 class WaiverReviewController
 {
+    public function __construct(private readonly AdmissionDocuments $admissionDocuments) {}
+
     /**
      * Advisor Waiver queue.
      *
@@ -325,6 +328,18 @@ class WaiverReviewController
             $student = $summaries[$item->student_id] ?? null;
             $user = $student === null ? null : ($users[$student->userId] ?? null);
             $item->setAttribute('student_context', $student === null ? null : ['student_id' => $student->studentId, 'university_id' => $student->universityId, 'name' => $user?->name]);
+            $documentIds = array_flip($item->evidence['official_transcript_document_ids'] ?? []);
+            $item->setAttribute('evidence_documents', $student === null ? [] : collect($this->admissionDocuments->forApplicant($student->userId))
+                ->filter(fn ($document): bool => isset($documentIds[$document->id]))
+                ->map(fn ($document): array => [
+                    'id' => $document->id,
+                    'type' => $document->type,
+                    'original_filename' => $document->originalFilename,
+                    'download_url' => route('enrollment.waiver-evidence.download', [
+                        'waiver_request' => $item->getKey(),
+                        'document' => $document->id,
+                    ], absolute: false),
+                ])->values()->all());
         }));
 
         return $paginator;

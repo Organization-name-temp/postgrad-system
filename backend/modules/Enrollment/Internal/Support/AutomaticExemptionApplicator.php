@@ -10,6 +10,8 @@ use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Enrollment\Internal\Enums\ExemptionSource;
 use Modules\Enrollment\Internal\Models\AutomaticExemptionEvidence;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
+use Modules\Enrollment\Internal\Models\TransferDecision;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Identity\Public\Enums\StudentLifecycleStatus;
@@ -87,6 +89,10 @@ class AutomaticExemptionApplicator
             foreach ($entries as $entry) {
                 $role = $entry->preparatoryRequirementRole;
                 if ($role === null || ! isset($reasonsByRole[$role->value])) {
+                    continue;
+                }
+                if (TransferDecision::query()->where('student_id', $student->studentId)->where('target_course_id', $entry->courseId)->exists()
+                    || WaiverDecision::query()->where('student_id', $student->studentId)->where('target_course_id', $entry->courseId)->exists()) {
                     continue;
                 }
 

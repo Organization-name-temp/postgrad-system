@@ -18,7 +18,7 @@ return [
         'invalid_target' => 'The target must be a Course in your bound Curriculum.',
         'external_study' => 'Study outside E-JUST must use the Transfer workflow.',
         'invalid_prior_result' => 'Choose a PRS result or provide an official legacy E-JUST transcript.',
-        'official_transcript_required' => 'An official E-JUST transcript is required for a legacy result.',
+        'official_transcript_required' => 'An owned official E-JUST transcript is required for a legacy result.',
         'prior_result_not_qualifying' => 'The prior E-JUST Course must be level 400 or above and completed at C+ or higher.',
         'coverage_below_minimum' => 'Verified content coverage must be at least 80%.',
         'target_attempt_exists' => 'A Waiver cannot target a Course with an effective for-credit Attempt.',

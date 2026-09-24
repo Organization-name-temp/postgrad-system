@@ -8,26 +8,33 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Knuckles\Scribe\Attributes\Response as ResponseAttribute;
 use Knuckles\Scribe\Attributes\ResponseField as ResponseFieldAttribute;
+use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CurriculumCatalog;
+use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
 use Modules\Enrollment\Internal\Http\Documentation\WaiverResponseExamples;
 use Modules\Enrollment\Internal\Http\Resources\WaiverRequestResource;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
+use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Internal\Models\WaiverRequest;
 use Modules\Enrollment\Internal\Support\WaiverWorkflow;
 use Modules\Identity\Public\Contracts\AuditLogger;
+use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
+use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Enums\Role;
 use Support\Export\XlsxExporter;
 use Support\Query\CollectionQuery;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /** @group Waivers */
 class WaiverRequestController
 {
     /**
-     * Courses in my bound Curriculum that can be targeted by a Waiver.
+     * My Waiver targets.
      *
      * @response 200 {"data": [{"target_course_id": 5, "target_course_code": "CSE511", "category": "Core", "credit_hours": 3, "already_recognized": false}]}
      */
@@ -38,6 +45,7 @@ class WaiverRequestController
         $recognized = ExemptionDecision::query()
             ->where('student_id', $student->studentId)
             ->pluck('target_course_id')
+            ->merge(TransferDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
             ->merge(WaiverDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
             ->map(fn ($id): int => (int) $id)
             ->all();
@@ -57,7 +65,7 @@ class WaiverRequestController
     }
 
     /**
-     * My qualifying prior E-JUST results recorded in PRS.
+     * My qualifying PRS results.
      *
      * Only earned results whose Course is level 400 or above are offered. The earned
      * flag is the authoritative Grading-owned C+-or-higher classification.
@@ -91,6 +99,69 @@ class WaiverRequestController
         })->filter()->values()->all();
 
         return response()->json(['data' => $rows]);
+    }
+
+    /**
+     * My Waiver transcript evidence.
+     *
+     * @response 200 {"data":[{"id":"01ARZ3NDEKTSV4RRFFQ69G5FAV","type":"transcript","original_filename":"transcript.pdf"}]}
+     */
+    public function evidenceDocuments(Request $request, StudentDirectory $students, AdmissionDocuments $documents): JsonResponse
+    {
+        $student = $students->find((int) $request->user()?->getAuthIdentifier());
+        abort_if($student === null, 403);
+
+        return response()->json(['data' => collect($documents->forApplicant($student->userId))
+            ->filter(fn ($document): bool => $document->type === 'transcript')
+            ->map(fn ($document): array => [
+                'id' => $document->id,
+                'type' => $document->type,
+                'original_filename' => $document->originalFilename,
+            ])->values()->all()]);
+    }
+
+    /**
+     * Open Waiver transcript evidence.
+     *
+     * @urlParam waiver_request_id integer required Example: 1
+     * @urlParam document string required The opaque document ULID. Example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+     *
+     * @response 200 <<binary>>
+     */
+    public function evidenceDocument(
+        Request $httpRequest,
+        WaiverRequest $waiverRequest,
+        string $document,
+        StudentDirectory $students,
+        Directory $directory,
+        CourseCatalog $courses,
+        DepartmentHeadAssignments $heads,
+        AdmissionDocuments $documents,
+    ): StreamedResponse {
+        $documentIds = $waiverRequest->evidence['official_transcript_document_ids'] ?? [];
+        abort_unless(in_array($document, $documentIds, true), 404);
+        $student = $students->findByStudentId($waiverRequest->student_id);
+        abort_if($student === null, 404);
+        $actorId = (int) $httpRequest->user()?->getAuthIdentifier();
+
+        if ($student->userId !== $actorId) {
+            $course = $courses->find($waiverRequest->target_course_id);
+            $authorized = ($waiverRequest->status === WaiverRequestStatus::PendingAdvisor
+                    && $directory->hasRole($actorId, Role::Advisor)
+                    && $student->advisorId === $actorId)
+                || ($waiverRequest->status === WaiverRequestStatus::PendingDepartmentHead
+                    && $directory->hasRole($actorId, Role::DepartmentHead)
+                    && $course !== null
+                    && in_array($actorId, $heads->headsForDepartment($course->departmentId), true))
+                || ($waiverRequest->status === WaiverRequestStatus::PendingCouncil
+                    && $directory->hasRole($actorId, Role::Council));
+            abort_unless($authorized, 403);
+        }
+
+        $response = $documents->downloadForApplicant($student->userId, $document);
+        abort_if($response === null, 404);
+
+        return $response;
     }
 
     /**
@@ -162,6 +233,7 @@ class WaiverRequestController
      * @bodyParam prior_result.source string required prs or legacy_transcript. Example: prs
      * @bodyParam prior_result.institution string required Must be E-JUST. Example: E-JUST
      * @bodyParam prior_result.enrollment_id integer PRS Enrollment for the prior result. Example: 12
+     * @bodyParam prior_result.official_transcript_document_ids string[] Owned official transcript ULIDs for a legacy result. Example: ["01ARZ3NDEKTSV4RRFFQ69G5FAW"]
      * @bodyParam student_note string Student explanation.
      */
     #[ResponseAttribute(content: WaiverResponseExamples::DRAFT, status: 201)]
@@ -176,7 +248,7 @@ class WaiverRequestController
             'prior_result.course_id' => ['nullable', 'integer', 'min:1'],
             'prior_result.letter_grade' => ['nullable', 'string', 'max:3'],
             'prior_result.official_transcript_document_ids' => ['nullable', 'array', 'min:1'],
-            'prior_result.official_transcript_document_ids.*' => ['integer', 'min:1'],
+            'prior_result.official_transcript_document_ids.*' => ['string', 'ulid', 'distinct'],
             'student_note' => ['nullable', 'string', 'max:2000'],
         ]);
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
@@ -212,6 +284,7 @@ class WaiverRequestController
      *
      * @bodyParam expected_revision integer required Example: 1
      * @bodyParam prior_result object Revised prior E-JUST result evidence.
+     * @bodyParam prior_result.official_transcript_document_ids string[] Owned official transcript ULIDs for a legacy result. Example: ["01ARZ3NDEKTSV4RRFFQ69G5FAW"]
      * @bodyParam student_note string Revised Student explanation.
      */
     #[ResponseAttribute(content: WaiverResponseExamples::ITEM)]
@@ -226,7 +299,7 @@ class WaiverRequestController
             'prior_result.course_id' => ['nullable', 'integer', 'min:1'],
             'prior_result.letter_grade' => ['nullable', 'string', 'max:3'],
             'prior_result.official_transcript_document_ids' => ['nullable', 'array', 'min:1'],
-            'prior_result.official_transcript_document_ids.*' => ['integer', 'min:1'],
+            'prior_result.official_transcript_document_ids.*' => ['string', 'ulid', 'distinct'],
             'student_note' => ['sometimes', 'nullable', 'string', 'max:2000'],
         ]);
         abort_if(! array_key_exists('prior_result', $validated) && ! array_key_exists('student_note', $validated), 422);

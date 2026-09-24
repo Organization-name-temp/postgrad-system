@@ -5371,7 +5371,7 @@ export const MyBoundPreparatoryExemptionTargetsResponse = zod.object({
   "target_course_code": zod.string().optional(),
   "preparatory_requirement_role": zod.string().optional(),
   "credit_hours": zod.number().optional(),
-  "already_exempt": zod.boolean().optional()
+  "already_recognized": zod.boolean().optional()
 })).optional()
 })
 
@@ -7223,7 +7223,7 @@ export const AdvisorWaiverQueueResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().nullish(),
   "status": zod.string().optional(),
@@ -7283,7 +7283,13 @@ export const AdvisorWaiverQueueResponse = zod.object({
   "student_id": zod.number().optional(),
   "university_id": zod.string().optional(),
   "name": zod.string().optional()
-}).optional()
+}).optional(),
+  "evidence_documents": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "download_url": zod.string().optional()
+})).optional()
 })).optional(),
   "links": zod.object({
   "first": zod.string().nullish(),
@@ -7352,7 +7358,7 @@ export const AdvisorActionOnAWaiverRequestResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),
@@ -7445,7 +7451,7 @@ export const DepartmentHeadWaiverQueueResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().nullish(),
   "status": zod.string().optional(),
@@ -7505,7 +7511,13 @@ export const DepartmentHeadWaiverQueueResponse = zod.object({
   "student_id": zod.number().optional(),
   "university_id": zod.string().optional(),
   "name": zod.string().optional()
-}).optional()
+}).optional(),
+  "evidence_documents": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "download_url": zod.string().optional()
+})).optional()
 })).optional(),
   "links": zod.object({
   "first": zod.string().nullish(),
@@ -7576,7 +7588,7 @@ export const ScopedDepartmentHeadVerificationResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),
@@ -7669,7 +7681,7 @@ export const CouncilWaiverQueueResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().nullish(),
   "status": zod.string().optional(),
@@ -7729,7 +7741,13 @@ export const CouncilWaiverQueueResponse = zod.object({
   "student_id": zod.number().optional(),
   "university_id": zod.string().optional(),
   "name": zod.string().optional()
-}).optional()
+}).optional(),
+  "evidence_documents": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "type": zod.string().optional(),
+  "original_filename": zod.string().optional(),
+  "download_url": zod.string().optional()
+})).optional()
 })).optional(),
   "links": zod.object({
   "first": zod.string().nullish(),
@@ -7798,7 +7816,7 @@ export const AcademicAffairsCouncilFinalDecisionResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),
@@ -7859,9 +7877,32 @@ export const AcademicAffairsCouncilFinalDecisionResponse = zod.object({
 
 
 /**
- * @summary Courses in my bound Curriculum that can be targeted by a Waiver.
+ * @summary My Waiver transcript evidence.
  */
-export const CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverResponse = zod.object({
+export const MyWaiverTranscriptEvidenceResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.string().optional(),
+  "type": zod.string().optional(),
+  "original_filename": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * @summary Open Waiver transcript evidence.
+ */
+export const OpenWaiverTranscriptEvidenceParams = zod.object({
+  "waiver_request_id": zod.number(),
+  "document": zod.string().describe('The opaque document ULID.')
+})
+
+export const OpenWaiverTranscriptEvidenceResponse = zod.unknown()
+
+
+/**
+ * @summary My Waiver targets.
+ */
+export const MyWaiverTargetsResponse = zod.object({
   "data": zod.array(zod.object({
   "target_course_id": zod.number().optional(),
   "target_course_code": zod.string().optional(),
@@ -7875,9 +7916,9 @@ export const CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverResponse = zod.
 /**
  * Only earned results whose Course is level 400 or above are offered. The earned
  * flag is the authoritative Grading-owned C+-or-higher classification.
- * @summary My qualifying prior E-JUST results recorded in PRS.
+ * @summary My qualifying PRS results.
  */
-export const MyQualifyingPriorEJUSTResultsRecordedInPRSResponse = zod.object({
+export const MyQualifyingPRSResultsResponse = zod.object({
   "data": zod.array(zod.object({
   "enrollment_id": zod.number().optional(),
   "course": zod.object({
@@ -7927,7 +7968,7 @@ export const MyWaiverRequestsResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().nullish(),
   "status": zod.string().optional(),
@@ -8013,7 +8054,7 @@ export const CreateAWaiverDraftBody = zod.object({
   "enrollment_id": zod.number().nullish().describe('PRS Enrollment for the prior result.'),
   "course_id": zod.number().nullish().describe('Must be at least 1.'),
   "letter_grade": zod.string().nullish().describe('Must not be greater than 3 characters.'),
-  "official_transcript_document_ids": zod.array(zod.number()).optional().describe('Must be at least 1.')
+  "official_transcript_document_ids": zod.array(zod.string()).optional().describe('Owned official transcript ULIDs for a legacy result.')
 }).describe('Prior E-JUST result evidence.'),
   "student_note": zod.string().nullish().describe('Student explanation.')
 })
@@ -8037,7 +8078,7 @@ export const CreateAWaiverDraftResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),
@@ -8115,7 +8156,7 @@ export const ViewOneOfMyWaiverRequestsResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),
@@ -8190,7 +8231,7 @@ export const ReviseAnEditableWaiverRequestBody = zod.object({
   "enrollment_id": zod.number().nullish().describe('Must be at least 1.'),
   "course_id": zod.number().nullish().describe('Must be at least 1.'),
   "letter_grade": zod.string().nullish().describe('Must not be greater than 3 characters.'),
-  "official_transcript_document_ids": zod.array(zod.number()).optional().describe('Must be at least 1.')
+  "official_transcript_document_ids": zod.array(zod.string()).optional().describe('Owned official transcript ULIDs for a legacy result.')
 }).optional().describe('Revised prior E-JUST result evidence.'),
   "student_note": zod.string().nullish().describe('Revised Student explanation.')
 })
@@ -8214,7 +8255,7 @@ export const ReviseAnEditableWaiverRequestResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),
@@ -8304,7 +8345,7 @@ export const AbandonAWaiverDraftResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),
@@ -8395,7 +8436,7 @@ export const SubmitOrResubmitAWaiverRequestResponse = zod.object({
   "institution": zod.string().optional(),
   "course_id": zod.number().optional(),
   "letter_grade": zod.string().optional(),
-  "official_transcript_document_ids": zod.array(zod.number()).optional()
+  "official_transcript_document_ids": zod.array(zod.string()).optional()
 }).optional(),
   "student_note": zod.string().optional(),
   "status": zod.string().optional(),

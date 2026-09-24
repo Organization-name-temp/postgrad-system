@@ -14,11 +14,14 @@ use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\ExemptionRequestStatus;
+use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\ExemptionRequest;
 use Modules\Enrollment\Internal\Models\ExemptionRequestTransition;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Internal\Models\WaiverRequest;
 use Modules\Enrollment\Public\ExemptionDecisions;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
 use Modules\Grading\Internal\Models\Grade;
@@ -95,6 +98,60 @@ function manualRequestFor(Student $student, Course $course, ExemptionRequestStat
         'submitted_at' => $status === ExemptionRequestStatus::Draft ? null : now(),
     ]);
 }
+
+it('blocks a manual Exemption target already recognized by Waiver', function () {
+    [$student, , $head, $course] = manualExemptionWorld();
+    $prior = Course::factory()->create(['department_id' => $course->department_id, 'code' => 'PRE-OLD']);
+    $waiverRequest = WaiverRequest::query()->create([
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $course->id,
+        'target_course_code' => $course->code,
+        'credit_hours' => $course->total_ch,
+        'prior_course_id' => $prior->id,
+        'prior_course_code' => $prior->code,
+        'prior_course_level' => $prior->level->value,
+        'prior_result_source' => 'legacy_transcript',
+        'prior_letter_grade' => 'A',
+        'evidence' => ['official_transcript_document_ids' => ['01ARZ3NDEKTSV4RRFFQ69G5FAW']],
+        'status' => WaiverRequestStatus::Approved,
+        'revision' => 1,
+        'submitted_at' => now(),
+        'coverage_percentage' => 90,
+        'equivalency_note' => 'Equivalent.',
+        'verified_by' => $head->id,
+        'verified_at' => now(),
+    ]);
+    WaiverDecision::query()->create([
+        'waiver_request_id' => $waiverRequest->id,
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $course->id,
+        'target_course_code' => $course->code,
+        'credit_hours' => $course->total_ch,
+        'prior_course_id' => $prior->id,
+        'prior_course_code' => $prior->code,
+        'prior_course_level' => $prior->level->value,
+        'prior_result_source' => 'legacy_transcript',
+        'prior_letter_grade' => 'A',
+        'coverage_percentage' => 90,
+        'verified_by' => $head->id,
+        'verified_at' => now(),
+        'approved_by' => $head->id,
+        'approved_at' => now(),
+    ]);
+    $request = manualRequestFor($student, $course, ExemptionRequestStatus::PendingDepartmentHead);
+
+    Sanctum::actingAs($student->user);
+    $this->getJson('/api/v1/credit-decisions/exemption-requests/targets')
+        ->assertOk()->assertJsonPath('data.0.already_recognized', true);
+    Sanctum::actingAs($head);
+    $this->postJson("/api/v1/credit-decisions/exemption-requests/{$request->id}/department-head-decision", [
+        'action' => 'approve',
+        'expected_revision' => 1,
+        'action_id' => '20202020-2020-4020-8020-202020202020',
+    ])->assertConflict();
+});
 
 it('applies the shared actor-aware collection and export contract', function (string $surface) {
     [$student, $advisor, $head, $course] = manualExemptionWorld();

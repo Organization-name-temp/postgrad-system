@@ -20302,7 +20302,7 @@ paths:
                       target_course_code: PRE401
                       preparatory_requirement_role: EnglishLanguage
                       credit_hours: 1
-                      already_exempt: false
+                      already_recognized: false
                 properties:
                   data:
                     type: array
@@ -20311,7 +20311,7 @@ paths:
                         target_course_code: PRE401
                         preparatory_requirement_role: EnglishLanguage
                         credit_hours: 1
-                        already_exempt: false
+                        already_recognized: false
                     items:
                       type: object
                       properties:
@@ -20327,7 +20327,7 @@ paths:
                         credit_hours:
                           type: integer
                           example: 1
-                        already_exempt:
+                        already_recognized:
                           type: boolean
                           example: false
       tags:
@@ -28647,7 +28647,7 @@ paths:
                         course_id: 8
                         letter_grade: C+
                         official_transcript_document_ids:
-                          - 41
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                       student_note: 'Prior E-JUST study evidence.'
                       status: Approved
                       revision: 1
@@ -28702,6 +28702,12 @@ paths:
                         student_id: 10
                         university_id: 2026-CSE-0001
                         name: 'Sara Student'
+                      evidence_documents:
+                        -
+                          id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                          type: transcript
+                          original_filename: transcript.pdf
+                          download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                   links:
                     first: null
                     last: null
@@ -28738,7 +28744,7 @@ paths:
                           course_id: 8
                           letter_grade: C+
                           official_transcript_document_ids:
-                            - 41
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                         student_note: 'Prior E-JUST study evidence.'
                         status: Approved
                         revision: 1
@@ -28793,6 +28799,11 @@ paths:
                           student_id: 10
                           university_id: 2026-CSE-0001
                           name: 'Sara Student'
+                        evidence_documents:
+                          - id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                            type: transcript
+                            original_filename: transcript.pdf
+                            download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                     items:
                       type: object
                       properties:
@@ -28852,9 +28863,9 @@ paths:
                             official_transcript_document_ids:
                               type: array
                               example:
-                                - 41
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                               items:
-                                type: integer
+                                type: string
                         student_note:
                           type: string
                           example: 'Prior E-JUST study evidence.'
@@ -29043,6 +29054,28 @@ paths:
                             name:
                               type: string
                               example: 'Sara Student'
+                        evidence_documents:
+                          type: array
+                          example:
+                            - id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                              type: transcript
+                              original_filename: transcript.pdf
+                              download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                              type:
+                                type: string
+                                example: transcript
+                              original_filename:
+                                type: string
+                                example: transcript.pdf
+                              download_url:
+                                type: string
+                                example: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                   links:
                     type: object
                     properties:
@@ -29209,7 +29242,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Approved
                     revision: 1
@@ -29319,9 +29352,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'
@@ -29635,7 +29668,7 @@ paths:
                         course_id: 8
                         letter_grade: C+
                         official_transcript_document_ids:
-                          - 41
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                       student_note: 'Prior E-JUST study evidence.'
                       status: Approved
                       revision: 1
@@ -29690,6 +29723,12 @@ paths:
                         student_id: 10
                         university_id: 2026-CSE-0001
                         name: 'Sara Student'
+                      evidence_documents:
+                        -
+                          id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                          type: transcript
+                          original_filename: transcript.pdf
+                          download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                   links:
                     first: null
                     last: null
@@ -29726,7 +29765,7 @@ paths:
                           course_id: 8
                           letter_grade: C+
                           official_transcript_document_ids:
-                            - 41
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                         student_note: 'Prior E-JUST study evidence.'
                         status: Approved
                         revision: 1
@@ -29781,6 +29820,11 @@ paths:
                           student_id: 10
                           university_id: 2026-CSE-0001
                           name: 'Sara Student'
+                        evidence_documents:
+                          - id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                            type: transcript
+                            original_filename: transcript.pdf
+                            download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                     items:
                       type: object
                       properties:
@@ -29840,9 +29884,9 @@ paths:
                             official_transcript_document_ids:
                               type: array
                               example:
-                                - 41
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                               items:
-                                type: integer
+                                type: string
                         student_note:
                           type: string
                           example: 'Prior E-JUST study evidence.'
@@ -30031,6 +30075,28 @@ paths:
                             name:
                               type: string
                               example: 'Sara Student'
+                        evidence_documents:
+                          type: array
+                          example:
+                            - id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                              type: transcript
+                              original_filename: transcript.pdf
+                              download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                              type:
+                                type: string
+                                example: transcript
+                              original_filename:
+                                type: string
+                                example: transcript.pdf
+                              download_url:
+                                type: string
+                                example: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                   links:
                     type: object
                     properties:
@@ -30197,7 +30263,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Approved
                     revision: 1
@@ -30307,9 +30373,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'
@@ -30631,7 +30697,7 @@ paths:
                         course_id: 8
                         letter_grade: C+
                         official_transcript_document_ids:
-                          - 41
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                       student_note: 'Prior E-JUST study evidence.'
                       status: Approved
                       revision: 1
@@ -30686,6 +30752,12 @@ paths:
                         student_id: 10
                         university_id: 2026-CSE-0001
                         name: 'Sara Student'
+                      evidence_documents:
+                        -
+                          id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                          type: transcript
+                          original_filename: transcript.pdf
+                          download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                   links:
                     first: null
                     last: null
@@ -30722,7 +30794,7 @@ paths:
                           course_id: 8
                           letter_grade: C+
                           official_transcript_document_ids:
-                            - 41
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                         student_note: 'Prior E-JUST study evidence.'
                         status: Approved
                         revision: 1
@@ -30777,6 +30849,11 @@ paths:
                           student_id: 10
                           university_id: 2026-CSE-0001
                           name: 'Sara Student'
+                        evidence_documents:
+                          - id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                            type: transcript
+                            original_filename: transcript.pdf
+                            download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                     items:
                       type: object
                       properties:
@@ -30836,9 +30913,9 @@ paths:
                             official_transcript_document_ids:
                               type: array
                               example:
-                                - 41
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                               items:
-                                type: integer
+                                type: string
                         student_note:
                           type: string
                           example: 'Prior E-JUST study evidence.'
@@ -31027,6 +31104,28 @@ paths:
                             name:
                               type: string
                               example: 'Sara Student'
+                        evidence_documents:
+                          type: array
+                          example:
+                            - id: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                              type: transcript
+                              original_filename: transcript.pdf
+                              download_url: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: 01ARZ3NDEKTSV4RRFFQ69G5FAW
+                              type:
+                                type: string
+                                example: transcript
+                              original_filename:
+                                type: string
+                                example: transcript.pdf
+                              download_url:
+                                type: string
+                                example: /api/v1/credit-decisions/waiver-requests/1/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAW
                   links:
                     type: object
                     properties:
@@ -31193,7 +31292,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Approved
                     revision: 1
@@ -31303,9 +31402,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'
@@ -31515,10 +31614,85 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/credit-decisions/waiver-requests/evidence-documents:
+    get:
+      summary: 'My Waiver transcript evidence.'
+      operationId: myWaiverTranscriptEvidence
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                      type: transcript
+                      original_filename: transcript.pdf
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                        type: transcript
+                        original_filename: transcript.pdf
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                        type:
+                          type: string
+                          example: transcript
+                        original_filename:
+                          type: string
+                          example: transcript.pdf
+      tags:
+        - Waivers
+      security: []
+  '/api/v1/credit-decisions/waiver-requests/{waiver_request_id}/evidence-documents/{document}':
+    get:
+      summary: 'Open Waiver transcript evidence.'
+      operationId: openWaiverTranscriptEvidence
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - Waivers
+      security: []
+    parameters:
+      -
+        in: path
+        name: waiver_request_id
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: document
+        description: 'The opaque document ULID.'
+        example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+        required: true
+        schema:
+          type: string
   /api/v1/credit-decisions/waiver-requests/targets:
     get:
-      summary: 'Courses in my bound Curriculum that can be targeted by a Waiver.'
-      operationId: coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver
+      summary: 'My Waiver targets.'
+      operationId: myWaiverTargets
       description: ''
       parameters: []
       responses:
@@ -31568,8 +31742,8 @@ paths:
       security: []
   /api/v1/credit-decisions/waiver-requests/prior-results:
     get:
-      summary: 'My qualifying prior E-JUST results recorded in PRS.'
-      operationId: myQualifyingPriorEJUSTResultsRecordedInPRS
+      summary: 'My qualifying PRS results.'
+      operationId: myQualifyingPRSResults
       description: "Only earned results whose Course is level 400 or above are offered. The earned\nflag is the authoritative Grading-owned C+-or-higher classification."
       parameters: []
       responses:
@@ -31749,7 +31923,7 @@ paths:
                         course_id: 8
                         letter_grade: C+
                         official_transcript_document_ids:
-                          - 41
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                       student_note: 'Prior E-JUST study evidence.'
                       status: Approved
                       revision: 1
@@ -31836,7 +32010,7 @@ paths:
                           course_id: 8
                           letter_grade: C+
                           official_transcript_document_ids:
-                            - 41
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                         student_note: 'Prior E-JUST study evidence.'
                         status: Approved
                         revision: 1
@@ -31946,9 +32120,9 @@ paths:
                             official_transcript_document_ids:
                               type: array
                               example:
-                                - 41
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                               items:
-                                type: integer
+                                type: string
                         student_note:
                           type: string
                           example: 'Prior E-JUST study evidence.'
@@ -32203,7 +32377,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Draft
                     revision: 1
@@ -32292,9 +32466,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'
@@ -32448,11 +32622,11 @@ paths:
                       nullable: true
                     official_transcript_document_ids:
                       type: array
-                      description: 'Must be at least 1.'
+                      description: 'Owned official transcript ULIDs for a legacy result.'
                       example:
-                        - 35
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                       items:
-                        type: integer
+                        type: string
                   required:
                     - source
                     - institution
@@ -32575,7 +32749,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Approved
                     revision: 1
@@ -32685,9 +32859,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'
@@ -32893,7 +33067,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Approved
                     revision: 1
@@ -33003,9 +33177,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'
@@ -33219,11 +33393,11 @@ paths:
                       nullable: true
                     official_transcript_document_ids:
                       type: array
-                      description: 'Must be at least 1.'
+                      description: 'Owned official transcript ULIDs for a legacy result.'
                       example:
-                        - 35
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                       items:
-                        type: integer
+                        type: string
                 student_note:
                   type: string
                   description: 'Revised Student explanation.'
@@ -33264,7 +33438,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Approved
                     revision: 1
@@ -33374,9 +33548,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'
@@ -33605,7 +33779,7 @@ paths:
                       course_id: 8
                       letter_grade: C+
                       official_transcript_document_ids:
-                        - 41
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                     student_note: 'Prior E-JUST study evidence.'
                     status: Approved
                     revision: 1
@@ -33715,9 +33889,9 @@ paths:
                           official_transcript_document_ids:
                             type: array
                             example:
-                              - 41
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAW
                             items:
-                              type: integer
+                              type: string
                       student_note:
                         type: string
                         example: 'Prior E-JUST study evidence.'

@@ -33,9 +33,8 @@ import {
   useDepartmentHeadWaiverQueue,
   useScopedDepartmentHeadVerification,
 } from '../../../shared/api/generated/endpoints'
-// Ticket05 will move these shared credit-decision helpers; retarget these imports then.
-import { downloadBlob } from '../exemptions/downloadBlob'
-import { useRetryStableActionId } from '../exemptions/useRetryStableActionId'
+import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import { headVerificationSchema, waiverReviewSchema, type WaiverReviewValues } from './formSchema'
 import type { ReviewerWaiverRequestRow } from './types'
 import { WaiverEvidenceSummary } from './WaiverEvidenceSummary'
@@ -96,8 +95,8 @@ export function WaiverReviewQueuePage({ stage }: { stage: WaiverReviewStage }) {
       </Stack>
       {query.isPending && (
         <Stack spacing={2} aria-label={t('waivers.loading')}>
-          <Skeleton variant="rounded" height={230} />
-          <Skeleton variant="rounded" height={230} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(29) })} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(29) })} />
         </Stack>
       )}
       {query.isError && (
@@ -242,6 +241,7 @@ function ReviewCard({
         </Stack>
         <WaiverEvidenceSummary
           evidence={row.evidence}
+          evidenceDocuments={row.evidence_documents}
           priorCourseCode={row.prior_course_code}
           priorCourseLevel={row.prior_course_level}
         />
@@ -296,7 +296,7 @@ function ReviewCard({
         {failed && <Alert severity="error">{t('waivers.actionError')}</Alert>}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
           <Button
-            variant="contained"
+            variant="outlined"
             disabled={pending || (stage === 'departmentHead' && !form.formState.isValid)}
             onClick={() =>
               void act(
@@ -315,7 +315,7 @@ function ReviewCard({
           </Button>
           <Button
             color="error"
-            variant="contained"
+            variant="outlined"
             startIcon={<BlockIcon />}
             disabled={pending}
             onClick={() => setConfirmReject(true)}
@@ -333,6 +333,7 @@ function ReviewCard({
             <Button
               color="error"
               variant="contained"
+              startIcon={<BlockIcon />}
               onClick={() => {
                 setConfirmReject(false)
                 void act('reject')

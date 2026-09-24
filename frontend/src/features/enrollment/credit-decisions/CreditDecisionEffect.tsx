@@ -1,5 +1,5 @@
 import { Alert, Stack, Typography } from '@mui/material'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 
 type Revocation = {
   revoked_by_user_id?: number | null
@@ -16,7 +16,7 @@ export function CreditDecisionEffect({
   revocation?: unknown
   children: React.ReactNode
 }) {
-  const { t } = useTranslation('enrollment')
+  const { t, i18n } = useTranslation('enrollment')
   const revoked = (revocation ?? null) as Revocation | null
 
   if (effective !== false || revoked === null) {
@@ -31,17 +31,20 @@ export function CreditDecisionEffect({
         </Typography>
         <Typography component="span">{revoked.reason}</Typography>
         <Typography component="span" variant="caption">
-          {t('creditDecisions.revokedBy')} <bdi dir="ltr">{revoked.revoked_by_user_id}</bdi>
-          {' · '}
-          {t('creditDecisions.revokedAt')}{' '}
-          <bdi dir="ltr">
-            {revoked.created_at
-              ? new Intl.DateTimeFormat('en-GB', {
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                }).format(new Date(revoked.created_at))
-              : ''}
-          </bdi>
+          <Trans
+            t={t}
+            i18nKey="creditDecisions.revokedMeta"
+            values={{
+              actor: revoked.revoked_by_user_id,
+              date: revoked.created_at
+                ? new Intl.DateTimeFormat(
+                    i18n.language.startsWith('ar') ? 'ar-EG-u-nu-latn' : 'en-GB-u-nu-latn',
+                    { dateStyle: 'medium', timeStyle: 'short' },
+                  ).format(new Date(revoked.created_at))
+                : '',
+            }}
+            components={{ actor: <bdi dir="ltr" />, date: <bdi dir="ltr" /> }}
+          />
         </Typography>
       </Stack>
     </Alert>

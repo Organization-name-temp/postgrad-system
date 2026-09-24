@@ -5287,7 +5287,7 @@ export const DepartmentHeadManualExemptionQueueQueryParams = zod.object({
   "sort": zod.string().optional(),
   "page": zod.number().optional(),
   "per_page": zod.number().optional().describe('Capped at 100.'),
-  "include_decided": zod.boolean().optional().describe('Include approved decision history for revocation.')
+  "include_decided": zod.boolean().optional().describe('Include approved, revoked, and rejected decision history.')
 })
 
 export const DepartmentHeadManualExemptionQueueResponse = zod.object({
@@ -6447,7 +6447,7 @@ export const CouncilTransferQueueQueryParams = zod.object({
   "sort": zod.string().optional(),
   "page": zod.number().optional(),
   "per_page": zod.number().optional().describe('Capped at 100.'),
-  "include_decided": zod.boolean().optional().describe('Include approved decision history for revocation.')
+  "include_decided": zod.boolean().optional().describe('Include approved, revoked, and rejected decision history.')
 })
 
 export const CouncilTransferQueueResponse = zod.object({

@@ -5720,7 +5720,7 @@ page?: number;
  */
 per_page?: number;
 /**
- * Include approved decision history for revocation.
+ * Include approved, revoked, and rejected decision history.
  */
 include_decided?: boolean;
 };
@@ -7124,7 +7124,7 @@ page?: number;
  */
 per_page?: number;
 /**
- * Include approved decision history for revocation.
+ * Include approved, revoked, and rejected decision history.
  */
 include_decided?: boolean;
 };

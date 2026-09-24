@@ -126,7 +126,7 @@ class TransferReviewController
      * @queryParam sort string Example: submitted_at
      * @queryParam page integer Example: 1
      * @queryParam per_page integer Capped at 100. Example: 25
-     * @queryParam include_decided boolean Include approved decision history for revocation. Example: true
+     * @queryParam include_decided boolean Include approved, revoked, and rejected decision history. Example: true
      */
     #[ResponseAttribute(content: TransferResponseExamples::LIST)]
     public function councilQueue(Request $request, StudentDirectory $students, Directory $directory): AnonymousResourceCollection

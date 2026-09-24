@@ -19597,12 +19597,12 @@ paths:
         -
           in: query
           name: include_decided
-          description: 'Include approved decision history for revocation.'
+          description: 'Include approved, revoked, and rejected decision history.'
           example: true
           required: false
           schema:
             type: boolean
-            description: 'Include approved decision history for revocation.'
+            description: 'Include approved, revoked, and rejected decision history.'
             example: true
       responses:
         200:
@@ -25389,12 +25389,12 @@ paths:
         -
           in: query
           name: include_decided
-          description: 'Include approved decision history for revocation.'
+          description: 'Include approved, revoked, and rejected decision history.'
           example: true
           required: false
           schema:
             type: boolean
-            description: 'Include approved decision history for revocation.'
+            description: 'Include approved, revoked, and rejected decision history.'
             example: true
       responses:
         200:

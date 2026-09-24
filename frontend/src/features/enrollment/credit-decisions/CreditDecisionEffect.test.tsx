@@ -35,4 +35,24 @@ describe('CreditDecisionEffect', () => {
     expect(screen.getByText(/24 Sept 2026/)).toHaveAttribute('dir', 'ltr')
     expect(screen.queryByText('Recognized for 3 CH')).not.toBeInTheDocument()
   })
+
+  it('keeps attributed identifiers and dates in Western digits inside Arabic copy', async () => {
+    await i18n.changeLanguage('ar')
+    render(
+      <CreditDecisionEffect
+        effective={false}
+        revocation={{
+          reason: 'تصحيح السجل.',
+          revoked_by_user_id: 9,
+          created_at: '2026-09-24T10:00:00+00:00',
+        }}
+      >
+        معتمد
+      </CreditDecisionEffect>,
+    )
+
+    expect(screen.getByText('9')).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByText(/2026/)).toHaveAttribute('dir', 'ltr')
+    expect(screen.queryByText(/[٠-٩]/)).not.toBeInTheDocument()
+  })
 })

@@ -1056,8 +1056,7 @@ export const ar = {
   enrollment: {
     creditDecisions: {
       revoked: 'تم إلغاء القرار',
-      revokedBy: 'سُجّل بواسطة المستخدم',
-      revokedAt: 'في',
+      revokedMeta: 'سُجّل بواسطة المستخدم <actor>{{actor}}</actor> في <date>{{date}}</date>.',
       revoke: 'إلغاء القرار',
       revokeConfirm: 'هل تريد إلغاء هذا القرار الساري؟ سيظل القرار الأصلي وسجل مراجعته محفوظين.',
       confirmRevoke: 'إلغاء القرار',

@@ -93,7 +93,7 @@ class ExemptionReviewController
      * @queryParam sort string Example: submitted_at
      * @queryParam page integer Example: 1
      * @queryParam per_page integer Capped at 100. Example: 25
-     * @queryParam include_decided boolean Include approved decision history for revocation. Example: true
+     * @queryParam include_decided boolean Include approved, revoked, and rejected decision history. Example: true
      */
     #[ResponseAttribute(content: ManualExemptionResponseExamples::DEPARTMENT_HEAD_QUEUE)]
     #[ResponseFieldAttribute(name: 'data.decision', type: 'object', description: 'The immutable effective decision when the request was approved.', required: false, nullable: true)]

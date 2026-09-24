@@ -153,7 +153,7 @@ final class TransferWorkflow
             $this->assertEvidenceDocuments($student, $locked->document_ids);
             $this->targetEntry($student, $locked->target_course_id);
             $this->assertNoEffectiveDecision($locked);
-            $this->assertNoFailedTargetAttempt($locked);
+            $this->assertNoCompletedTargetAttempt($locked);
             $from = $locked->status;
             $locked->update([
                 'status' => TransferRequestStatus::PendingAdvisor,
@@ -400,10 +400,10 @@ final class TransferWorkflow
         }
     }
 
-    private function assertNoFailedTargetAttempt(TransferRequest $request): void
+    private function assertNoCompletedTargetAttempt(TransferRequest $request): void
     {
-        if ($this->attempts->hasFailed($request->student_id, $request->target_course_id)) {
-            throw new ConflictHttpException(__('credit_decisions.transfer.target_failed_attempt'));
+        if ($this->attempts->hasCompleted($request->student_id, $request->target_course_id)) {
+            throw new ConflictHttpException(__('credit_decisions.transfer.target_attempt_exists'));
         }
     }
 

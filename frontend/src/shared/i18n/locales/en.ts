@@ -1116,7 +1116,8 @@ export const en = {
   enrollment: {
     creditDecisions: {
       revoked: 'Decision revoked',
-      revokedMeta: 'Recorded {{date}} by user {{actor}}.',
+      revokedBy: 'Recorded by user',
+      revokedAt: 'on',
       revoke: 'Revoke decision',
       revokeConfirm:
         'Revoke this effective decision? The original decision and its review history will remain on record.',

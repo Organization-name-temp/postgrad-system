@@ -31,7 +31,8 @@ describe('CreditDecisionEffect', () => {
 
     expect(screen.getByText('Decision revoked')).toBeInTheDocument()
     expect(screen.getByText('Corrected source transcript.')).toBeInTheDocument()
-    expect(screen.getByText(/user 9/)).toBeInTheDocument()
+    expect(screen.getByText('9')).toHaveAttribute('dir', 'ltr')
+    expect(screen.getByText(/24 Sept 2026/)).toHaveAttribute('dir', 'ltr')
     expect(screen.queryByText('Recognized for 3 CH')).not.toBeInTheDocument()
   })
 })

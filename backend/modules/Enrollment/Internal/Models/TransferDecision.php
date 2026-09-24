@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Modules\Catalog\Public\Enums\CourseCategory;
+use Modules\Enrollment\Internal\Enums\CreditDecisionType;
 
 /**
  * One immutable effective Transfer decision. It recognizes a target Curriculum Course
@@ -78,7 +79,7 @@ class TransferDecision extends Model
     public function revocation(): HasOne
     {
         return $this->hasOne(CreditDecisionRevocation::class, 'decision_id')
-            ->where('decision_type', 'transfer');
+            ->where('decision_type', CreditDecisionType::Transfer->value);
     }
 
     /** @param Builder<TransferDecision> $query */

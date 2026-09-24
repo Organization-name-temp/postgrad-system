@@ -174,8 +174,9 @@ class DepartmentHeadReviewController
         );
         $affectedStudentIds = collect($affectedEnrollments)
             ->pluck('studentId')->map(fn ($id): int => (int) $id)->unique()->sort()->values()->all();
+        $finalizedEnrollmentIds = $gradeSheet->grades->pluck('enrollment_id')->map(fn ($id): int => (int) $id)->all();
 
-        DB::transaction(function () use ($gradeSheet, $enrollments, $threshold, $actorId, &$auditChanges, $audit, $studentGuard, $affectedStudentIds): void {
+        DB::transaction(function () use ($gradeSheet, $enrollments, $threshold, $actorId, &$auditChanges, $audit, $studentGuard, $affectedStudentIds, $finalizedEnrollmentIds): void {
             // Identity-first locks serialize Grade finalization with credit approval and
             // final termination for every Student affected by this Sheet.
             foreach ($affectedStudentIds as $studentId) {
@@ -240,11 +241,14 @@ class DepartmentHeadReviewController
                     subjectId: (string) $gradeSheet->getKey(),
                 );
             }
+
+            // Eligibility invalidation is part of the same database commit as the Grade
+            // outcome. Its listener is retry-safe, but no stale review window is exposed if
+            // a notification, audit write, or transition append fails.
+            Event::dispatch(new GradeOutcomesFinalized((int) $gradeSheet->getKey(), $finalizedEnrollmentIds));
         });
 
-        $finalizedEnrollmentIds = $gradeSheet->grades->pluck('enrollment_id')->map(fn ($id): int => (int) $id)->all();
         Event::dispatch(new GradeFinalized((int) $gradeSheet->getKey(), $finalizedEnrollmentIds));
-        Event::dispatch(new GradeOutcomesFinalized((int) $gradeSheet->getKey(), $finalizedEnrollmentIds));
 
         return response()->json(['data' => ['sheet' => $this->sheetArray($gradeSheet)]]);
     }

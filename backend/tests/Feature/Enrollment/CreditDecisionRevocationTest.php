@@ -132,6 +132,9 @@ it('lets Council append a reasoned Transfer revocation without rewriting the dec
         'student_id' => $student->id,
         'reason' => 'The source institution corrected its transcript.',
     ]);
+    $this->getJson('/api/v1/credit-decisions/transfer-requests/council-queue?include_decided=true')
+        ->assertOk()
+        ->assertJsonPath('data.0.decision.effective', false);
 });
 
 it('requires Council authority and a reason and never appends a second revocation', function () {
@@ -193,6 +196,9 @@ it('lets only the scoped Department Head revoke an Exemption decision', function
     ])->assertOk()
         ->assertJsonPath('data.effective', false)
         ->assertJsonPath('data.revocation.revoked_by_user_id', $scopedHead->id);
+    $this->getJson('/api/v1/credit-decisions/exemption-requests/department-head-queue?include_decided=true')
+        ->assertOk()
+        ->assertJsonPath('data', []);
 });
 
 it('lets Council revoke a Waiver decision while preserving its request and evidence', function () {
@@ -245,6 +251,19 @@ it('lets Council revoke a Waiver decision while preserving its request and evide
         'reason' => 'Coverage verification was corrected.',
     ])->assertOk()->assertJsonPath('data.effective', false);
 
+    WaiverRequest::query()->create([
+        ...$request->only([
+            'student_id', 'curriculum_version_id', 'target_course_id', 'target_course_code',
+            'credit_hours', 'prior_course_id', 'prior_course_code', 'prior_course_level',
+            'prior_result_source', 'prior_letter_grade', 'evidence', 'submitted_at',
+        ]),
+        'status' => WaiverRequestStatus::Rejected,
+        'revision' => 1,
+    ]);
+    $this->getJson('/api/v1/credit-decisions/waiver-requests/council-queue?include_decided=true')
+        ->assertOk()
+        ->assertJsonCount(2, 'data');
+
     expect($request->fresh()->evidence)->toBe(['document_ids' => ['immutable-document']])
         ->and($request->fresh()->status)->toBe(WaiverRequestStatus::Approved)
         ->and(WaiverDecision::query()->find($decision->id))->not->toBeNull();
@@ -290,6 +309,49 @@ it('idempotently rejects an in-review Transfer when a failed Grade becomes effec
         ->and(Notification::query()->where('user_id', $student->advisor_id)->where('type', 'transfer.request_decided')->count())->toBe(1);
 });
 
+it('idempotently rejects an in-review Waiver and notifies its current Council reviewers', function () {
+    [$student, $council, $course] = revocationWorld();
+    $priorCourse = Course::factory()->create([
+        'department_id' => $course->department_id,
+        'code' => 'REV-402',
+    ]);
+    $request = WaiverRequest::query()->create([
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $course->id,
+        'target_course_code' => $course->code,
+        'credit_hours' => 3,
+        'prior_course_id' => $priorCourse->id,
+        'prior_course_code' => $priorCourse->code,
+        'prior_course_level' => 400,
+        'prior_result_source' => 'legacy_transcript',
+        'prior_letter_grade' => 'A',
+        'evidence' => ['document_ids' => ['immutable-document']],
+        'status' => WaiverRequestStatus::PendingCouncil,
+        'revision' => 1,
+        'submitted_at' => now(),
+        'coverage_percentage' => 90,
+        'equivalency_note' => 'Verified.',
+        'verified_by' => $council->id,
+        'verified_at' => now(),
+    ]);
+    $offering = CourseOffering::factory()->create(['course_id' => $course->id]);
+    $enrollment = Enrollment::factory()->create([
+        'student_id' => $student->id,
+        'course_offering_id' => $offering->id,
+        'classification' => EnrollmentClassification::Core,
+        'earned' => false,
+    ]);
+
+    Event::dispatch(new GradeOutcomesFinalized(78, [$enrollment->id]));
+    Event::dispatch(new GradeOutcomesFinalized(78, [$enrollment->id]));
+
+    expect($request->fresh()->status)->toBe(WaiverRequestStatus::Rejected)
+        ->and($request->transitions()->where('action', 'system_rejected_failed_attempt')->count())->toBe(1)
+        ->and(Notification::query()->where('user_id', $student->user_id)->where('type', 'waiver.request_decided')->count())->toBe(1)
+        ->and(Notification::query()->where('user_id', $council->id)->where('type', 'waiver.request_decided')->count())->toBe(1);
+});
+
 it('frees Transfer hours and requires a replacement to complete a new workflow', function () {
     [$student, $council, $course, $decision] = revocationWorld();
     Sanctum::actingAs($council);
@@ -329,7 +391,7 @@ it('frees Transfer hours and requires a replacement to complete a new workflow',
         ->toBe('Replacement University');
 });
 
-it('rejects a new Transfer submission after an effective failed Attempt', function () {
+it('rejects a new Transfer submission after any effective completed Attempt', function (bool $earned) {
     [$student, $council, $course, $decision] = revocationWorld();
     Sanctum::actingAs($council);
     $this->postJson("/api/v1/credit-decisions/transfers/{$decision->id}/revoke", [
@@ -355,7 +417,7 @@ it('rejects a new Transfer submission after an effective failed Attempt', functi
         'student_id' => $student->id,
         'course_offering_id' => $offering->id,
         'classification' => EnrollmentClassification::Core,
-        'earned' => false,
+        'earned' => $earned,
     ]);
     Sanctum::actingAs($student->user);
     $draftId = $this->postJson('/api/v1/credit-decisions/transfer-requests', [
@@ -371,5 +433,5 @@ it('rejects a new Transfer submission after an effective failed Attempt', functi
     $this->postJson("/api/v1/credit-decisions/transfer-requests/{$draftId}/submit", [
         'expected_revision' => 1,
         'action_id' => '72727272-7272-4272-8272-727272727272',
-    ])->assertConflict()->assertJsonPath('message', __('credit_decisions.transfer.target_failed_attempt'));
-});
+    ])->assertConflict()->assertJsonPath('message', __('credit_decisions.transfer.target_attempt_exists'));
+})->with([false, true]);

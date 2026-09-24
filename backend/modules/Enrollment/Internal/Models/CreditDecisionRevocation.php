@@ -4,12 +4,13 @@ namespace Modules\Enrollment\Internal\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Modules\Enrollment\Internal\Enums\CreditDecisionType;
 
 /**
  * Append-only fact that ends one immutable credit decision's academic effect.
  *
  * @property int $id
- * @property string $decision_type
+ * @property CreditDecisionType $decision_type
  * @property int $decision_id
  * @property int $student_id
  * @property int $target_course_id
@@ -39,6 +40,7 @@ class CreditDecisionRevocation extends Model
     protected function casts(): array
     {
         return [
+            'decision_type' => CreditDecisionType::class,
             'decision_id' => 'integer', 'student_id' => 'integer',
             'target_course_id' => 'integer', 'revoked_by_user_id' => 'integer',
             'created_at' => 'datetime',

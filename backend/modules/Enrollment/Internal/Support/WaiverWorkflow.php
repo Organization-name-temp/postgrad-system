@@ -281,7 +281,6 @@ final class WaiverWorkflow
             if ($action === 'approve') {
                 $this->assertNoEffectiveDecision($locked->student_id, $locked->target_course_id);
                 $this->assertNoTargetAttempt($student->studentId, $locked->target_course_id);
-                $this->assertNoTargetAttempt($locked->student_id, $locked->target_course_id);
                 WaiverDecision::query()->create([
                     'waiver_request_id' => $locked->getKey(), 'student_id' => $locked->student_id,
                     'curriculum_version_id' => $locked->curriculum_version_id,

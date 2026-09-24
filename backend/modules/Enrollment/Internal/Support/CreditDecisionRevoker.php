@@ -5,6 +5,7 @@ namespace Modules\Enrollment\Internal\Support;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Modules\Catalog\Public\CourseCatalog;
+use Modules\Enrollment\Internal\Enums\CreditDecisionType;
 use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
@@ -34,7 +35,7 @@ final class CreditDecisionRevoker
         abort_unless($this->directory->hasRole($actorUserId, Role::Council), 403);
 
         /** @var TransferDecision */
-        return $this->revoke('transfer', $decision, $actorUserId, $reason);
+        return $this->revoke(CreditDecisionType::Transfer, $decision, $actorUserId, $reason);
     }
 
     public function waiver(WaiverDecision $decision, int $actorUserId, string $reason): WaiverDecision
@@ -42,7 +43,7 @@ final class CreditDecisionRevoker
         abort_unless($this->directory->hasRole($actorUserId, Role::Council), 403);
 
         /** @var WaiverDecision */
-        return $this->revoke('waiver', $decision, $actorUserId, $reason);
+        return $this->revoke(CreditDecisionType::Waiver, $decision, $actorUserId, $reason);
     }
 
     public function exemption(ExemptionDecision $decision, int $actorUserId, string $reason): ExemptionDecision
@@ -55,7 +56,7 @@ final class CreditDecisionRevoker
         );
 
         /** @var ExemptionDecision */
-        return $this->revoke('exemption', $decision, $actorUserId, $reason);
+        return $this->revoke(CreditDecisionType::Exemption, $decision, $actorUserId, $reason);
     }
 
     /**
@@ -64,7 +65,7 @@ final class CreditDecisionRevoker
      * @param  T  $decision
      * @return T
      */
-    private function revoke(string $type, Model $decision, int $actorUserId, string $reason): Model
+    private function revoke(CreditDecisionType $type, Model $decision, int $actorUserId, string $reason): Model
     {
         return DB::transaction(function () use ($type, $decision, $actorUserId, $reason): Model {
             $student = $this->students->lock((int) $decision->getAttribute('student_id'));
@@ -73,14 +74,14 @@ final class CreditDecisionRevoker
             /** @var Model $locked */
             $locked = $decision->newQuery()->lockForUpdate()->findOrFail($decision->getKey());
             if (CreditDecisionRevocation::query()
-                ->where('decision_type', $type)
+                ->where('decision_type', $type->value)
                 ->where('decision_id', $locked->getKey())
                 ->exists()) {
                 throw new ConflictHttpException(__('credit_decisions.revocation.already_revoked'));
             }
 
             $revocation = CreditDecisionRevocation::query()->create([
-                'decision_type' => $type,
+                'decision_type' => $type->value,
                 'decision_id' => $locked->getKey(),
                 'student_id' => $student->studentId,
                 'target_course_id' => (int) $locked->getAttribute('target_course_id'),
@@ -89,7 +90,7 @@ final class CreditDecisionRevoker
                 'created_at' => now(),
             ]);
             $payload = [
-                'decision_type' => $type,
+                'decision_type' => $type->value,
                 'decision_id' => (int) $locked->getKey(),
                 'target_course_code' => (string) $locked->getAttribute('target_course_code'),
                 'reason' => $reason,
@@ -110,7 +111,7 @@ final class CreditDecisionRevoker
                 action: 'credit_decision.revoked',
                 actorUserId: $actorUserId,
                 metadata: [...$payload, 'revocation_id' => $revocation->id],
-                subjectType: $type.'_decision',
+                subjectType: $type->value.'_decision',
                 subjectId: (string) $locked->getKey(),
             );
 

@@ -352,7 +352,8 @@ function TransferReviewCard({
             </Button>
           </Stack>
         ) : (
-          row.decision?.effective !== false && (
+          row.decision &&
+          row.decision.effective !== false && (
             <Button
               color="error"
               variant="outlined"

@@ -16,7 +16,7 @@ export function CreditDecisionEffect({
   revocation?: unknown
   children: React.ReactNode
 }) {
-  const { t, i18n } = useTranslation('enrollment')
+  const { t } = useTranslation('enrollment')
   const revoked = (revocation ?? null) as Revocation | null
 
   if (effective !== false || revoked === null) {
@@ -31,15 +31,17 @@ export function CreditDecisionEffect({
         </Typography>
         <Typography component="span">{revoked.reason}</Typography>
         <Typography component="span" variant="caption">
-          {t('creditDecisions.revokedMeta', {
-            actor: revoked.revoked_by_user_id,
-            date: revoked.created_at
-              ? new Intl.DateTimeFormat(i18n.language, {
+          {t('creditDecisions.revokedBy')} <bdi dir="ltr">{revoked.revoked_by_user_id}</bdi>
+          {' · '}
+          {t('creditDecisions.revokedAt')}{' '}
+          <bdi dir="ltr">
+            {revoked.created_at
+              ? new Intl.DateTimeFormat('en-GB', {
                   dateStyle: 'medium',
                   timeStyle: 'short',
                 }).format(new Date(revoked.created_at))
-              : '',
-          })}
+              : ''}
+          </bdi>
         </Typography>
       </Stack>
     </Alert>

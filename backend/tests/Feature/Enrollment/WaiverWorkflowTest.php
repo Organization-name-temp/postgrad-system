@@ -175,9 +175,9 @@ it('takes a qualifying prior E-JUST result through Advisor Head and Council to a
         ->and(app(WaiverDecisions::class)->effectiveForStudent((int) $student->id)[0]->creditHours)
         ->toBe(3);
 
-    expect(fn () => WaiverDecision::query()->findOrFail($id)->update(['credit_hours' => 4]))
+    expect(fn () => WaiverDecision::query()->where('waiver_request_id', $id)->firstOrFail()->update(['credit_hours' => 4]))
         ->toThrow(LogicException::class, 'Effective Waiver decisions are immutable.')
-        ->and(fn () => WaiverDecision::query()->findOrFail($id)->delete())
+        ->and(fn () => WaiverDecision::query()->where('waiver_request_id', $id)->firstOrFail()->delete())
         ->toThrow(LogicException::class, 'Effective Waiver decisions are immutable.')
         ->and(fn () => WaiverRequestTransition::query()->where('waiver_request_id', $id)->firstOrFail()->update(['reason' => 'rewritten']))
         ->toThrow(LogicException::class, 'Waiver request transitions are append-only.')

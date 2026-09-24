@@ -200,7 +200,7 @@ class ExemptionReviewController
     {
         return CollectionQuery::from(
             $request->query(),
-            knownFilters: ['target_course_id', 'student_id', 'national_id'],
+            knownFilters: ['target_course_id', 'student_id', 'national_id', 'include_decided'],
             readableFilters: ['target_course_id', 'student_id'],
             sortable: ['id', 'target_course_code', 'submitted_at', 'created_at', 'updated_at'],
             stableKey: 'id',
@@ -212,7 +212,7 @@ class ExemptionReviewController
     private function departmentHeadScopedQuery(int $actorId, CourseCatalog $courses, DepartmentHeadAssignments $heads, bool $includeDecided = false): Builder
     {
         $statuses = $includeDecided
-            ? [ExemptionRequestStatus::PendingDepartmentHead, ExemptionRequestStatus::Approved]
+            ? [ExemptionRequestStatus::PendingDepartmentHead, ExemptionRequestStatus::Approved, ExemptionRequestStatus::Rejected]
             : [ExemptionRequestStatus::PendingDepartmentHead];
         $candidateCourseIds = ExemptionRequest::query()->whereIn('status', $statuses)->distinct()->pluck('target_course_id')->map(fn ($id): int => (int) $id)->all();
         $courseSummaries = $courses->findMany($candidateCourseIds);

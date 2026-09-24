@@ -132,7 +132,7 @@ class TransferReviewController
     public function councilQueue(Request $request, StudentDirectory $students, Directory $directory): AnonymousResourceCollection
     {
         $statuses = $request->boolean('include_decided')
-            ? [TransferRequestStatus::PendingCouncil, TransferRequestStatus::Approved]
+            ? [TransferRequestStatus::PendingCouncil, TransferRequestStatus::Approved, TransferRequestStatus::Rejected]
             : [TransferRequestStatus::PendingCouncil];
 
         return $this->list($request, TransferRequest::query()->whereIn('status', $statuses), $students, $directory);
@@ -230,7 +230,7 @@ class TransferReviewController
     {
         return CollectionQuery::from(
             $request->query(),
-            knownFilters: ['target_course_id', 'student_id', 'normalized_grade', 'national_id'],
+            knownFilters: ['target_course_id', 'student_id', 'normalized_grade', 'national_id', 'include_decided'],
             readableFilters: ['target_course_id', 'student_id', 'normalized_grade'],
             sortable: ['id', 'target_course_code', 'external_institution', 'normalized_grade', 'submitted_at', 'created_at', 'updated_at'],
             integerFilters: ['target_course_id', 'student_id'],

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
+use Modules\Enrollment\Internal\Enums\CreditDecisionType;
 use Modules\Enrollment\Internal\Enums\ExemptionSource;
 
 /**
@@ -79,7 +80,7 @@ class ExemptionDecision extends Model
     public function revocation(): HasOne
     {
         return $this->hasOne(CreditDecisionRevocation::class, 'decision_id')
-            ->where('decision_type', 'exemption');
+            ->where('decision_type', CreditDecisionType::Exemption->value);
     }
 
     /** @param Builder<ExemptionDecision> $query */

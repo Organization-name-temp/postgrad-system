@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use Modules\Enrollment\Internal\Enums\CreditDecisionType;
 
 /**
  * @property int $id
@@ -63,7 +64,7 @@ class WaiverDecision extends Model
     public function revocation(): HasOne
     {
         return $this->hasOne(CreditDecisionRevocation::class, 'decision_id')
-            ->where('decision_type', 'waiver');
+            ->where('decision_type', CreditDecisionType::Waiver->value);
     }
 
     /** @param Builder<WaiverDecision> $query */

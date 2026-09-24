@@ -29191,16 +29191,6 @@ paths:
             type: integer
             description: 'Capped at 100.'
             example: 25
-        -
-          in: query
-          name: include_decided
-          description: 'Include approved decision history for revocation.'
-          example: true
-          required: false
-          schema:
-            type: boolean
-            description: 'Include approved decision history for revocation.'
-            example: true
       responses:
         200:
           description: ''
@@ -31291,6 +31281,16 @@ paths:
             type: integer
             description: 'Capped at 100.'
             example: 25
+        -
+          in: query
+          name: include_decided
+          description: 'Include approved, revoked, and rejected decision history.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Include approved, revoked, and rejected decision history.'
+            example: true
       responses:
         200:
           description: ''

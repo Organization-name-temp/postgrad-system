@@ -8127,10 +8127,6 @@ page?: number;
  * Capped at 100.
  */
 per_page?: number;
-/**
- * Include approved decision history for revocation.
- */
-include_decided?: boolean;
 };
 
 export type AdvisorWaiverQueue200DataItemEvidence = {
@@ -8761,6 +8757,10 @@ page?: number;
  * Capped at 100.
  */
 per_page?: number;
+/**
+ * Include approved, revoked, and rejected decision history.
+ */
+include_decided?: boolean;
 };
 
 export type CouncilWaiverQueue200DataItemEvidence = {

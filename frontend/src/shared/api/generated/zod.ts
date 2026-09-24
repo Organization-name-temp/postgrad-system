@@ -7339,8 +7339,7 @@ export const AdvisorWaiverQueueQueryParams = zod.object({
   "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
   "sort": zod.string().optional(),
   "page": zod.number().optional(),
-  "per_page": zod.number().optional().describe('Capped at 100.'),
-  "include_decided": zod.boolean().optional().describe('Include approved decision history for revocation.')
+  "per_page": zod.number().optional().describe('Capped at 100.')
 })
 
 export const AdvisorWaiverQueueResponse = zod.object({
@@ -7806,7 +7805,8 @@ export const CouncilWaiverQueueQueryParams = zod.object({
   "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
   "sort": zod.string().optional(),
   "page": zod.number().optional(),
-  "per_page": zod.number().optional().describe('Capped at 100.')
+  "per_page": zod.number().optional().describe('Capped at 100.'),
+  "include_decided": zod.boolean().optional().describe('Include approved, revoked, and rejected decision history.')
 })
 
 export const CouncilWaiverQueueResponse = zod.object({

@@ -22908,7 +22908,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       student_note: 'Equivalent syllabus attached.'
                       normalized_grade: A
                       verified_by_user_id: 8
@@ -22940,7 +22940,7 @@ paths:
                             source_credit_hours: '4.00'
                             external_grade: Excellent
                             document_ids:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             student_note: 'Equivalent syllabus attached.'
                           review_snapshot:
                             normalized_grade: A
@@ -22962,7 +22962,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         normalized_grade: A
                         verified_by_user_id: 8
                         verified_at: '2026-09-01T10:00:00+00:00'
@@ -23000,7 +23000,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         student_note: 'Equivalent syllabus attached.'
                         normalized_grade: A
                         verified_by_user_id: 8
@@ -23032,7 +23032,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -23054,7 +23054,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           normalized_grade: A
                           verified_by_user_id: 8
                           verified_at: '2026-09-01T10:00:00+00:00'
@@ -23102,9 +23102,9 @@ paths:
                         document_ids:
                           type: array
                           example:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           items:
-                            type: integer
+                            type: string
                         student_note:
                           type: string
                           example: 'Equivalent syllabus attached.'
@@ -23168,7 +23168,7 @@ paths:
                                 source_credit_hours: '4.00'
                                 external_grade: Excellent
                                 document_ids:
-                                  - 91
+                                  - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                 student_note: 'Equivalent syllabus attached.'
                               review_snapshot:
                                 normalized_grade: A
@@ -23221,9 +23221,9 @@ paths:
                                   document_ids:
                                     type: array
                                     example:
-                                      - 91
+                                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                     items:
-                                      type: integer
+                                      type: string
                                   student_note:
                                     type: string
                                     example: 'Equivalent syllabus attached.'
@@ -23287,9 +23287,9 @@ paths:
                             document_ids:
                               type: array
                               example:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               items:
-                                type: integer
+                                type: string
                             normalized_grade:
                               type: string
                               example: A
@@ -23467,7 +23467,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -23499,7 +23499,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -23521,7 +23521,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -23570,9 +23570,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -23636,7 +23636,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -23690,9 +23690,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -23756,9 +23756,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -23912,7 +23912,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       student_note: 'Equivalent syllabus attached.'
                       normalized_grade: A
                       verified_by_user_id: 8
@@ -23944,7 +23944,7 @@ paths:
                             source_credit_hours: '4.00'
                             external_grade: Excellent
                             document_ids:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             student_note: 'Equivalent syllabus attached.'
                           review_snapshot:
                             normalized_grade: A
@@ -23966,7 +23966,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         normalized_grade: A
                         verified_by_user_id: 8
                         verified_at: '2026-09-01T10:00:00+00:00'
@@ -24004,7 +24004,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         student_note: 'Equivalent syllabus attached.'
                         normalized_grade: A
                         verified_by_user_id: 8
@@ -24036,7 +24036,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -24058,7 +24058,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           normalized_grade: A
                           verified_by_user_id: 8
                           verified_at: '2026-09-01T10:00:00+00:00'
@@ -24106,9 +24106,9 @@ paths:
                         document_ids:
                           type: array
                           example:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           items:
-                            type: integer
+                            type: string
                         student_note:
                           type: string
                           example: 'Equivalent syllabus attached.'
@@ -24172,7 +24172,7 @@ paths:
                                 source_credit_hours: '4.00'
                                 external_grade: Excellent
                                 document_ids:
-                                  - 91
+                                  - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                 student_note: 'Equivalent syllabus attached.'
                               review_snapshot:
                                 normalized_grade: A
@@ -24225,9 +24225,9 @@ paths:
                                   document_ids:
                                     type: array
                                     example:
-                                      - 91
+                                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                     items:
-                                      type: integer
+                                      type: string
                                   student_note:
                                     type: string
                                     example: 'Equivalent syllabus attached.'
@@ -24291,9 +24291,9 @@ paths:
                             document_ids:
                               type: array
                               example:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               items:
-                                type: integer
+                                type: string
                             normalized_grade:
                               type: string
                               example: A
@@ -24471,7 +24471,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -24503,7 +24503,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -24525,7 +24525,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -24574,9 +24574,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -24640,7 +24640,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -24694,9 +24694,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -24760,9 +24760,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -24920,7 +24920,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       student_note: 'Equivalent syllabus attached.'
                       normalized_grade: A
                       verified_by_user_id: 8
@@ -24952,7 +24952,7 @@ paths:
                             source_credit_hours: '4.00'
                             external_grade: Excellent
                             document_ids:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             student_note: 'Equivalent syllabus attached.'
                           review_snapshot:
                             normalized_grade: A
@@ -24974,7 +24974,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         normalized_grade: A
                         verified_by_user_id: 8
                         verified_at: '2026-09-01T10:00:00+00:00'
@@ -25012,7 +25012,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         student_note: 'Equivalent syllabus attached.'
                         normalized_grade: A
                         verified_by_user_id: 8
@@ -25044,7 +25044,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -25066,7 +25066,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           normalized_grade: A
                           verified_by_user_id: 8
                           verified_at: '2026-09-01T10:00:00+00:00'
@@ -25114,9 +25114,9 @@ paths:
                         document_ids:
                           type: array
                           example:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           items:
-                            type: integer
+                            type: string
                         student_note:
                           type: string
                           example: 'Equivalent syllabus attached.'
@@ -25180,7 +25180,7 @@ paths:
                                 source_credit_hours: '4.00'
                                 external_grade: Excellent
                                 document_ids:
-                                  - 91
+                                  - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                 student_note: 'Equivalent syllabus attached.'
                               review_snapshot:
                                 normalized_grade: A
@@ -25233,9 +25233,9 @@ paths:
                                   document_ids:
                                     type: array
                                     example:
-                                      - 91
+                                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                     items:
-                                      type: integer
+                                      type: string
                                   student_note:
                                     type: string
                                     example: 'Equivalent syllabus attached.'
@@ -25299,9 +25299,9 @@ paths:
                             document_ids:
                               type: array
                               example:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               items:
-                                type: integer
+                                type: string
                             normalized_grade:
                               type: string
                               example: A
@@ -25479,7 +25479,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -25511,7 +25511,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -25533,7 +25533,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -25582,9 +25582,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -25648,7 +25648,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -25702,9 +25702,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -25768,9 +25768,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -25854,7 +25854,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -25879,7 +25879,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         normalized_grade: A
                         verified_by_user_id: 8
                         verified_at: '2026-09-01T10:00:00+00:00'
@@ -25928,9 +25928,9 @@ paths:
                         document_ids:
                           type: array
                           example:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           items:
-                            type: integer
+                            type: string
                         normalized_grade:
                           type: string
                           example: A
@@ -25949,6 +25949,47 @@ paths:
                         transfer_request_id:
                           type: integer
                           example: 1
+      tags:
+        - Transfers
+      security: []
+  /api/v1/credit-decisions/transfer-requests/evidence-documents:
+    get:
+      summary: 'My Transfer evidence.'
+      operationId: myTransferEvidence
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                      type: transcript
+                      original_filename: transcript.pdf
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                        type: transcript
+                        original_filename: transcript.pdf
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+                        type:
+                          type: string
+                          example: transcript
+                        original_filename:
+                          type: string
+                          example: transcript.pdf
       tags:
         - Transfers
       security: []
@@ -26102,7 +26143,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       student_note: 'Equivalent syllabus attached.'
                       normalized_grade: A
                       verified_by_user_id: 8
@@ -26134,7 +26175,7 @@ paths:
                             source_credit_hours: '4.00'
                             external_grade: Excellent
                             document_ids:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             student_note: 'Equivalent syllabus attached.'
                           review_snapshot:
                             normalized_grade: A
@@ -26156,7 +26197,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         normalized_grade: A
                         verified_by_user_id: 8
                         verified_at: '2026-09-01T10:00:00+00:00'
@@ -26194,7 +26235,7 @@ paths:
                         source_credit_hours: '4.00'
                         external_grade: Excellent
                         document_ids:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         student_note: 'Equivalent syllabus attached.'
                         normalized_grade: A
                         verified_by_user_id: 8
@@ -26226,7 +26267,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -26248,7 +26289,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           normalized_grade: A
                           verified_by_user_id: 8
                           verified_at: '2026-09-01T10:00:00+00:00'
@@ -26296,9 +26337,9 @@ paths:
                         document_ids:
                           type: array
                           example:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           items:
-                            type: integer
+                            type: string
                         student_note:
                           type: string
                           example: 'Equivalent syllabus attached.'
@@ -26362,7 +26403,7 @@ paths:
                                 source_credit_hours: '4.00'
                                 external_grade: Excellent
                                 document_ids:
-                                  - 91
+                                  - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                 student_note: 'Equivalent syllabus attached.'
                               review_snapshot:
                                 normalized_grade: A
@@ -26415,9 +26456,9 @@ paths:
                                   document_ids:
                                     type: array
                                     example:
-                                      - 91
+                                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                     items:
-                                      type: integer
+                                      type: string
                                   student_note:
                                     type: string
                                     example: 'Equivalent syllabus attached.'
@@ -26481,9 +26522,9 @@ paths:
                             document_ids:
                               type: array
                               example:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               items:
-                                type: integer
+                                type: string
                             normalized_grade:
                               type: string
                               example: A
@@ -26573,7 +26614,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -26605,7 +26646,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -26627,7 +26668,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -26676,9 +26717,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -26742,7 +26783,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -26796,9 +26837,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -26862,9 +26903,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -26915,11 +26956,11 @@ paths:
                   example: Excellent
                 document_ids:
                   type: array
-                  description: 'Supporting transcript/evidence IDs.'
+                  description: 'Owned admission transcript/evidence ULIDs.'
                   example:
-                    - 91
+                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                   items:
-                    type: integer
+                    type: string
                 student_note:
                   type: string
                   description: 'Student explanation.'
@@ -27048,7 +27089,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -27080,7 +27121,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -27102,7 +27143,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -27151,9 +27192,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -27217,7 +27258,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -27271,9 +27312,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -27337,9 +27378,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -27385,7 +27426,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -27417,7 +27458,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -27439,7 +27480,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -27488,9 +27529,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -27554,7 +27595,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -27608,9 +27649,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -27674,9 +27715,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -27732,11 +27773,11 @@ paths:
                   example: Excellent
                 document_ids:
                   type: array
-                  description: 'Supporting transcript/evidence IDs.'
+                  description: 'Supporting transcript/evidence ULIDs.'
                   example:
-                    - 91
+                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                   items:
-                    type: integer
+                    type: string
               required:
                 - expected_revision
       security: []
@@ -27767,7 +27808,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -27799,7 +27840,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -27821,7 +27862,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -27870,9 +27911,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -27936,7 +27977,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -27990,9 +28031,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -28056,9 +28097,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -28127,7 +28168,7 @@ paths:
                     source_credit_hours: '4.00'
                     external_grade: Excellent
                     document_ids:
-                      - 91
+                      - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                     student_note: 'Equivalent syllabus attached.'
                     normalized_grade: A
                     verified_by_user_id: 8
@@ -28159,7 +28200,7 @@ paths:
                           source_credit_hours: '4.00'
                           external_grade: Excellent
                           document_ids:
-                            - 91
+                            - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                           student_note: 'Equivalent syllabus attached.'
                         review_snapshot:
                           normalized_grade: A
@@ -28181,7 +28222,7 @@ paths:
                       source_credit_hours: '4.00'
                       external_grade: Excellent
                       document_ids:
-                        - 91
+                        - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                       normalized_grade: A
                       verified_by_user_id: 8
                       verified_at: '2026-09-01T10:00:00+00:00'
@@ -28230,9 +28271,9 @@ paths:
                       document_ids:
                         type: array
                         example:
-                          - 91
+                          - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                         items:
-                          type: integer
+                          type: string
                       student_note:
                         type: string
                         example: 'Equivalent syllabus attached.'
@@ -28296,7 +28337,7 @@ paths:
                               source_credit_hours: '4.00'
                               external_grade: Excellent
                               document_ids:
-                                - 91
+                                - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                               student_note: 'Equivalent syllabus attached.'
                             review_snapshot:
                               normalized_grade: A
@@ -28350,9 +28391,9 @@ paths:
                                 document_ids:
                                   type: array
                                   example:
-                                    - 91
+                                    - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                                   items:
-                                    type: integer
+                                    type: string
                                 student_note:
                                   type: string
                                   example: 'Equivalent syllabus attached.'
@@ -28416,9 +28457,9 @@ paths:
                           document_ids:
                             type: array
                             example:
-                              - 91
+                              - 01ARZ3NDEKTSV4RRFFQ69G5FAV
                             items:
-                              type: integer
+                              type: string
                           normalized_grade:
                             type: string
                             example: A
@@ -28464,3 +28505,37 @@ paths:
         required: true
         schema:
           type: integer
+  '/api/v1/credit-decisions/transfer-requests/{transfer_request_id}/evidence-documents/{document}':
+    get:
+      summary: 'Open Transfer evidence.'
+      operationId: openTransferEvidence
+      description: "The owner and only the reviewer whose live queue contains this request may\nstream a referenced admission document. The Admissions facade rechecks that\nthe opaque document belongs to the Student's applicant account."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - Transfers
+      security: []
+    parameters:
+      -
+        in: path
+        name: transfer_request_id
+        description: ''
+        example: 1
+        required: true
+        schema:
+          type: integer
+      -
+        in: path
+        name: document
+        description: 'The opaque document ULID.'
+        example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+        required: true
+        schema:
+          type: string

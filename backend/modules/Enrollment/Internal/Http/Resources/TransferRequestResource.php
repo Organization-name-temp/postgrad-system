@@ -27,6 +27,10 @@ class TransferRequestResource extends JsonResource
             'source_credit_hours' => $this->source_credit_hours,
             'external_grade' => $this->external_grade,
             'document_ids' => $this->document_ids,
+            'evidence_documents' => $this->when(
+                $this->getAttribute('evidence_documents') !== null,
+                $this->getAttribute('evidence_documents'),
+            ),
             'student_note' => $this->student_note,
             'normalized_grade' => $this->normalized_grade,
             'verified_by_user_id' => $this->verified_by_user_id,

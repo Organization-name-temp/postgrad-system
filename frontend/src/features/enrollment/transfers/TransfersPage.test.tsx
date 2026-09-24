@@ -13,11 +13,21 @@ const api = vi.hoisted(() => ({
   failGets: false,
 }))
 
+const transcriptId = '01ARZ3NDEKTSV4RRFFQ69G5FAV'
+const syllabusId = '01ARZ3NDEKTSV4RRFFQ69G5FAW'
+
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } }, get: vi.fn() },
   customInstance: (config: AxiosRequestConfig) => {
     api.calls.push(config)
     if (config.method === 'GET' && api.failGets) return Promise.reject(new Error('unavailable'))
+    if (config.url?.endsWith('/evidence-documents'))
+      return Promise.resolve({
+        data: [
+          { id: transcriptId, type: 'transcript', original_filename: 'transcript.pdf' },
+          { id: syllabusId, type: 'additional_certificate', original_filename: 'syllabus.pdf' },
+        ],
+      })
     if (config.url?.endsWith('/targets'))
       return Promise.resolve({
         data: [
@@ -74,7 +84,8 @@ it('creates a Draft with exact printed evidence and target/source hours kept dis
   change('courseName', 'Machine Learning')
   change('sourceHours', '12.50')
   change('printedGrade', 'Très bien (B)')
-  change('documentIds', '91, 92')
+  fireEvent.click(screen.getByLabelText(/transcript\.pdf/i))
+  fireEvent.click(screen.getByLabelText(/syllabus\.pdf/i))
   for (const field of screen.getAllByRole('textbox')) fireEvent.blur(field)
   const save = screen.getByRole('button', { name: /save draft/i })
   await waitFor(() => expect(save).toBeEnabled())
@@ -88,7 +99,7 @@ it('creates a Draft with exact printed evidence and target/source hours kept dis
     external_course_name: 'Machine Learning',
     source_credit_hours: 12.5,
     external_grade: 'Très bien (B)',
-    document_ids: [91, 92],
+    document_ids: [transcriptId, syllabusId],
     student_note: undefined,
   })
 })
@@ -106,14 +117,21 @@ it('renders immutable history and the final target-hour decision', async () => {
         external_course_name: 'Algorithms',
         source_credit_hours: '4.00',
         external_grade: 'Excellent',
-        document_ids: [91],
+        document_ids: [transcriptId],
         normalized_grade: 'A',
         status: 'Approved',
         revision: 2,
         editable: false,
         terminal: true,
         transitions: [
-          { id: 1, action: 'verified_by_department_head', current_revision: false, revision: 1 },
+          {
+            id: 1,
+            action: 'verified_by_department_head',
+            current_revision: false,
+            revision: 1,
+            actor_user_id: 8,
+            created_at: '2026-09-01T10:00:00+00:00',
+          },
           { id: 2, action: 'approved_by_council', current_revision: true, revision: 2 },
         ],
         decision: { normalized_grade: 'A', target_credit_hours: 3 },
@@ -123,8 +141,20 @@ it('renders immutable history and the final target-hour decision', async () => {
   }
   renderPage()
 
-  expect(await screen.findByText(/recognized as A using 3 target CH/i)).toBeInTheDocument()
+  expect(
+    await screen.findByText(
+      (_content, element) =>
+        element?.classList.contains('MuiAlert-message') === true &&
+        /recognized as A using 3 target CH/i.test(element.textContent ?? ''),
+    ),
+  ).toBeInTheDocument()
   expect(screen.getByText(/previous revision.*review invalidated/i)).toBeInTheDocument()
+  expect(
+    screen.getByText(
+      (_content, element) =>
+        element?.tagName === 'SPAN' && /Actor 8/.test(element.textContent ?? ''),
+    ),
+  ).toBeInTheDocument()
   expect(
     screen.getByText(
       (_content, element) =>
@@ -132,6 +162,15 @@ it('renders immutable history and the final target-hour decision', async () => {
         /4.00.*printed grade.*Excellent/i.test(element.textContent ?? ''),
     ),
   ).toBeInTheDocument()
+})
+
+it('requires the Student to select owned admission evidence before saving', async () => {
+  renderPage()
+  const transcript = await screen.findByLabelText(/transcript\.pdf/i)
+  fireEvent.click(transcript)
+  fireEvent.click(transcript)
+  fireEvent.blur(transcript)
+  expect(await screen.findByRole('alert')).toHaveTextContent(/required/i)
 })
 
 it('localizes the Student surface and validation for Arabic RTL', async () => {

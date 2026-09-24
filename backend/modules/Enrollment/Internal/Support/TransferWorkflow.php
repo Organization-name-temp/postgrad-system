@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Support\Facades\DB;
+use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CurriculumCatalog;
@@ -31,6 +32,7 @@ final class TransferWorkflow
         private readonly CurriculumCatalog $curricula,
         private readonly CourseCatalog $courses,
         private readonly StudentGuard $studentGuard,
+        private readonly AdmissionDocuments $admissionDocuments,
         private readonly DepartmentHeadAssignments $heads,
         private readonly Directory $directory,
         private readonly Notifier $notifier,
@@ -45,6 +47,7 @@ final class TransferWorkflow
             abort_unless($guarded->userId === $student->userId, 403);
             $this->assertActive($guarded);
             $entry = $this->targetEntry($guarded, $targetCourseId);
+            $this->assertEvidenceDocuments($guarded, $evidence['document_ids']);
 
             $request = TransferRequest::query()->create([
                 'student_id' => $guarded->studentId,
@@ -77,6 +80,7 @@ final class TransferWorkflow
             if (! $locked->status->isEditable()) {
                 throw new ConflictHttpException(__('credit_decisions.transfer.invalid_state'));
             }
+            $this->assertEvidenceDocuments($student, $changes['document_ids'] ?? $locked->document_ids);
 
             $dirty = false;
             foreach ([
@@ -144,6 +148,7 @@ final class TransferWorkflow
             if (now()->greaterThan($student->admittedAt->copy()->addMonthNoOverflow())) {
                 throw new ConflictHttpException(__('credit_decisions.transfer.deadline_passed'));
             }
+            $this->assertEvidenceDocuments($student, $locked->document_ids);
             $this->targetEntry($student, $locked->target_course_id);
             $this->assertNoEffectiveDecision($locked);
             $from = $locked->status;
@@ -198,7 +203,7 @@ final class TransferWorkflow
                     $this->notifier->notifyOnce($headId, NotificationType::TransferRequestAdvanced, 'transfer-transition:'.$transition->id.':'.$headId, $this->payload($locked));
                 }
             } else {
-                $this->notifyStudentAndAdvisor($locked, $student, $transition, $action === 'return' ? NotificationType::TransferRequestReturned : NotificationType::TransferRequestDecided, $reason);
+                $this->notifyStudent($locked, $student, $transition, $action === 'return' ? NotificationType::TransferRequestReturned : NotificationType::TransferRequestDecided, $reason);
             }
             $this->audit($locked, $action === 'recommend' ? 'recommended' : $action.'ed', $actorUserId, $reason);
 
@@ -368,6 +373,18 @@ final class TransferWorkflow
         }
     }
 
+    /** @param list<string> $documentIds */
+    private function assertEvidenceDocuments(StudentSummary $student, array $documentIds): void
+    {
+        $available = collect($this->admissionDocuments->forApplicant($student->userId));
+        $selected = $available->whereIn('id', $documentIds);
+        if ($selected->count() !== count(array_unique($documentIds))
+            || $selected->contains(fn ($document): bool => ! in_array($document->type, ['transcript', 'additional_certificate'], true))
+            || ! $selected->contains(fn ($document): bool => $document->type === 'transcript')) {
+            throw new ConflictHttpException(__('credit_decisions.transfer.invalid_documents'));
+        }
+    }
+
     private function assertNoEffectiveDecision(TransferRequest $request): void
     {
         if (TransferDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
@@ -404,6 +421,12 @@ final class TransferWorkflow
         $payload = [...$this->payload($request), 'outcome' => $request->status->value, 'reason' => $reason];
         $this->notifier->notifyOnce($student->userId, $type, 'transfer-transition:'.$transition->id.':student', $payload);
         $this->notifier->notifyOnce($student->advisorId, $type, 'transfer-transition:'.$transition->id.':advisor', [...$payload, 'audience' => 'advisor']);
+    }
+
+    private function notifyStudent(TransferRequest $request, StudentSummary $student, TransferRequestTransition $transition, NotificationType $type, ?string $reason): void
+    {
+        $payload = [...$this->payload($request), 'outcome' => $request->status->value, 'reason' => $reason];
+        $this->notifier->notifyOnce($student->userId, $type, 'transfer-transition:'.$transition->id.':student', $payload);
     }
 
     /** @return array<string, mixed> */

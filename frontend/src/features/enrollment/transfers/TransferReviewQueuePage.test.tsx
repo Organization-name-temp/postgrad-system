@@ -29,7 +29,15 @@ vi.mock('../../../shared/api/http', () => ({
                 external_course_name: 'Algorithms',
                 source_credit_hours: '4.00',
                 external_grade: 'Excellent',
-                document_ids: [91],
+                document_ids: ['01ARZ3NDEKTSV4RRFFQ69G5FAV'],
+                evidence_documents: [
+                  {
+                    id: '01ARZ3NDEKTSV4RRFFQ69G5FAV',
+                    original_filename: 'transcript.pdf',
+                    download_url:
+                      '/api/v1/credit-decisions/transfer-requests/9/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAV',
+                  },
+                ],
                 status: 'PendingDepartmentHead',
                 revision: 1,
                 student: { name: 'Sara Student', university_id: '2026-CSE-0001' },
@@ -71,6 +79,10 @@ beforeEach(async () => {
 it('requires and submits one of the four normalized grades at the scoped Head seam', async () => {
   renderQueue('departmentHead')
   expect(await screen.findByText('Sara Student')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'transcript.pdf' })).toHaveAttribute(
+    'href',
+    '/api/v1/credit-decisions/transfer-requests/9/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAV',
+  )
   fireEvent.click(screen.getByRole('button', { name: /verify equivalency/i }))
   expect(await screen.findByRole('alert')).toHaveTextContent(/required/i)
   fireEvent.mouseDown(screen.getByLabelText(/normalized e-just grade/i))
@@ -99,6 +111,23 @@ it('keeps the idempotency key stable when a Council retry follows a lost respons
   await waitFor(() => expect(api.calls.filter((call) => call.method === 'POST')).toHaveLength(2))
   const posts = api.calls.filter((call) => call.method === 'POST')
   expect(posts[0]?.data.action_id).toBe(posts[1]?.data.action_id)
+})
+
+it('requires a reason and confirmation before terminal rejection', async () => {
+  renderQueue('advisor')
+  expect(await screen.findByText('Sara Student')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: /^reject$/i }))
+  expect(await screen.findByRole('alert')).toHaveTextContent(/required/i)
+  fireEvent.change(screen.getByLabelText(/review reason/i), {
+    target: { value: 'Evidence is not official.' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: /^reject$/i }))
+  fireEvent.click(await screen.findByRole('button', { name: /reject request/i }))
+
+  await waitFor(() => expect(api.calls.some((call) => call.method === 'POST')).toBe(true))
+  expect(api.calls.find((call) => call.method === 'POST')?.data).toEqual(
+    expect.objectContaining({ action: 'reject', reason: 'Evidence is not official.' }),
+  )
 })
 
 it('renders the Advisor queue and immutable evidence history in Arabic RTL', async () => {

@@ -1,26 +1,21 @@
-import { Chip } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import { StatusChip, type StatusChipProps } from '../../../shared/ui/StatusChip'
 
-const colors = {
-  Draft: 'default',
-  PendingAdvisor: 'info',
-  PendingDepartmentHead: 'warning',
-  PendingCouncil: 'warning',
-  Returned: 'warning',
-  Approved: 'success',
-  Rejected: 'error',
-  Abandoned: 'default',
-} as const
+const STATUS_STYLE: Record<string, Pick<StatusChipProps, 'tone' | 'variant'>> = {
+  Draft: { tone: 'neutral', variant: 'outlined' },
+  PendingAdvisor: { tone: 'info', variant: 'filled-soft' },
+  PendingDepartmentHead: { tone: 'secondary', variant: 'filled-soft' },
+  PendingCouncil: { tone: 'secondary', variant: 'filled-soft' },
+  Returned: { tone: 'warning', variant: 'filled-soft' },
+  Approved: { tone: 'success', variant: 'filled' },
+  Rejected: { tone: 'error', variant: 'filled' },
+  Abandoned: { tone: 'neutral', variant: 'outlined' },
+}
 
 export function TransferStatusChip({ status }: { status?: string }) {
   const { t } = useTranslation('enrollment')
-  const known = status && status in colors ? (status as keyof typeof colors) : undefined
+  const current = status ?? 'Draft'
+  const style = STATUS_STYLE[current] ?? STATUS_STYLE.Draft
 
-  return (
-    <Chip
-      size="small"
-      color={known ? colors[known] : 'default'}
-      label={known ? t(`transfers.statuses.${known}`) : status}
-    />
-  )
+  return <StatusChip {...style} label={t(`transfers.statuses.${current}`)} />
 }

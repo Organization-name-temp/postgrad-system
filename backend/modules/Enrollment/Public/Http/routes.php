@@ -97,6 +97,7 @@ Route::middleware(['auth:sanctum', 'can:exemption.approve'])->group(function () 
 
 Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->group(function () {
     Route::get('/credit-decisions/transfers', [TransferDecisionController::class, 'index']);
+    Route::get('/credit-decisions/transfer-requests/evidence-documents', [TransferRequestController::class, 'evidenceDocuments']);
     Route::get('/credit-decisions/transfer-requests/targets', [TransferRequestController::class, 'targets']);
     Route::get('/credit-decisions/transfer-requests', [TransferRequestController::class, 'index']);
     Route::get('/credit-decisions/transfer-requests/export', [TransferRequestController::class, 'export']);
@@ -106,6 +107,12 @@ Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->g
     Route::delete('/credit-decisions/transfer-requests/{transfer_request}', [TransferRequestController::class, 'destroy'])->whereNumber('transfer_request');
     Route::post('/credit-decisions/transfer-requests/{transfer_request}/submit', [TransferRequestController::class, 'submit'])->whereNumber('transfer_request');
 });
+
+Route::get('/credit-decisions/transfer-requests/{transfer_request}/evidence-documents/{document}', [TransferRequestController::class, 'evidenceDocument'])
+    ->middleware('auth:sanctum')
+    ->whereNumber('transfer_request')
+    ->whereUlid('document')
+    ->name('enrollment.transfer-evidence.download');
 
 Route::middleware(['auth:sanctum', 'can:transfer_waiver.approve'])->group(function () {
     Route::get('/credit-decisions/transfer-requests/advisor-queue', [TransferReviewController::class, 'advisorQueue'])->middleware('role:R03');

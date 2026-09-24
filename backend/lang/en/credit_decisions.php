@@ -50,6 +50,7 @@ return [
         'invalid_state' => 'This action is no longer available for the Transfer request.',
         'revision_required' => 'Revise the returned evidence before resubmitting this Transfer request.',
         'deadline_passed' => 'Transfer requests must be submitted no later than one calendar month after admission.',
+        'invalid_documents' => 'Choose evidence from your own admission documents and include a transcript.',
         'normalized_grade_ineligible' => 'The normalized E-JUST grade must be A+, A, B+, or B.',
         'verification_required' => 'Department Head equivalency verification and an eligible normalized grade are required.',
         'cap_exceeded' => 'Approval would exceed the lifetime 9-credit-hour Transfer limit.',

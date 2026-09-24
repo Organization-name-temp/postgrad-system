@@ -6522,7 +6522,7 @@ export type AdvisorTransferQueue200DataItemTransitionsItemEvidenceSnapshot = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -6560,7 +6560,7 @@ export type AdvisorTransferQueue200DataItemDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -6581,7 +6581,7 @@ export type AdvisorTransferQueue200DataItem = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -6659,7 +6659,7 @@ export type AdvisorActionOnTransferRequest200DataTransitionsItemEvidenceSnapshot
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -6698,7 +6698,7 @@ export type AdvisorActionOnTransferRequest200DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -6719,7 +6719,7 @@ export type AdvisorActionOnTransferRequest200Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -6765,7 +6765,7 @@ export type DepartmentHeadTransferQueue200DataItemTransitionsItemEvidenceSnapsho
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -6803,7 +6803,7 @@ export type DepartmentHeadTransferQueue200DataItemDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -6824,7 +6824,7 @@ export type DepartmentHeadTransferQueue200DataItem = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -6904,7 +6904,7 @@ export type ScopedHeadActionOnTransferRequest200DataTransitionsItemEvidenceSnaps
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -6943,7 +6943,7 @@ export type ScopedHeadActionOnTransferRequest200DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -6964,7 +6964,7 @@ export type ScopedHeadActionOnTransferRequest200Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7010,7 +7010,7 @@ export type CouncilTransferQueue200DataItemTransitionsItemEvidenceSnapshot = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7048,7 +7048,7 @@ export type CouncilTransferQueue200DataItemDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7069,7 +7069,7 @@ export type CouncilTransferQueue200DataItem = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7147,7 +7147,7 @@ export type CouncilFinalTransferAction200DataTransitionsItemEvidenceSnapshot = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7186,7 +7186,7 @@ export type CouncilFinalTransferAction200DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7207,7 +7207,7 @@ export type CouncilFinalTransferAction200Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7241,7 +7241,7 @@ export type MyEffectiveTransferDecisions200DataItem = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7252,6 +7252,16 @@ export type MyEffectiveTransferDecisions200DataItem = {
 
 export type MyEffectiveTransferDecisions200 = {
   data?: MyEffectiveTransferDecisions200DataItem[];
+};
+
+export type MyTransferEvidence200DataItem = {
+  id?: string;
+  type?: string;
+  original_filename?: string;
+};
+
+export type MyTransferEvidence200 = {
+  data?: MyTransferEvidence200DataItem[];
 };
 
 export type MyTransferTargets200DataItem = {
@@ -7303,7 +7313,7 @@ export type MyTransferRequests200DataItemTransitionsItemEvidenceSnapshot = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7341,7 +7351,7 @@ export type MyTransferRequests200DataItemDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7362,7 +7372,7 @@ export type MyTransferRequests200DataItem = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7418,8 +7428,8 @@ export type CreateATransferDraftBody = {
   source_credit_hours: number;
   /** Grade exactly as printed. */
   external_grade: string;
-  /** Supporting transcript/evidence IDs. */
-  document_ids: number[];
+  /** Owned admission transcript/evidence ULIDs. */
+  document_ids: string[];
   /** Student explanation. */
   student_note?: string;
 };
@@ -7436,7 +7446,7 @@ export type CreateATransferDraft201DataTransitionsItemEvidenceSnapshot = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7475,7 +7485,7 @@ export type CreateATransferDraft201DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7496,7 +7506,7 @@ export type CreateATransferDraft201Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7542,7 +7552,7 @@ export type ViewOneOfMyTransferRequests200DataTransitionsItemEvidenceSnapshot = 
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7581,7 +7591,7 @@ export type ViewOneOfMyTransferRequests200DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7602,7 +7612,7 @@ export type ViewOneOfMyTransferRequests200Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7640,8 +7650,8 @@ export type ReviseAnEditableTransferRequestBody = {
   source_credit_hours?: number;
   /** Grade exactly as printed. */
   external_grade?: string;
-  /** Supporting transcript/evidence IDs. */
-  document_ids?: number[];
+  /** Supporting transcript/evidence ULIDs. */
+  document_ids?: string[];
 };
 
 export type ReviseAnEditableTransferRequest200DataStudent = {
@@ -7656,7 +7666,7 @@ export type ReviseAnEditableTransferRequest200DataTransitionsItemEvidenceSnapsho
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7695,7 +7705,7 @@ export type ReviseAnEditableTransferRequest200DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7716,7 +7726,7 @@ export type ReviseAnEditableTransferRequest200Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7753,7 +7763,7 @@ export type AbandonATransferDraft200DataTransitionsItemEvidenceSnapshot = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7792,7 +7802,7 @@ export type AbandonATransferDraft200DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7813,7 +7823,7 @@ export type AbandonATransferDraft200Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -7852,7 +7862,7 @@ export type SubmitOrResubmitATransferRequest200DataTransitionsItemEvidenceSnapsh
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
 };
 
@@ -7891,7 +7901,7 @@ export type SubmitOrResubmitATransferRequest200DataDecision = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   normalized_grade?: string;
   verified_by_user_id?: number;
   verified_at?: string;
@@ -7912,7 +7922,7 @@ export type SubmitOrResubmitATransferRequest200Data = {
   external_course_name?: string;
   source_credit_hours?: string;
   external_grade?: string;
-  document_ids?: number[];
+  document_ids?: string[];
   student_note?: string;
   normalized_grade?: string;
   verified_by_user_id?: number;
@@ -22356,6 +22366,99 @@ export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeo
 
 
 /**
+ * @summary My Transfer evidence.
+ */
+export const myTransferEvidence = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyTransferEvidence200>(
+      {url: `/api/v1/credit-decisions/transfer-requests/evidence-documents`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyTransferEvidenceQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/evidence-documents`
+    ] as const;
+    }
+
+
+export const getMyTransferEvidenceQueryOptions = <TData = Awaited<ReturnType<typeof myTransferEvidence>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferEvidence>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyTransferEvidenceQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myTransferEvidence>>> = ({ signal }) => myTransferEvidence(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myTransferEvidence>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyTransferEvidenceQueryResult = NonNullable<Awaited<ReturnType<typeof myTransferEvidence>>>
+export type MyTransferEvidenceQueryError = unknown
+
+
+export function useMyTransferEvidence<TData = Awaited<ReturnType<typeof myTransferEvidence>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferEvidence>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTransferEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof myTransferEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTransferEvidence<TData = Awaited<ReturnType<typeof myTransferEvidence>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferEvidence>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTransferEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof myTransferEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTransferEvidence<TData = Awaited<ReturnType<typeof myTransferEvidence>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Transfer evidence.
+ */
+
+export function useMyTransferEvidence<TData = Awaited<ReturnType<typeof myTransferEvidence>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyTransferEvidenceQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
  * @summary My Transfer targets.
  */
 export const myTransferTargets = (
@@ -22992,3 +23095,101 @@ export const useSubmitOrResubmitATransferRequest = <TError = unknown,
       > => {
       return useMutation(getSubmitOrResubmitATransferRequestMutationOptions(options), queryClient);
     }
+
+/**
+ * The owner and only the reviewer whose live queue contains this request may
+ * stream a referenced admission document. The Admissions facade rechecks that
+ * the opaque document belongs to the Student's applicant account.
+ * @summary Open Transfer evidence.
+ */
+export const openTransferEvidence = (
+    transferRequestId: number,
+    document: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/transfer-requests/${transferRequestId}/evidence-documents/${document}`, method: 'GET',
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getOpenTransferEvidenceQueryKey = (transferRequestId: number,
+    document: string,) => {
+    return [
+    `/api/v1/credit-decisions/transfer-requests/${transferRequestId}/evidence-documents/${document}`
+    ] as const;
+    }
+
+
+export const getOpenTransferEvidenceQueryOptions = <TData = Awaited<ReturnType<typeof openTransferEvidence>>, TError = unknown>(transferRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openTransferEvidence>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOpenTransferEvidenceQueryKey(transferRequestId,document);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openTransferEvidence>>> = ({ signal }) => openTransferEvidence(transferRequestId,document, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: transferRequestId !== null && transferRequestId !== undefined && document !== null && document !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof openTransferEvidence>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OpenTransferEvidenceQueryResult = NonNullable<Awaited<ReturnType<typeof openTransferEvidence>>>
+export type OpenTransferEvidenceQueryError = unknown
+
+
+export function useOpenTransferEvidence<TData = Awaited<ReturnType<typeof openTransferEvidence>>, TError = unknown>(
+ transferRequestId: number,
+    document: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openTransferEvidence>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openTransferEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof openTransferEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenTransferEvidence<TData = Awaited<ReturnType<typeof openTransferEvidence>>, TError = unknown>(
+ transferRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openTransferEvidence>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof openTransferEvidence>>,
+          TError,
+          Awaited<ReturnType<typeof openTransferEvidence>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOpenTransferEvidence<TData = Awaited<ReturnType<typeof openTransferEvidence>>, TError = unknown>(
+ transferRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openTransferEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Open Transfer evidence.
+ */
+
+export function useOpenTransferEvidence<TData = Awaited<ReturnType<typeof openTransferEvidence>>, TError = unknown>(
+ transferRequestId: number,
+    document: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openTransferEvidence>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOpenTransferEvidenceQueryOptions(transferRequestId,document,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

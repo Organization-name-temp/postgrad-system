@@ -14,6 +14,12 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  FormHelperText,
+  FormLabel,
   Pagination,
   Paper,
   Skeleton,
@@ -29,20 +35,22 @@ import {
   exportMyTransferRequests,
   getMyTransferRequestsQueryKey,
   type MyTransferRequests200DataItem,
+  type MyTransferEvidence200DataItem,
   type MyTransferTargets200DataItem,
   useAbandonATransferDraft,
   useCreateATransferDraft,
   useMyTransferRequests,
+  useMyTransferEvidence,
   useMyTransferTargets,
   useReviseAnEditableTransferRequest,
   useSubmitOrResubmitATransferRequest,
 } from '../../../shared/api/generated/endpoints'
+import { apiErrorMessage } from '../../../shared/api/errors'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import {
   FormErrorText,
   newTransferSchema,
-  parseDocumentIds,
   transferEvidenceSchema,
   type TransferEvidenceValues,
 } from './formSchema'
@@ -57,7 +65,7 @@ const blankEvidence: TransferEvidenceValues = {
   courseName: '',
   sourceHours: '',
   printedGrade: '',
-  documentIds: '',
+  documentIds: [],
   note: '',
 }
 
@@ -68,7 +76,7 @@ function evidencePayload(values: TransferEvidenceValues) {
     external_course_name: values.courseName,
     source_credit_hours: Number(values.sourceHours),
     external_grade: values.printedGrade,
-    document_ids: parseDocumentIds(values.documentIds),
+    document_ids: values.documentIds,
     student_note: values.note || undefined,
   }
 }
@@ -80,6 +88,7 @@ export function TransfersPage() {
   const params = { sort: '-updated_at', page }
   const requests = useMyTransferRequests(params)
   const targets = useMyTransferTargets()
+  const evidenceDocuments = useMyTransferEvidence()
   const create = useCreateATransferDraft()
   const form = useForm<TransferEvidenceValues>({
     resolver: zodResolver(newTransferSchema),
@@ -102,9 +111,9 @@ export function TransfersPage() {
     await refresh()
   }
   const state =
-    requests.isError || targets.isError
+    requests.isError || targets.isError || evidenceDocuments.isError
       ? 'error'
-      : requests.isPending || targets.isPending
+      : requests.isPending || targets.isPending || evidenceDocuments.isPending
         ? 'loading'
         : rows.length === 0
           ? 'empty'
@@ -140,7 +149,11 @@ export function TransfersPage() {
               />
             )}
           />
-          <TransferFields form={form} prefix="new-transfer" />
+          <TransferFields
+            form={form}
+            prefix="new-transfer"
+            documents={evidenceDocuments.data?.data ?? []}
+          />
           <Button
             type="submit"
             variant="contained"
@@ -170,8 +183,8 @@ export function TransfersPage() {
 
       {state === 'loading' && (
         <Stack spacing={2} aria-label={t('transfers.loading')}>
-          <Skeleton variant="rounded" height={220} />
-          <Skeleton variant="rounded" height={220} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(27.5) })} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(27.5) })} />
         </Stack>
       )}
       {state === 'error' && (
@@ -183,6 +196,7 @@ export function TransfersPage() {
               onClick={() => {
                 void requests.refetch()
                 void targets.refetch()
+                void evidenceDocuments.refetch()
               }}
             >
               {t('transfers.retry')}
@@ -199,7 +213,14 @@ export function TransfersPage() {
         </Stack>
       )}
       {state === 'content' &&
-        rows.map((row) => <TransferRequestCard key={row.id} row={row} onChanged={refresh} />)}
+        rows.map((row) => (
+          <TransferRequestCard
+            key={row.id}
+            row={row}
+            documents={evidenceDocuments.data?.data ?? []}
+            onChanged={refresh}
+          />
+        ))}
       {!requests.isPending && !requests.isError && lastPage > 1 && (
         <Pagination
           page={page}
@@ -214,9 +235,11 @@ export function TransfersPage() {
 
 function TransferRequestCard({
   row,
+  documents,
   onChanged,
 }: {
   row: MyTransferRequests200DataItem
+  documents: MyTransferEvidence200DataItem[]
   onChanged: () => Promise<unknown>
 }) {
   const { t } = useTranslation('enrollment')
@@ -237,12 +260,12 @@ function TransferRequestCard({
       courseName: row.external_course_name ?? '',
       sourceHours: row.source_credit_hours ?? '',
       printedGrade: row.external_grade ?? '',
-      documentIds: row.document_ids?.join(', ') ?? '',
+      documentIds: row.document_ids?.map(String) ?? [],
       note: row.student_note ?? '',
     },
   })
   const pending = revise.isPending || submit.isPending || abandon.isPending
-  const failed = revise.isError || submit.isError || abandon.isError
+  const actionError = revise.error ?? submit.error ?? abandon.error
   const lastReturnRevision = Math.max(
     0,
     ...(row.transitions ?? [])
@@ -297,13 +320,13 @@ function TransferRequestCard({
         </Stack>
         {row.editable ? (
           <Stack component="form" spacing={2} noValidate onSubmit={form.handleSubmit(save)}>
-            <TransferFields form={form} prefix={`transfer-${id}`} />
+            <TransferFields form={form} prefix={`transfer-${id}`} documents={documents} />
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
               <Button type="submit" disabled={pending || !form.formState.isValid}>
                 {t('transfers.saveChanges')}
               </Button>
               <Button
-                variant="contained"
+                variant="outlined"
                 startIcon={
                   <SendIcon
                     sx={(theme) => ({
@@ -319,7 +342,7 @@ function TransferRequestCard({
               {row.status === 'Draft' && (
                 <Button
                   color="error"
-                  variant="contained"
+                  variant="outlined"
                   startIcon={<DeleteOutlineIcon />}
                   disabled={pending}
                   onClick={() => setConfirmAbandon(true)}
@@ -333,7 +356,11 @@ function TransferRequestCard({
                 {t('transfers.saveBeforeResubmit')}
               </Typography>
             )}
-            {failed && <Alert severity="error">{t('transfers.actionError')}</Alert>}
+            {Boolean(actionError) && (
+              <Alert severity="error">
+                {apiErrorMessage(actionError) ?? t('transfers.actionError')}
+              </Alert>
+            )}
           </Stack>
         ) : (
           <TransferEvidenceSummary evidence={row} />
@@ -341,10 +368,15 @@ function TransferRequestCard({
         {row.student_note && !row.editable && <Typography>{row.student_note}</Typography>}
         {row.decision && (
           <Alert severity="success">
-            {t('transfers.decision', {
-              grade: row.decision.normalized_grade,
-              count: row.decision.target_credit_hours,
-            })}
+            <Trans
+              t={t}
+              i18nKey="transfers.decision"
+              values={{
+                grade: row.decision.normalized_grade,
+                count: row.decision.target_credit_hours,
+              }}
+              components={{ grade: <bdi dir="ltr" />, hours: <bdi dir="ltr" /> }}
+            />
           </Alert>
         )}
         <Divider />
@@ -371,6 +403,7 @@ function TransferRequestCard({
           <Button
             color="error"
             variant="contained"
+            startIcon={<DeleteOutlineIcon />}
             onClick={() => {
               setConfirmAbandon(false)
               void abandon
@@ -407,8 +440,23 @@ function TargetPicker({
       value={selected}
       getOptionDisabled={(target) => target.already_transferred === true}
       getOptionLabel={(target) =>
-        `${target.target_course_code ?? ''} · ${t(`transfers.categories.${target.target_category}`)} · ${t('transfers.targetHours', { count: target.target_credit_hours })}`
+        `${target.target_course_code ?? ''} · ${t(`transfers.categories.${target.target_category}`)} · ${t('transfers.targetHoursPlain', { count: target.target_credit_hours })}`
       }
+      renderOption={({ key, ...props }, target) => (
+        <li key={key} {...props}>
+          <bdi dir="ltr">{target.target_course_code}</bdi>
+          <Box component="span" sx={{ mx: 1 }}>
+            ·
+          </Box>
+          {t(`transfers.categories.${target.target_category}`)}
+          <Box component="span" sx={{ mx: 1 }}>
+            ·
+          </Box>
+          <bdi dir="ltr">
+            {t('transfers.targetHoursPlain', { count: target.target_credit_hours })}
+          </bdi>
+        </li>
+      )}
       isOptionEqualToValue={(option, candidate) =>
         option.target_course_id === candidate.target_course_id
       }
@@ -432,9 +480,11 @@ function TargetPicker({
 function TransferFields({
   form,
   prefix,
+  documents,
 }: {
   form: UseFormReturn<TransferEvidenceValues>
   prefix: string
+  documents: MyTransferEvidence200DataItem[]
 }) {
   const { t } = useTranslation('enrollment')
   const input = (
@@ -463,14 +513,59 @@ function TransferFields({
     <>
       {input('institution', t('transfers.institution'))}
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-        {input('courseCode', t('transfers.externalCourseCode'), { dir: 'ltr' })}
-        {input('courseName', t('transfers.externalCourseName'))}
+        {input('courseCode', t('transfers.courseCode'), { dir: 'ltr' })}
+        {input('courseName', t('transfers.courseName'))}
       </Stack>
       <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
         {input('sourceHours', t('transfers.sourceHours'), { dir: 'ltr' })}
-        {input('printedGrade', t('transfers.printedGrade'), { dir: 'ltr' })}
+        {input('printedGrade', t('transfers.printedGrade'))}
       </Stack>
-      {input('documentIds', t('transfers.documentIds'), { dir: 'ltr' })}
+      <Controller
+        control={form.control}
+        name="documentIds"
+        render={({ field, fieldState }) => (
+          <FormControl required error={Boolean(fieldState.error)}>
+            <FormLabel>{t('transfers.documentIds')}</FormLabel>
+            <FormGroup>
+              {documents.map((document) => {
+                const documentId = document.id ?? ''
+                return (
+                  <FormControlLabel
+                    key={documentId}
+                    disabled={!documentId}
+                    control={
+                      <Checkbox
+                        checked={field.value.includes(documentId)}
+                        onBlur={field.onBlur}
+                        onChange={(_, checked) =>
+                          field.onChange(
+                            checked
+                              ? [...field.value, documentId]
+                              : field.value.filter((id) => id !== documentId),
+                          )
+                        }
+                      />
+                    }
+                    label={
+                      <span>
+                        <bdi dir="ltr">{document.original_filename}</bdi> ·{' '}
+                        {t(`transfers.documentTypes.${document.type}`)}
+                      </span>
+                    }
+                  />
+                )
+              })}
+            </FormGroup>
+            <FormHelperText>
+              {fieldState.error ? (
+                <FormErrorText message={t('transfers.validation.required')} />
+              ) : (
+                t('transfers.documentIdsHelp')
+              )}
+            </FormHelperText>
+          </FormControl>
+        )}
+      />
       {input('note', t('transfers.studentNote'), { multiline: true })}
     </>
   )

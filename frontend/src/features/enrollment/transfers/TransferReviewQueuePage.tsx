@@ -39,6 +39,7 @@ import {
   useDepartmentHeadTransferQueue,
   useScopedHeadActionOnTransferRequest,
 } from '../../../shared/api/generated/endpoints'
+import { apiErrorMessage } from '../../../shared/api/errors'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import { FormErrorText, transferReviewSchema, type TransferReviewValues } from './formSchema'
@@ -107,8 +108,8 @@ export function TransferReviewQueuePage({ stage }: { stage: TransferReviewStage 
       </Stack>
       {state === 'loading' && (
         <Stack spacing={2} aria-label={t('transfers.loading')}>
-          <Skeleton variant="rounded" height={260} />
-          <Skeleton variant="rounded" height={260} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(32.5) })} />
+          <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(32.5) })} />
         </Stack>
       )}
       {state === 'error' && (
@@ -171,7 +172,7 @@ function TransferReviewCard({
   const councilAction = useCouncilFinalTransferAction()
   const actionId = useRetryStableActionId()
   const pending = advisorAction.isPending || headAction.isPending || councilAction.isPending
-  const failed = advisorAction.isError || headAction.isError || councilAction.isError
+  const actionError = advisorAction.error ?? headAction.error ?? councilAction.error
   const id = row.id ?? 0
   const revision = row.revision ?? 1
 
@@ -276,10 +277,14 @@ function TransferReviewCard({
             )
           }
         />
-        {failed && <Alert severity="error">{t('transfers.actionError')}</Alert>}
+        {Boolean(actionError) && (
+          <Alert severity="error">
+            {apiErrorMessage(actionError) ?? t('transfers.actionError')}
+          </Alert>
+        )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
           <Button
-            variant="contained"
+            variant="outlined"
             disabled={pending}
             onClick={() =>
               void act(
@@ -300,7 +305,7 @@ function TransferReviewCard({
           </Button>
           <Button
             color="error"
-            variant="contained"
+            variant="outlined"
             startIcon={<BlockIcon />}
             disabled={pending}
             onClick={async () => {
@@ -335,6 +340,7 @@ function TransferReviewCard({
           <Button
             color="error"
             variant="contained"
+            startIcon={<BlockIcon />}
             onClick={() => {
               setConfirmReject(false)
               void act('reject')

@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\Rule;
 use Knuckles\Scribe\Attributes\Response as ResponseAttribute;
+use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Http\Documentation\TransferResponseExamples;
@@ -28,6 +29,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /** @group Transfer Review */
 class TransferReviewController
 {
+    public function __construct(private readonly AdmissionDocuments $admissionDocuments) {}
+
     /**
      * Advisor Transfer queue.
      *
@@ -325,6 +328,18 @@ class TransferReviewController
                 'university_id' => $student->universityId,
                 'name' => $users[$student->userId]->name ?? null,
             ]);
+            $documentIds = array_flip($request->document_ids);
+            $request->setAttribute('evidence_documents', $student === null ? [] : collect($this->admissionDocuments->forApplicant($student->userId))
+                ->filter(fn ($document): bool => isset($documentIds[$document->id]))
+                ->map(fn ($document): array => [
+                    'id' => $document->id,
+                    'type' => $document->type,
+                    'original_filename' => $document->originalFilename,
+                    'download_url' => route('enrollment.transfer-evidence.download', [
+                        'transfer_request' => $request->getKey(),
+                        'document' => $document->id,
+                    ], absolute: false),
+                ])->values()->all());
         }));
 
         return $paginator;

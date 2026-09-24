@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 /** Immutable effective Transfer fact crossing the Enrollment public seam. */
 final readonly class TransferDecisionSummary
 {
-    /** @param list<int> $documentIds */
+    /** @param list<string> $documentIds */
     public function __construct(
         public int $id,
         public int $studentId,

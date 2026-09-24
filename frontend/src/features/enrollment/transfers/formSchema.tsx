@@ -10,7 +10,7 @@ export const transferEvidenceSchema = z
     courseName: z.string().min(1, 'required').max(500, 'too_long'),
     sourceHours: z.string().min(1, 'required'),
     printedGrade: z.string().min(1, 'required').max(200, 'too_long'),
-    documentIds: z.string().min(1, 'required'),
+    documentIds: z.array(z.string()).min(1, 'required'),
     note: z.string().max(2000, 'too_long'),
   })
   .superRefine((values, context) => {
@@ -18,8 +18,7 @@ export const transferEvidenceSchema = z
     if (!Number.isFinite(hours) || hours <= 0 || hours > 999999.99) {
       context.addIssue({ code: 'custom', path: ['sourceHours'], message: 'positive_number' })
     }
-    const documents = parseDocumentIds(values.documentIds)
-    if (documents.length === 0 || documents.some((id) => !Number.isInteger(id) || id < 1)) {
+    if (new Set(values.documentIds).size !== values.documentIds.length) {
       context.addIssue({ code: 'custom', path: ['documentIds'], message: 'document_ids' })
     }
   })
@@ -39,13 +38,6 @@ export const transferReviewSchema = z.object({
 
 export type TransferEvidenceValues = z.infer<typeof transferEvidenceSchema>
 export type TransferReviewValues = z.infer<typeof transferReviewSchema>
-
-export function parseDocumentIds(value: string): number[] {
-  return value
-    .split(',')
-    .map((item) => Number(item.trim()))
-    .filter((item, index, all) => Number.isFinite(item) && all.indexOf(item) === index)
-}
 
 export function FormErrorText({ message }: { message?: string }) {
   if (!message) return undefined

@@ -22,7 +22,7 @@ use Modules\Catalog\Public\Enums\CourseCategory;
  * @property string $external_course_name
  * @property string $source_credit_hours
  * @property string $external_grade
- * @property list<int> $document_ids
+ * @property list<string> $document_ids
  * @property string $normalized_grade
  * @property int $verified_by_user_id
  * @property Carbon $verified_at

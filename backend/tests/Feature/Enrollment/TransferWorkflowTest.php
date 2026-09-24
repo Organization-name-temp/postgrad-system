@@ -2,12 +2,15 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Modules\Admissions\Public\AdmissionDocuments;
+use Modules\Admissions\Public\AdmissionDocumentSummary;
 use Modules\Catalog\Internal\Enums\VersionSubject;
 use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\CourseCategory;
+use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Models\TransferRequestTransition;
@@ -18,9 +21,33 @@ use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Identity\Public\Enums\StudentLifecycleStatus;
+use Modules\Notifications\Internal\Models\Notification;
 use OpenSpout\Reader\XLSX\Reader;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 uses(RefreshDatabase::class);
+
+function transferTranscriptId(): string
+{
+    return '01ARZ3NDEKTSV4RRFFQ69G5FAV';
+}
+
+beforeEach(function (): void {
+    app()->instance(AdmissionDocuments::class, new class implements AdmissionDocuments
+    {
+        public function forApplicant(int $userId): array
+        {
+            return [new AdmissionDocumentSummary(transferTranscriptId(), 'transcript', 'transcript.pdf')];
+        }
+
+        public function downloadForApplicant(int $userId, string $documentId): ?StreamedResponse
+        {
+            return $documentId === transferTranscriptId()
+                ? response()->streamDownload(fn () => print 'transcript bytes', 'transcript.pdf')
+                : null;
+        }
+    });
+});
 
 /** @return array{Student, User, User, User, Course} */
 function transferWorld(): array
@@ -77,7 +104,7 @@ function transferEvidence(int $targetCourseId, string $institution = 'Universit�
         'external_course_name' => 'Machine Learning',
         'source_credit_hours' => '12.50',
         'external_grade' => 'Très bien (B)',
-        'document_ids' => [91],
+        'document_ids' => [transferTranscriptId()],
         'student_note' => 'Please assess this course.',
     ];
 }
@@ -109,6 +136,30 @@ function advanceTransferToCouncil(int $id, User $advisor, User $head, string $gr
     ])->assertOk();
 }
 
+function transferRequestFor(Student $student, Course $course, TransferRequestStatus $status, string $institution = 'أَحْمَد University'): TransferRequest
+{
+    return TransferRequest::query()->create([
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $course->id,
+        'target_course_code' => $course->code,
+        'target_category' => CourseCategory::ProgramCore,
+        'target_credit_hours' => $course->total_ch,
+        'external_institution' => $institution,
+        'external_course_code' => 'EXT-501',
+        'external_course_name' => 'External Algorithms',
+        'source_credit_hours' => '4.00',
+        'external_grade' => 'Excellent',
+        'document_ids' => [transferTranscriptId()],
+        'normalized_grade' => $status === TransferRequestStatus::PendingCouncil ? 'A' : null,
+        'verified_by_user_id' => $status === TransferRequestStatus::PendingCouncil ? $student->advisor_id : null,
+        'verified_at' => $status === TransferRequestStatus::PendingCouncil ? now() : null,
+        'status' => $status,
+        'revision' => 1,
+        'submitted_at' => $status === TransferRequestStatus::Draft ? null : now(),
+    ]);
+}
+
 it('recognizes external study through Advisor Head and Council without creating an Enrollment or Grade', function () {
     [$student, $advisor, $head, $council, $course] = transferWorld();
     $this->travelTo('2026-02-28 10:15:00');
@@ -121,7 +172,7 @@ it('recognizes external study through Advisor Head and Council without creating 
         'external_course_name' => 'Machine Learning',
         'source_credit_hours' => '12.50',
         'external_grade' => 'Très bien (B)',
-        'document_ids' => [91],
+        'document_ids' => [transferTranscriptId()],
         'student_note' => 'Please assess this course.',
     ])->assertCreated()
         ->assertJsonPath('data.status', 'Draft')
@@ -170,6 +221,122 @@ it('recognizes external study through Advisor Head and Council without creating 
         ->and(fn () => $decision->delete())->toThrow(LogicException::class, 'immutable')
         ->and(fn () => $transition->update(['reason' => 'changed']))->toThrow(LogicException::class, 'append-only')
         ->and(fn () => $transition->delete())->toThrow(LogicException::class, 'append-only');
+});
+
+it('accepts only owned admission evidence and requires a transcript', function () {
+    [$student, , , , $course] = transferWorld();
+    $this->travelTo('2026-02-10 10:15:00');
+    $supplementId = '01ARZ3NDEKTSV4RRFFQ69G5FAW';
+    app()->instance(AdmissionDocuments::class, new class($student->user_id, $supplementId) implements AdmissionDocuments
+    {
+        public function __construct(private readonly int $ownerId, private readonly string $supplementId) {}
+
+        public function forApplicant(int $userId): array
+        {
+            if ($userId !== $this->ownerId) {
+                return [];
+            }
+
+            return [
+                new AdmissionDocumentSummary(transferTranscriptId(), 'transcript', 'transcript.pdf'),
+                new AdmissionDocumentSummary($this->supplementId, 'additional_certificate', 'syllabus.pdf'),
+            ];
+        }
+
+        public function downloadForApplicant(int $userId, string $documentId): ?StreamedResponse
+        {
+            return $userId === $this->ownerId && in_array($documentId, [transferTranscriptId(), $this->supplementId], true)
+                ? response()->streamDownload(fn () => print 'evidence bytes', 'evidence.pdf')
+                : null;
+        }
+    });
+    Sanctum::actingAs($student->user);
+
+    $this->getJson('/api/v1/credit-decisions/transfer-requests/evidence-documents')
+        ->assertOk()
+        ->assertJsonCount(2, 'data')
+        ->assertJsonPath('data.0.id', transferTranscriptId());
+
+    $payload = transferEvidence($course->id);
+    $payload['document_ids'] = [$supplementId];
+    $this->postJson('/api/v1/credit-decisions/transfer-requests', $payload)
+        ->assertConflict()->assertJsonPath('message', __('credit_decisions.transfer.invalid_documents'));
+
+    $payload['document_ids'] = ['01ARZ3NDEKTSV4RRFFQ69G5FAX'];
+    $this->postJson('/api/v1/credit-decisions/transfer-requests', $payload)
+        ->assertConflict()->assertJsonPath('message', __('credit_decisions.transfer.invalid_documents'));
+
+    $payload['document_ids'] = [transferTranscriptId(), $supplementId];
+    $this->postJson('/api/v1/credit-decisions/transfer-requests', $payload)->assertCreated();
+});
+
+it('lets only the live scoped reviewer open named supporting evidence', function () {
+    [$student, $advisor, $head, , $course] = transferWorld();
+    $this->travelTo('2026-02-10 10:15:00');
+    $id = createAndSubmitTransfer($student, $course);
+    $documentUrl = "/api/v1/credit-decisions/transfer-requests/{$id}/evidence-documents/".transferTranscriptId();
+
+    Sanctum::actingAs($advisor);
+    $this->getJson('/api/v1/credit-decisions/transfer-requests/advisor-queue')
+        ->assertOk()
+        ->assertJsonPath('data.0.evidence_documents.0.original_filename', 'transcript.pdf')
+        ->assertJsonPath('data.0.evidence_documents.0.download_url', $documentUrl);
+    $this->get($documentUrl)->assertOk()->assertHeader('content-disposition');
+
+    $otherAdvisor = User::factory()->create();
+    $otherAdvisor->assignRole(Role::Advisor);
+    Sanctum::actingAs($otherAdvisor);
+    $this->get($documentUrl)->assertForbidden();
+
+    Sanctum::actingAs($advisor);
+    $this->postJson("/api/v1/credit-decisions/transfer-requests/{$id}/advisor-decision", [
+        'action' => 'recommend', 'expected_revision' => 1,
+        'action_id' => 'edededed-eded-4ded-8ded-edededededed',
+    ])->assertOk();
+    $this->get($documentUrl)->assertForbidden();
+
+    Sanctum::actingAs($head);
+    $this->get($documentUrl)->assertOk();
+});
+
+it('notifies the active reviewer without notifying an Advisor about their own return', function () {
+    [$student, $advisor, , , $course] = transferWorld();
+    $this->travelTo('2026-02-10 10:15:00');
+    $id = createAndSubmitTransfer($student, $course);
+
+    expect(Notification::query()->where('user_id', $advisor->id)->where('type', 'transfer.request_submitted')->count())->toBe(1);
+    Sanctum::actingAs($advisor);
+    $this->postJson("/api/v1/credit-decisions/transfer-requests/{$id}/advisor-decision", [
+        'action' => 'return', 'reason' => 'Attach a clearer transcript.', 'expected_revision' => 1,
+        'action_id' => 'abababab-abab-4bab-8bab-abababababab',
+    ])->assertOk()->assertJsonPath('data.status', 'Returned');
+
+    expect(Notification::query()->where('user_id', $student->user_id)->where('type', 'transfer.request_returned')->count())->toBe(1)
+        ->and(Notification::query()->where('user_id', $advisor->id)->where('type', 'transfer.request_returned')->count())->toBe(0);
+});
+
+it('enforces the fixed Role and live scope at every review transition', function () {
+    [$student, $advisor, $head, , $course] = transferWorld();
+    $this->travelTo('2026-02-10 10:15:00');
+    $id = createAndSubmitTransfer($student, $course);
+
+    Sanctum::actingAs($student->user);
+    $this->postJson("/api/v1/credit-decisions/transfer-requests/{$id}/advisor-decision", [
+        'action' => 'recommend', 'expected_revision' => 1,
+        'action_id' => 'acacacac-acac-4cac-8cac-acacacacacac',
+    ])->assertForbidden();
+
+    Sanctum::actingAs($advisor);
+    $this->postJson("/api/v1/credit-decisions/transfer-requests/{$id}/department-head-decision", [
+        'action' => 'verify', 'normalized_grade' => 'A', 'expected_revision' => 1,
+        'action_id' => 'adadadad-adad-4dad-8dad-adadadadadad',
+    ])->assertForbidden();
+
+    Sanctum::actingAs($head);
+    $this->postJson("/api/v1/credit-decisions/transfer-requests/{$id}/council-decision", [
+        'action' => 'approve', 'expected_revision' => 1,
+        'action_id' => 'aeaeaeae-aeae-4eae-8eae-aeaeaeaeaeae',
+    ])->assertForbidden();
 });
 
 it('enforces the inclusive clamped one-calendar-month submission deadline bilingually', function () {
@@ -362,3 +529,57 @@ it('provides scoped pagination search and formula-safe audited XLSX export', fun
     Sanctum::actingAs($outsideAdvisor);
     $this->getJson('/api/v1/credit-decisions/transfer-requests/advisor-queue')->assertOk()->assertJsonPath('meta.total', 0);
 });
+
+it('applies the shared actor-aware collection contract to every Transfer surface', function (string $surface) {
+    [$student, $advisor, $head, $council, $course] = transferWorld();
+    $status = match ($surface) {
+        'student' => TransferRequestStatus::Draft,
+        'advisor' => TransferRequestStatus::PendingAdvisor,
+        'department_head' => TransferRequestStatus::PendingDepartmentHead,
+        'council' => TransferRequestStatus::PendingCouncil,
+    };
+    transferRequestFor($student, $course, $status);
+    transferRequestFor($student, $course, $status, 'Kyoto University');
+
+    $outsideDepartment = Department::factory()->create();
+    $outsideProgram = Program::factory()->create(['department_id' => $outsideDepartment->id]);
+    $outsideCourse = Course::factory()->create(['department_id' => $outsideDepartment->id, 'code' => 'CSE-OUT', 'lecture_ch' => 3, 'tutorial_ch' => 0, 'lab_ch' => 0, 'total_ch' => 3]);
+    $outsideAdvisor = User::factory()->create();
+    $outsideAdvisor->assignRole(Role::Advisor);
+    $outsideStudent = Student::factory()->create(['program_id' => $outsideProgram->id, 'curriculum_version_id' => $student->curriculum_version_id, 'advisor_id' => $outsideAdvisor->id]);
+    transferRequestFor($outsideStudent, $outsideCourse, $status);
+
+    [$actor, $endpoint] = match ($surface) {
+        'student' => [$student->user, '/api/v1/credit-decisions/transfer-requests'],
+        'advisor' => [$advisor, '/api/v1/credit-decisions/transfer-requests/advisor-queue'],
+        'department_head' => [$head, '/api/v1/credit-decisions/transfer-requests/department-head-queue'],
+        'council' => [$council, '/api/v1/credit-decisions/transfer-requests/council-queue'],
+    };
+    Sanctum::actingAs($actor);
+    $expectedScoped = $surface === 'council' ? 3 : 2;
+
+    $this->withHeader('Accept-Language', 'ar')->getJson($endpoint.'?unknown_field=1')
+        ->assertUnprocessable()->assertJsonPath('message', 'حقل استعلام المجموعة غير معروف: unknown_field.');
+    $this->withHeader('Accept-Language', 'ar')->getJson($endpoint.'?target_course_id=abc')
+        ->assertUnprocessable()->assertJsonPath('message', 'يجب أن يحتوي حقل استعلام المجموعة target_course_id على أعداد صحيحة موجبة فقط.');
+    $this->getJson($endpoint.'?target_course_id='.$course->id.','.$outsideCourse->id)
+        ->assertOk()->assertJsonPath('meta.total', $expectedScoped);
+    $this->getJson($endpoint.'?target_course_id='.$outsideCourse->id)
+        ->assertOk()->assertJsonPath('meta.total', $surface === 'council' ? 1 : 0);
+    $this->getJson($endpoint.'?national_id=29001011234567')
+        ->assertOk()->assertJsonPath('meta.total', $expectedScoped)
+        ->assertJsonMissingPath('data.0.national_id')->assertJsonMissingPath('data.0.student.national_id');
+    $page = $this->getJson($endpoint.'?per_page=1')->assertOk()
+        ->assertJsonPath('meta.total', $expectedScoped)->assertJsonPath('meta.per_page', 1)
+        ->assertJsonPath('meta.last_page', $expectedScoped);
+    expect($page->json('data'))->toHaveCount(1);
+
+    if ($surface === 'student') {
+        $this->getJson($endpoint.'?q=احمد')->assertOk()->assertJsonPath('meta.total', 1);
+    } else {
+        $this->withHeader('Accept-Language', 'ar')->getJson($endpoint.'?student_id=bad')
+            ->assertUnprocessable()->assertJsonPath('message', 'يجب أن يحتوي حقل استعلام المجموعة student_id على أعداد صحيحة موجبة فقط.');
+    }
+    $this->get($endpoint.'/export?target_course_id=999999')->assertOk()->assertDownload();
+    expect(AuditLog::query()->where('action', 'transfer.requests.exported')->latest('id')->firstOrFail()->metadata['row_count'])->toBe(0);
+})->with('transfer collections');

@@ -7,21 +7,95 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Knuckles\Scribe\Attributes\Response as ResponseAttribute;
+use Modules\Admissions\Public\AdmissionDocuments;
+use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CurriculumCatalog;
+use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Http\Documentation\TransferResponseExamples;
 use Modules\Enrollment\Internal\Http\Resources\TransferRequestResource;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Support\TransferWorkflow;
 use Modules\Identity\Public\Contracts\AuditLogger;
+use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
+use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Enums\Role;
 use Support\Export\XlsxExporter;
+use Support\Query\ArabicNormalizer;
 use Support\Query\CollectionQuery;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /** @group Transfers */
 class TransferRequestController
 {
+    /**
+     * My Transfer evidence.
+     *
+     * @response 200 {"data":[{"id":"01ARZ3NDEKTSV4RRFFQ69G5FAV","type":"transcript","original_filename":"transcript.pdf"}]}
+     */
+    public function evidenceDocuments(Request $request, StudentDirectory $students, AdmissionDocuments $documents): JsonResponse
+    {
+        $student = $students->find((int) $request->user()?->getAuthIdentifier());
+        abort_if($student === null, 403);
+
+        return response()->json(['data' => collect($documents->forApplicant($student->userId))
+            ->filter(fn ($document): bool => in_array($document->type, ['transcript', 'additional_certificate'], true))
+            ->map(fn ($document): array => [
+                'id' => $document->id,
+                'type' => $document->type,
+                'original_filename' => $document->originalFilename,
+            ])->values()->all()]);
+    }
+
+    /**
+     * Open Transfer evidence.
+     *
+     * The owner and only the reviewer whose live queue contains this request may
+     * stream a referenced admission document. The Admissions facade rechecks that
+     * the opaque document belongs to the Student's applicant account.
+     *
+     * @urlParam transfer_request_id integer required Example: 1
+     * @urlParam document string required The opaque document ULID. Example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+     *
+     * @response 200 <<binary>>
+     */
+    public function evidenceDocument(
+        Request $httpRequest,
+        TransferRequest $transferRequest,
+        string $document,
+        StudentDirectory $students,
+        Directory $directory,
+        CourseCatalog $courses,
+        DepartmentHeadAssignments $heads,
+        AdmissionDocuments $documents,
+    ): StreamedResponse {
+        abort_unless(in_array($document, $transferRequest->document_ids, true), 404);
+        $student = $students->findByStudentId($transferRequest->student_id);
+        abort_if($student === null, 404);
+        $actorId = (int) $httpRequest->user()?->getAuthIdentifier();
+
+        if ($student->userId !== $actorId) {
+            $course = $courses->find($transferRequest->target_course_id);
+            $authorized = ($transferRequest->status === TransferRequestStatus::PendingAdvisor
+                    && $directory->hasRole($actorId, Role::Advisor)
+                    && $student->advisorId === $actorId)
+                || ($transferRequest->status === TransferRequestStatus::PendingDepartmentHead
+                    && $directory->hasRole($actorId, Role::DepartmentHead)
+                    && $course !== null
+                    && in_array($actorId, $heads->headsForDepartment($course->departmentId), true))
+                || ($transferRequest->status === TransferRequestStatus::PendingCouncil
+                    && $directory->hasRole($actorId, Role::Council));
+            abort_unless($authorized, 403);
+        }
+
+        $response = $documents->downloadForApplicant($student->userId, $document);
+        abort_if($response === null, 404);
+
+        return $response;
+    }
+
     /**
      * My Transfer targets.
      *
@@ -106,7 +180,7 @@ class TransferRequestController
      * @bodyParam external_course_name string required Exact external Course name. Example: Algorithms
      * @bodyParam source_credit_hours float required Source hours retained only as evidence. Example: 4.00
      * @bodyParam external_grade string required Grade exactly as printed. Example: Excellent
-     * @bodyParam document_ids integer[] required Supporting transcript/evidence IDs. Example: [91]
+     * @bodyParam document_ids string[] required Owned admission transcript/evidence ULIDs. Example: ["01ARZ3NDEKTSV4RRFFQ69G5FAV"]
      * @bodyParam student_note string Student explanation. Example: Equivalent syllabus attached.
      */
     #[ResponseAttribute(content: TransferResponseExamples::REQUEST, status: 201)]
@@ -145,7 +219,7 @@ class TransferRequestController
      * @bodyParam external_course_name string Exact external Course name. Example: Algorithms
      * @bodyParam source_credit_hours float Source hours retained only as evidence. Example: 4.00
      * @bodyParam external_grade string Grade exactly as printed. Example: Excellent
-     * @bodyParam document_ids integer[] Supporting transcript/evidence IDs. Example: [91]
+     * @bodyParam document_ids string[] Supporting transcript/evidence ULIDs. Example: ["01ARZ3NDEKTSV4RRFFQ69G5FAV"]
      * @bodyParam student_note string Student explanation; nullable. Example: Updated evidence attached.
      */
     #[ResponseAttribute(content: TransferResponseExamples::REQUEST)]
@@ -217,7 +291,7 @@ class TransferRequestController
             'source_credit_hours' => [$presence, 'decimal:0,2', 'gt:0', 'max:999999.99'],
             'external_grade' => [$presence, 'string', 'max:200'],
             'document_ids' => [$presence, 'array', 'min:1'],
-            'document_ids.*' => ['integer', 'min:1', 'distinct'],
+            'document_ids.*' => ['string', 'ulid', 'distinct'],
         ];
     }
 
@@ -251,12 +325,18 @@ class TransferRequestController
             $query->whereIn($field, $values);
         }
         if ($collection->search !== null) {
-            $needle = '%'.mb_strtolower($collection->search).'%';
-            $query->where(function (Builder $nested) use ($needle): void {
-                foreach (['target_course_code', 'external_institution', 'external_course_code', 'external_course_name', 'external_grade'] as $field) {
-                    $nested->orWhereRaw("LOWER({$field}) LIKE ?", [$needle]);
-                }
-            });
+            $needle = ArabicNormalizer::normalize($collection->search);
+            $query->whereIn('id', (clone $query)->get()->filter(function (TransferRequest $candidate) use ($needle): bool {
+                $haystack = ArabicNormalizer::normalize(implode(' ', [
+                    $candidate->target_course_code,
+                    $candidate->external_institution,
+                    $candidate->external_course_code,
+                    $candidate->external_course_name,
+                    $candidate->external_grade,
+                ]));
+
+                return str_contains($haystack, $needle);
+            })->pluck('id')->all());
         }
         foreach ($collection->sorts as $sort) {
             $query->orderBy($sort['field'], $sort['direction']);

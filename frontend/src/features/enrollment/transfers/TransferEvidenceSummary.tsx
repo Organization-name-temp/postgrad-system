@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material'
+import { Link, Stack, Typography } from '@mui/material'
 import { Trans, useTranslation } from 'react-i18next'
 
 export type TransferEvidence = {
@@ -7,7 +7,12 @@ export type TransferEvidence = {
   external_course_name?: string
   source_credit_hours?: string
   external_grade?: string
-  document_ids?: number[]
+  document_ids?: Array<number | string>
+  evidence_documents?: Array<{
+    id?: string
+    original_filename?: string
+    download_url?: string
+  }>
   target_credit_hours?: number
   normalized_grade?: string | null
 }
@@ -34,22 +39,49 @@ export function TransferEvidenceSummary({ evidence }: { evidence: TransferEviden
           t={t}
           i18nKey="transfers.evidenceValues"
           values={{ hours: evidence.source_credit_hours, grade: evidence.external_grade }}
-          components={{ value: <bdi dir="ltr" /> }}
+          components={{ hours: <bdi dir="ltr" /> }}
         />
       </Typography>
       {evidence.target_credit_hours !== undefined && (
         <Typography color="text.secondary">
-          {t('transfers.targetHours', { count: evidence.target_credit_hours })}
+          <Trans
+            t={t}
+            i18nKey="transfers.targetHours"
+            values={{ count: evidence.target_credit_hours }}
+            components={{ hours: <bdi dir="ltr" /> }}
+          />
         </Typography>
       )}
       {evidence.normalized_grade && (
         <Typography>
-          {t('transfers.normalizedGradeValue', { grade: evidence.normalized_grade })}
+          <Trans
+            t={t}
+            i18nKey="transfers.normalizedGradeValue"
+            values={{ grade: evidence.normalized_grade }}
+            components={{ grade: <bdi dir="ltr" /> }}
+          />
         </Typography>
       )}
-      <Typography variant="body2" color="text.secondary">
-        {t('transfers.documentsValue', { documents: evidence.document_ids?.join(', ') })}
-      </Typography>
+      {evidence.evidence_documents?.length ? (
+        <Stack component="ul" spacing={0.5} sx={{ m: 0, ps: 2.5 }}>
+          {evidence.evidence_documents.map((document) => (
+            <Typography component="li" variant="body2" key={document.id}>
+              <Link href={document.download_url} target="_blank" rel="noopener noreferrer">
+                <bdi dir="ltr">{document.original_filename}</bdi>
+              </Link>
+            </Typography>
+          ))}
+        </Stack>
+      ) : (
+        <Typography variant="body2" color="text.secondary">
+          <Trans
+            t={t}
+            i18nKey="transfers.documentsValue"
+            values={{ documents: evidence.document_ids?.join(', ') }}
+            components={{ documents: <bdi dir="ltr" /> }}
+          />
+        </Typography>
+      )}
     </Stack>
   )
 }

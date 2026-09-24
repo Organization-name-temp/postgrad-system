@@ -21,6 +21,7 @@ uses(TestCase::class)->in('Feature');
  * endpoint tickets extend this registry rather than inventing ad-hoc assertions.
  */
 dataset('manual exemption collections', ['student', 'advisor', 'department_head']);
+dataset('transfer collections', ['student', 'advisor', 'department_head', 'council']);
 
 /**
  * Sign in as a fresh user holding the given role. Shared across feature tests

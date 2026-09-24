@@ -10,10 +10,14 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Stack,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { useMyTargetAwareCreditHourSummary } from '../../shared/api/generated/endpoints'
+import { useMyCurrentAcademicStandingAndObservationHistory } from '../../shared/api/generated/endpoints'
 import { tabularNums } from '../../app/theme/fonts'
+import { StatusChip } from '../../shared/ui/StatusChip'
+import { standingPresentation } from './AcademicStandingCard'
 
 const metrics = [
   'baseline_required_ch',
@@ -32,6 +36,7 @@ type SummaryRow = { category?: string } & Partial<Record<(typeof metrics)[number
 export function CreditHourSummaryPage() {
   const { t } = useTranslation('academicStanding')
   const { data, isPending, isError } = useMyTargetAwareCreditHourSummary()
+  const standingQuery = useMyCurrentAcademicStandingAndObservationHistory()
   const summary = data?.data
   const rows: SummaryRow[] = summary
     ? [...(summary.categories ?? []), ...(summary.total ? [summary.total] : [])]
@@ -45,6 +50,28 @@ export function CreditHourSummaryPage() {
       <Typography color="text.secondary" sx={{ mb: 3 }}>
         {t('creditHours.intro')}
       </Typography>
+      {!standingQuery.isPending && !standingQuery.isError && standingQuery.data?.data && (
+        <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+          <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
+            <Typography variant="h6" component="h2">
+              {t('standing.title')}
+            </Typography>
+            <StatusChip
+              {...standingPresentation(standingQuery.data.data.standing)}
+              variant="filled-soft"
+              label={t(`standing.values.${standingQuery.data.data.standing}`)}
+            />
+            <Typography color="text.secondary">
+              {t(`standing.explanations.${standingQuery.data.data.explanation}`)}
+            </Typography>
+            {standingQuery.data.data.registration_ceiling_ch != null && (
+              <Typography>
+                {t('standing.ceiling', { count: standingQuery.data.data.registration_ceiling_ch })}
+              </Typography>
+            )}
+          </Stack>
+        </Paper>
+      )}
       {isPending && <CircularProgress aria-label={t('creditHours.loading')} />}
       {isError && <Alert severity="error">{t('creditHours.loadError')}</Alert>}
       {!isPending && !isError && (

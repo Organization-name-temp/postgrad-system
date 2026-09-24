@@ -85,6 +85,61 @@ export const AScopedStudentsTargetAwareCreditHourSummaryResponse = zod.object({
 
 
 /**
+ * @summary My current Academic Standing and observation history.
+ */
+export const MyCurrentAcademicStandingAndObservationHistoryResponse = zod.object({
+  "data": zod.object({
+  "student_id": zod.number().optional(),
+  "standing": zod.string().optional(),
+  "cgpa": zod.number().optional(),
+  "explanation": zod.string().optional(),
+  "registration_ceiling_ch": zod.string().nullish(),
+  "observations": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "standing": zod.string().optional(),
+  "cause_type": zod.string().optional(),
+  "cause_id": zod.number().optional(),
+  "observed_at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary My Academic Standing Dashboard Card.
+ */
+export const MyAcademicStandingDashboardCardResponse = zod.object({
+  "data": zod.object({
+  "standing": zod.string().optional(),
+  "cgpa": zod.number().optional(),
+  "explanation": zod.string().optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).optional()
+})
+
+
+/**
+ * @summary A scoped Student's current Academic Standing and observation history.
+ */
+export const AScopedStudentsCurrentAcademicStandingAndObservationHistoryParams = zod.object({
+  "student_id": zod.number().describe('The Student anchor id.')
+})
+
+export const AScopedStudentsCurrentAcademicStandingAndObservationHistoryResponse = zod.object({
+  "data": zod.object({
+  "student_id": zod.number().optional(),
+  "standing": zod.string().optional(),
+  "cgpa": zod.number().optional(),
+  "explanation": zod.string().optional(),
+  "registration_ceiling_ch": zod.string().nullish(),
+  "observations": zod.array().optional()
+}).optional()
+})
+
+
+/**
  * The R07 (Dean) users an administrator may assign to a Faculty — the source for
  * the assignment screen's Dean picker. Admin-only (R09/R10).
  * @summary List assignable Deans.

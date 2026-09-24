@@ -371,6 +371,7 @@ export const en = {
       waiverDecided: 'Your Waiver request for {{course_code}} was decided: {{outcome}}.',
       creditDecisionRevoked:
         'The {{decision_type}} decision for {{target_course_code}} was revoked: {{reason}}',
+      standingChanged: 'Your Academic Standing changed to {{standing}}.',
       waiverDecided_advisor:
         "An advisee's Waiver request for {{course_code}} was decided: {{outcome}}.",
       waiverDecided_department_head:
@@ -1826,6 +1827,27 @@ export const en = {
     },
   },
   academicStanding: {
+    standing: {
+      title: 'Current Academic Standing',
+      cardTitle: 'Academic Standing',
+      values: {
+        TerminationPending: 'Termination Pending',
+        NotYetAssessed: 'Not Yet Assessed',
+        AcademicProbation: 'Academic Probation',
+        AcademicWarning: 'Academic Warning',
+        GoodStanding: 'Good Standing',
+      },
+      explanations: {
+        termination_pending: 'Actionable termination evidence is under review.',
+        no_finalized_cgpa_grade: 'No CGPA-bearing Grade has been finalized yet.',
+        cgpa_below_minimum: 'Your CGPA is below 3.00.',
+        effective_grade_below_c_plus: 'At least one effective Grade is below C+.',
+        requirements_met: 'Your CGPA is at least 3.00 and every effective Grade is C+ or higher.',
+      },
+      ceiling: 'Registration is currently capped at {{count}} credit hours, including Audit.',
+      action: 'View academic progress',
+      loadError: 'Could not load Academic Standing.',
+    },
     creditHours: {
       title: 'Credit-Hour Summary',
       intro:

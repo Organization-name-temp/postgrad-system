@@ -12,6 +12,7 @@ import { SheetsAwaitingReviewCard } from '../features/grading/dashboard/SheetsAw
 import { AdministrationCard } from '../features/admin/dashboard/AdministrationCard'
 import { SemesterWindowsCard } from '../features/admin/dashboard/SemesterWindowsCard'
 import { CreditHourSummaryCard } from '../features/academic-standing/CreditHourSummaryCard'
+import { AcademicStandingCard } from '../features/academic-standing/AcademicStandingCard'
 import { PERMISSION } from '../shared/access/permissions'
 import type { PermissionCode } from '../shared/access/permissions'
 import { ADMIN_ROLES, ROLE } from '../shared/access/roles'
@@ -151,6 +152,11 @@ export const dashboardCards: DashboardCardEntry[] = [
   {
     key: 'creditHourSummary',
     component: CreditHourSummaryCard,
+    roles: [ROLE.student],
+  },
+  {
+    key: 'academicStanding',
+    component: AcademicStandingCard,
     roles: [ROLE.student],
   },
 

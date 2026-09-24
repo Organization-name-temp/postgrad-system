@@ -98,6 +98,55 @@ export type AScopedStudentsTargetAwareCreditHourSummary200 = {
   data?: AScopedStudentsTargetAwareCreditHourSummary200Data;
 };
 
+export type MyCurrentAcademicStandingAndObservationHistory200DataObservationsItem = {
+  id?: number;
+  standing?: string;
+  cause_type?: string;
+  cause_id?: number;
+  observed_at?: string;
+};
+
+export type MyCurrentAcademicStandingAndObservationHistory200Data = {
+  student_id?: number;
+  standing?: string;
+  cgpa?: number;
+  explanation?: string;
+  /** @nullable */
+  registration_ceiling_ch?: string | null;
+  observations?: MyCurrentAcademicStandingAndObservationHistory200DataObservationsItem[];
+};
+
+export type MyCurrentAcademicStandingAndObservationHistory200 = {
+  data?: MyCurrentAcademicStandingAndObservationHistory200Data;
+};
+
+export type MyAcademicStandingDashboardCard200Data = {
+  standing?: string;
+  cgpa?: number;
+  explanation?: string;
+};
+
+export type MyAcademicStandingDashboardCard200Meta = { [key: string]: unknown };
+
+export type MyAcademicStandingDashboardCard200 = {
+  data?: MyAcademicStandingDashboardCard200Data;
+  meta?: MyAcademicStandingDashboardCard200Meta;
+};
+
+export type AScopedStudentsCurrentAcademicStandingAndObservationHistory200Data = {
+  student_id?: number;
+  standing?: string;
+  cgpa?: number;
+  explanation?: string;
+  /** @nullable */
+  registration_ceiling_ch?: string | null;
+  observations?: unknown[];
+};
+
+export type AScopedStudentsCurrentAcademicStandingAndObservationHistory200 = {
+  data?: AScopedStudentsCurrentAcademicStandingAndObservationHistory200Data;
+};
+
 export type ListAssignableDeans200DataItem = {
   id?: number;
   name?: string;
@@ -10191,6 +10240,285 @@ export function useAScopedStudentsTargetAwareCreditHourSummary<TData = Awaited<R
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getAScopedStudentsTargetAwareCreditHourSummaryQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My current Academic Standing and observation history.
+ */
+export const myCurrentAcademicStandingAndObservationHistory = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyCurrentAcademicStandingAndObservationHistory200>(
+      {url: `/api/v1/academic-standing/me`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyCurrentAcademicStandingAndObservationHistoryQueryKey = () => {
+    return [
+    `/api/v1/academic-standing/me`
+    ] as const;
+    }
+
+
+export const getMyCurrentAcademicStandingAndObservationHistoryQueryOptions = <TData = Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyCurrentAcademicStandingAndObservationHistoryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>> = ({ signal }) => myCurrentAcademicStandingAndObservationHistory(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyCurrentAcademicStandingAndObservationHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>>
+export type MyCurrentAcademicStandingAndObservationHistoryQueryError = unknown
+
+
+export function useMyCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>,
+          TError,
+          Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>,
+          TError,
+          Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My current Academic Standing and observation history.
+ */
+
+export function useMyCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCurrentAcademicStandingAndObservationHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyCurrentAcademicStandingAndObservationHistoryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My Academic Standing Dashboard Card.
+ */
+export const myAcademicStandingDashboardCard = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyAcademicStandingDashboardCard200>(
+      {url: `/api/v1/academic-standing/cards/standing`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyAcademicStandingDashboardCardQueryKey = () => {
+    return [
+    `/api/v1/academic-standing/cards/standing`
+    ] as const;
+    }
+
+
+export const getMyAcademicStandingDashboardCardQueryOptions = <TData = Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyAcademicStandingDashboardCardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>> = ({ signal }) => myAcademicStandingDashboardCard(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyAcademicStandingDashboardCardQueryResult = NonNullable<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>>
+export type MyAcademicStandingDashboardCardQueryError = unknown
+
+
+export function useMyAcademicStandingDashboardCard<TData = Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>,
+          TError,
+          Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyAcademicStandingDashboardCard<TData = Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>,
+          TError,
+          Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyAcademicStandingDashboardCard<TData = Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Academic Standing Dashboard Card.
+ */
+
+export function useMyAcademicStandingDashboardCard<TData = Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myAcademicStandingDashboardCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyAcademicStandingDashboardCardQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary A scoped Student's current Academic Standing and observation history.
+ */
+export const aScopedStudentsCurrentAcademicStandingAndObservationHistory = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AScopedStudentsCurrentAcademicStandingAndObservationHistory200>(
+      {url: `/api/v1/academic-standing/students/${studentId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAScopedStudentsCurrentAcademicStandingAndObservationHistoryQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/academic-standing/students/${studentId}`
+    ] as const;
+    }
+
+
+export const getAScopedStudentsCurrentAcademicStandingAndObservationHistoryQueryOptions = <TData = Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAScopedStudentsCurrentAcademicStandingAndObservationHistoryQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>> = ({ signal }) => aScopedStudentsCurrentAcademicStandingAndObservationHistory(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AScopedStudentsCurrentAcademicStandingAndObservationHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>>
+export type AScopedStudentsCurrentAcademicStandingAndObservationHistoryQueryError = unknown
+
+
+export function useAScopedStudentsCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>,
+          TError,
+          Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAScopedStudentsCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>,
+          TError,
+          Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAScopedStudentsCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary A scoped Student's current Academic Standing and observation history.
+ */
+
+export function useAScopedStudentsCurrentAcademicStandingAndObservationHistory<TData = Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsCurrentAcademicStandingAndObservationHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAScopedStudentsCurrentAcademicStandingAndObservationHistoryQueryOptions(studentId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

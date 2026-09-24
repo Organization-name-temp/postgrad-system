@@ -186,4 +186,7 @@ enum NotificationType: string
      * `course_offering_id`, `course_code`, `deadline`.
      */
     case GradesOverdue = 'grades.overdue';
+
+    /** A real derived Academic Standing transition or recovery. */
+    case StandingChanged = 'academic_standing.changed';
 }

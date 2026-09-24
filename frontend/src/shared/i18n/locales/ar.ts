@@ -348,6 +348,7 @@ export const ar = {
       waiverDecided: 'اتُّخذ قرار بشأن طلب إعفائك من المقرر {{course_code}}: {{outcome}}.',
       creditDecisionRevoked:
         'تم إلغاء قرار {{decision_type}} للمقرر {{target_course_code}}: {{reason}}',
+      standingChanged: 'تغيّرت حالتك الأكاديمية إلى {{standing}}.',
       waiverDecided_advisor:
         'اتُّخذ قرار بشأن طلب إعفاء من مقرر لأحد طلابك {{course_code}}: {{outcome}}.',
       waiverDecided_department_head:
@@ -1751,6 +1752,27 @@ export const ar = {
     },
   },
   academicStanding: {
+    standing: {
+      title: 'الحالة الأكاديمية الحالية',
+      cardTitle: 'الحالة الأكاديمية',
+      values: {
+        TerminationPending: 'إنهاء القيد قيد النظر',
+        NotYetAssessed: 'لم يُقيّم بعد',
+        AcademicProbation: 'إنذار بالمعدل التراكمي',
+        AcademicWarning: 'تحذير أكاديمي',
+        GoodStanding: 'حالة أكاديمية جيدة',
+      },
+      explanations: {
+        termination_pending: 'توجد أدلة موجبة لإنهاء القيد قيد المراجعة.',
+        no_finalized_cgpa_grade: 'لم يُعتمد أي تقدير يدخل في المعدل التراكمي بعد.',
+        cgpa_below_minimum: 'المعدل التراكمي أقل من 3.00.',
+        effective_grade_below_c_plus: 'يوجد تقدير سارٍ واحد على الأقل أقل من C+.',
+        requirements_met: 'المعدل التراكمي 3.00 فأعلى وجميع التقديرات السارية C+ فأعلى.',
+      },
+      ceiling: 'الحد الأقصى الحالي للتسجيل {{count}} ساعات معتمدة، ويشمل مقررات الاستماع.',
+      action: 'عرض التقدم الأكاديمي',
+      loadError: 'تعذّر تحميل الحالة الأكاديمية.',
+    },
     creditHours: {
       title: 'ملخص الساعات المعتمدة',
       intro:

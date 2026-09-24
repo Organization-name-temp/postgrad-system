@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CourseSummary;
@@ -232,6 +233,7 @@ class RegistrationReviewController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         AuditLogger $auditLogger,
+        StandingRecords $standing,
     ): JsonResponse {
         $userId = (int) $request->user()?->getAuthIdentifier();
 
@@ -289,7 +291,9 @@ class RegistrationReviewController
 
         // $cartLines is keyed by request-line id (for the mint plan below); the batch
         // validator wants a plain list.
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+        ));
         $violations = $validator->validate(array_values($cartLines), $this->exceptionsFor($student, $semester), $existing);
 
         // Derive each approved line's status (Regular/Retake/Audit); a second retake blocks,

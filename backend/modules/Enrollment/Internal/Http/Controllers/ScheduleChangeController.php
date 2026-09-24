@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
@@ -96,6 +97,7 @@ class ScheduleChangeController
         Directory $directory,
         EligibilityResolver $eligibility,
         Notifier $notifier,
+        StandingRecords $standing,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
@@ -144,7 +146,9 @@ class ScheduleChangeController
 
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+        ));
         $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester), $existing);
 
         // Derive the status (Regular/Retake/CGPA Improvement/Audit); a third for-credit

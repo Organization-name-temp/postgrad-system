@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
@@ -162,6 +163,7 @@ class RegistrationController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         AutomaticExemptionReadiness $exemptionReadiness,
+        StandingRecords $standing,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
         $exemptionReadiness->ensureReconciled($student);
@@ -194,7 +196,9 @@ class RegistrationController
         // clash); ExistingEnrollments carries both the historical and current-semester facts.
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+        ));
         $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
 
         $errors = $this->errorsFrom($violations, $ineligible);
@@ -555,6 +559,7 @@ class RegistrationController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         AutomaticExemptionReadiness $exemptionReadiness,
+        StandingRecords $standing,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
         $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
@@ -588,7 +593,9 @@ class RegistrationController
         // ExistingEnrollments read carries both.
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+        ));
         $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
 
         $mintPlan = [];

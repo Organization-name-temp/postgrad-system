@@ -4,11 +4,15 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import '../../shared/i18n/config'
 import i18n from '../../shared/i18n/config'
 import { CreditHourSummaryPage } from './CreditHourSummaryPage'
-import { useMyTargetAwareCreditHourSummary } from '../../shared/api/generated/endpoints'
+import {
+  useMyCurrentAcademicStandingAndObservationHistory,
+  useMyTargetAwareCreditHourSummary,
+} from '../../shared/api/generated/endpoints'
 
 vi.mock('../../shared/api/generated/endpoints')
 const mockedQuery = vi.mocked(useMyTargetAwareCreditHourSummary)
-const theme = createTheme()
+const mockedStanding = vi.mocked(useMyCurrentAcademicStandingAndObservationHistory)
+const theme = createTheme({ cssVariables: true, colorSchemes: { light: true, dark: true } })
 
 afterEach(async () => {
   await i18n.changeLanguage('en')
@@ -16,6 +20,17 @@ afterEach(async () => {
 })
 
 it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
+  mockedStanding.mockReturnValue({
+    data: {
+      data: {
+        standing: 'AcademicWarning',
+        explanation: 'effective_grade_below_c_plus',
+        observations: [],
+      },
+    },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useMyCurrentAcademicStandingAndObservationHistory>)
   mockedQuery.mockReturnValue({
     data: {
       data: {
@@ -67,6 +82,11 @@ it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
 
 it('renders the same accounting labels in Arabic RTL', async () => {
   await i18n.changeLanguage('ar')
+  mockedStanding.mockReturnValue({
+    data: { data: { standing: 'GoodStanding', explanation: 'requirements_met', observations: [] } },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useMyCurrentAcademicStandingAndObservationHistory>)
   mockedQuery.mockReturnValue({
     data: { data: { categories: [], total: { category: 'Total' } } },
     isPending: false,

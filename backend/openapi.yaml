@@ -296,6 +296,176 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/academic-standing/me:
+    get:
+      summary: 'My current Academic Standing and observation history.'
+      operationId: myCurrentAcademicStandingAndObservationHistory
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    student_id: 1
+                    standing: AcademicWarning
+                    cgpa: 3.2
+                    explanation: effective_grade_below_c_plus
+                    registration_ceiling_ch: null
+                    observations:
+                      -
+                        id: 2
+                        standing: AcademicWarning
+                        cause_type: grade_sheet
+                        cause_id: 9
+                        observed_at: '2026-09-01T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      student_id:
+                        type: integer
+                        example: 1
+                      standing:
+                        type: string
+                        example: AcademicWarning
+                      cgpa:
+                        type: number
+                        example: 3.2
+                      explanation:
+                        type: string
+                        example: effective_grade_below_c_plus
+                      registration_ceiling_ch:
+                        type: string
+                        example: null
+                        nullable: true
+                      observations:
+                        type: array
+                        example:
+                          - id: 2
+                            standing: AcademicWarning
+                            cause_type: grade_sheet
+                            cause_id: 9
+                            observed_at: '2026-09-01T10:00:00+00:00'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            standing:
+                              type: string
+                              example: AcademicWarning
+                            cause_type:
+                              type: string
+                              example: grade_sheet
+                            cause_id:
+                              type: integer
+                              example: 9
+                            observed_at:
+                              type: string
+                              example: '2026-09-01T10:00:00+00:00'
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/academic-standing/cards/standing:
+    get:
+      summary: 'My Academic Standing Dashboard Card.'
+      operationId: myAcademicStandingDashboardCard
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    standing: GoodStanding
+                    cgpa: 3.5
+                    explanation: requirements_met
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      standing:
+                        type: string
+                        example: GoodStanding
+                      cgpa:
+                        type: number
+                        example: 3.5
+                      explanation:
+                        type: string
+                        example: requirements_met
+                  meta:
+                    type: object
+                    properties: {}
+      tags:
+        - 'Academic Standing'
+      security: []
+  '/api/v1/academic-standing/students/{student_id}':
+    get:
+      summary: "A scoped Student's current Academic Standing and observation history."
+      operationId: aScopedStudentsCurrentAcademicStandingAndObservationHistory
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    student_id: 1
+                    standing: GoodStanding
+                    cgpa: 3.5
+                    explanation: requirements_met
+                    registration_ceiling_ch: null
+                    observations: []
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      student_id:
+                        type: integer
+                        example: 1
+                      standing:
+                        type: string
+                        example: GoodStanding
+                      cgpa:
+                        type: number
+                        example: 3.5
+                      explanation:
+                        type: string
+                        example: requirements_met
+                      registration_ceiling_ch:
+                        type: string
+                        example: null
+                        nullable: true
+                      observations:
+                        type: array
+                        example: []
+      tags:
+        - 'Academic Standing'
+      security: []
+    parameters:
+      -
+        in: path
+        name: student_id
+        description: 'The Student anchor id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/admin/deans:
     get:
       summary: 'List assignable Deans.'

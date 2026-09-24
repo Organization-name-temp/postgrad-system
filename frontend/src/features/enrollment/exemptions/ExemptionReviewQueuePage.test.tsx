@@ -195,7 +195,7 @@ it('uses the named large-radius token for reviewer panels', async () => {
 
 it.each([
   ['en', /review reason/i, 'Use 2,000 characters or fewer.'],
-  ['ar', /سبب المراجعة/i, 'استخدم ٢٠٠٠ حرف أو أقل.'],
+  ['ar', /سبب المراجعة/i, 'استخدم 2000 حرف أو أقل.'],
 ])(
   'localizes an overlength review reason in %s without exposing a translation key',
   async (locale, reasonLabel, expected) => {

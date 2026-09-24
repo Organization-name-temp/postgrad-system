@@ -7,6 +7,7 @@ use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\ScheduleChangeController;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Identity\Public\StudentSummary;
 
 /**
@@ -26,6 +27,7 @@ trait ResolvesStudent
         $userId = (int) $request->user()?->getAuthIdentifier();
         $student = $students->find($userId);
         abort_if($student === null, 403, 'You do not have a student record to register with.');
+        abort_if($student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, 'A terminated Student cannot make new academic changes.');
 
         return $student;
     }

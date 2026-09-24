@@ -11,12 +11,14 @@ use Modules\Enrollment\Internal\Console\Commands\ReconcileRemediation;
 use Modules\Enrollment\Internal\Listeners\ApplyAutomaticPreparatoryExemptions;
 use Modules\Enrollment\Internal\Listeners\ReconcileMustRetakeObligations;
 use Modules\Enrollment\Internal\Listeners\RejectCreditRequestsAfterFailedGrade;
+use Modules\Enrollment\Internal\Support\EloquentAcademicRequestCloseout;
 use Modules\Enrollment\Internal\Support\EloquentEnrollmentRecords;
 use Modules\Enrollment\Internal\Support\EloquentExemptionDecisions;
 use Modules\Enrollment\Internal\Support\EloquentMustRetakeObligations;
 use Modules\Enrollment\Internal\Support\EloquentTransferDecisions;
 use Modules\Enrollment\Internal\Support\EloquentWaiverDecisions;
 use Modules\Enrollment\Internal\Support\RemediationReconciler;
+use Modules\Enrollment\Public\AcademicRequestCloseout;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\Events\GradeOutcomesFinalized;
 use Modules\Enrollment\Public\ExemptionDecisions;
@@ -45,6 +47,7 @@ class EnrollmentServiceProvider extends ServiceProvider
         // The cross-module read facade (ADR-0012/0017): consumers depend on the
         // Enrollment\Public contract; the Eloquent reader lives in Enrollment\Internal.
         $this->app->bind(EnrollmentRecords::class, EloquentEnrollmentRecords::class);
+        $this->app->bind(AcademicRequestCloseout::class, EloquentAcademicRequestCloseout::class);
         $this->app->bind(ExemptionDecisions::class, EloquentExemptionDecisions::class);
         $this->app->bind(TransferDecisions::class, EloquentTransferDecisions::class);
         $this->app->bind(WaiverDecisions::class, EloquentWaiverDecisions::class);

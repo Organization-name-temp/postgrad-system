@@ -1752,6 +1752,17 @@ export const ar = {
     },
   },
   academicStanding: {
+    termination: {
+      title: 'حالة إنهاء القيد',
+      explanation: 'تظل الأدلة وجميع المراجعات المنسوبة متاحة أثناء نظر الجهة المسؤولة في الحالة.',
+      states: {
+        AwaitingAdvisor: 'بانتظار تقييم المرشد الأكاديمي',
+        AwaitingDepartmentHead: 'بانتظار مراجعة رئيس القسم',
+        AwaitingCouncil: 'بانتظار قرار المجلس',
+        Dismissed: 'رُفضت الحالة',
+        Terminated: 'تم اعتماد إنهاء القيد',
+      },
+    },
     readiness: {
       title: 'الجاهزية للتخرج',
       ready: 'مستوفٍ أكاديميًا',

@@ -563,6 +563,382 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/termination-cases/mine:
+    get:
+      summary: ''
+      operationId: getApiV1TerminationCasesMine
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: null
+                properties:
+                  data:
+                    type: string
+                    example: null
+                    nullable: true
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/termination-cases/advisor:
+    get:
+      summary: ''
+      operationId: getApiV1TerminationCasesAdvisor
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: []
+                properties:
+                  data:
+                    type: array
+                    example: []
+      tags:
+        - 'Academic Standing'
+      security: []
+  '/api/v1/termination-cases/{case_id}/advisor-review':
+    post:
+      summary: ''
+      operationId: postApiV1TerminationCasesCase_idAdvisorReview
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 5
+                    fingerprint: abc
+                    state: AwaitingDepartmentHead
+                    evidence:
+                      df_grades: []
+                    advisor_user_id: 3
+                    advisor_assessment: 'Two failures.'
+                    advisor_recommendation: continue
+                    department_head_user_id: null
+                    department_head_reason: null
+                    council_user_id: null
+                    council_reason: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 5
+                      fingerprint:
+                        type: string
+                        example: abc
+                      state:
+                        type: string
+                        example: AwaitingDepartmentHead
+                      evidence:
+                        type: object
+                        properties:
+                          df_grades:
+                            type: array
+                            example: []
+                      advisor_user_id:
+                        type: integer
+                        example: 3
+                      advisor_assessment:
+                        type: string
+                        example: 'Two failures.'
+                      advisor_recommendation:
+                        type: string
+                        example: continue
+                      department_head_user_id:
+                        type: string
+                        example: null
+                        nullable: true
+                      department_head_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      council_user_id:
+                        type: string
+                        example: null
+                        nullable: true
+                      council_reason:
+                        type: string
+                        example: null
+                        nullable: true
+      tags:
+        - 'Academic Standing'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assessment:
+                  type: string
+                  description: ''
+                  example: 'Two distinct failing grades remain effective.'
+                recommendation:
+                  type: string
+                  description: 'continue or dismiss.'
+                  example: continue
+              required:
+                - assessment
+                - recommendation
+      security: []
+    parameters:
+      -
+        in: path
+        name: case_id
+        description: 'The ID of the case.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  /api/v1/termination-cases/department-head:
+    get:
+      summary: ''
+      operationId: getApiV1TerminationCasesDepartmentHead
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data: []
+                properties:
+                  data:
+                    type: array
+                    example: []
+      tags:
+        - 'Academic Standing'
+      security: []
+  '/api/v1/termination-cases/{case_id}/department-review':
+    post:
+      summary: ''
+      operationId: postApiV1TerminationCasesCase_idDepartmentReview
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 5
+                    fingerprint: abc
+                    state: AwaitingCouncil
+                    evidence:
+                      df_grades: []
+                    advisor_user_id: 3
+                    advisor_assessment: 'Two failures.'
+                    advisor_recommendation: continue
+                    department_head_user_id: 6
+                    department_head_reason: Actionable.
+                    council_user_id: null
+                    council_reason: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 5
+                      fingerprint:
+                        type: string
+                        example: abc
+                      state:
+                        type: string
+                        example: AwaitingCouncil
+                      evidence:
+                        type: object
+                        properties:
+                          df_grades:
+                            type: array
+                            example: []
+                      advisor_user_id:
+                        type: integer
+                        example: 3
+                      advisor_assessment:
+                        type: string
+                        example: 'Two failures.'
+                      advisor_recommendation:
+                        type: string
+                        example: continue
+                      department_head_user_id:
+                        type: integer
+                        example: 6
+                      department_head_reason:
+                        type: string
+                        example: Actionable.
+                      council_user_id:
+                        type: string
+                        example: null
+                        nullable: true
+                      council_reason:
+                        type: string
+                        example: null
+                        nullable: true
+      tags:
+        - 'Academic Standing'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: 'recommend or dismiss.'
+                  example: recommend
+                reason:
+                  type: string
+                  description: ''
+                  example: 'Evidence is actionable.'
+              required:
+                - action
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: case_id
+        description: 'The ID of the case.'
+        example: 16
+        required: true
+        schema:
+          type: integer
+  '/api/v1/termination-cases/{case_id}/council-decision':
+    post:
+      summary: ''
+      operationId: postApiV1TerminationCasesCase_idCouncilDecision
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 5
+                    fingerprint: abc
+                    state: Terminated
+                    evidence:
+                      df_grades: []
+                    advisor_user_id: 3
+                    advisor_assessment: 'Two failures.'
+                    advisor_recommendation: continue
+                    department_head_user_id: 6
+                    department_head_reason: Actionable.
+                    council_user_id: 8
+                    council_reason: Confirmed.
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 5
+                      fingerprint:
+                        type: string
+                        example: abc
+                      state:
+                        type: string
+                        example: Terminated
+                      evidence:
+                        type: object
+                        properties:
+                          df_grades:
+                            type: array
+                            example: []
+                      advisor_user_id:
+                        type: integer
+                        example: 3
+                      advisor_assessment:
+                        type: string
+                        example: 'Two failures.'
+                      advisor_recommendation:
+                        type: string
+                        example: continue
+                      department_head_user_id:
+                        type: integer
+                        example: 6
+                      department_head_reason:
+                        type: string
+                        example: Actionable.
+                      council_user_id:
+                        type: integer
+                        example: 8
+                      council_reason:
+                        type: string
+                        example: Confirmed.
+      tags:
+        - 'Academic Standing'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  description: 'terminate or dismiss.'
+                  example: terminate
+                reason:
+                  type: string
+                  description: ''
+                  example: 'Council confirmed termination.'
+              required:
+                - action
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: case_id
+        description: 'The ID of the case.'
+        example: 16
+        required: true
+        schema:
+          type: integer
   /api/v1/admin/deans:
     get:
       summary: 'List assignable Deans.'

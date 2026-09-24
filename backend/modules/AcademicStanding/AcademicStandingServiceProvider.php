@@ -10,9 +10,11 @@ use Modules\AcademicStanding\Internal\Listeners\ReconcileStandingAfterGrade;
 use Modules\AcademicStanding\Internal\Support\DerivedCreditHourSummaries;
 use Modules\AcademicStanding\Internal\Support\DerivedGraduationProgress;
 use Modules\AcademicStanding\Internal\Support\DerivedStandingRecords;
+use Modules\AcademicStanding\Internal\Support\TerminationCaseReconciler;
 use Modules\AcademicStanding\Public\CreditHourSummaries;
 use Modules\AcademicStanding\Public\GraduationProgress;
 use Modules\AcademicStanding\Public\StandingRecords;
+use Modules\AcademicStanding\Public\TerminationCases;
 use Modules\Grading\Public\Events\GradeFinalized;
 
 final class AcademicStandingServiceProvider extends ServiceProvider
@@ -22,6 +24,7 @@ final class AcademicStandingServiceProvider extends ServiceProvider
         $this->app->bind(CreditHourSummaries::class, DerivedCreditHourSummaries::class);
         $this->app->bind(GraduationProgress::class, DerivedGraduationProgress::class);
         $this->app->bind(StandingRecords::class, DerivedStandingRecords::class);
+        $this->app->bind(TerminationCases::class, TerminationCaseReconciler::class);
     }
 
     public function boot(): void

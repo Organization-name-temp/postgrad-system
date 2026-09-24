@@ -171,6 +171,108 @@ export const AScopedStudentsCurrentAcademicStandingAndObservationHistoryResponse
 })
 
 
+export const GetApiV1TerminationCasesMineResponse = zod.object({
+  "data": zod.string().nullish()
+})
+
+
+export const GetApiV1TerminationCasesAdvisorResponse = zod.object({
+  "data": zod.array().optional()
+})
+
+
+export const PostApiV1TerminationCasesCaseIdAdvisorReviewParams = zod.object({
+  "case_id": zod.number().describe('The ID of the case.')
+})
+
+export const PostApiV1TerminationCasesCaseIdAdvisorReviewBody = zod.object({
+  "assessment": zod.string(),
+  "recommendation": zod.string().describe('continue or dismiss.')
+})
+
+export const PostApiV1TerminationCasesCaseIdAdvisorReviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "fingerprint": zod.string().optional(),
+  "state": zod.string().optional(),
+  "evidence": zod.object({
+  "df_grades": zod.array().optional()
+}).optional(),
+  "advisor_user_id": zod.number().optional(),
+  "advisor_assessment": zod.string().optional(),
+  "advisor_recommendation": zod.string().optional(),
+  "department_head_user_id": zod.string().nullish(),
+  "department_head_reason": zod.string().nullish(),
+  "council_user_id": zod.string().nullish(),
+  "council_reason": zod.string().nullish()
+}).optional()
+})
+
+
+export const GetApiV1TerminationCasesDepartmentHeadResponse = zod.object({
+  "data": zod.array().optional()
+})
+
+
+export const PostApiV1TerminationCasesCaseIdDepartmentReviewParams = zod.object({
+  "case_id": zod.number().describe('The ID of the case.')
+})
+
+export const PostApiV1TerminationCasesCaseIdDepartmentReviewBody = zod.object({
+  "action": zod.string().describe('recommend or dismiss.'),
+  "reason": zod.string()
+})
+
+export const PostApiV1TerminationCasesCaseIdDepartmentReviewResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "fingerprint": zod.string().optional(),
+  "state": zod.string().optional(),
+  "evidence": zod.object({
+  "df_grades": zod.array().optional()
+}).optional(),
+  "advisor_user_id": zod.number().optional(),
+  "advisor_assessment": zod.string().optional(),
+  "advisor_recommendation": zod.string().optional(),
+  "department_head_user_id": zod.number().optional(),
+  "department_head_reason": zod.string().optional(),
+  "council_user_id": zod.string().nullish(),
+  "council_reason": zod.string().nullish()
+}).optional()
+})
+
+
+export const PostApiV1TerminationCasesCaseIdCouncilDecisionParams = zod.object({
+  "case_id": zod.number().describe('The ID of the case.')
+})
+
+export const PostApiV1TerminationCasesCaseIdCouncilDecisionBody = zod.object({
+  "action": zod.string().describe('terminate or dismiss.'),
+  "reason": zod.string()
+})
+
+export const PostApiV1TerminationCasesCaseIdCouncilDecisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "fingerprint": zod.string().optional(),
+  "state": zod.string().optional(),
+  "evidence": zod.object({
+  "df_grades": zod.array().optional()
+}).optional(),
+  "advisor_user_id": zod.number().optional(),
+  "advisor_assessment": zod.string().optional(),
+  "advisor_recommendation": zod.string().optional(),
+  "department_head_user_id": zod.number().optional(),
+  "department_head_reason": zod.string().optional(),
+  "council_user_id": zod.number().optional(),
+  "council_reason": zod.string().optional()
+}).optional()
+})
+
+
 /**
  * The R07 (Dean) users an administrator may assign to a Faculty — the source for
  * the assignment screen's Dean picker. Admin-only (R09/R10).

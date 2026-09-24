@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next'
 import { useMyTargetAwareCreditHourSummary } from '../../shared/api/generated/endpoints'
 import { useMyCurrentAcademicStandingAndObservationHistory } from '../../shared/api/generated/endpoints'
 import { useMyDerivedGraduationReadiness } from '../../shared/api/generated/endpoints'
+import { useGetApiV1TerminationCasesMine } from '../../shared/api/generated/endpoints'
 import { tabularNums } from '../../app/theme/fonts'
 import { StatusChip } from '../../shared/ui/StatusChip'
 import { standingPresentation } from './AcademicStandingCard'
@@ -40,6 +41,9 @@ export function CreditHourSummaryPage() {
   const { data, isPending, isError } = useMyTargetAwareCreditHourSummary()
   const standingQuery = useMyCurrentAcademicStandingAndObservationHistory()
   const readinessQuery = useMyDerivedGraduationReadiness()
+  const terminationQuery = useGetApiV1TerminationCasesMine()
+  const terminationCase = terminationQuery.data?.data as
+    { state?: string; evidence?: Record<string, unknown> } | null | undefined
   const summary = data?.data
   const rows: SummaryRow[] = summary
     ? [...(summary.categories ?? []), ...(summary.total ? [summary.total] : [])]
@@ -101,6 +105,13 @@ export function CreditHourSummaryPage() {
             <Typography color="text.secondary">{t('readiness.completingSchedule')}</Typography>
           </Stack>
         </Paper>
+      )}
+      {terminationCase && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="subtitle1">{t('termination.title')}</Typography>
+          <Typography>{t(`termination.states.${terminationCase.state}`)}</Typography>
+          <Typography variant="body2">{t('termination.explanation')}</Typography>
+        </Alert>
       )}
       {isPending && <CircularProgress aria-label={t('creditHours.loading')} />}
       {isError && <Alert severity="error">{t('creditHours.loadError')}</Alert>}

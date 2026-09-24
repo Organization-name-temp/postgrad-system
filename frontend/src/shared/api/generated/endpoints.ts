@@ -171,6 +171,112 @@ export type AScopedStudentsCurrentAcademicStandingAndObservationHistory200 = {
   data?: AScopedStudentsCurrentAcademicStandingAndObservationHistory200Data;
 };
 
+export type GetApiV1TerminationCasesMine200 = {
+  /** @nullable */
+  data?: string | null;
+};
+
+export type GetApiV1TerminationCasesAdvisor200 = {
+  data?: unknown[];
+};
+
+export type PostApiV1TerminationCasesCaseIdAdvisorReviewBody = {
+  assessment: string;
+  /** continue or dismiss. */
+  recommendation: string;
+};
+
+export type PostApiV1TerminationCasesCaseIdAdvisorReview200DataEvidence = {
+  df_grades?: unknown[];
+};
+
+export type PostApiV1TerminationCasesCaseIdAdvisorReview200Data = {
+  id?: number;
+  student_id?: number;
+  fingerprint?: string;
+  state?: string;
+  evidence?: PostApiV1TerminationCasesCaseIdAdvisorReview200DataEvidence;
+  advisor_user_id?: number;
+  advisor_assessment?: string;
+  advisor_recommendation?: string;
+  /** @nullable */
+  department_head_user_id?: string | null;
+  /** @nullable */
+  department_head_reason?: string | null;
+  /** @nullable */
+  council_user_id?: string | null;
+  /** @nullable */
+  council_reason?: string | null;
+};
+
+export type PostApiV1TerminationCasesCaseIdAdvisorReview200 = {
+  data?: PostApiV1TerminationCasesCaseIdAdvisorReview200Data;
+};
+
+export type GetApiV1TerminationCasesDepartmentHead200 = {
+  data?: unknown[];
+};
+
+export type PostApiV1TerminationCasesCaseIdDepartmentReviewBody = {
+  /** recommend or dismiss. */
+  action: string;
+  reason: string;
+};
+
+export type PostApiV1TerminationCasesCaseIdDepartmentReview200DataEvidence = {
+  df_grades?: unknown[];
+};
+
+export type PostApiV1TerminationCasesCaseIdDepartmentReview200Data = {
+  id?: number;
+  student_id?: number;
+  fingerprint?: string;
+  state?: string;
+  evidence?: PostApiV1TerminationCasesCaseIdDepartmentReview200DataEvidence;
+  advisor_user_id?: number;
+  advisor_assessment?: string;
+  advisor_recommendation?: string;
+  department_head_user_id?: number;
+  department_head_reason?: string;
+  /** @nullable */
+  council_user_id?: string | null;
+  /** @nullable */
+  council_reason?: string | null;
+};
+
+export type PostApiV1TerminationCasesCaseIdDepartmentReview200 = {
+  data?: PostApiV1TerminationCasesCaseIdDepartmentReview200Data;
+};
+
+export type PostApiV1TerminationCasesCaseIdCouncilDecisionBody = {
+  /** terminate or dismiss. */
+  action: string;
+  reason: string;
+};
+
+export type PostApiV1TerminationCasesCaseIdCouncilDecision200DataEvidence = {
+  df_grades?: unknown[];
+};
+
+export type PostApiV1TerminationCasesCaseIdCouncilDecision200Data = {
+  id?: number;
+  student_id?: number;
+  fingerprint?: string;
+  state?: string;
+  evidence?: PostApiV1TerminationCasesCaseIdCouncilDecision200DataEvidence;
+  advisor_user_id?: number;
+  advisor_assessment?: string;
+  advisor_recommendation?: string;
+  department_head_user_id?: number;
+  department_head_reason?: string;
+  council_user_id?: number;
+  council_reason?: string;
+};
+
+export type PostApiV1TerminationCasesCaseIdCouncilDecision200 = {
+  data?: PostApiV1TerminationCasesCaseIdCouncilDecision200Data;
+};
+
 export type ListAssignableDeans200DataItem = {
   id?: number;
   name?: string;
@@ -10778,6 +10884,447 @@ export function useAScopedStudentsCurrentAcademicStandingAndObservationHistory<T
 
 
 
+
+export const getApiV1TerminationCasesMine = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<GetApiV1TerminationCasesMine200>(
+      {url: `/api/v1/termination-cases/mine`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetApiV1TerminationCasesMineQueryKey = () => {
+    return [
+    `/api/v1/termination-cases/mine`
+    ] as const;
+    }
+
+
+export const getGetApiV1TerminationCasesMineQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1TerminationCasesMineQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>> = ({ signal }) => getApiV1TerminationCasesMine(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiV1TerminationCasesMineQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>>
+export type GetApiV1TerminationCasesMineQueryError = unknown
+
+
+export function useGetApiV1TerminationCasesMine<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesMine<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesMine<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiV1TerminationCasesMine<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesMine>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiV1TerminationCasesMineQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getApiV1TerminationCasesAdvisor = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<GetApiV1TerminationCasesAdvisor200>(
+      {url: `/api/v1/termination-cases/advisor`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetApiV1TerminationCasesAdvisorQueryKey = () => {
+    return [
+    `/api/v1/termination-cases/advisor`
+    ] as const;
+    }
+
+
+export const getGetApiV1TerminationCasesAdvisorQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1TerminationCasesAdvisorQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>> = ({ signal }) => getApiV1TerminationCasesAdvisor(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiV1TerminationCasesAdvisorQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>>
+export type GetApiV1TerminationCasesAdvisorQueryError = unknown
+
+
+export function useGetApiV1TerminationCasesAdvisor<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesAdvisor<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesAdvisor<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiV1TerminationCasesAdvisor<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesAdvisor>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiV1TerminationCasesAdvisorQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const postApiV1TerminationCasesCaseIdAdvisorReview = (
+    caseId: number,
+    postApiV1TerminationCasesCaseIdAdvisorReviewBody: PostApiV1TerminationCasesCaseIdAdvisorReviewBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<PostApiV1TerminationCasesCaseIdAdvisorReview200>(
+      {url: `/api/v1/termination-cases/${caseId}/advisor-review`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postApiV1TerminationCasesCaseIdAdvisorReviewBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getPostApiV1TerminationCasesCaseIdAdvisorReviewMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdAdvisorReview>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdAdvisorReviewBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdAdvisorReview>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdAdvisorReviewBody}, TContext> => {
+
+const mutationKey = ['postApiV1TerminationCasesCaseIdAdvisorReview'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdAdvisorReview>>, {caseId: number;data: PostApiV1TerminationCasesCaseIdAdvisorReviewBody}> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  postApiV1TerminationCasesCaseIdAdvisorReview(caseId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiV1TerminationCasesCaseIdAdvisorReviewMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdAdvisorReview>>>
+    export type PostApiV1TerminationCasesCaseIdAdvisorReviewMutationBody = PostApiV1TerminationCasesCaseIdAdvisorReviewBody
+    export type PostApiV1TerminationCasesCaseIdAdvisorReviewMutationError = unknown
+
+    export const usePostApiV1TerminationCasesCaseIdAdvisorReview = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdAdvisorReview>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdAdvisorReviewBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdAdvisorReview>>,
+        TError,
+        {caseId: number;data: PostApiV1TerminationCasesCaseIdAdvisorReviewBody},
+        TContext
+      > => {
+      return useMutation(getPostApiV1TerminationCasesCaseIdAdvisorReviewMutationOptions(options), queryClient);
+    }
+
+export const getApiV1TerminationCasesDepartmentHead = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<GetApiV1TerminationCasesDepartmentHead200>(
+      {url: `/api/v1/termination-cases/department-head`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetApiV1TerminationCasesDepartmentHeadQueryKey = () => {
+    return [
+    `/api/v1/termination-cases/department-head`
+    ] as const;
+    }
+
+
+export const getGetApiV1TerminationCasesDepartmentHeadQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1TerminationCasesDepartmentHeadQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>> = ({ signal }) => getApiV1TerminationCasesDepartmentHead(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiV1TerminationCasesDepartmentHeadQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>>
+export type GetApiV1TerminationCasesDepartmentHeadQueryError = unknown
+
+
+export function useGetApiV1TerminationCasesDepartmentHead<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesDepartmentHead<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesDepartmentHead<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiV1TerminationCasesDepartmentHead<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesDepartmentHead>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiV1TerminationCasesDepartmentHeadQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const postApiV1TerminationCasesCaseIdDepartmentReview = (
+    caseId: number,
+    postApiV1TerminationCasesCaseIdDepartmentReviewBody: PostApiV1TerminationCasesCaseIdDepartmentReviewBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<PostApiV1TerminationCasesCaseIdDepartmentReview200>(
+      {url: `/api/v1/termination-cases/${caseId}/department-review`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postApiV1TerminationCasesCaseIdDepartmentReviewBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getPostApiV1TerminationCasesCaseIdDepartmentReviewMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdDepartmentReview>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdDepartmentReviewBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdDepartmentReview>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdDepartmentReviewBody}, TContext> => {
+
+const mutationKey = ['postApiV1TerminationCasesCaseIdDepartmentReview'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdDepartmentReview>>, {caseId: number;data: PostApiV1TerminationCasesCaseIdDepartmentReviewBody}> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  postApiV1TerminationCasesCaseIdDepartmentReview(caseId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiV1TerminationCasesCaseIdDepartmentReviewMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdDepartmentReview>>>
+    export type PostApiV1TerminationCasesCaseIdDepartmentReviewMutationBody = PostApiV1TerminationCasesCaseIdDepartmentReviewBody
+    export type PostApiV1TerminationCasesCaseIdDepartmentReviewMutationError = unknown
+
+    export const usePostApiV1TerminationCasesCaseIdDepartmentReview = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdDepartmentReview>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdDepartmentReviewBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdDepartmentReview>>,
+        TError,
+        {caseId: number;data: PostApiV1TerminationCasesCaseIdDepartmentReviewBody},
+        TContext
+      > => {
+      return useMutation(getPostApiV1TerminationCasesCaseIdDepartmentReviewMutationOptions(options), queryClient);
+    }
+
+export const postApiV1TerminationCasesCaseIdCouncilDecision = (
+    caseId: number,
+    postApiV1TerminationCasesCaseIdCouncilDecisionBody: PostApiV1TerminationCasesCaseIdCouncilDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<PostApiV1TerminationCasesCaseIdCouncilDecision200>(
+      {url: `/api/v1/termination-cases/${caseId}/council-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postApiV1TerminationCasesCaseIdCouncilDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getPostApiV1TerminationCasesCaseIdCouncilDecisionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdCouncilDecision>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdCouncilDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdCouncilDecision>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdCouncilDecisionBody}, TContext> => {
+
+const mutationKey = ['postApiV1TerminationCasesCaseIdCouncilDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdCouncilDecision>>, {caseId: number;data: PostApiV1TerminationCasesCaseIdCouncilDecisionBody}> = (props) => {
+          const {caseId,data} = props ?? {};
+
+          return  postApiV1TerminationCasesCaseIdCouncilDecision(caseId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiV1TerminationCasesCaseIdCouncilDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdCouncilDecision>>>
+    export type PostApiV1TerminationCasesCaseIdCouncilDecisionMutationBody = PostApiV1TerminationCasesCaseIdCouncilDecisionBody
+    export type PostApiV1TerminationCasesCaseIdCouncilDecisionMutationError = unknown
+
+    export const usePostApiV1TerminationCasesCaseIdCouncilDecision = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdCouncilDecision>>, TError,{caseId: number;data: PostApiV1TerminationCasesCaseIdCouncilDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiV1TerminationCasesCaseIdCouncilDecision>>,
+        TError,
+        {caseId: number;data: PostApiV1TerminationCasesCaseIdCouncilDecisionBody},
+        TContext
+      > => {
+      return useMutation(getPostApiV1TerminationCasesCaseIdCouncilDecisionMutationOptions(options), queryClient);
+    }
 
 /**
  * The R07 (Dean) users an administrator may assign to a Faculty — the source for

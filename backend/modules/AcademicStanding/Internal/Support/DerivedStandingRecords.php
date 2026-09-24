@@ -6,11 +6,12 @@ use Modules\AcademicStanding\Internal\Models\StandingObservation;
 use Modules\AcademicStanding\Public\AcademicStanding;
 use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\AcademicStanding\Public\StandingSummary;
+use Modules\AcademicStanding\Public\TerminationCases;
 use Modules\Grading\Public\GradingRecords;
 
 final readonly class DerivedStandingRecords implements StandingRecords
 {
-    public function __construct(private GradingRecords $grading) {}
+    public function __construct(private GradingRecords $grading, private TerminationCases $terminationCases) {}
 
     public function currentForStudent(int $studentId): StandingSummary
     {
@@ -19,7 +20,7 @@ final readonly class DerivedStandingRecords implements StandingRecords
         $standing = StandingCalculator::calculate(
             $cgpa,
             array_map(fn ($attempt): bool => $attempt->earned, $attempts),
-            false,
+            $this->terminationCases->currentForStudent($studentId) !== null,
         );
 
         return new StandingSummary(

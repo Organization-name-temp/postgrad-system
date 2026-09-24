@@ -1827,6 +1827,18 @@ export const en = {
     },
   },
   academicStanding: {
+    termination: {
+      title: 'Termination case',
+      explanation:
+        'The evidence and every attributed review remain available while the responsible role considers the case.',
+      states: {
+        AwaitingAdvisor: 'Awaiting Advisor assessment',
+        AwaitingDepartmentHead: 'Awaiting Department Head review',
+        AwaitingCouncil: 'Awaiting Council decision',
+        Dismissed: 'Dismissed',
+        Terminated: 'Termination confirmed',
+      },
+    },
     readiness: {
       title: 'Graduation Readiness',
       ready: 'Academically ready',

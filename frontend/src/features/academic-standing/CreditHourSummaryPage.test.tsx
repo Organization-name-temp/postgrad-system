@@ -8,12 +8,14 @@ import {
   useMyCurrentAcademicStandingAndObservationHistory,
   useMyTargetAwareCreditHourSummary,
   useMyDerivedGraduationReadiness,
+  useGetApiV1TerminationCasesMine,
 } from '../../shared/api/generated/endpoints'
 
 vi.mock('../../shared/api/generated/endpoints')
 const mockedQuery = vi.mocked(useMyTargetAwareCreditHourSummary)
 const mockedStanding = vi.mocked(useMyCurrentAcademicStandingAndObservationHistory)
 const mockedReadiness = vi.mocked(useMyDerivedGraduationReadiness)
+const mockedTermination = vi.mocked(useGetApiV1TerminationCasesMine)
 const theme = createTheme({ cssVariables: true, colorSchemes: { light: true, dark: true } })
 
 afterEach(async () => {
@@ -22,6 +24,11 @@ afterEach(async () => {
 })
 
 it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
+  mockedTermination.mockReturnValue({
+    data: { data: null },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useGetApiV1TerminationCasesMine>)
   mockedReadiness.mockReturnValue({
     data: {
       data: {
@@ -96,6 +103,11 @@ it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
 })
 
 it('renders the same accounting labels in Arabic RTL', async () => {
+  mockedTermination.mockReturnValue({
+    data: { data: null },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useGetApiV1TerminationCasesMine>)
   await i18n.changeLanguage('ar')
   mockedStanding.mockReturnValue({
     data: { data: { standing: 'GoodStanding', explanation: 'requirements_met', observations: [] } },

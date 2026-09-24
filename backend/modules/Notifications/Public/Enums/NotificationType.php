@@ -189,4 +189,7 @@ enum NotificationType: string
 
     /** A real derived Academic Standing transition or recovery. */
     case StandingChanged = 'academic_standing.changed';
+
+    /** An actionable termination Case opened, changed, or cleared. */
+    case TerminationCaseChanged = 'academic_standing.termination_case_changed';
 }

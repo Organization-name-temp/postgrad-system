@@ -3931,6 +3931,27 @@ export type MyRegistrationCard403 = {
   message?: string;
 };
 
+export type GetApiV1RegistrationCapacityOverrides200 = {
+  data?: unknown[];
+};
+
+export type DecideOneScopedFullOfferingRequirementBody = {
+  /** approve or deny. */
+  action: string;
+  /** The accountable reason. */
+  reason: string;
+};
+
+export type DecideOneScopedFullOfferingRequirement200Data = {
+  id?: number;
+  state?: string;
+  reason?: string;
+};
+
+export type DecideOneScopedFullOfferingRequirement200 = {
+  data?: DecideOneScopedFullOfferingRequirement200Data;
+};
+
 export type TheStudentsTheComposerMayRegisterOnBehalfOf200DataItemProgram = {
   id?: number;
   code?: string;
@@ -20113,6 +20134,159 @@ export function useMyRegistrationCard<TData = Awaited<ReturnType<typeof myRegist
 
 
 
+
+export const getApiV1RegistrationCapacityOverrides = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<GetApiV1RegistrationCapacityOverrides200>(
+      {url: `/api/v1/registration/capacity-overrides`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetApiV1RegistrationCapacityOverridesQueryKey = () => {
+    return [
+    `/api/v1/registration/capacity-overrides`
+    ] as const;
+    }
+
+
+export const getGetApiV1RegistrationCapacityOverridesQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1RegistrationCapacityOverridesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>> = ({ signal }) => getApiV1RegistrationCapacityOverrides(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiV1RegistrationCapacityOverridesQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>>
+export type GetApiV1RegistrationCapacityOverridesQueryError = unknown
+
+
+export function useGetApiV1RegistrationCapacityOverrides<TData = Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1RegistrationCapacityOverrides<TData = Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1RegistrationCapacityOverrides<TData = Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiV1RegistrationCapacityOverrides<TData = Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationCapacityOverrides>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiV1RegistrationCapacityOverridesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Decide one scoped full-Offering requirement.
+ */
+export const decideOneScopedFullOfferingRequirement = (
+    requirementId: number,
+    decideOneScopedFullOfferingRequirementBody: DecideOneScopedFullOfferingRequirementBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DecideOneScopedFullOfferingRequirement200>(
+      {url: `/api/v1/registration/capacity-overrides/${requirementId}/decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: decideOneScopedFullOfferingRequirementBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getDecideOneScopedFullOfferingRequirementMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideOneScopedFullOfferingRequirement>>, TError,{requirementId: number;data: DecideOneScopedFullOfferingRequirementBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof decideOneScopedFullOfferingRequirement>>, TError,{requirementId: number;data: DecideOneScopedFullOfferingRequirementBody}, TContext> => {
+
+const mutationKey = ['decideOneScopedFullOfferingRequirement'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof decideOneScopedFullOfferingRequirement>>, {requirementId: number;data: DecideOneScopedFullOfferingRequirementBody}> = (props) => {
+          const {requirementId,data} = props ?? {};
+
+          return  decideOneScopedFullOfferingRequirement(requirementId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DecideOneScopedFullOfferingRequirementMutationResult = NonNullable<Awaited<ReturnType<typeof decideOneScopedFullOfferingRequirement>>>
+    export type DecideOneScopedFullOfferingRequirementMutationBody = DecideOneScopedFullOfferingRequirementBody
+    export type DecideOneScopedFullOfferingRequirementMutationError = unknown
+
+    /**
+ * @summary Decide one scoped full-Offering requirement.
+ */
+export const useDecideOneScopedFullOfferingRequirement = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideOneScopedFullOfferingRequirement>>, TError,{requirementId: number;data: DecideOneScopedFullOfferingRequirementBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof decideOneScopedFullOfferingRequirement>>,
+        TError,
+        {requirementId: number;data: DecideOneScopedFullOfferingRequirementBody},
+        TContext
+      > => {
+      return useMutation(getDecideOneScopedFullOfferingRequirementMutationOptions(options), queryClient);
+    }
 
 /**
  * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;

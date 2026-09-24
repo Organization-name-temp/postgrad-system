@@ -3705,6 +3705,32 @@ export const MyRegistrationCardResponse = zod.object({
 })
 
 
+export const GetApiV1RegistrationCapacityOverridesResponse = zod.object({
+  "data": zod.array().optional()
+})
+
+
+/**
+ * @summary Decide one scoped full-Offering requirement.
+ */
+export const DecideOneScopedFullOfferingRequirementParams = zod.object({
+  "requirement_id": zod.number().describe('The ID of the requirement.')
+})
+
+export const DecideOneScopedFullOfferingRequirementBody = zod.object({
+  "action": zod.string().describe('approve or deny.'),
+  "reason": zod.string().describe('The accountable reason.')
+})
+
+export const DecideOneScopedFullOfferingRequirementResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "state": zod.string().optional(),
+  "reason": zod.string().optional()
+}).optional()
+})
+
+
 /**
  * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
  * Student Affairs (or an administrator) sees **every** Student, unscoped — the same

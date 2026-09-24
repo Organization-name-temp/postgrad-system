@@ -30,6 +30,7 @@ use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Models\RegistrationRequestLine;
+use Modules\Enrollment\Internal\Support\CapacityOverrideWorkflow;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
@@ -238,6 +239,7 @@ class RegistrationReviewController
         StandingRecords $standing,
         GraduationProgress $graduationProgress,
         RequiredRetakeValidator $requiredRetakes,
+        CapacityOverrideWorkflow $capacityOverrides,
     ): JsonResponse {
         $userId = (int) $request->user()?->getAuthIdentifier();
 
@@ -307,6 +309,13 @@ class RegistrationReviewController
         // surfacing as a violation rather than a plan entry (the shared mint seam).
         [$mintPlan, $retakeViolations] = $this->buildMintPlan($cartLines, $existing);
         $violations = [...$violations, ...$retakeViolations];
+
+        $withoutCapacity = array_values(array_filter($violations, fn (CartViolation $violation): bool => $violation->code !== CartViolation::OFFERING_FULL));
+        if ($withoutCapacity === [] && $capacityOverrides->startIfRequired($registration, $decisions, $approvedCartLines, $userId, $note)) {
+            $this->afterDecision($notifier, $registration, $student, RegistrationStatus::AwaitingCapacityOverride, approvedCount: count($approvedCartLines), rejectedCount: $registration->lines->count() - count($approvedCartLines));
+
+            return $this->decidedResponse($registration, $student, $courses, $directory, $eligibility);
+        }
 
         $errors = $this->errorsFrom($violations, $ineligible);
         if ($errors !== []) {

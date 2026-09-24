@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\AttendanceController;
+use Modules\Enrollment\Internal\Http\Controllers\CapacityOverrideController;
 use Modules\Enrollment\Internal\Http\Controllers\CreditDecisionRevocationController;
 use Modules\Enrollment\Internal\Http\Controllers\DashboardCardController;
 use Modules\Enrollment\Internal\Http\Controllers\ExemptionDecisionController;
@@ -97,6 +98,11 @@ Route::middleware(['auth:sanctum', 'can:exemption.approve'])->group(function () 
     Route::get('/credit-decisions/exemption-requests/department-head-queue/export', [ExemptionReviewController::class, 'departmentHeadExport'])->middleware('role:R06');
     Route::post('/credit-decisions/exemption-requests/{exemption_request}/department-head-decision', [ExemptionReviewController::class, 'departmentHeadDecision'])->whereNumber('exemption_request')->middleware('role:R06');
     Route::post('/credit-decisions/exemptions/{decision}/revoke', [CreditDecisionRevocationController::class, 'exemption'])->whereNumber('decision')->middleware('role:R06');
+});
+
+Route::middleware(['auth:sanctum', 'role:R06'])->group(function () {
+    Route::get('/registration/capacity-overrides', [CapacityOverrideController::class, 'index']);
+    Route::post('/registration/capacity-overrides/{requirement}/decision', [CapacityOverrideController::class, 'decide'])->whereNumber('requirement');
 });
 
 Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->group(function () {

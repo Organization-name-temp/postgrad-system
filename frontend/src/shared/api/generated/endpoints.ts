@@ -3952,6 +3952,23 @@ export type DecideOneScopedFullOfferingRequirement200 = {
   data?: DecideOneScopedFullOfferingRequirement200Data;
 };
 
+export type GetApiV1RegistrationRemediationObligations200DataItem = {
+  id?: number;
+  course_id?: number;
+  revocation_id?: number;
+  state?: string;
+  /** @nullable */
+  opportunity_offering_id?: string | null;
+  /** @nullable */
+  checkpoint_semester_id?: string | null;
+  /** @nullable */
+  effective_deadline?: string | null;
+};
+
+export type GetApiV1RegistrationRemediationObligations200 = {
+  data?: GetApiV1RegistrationRemediationObligations200DataItem[];
+};
+
 export type TheStudentsTheComposerMayRegisterOnBehalfOf200DataItemProgram = {
   id?: number;
   code?: string;
@@ -20287,6 +20304,93 @@ export const useDecideOneScopedFullOfferingRequirement = <TError = unknown,
       > => {
       return useMutation(getDecideOneScopedFullOfferingRequirementMutationOptions(options), queryClient);
     }
+
+export const getApiV1RegistrationRemediationObligations = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<GetApiV1RegistrationRemediationObligations200>(
+      {url: `/api/v1/registration/remediation-obligations`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetApiV1RegistrationRemediationObligationsQueryKey = () => {
+    return [
+    `/api/v1/registration/remediation-obligations`
+    ] as const;
+    }
+
+
+export const getGetApiV1RegistrationRemediationObligationsQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1RegistrationRemediationObligationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>> = ({ signal }) => getApiV1RegistrationRemediationObligations(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiV1RegistrationRemediationObligationsQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>>
+export type GetApiV1RegistrationRemediationObligationsQueryError = unknown
+
+
+export function useGetApiV1RegistrationRemediationObligations<TData = Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1RegistrationRemediationObligations<TData = Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1RegistrationRemediationObligations<TData = Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiV1RegistrationRemediationObligations<TData = Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1RegistrationRemediationObligations>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiV1RegistrationRemediationObligationsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;

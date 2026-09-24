@@ -212,6 +212,11 @@ it('lets only the scoped Department Head revoke an Exemption decision', function
     ])->assertOk()
         ->assertJsonPath('data.effective', false)
         ->assertJsonPath('data.revocation.revoked_by_user_id', $scopedHead->id);
+    $this->assertDatabaseHas('remediation_obligations', [
+        'student_id' => $student->id,
+        'course_id' => $course->id,
+        'state' => 'AwaitingOffering',
+    ]);
     $this->getJson('/api/v1/credit-decisions/exemption-requests/department-head-queue?include_decided=true')
         ->assertOk()
         ->assertJsonPath('data', []);

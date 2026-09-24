@@ -10,6 +10,7 @@ use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
@@ -28,6 +29,7 @@ final class CreditDecisionRevoker
         private readonly Directory $directory,
         private readonly Notifier $notifier,
         private readonly AuditLogger $audit,
+        private readonly RemediationObligations $remediation,
     ) {}
 
     public function transfer(TransferDecision $decision, int $actorUserId, string $reason): TransferDecision
@@ -89,6 +91,9 @@ final class CreditDecisionRevoker
                 'reason' => $reason,
                 'created_at' => now(),
             ]);
+            if ($type === CreditDecisionType::Exemption) {
+                $this->remediation->createFromRevocation((int) $revocation->getKey());
+            }
             $payload = [
                 'decision_type' => $type->value,
                 'decision_id' => (int) $locked->getKey(),

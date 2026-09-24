@@ -13,6 +13,7 @@ use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Public\MustRetakeObligations;
+use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Identity\Public\Enums\StudentLifecycleStatus;
@@ -29,6 +30,7 @@ class AutomaticExemptionApplicator
         private readonly Notifier $notifier,
         private readonly PreparatoryExemptionRules $rules,
         private readonly MustRetakeObligations $mustRetakes,
+        private readonly RemediationObligations $remediation,
     ) {}
 
     /** Persist the event snapshot independently of evaluation for recovery. */
@@ -119,6 +121,7 @@ class AutomaticExemptionApplicator
                 }
 
                 $this->mustRetakes->releaseByExemption($student->studentId, $entry->courseId, (int) $decision->getKey());
+                $this->remediation->releaseByExemption($student->studentId, $entry->courseId, (int) $decision->getKey());
 
                 $created++;
                 $this->audit->record(

@@ -13460,6 +13460,70 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/registration/remediation-obligations:
+    get:
+      summary: ''
+      operationId: getApiV1RegistrationRemediationObligations
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      course_id: 10
+                      revocation_id: 3
+                      state: AwaitingOffering
+                      opportunity_offering_id: null
+                      checkpoint_semester_id: null
+                      effective_deadline: null
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        course_id: 10
+                        revocation_id: 3
+                        state: AwaitingOffering
+                        opportunity_offering_id: null
+                        checkpoint_semester_id: null
+                        effective_deadline: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        course_id:
+                          type: integer
+                          example: 10
+                        revocation_id:
+                          type: integer
+                          example: 3
+                        state:
+                          type: string
+                          example: AwaitingOffering
+                        opportunity_offering_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        checkpoint_semester_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        effective_deadline:
+                          type: string
+                          example: null
+                          nullable: true
+      tags:
+        - Enrollment
+      security: []
   /api/v1/registration/on-behalf/students:
     get:
       summary: 'The students the composer may register on behalf of.'

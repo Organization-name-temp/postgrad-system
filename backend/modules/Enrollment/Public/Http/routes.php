@@ -11,6 +11,7 @@ use Modules\Enrollment\Internal\Http\Controllers\ExemptionReviewController;
 use Modules\Enrollment\Internal\Http\Controllers\OfferingController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
+use Modules\Enrollment\Internal\Http\Controllers\RemediationObligationController;
 use Modules\Enrollment\Internal\Http\Controllers\ScheduleChangeController;
 use Modules\Enrollment\Internal\Http\Controllers\TransferDecisionController;
 use Modules\Enrollment\Internal\Http\Controllers\TransferRequestController;
@@ -104,6 +105,9 @@ Route::middleware(['auth:sanctum', 'role:R06'])->group(function () {
     Route::get('/registration/capacity-overrides', [CapacityOverrideController::class, 'index']);
     Route::post('/registration/capacity-overrides/{requirement}/decision', [CapacityOverrideController::class, 'decide'])->whereNumber('requirement');
 });
+
+Route::get('/registration/remediation-obligations', [RemediationObligationController::class, 'mine'])
+    ->middleware(['auth:sanctum', 'role:R02']);
 
 Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->group(function () {
     Route::get('/credit-decisions/waiver-requests/evidence-documents', [WaiverRequestController::class, 'evidenceDocuments']);

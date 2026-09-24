@@ -3731,6 +3731,19 @@ export const DecideOneScopedFullOfferingRequirementResponse = zod.object({
 })
 
 
+export const GetApiV1RegistrationRemediationObligationsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "revocation_id": zod.number().optional(),
+  "state": zod.string().optional(),
+  "opportunity_offering_id": zod.string().nullish(),
+  "checkpoint_semester_id": zod.string().nullish(),
+  "effective_deadline": zod.string().nullish()
+})).optional()
+})
+
+
 /**
  * The register-for-student picker (ticket 09): an Advisor sees their **live** advisees;
  * Student Affairs (or an administrator) sees **every** Student, unscoped — the same

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Enrollment\Internal\Console\Commands\ReconcileAutomaticExemptions;
+use Modules\Enrollment\Internal\Console\Commands\ReconcileRemediation;
 use Modules\Enrollment\Internal\Listeners\ApplyAutomaticPreparatoryExemptions;
 use Modules\Enrollment\Internal\Listeners\ReconcileMustRetakeObligations;
 use Modules\Enrollment\Internal\Listeners\RejectCreditRequestsAfterFailedGrade;
@@ -15,10 +16,12 @@ use Modules\Enrollment\Internal\Support\EloquentExemptionDecisions;
 use Modules\Enrollment\Internal\Support\EloquentMustRetakeObligations;
 use Modules\Enrollment\Internal\Support\EloquentTransferDecisions;
 use Modules\Enrollment\Internal\Support\EloquentWaiverDecisions;
+use Modules\Enrollment\Internal\Support\RemediationReconciler;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\Events\GradeOutcomesFinalized;
 use Modules\Enrollment\Public\ExemptionDecisions;
 use Modules\Enrollment\Public\MustRetakeObligations;
+use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Enrollment\Public\TransferDecisions;
 use Modules\Enrollment\Public\WaiverDecisions;
 
@@ -46,6 +49,7 @@ class EnrollmentServiceProvider extends ServiceProvider
         $this->app->bind(TransferDecisions::class, EloquentTransferDecisions::class);
         $this->app->bind(WaiverDecisions::class, EloquentWaiverDecisions::class);
         $this->app->bind(MustRetakeObligations::class, EloquentMustRetakeObligations::class);
+        $this->app->bind(RemediationObligations::class, RemediationReconciler::class);
     }
 
     public function boot(): void
@@ -57,7 +61,7 @@ class EnrollmentServiceProvider extends ServiceProvider
         Event::listen(GradeOutcomesFinalized::class, ReconcileMustRetakeObligations::class);
 
         if ($this->app->runningInConsole()) {
-            $this->commands([ReconcileAutomaticExemptions::class]);
+            $this->commands([ReconcileAutomaticExemptions::class, ReconcileRemediation::class]);
         }
 
         // The module owns its /api/v1 routes (ADR-0002). Authorization gates are

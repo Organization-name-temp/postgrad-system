@@ -9,6 +9,7 @@ use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Catalog\Public\CurriculumEntrySummary;
+use Modules\Catalog\Public\CurriculumRequirementsSummary;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 
@@ -20,6 +21,22 @@ use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
  */
 class EloquentCurriculumCatalog implements CurriculumCatalog
 {
+    public function requirementsForVersion(int $curriculumVersionId): ?CurriculumRequirementsSummary
+    {
+        $version = CatalogVersion::query()->find($curriculumVersionId);
+        if ($version === null || $version->subject_type !== VersionSubject::Program) {
+            return null;
+        }
+
+        return new CurriculumRequirementsSummary(
+            curriculumVersionId: (int) $version->getKey(),
+            programId: (int) $version->subject_id,
+            preparatoryCh: (int) ($version->snapshot['prep_required_ch'] ?? CourseCategory::Preparatory->defaultRequiredCh()),
+            programCoreCh: (int) ($version->snapshot['core_required_ch'] ?? CourseCategory::ProgramCore->defaultRequiredCh()),
+            researchElectiveCh: (int) ($version->snapshot['elective_required_ch'] ?? CourseCategory::ResearchElective->defaultRequiredCh()),
+        );
+    }
+
     /**
      * @return array<int, CurriculumEntrySummary>
      */

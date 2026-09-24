@@ -7,6 +7,84 @@
 import * as zod from 'zod';
 
 /**
+ * @summary My target-aware Credit-Hour Summary.
+ */
+export const MyTargetAwareCreditHourSummaryResponse = zod.object({
+  "data": zod.object({
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "categories": zod.array(zod.object({
+  "category": zod.string().optional(),
+  "baseline_required_ch": zod.number().optional(),
+  "adjusted_required_ch": zod.number().optional(),
+  "attended_ch": zod.number().optional(),
+  "earned_ch": zod.number().optional(),
+  "transferred_ch": zod.number().optional(),
+  "waived_ch": zod.number().optional(),
+  "exempted_ch": zod.number().optional(),
+  "satisfied_ch": zod.number().optional(),
+  "remaining_ch": zod.number().optional()
+})).optional(),
+  "total": zod.object({
+  "category": zod.string().optional(),
+  "baseline_required_ch": zod.number().optional(),
+  "adjusted_required_ch": zod.number().optional(),
+  "attended_ch": zod.number().optional(),
+  "earned_ch": zod.number().optional(),
+  "transferred_ch": zod.number().optional(),
+  "waived_ch": zod.number().optional(),
+  "exempted_ch": zod.number().optional(),
+  "satisfied_ch": zod.number().optional(),
+  "remaining_ch": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary My Credit-Hour Summary Dashboard Card.
+ */
+export const MyCreditHourSummaryDashboardCardResponse = zod.object({
+  "data": zod.object({
+  "satisfied_ch": zod.number().optional(),
+  "adjusted_required_ch": zod.number().optional(),
+  "remaining_ch": zod.number().optional()
+}).optional(),
+  "meta": zod.looseObject({
+
+}).optional()
+})
+
+
+/**
+ * @summary A scoped Student's target-aware Credit-Hour Summary.
+ */
+export const AScopedStudentsTargetAwareCreditHourSummaryParams = zod.object({
+  "student_id": zod.number().describe('The Student anchor id.')
+})
+
+export const AScopedStudentsTargetAwareCreditHourSummaryResponse = zod.object({
+  "data": zod.object({
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "categories": zod.array().optional(),
+  "total": zod.object({
+  "category": zod.string().optional(),
+  "baseline_required_ch": zod.number().optional(),
+  "adjusted_required_ch": zod.number().optional(),
+  "attended_ch": zod.number().optional(),
+  "earned_ch": zod.number().optional(),
+  "transferred_ch": zod.number().optional(),
+  "waived_ch": zod.number().optional(),
+  "exempted_ch": zod.number().optional(),
+  "satisfied_ch": zod.number().optional(),
+  "remaining_ch": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
  * The R07 (Dean) users an administrator may assign to a Faculty — the source for
  * the assignment screen's Dean picker. Admin-only (R09/R10).
  * @summary List assignable Deans.

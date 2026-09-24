@@ -57,6 +57,7 @@ export const en = {
       myInterviews: 'My interviews',
       registration: 'My registration',
       schedule: 'My schedule',
+      academicStanding: 'Academic progress',
       advising: 'Registration requests',
       registerForStudent: 'Register for a student',
       studentSchedules: 'Student schedules',
@@ -1822,6 +1823,43 @@ export const en = {
       intro:
         'Look up a student to review their schedule and attendance. Advisors see their advisees; Student Affairs and administrators can view any student.',
       empty: 'This student has no enrollments yet.',
+    },
+  },
+  academicStanding: {
+    creditHours: {
+      title: 'Credit-Hour Summary',
+      intro:
+        'Progress against your admission-bound Curriculum. Raw academic facts remain visible; Satisfied credit is target-aware and capped at each adjusted requirement.',
+      loading: 'Loading credit-hour summary',
+      loadError: 'Could not load your credit-hour summary.',
+      category: 'Category',
+      categories: {
+        Preparatory: 'Preparatory',
+        ProgramCore: 'Program Core',
+        ResearchElective: 'Research Elective',
+        Total: 'Total',
+      },
+      metrics: {
+        baseline_required_ch: 'Baseline required',
+        adjusted_required_ch: 'Adjusted required',
+        attended_ch: 'Attended',
+        earned_ch: 'Earned',
+        transferred_ch: 'Transferred',
+        waived_ch: 'Waived',
+        exempted_ch: 'Exempted',
+        satisfied_ch: 'Satisfied',
+        remaining_ch: 'Remaining',
+      },
+      explanation:
+        'Exemptions reduce the requirement. Transfers and Waivers satisfy it. A Course target contributes to Satisfied credit at most once, while Earned and Exempted remain visible as separate facts.',
+    },
+    card: {
+      title: 'Credit-Hour Summary',
+      satisfied: 'Satisfied CH',
+      remaining: 'Remaining CH',
+      requirement: '{{count}} adjusted credit hours required',
+      action: 'View academic progress',
+      loadError: 'Could not load academic progress.',
     },
   },
   grading: {

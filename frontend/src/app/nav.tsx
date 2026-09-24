@@ -26,6 +26,7 @@ import RateReviewIcon from '@mui/icons-material/RateReview'
 import GradeIcon from '@mui/icons-material/Grade'
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
+import DonutLargeIcon from '@mui/icons-material/DonutLarge'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
@@ -175,6 +176,13 @@ export const navItems: NavItem[] = [
     key: 'schedule',
     to: '/schedule',
     icon: <CalendarViewWeekIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  {
+    key: 'academicStanding',
+    to: '/academic-standing',
+    icon: <DonutLargeIcon />,
     section: 'enrollment',
     roles: [ROLE.student],
   },

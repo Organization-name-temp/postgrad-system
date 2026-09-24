@@ -22,6 +22,9 @@ use Modules\Catalog\CatalogServiceProvider;
  */
 interface CurriculumCatalog
 {
+    /** The category requirements frozen into a Program Curriculum Version. */
+    public function requirementsForVersion(int $curriculumVersionId): ?CurriculumRequirementsSummary;
+
     /**
      * The Curriculum Entries of the given Program, keyed by Course id — a Course's
      * placement (Category + ordinal) within that Program. Empty when the Program has no

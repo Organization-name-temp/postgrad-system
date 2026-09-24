@@ -235,6 +235,7 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
             courseId: (int) $offering->course_id,
             semesterId: (int) $offering->semester_id,
             countsTowardCgpa: $enrollment->course_status->counting()->cgpa,
+            countsTowardAttendance: $enrollment->course_status->counting()->attendedCh,
             earned: $enrollment->earned,
         );
     }

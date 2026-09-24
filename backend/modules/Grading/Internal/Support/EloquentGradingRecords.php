@@ -3,6 +3,7 @@
 namespace Modules\Grading\Internal\Support;
 
 use Modules\Grading\GradingServiceProvider;
+use Modules\Grading\Public\EffectiveAttemptSummary;
 use Modules\Grading\Public\GradeSummary;
 use Modules\Grading\Public\GradingRecords;
 
@@ -20,6 +21,26 @@ final readonly class EloquentGradingRecords implements GradingRecords
     public function cgpaFor(int $studentId): ?float
     {
         return GpaCalculator::average(GpaCalculator::nonSuperseded($this->tally->recordFor($studentId)->attempts));
+    }
+
+    public function effectiveAttemptsForStudent(int $studentId): array
+    {
+        $record = $this->tally->recordFor($studentId);
+        $enrollments = collect($record->enrollments)->keyBy(fn ($enrollment): int => $enrollment->id);
+
+        return array_map(function (GpaAttempt $attempt) use ($record, $enrollments): EffectiveAttemptSummary {
+            $enrollment = $enrollments->get($attempt->enrollmentId);
+            $grade = $record->grades[$attempt->enrollmentId];
+
+            return new EffectiveAttemptSummary(
+                enrollmentId: $attempt->enrollmentId,
+                courseId: $attempt->courseId,
+                classification: $enrollment->classification,
+                creditHours: $attempt->creditHours,
+                earned: $attempt->earned === true,
+                letterGrade: $grade->letter_grade->value,
+            );
+        }, GpaCalculator::nonSuperseded($record->attempts));
     }
 
     public function semesterGpaFor(int $studentId, int $semesterId): ?float

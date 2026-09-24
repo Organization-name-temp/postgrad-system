@@ -6,6 +6,8 @@ info:
 servers:
   - url: 'http://localhost'
 tags:
+  - name: 'Academic Standing'
+    description: ''
   - name: Administration
     description: "\nThe Dean↔Faculty assignment admin surface (ticket 08) — the system's first\n**role-gated** surface. Every endpoint sits behind the `admin` middleware, so\nonly a System/Super Administrator (R09/R10) may read or change the mapping;\nordinary staff — even a Dean — get a 403 (BR-75). No new permission is invented\nfor this (ADR-0008 intact): admin org-routing is a role concern, not a §3.2\nmatrix function.\n\nAn administrator lists the current assignments, picks a Dean (an R07 user) and a\nFaculty (opaque Catalog id, no FK — ADR-0012) to assign, or removes a row. The\nDean review queue (Admissions) reads the resulting mapping through the\nIdentity\\Public DeanAssignments facade."
   - name: Admissions
@@ -37,6 +39,263 @@ tags:
   - name: Waivers
     description: ''
 paths:
+  /api/v1/academic-standing/me/credit-hours:
+    get:
+      summary: 'My target-aware Credit-Hour Summary.'
+      operationId: myTargetAwareCreditHourSummary
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    student_id: 1
+                    curriculum_version_id: 1
+                    categories:
+                      -
+                        category: Preparatory
+                        baseline_required_ch: 6
+                        adjusted_required_ch: 5
+                        attended_ch: 2
+                        earned_ch: 1
+                        transferred_ch: 0
+                        waived_ch: 0
+                        exempted_ch: 1
+                        satisfied_ch: 0
+                        remaining_ch: 5
+                    total:
+                      category: Total
+                      baseline_required_ch: 21
+                      adjusted_required_ch: 20
+                      attended_ch: 2
+                      earned_ch: 1
+                      transferred_ch: 0
+                      waived_ch: 0
+                      exempted_ch: 1
+                      satisfied_ch: 0
+                      remaining_ch: 20
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      student_id:
+                        type: integer
+                        example: 1
+                      curriculum_version_id:
+                        type: integer
+                        example: 1
+                      categories:
+                        type: array
+                        example:
+                          - category: Preparatory
+                            baseline_required_ch: 6
+                            adjusted_required_ch: 5
+                            attended_ch: 2
+                            earned_ch: 1
+                            transferred_ch: 0
+                            waived_ch: 0
+                            exempted_ch: 1
+                            satisfied_ch: 0
+                            remaining_ch: 5
+                        items:
+                          type: object
+                          properties:
+                            category:
+                              type: string
+                              example: Preparatory
+                            baseline_required_ch:
+                              type: integer
+                              example: 6
+                            adjusted_required_ch:
+                              type: integer
+                              example: 5
+                            attended_ch:
+                              type: integer
+                              example: 2
+                            earned_ch:
+                              type: integer
+                              example: 1
+                            transferred_ch:
+                              type: integer
+                              example: 0
+                            waived_ch:
+                              type: integer
+                              example: 0
+                            exempted_ch:
+                              type: integer
+                              example: 1
+                            satisfied_ch:
+                              type: integer
+                              example: 0
+                            remaining_ch:
+                              type: integer
+                              example: 5
+                      total:
+                        type: object
+                        properties:
+                          category:
+                            type: string
+                            example: Total
+                          baseline_required_ch:
+                            type: integer
+                            example: 21
+                          adjusted_required_ch:
+                            type: integer
+                            example: 20
+                          attended_ch:
+                            type: integer
+                            example: 2
+                          earned_ch:
+                            type: integer
+                            example: 1
+                          transferred_ch:
+                            type: integer
+                            example: 0
+                          waived_ch:
+                            type: integer
+                            example: 0
+                          exempted_ch:
+                            type: integer
+                            example: 1
+                          satisfied_ch:
+                            type: integer
+                            example: 0
+                          remaining_ch:
+                            type: integer
+                            example: 20
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/academic-standing/cards/credit-hours:
+    get:
+      summary: 'My Credit-Hour Summary Dashboard Card.'
+      operationId: myCreditHourSummaryDashboardCard
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    satisfied_ch: 12
+                    adjusted_required_ch: 20
+                    remaining_ch: 8
+                  meta: {}
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      satisfied_ch:
+                        type: integer
+                        example: 12
+                      adjusted_required_ch:
+                        type: integer
+                        example: 20
+                      remaining_ch:
+                        type: integer
+                        example: 8
+                  meta:
+                    type: object
+                    properties: {}
+      tags:
+        - 'Academic Standing'
+      security: []
+  '/api/v1/academic-standing/students/{student_id}/credit-hours':
+    get:
+      summary: "A scoped Student's target-aware Credit-Hour Summary."
+      operationId: aScopedStudentsTargetAwareCreditHourSummary
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    student_id: 1
+                    curriculum_version_id: 1
+                    categories: []
+                    total:
+                      category: Total
+                      baseline_required_ch: 21
+                      adjusted_required_ch: 21
+                      attended_ch: 0
+                      earned_ch: 0
+                      transferred_ch: 0
+                      waived_ch: 0
+                      exempted_ch: 0
+                      satisfied_ch: 0
+                      remaining_ch: 21
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      student_id:
+                        type: integer
+                        example: 1
+                      curriculum_version_id:
+                        type: integer
+                        example: 1
+                      categories:
+                        type: array
+                        example: []
+                      total:
+                        type: object
+                        properties:
+                          category:
+                            type: string
+                            example: Total
+                          baseline_required_ch:
+                            type: integer
+                            example: 21
+                          adjusted_required_ch:
+                            type: integer
+                            example: 21
+                          attended_ch:
+                            type: integer
+                            example: 0
+                          earned_ch:
+                            type: integer
+                            example: 0
+                          transferred_ch:
+                            type: integer
+                            example: 0
+                          waived_ch:
+                            type: integer
+                            example: 0
+                          exempted_ch:
+                            type: integer
+                            example: 0
+                          satisfied_ch:
+                            type: integer
+                            example: 0
+                          remaining_ch:
+                            type: integer
+                            example: 21
+      tags:
+        - 'Academic Standing'
+      security: []
+    parameters:
+      -
+        in: path
+        name: student_id
+        description: 'The Student anchor id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/admin/deans:
     get:
       summary: 'List assignable Deans.'

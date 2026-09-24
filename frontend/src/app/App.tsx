@@ -49,6 +49,7 @@ import { DepartmentHeadQueuePage } from '../features/grading/department-head/Dep
 import { DepartmentHeadSheetPage } from '../features/grading/department-head/DepartmentHeadSheetPage'
 import { MyGradesPage } from '../features/grading/student/MyGradesPage'
 import { StudentGradesPage } from '../features/grading/oversight/StudentGradesPage'
+import { CreditHourSummaryPage } from '../features/academic-standing/CreditHourSummaryPage'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 // The Dashboard lives in the app shell, not in a feature: it composes Cards from many
@@ -102,6 +103,7 @@ export function App() {
                   <Route path="/exemptions" element={<ManualExemptionsPage />} />
                   <Route path="/transfers" element={<TransfersPage />} />
                   <Route path="/waivers" element={<WaiversPage />} />
+                  <Route path="/academic-standing" element={<CreditHourSummaryPage />} />
                 </Route>
                 {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
                     Persona-guarded to R02 — an admin inheriting grades.view_own has no Student

@@ -46,6 +46,7 @@ final readonly class EnrollmentSummary
         public int $courseId,
         public int $semesterId,
         public bool $countsTowardCgpa,
+        public bool $countsTowardAttendance,
         public ?bool $earned,
     ) {}
 }

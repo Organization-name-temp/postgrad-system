@@ -75,6 +75,14 @@ deptrac:
       collectors:
         - type: classLike
           value: '^Modules\\Grading\\Internal\\.*'
+    - name: AcademicStanding_Public
+      collectors:
+        - type: classLike
+          value: '^Modules\\AcademicStanding\\Public\\.*'
+    - name: AcademicStanding_Internal
+      collectors:
+        - type: classLike
+          value: '^Modules\\AcademicStanding\\Internal\\.*'
   ruleset:
     # The app may orchestrate modules only through their Public facades.
     App:
@@ -83,6 +91,7 @@ deptrac:
       - Calendar_Public
       - Enrollment_Public
       - Grading_Public
+      - AcademicStanding_Public
     # A module's own Public facade may use its own Internal, and vice versa.
     Identity_Public:
       - Identity_Internal
@@ -172,6 +181,16 @@ deptrac:
       - Catalog_Public
       - Calendar_Public
       - Enrollment_Public
+      - Notifications_Public
+      - Support
+    AcademicStanding_Public:
+      - AcademicStanding_Internal
+    AcademicStanding_Internal:
+      - AcademicStanding_Public
+      - Identity_Public
+      - Catalog_Public
+      - Enrollment_Public
+      - Grading_Public
       - Notifications_Public
       - Support
     # No rule grants anyone access to another module's *_Internal — that is the seam.

@@ -24,6 +24,80 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type MyTargetAwareCreditHourSummary200DataCategoriesItem = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type MyTargetAwareCreditHourSummary200DataTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type MyTargetAwareCreditHourSummary200Data = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: MyTargetAwareCreditHourSummary200DataCategoriesItem[];
+  total?: MyTargetAwareCreditHourSummary200DataTotal;
+};
+
+export type MyTargetAwareCreditHourSummary200 = {
+  data?: MyTargetAwareCreditHourSummary200Data;
+};
+
+export type MyCreditHourSummaryDashboardCard200Data = {
+  satisfied_ch?: number;
+  adjusted_required_ch?: number;
+  remaining_ch?: number;
+};
+
+export type MyCreditHourSummaryDashboardCard200Meta = { [key: string]: unknown };
+
+export type MyCreditHourSummaryDashboardCard200 = {
+  data?: MyCreditHourSummaryDashboardCard200Data;
+  meta?: MyCreditHourSummaryDashboardCard200Meta;
+};
+
+export type AScopedStudentsTargetAwareCreditHourSummary200DataTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type AScopedStudentsTargetAwareCreditHourSummary200Data = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: unknown[];
+  total?: AScopedStudentsTargetAwareCreditHourSummary200DataTotal;
+};
+
+export type AScopedStudentsTargetAwareCreditHourSummary200 = {
+  data?: AScopedStudentsTargetAwareCreditHourSummary200Data;
+};
+
 export type ListAssignableDeans200DataItem = {
   id?: number;
   name?: string;
@@ -9849,6 +9923,285 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * @summary My target-aware Credit-Hour Summary.
+ */
+export const myTargetAwareCreditHourSummary = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyTargetAwareCreditHourSummary200>(
+      {url: `/api/v1/academic-standing/me/credit-hours`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyTargetAwareCreditHourSummaryQueryKey = () => {
+    return [
+    `/api/v1/academic-standing/me/credit-hours`
+    ] as const;
+    }
+
+
+export const getMyTargetAwareCreditHourSummaryQueryOptions = <TData = Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyTargetAwareCreditHourSummaryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>> = ({ signal }) => myTargetAwareCreditHourSummary(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyTargetAwareCreditHourSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>>
+export type MyTargetAwareCreditHourSummaryQueryError = unknown
+
+
+export function useMyTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>,
+          TError,
+          Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>,
+          TError,
+          Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My target-aware Credit-Hour Summary.
+ */
+
+export function useMyTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTargetAwareCreditHourSummary>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyTargetAwareCreditHourSummaryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My Credit-Hour Summary Dashboard Card.
+ */
+export const myCreditHourSummaryDashboardCard = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyCreditHourSummaryDashboardCard200>(
+      {url: `/api/v1/academic-standing/cards/credit-hours`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyCreditHourSummaryDashboardCardQueryKey = () => {
+    return [
+    `/api/v1/academic-standing/cards/credit-hours`
+    ] as const;
+    }
+
+
+export const getMyCreditHourSummaryDashboardCardQueryOptions = <TData = Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyCreditHourSummaryDashboardCardQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>> = ({ signal }) => myCreditHourSummaryDashboardCard(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyCreditHourSummaryDashboardCardQueryResult = NonNullable<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>>
+export type MyCreditHourSummaryDashboardCardQueryError = unknown
+
+
+export function useMyCreditHourSummaryDashboardCard<TData = Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>,
+          TError,
+          Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyCreditHourSummaryDashboardCard<TData = Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>,
+          TError,
+          Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyCreditHourSummaryDashboardCard<TData = Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Credit-Hour Summary Dashboard Card.
+ */
+
+export function useMyCreditHourSummaryDashboardCard<TData = Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myCreditHourSummaryDashboardCard>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyCreditHourSummaryDashboardCardQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary A scoped Student's target-aware Credit-Hour Summary.
+ */
+export const aScopedStudentsTargetAwareCreditHourSummary = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AScopedStudentsTargetAwareCreditHourSummary200>(
+      {url: `/api/v1/academic-standing/students/${studentId}/credit-hours`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAScopedStudentsTargetAwareCreditHourSummaryQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/academic-standing/students/${studentId}/credit-hours`
+    ] as const;
+    }
+
+
+export const getAScopedStudentsTargetAwareCreditHourSummaryQueryOptions = <TData = Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError = unknown>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAScopedStudentsTargetAwareCreditHourSummaryQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>> = ({ signal }) => aScopedStudentsTargetAwareCreditHourSummary(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AScopedStudentsTargetAwareCreditHourSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>>
+export type AScopedStudentsTargetAwareCreditHourSummaryQueryError = unknown
+
+
+export function useAScopedStudentsTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError = unknown>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>,
+          TError,
+          Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAScopedStudentsTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>,
+          TError,
+          Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAScopedStudentsTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary A scoped Student's target-aware Credit-Hour Summary.
+ */
+
+export function useAScopedStudentsTargetAwareCreditHourSummary<TData = Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsTargetAwareCreditHourSummary>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAScopedStudentsTargetAwareCreditHourSummaryQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * The R07 (Dean) users an administrator may assign to a Faculty — the source for

@@ -133,6 +133,30 @@ export type MyAcademicStandingDashboardCard200 = {
   meta?: MyAcademicStandingDashboardCard200Meta;
 };
 
+export type MyDerivedGraduationReadiness200Data = {
+  ready?: boolean;
+  remaining_credit_hours?: number;
+  cgpa?: number;
+  approaching_graduation?: boolean;
+  blockers?: string[];
+};
+
+export type MyDerivedGraduationReadiness200 = {
+  data?: MyDerivedGraduationReadiness200Data;
+};
+
+export type AScopedStudentsDerivedGraduationReadiness200Data = {
+  ready?: boolean;
+  remaining_credit_hours?: number;
+  cgpa?: number;
+  approaching_graduation?: boolean;
+  blockers?: unknown[];
+};
+
+export type AScopedStudentsDerivedGraduationReadiness200 = {
+  data?: AScopedStudentsDerivedGraduationReadiness200Data;
+};
+
 export type AScopedStudentsCurrentAcademicStandingAndObservationHistory200Data = {
   student_id?: number;
   standing?: string;
@@ -10426,6 +10450,192 @@ export function useMyAcademicStandingDashboardCard<TData = Awaited<ReturnType<ty
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getMyAcademicStandingDashboardCardQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My derived Graduation Readiness.
+ */
+export const myDerivedGraduationReadiness = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyDerivedGraduationReadiness200>(
+      {url: `/api/v1/academic-standing/me/graduation-readiness`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyDerivedGraduationReadinessQueryKey = () => {
+    return [
+    `/api/v1/academic-standing/me/graduation-readiness`
+    ] as const;
+    }
+
+
+export const getMyDerivedGraduationReadinessQueryOptions = <TData = Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyDerivedGraduationReadinessQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>> = ({ signal }) => myDerivedGraduationReadiness(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyDerivedGraduationReadinessQueryResult = NonNullable<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>>
+export type MyDerivedGraduationReadinessQueryError = unknown
+
+
+export function useMyDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myDerivedGraduationReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof myDerivedGraduationReadiness>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myDerivedGraduationReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof myDerivedGraduationReadiness>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My derived Graduation Readiness.
+ */
+
+export function useMyDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myDerivedGraduationReadiness>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyDerivedGraduationReadinessQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary A scoped Student's derived Graduation Readiness.
+ */
+export const aScopedStudentsDerivedGraduationReadiness = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AScopedStudentsDerivedGraduationReadiness200>(
+      {url: `/api/v1/academic-standing/students/${studentId}/graduation-readiness`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getAScopedStudentsDerivedGraduationReadinessQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/academic-standing/students/${studentId}/graduation-readiness`
+    ] as const;
+    }
+
+
+export const getAScopedStudentsDerivedGraduationReadinessQueryOptions = <TData = Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError = unknown>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAScopedStudentsDerivedGraduationReadinessQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>> = ({ signal }) => aScopedStudentsDerivedGraduationReadiness(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AScopedStudentsDerivedGraduationReadinessQueryResult = NonNullable<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>>
+export type AScopedStudentsDerivedGraduationReadinessQueryError = unknown
+
+
+export function useAScopedStudentsDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError = unknown>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAScopedStudentsDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAScopedStudentsDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary A scoped Student's derived Graduation Readiness.
+ */
+
+export function useAScopedStudentsDerivedGraduationReadiness<TData = Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError = unknown>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof aScopedStudentsDerivedGraduationReadiness>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAScopedStudentsDerivedGraduationReadinessQueryOptions(studentId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

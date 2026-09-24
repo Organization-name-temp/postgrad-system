@@ -1827,6 +1827,21 @@ export const en = {
     },
   },
   academicStanding: {
+    readiness: {
+      title: 'Graduation Readiness',
+      ready: 'Academically ready',
+      notReady: 'Not yet academically ready',
+      remaining: '{{count}} credit hours remaining',
+      cgpa: 'CGPA: {{value}}',
+      completingSchedule:
+        'A 1–5 CH below-minimum schedule is allowed only when its for-credit courses complete every remaining requirement.',
+      blockers: {
+        RemainingRequirements: 'Curriculum requirements remain.',
+        CgpaUnavailable: 'A CGPA is not available yet.',
+        CgpaBelowMinimum: 'The CGPA is below 3.00.',
+        TerminationPending: 'An actionable termination case is pending.',
+      },
+    },
     standing: {
       title: 'Current Academic Standing',
       cardTitle: 'Academic Standing',

@@ -410,6 +410,103 @@ paths:
       tags:
         - 'Academic Standing'
       security: []
+  /api/v1/academic-standing/me/graduation-readiness:
+    get:
+      summary: 'My derived Graduation Readiness.'
+      operationId: myDerivedGraduationReadiness
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    ready: false
+                    remaining_credit_hours: 3
+                    cgpa: 3.25
+                    approaching_graduation: false
+                    blockers:
+                      - RemainingRequirements
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      ready:
+                        type: boolean
+                        example: false
+                      remaining_credit_hours:
+                        type: integer
+                        example: 3
+                      cgpa:
+                        type: number
+                        example: 3.25
+                      approaching_graduation:
+                        type: boolean
+                        example: false
+                      blockers:
+                        type: array
+                        example:
+                          - RemainingRequirements
+                        items:
+                          type: string
+      tags:
+        - 'Academic Standing'
+      security: []
+  '/api/v1/academic-standing/students/{student_id}/graduation-readiness':
+    get:
+      summary: "A scoped Student's derived Graduation Readiness."
+      operationId: aScopedStudentsDerivedGraduationReadiness
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    ready: true
+                    remaining_credit_hours: 0
+                    cgpa: 3.4
+                    approaching_graduation: false
+                    blockers: []
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      ready:
+                        type: boolean
+                        example: true
+                      remaining_credit_hours:
+                        type: integer
+                        example: 0
+                      cgpa:
+                        type: number
+                        example: 3.4
+                      approaching_graduation:
+                        type: boolean
+                        example: false
+                      blockers:
+                        type: array
+                        example: []
+      tags:
+        - 'Academic Standing'
+      security: []
+    parameters:
+      -
+        in: path
+        name: student_id
+        description: 'The Student anchor id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   '/api/v1/academic-standing/students/{student_id}':
     get:
       summary: "A scoped Student's current Academic Standing and observation history."

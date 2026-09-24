@@ -8,8 +8,10 @@ use Illuminate\Support\ServiceProvider;
 use Modules\AcademicStanding\Internal\Console\Commands\ReconcileAcademicStanding;
 use Modules\AcademicStanding\Internal\Listeners\ReconcileStandingAfterGrade;
 use Modules\AcademicStanding\Internal\Support\DerivedCreditHourSummaries;
+use Modules\AcademicStanding\Internal\Support\DerivedGraduationProgress;
 use Modules\AcademicStanding\Internal\Support\DerivedStandingRecords;
 use Modules\AcademicStanding\Public\CreditHourSummaries;
+use Modules\AcademicStanding\Public\GraduationProgress;
 use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Grading\Public\Events\GradeFinalized;
 
@@ -18,6 +20,7 @@ final class AcademicStandingServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(CreditHourSummaries::class, DerivedCreditHourSummaries::class);
+        $this->app->bind(GraduationProgress::class, DerivedGraduationProgress::class);
         $this->app->bind(StandingRecords::class, DerivedStandingRecords::class);
     }
 

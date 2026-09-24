@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\AcademicStanding\Public\GraduationProgress;
 use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CourseCatalog;
@@ -234,6 +235,7 @@ class RegistrationReviewController
         Notifier $notifier,
         AuditLogger $auditLogger,
         StandingRecords $standing,
+        GraduationProgress $graduationProgress,
     ): JsonResponse {
         $userId = (int) $request->user()?->getAuthIdentifier();
 
@@ -294,7 +296,8 @@ class RegistrationReviewController
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
             $standing->currentForStudent($student->studentId)->registrationCeilingCh,
         ));
-        $violations = $validator->validate(array_values($cartLines), $this->exceptionsFor($student, $semester), $existing);
+        $approvedCartLines = array_values($cartLines);
+        $violations = $validator->validate($approvedCartLines, $this->exceptionsFor($student, $semester, $approvedCartLines, $graduationProgress), $existing);
 
         // Derive each approved line's status (Regular/Retake/Audit); a second retake blocks,
         // surfacing as a violation rather than a plan entry (the shared mint seam).

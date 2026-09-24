@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\AcademicStanding\Public\GraduationProgress;
 use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
@@ -164,6 +165,7 @@ class RegistrationController
         Notifier $notifier,
         AutomaticExemptionReadiness $exemptionReadiness,
         StandingRecords $standing,
+        GraduationProgress $graduationProgress,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
         $exemptionReadiness->ensureReconciled($student);
@@ -199,7 +201,7 @@ class RegistrationController
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
             $standing->currentForStudent($student->studentId)->registrationCeilingCh,
         ));
-        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $graduationProgress), $existing);
 
         $errors = $this->errorsFrom($violations, $ineligible);
         if ($errors !== []) {
@@ -560,6 +562,7 @@ class RegistrationController
         Notifier $notifier,
         AutomaticExemptionReadiness $exemptionReadiness,
         StandingRecords $standing,
+        GraduationProgress $graduationProgress,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
         $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
@@ -596,7 +599,7 @@ class RegistrationController
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
             $standing->currentForStudent($student->studentId)->registrationCeilingCh,
         ));
-        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $graduationProgress), $existing);
 
         $mintPlan = [];
         if ($bornApproved) {

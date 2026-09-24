@@ -7,24 +7,22 @@ namespace Modules\Enrollment\Internal\Support;
  * Semester — the context the pure {@see CreditHoursValidator} reads to decide whether the
  * 6-CH floor is waived (spec §Rules engines, FR-REG-001).
  *
- * It is a deliberate seam: ticket 05 implements only the **first-semester** exception
- * (the target Semester is the Student's enrollment term — a reduced first load is
- * allowed), and the caller computes that boolean by comparing the open Semester's name to
- * the Student's `enrollment_term`. The **approaching-graduation** exception is deferred to
- * Phase 5 (it needs Remaining CH, which this phase does not compute); when it lands it
- * adds a field here and folds into {@see self::waivesFloor()} without reshaping the
- * validator's signature. There is no ceiling exception and no advisor override.
+ * Both exceptions are completion rules computed by Academic Standing from the proposed
+ * for-credit schedule. There is no ceiling exception and no advisor override.
  *
  * An immutable value object.
  */
 final readonly class CreditHoursExceptions
 {
     /**
-     * @param  bool  $firstSemester  whether the target Semester is the Student's first
-     *                               (their enrollment term) — waives the CH floor
+     * @param  bool  $firstSemester  proposed schedule completes every remaining
+     *                               first-Semester Preparatory target
+     * @param  bool  $approachingGraduationCompletion  proposed schedule completes every
+     *                                                 remaining Curriculum requirement
      */
     public function __construct(
         public bool $firstSemester = false,
+        public bool $approachingGraduationCompletion = false,
     ) {}
 
     /** No exceptions apply — the full floor and ceiling are enforced. */
@@ -40,6 +38,6 @@ final readonly class CreditHoursExceptions
      */
     public function waivesFloor(): bool
     {
-        return $this->firstSemester;
+        return $this->firstSemester || $this->approachingGraduationCompletion;
     }
 }

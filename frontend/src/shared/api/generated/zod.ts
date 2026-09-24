@@ -121,6 +121,38 @@ export const MyAcademicStandingDashboardCardResponse = zod.object({
 
 
 /**
+ * @summary My derived Graduation Readiness.
+ */
+export const MyDerivedGraduationReadinessResponse = zod.object({
+  "data": zod.object({
+  "ready": zod.boolean().optional(),
+  "remaining_credit_hours": zod.number().optional(),
+  "cgpa": zod.number().optional(),
+  "approaching_graduation": zod.boolean().optional(),
+  "blockers": zod.array(zod.string()).optional()
+}).optional()
+})
+
+
+/**
+ * @summary A scoped Student's derived Graduation Readiness.
+ */
+export const AScopedStudentsDerivedGraduationReadinessParams = zod.object({
+  "student_id": zod.number().describe('The Student anchor id.')
+})
+
+export const AScopedStudentsDerivedGraduationReadinessResponse = zod.object({
+  "data": zod.object({
+  "ready": zod.boolean().optional(),
+  "remaining_credit_hours": zod.number().optional(),
+  "cgpa": zod.number().optional(),
+  "approaching_graduation": zod.boolean().optional(),
+  "blockers": zod.array().optional()
+}).optional()
+})
+
+
+/**
  * @summary A scoped Student's current Academic Standing and observation history.
  */
 export const AScopedStudentsCurrentAcademicStandingAndObservationHistoryParams = zod.object({

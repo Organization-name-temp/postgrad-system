@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Modules\AcademicStanding\Public\CreditHourCategory;
+use Modules\AcademicStanding\Public\GraduationProgress;
+use Modules\AcademicStanding\Public\ProposedCourse;
 use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
@@ -98,6 +101,7 @@ class ScheduleChangeController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         StandingRecords $standing,
+        GraduationProgress $graduationProgress,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
@@ -149,7 +153,7 @@ class ScheduleChangeController
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
             $standing->currentForStudent($student->studentId)->registrationCeilingCh,
         ));
-        $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester), $existing);
+        $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester, [$cartLine], $graduationProgress), $existing);
 
         // Derive the status (Regular/Retake/CGPA Improvement/Audit); a third for-credit
         // attempt blocks the add.
@@ -216,6 +220,7 @@ class ScheduleChangeController
         CourseCatalog $courses,
         Directory $directory,
         Notifier $notifier,
+        GraduationProgress $graduationProgress,
     ): Response {
         $student = $this->actingStudent($request, $students);
         $this->authorizeOwnEnrollment($enrollment, $student);
@@ -232,7 +237,30 @@ class ScheduleChangeController
         $min = (int) config('enrollment.min_credit_hours');
         $loadAfterDrop = $existing->activeCreditHours - (int) $enrollment->credit_hours;
 
-        if (! $this->exceptionsFor($student, $semester)->waivesFloor() && $loadAfterDrop < $min) {
+        $remainingSchedule = Enrollment::query()
+            ->active()
+            ->with('offering')
+            ->where('student_id', $student->studentId)
+            ->whereKeyNot($enrollment->getKey())
+            ->whereHas('offering', fn ($query) => $query->where('semester_id', $semester->id))
+            ->get()
+            ->map(fn (Enrollment $line): ProposedCourse => new ProposedCourse(
+                courseId: (int) $line->offering->course_id,
+                category: match ($line->classification) {
+                    EnrollmentClassification::Preparatory => CreditHourCategory::Preparatory,
+                    EnrollmentClassification::Core => CreditHourCategory::ProgramCore,
+                    default => CreditHourCategory::ResearchElective,
+                },
+                creditHours: $line->credit_hours,
+                forCredit: $line->course_status !== CourseStatus::Audit,
+            ))->all();
+        $underload = $graduationProgress->underloadEligibility(
+            $student->studentId,
+            $student->enrollmentTerm === $semester->nameEn,
+            $remainingSchedule,
+        );
+
+        if (! $underload->waivesFloor() && $loadAfterDrop < $min) {
             throw ValidationException::withMessages([
                 CartViolation::BELOW_MIN_CREDIT_HOURS => "Dropping {$courseCode} would leave you below the {$min}-hour minimum load.",
             ]);

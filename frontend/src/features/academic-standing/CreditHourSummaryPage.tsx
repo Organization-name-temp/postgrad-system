@@ -3,6 +3,7 @@ import {
   Box,
   CircularProgress,
   Paper,
+  Chip,
   Table,
   TableBody,
   TableCell,
@@ -15,6 +16,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { useMyTargetAwareCreditHourSummary } from '../../shared/api/generated/endpoints'
 import { useMyCurrentAcademicStandingAndObservationHistory } from '../../shared/api/generated/endpoints'
+import { useMyDerivedGraduationReadiness } from '../../shared/api/generated/endpoints'
 import { tabularNums } from '../../app/theme/fonts'
 import { StatusChip } from '../../shared/ui/StatusChip'
 import { standingPresentation } from './AcademicStandingCard'
@@ -37,6 +39,7 @@ export function CreditHourSummaryPage() {
   const { t } = useTranslation('academicStanding')
   const { data, isPending, isError } = useMyTargetAwareCreditHourSummary()
   const standingQuery = useMyCurrentAcademicStandingAndObservationHistory()
+  const readinessQuery = useMyDerivedGraduationReadiness()
   const summary = data?.data
   const rows: SummaryRow[] = summary
     ? [...(summary.categories ?? []), ...(summary.total ? [summary.total] : [])]
@@ -69,6 +72,33 @@ export function CreditHourSummaryPage() {
                 {t('standing.ceiling', { count: standingQuery.data.data.registration_ceiling_ch })}
               </Typography>
             )}
+          </Stack>
+        </Paper>
+      )}
+      {!readinessQuery.isPending && !readinessQuery.isError && readinessQuery.data?.data && (
+        <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+          <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
+            <Typography variant="h6" component="h2">
+              {t('readiness.title')}
+            </Typography>
+            <Chip
+              color={readinessQuery.data.data.ready ? 'success' : 'warning'}
+              label={t(readinessQuery.data.data.ready ? 'readiness.ready' : 'readiness.notReady')}
+            />
+            <Typography>
+              {t('readiness.remaining', {
+                count: readinessQuery.data.data.remaining_credit_hours ?? 0,
+              })}
+            </Typography>
+            <Typography>
+              {t('readiness.cgpa', { value: readinessQuery.data.data.cgpa?.toFixed(2) ?? '—' })}
+            </Typography>
+            {(readinessQuery.data.data.blockers ?? []).map((blocker) => (
+              <Alert key={blocker} severity="info">
+                {t(`readiness.blockers.${blocker}`)}
+              </Alert>
+            ))}
+            <Typography color="text.secondary">{t('readiness.completingSchedule')}</Typography>
           </Stack>
         </Paper>
       )}

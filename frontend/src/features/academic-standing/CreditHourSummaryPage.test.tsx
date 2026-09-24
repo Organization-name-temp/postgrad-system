@@ -7,11 +7,13 @@ import { CreditHourSummaryPage } from './CreditHourSummaryPage'
 import {
   useMyCurrentAcademicStandingAndObservationHistory,
   useMyTargetAwareCreditHourSummary,
+  useMyDerivedGraduationReadiness,
 } from '../../shared/api/generated/endpoints'
 
 vi.mock('../../shared/api/generated/endpoints')
 const mockedQuery = vi.mocked(useMyTargetAwareCreditHourSummary)
 const mockedStanding = vi.mocked(useMyCurrentAcademicStandingAndObservationHistory)
+const mockedReadiness = vi.mocked(useMyDerivedGraduationReadiness)
 const theme = createTheme({ cssVariables: true, colorSchemes: { light: true, dark: true } })
 
 afterEach(async () => {
@@ -20,6 +22,19 @@ afterEach(async () => {
 })
 
 it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
+  mockedReadiness.mockReturnValue({
+    data: {
+      data: {
+        ready: false,
+        remaining_credit_hours: 20,
+        cgpa: 3.2,
+        approaching_graduation: false,
+        blockers: ['RemainingRequirements'],
+      },
+    },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useMyDerivedGraduationReadiness>)
   mockedStanding.mockReturnValue({
     data: {
       data: {
@@ -87,6 +102,19 @@ it('renders the same accounting labels in Arabic RTL', async () => {
     isPending: false,
     isError: false,
   } as ReturnType<typeof useMyCurrentAcademicStandingAndObservationHistory>)
+  mockedReadiness.mockReturnValue({
+    data: {
+      data: {
+        ready: true,
+        remaining_credit_hours: 0,
+        cgpa: 3.5,
+        approaching_graduation: false,
+        blockers: [],
+      },
+    },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useMyDerivedGraduationReadiness>)
   mockedQuery.mockReturnValue({
     data: { data: { categories: [], total: { category: 'Total' } } },
     isPending: false,

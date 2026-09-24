@@ -282,11 +282,11 @@ it('blocks a free drop that would take the load below the credit-hour floor', fu
     $this->assertDatabaseHas('enrollments', ['id' => $drop->id]);
 });
 
-it('allows a below-floor free drop in the student\'s first semester', function () {
+it('does not grant a blanket below-floor waiver merely because it is the student\'s first semester', function () {
     $this->travelTo(Carbon::parse(CHG_ADD_DROP));
 
     $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
-    // First semester (enrollment term == the semester) → the floor is waived.
+    // There is no remaining Preparatory completion set, so the normal floor applies.
     $student = chgStudentIn($program, chgAdvisor(), enrollmentTerm: 'Fall 2026');
     $semester = chgSemester();
     chgApprovedInitial($student, $semester);
@@ -294,8 +294,10 @@ it('allows a below-floor free drop in the student\'s first semester', function (
     $drop = chgEnroll($student, chgCore($program, $semester, Weekday::Monday));
     chgEnroll($student, chgCore($program, $semester, Weekday::Tuesday));
 
-    test()->deleteJson("/api/v1/registration/enrollments/{$drop->id}")->assertNoContent();
-    $this->assertDatabaseMissing('enrollments', ['id' => $drop->id]);
+    test()->deleteJson("/api/v1/registration/enrollments/{$drop->id}")
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['below_min_credit_hours']);
+    $this->assertDatabaseHas('enrollments', ['id' => $drop->id]);
 });
 
 it('refuses a free drop outside the add/drop window', function () {

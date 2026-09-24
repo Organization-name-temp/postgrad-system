@@ -52,6 +52,14 @@ it('returns the owner-composed summary and card for the acting Student', functio
     $this->getJson('/api/v1/academic-standing/cards/credit-hours')
         ->assertOk()
         ->assertJsonPath('data.remaining_ch', 21);
+    $this->getJson('/api/v1/academic-standing/me/graduation-readiness')
+        ->assertOk()
+        ->assertJsonPath('data.ready', false)
+        ->assertJsonPath('data.remaining_credit_hours', 21)
+        ->assertJsonPath('data.cgpa', null)
+        ->assertJsonPath('data.approaching_graduation', false)
+        ->assertJsonPath('data.blockers.0', 'RemainingRequirements')
+        ->assertJsonPath('data.blockers.1', 'CgpaUnavailable');
 });
 
 it('allows only the current Advisor or authorized oversight to read another Student', function () {

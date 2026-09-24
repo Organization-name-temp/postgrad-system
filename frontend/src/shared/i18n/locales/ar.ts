@@ -1752,6 +1752,21 @@ export const ar = {
     },
   },
   academicStanding: {
+    readiness: {
+      title: 'الجاهزية للتخرج',
+      ready: 'مستوفٍ أكاديميًا',
+      notReady: 'غير مستوفٍ أكاديميًا بعد',
+      remaining: 'الساعات المتبقية: {{count}}',
+      cgpa: 'المعدل التراكمي: {{value}}',
+      completingSchedule:
+        'يُسمح بجدول أقل من الحد الأدنى من 1 إلى 5 ساعات فقط إذا استكملت مقرراته المحتسبة جميع المتطلبات المتبقية.',
+      blockers: {
+        RemainingRequirements: 'لا تزال هناك متطلبات في الخطة الدراسية.',
+        CgpaUnavailable: 'لا يتوفر معدل تراكمي بعد.',
+        CgpaBelowMinimum: 'المعدل التراكمي أقل من 3.00.',
+        TerminationPending: 'توجد حالة إنهاء قيد واجبة الإجراء قيد النظر.',
+      },
+    },
     standing: {
       title: 'الحالة الأكاديمية الحالية',
       cardTitle: 'الحالة الأكاديمية',

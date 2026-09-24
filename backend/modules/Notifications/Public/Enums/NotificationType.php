@@ -85,6 +85,12 @@ enum NotificationType: string
     /** A reviewer recorded a terminal Transfer outcome. */
     case TransferRequestDecided = 'transfer.request_decided';
 
+    case WaiverSubmitted = 'waiver.request_submitted';
+    case WaiverReturned = 'waiver.request_returned';
+    case WaiverRecommended = 'waiver.request_recommended';
+    case WaiverVerified = 'waiver.request_verified';
+    case WaiverDecided = 'waiver.request_decided';
+
     /**
      * A Student (or staff on their behalf) submitted a registration for the advisor's
      * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds

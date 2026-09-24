@@ -68,6 +68,11 @@ const TYPE_ALIAS: Record<string, string> = {
   'transfer.request_returned': 'transferReturned',
   'transfer.request_advanced': 'transferAdvanced',
   'transfer.request_decided': 'transferDecided',
+  'waiver.request_submitted': 'waiverSubmitted',
+  'waiver.request_returned': 'waiverReturned',
+  'waiver.request_recommended': 'waiverRecommended',
+  'waiver.request_verified': 'waiverVerified',
+  'waiver.request_decided': 'waiverDecided',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

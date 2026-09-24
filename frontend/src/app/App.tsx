@@ -32,6 +32,8 @@ import { ManualExemptionsPage } from '../features/enrollment/exemptions/ManualEx
 import { ExemptionReviewQueuePage } from '../features/enrollment/exemptions/ExemptionReviewQueuePage'
 import { TransfersPage } from '../features/enrollment/transfers/TransfersPage'
 import { TransferReviewQueuePage } from '../features/enrollment/transfers/TransferReviewQueuePage'
+import { WaiversPage } from '../features/enrollment/waivers/WaiversPage'
+import { WaiverReviewQueuePage } from '../features/enrollment/waivers/WaiverReviewQueuePage'
 import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
 import { RegistrationReviewPage } from '../features/enrollment/advising/RegistrationReviewPage'
 import { StudentSchedulePage } from '../features/enrollment/advising/StudentSchedulePage'
@@ -99,6 +101,7 @@ export function App() {
                   <Route path="/schedule" element={<SchedulePage />} />
                   <Route path="/exemptions" element={<ManualExemptionsPage />} />
                   <Route path="/transfers" element={<TransfersPage />} />
+                  <Route path="/waivers" element={<WaiversPage />} />
                 </Route>
                 {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
                     Persona-guarded to R02 — an admin inheriting grades.view_own has no Student
@@ -157,6 +160,10 @@ export function App() {
                     path="/transfers/department-head"
                     element={<TransferReviewQueuePage stage="departmentHead" />}
                   />
+                  <Route
+                    path="/waivers/department-head"
+                    element={<WaiverReviewQueuePage stage="departmentHead" />}
+                  />
                 </Route>
                 <Route element={<RequireAuth roles={[ROLE.advisor]} />}>
                   <Route
@@ -167,11 +174,19 @@ export function App() {
                     path="/transfers/advisor"
                     element={<TransferReviewQueuePage stage="advisor" />}
                   />
+                  <Route
+                    path="/waivers/advisor"
+                    element={<WaiverReviewQueuePage stage="advisor" />}
+                  />
                 </Route>
                 <Route element={<RequireAuth roles={[ROLE.council]} />}>
                   <Route
                     path="/transfers/council"
                     element={<TransferReviewQueuePage stage="council" />}
+                  />
+                  <Route
+                    path="/waivers/council"
+                    element={<WaiverReviewQueuePage stage="council" />}
                   />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the

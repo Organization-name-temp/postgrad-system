@@ -7943,6 +7943,1660 @@ export type SubmitOrResubmitATransferRequest200 = {
   data?: SubmitOrResubmitATransferRequest200Data;
 };
 
+export type AdvisorWaiverQueueParams = {
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive prior Course IDs.
+ */
+prior_course_id?: string;
+/**
+ * Comma-separated positive Student IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, target-code, or prior-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type AdvisorWaiverQueue200DataItemEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+/**
+ * @nullable
+ */
+export type AdvisorWaiverQueue200DataItemHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type AdvisorWaiverQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+/**
+ * @nullable
+ */
+export type AdvisorWaiverQueue200DataItemTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type AdvisorWaiverQueue200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AdvisorWaiverQueue200DataItemTransitionsItemEvidenceSnapshot;
+  /** @nullable */
+  verification_snapshot?: AdvisorWaiverQueue200DataItemTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective Waiver decision after Council approval.
+ * @nullable
+ */
+export type AdvisorWaiverQueue200DataItemDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+} | null;
+
+export type AdvisorWaiverQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type AdvisorWaiverQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: number | null;
+  /** @nullable */
+  prior_letter_grade?: string | null;
+  evidence?: AdvisorWaiverQueue200DataItemEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  /** @nullable */
+  head_verification?: AdvisorWaiverQueue200DataItemHeadVerification;
+  transitions?: AdvisorWaiverQueue200DataItemTransitionsItem[];
+  /**
+     * The immutable effective Waiver decision after Council approval.
+     * @nullable
+     */
+  decision?: AdvisorWaiverQueue200DataItemDecision;
+  created_at?: string;
+  updated_at?: string;
+  student?: AdvisorWaiverQueue200DataItemStudent;
+};
+
+export type AdvisorWaiverQueue200Links = {
+  /** @nullable */
+  first?: string | null;
+  /** @nullable */
+  last?: string | null;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type AdvisorWaiverQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type AdvisorWaiverQueue200 = {
+  data?: AdvisorWaiverQueue200DataItem[];
+  links?: AdvisorWaiverQueue200Links;
+  meta?: AdvisorWaiverQueue200Meta;
+};
+
+export type ExportAdvisorWaiverQueueParams = {
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive prior Course IDs.
+ */
+prior_course_id?: string;
+/**
+ * Comma-separated positive Student IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, target-code, or prior-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type AdvisorActionOnAWaiverRequestBody = {
+  /** recommend, return, or reject. */
+  action: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type AdvisorActionOnAWaiverRequest200DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type AdvisorActionOnAWaiverRequest200DataHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type AdvisorActionOnAWaiverRequest200DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type AdvisorActionOnAWaiverRequest200DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type AdvisorActionOnAWaiverRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AdvisorActionOnAWaiverRequest200DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: AdvisorActionOnAWaiverRequest200DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type AdvisorActionOnAWaiverRequest200DataDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+};
+
+export type AdvisorActionOnAWaiverRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: AdvisorActionOnAWaiverRequest200DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  head_verification?: AdvisorActionOnAWaiverRequest200DataHeadVerification;
+  transitions?: AdvisorActionOnAWaiverRequest200DataTransitionsItem[];
+  decision?: AdvisorActionOnAWaiverRequest200DataDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type AdvisorActionOnAWaiverRequest200 = {
+  data?: AdvisorActionOnAWaiverRequest200Data;
+};
+
+export type DepartmentHeadWaiverQueueParams = {
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive prior Course IDs.
+ */
+prior_course_id?: string;
+/**
+ * Comma-separated positive Student IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, target-code, or prior-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type DepartmentHeadWaiverQueue200DataItemEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+/**
+ * @nullable
+ */
+export type DepartmentHeadWaiverQueue200DataItemHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type DepartmentHeadWaiverQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+/**
+ * @nullable
+ */
+export type DepartmentHeadWaiverQueue200DataItemTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type DepartmentHeadWaiverQueue200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: DepartmentHeadWaiverQueue200DataItemTransitionsItemEvidenceSnapshot;
+  /** @nullable */
+  verification_snapshot?: DepartmentHeadWaiverQueue200DataItemTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective Waiver decision after Council approval.
+ * @nullable
+ */
+export type DepartmentHeadWaiverQueue200DataItemDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+} | null;
+
+export type DepartmentHeadWaiverQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type DepartmentHeadWaiverQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: number | null;
+  /** @nullable */
+  prior_letter_grade?: string | null;
+  evidence?: DepartmentHeadWaiverQueue200DataItemEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  /** @nullable */
+  head_verification?: DepartmentHeadWaiverQueue200DataItemHeadVerification;
+  transitions?: DepartmentHeadWaiverQueue200DataItemTransitionsItem[];
+  /**
+     * The immutable effective Waiver decision after Council approval.
+     * @nullable
+     */
+  decision?: DepartmentHeadWaiverQueue200DataItemDecision;
+  created_at?: string;
+  updated_at?: string;
+  student?: DepartmentHeadWaiverQueue200DataItemStudent;
+};
+
+export type DepartmentHeadWaiverQueue200Links = {
+  /** @nullable */
+  first?: string | null;
+  /** @nullable */
+  last?: string | null;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type DepartmentHeadWaiverQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type DepartmentHeadWaiverQueue200 = {
+  data?: DepartmentHeadWaiverQueue200DataItem[];
+  links?: DepartmentHeadWaiverQueue200Links;
+  meta?: DepartmentHeadWaiverQueue200Meta;
+};
+
+export type ExportDepartmentHeadWaiverQueueParams = {
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive prior Course IDs.
+ */
+prior_course_id?: string;
+/**
+ * Comma-separated positive Student IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, target-code, or prior-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type ScopedDepartmentHeadVerificationBody = {
+  /** verify, return, or reject. */
+  action: string;
+  /** Required for verify; minimum 80. */
+  coverage_percentage?: number;
+  /** Required for verify. */
+  equivalency_note?: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type ScopedDepartmentHeadVerification200DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type ScopedDepartmentHeadVerification200DataHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type ScopedDepartmentHeadVerification200DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type ScopedDepartmentHeadVerification200DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type ScopedDepartmentHeadVerification200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ScopedDepartmentHeadVerification200DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: ScopedDepartmentHeadVerification200DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type ScopedDepartmentHeadVerification200DataDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+};
+
+export type ScopedDepartmentHeadVerification200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: ScopedDepartmentHeadVerification200DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  head_verification?: ScopedDepartmentHeadVerification200DataHeadVerification;
+  transitions?: ScopedDepartmentHeadVerification200DataTransitionsItem[];
+  decision?: ScopedDepartmentHeadVerification200DataDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ScopedDepartmentHeadVerification200 = {
+  data?: ScopedDepartmentHeadVerification200Data;
+};
+
+export type CouncilWaiverQueueParams = {
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive prior Course IDs.
+ */
+prior_course_id?: string;
+/**
+ * Comma-separated positive Student IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, target-code, or prior-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type CouncilWaiverQueue200DataItemEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+/**
+ * @nullable
+ */
+export type CouncilWaiverQueue200DataItemHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type CouncilWaiverQueue200DataItemTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+/**
+ * @nullable
+ */
+export type CouncilWaiverQueue200DataItemTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type CouncilWaiverQueue200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: CouncilWaiverQueue200DataItemTransitionsItemEvidenceSnapshot;
+  /** @nullable */
+  verification_snapshot?: CouncilWaiverQueue200DataItemTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective Waiver decision after Council approval.
+ * @nullable
+ */
+export type CouncilWaiverQueue200DataItemDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+} | null;
+
+export type CouncilWaiverQueue200DataItemStudent = {
+  student_id?: number;
+  university_id?: string;
+  name?: string;
+};
+
+export type CouncilWaiverQueue200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: number | null;
+  /** @nullable */
+  prior_letter_grade?: string | null;
+  evidence?: CouncilWaiverQueue200DataItemEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  /** @nullable */
+  head_verification?: CouncilWaiverQueue200DataItemHeadVerification;
+  transitions?: CouncilWaiverQueue200DataItemTransitionsItem[];
+  /**
+     * The immutable effective Waiver decision after Council approval.
+     * @nullable
+     */
+  decision?: CouncilWaiverQueue200DataItemDecision;
+  created_at?: string;
+  updated_at?: string;
+  student?: CouncilWaiverQueue200DataItemStudent;
+};
+
+export type CouncilWaiverQueue200Links = {
+  /** @nullable */
+  first?: string | null;
+  /** @nullable */
+  last?: string | null;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type CouncilWaiverQueue200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type CouncilWaiverQueue200 = {
+  data?: CouncilWaiverQueue200DataItem[];
+  links?: CouncilWaiverQueue200Links;
+  meta?: CouncilWaiverQueue200Meta;
+};
+
+export type ExportCouncilWaiverQueueParams = {
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Comma-separated positive prior Course IDs.
+ */
+prior_course_id?: string;
+/**
+ * Comma-separated positive Student IDs.
+ */
+student_id?: string;
+/**
+ * Student, University-ID, target-code, or prior-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type AcademicAffairsCouncilFinalDecisionBody = {
+  /** approve, return, or reject. */
+  action: string;
+  /** Required for return/reject. */
+  reason?: string;
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type AcademicAffairsCouncilFinalDecision200DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type AcademicAffairsCouncilFinalDecision200DataHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type AcademicAffairsCouncilFinalDecision200DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type AcademicAffairsCouncilFinalDecision200DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type AcademicAffairsCouncilFinalDecision200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AcademicAffairsCouncilFinalDecision200DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: AcademicAffairsCouncilFinalDecision200DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type AcademicAffairsCouncilFinalDecision200DataDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+};
+
+export type AcademicAffairsCouncilFinalDecision200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: AcademicAffairsCouncilFinalDecision200DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  head_verification?: AcademicAffairsCouncilFinalDecision200DataHeadVerification;
+  transitions?: AcademicAffairsCouncilFinalDecision200DataTransitionsItem[];
+  decision?: AcademicAffairsCouncilFinalDecision200DataDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type AcademicAffairsCouncilFinalDecision200 = {
+  data?: AcademicAffairsCouncilFinalDecision200Data;
+};
+
+export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200DataItem = {
+  target_course_id?: number;
+  target_course_code?: string;
+  category?: string;
+  credit_hours?: number;
+  already_recognized?: boolean;
+};
+
+export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200 = {
+  data?: CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200DataItem[];
+};
+
+export type MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItemCourse = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  level?: number;
+  total_ch?: number;
+  /** @nullable */
+  research_type?: string | null;
+  is_active?: boolean;
+  /** @nullable */
+  department_id?: number | null;
+};
+
+export type MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItem = {
+  enrollment_id?: number;
+  course?: MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItemCourse;
+  minimum_result?: string;
+};
+
+export type MyQualifyingPriorEJUSTResultsRecordedInPRS200 = {
+  data?: MyQualifyingPriorEJUSTResultsRecordedInPRS200DataItem[];
+};
+
+export type MyWaiverRequestsParams = {
+/**
+ * Comma-separated request statuses.
+ */
+status?: string;
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Course-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type MyWaiverRequests200DataItemEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+/**
+ * @nullable
+ */
+export type MyWaiverRequests200DataItemHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type MyWaiverRequests200DataItemTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+/**
+ * @nullable
+ */
+export type MyWaiverRequests200DataItemTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+} | null;
+
+export type MyWaiverRequests200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: MyWaiverRequests200DataItemTransitionsItemEvidenceSnapshot;
+  /** @nullable */
+  verification_snapshot?: MyWaiverRequests200DataItemTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+/**
+ * The immutable effective Waiver decision after Council approval.
+ * @nullable
+ */
+export type MyWaiverRequests200DataItemDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+} | null;
+
+export type MyWaiverRequests200DataItem = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: number | null;
+  /** @nullable */
+  prior_letter_grade?: string | null;
+  evidence?: MyWaiverRequests200DataItemEvidence;
+  /** @nullable */
+  student_note?: string | null;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  /** @nullable */
+  head_verification?: MyWaiverRequests200DataItemHeadVerification;
+  transitions?: MyWaiverRequests200DataItemTransitionsItem[];
+  /**
+     * The immutable effective Waiver decision after Council approval.
+     * @nullable
+     */
+  decision?: MyWaiverRequests200DataItemDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type MyWaiverRequests200Links = {
+  /** @nullable */
+  first?: string | null;
+  /** @nullable */
+  last?: string | null;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type MyWaiverRequests200Meta = {
+  current_page?: number;
+  from?: number;
+  last_page?: number;
+  path?: string;
+  per_page?: number;
+  to?: number;
+  total?: number;
+};
+
+export type MyWaiverRequests200 = {
+  data?: MyWaiverRequests200DataItem[];
+  links?: MyWaiverRequests200Links;
+  meta?: MyWaiverRequests200Meta;
+};
+
+/**
+ * Prior E-JUST result evidence.
+ */
+export type CreateAWaiverDraftBodyPriorResult = {
+  /** prs or legacy_transcript. */
+  source: string;
+  /** Must be E-JUST. */
+  institution: string;
+  /**
+     * PRS Enrollment for the prior result.
+     * @nullable
+     */
+  enrollment_id?: number | null;
+  /**
+     * Must be at least 1.
+     * @nullable
+     */
+  course_id?: number | null;
+  /**
+     * Must not be greater than 3 characters.
+     * @nullable
+     */
+  letter_grade?: string | null;
+  /** Must be at least 1. */
+  official_transcript_document_ids?: number[];
+};
+
+export type CreateAWaiverDraftBody = {
+  /** Target Course in the bound Curriculum. */
+  target_course_id: number;
+  /** Prior E-JUST result evidence. */
+  prior_result: CreateAWaiverDraftBodyPriorResult;
+  /**
+     * Student explanation.
+     * @nullable
+     */
+  student_note?: string | null;
+};
+
+export type CreateAWaiverDraft201DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type CreateAWaiverDraft201DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type CreateAWaiverDraft201DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type CreateAWaiverDraft201DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: CreateAWaiverDraft201DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: CreateAWaiverDraft201DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type CreateAWaiverDraft201Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: CreateAWaiverDraft201DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  /** @nullable */
+  submitted_at?: string | null;
+  /** @nullable */
+  head_verification?: string | null;
+  transitions?: CreateAWaiverDraft201DataTransitionsItem[];
+  /** @nullable */
+  decision?: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type CreateAWaiverDraft201 = {
+  data?: CreateAWaiverDraft201Data;
+};
+
+export type ExportMyWaiverRequestsParams = {
+/**
+ * Comma-separated request statuses.
+ */
+status?: string;
+/**
+ * Comma-separated positive target Course IDs.
+ */
+target_course_id?: string;
+/**
+ * Course-code search.
+ */
+q?: string;
+sort?: string;
+page?: number;
+/**
+ * Capped at 100.
+ */
+per_page?: number;
+};
+
+export type ViewOneOfMyWaiverRequests200DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type ViewOneOfMyWaiverRequests200DataHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type ViewOneOfMyWaiverRequests200DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type ViewOneOfMyWaiverRequests200DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type ViewOneOfMyWaiverRequests200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ViewOneOfMyWaiverRequests200DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: ViewOneOfMyWaiverRequests200DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type ViewOneOfMyWaiverRequests200DataDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+};
+
+export type ViewOneOfMyWaiverRequests200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: ViewOneOfMyWaiverRequests200DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  head_verification?: ViewOneOfMyWaiverRequests200DataHeadVerification;
+  transitions?: ViewOneOfMyWaiverRequests200DataTransitionsItem[];
+  decision?: ViewOneOfMyWaiverRequests200DataDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ViewOneOfMyWaiverRequests200 = {
+  data?: ViewOneOfMyWaiverRequests200Data;
+};
+
+/**
+ * Revised prior E-JUST result evidence.
+ */
+export type ReviseAnEditableWaiverRequestBodyPriorResult = {
+  /** This field is required when <code>prior_result</code> is present. */
+  source?: string;
+  /** This field is required when <code>prior_result</code> is present. Must not be greater than 100 characters. */
+  institution?: string;
+  /**
+     * Must be at least 1.
+     * @nullable
+     */
+  enrollment_id?: number | null;
+  /**
+     * Must be at least 1.
+     * @nullable
+     */
+  course_id?: number | null;
+  /**
+     * Must not be greater than 3 characters.
+     * @nullable
+     */
+  letter_grade?: string | null;
+  /** Must be at least 1. */
+  official_transcript_document_ids?: number[];
+};
+
+export type ReviseAnEditableWaiverRequestBody = {
+  expected_revision: number;
+  /** Revised prior E-JUST result evidence. */
+  prior_result?: ReviseAnEditableWaiverRequestBodyPriorResult;
+  /**
+     * Revised Student explanation.
+     * @nullable
+     */
+  student_note?: string | null;
+};
+
+export type ReviseAnEditableWaiverRequest200DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type ReviseAnEditableWaiverRequest200DataHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type ReviseAnEditableWaiverRequest200DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type ReviseAnEditableWaiverRequest200DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type ReviseAnEditableWaiverRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: ReviseAnEditableWaiverRequest200DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: ReviseAnEditableWaiverRequest200DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type ReviseAnEditableWaiverRequest200DataDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+};
+
+export type ReviseAnEditableWaiverRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: ReviseAnEditableWaiverRequest200DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  head_verification?: ReviseAnEditableWaiverRequest200DataHeadVerification;
+  transitions?: ReviseAnEditableWaiverRequest200DataTransitionsItem[];
+  decision?: ReviseAnEditableWaiverRequest200DataDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ReviseAnEditableWaiverRequest200 = {
+  data?: ReviseAnEditableWaiverRequest200Data;
+};
+
+export type AbandonAWaiverDraftBody = {
+  expected_revision: number;
+};
+
+export type AbandonAWaiverDraft200DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type AbandonAWaiverDraft200DataHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type AbandonAWaiverDraft200DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type AbandonAWaiverDraft200DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type AbandonAWaiverDraft200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: AbandonAWaiverDraft200DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: AbandonAWaiverDraft200DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type AbandonAWaiverDraft200DataDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+};
+
+export type AbandonAWaiverDraft200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: AbandonAWaiverDraft200DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  head_verification?: AbandonAWaiverDraft200DataHeadVerification;
+  transitions?: AbandonAWaiverDraft200DataTransitionsItem[];
+  decision?: AbandonAWaiverDraft200DataDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type AbandonAWaiverDraft200 = {
+  data?: AbandonAWaiverDraft200Data;
+};
+
+export type SubmitOrResubmitAWaiverRequestBody = {
+  expected_revision: number;
+  /** Retry-stable UUID. */
+  action_id: string;
+};
+
+export type SubmitOrResubmitAWaiverRequest200DataEvidence = {
+  source?: string;
+  institution?: string;
+  course_id?: number;
+  letter_grade?: string;
+  official_transcript_document_ids?: number[];
+};
+
+export type SubmitOrResubmitAWaiverRequest200DataHeadVerification = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type SubmitOrResubmitAWaiverRequest200DataTransitionsItemEvidenceSnapshot = {
+  source?: string;
+  institution?: string;
+};
+
+export type SubmitOrResubmitAWaiverRequest200DataTransitionsItemVerificationSnapshot = {
+  coverage_percentage?: number;
+  equivalency_note?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type SubmitOrResubmitAWaiverRequest200DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  actor_user_id?: number;
+  /** @nullable */
+  reason?: string | null;
+  revision?: number;
+  evidence_snapshot?: SubmitOrResubmitAWaiverRequest200DataTransitionsItemEvidenceSnapshot;
+  verification_snapshot?: SubmitOrResubmitAWaiverRequest200DataTransitionsItemVerificationSnapshot;
+  current_revision?: boolean;
+  created_at?: string;
+};
+
+export type SubmitOrResubmitAWaiverRequest200DataDecision = {
+  id?: number;
+  waiver_request_id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  prior_letter_grade?: string;
+  coverage_percentage?: number;
+  verified_by?: number;
+  verified_at?: string;
+  approved_by?: number;
+  approved_at?: string;
+};
+
+export type SubmitOrResubmitAWaiverRequest200Data = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  prior_course_id?: number;
+  prior_course_code?: string;
+  prior_course_level?: number;
+  prior_result_source?: string;
+  /** @nullable */
+  prior_enrollment_id?: string | null;
+  prior_letter_grade?: string;
+  evidence?: SubmitOrResubmitAWaiverRequest200DataEvidence;
+  student_note?: string;
+  status?: string;
+  revision?: number;
+  editable?: boolean;
+  terminal?: boolean;
+  submitted_at?: string;
+  head_verification?: SubmitOrResubmitAWaiverRequest200DataHeadVerification;
+  transitions?: SubmitOrResubmitAWaiverRequest200DataTransitionsItem[];
+  decision?: SubmitOrResubmitAWaiverRequest200DataDecision;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type SubmitOrResubmitAWaiverRequest200 = {
+  data?: SubmitOrResubmitAWaiverRequest200Data;
+};
+
 const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
   const result = { queryKey } as T & { queryKey: K };
   for (const key of Object.keys(query)) {
@@ -23193,3 +24847,1509 @@ export function useOpenTransferEvidence<TData = Awaited<ReturnType<typeof openTr
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+/**
+ * @summary Advisor Waiver queue.
+ */
+export const advisorWaiverQueue = (
+    params?: AdvisorWaiverQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorWaiverQueue200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/advisor-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorWaiverQueueQueryKey = (params?: AdvisorWaiverQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/advisor-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdvisorWaiverQueueQueryOptions = <TData = Awaited<ReturnType<typeof advisorWaiverQueue>>, TError = unknown>(params?: AdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorWaiverQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdvisorWaiverQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisorWaiverQueue>>> = ({ signal }) => advisorWaiverQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof advisorWaiverQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdvisorWaiverQueueQueryResult = NonNullable<Awaited<ReturnType<typeof advisorWaiverQueue>>>
+export type AdvisorWaiverQueueQueryError = unknown
+
+
+export function useAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof advisorWaiverQueue>>, TError = unknown>(
+ params: undefined |  AdvisorWaiverQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorWaiverQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof advisorWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof advisorWaiverQueue>>, TError = unknown>(
+ params?: AdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorWaiverQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisorWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof advisorWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof advisorWaiverQueue>>, TError = unknown>(
+ params?: AdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Advisor Waiver queue.
+ */
+
+export function useAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof advisorWaiverQueue>>, TError = unknown>(
+ params?: AdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdvisorWaiverQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Advisor Waiver queue.
+ */
+export const exportAdvisorWaiverQueue = (
+    params?: ExportAdvisorWaiverQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/waiver-requests/advisor-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportAdvisorWaiverQueueQueryKey = (params?: ExportAdvisorWaiverQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/advisor-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportAdvisorWaiverQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError = unknown>(params?: ExportAdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportAdvisorWaiverQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>> = ({ signal }) => exportAdvisorWaiverQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportAdvisorWaiverQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>>
+export type ExportAdvisorWaiverQueueQueryError = unknown
+
+
+export function useExportAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError = unknown>(
+ params: undefined |  ExportAdvisorWaiverQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError = unknown>(
+ params?: ExportAdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError = unknown>(
+ params?: ExportAdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Advisor Waiver queue.
+ */
+
+export function useExportAdvisorWaiverQueue<TData = Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError = unknown>(
+ params?: ExportAdvisorWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdvisorWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportAdvisorWaiverQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Advisor action on a Waiver request.
+ */
+export const advisorActionOnAWaiverRequest = (
+    waiverRequestId: number,
+    advisorActionOnAWaiverRequestBody: AdvisorActionOnAWaiverRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisorActionOnAWaiverRequest200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}/advisor-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: advisorActionOnAWaiverRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisorActionOnAWaiverRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnAWaiverRequest>>, TError,{waiverRequestId: number;data: AdvisorActionOnAWaiverRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnAWaiverRequest>>, TError,{waiverRequestId: number;data: AdvisorActionOnAWaiverRequestBody}, TContext> => {
+
+const mutationKey = ['advisorActionOnAWaiverRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof advisorActionOnAWaiverRequest>>, {waiverRequestId: number;data: AdvisorActionOnAWaiverRequestBody}> = (props) => {
+          const {waiverRequestId,data} = props ?? {};
+
+          return  advisorActionOnAWaiverRequest(waiverRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdvisorActionOnAWaiverRequestMutationResult = NonNullable<Awaited<ReturnType<typeof advisorActionOnAWaiverRequest>>>
+    export type AdvisorActionOnAWaiverRequestMutationBody = AdvisorActionOnAWaiverRequestBody
+    export type AdvisorActionOnAWaiverRequestMutationError = unknown
+
+    /**
+ * @summary Advisor action on a Waiver request.
+ */
+export const useAdvisorActionOnAWaiverRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof advisorActionOnAWaiverRequest>>, TError,{waiverRequestId: number;data: AdvisorActionOnAWaiverRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof advisorActionOnAWaiverRequest>>,
+        TError,
+        {waiverRequestId: number;data: AdvisorActionOnAWaiverRequestBody},
+        TContext
+      > => {
+      return useMutation(getAdvisorActionOnAWaiverRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * Uses the same query contract as the Advisor queue.
+ * @summary Department Head Waiver queue.
+ */
+export const departmentHeadWaiverQueue = (
+    params?: DepartmentHeadWaiverQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DepartmentHeadWaiverQueue200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/department-head-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getDepartmentHeadWaiverQueueQueryKey = (params?: DepartmentHeadWaiverQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/department-head-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getDepartmentHeadWaiverQueueQueryOptions = <TData = Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError = unknown>(params?: DepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDepartmentHeadWaiverQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>> = ({ signal }) => departmentHeadWaiverQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DepartmentHeadWaiverQueueQueryResult = NonNullable<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>>
+export type DepartmentHeadWaiverQueueQueryError = unknown
+
+
+export function useDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError = unknown>(
+ params: undefined |  DepartmentHeadWaiverQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentHeadWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof departmentHeadWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError = unknown>(
+ params?: DepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof departmentHeadWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof departmentHeadWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError = unknown>(
+ params?: DepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Department Head Waiver queue.
+ */
+
+export function useDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError = unknown>(
+ params?: DepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof departmentHeadWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDepartmentHeadWaiverQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Department Head Waiver queue.
+ */
+export const exportDepartmentHeadWaiverQueue = (
+    params?: ExportDepartmentHeadWaiverQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/waiver-requests/department-head-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportDepartmentHeadWaiverQueueQueryKey = (params?: ExportDepartmentHeadWaiverQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/department-head-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportDepartmentHeadWaiverQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError = unknown>(params?: ExportDepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportDepartmentHeadWaiverQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>> = ({ signal }) => exportDepartmentHeadWaiverQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportDepartmentHeadWaiverQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>>
+export type ExportDepartmentHeadWaiverQueueQueryError = unknown
+
+
+export function useExportDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError = unknown>(
+ params: undefined |  ExportDepartmentHeadWaiverQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Department Head Waiver queue.
+ */
+
+export function useExportDepartmentHeadWaiverQueue<TData = Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError = unknown>(
+ params?: ExportDepartmentHeadWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDepartmentHeadWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportDepartmentHeadWaiverQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Scoped Department Head verification.
+ */
+export const scopedDepartmentHeadVerification = (
+    waiverRequestId: number,
+    scopedDepartmentHeadVerificationBody: ScopedDepartmentHeadVerificationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScopedDepartmentHeadVerification200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}/department-head-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: scopedDepartmentHeadVerificationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getScopedDepartmentHeadVerificationMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scopedDepartmentHeadVerification>>, TError,{waiverRequestId: number;data: ScopedDepartmentHeadVerificationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof scopedDepartmentHeadVerification>>, TError,{waiverRequestId: number;data: ScopedDepartmentHeadVerificationBody}, TContext> => {
+
+const mutationKey = ['scopedDepartmentHeadVerification'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scopedDepartmentHeadVerification>>, {waiverRequestId: number;data: ScopedDepartmentHeadVerificationBody}> = (props) => {
+          const {waiverRequestId,data} = props ?? {};
+
+          return  scopedDepartmentHeadVerification(waiverRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScopedDepartmentHeadVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof scopedDepartmentHeadVerification>>>
+    export type ScopedDepartmentHeadVerificationMutationBody = ScopedDepartmentHeadVerificationBody
+    export type ScopedDepartmentHeadVerificationMutationError = unknown
+
+    /**
+ * @summary Scoped Department Head verification.
+ */
+export const useScopedDepartmentHeadVerification = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scopedDepartmentHeadVerification>>, TError,{waiverRequestId: number;data: ScopedDepartmentHeadVerificationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof scopedDepartmentHeadVerification>>,
+        TError,
+        {waiverRequestId: number;data: ScopedDepartmentHeadVerificationBody},
+        TContext
+      > => {
+      return useMutation(getScopedDepartmentHeadVerificationMutationOptions(options), queryClient);
+    }
+
+/**
+ * Uses the same query contract as the Advisor queue.
+ * @summary Council Waiver queue.
+ */
+export const councilWaiverQueue = (
+    params?: CouncilWaiverQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CouncilWaiverQueue200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/council-queue`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getCouncilWaiverQueueQueryKey = (params?: CouncilWaiverQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/council-queue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getCouncilWaiverQueueQueryOptions = <TData = Awaited<ReturnType<typeof councilWaiverQueue>>, TError = unknown>(params?: CouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilWaiverQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCouncilWaiverQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof councilWaiverQueue>>> = ({ signal }) => councilWaiverQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof councilWaiverQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CouncilWaiverQueueQueryResult = NonNullable<Awaited<ReturnType<typeof councilWaiverQueue>>>
+export type CouncilWaiverQueueQueryError = unknown
+
+
+export function useCouncilWaiverQueue<TData = Awaited<ReturnType<typeof councilWaiverQueue>>, TError = unknown>(
+ params: undefined |  CouncilWaiverQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilWaiverQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof councilWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof councilWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCouncilWaiverQueue<TData = Awaited<ReturnType<typeof councilWaiverQueue>>, TError = unknown>(
+ params?: CouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilWaiverQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof councilWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof councilWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCouncilWaiverQueue<TData = Awaited<ReturnType<typeof councilWaiverQueue>>, TError = unknown>(
+ params?: CouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Council Waiver queue.
+ */
+
+export function useCouncilWaiverQueue<TData = Awaited<ReturnType<typeof councilWaiverQueue>>, TError = unknown>(
+ params?: CouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof councilWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCouncilWaiverQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Council Waiver queue.
+ */
+export const exportCouncilWaiverQueue = (
+    params?: ExportCouncilWaiverQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/waiver-requests/council-queue/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportCouncilWaiverQueueQueryKey = (params?: ExportCouncilWaiverQueueParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/council-queue/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportCouncilWaiverQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError = unknown>(params?: ExportCouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportCouncilWaiverQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>> = ({ signal }) => exportCouncilWaiverQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportCouncilWaiverQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>>
+export type ExportCouncilWaiverQueueQueryError = unknown
+
+
+export function useExportCouncilWaiverQueue<TData = Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError = unknown>(
+ params: undefined |  ExportCouncilWaiverQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCouncilWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportCouncilWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCouncilWaiverQueue<TData = Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError = unknown>(
+ params?: ExportCouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCouncilWaiverQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportCouncilWaiverQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCouncilWaiverQueue<TData = Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError = unknown>(
+ params?: ExportCouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Council Waiver queue.
+ */
+
+export function useExportCouncilWaiverQueue<TData = Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError = unknown>(
+ params?: ExportCouncilWaiverQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCouncilWaiverQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportCouncilWaiverQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Academic Affairs Council final decision.
+ */
+export const academicAffairsCouncilFinalDecision = (
+    waiverRequestId: number,
+    academicAffairsCouncilFinalDecisionBody: AcademicAffairsCouncilFinalDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AcademicAffairsCouncilFinalDecision200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}/council-decision`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: academicAffairsCouncilFinalDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAcademicAffairsCouncilFinalDecisionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicAffairsCouncilFinalDecision>>, TError,{waiverRequestId: number;data: AcademicAffairsCouncilFinalDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof academicAffairsCouncilFinalDecision>>, TError,{waiverRequestId: number;data: AcademicAffairsCouncilFinalDecisionBody}, TContext> => {
+
+const mutationKey = ['academicAffairsCouncilFinalDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof academicAffairsCouncilFinalDecision>>, {waiverRequestId: number;data: AcademicAffairsCouncilFinalDecisionBody}> = (props) => {
+          const {waiverRequestId,data} = props ?? {};
+
+          return  academicAffairsCouncilFinalDecision(waiverRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AcademicAffairsCouncilFinalDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof academicAffairsCouncilFinalDecision>>>
+    export type AcademicAffairsCouncilFinalDecisionMutationBody = AcademicAffairsCouncilFinalDecisionBody
+    export type AcademicAffairsCouncilFinalDecisionMutationError = unknown
+
+    /**
+ * @summary Academic Affairs Council final decision.
+ */
+export const useAcademicAffairsCouncilFinalDecision = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof academicAffairsCouncilFinalDecision>>, TError,{waiverRequestId: number;data: AcademicAffairsCouncilFinalDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof academicAffairsCouncilFinalDecision>>,
+        TError,
+        {waiverRequestId: number;data: AcademicAffairsCouncilFinalDecisionBody},
+        TContext
+      > => {
+      return useMutation(getAcademicAffairsCouncilFinalDecisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Courses in my bound Curriculum that can be targeted by a Waiver.
+ */
+export const coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/targets`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/targets`
+    ] as const;
+    }
+
+
+export const getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryOptions = <TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>> = ({ signal }) => coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryResult = NonNullable<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>>
+export type CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryError = unknown
+
+
+export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>,
+          TError,
+          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>,
+          TError,
+          Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Courses in my bound Curriculum that can be targeted by a Waiver.
+ */
+
+export function useCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiver<TData = Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof coursesInMyBoundCurriculumThatCanBeTargetedByAWaiver>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Only earned results whose Course is level 400 or above are offered. The earned
+ * flag is the authoritative Grading-owned C+-or-higher classification.
+ * @summary My qualifying prior E-JUST results recorded in PRS.
+ */
+export const myQualifyingPriorEJUSTResultsRecordedInPRS = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyQualifyingPriorEJUSTResultsRecordedInPRS200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/prior-results`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryKey = () => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/prior-results`
+    ] as const;
+    }
+
+
+export const getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryOptions = <TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>> = ({ signal }) => myQualifyingPriorEJUSTResultsRecordedInPRS(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyQualifyingPriorEJUSTResultsRecordedInPRSQueryResult = NonNullable<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>>
+export type MyQualifyingPriorEJUSTResultsRecordedInPRSQueryError = unknown
+
+
+export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>,
+          TError,
+          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>,
+          TError,
+          Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My qualifying prior E-JUST results recorded in PRS.
+ */
+
+export function useMyQualifyingPriorEJUSTResultsRecordedInPRS<TData = Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myQualifyingPriorEJUSTResultsRecordedInPRS>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyQualifyingPriorEJUSTResultsRecordedInPRSQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary My Waiver requests.
+ */
+export const myWaiverRequests = (
+    params?: MyWaiverRequestsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<MyWaiverRequests200>(
+      {url: `/api/v1/credit-decisions/waiver-requests`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getMyWaiverRequestsQueryKey = (params?: MyWaiverRequestsParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getMyWaiverRequestsQueryOptions = <TData = Awaited<ReturnType<typeof myWaiverRequests>>, TError = unknown>(params?: MyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getMyWaiverRequestsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myWaiverRequests>>> = ({ signal }) => myWaiverRequests(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myWaiverRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type MyWaiverRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof myWaiverRequests>>>
+export type MyWaiverRequestsQueryError = unknown
+
+
+export function useMyWaiverRequests<TData = Awaited<ReturnType<typeof myWaiverRequests>>, TError = unknown>(
+ params: undefined |  MyWaiverRequestsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myWaiverRequests>>,
+          TError,
+          Awaited<ReturnType<typeof myWaiverRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyWaiverRequests<TData = Awaited<ReturnType<typeof myWaiverRequests>>, TError = unknown>(
+ params?: MyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myWaiverRequests>>,
+          TError,
+          Awaited<ReturnType<typeof myWaiverRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useMyWaiverRequests<TData = Awaited<ReturnType<typeof myWaiverRequests>>, TError = unknown>(
+ params?: MyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary My Waiver requests.
+ */
+
+export function useMyWaiverRequests<TData = Awaited<ReturnType<typeof myWaiverRequests>>, TError = unknown>(
+ params?: MyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myWaiverRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getMyWaiverRequestsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Create a Waiver Draft.
+ */
+export const createAWaiverDraft = (
+    createAWaiverDraftBody: CreateAWaiverDraftBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CreateAWaiverDraft201>(
+      {url: `/api/v1/credit-decisions/waiver-requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createAWaiverDraftBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCreateAWaiverDraftMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAWaiverDraft>>, TError,{data: CreateAWaiverDraftBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createAWaiverDraft>>, TError,{data: CreateAWaiverDraftBody}, TContext> => {
+
+const mutationKey = ['createAWaiverDraft'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAWaiverDraft>>, {data: CreateAWaiverDraftBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createAWaiverDraft(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateAWaiverDraftMutationResult = NonNullable<Awaited<ReturnType<typeof createAWaiverDraft>>>
+    export type CreateAWaiverDraftMutationBody = CreateAWaiverDraftBody
+    export type CreateAWaiverDraftMutationError = unknown
+
+    /**
+ * @summary Create a Waiver Draft.
+ */
+export const useCreateAWaiverDraft = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAWaiverDraft>>, TError,{data: CreateAWaiverDraftBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createAWaiverDraft>>,
+        TError,
+        {data: CreateAWaiverDraftBody},
+        TContext
+      > => {
+      return useMutation(getCreateAWaiverDraftMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Export my Waiver requests.
+ */
+export const exportMyWaiverRequests = (
+    params?: ExportMyWaiverRequestsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/credit-decisions/waiver-requests/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportMyWaiverRequestsQueryKey = (params?: ExportMyWaiverRequestsParams,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportMyWaiverRequestsQueryOptions = <TData = Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError = unknown>(params?: ExportMyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportMyWaiverRequestsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportMyWaiverRequests>>> = ({ signal }) => exportMyWaiverRequests(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportMyWaiverRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof exportMyWaiverRequests>>>
+export type ExportMyWaiverRequestsQueryError = unknown
+
+
+export function useExportMyWaiverRequests<TData = Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError = unknown>(
+ params: undefined |  ExportMyWaiverRequestsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportMyWaiverRequests>>,
+          TError,
+          Awaited<ReturnType<typeof exportMyWaiverRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportMyWaiverRequests<TData = Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError = unknown>(
+ params?: ExportMyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportMyWaiverRequests>>,
+          TError,
+          Awaited<ReturnType<typeof exportMyWaiverRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportMyWaiverRequests<TData = Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError = unknown>(
+ params?: ExportMyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export my Waiver requests.
+ */
+
+export function useExportMyWaiverRequests<TData = Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError = unknown>(
+ params?: ExportMyWaiverRequestsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportMyWaiverRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportMyWaiverRequestsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary View one of my Waiver requests.
+ */
+export const viewOneOfMyWaiverRequests = (
+    waiverRequestId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ViewOneOfMyWaiverRequests200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getViewOneOfMyWaiverRequestsQueryKey = (waiverRequestId: number,) => {
+    return [
+    `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}`
+    ] as const;
+    }
+
+
+export const getViewOneOfMyWaiverRequestsQueryOptions = <TData = Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError = unknown>(waiverRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getViewOneOfMyWaiverRequestsQueryKey(waiverRequestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>> = ({ signal }) => viewOneOfMyWaiverRequests(waiverRequestId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: waiverRequestId !== null && waiverRequestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ViewOneOfMyWaiverRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>>
+export type ViewOneOfMyWaiverRequestsQueryError = unknown
+
+
+export function useViewOneOfMyWaiverRequests<TData = Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError = unknown>(
+ waiverRequestId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>,
+          TError,
+          Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewOneOfMyWaiverRequests<TData = Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError = unknown>(
+ waiverRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>,
+          TError,
+          Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useViewOneOfMyWaiverRequests<TData = Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError = unknown>(
+ waiverRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary View one of my Waiver requests.
+ */
+
+export function useViewOneOfMyWaiverRequests<TData = Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError = unknown>(
+ waiverRequestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof viewOneOfMyWaiverRequests>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getViewOneOfMyWaiverRequestsQueryOptions(waiverRequestId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Revise an editable Waiver request.
+ */
+export const reviseAnEditableWaiverRequest = (
+    waiverRequestId: number,
+    reviseAnEditableWaiverRequestBody: ReviseAnEditableWaiverRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReviseAnEditableWaiverRequest200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: reviseAnEditableWaiverRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getReviseAnEditableWaiverRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableWaiverRequest>>, TError,{waiverRequestId: number;data: ReviseAnEditableWaiverRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableWaiverRequest>>, TError,{waiverRequestId: number;data: ReviseAnEditableWaiverRequestBody}, TContext> => {
+
+const mutationKey = ['reviseAnEditableWaiverRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviseAnEditableWaiverRequest>>, {waiverRequestId: number;data: ReviseAnEditableWaiverRequestBody}> = (props) => {
+          const {waiverRequestId,data} = props ?? {};
+
+          return  reviseAnEditableWaiverRequest(waiverRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviseAnEditableWaiverRequestMutationResult = NonNullable<Awaited<ReturnType<typeof reviseAnEditableWaiverRequest>>>
+    export type ReviseAnEditableWaiverRequestMutationBody = ReviseAnEditableWaiverRequestBody
+    export type ReviseAnEditableWaiverRequestMutationError = unknown
+
+    /**
+ * @summary Revise an editable Waiver request.
+ */
+export const useReviseAnEditableWaiverRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviseAnEditableWaiverRequest>>, TError,{waiverRequestId: number;data: ReviseAnEditableWaiverRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reviseAnEditableWaiverRequest>>,
+        TError,
+        {waiverRequestId: number;data: ReviseAnEditableWaiverRequestBody},
+        TContext
+      > => {
+      return useMutation(getReviseAnEditableWaiverRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Abandon a Waiver Draft.
+ */
+export const abandonAWaiverDraft = (
+    waiverRequestId: number,
+    abandonAWaiverDraftBody: AbandonAWaiverDraftBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AbandonAWaiverDraft200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}`, method: 'DELETE',
+      headers: {'Content-Type': 'application/json', },
+      data: abandonAWaiverDraftBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getAbandonAWaiverDraftMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof abandonAWaiverDraft>>, TError,{waiverRequestId: number;data: AbandonAWaiverDraftBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof abandonAWaiverDraft>>, TError,{waiverRequestId: number;data: AbandonAWaiverDraftBody}, TContext> => {
+
+const mutationKey = ['abandonAWaiverDraft'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof abandonAWaiverDraft>>, {waiverRequestId: number;data: AbandonAWaiverDraftBody}> = (props) => {
+          const {waiverRequestId,data} = props ?? {};
+
+          return  abandonAWaiverDraft(waiverRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AbandonAWaiverDraftMutationResult = NonNullable<Awaited<ReturnType<typeof abandonAWaiverDraft>>>
+    export type AbandonAWaiverDraftMutationBody = AbandonAWaiverDraftBody
+    export type AbandonAWaiverDraftMutationError = unknown
+
+    /**
+ * @summary Abandon a Waiver Draft.
+ */
+export const useAbandonAWaiverDraft = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof abandonAWaiverDraft>>, TError,{waiverRequestId: number;data: AbandonAWaiverDraftBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof abandonAWaiverDraft>>,
+        TError,
+        {waiverRequestId: number;data: AbandonAWaiverDraftBody},
+        TContext
+      > => {
+      return useMutation(getAbandonAWaiverDraftMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Submit or resubmit a Waiver request.
+ */
+export const submitOrResubmitAWaiverRequest = (
+    waiverRequestId: number,
+    submitOrResubmitAWaiverRequestBody: SubmitOrResubmitAWaiverRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitOrResubmitAWaiverRequest200>(
+      {url: `/api/v1/credit-decisions/waiver-requests/${waiverRequestId}/submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitOrResubmitAWaiverRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitOrResubmitAWaiverRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitAWaiverRequest>>, TError,{waiverRequestId: number;data: SubmitOrResubmitAWaiverRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitAWaiverRequest>>, TError,{waiverRequestId: number;data: SubmitOrResubmitAWaiverRequestBody}, TContext> => {
+
+const mutationKey = ['submitOrResubmitAWaiverRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitOrResubmitAWaiverRequest>>, {waiverRequestId: number;data: SubmitOrResubmitAWaiverRequestBody}> = (props) => {
+          const {waiverRequestId,data} = props ?? {};
+
+          return  submitOrResubmitAWaiverRequest(waiverRequestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitOrResubmitAWaiverRequestMutationResult = NonNullable<Awaited<ReturnType<typeof submitOrResubmitAWaiverRequest>>>
+    export type SubmitOrResubmitAWaiverRequestMutationBody = SubmitOrResubmitAWaiverRequestBody
+    export type SubmitOrResubmitAWaiverRequestMutationError = unknown
+
+    /**
+ * @summary Submit or resubmit a Waiver request.
+ */
+export const useSubmitOrResubmitAWaiverRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOrResubmitAWaiverRequest>>, TError,{waiverRequestId: number;data: SubmitOrResubmitAWaiverRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitOrResubmitAWaiverRequest>>,
+        TError,
+        {waiverRequestId: number;data: SubmitOrResubmitAWaiverRequestBody},
+        TContext
+      > => {
+      return useMutation(getSubmitOrResubmitAWaiverRequestMutationOptions(options), queryClient);
+    }

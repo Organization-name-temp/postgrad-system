@@ -218,4 +218,27 @@ describe('NotificationsBell', () => {
     expect(await screen.findByText(/CSE501.*مراجعتك/)).toBeInTheDocument()
     expect(screen.getByText(/CSE502.*مقبول/)).toBeInTheDocument()
   })
+
+  it('renders Waiver stage notifications in English and Arabic', async () => {
+    const user = userEvent.setup()
+    srv.unread = 1
+    srv.rows = [
+      {
+        id: 7,
+        type: 'waiver.request_verified',
+        data: { course_code: 'CSE-511' },
+        read_at: null,
+        created_at: '2026-09-05T09:00:00+00:00',
+      },
+    ]
+    renderBell()
+
+    await user.click(screen.getByRole('button', { name: /open notifications/i }))
+    expect(
+      await screen.findByText(/verified waiver request.*CSE-511.*council/i),
+    ).toBeInTheDocument()
+
+    await i18n.changeLanguage('ar')
+    expect(await screen.findByText(/طلب إعفاء متحقق منه.*CSE-511.*المجلس/i)).toBeInTheDocument()
+  })
 })

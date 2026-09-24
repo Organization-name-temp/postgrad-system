@@ -13,6 +13,8 @@ use Modules\Enrollment\Internal\Http\Controllers\ScheduleChangeController;
 use Modules\Enrollment\Internal\Http\Controllers\TransferDecisionController;
 use Modules\Enrollment\Internal\Http\Controllers\TransferRequestController;
 use Modules\Enrollment\Internal\Http\Controllers\TransferReviewController;
+use Modules\Enrollment\Internal\Http\Controllers\WaiverRequestController;
+use Modules\Enrollment\Internal\Http\Controllers\WaiverReviewController;
 
 /*
 | Enrollment routes, mounted under /api/v1 by EnrollmentServiceProvider.
@@ -124,6 +126,30 @@ Route::middleware(['auth:sanctum', 'can:transfer_waiver.approve'])->group(functi
     Route::get('/credit-decisions/transfer-requests/council-queue', [TransferReviewController::class, 'councilQueue'])->middleware('role:R08');
     Route::get('/credit-decisions/transfer-requests/council-queue/export', [TransferReviewController::class, 'councilExport'])->middleware('role:R08');
     Route::post('/credit-decisions/transfer-requests/{transfer_request}/council-decision', [TransferReviewController::class, 'councilDecision'])->whereNumber('transfer_request')->middleware('role:R08');
+});
+
+Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->group(function () {
+    Route::get('/credit-decisions/waiver-requests/targets', [WaiverRequestController::class, 'targets']);
+    Route::get('/credit-decisions/waiver-requests/prior-results', [WaiverRequestController::class, 'priorResults']);
+    Route::get('/credit-decisions/waiver-requests', [WaiverRequestController::class, 'index']);
+    Route::get('/credit-decisions/waiver-requests/export', [WaiverRequestController::class, 'export']);
+    Route::post('/credit-decisions/waiver-requests', [WaiverRequestController::class, 'store']);
+    Route::get('/credit-decisions/waiver-requests/{waiver_request}', [WaiverRequestController::class, 'show'])->whereNumber('waiver_request');
+    Route::patch('/credit-decisions/waiver-requests/{waiver_request}', [WaiverRequestController::class, 'update'])->whereNumber('waiver_request');
+    Route::delete('/credit-decisions/waiver-requests/{waiver_request}', [WaiverRequestController::class, 'destroy'])->whereNumber('waiver_request');
+    Route::post('/credit-decisions/waiver-requests/{waiver_request}/submit', [WaiverRequestController::class, 'submit'])->whereNumber('waiver_request');
+});
+
+Route::middleware(['auth:sanctum', 'can:transfer_waiver.approve'])->group(function () {
+    Route::get('/credit-decisions/waiver-requests/advisor-queue', [WaiverReviewController::class, 'advisorQueue'])->middleware('role:R03');
+    Route::get('/credit-decisions/waiver-requests/advisor-queue/export', [WaiverReviewController::class, 'advisorExport'])->middleware('role:R03');
+    Route::post('/credit-decisions/waiver-requests/{waiver_request}/advisor-decision', [WaiverReviewController::class, 'advisorDecision'])->whereNumber('waiver_request')->middleware('role:R03');
+    Route::get('/credit-decisions/waiver-requests/department-head-queue', [WaiverReviewController::class, 'departmentHeadQueue'])->middleware('role:R06');
+    Route::get('/credit-decisions/waiver-requests/department-head-queue/export', [WaiverReviewController::class, 'departmentHeadExport'])->middleware('role:R06');
+    Route::post('/credit-decisions/waiver-requests/{waiver_request}/department-head-decision', [WaiverReviewController::class, 'departmentHeadDecision'])->whereNumber('waiver_request')->middleware('role:R06');
+    Route::get('/credit-decisions/waiver-requests/council-queue', [WaiverReviewController::class, 'councilQueue'])->middleware('role:R08');
+    Route::get('/credit-decisions/waiver-requests/council-queue/export', [WaiverReviewController::class, 'councilExport'])->middleware('role:R08');
+    Route::post('/credit-decisions/waiver-requests/{waiver_request}/council-decision', [WaiverReviewController::class, 'councilDecision'])->whereNumber('waiver_request')->middleware('role:R08');
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {

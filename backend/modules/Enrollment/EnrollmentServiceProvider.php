@@ -11,9 +11,11 @@ use Modules\Enrollment\Internal\Listeners\ApplyAutomaticPreparatoryExemptions;
 use Modules\Enrollment\Internal\Support\EloquentEnrollmentRecords;
 use Modules\Enrollment\Internal\Support\EloquentExemptionDecisions;
 use Modules\Enrollment\Internal\Support\EloquentTransferDecisions;
+use Modules\Enrollment\Internal\Support\EloquentWaiverDecisions;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\ExemptionDecisions;
 use Modules\Enrollment\Public\TransferDecisions;
+use Modules\Enrollment\Public\WaiverDecisions;
 
 /**
  * The Enrollment domain module (ADR-0017): it owns Course Offerings, Registration Requests,
@@ -37,6 +39,7 @@ class EnrollmentServiceProvider extends ServiceProvider
         $this->app->bind(EnrollmentRecords::class, EloquentEnrollmentRecords::class);
         $this->app->bind(ExemptionDecisions::class, EloquentExemptionDecisions::class);
         $this->app->bind(TransferDecisions::class, EloquentTransferDecisions::class);
+        $this->app->bind(WaiverDecisions::class, EloquentWaiverDecisions::class);
     }
 
     public function boot(): void

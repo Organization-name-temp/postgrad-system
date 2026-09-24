@@ -7189,3 +7189,1267 @@ export const OpenTransferEvidenceParams = zod.object({
 })
 
 export const OpenTransferEvidenceResponse = zod.unknown()
+
+
+/**
+ * @summary Advisor Waiver queue.
+ */
+export const AdvisorWaiverQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "prior_course_id": zod.string().optional().describe('Comma-separated positive prior Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const AdvisorWaiverQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.number().nullish(),
+  "prior_letter_grade": zod.string().nullish(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).nullish().describe('The immutable effective Waiver decision after Council approval.'),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().nullish(),
+  "last": zod.string().nullish(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export Advisor Waiver queue.
+ */
+export const ExportAdvisorWaiverQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "prior_course_id": zod.string().optional().describe('Comma-separated positive prior Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const ExportAdvisorWaiverQueueResponse = zod.unknown()
+
+
+/**
+ * @summary Advisor action on a Waiver request.
+ */
+export const AdvisorActionOnAWaiverRequestParams = zod.object({
+  "waiver_request_id": zod.number()
+})
+
+export const AdvisorActionOnAWaiverRequestBody = zod.object({
+  "action": zod.string().describe('recommend, return, or reject.'),
+  "reason": zod.string().optional().describe('Required for return\/reject.'),
+  "expected_revision": zod.number(),
+  "action_id": zod.string().describe('Retry-stable UUID.')
+})
+
+export const AdvisorActionOnAWaiverRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).optional(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Uses the same query contract as the Advisor queue.
+ * @summary Department Head Waiver queue.
+ */
+export const DepartmentHeadWaiverQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "prior_course_id": zod.string().optional().describe('Comma-separated positive prior Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const DepartmentHeadWaiverQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.number().nullish(),
+  "prior_letter_grade": zod.string().nullish(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).nullish().describe('The immutable effective Waiver decision after Council approval.'),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().nullish(),
+  "last": zod.string().nullish(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export Department Head Waiver queue.
+ */
+export const ExportDepartmentHeadWaiverQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "prior_course_id": zod.string().optional().describe('Comma-separated positive prior Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const ExportDepartmentHeadWaiverQueueResponse = zod.unknown()
+
+
+/**
+ * @summary Scoped Department Head verification.
+ */
+export const ScopedDepartmentHeadVerificationParams = zod.object({
+  "waiver_request_id": zod.number()
+})
+
+export const ScopedDepartmentHeadVerificationBody = zod.object({
+  "action": zod.string().describe('verify, return, or reject.'),
+  "coverage_percentage": zod.number().optional().describe('Required for verify; minimum 80.'),
+  "equivalency_note": zod.string().optional().describe('Required for verify.'),
+  "reason": zod.string().optional().describe('Required for return\/reject.'),
+  "expected_revision": zod.number(),
+  "action_id": zod.string().describe('Retry-stable UUID.')
+})
+
+export const ScopedDepartmentHeadVerificationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).optional(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * Uses the same query contract as the Advisor queue.
+ * @summary Council Waiver queue.
+ */
+export const CouncilWaiverQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "prior_course_id": zod.string().optional().describe('Comma-separated positive prior Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const CouncilWaiverQueueResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.number().nullish(),
+  "prior_letter_grade": zod.string().nullish(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).nullish().describe('The immutable effective Waiver decision after Council approval.'),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional(),
+  "student": zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name": zod.string().optional()
+}).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().nullish(),
+  "last": zod.string().nullish(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export Council Waiver queue.
+ */
+export const ExportCouncilWaiverQueueQueryParams = zod.object({
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "prior_course_id": zod.string().optional().describe('Comma-separated positive prior Course IDs.'),
+  "student_id": zod.string().optional().describe('Comma-separated positive Student IDs.'),
+  "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const ExportCouncilWaiverQueueResponse = zod.unknown()
+
+
+/**
+ * @summary Academic Affairs Council final decision.
+ */
+export const AcademicAffairsCouncilFinalDecisionParams = zod.object({
+  "waiver_request_id": zod.number()
+})
+
+export const AcademicAffairsCouncilFinalDecisionBody = zod.object({
+  "action": zod.string().describe('approve, return, or reject.'),
+  "reason": zod.string().optional().describe('Required for return\/reject.'),
+  "expected_revision": zod.number(),
+  "action_id": zod.string().describe('Retry-stable UUID.')
+})
+
+export const AcademicAffairsCouncilFinalDecisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).optional(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Courses in my bound Curriculum that can be targeted by a Waiver.
+ */
+export const CoursesInMyBoundCurriculumThatCanBeTargetedByAWaiverResponse = zod.object({
+  "data": zod.array(zod.object({
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "category": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "already_recognized": zod.boolean().optional()
+})).optional()
+})
+
+
+/**
+ * Only earned results whose Course is level 400 or above are offered. The earned
+ * flag is the authoritative Grading-owned C+-or-higher classification.
+ * @summary My qualifying prior E-JUST results recorded in PRS.
+ */
+export const MyQualifyingPriorEJUSTResultsRecordedInPRSResponse = zod.object({
+  "data": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "level": zod.number().optional(),
+  "total_ch": zod.number().optional(),
+  "research_type": zod.string().nullish(),
+  "is_active": zod.boolean().optional(),
+  "department_id": zod.number().nullish()
+}).optional(),
+  "minimum_result": zod.string().optional()
+})).optional()
+})
+
+
+/**
+ * @summary My Waiver requests.
+ */
+export const MyWaiverRequestsQueryParams = zod.object({
+  "status": zod.string().optional().describe('Comma-separated request statuses.'),
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "q": zod.string().optional().describe('Course-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const MyWaiverRequestsResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.number().nullish(),
+  "prior_letter_grade": zod.string().nullish(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().nullish(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).nullish(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).nullish().describe('The immutable effective Waiver decision after Council approval.'),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().nullish(),
+  "last": zod.string().nullish(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "from": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "path": zod.string().optional(),
+  "per_page": zod.number().optional(),
+  "to": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Create a Waiver Draft.
+ */
+export const CreateAWaiverDraftBody = zod.object({
+  "target_course_id": zod.number().describe('Target Course in the bound Curriculum.'),
+  "prior_result": zod.object({
+  "source": zod.string().describe('prs or legacy_transcript.'),
+  "institution": zod.string().describe('Must be E-JUST.'),
+  "enrollment_id": zod.number().nullish().describe('PRS Enrollment for the prior result.'),
+  "course_id": zod.number().nullish().describe('Must be at least 1.'),
+  "letter_grade": zod.string().nullish().describe('Must not be greater than 3 characters.'),
+  "official_transcript_document_ids": zod.array(zod.number()).optional().describe('Must be at least 1.')
+}).describe('Prior E-JUST result evidence.'),
+  "student_note": zod.string().nullish().describe('Student explanation.')
+})
+
+export const CreateAWaiverDraftResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().nullish(),
+  "head_verification": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.string().nullish(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export my Waiver requests.
+ */
+export const ExportMyWaiverRequestsQueryParams = zod.object({
+  "status": zod.string().optional().describe('Comma-separated request statuses.'),
+  "target_course_id": zod.string().optional().describe('Comma-separated positive target Course IDs.'),
+  "q": zod.string().optional().describe('Course-code search.'),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
+export const ExportMyWaiverRequestsResponse = zod.unknown()
+
+
+/**
+ * @summary View one of my Waiver requests.
+ */
+export const ViewOneOfMyWaiverRequestsParams = zod.object({
+  "waiver_request_id": zod.number()
+})
+
+export const ViewOneOfMyWaiverRequestsResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).optional(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Revise an editable Waiver request.
+ */
+export const ReviseAnEditableWaiverRequestParams = zod.object({
+  "waiver_request_id": zod.number()
+})
+
+export const ReviseAnEditableWaiverRequestBody = zod.object({
+  "expected_revision": zod.number(),
+  "prior_result": zod.object({
+  "source": zod.string().optional().describe('This field is required when <code>prior_result<\/code> is present.'),
+  "institution": zod.string().optional().describe('This field is required when <code>prior_result<\/code> is present. Must not be greater than 100 characters.'),
+  "enrollment_id": zod.number().nullish().describe('Must be at least 1.'),
+  "course_id": zod.number().nullish().describe('Must be at least 1.'),
+  "letter_grade": zod.string().nullish().describe('Must not be greater than 3 characters.'),
+  "official_transcript_document_ids": zod.array(zod.number()).optional().describe('Must be at least 1.')
+}).optional().describe('Revised prior E-JUST result evidence.'),
+  "student_note": zod.string().nullish().describe('Revised Student explanation.')
+})
+
+export const ReviseAnEditableWaiverRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).optional(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Abandon a Waiver Draft.
+ */
+export const AbandonAWaiverDraftParams = zod.object({
+  "waiver_request_id": zod.number()
+})
+
+export const AbandonAWaiverDraftBody = zod.object({
+  "expected_revision": zod.number()
+})
+
+export const AbandonAWaiverDraftResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).optional(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Submit or resubmit a Waiver request.
+ */
+export const SubmitOrResubmitAWaiverRequestParams = zod.object({
+  "waiver_request_id": zod.number()
+})
+
+export const SubmitOrResubmitAWaiverRequestBody = zod.object({
+  "expected_revision": zod.number(),
+  "action_id": zod.string().describe('Retry-stable UUID.')
+})
+
+export const SubmitOrResubmitAWaiverRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_enrollment_id": zod.string().nullish(),
+  "prior_letter_grade": zod.string().optional(),
+  "evidence": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional(),
+  "course_id": zod.number().optional(),
+  "letter_grade": zod.string().optional(),
+  "official_transcript_document_ids": zod.array(zod.number()).optional()
+}).optional(),
+  "student_note": zod.string().optional(),
+  "status": zod.string().optional(),
+  "revision": zod.number().optional(),
+  "editable": zod.boolean().optional(),
+  "terminal": zod.boolean().optional(),
+  "submitted_at": zod.string().optional(),
+  "head_verification": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "reason": zod.string().nullish(),
+  "revision": zod.number().optional(),
+  "evidence_snapshot": zod.object({
+  "source": zod.string().optional(),
+  "institution": zod.string().optional()
+}).optional(),
+  "verification_snapshot": zod.object({
+  "coverage_percentage": zod.number().optional(),
+  "equivalency_note": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "current_revision": zod.boolean().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "waiver_request_id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "prior_course_id": zod.number().optional(),
+  "prior_course_code": zod.string().optional(),
+  "prior_course_level": zod.number().optional(),
+  "prior_result_source": zod.string().optional(),
+  "prior_letter_grade": zod.string().optional(),
+  "coverage_percentage": zod.number().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional(),
+  "approved_by": zod.number().optional(),
+  "approved_at": zod.string().optional()
+}).optional(),
+  "created_at": zod.string().optional(),
+  "updated_at": zod.string().optional()
+}).optional()
+})

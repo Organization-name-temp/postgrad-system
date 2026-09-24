@@ -42,6 +42,7 @@ final class WaiverWorkflow
         private readonly Directory $directory,
         private readonly Notifier $notifier,
         private readonly AuditLogger $audit,
+        private readonly EffectiveAttemptLookup $attempts,
     ) {}
 
     /** @param array<string, mixed> $priorResult */
@@ -93,6 +94,7 @@ final class WaiverWorkflow
                 && (int) $locked->transitions()->where('action', 'like', 'returned_by_%')->latest('id')->value('revision') >= $locked->revision) {
                 throw new ConflictHttpException(__('credit_decisions.waiver.revision_required'));
             }
+            $this->assertNoTargetAttempt($student->studentId, $locked->target_course_id);
             $from = $locked->status;
             $locked->update(['status' => WaiverRequestStatus::PendingAdvisor, 'submitted_at' => now()]);
             $transition = $this->transition($locked, $from, WaiverRequestStatus::PendingAdvisor, 'submitted', $actorUserId, null, $actionId);
@@ -278,6 +280,7 @@ final class WaiverWorkflow
             };
             if ($action === 'approve') {
                 $this->assertNoEffectiveDecision($locked->student_id, $locked->target_course_id);
+                $this->assertNoTargetAttempt($student->studentId, $locked->target_course_id);
                 $this->assertNoTargetAttempt($locked->student_id, $locked->target_course_id);
                 WaiverDecision::query()->create([
                     'waiver_request_id' => $locked->getKey(), 'student_id' => $locked->student_id,
@@ -361,22 +364,16 @@ final class WaiverWorkflow
 
     private function assertNoEffectiveDecision(int $studentId, int $targetCourseId): void
     {
-        if (ExemptionDecision::query()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()
-            || TransferDecision::query()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()
-            || WaiverDecision::query()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()) {
+        if (ExemptionDecision::query()->effective()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()
+            || TransferDecision::query()->effective()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()
+            || WaiverDecision::query()->effective()->where('student_id', $studentId)->where('target_course_id', $targetCourseId)->exists()) {
             throw new ConflictHttpException(__('credit_decisions.effective_decision_exists'));
         }
     }
 
     private function assertNoTargetAttempt(int $studentId, int $targetCourseId): void
     {
-        $exists = Enrollment::query()
-            ->where('student_id', $studentId)
-            ->whereNotNull('earned')
-            ->whereHas('offering', fn ($query) => $query->where('course_id', $targetCourseId))
-            ->get()
-            ->contains(fn (Enrollment $enrollment): bool => $enrollment->course_status->burnsRetakeAllowance());
-        if ($exists) {
+        if ($this->attempts->hasCompleted($studentId, $targetCourseId)) {
             throw new ConflictHttpException(__('credit_decisions.waiver.target_attempt_exists'));
         }
     }

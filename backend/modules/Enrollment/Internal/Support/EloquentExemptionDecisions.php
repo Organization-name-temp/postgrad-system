@@ -22,7 +22,7 @@ final class EloquentExemptionDecisions implements ExemptionDecisions
         if ($studentIds === []) {
             return [];
         }
-        $grouped = ExemptionDecision::query()->whereIn('student_id', array_values(array_unique($studentIds)))->orderBy('id')->get()->groupBy('student_id');
+        $grouped = ExemptionDecision::query()->effective()->whereIn('student_id', array_values(array_unique($studentIds)))->orderBy('id')->get()->groupBy('student_id');
 
         return $grouped->map(fn ($items): array => $items->map(fn (ExemptionDecision $decision): ExemptionDecisionSummary => new ExemptionDecisionSummary(
             id: (int) $decision->getKey(),

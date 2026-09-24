@@ -37,11 +37,11 @@ class ExemptionRequestController
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
         abort_if($student === null, 403);
-        $existing = ExemptionDecision::query()
+        $existing = ExemptionDecision::query()->effective()
             ->where('student_id', $student->studentId)
             ->pluck('target_course_id')
-            ->merge(TransferDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
-            ->merge(WaiverDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(TransferDecision::query()->effective()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(WaiverDecision::query()->effective()->where('student_id', $student->studentId)->pluck('target_course_id'))
             ->map(fn ($id): int => (int) $id)
             ->all();
         $rows = collect($curricula->entriesForVersion($student->curriculumVersionId))
@@ -74,6 +74,11 @@ class ExemptionRequestController
     #[ResponseFieldAttribute(name: 'data.transitions.from_status', type: 'string', required: false, nullable: true)]
     #[ResponseFieldAttribute(name: 'data.transitions.reason', type: 'string', required: false, nullable: true)]
     #[ResponseFieldAttribute(name: 'data.decision.admission_application_id', type: 'integer', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.effective', type: 'boolean', required: false)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation', type: 'object', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.revoked_by_user_id', type: 'integer', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.reason', type: 'string', required: false)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.created_at', type: 'string', required: false)]
     public function index(Request $request, StudentDirectory $students): AnonymousResourceCollection
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
@@ -82,7 +87,7 @@ class ExemptionRequestController
         $query = ExemptionRequest::query()->where('student_id', $student->studentId);
         $this->apply($query, $collection);
 
-        return ExemptionRequestResource::collection($query->with(['transitions', 'decision'])->paginate($collection->perPage, page: $collection->page));
+        return ExemptionRequestResource::collection($query->with(['transitions', 'decision.revocation'])->paginate($collection->perPage, page: $collection->page));
     }
 
     /**

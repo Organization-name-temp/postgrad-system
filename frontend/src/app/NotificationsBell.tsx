@@ -73,6 +73,7 @@ const TYPE_ALIAS: Record<string, string> = {
   'waiver.request_recommended': 'waiverRecommended',
   'waiver.request_verified': 'waiverVerified',
   'waiver.request_decided': 'waiverDecided',
+  'credit_decision.revoked': 'creditDecisionRevoked',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

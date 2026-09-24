@@ -32,6 +32,10 @@ class TransferDecisionResource extends JsonResource
             'approved_by_user_id' => $this->approved_by_user_id,
             'approved_at' => $this->approved_at->toIso8601String(),
             'transfer_request_id' => $this->transfer_request_id,
+            'effective' => $this->revocation === null,
+            'revocation' => $this->revocation === null
+                ? null
+                : (new CreditDecisionRevocationResource($this->revocation))->resolve(),
         ];
     }
 }

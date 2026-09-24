@@ -167,6 +167,8 @@ final class ManualExemptionResponseExamples
             'admission_application_id' => null,
             'manual_request_id' => 1,
             'approved_at' => '2026-09-04T10:00:00+00:00',
+            'effective' => true,
+            'revocation' => null,
         ],
     ];
 
@@ -215,7 +217,7 @@ final class ManualExemptionResponseExamples
     ];
 
     public const DEPARTMENT_HEAD_QUEUE = [
-        'data' => [[...self::PENDING_HEAD_DATA, 'student' => [
+        'data' => [[...self::APPROVED_DATA, 'student' => [
             'student_id' => 10,
             'university_id' => '2026-CSE-0001',
             'name' => 'Sara Student',

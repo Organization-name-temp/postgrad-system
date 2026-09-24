@@ -13,7 +13,9 @@ use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
  * @property TransferRequestStatus|null $from_status
  * @property TransferRequestStatus $to_status
  * @property string $action
- * @property int $actor_user_id
+ * @property int|null $actor_user_id
+ * @property string|null $system_cause_type
+ * @property int|null $system_cause_id
  * @property int $revision
  * @property array<string, mixed> $evidence_snapshot
  * @property array<string, mixed>|null $review_snapshot
@@ -38,7 +40,8 @@ class TransferRequestTransition extends Model
     /** @var list<string> */
     protected $fillable = [
         'transfer_request_id', 'from_status', 'to_status', 'action', 'actor_user_id',
-        'revision', 'evidence_snapshot', 'review_snapshot', 'action_id', 'reason', 'created_at',
+        'revision', 'evidence_snapshot', 'review_snapshot', 'action_id', 'reason',
+        'system_cause_type', 'system_cause_id', 'created_at',
     ];
 
     /** @return array<string, string> */
@@ -49,6 +52,7 @@ class TransferRequestTransition extends Model
             'from_status' => TransferRequestStatus::class,
             'to_status' => TransferRequestStatus::class,
             'actor_user_id' => 'integer',
+            'system_cause_id' => 'integer',
             'revision' => 'integer',
             'evidence_snapshot' => 'array',
             'review_snapshot' => 'array',

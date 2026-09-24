@@ -32,6 +32,8 @@ class ExemptionDecisionController
         $readiness->ensureReconciled($student);
 
         $decisions = ExemptionDecision::query()
+            ->effective()
+            ->with('revocation')
             ->where('student_id', $student->studentId)
             ->orderBy('approved_at')
             ->orderBy('id')

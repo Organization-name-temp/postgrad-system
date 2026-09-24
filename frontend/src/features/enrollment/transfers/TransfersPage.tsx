@@ -47,6 +47,7 @@ import {
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import {
   FormErrorText,
@@ -367,7 +368,10 @@ function TransferRequestCard({
         )}
         {row.student_note && !row.editable && <Typography>{row.student_note}</Typography>}
         {row.decision && (
-          <Alert severity="success">
+          <CreditDecisionEffect
+            effective={row.decision.effective}
+            revocation={row.decision.revocation}
+          >
             <Trans
               t={t}
               i18nKey="transfers.decision"
@@ -377,7 +381,7 @@ function TransferRequestCard({
               }}
               components={{ grade: <bdi dir="ltr" />, hours: <bdi dir="ltr" /> }}
             />
-          </Alert>
+          </CreditDecisionEffect>
         )}
         <Divider />
         <TransferHistory transitions={row.transitions} />

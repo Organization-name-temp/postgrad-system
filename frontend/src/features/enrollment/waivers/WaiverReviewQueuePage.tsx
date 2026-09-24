@@ -32,8 +32,10 @@ import {
   useCouncilWaiverQueue,
   useDepartmentHeadWaiverQueue,
   useScopedDepartmentHeadVerification,
+  useRevokeAWaiverDecision,
 } from '../../../shared/api/generated/endpoints'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import { headVerificationSchema, waiverReviewSchema, type WaiverReviewValues } from './formSchema'
 import type { ReviewerWaiverRequestRow } from './types'
@@ -48,7 +50,11 @@ export function WaiverReviewQueuePage({ stage }: { stage: WaiverReviewStage }) {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const params = { q: search || undefined, page }
+  const params = {
+    q: search || undefined,
+    page,
+    include_decided: stage === 'council' ? true : undefined,
+  }
   const advisor = useAdvisorWaiverQueue(params, { query: { enabled: stage === 'advisor' } })
   const head = useDepartmentHeadWaiverQueue(params, {
     query: { enabled: stage === 'departmentHead' },
@@ -152,8 +158,10 @@ function ReviewCard({
   const advisorAction = useAdvisorActionOnAWaiverRequest()
   const headAction = useScopedDepartmentHeadVerification()
   const councilAction = useAcademicAffairsCouncilFinalDecision()
+  const revoke = useRevokeAWaiverDecision()
   const actionIds = useRetryStableActionId()
   const [confirmReject, setConfirmReject] = useState(false)
+  const [confirmRevoke, setConfirmRevoke] = useState(false)
   const form = useForm<WaiverReviewValues>({
     resolver: zodResolver(stage === 'departmentHead' ? headVerificationSchema : waiverReviewSchema),
     mode: 'onBlur',
@@ -161,8 +169,10 @@ function ReviewCard({
   })
   const id = row.id ?? 0
   const revision = row.revision ?? 1
-  const pending = advisorAction.isPending || headAction.isPending || councilAction.isPending
-  const failed = advisorAction.isError || headAction.isError || councilAction.isError
+  const pending =
+    advisorAction.isPending || headAction.isPending || councilAction.isPending || revoke.isPending
+  const failed =
+    advisorAction.isError || headAction.isError || councilAction.isError || revoke.isError
 
   const act = async (action: string) => {
     const values = form.getValues()
@@ -200,6 +210,17 @@ function ReviewCard({
     } catch {
       // Mutation state renders the retryable error and the id remains stable for a retry.
     }
+  }
+  const revokeDecision = async () => {
+    const reason = form.getValues('reason').trim()
+    if (!reason) {
+      form.setError('reason', { message: 'required' })
+      return
+    }
+    await revoke.mutateAsync({ decisionId: row.decision?.id ?? 0, data: { reason } })
+    setConfirmRevoke(false)
+    form.reset()
+    await onChanged()
   }
 
   const errorText = (message?: string) =>
@@ -253,6 +274,14 @@ function ReviewCard({
           </Alert>
         )}
         <WaiverTransitionHistory transitions={row.transitions} />
+        {row.decision && (
+          <CreditDecisionEffect
+            effective={row.decision.effective}
+            revocation={row.decision.revocation}
+          >
+            {t('waivers.decision', { count: row.decision.credit_hours })}
+          </CreditDecisionEffect>
+        )}
         {stage === 'departmentHead' && (
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
@@ -294,35 +323,49 @@ function ReviewCard({
           }
         />
         {failed && <Alert severity="error">{t('waivers.actionError')}</Alert>}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-          <Button
-            variant="outlined"
-            disabled={pending || (stage === 'departmentHead' && !form.formState.isValid)}
-            onClick={() =>
-              void act(
-                stage === 'advisor'
-                  ? 'recommend'
-                  : stage === 'departmentHead'
-                    ? 'verify'
-                    : 'approve',
-              )
-            }
-          >
-            {t(`waivers.review.${stage}`)}
-          </Button>
-          <Button disabled={pending} onClick={() => void act('return')}>
-            {t('waivers.review.return')}
-          </Button>
-          <Button
-            color="error"
-            variant="outlined"
-            startIcon={<BlockIcon />}
-            disabled={pending}
-            onClick={() => setConfirmReject(true)}
-          >
-            {t('waivers.review.reject')}
-          </Button>
-        </Stack>
+        {row.status === 'PendingCouncil' || stage !== 'council' ? (
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+            <Button
+              variant="outlined"
+              disabled={pending || (stage === 'departmentHead' && !form.formState.isValid)}
+              onClick={() =>
+                void act(
+                  stage === 'advisor'
+                    ? 'recommend'
+                    : stage === 'departmentHead'
+                      ? 'verify'
+                      : 'approve',
+                )
+              }
+            >
+              {t(`waivers.review.${stage}`)}
+            </Button>
+            <Button disabled={pending} onClick={() => void act('return')}>
+              {t('waivers.review.return')}
+            </Button>
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<BlockIcon />}
+              disabled={pending}
+              onClick={() => setConfirmReject(true)}
+            >
+              {t('waivers.review.reject')}
+            </Button>
+          </Stack>
+        ) : (
+          row.decision?.effective !== false && (
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<BlockIcon />}
+              disabled={pending}
+              onClick={() => setConfirmRevoke(true)}
+            >
+              {t('creditDecisions.revoke')}
+            </Button>
+          )
+        )}
         <Dialog open={confirmReject} onClose={() => setConfirmReject(false)}>
           <DialogTitle>{t('waivers.review.reject')}</DialogTitle>
           <DialogContent>
@@ -340,6 +383,18 @@ function ReviewCard({
               }}
             >
               {t('waivers.confirmReject')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={confirmRevoke} onClose={() => setConfirmRevoke(false)}>
+          <DialogTitle>{t('creditDecisions.revoke')}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{t('creditDecisions.revokeConfirm')}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmRevoke(false)}>{t('waivers.cancel')}</Button>
+            <Button color="error" variant="contained" onClick={() => void revokeDecision()}>
+              {t('creditDecisions.confirmRevoke')}
             </Button>
           </DialogActions>
         </Dialog>

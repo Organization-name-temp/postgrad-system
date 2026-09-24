@@ -50,6 +50,8 @@ class TransferRequestResource extends JsonResource
                     'to_status' => $transition->to_status->value,
                     'action' => $transition->action,
                     'actor_user_id' => $transition->actor_user_id,
+                    'system_cause_type' => $transition->system_cause_type,
+                    'system_cause_id' => $transition->system_cause_id,
                     'reason' => $transition->reason,
                     'revision' => $transition->revision,
                     'evidence_snapshot' => $transition->evidence_snapshot,

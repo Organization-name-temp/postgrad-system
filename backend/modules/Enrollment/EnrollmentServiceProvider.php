@@ -8,11 +8,13 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Enrollment\Internal\Console\Commands\ReconcileAutomaticExemptions;
 use Modules\Enrollment\Internal\Listeners\ApplyAutomaticPreparatoryExemptions;
+use Modules\Enrollment\Internal\Listeners\RejectCreditRequestsAfterFailedGrade;
 use Modules\Enrollment\Internal\Support\EloquentEnrollmentRecords;
 use Modules\Enrollment\Internal\Support\EloquentExemptionDecisions;
 use Modules\Enrollment\Internal\Support\EloquentTransferDecisions;
 use Modules\Enrollment\Internal\Support\EloquentWaiverDecisions;
 use Modules\Enrollment\Public\EnrollmentRecords;
+use Modules\Enrollment\Public\Events\GradeOutcomesFinalized;
 use Modules\Enrollment\Public\ExemptionDecisions;
 use Modules\Enrollment\Public\TransferDecisions;
 use Modules\Enrollment\Public\WaiverDecisions;
@@ -47,6 +49,7 @@ class EnrollmentServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
 
         Event::listen(AdmissionAccepted::class, ApplyAutomaticPreparatoryExemptions::class);
+        Event::listen(GradeOutcomesFinalized::class, RejectCreditRequestsAfterFailedGrade::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([ReconcileAutomaticExemptions::class]);

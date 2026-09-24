@@ -49,6 +49,7 @@ import {
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import { waiverDraftSchema, type WaiverDraftValues } from './formSchema'
 import type { StudentWaiverRequestRow } from './types'
@@ -541,6 +542,14 @@ function WaiverRequestCard({
             </Typography>
             <Typography color="text.secondary">{row.head_verification.equivalency_note}</Typography>
           </Stack>
+        )}
+        {row.decision && (
+          <CreditDecisionEffect
+            effective={row.decision.effective}
+            revocation={row.decision.revocation}
+          >
+            {t('waivers.decision', { count: row.decision.credit_hours })}
+          </CreditDecisionEffect>
         )}
         <WaiverTransitionHistory transitions={row.transitions} />
         {row.editable && (

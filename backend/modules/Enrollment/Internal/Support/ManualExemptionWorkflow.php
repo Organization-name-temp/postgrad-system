@@ -291,9 +291,9 @@ final class ManualExemptionWorkflow
 
     private function assertNoEffectiveDecision(ExemptionRequest $request): void
     {
-        if (ExemptionDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
-            || TransferDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
-            || WaiverDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
+        if (ExemptionDecision::query()->effective()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
+            || TransferDecision::query()->effective()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
+            || WaiverDecision::query()->effective()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
             throw new ConflictHttpException(__('credit_decisions.effective_decision_exists'));
         }
     }

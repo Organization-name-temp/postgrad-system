@@ -2,7 +2,9 @@
 
 namespace Modules\Enrollment\Internal\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 use Modules\Enrollment\Internal\Enums\ExemptionSource;
@@ -71,5 +73,18 @@ class ExemptionDecision extends Model
             'manual_request_id' => 'integer',
             'approved_at' => 'datetime',
         ];
+    }
+
+    /** @return HasOne<CreditDecisionRevocation, $this> */
+    public function revocation(): HasOne
+    {
+        return $this->hasOne(CreditDecisionRevocation::class, 'decision_id')
+            ->where('decision_type', 'exemption');
+    }
+
+    /** @param Builder<ExemptionDecision> $query */
+    public function scopeEffective(Builder $query): void
+    {
+        $query->whereDoesntHave('revocation');
     }
 }

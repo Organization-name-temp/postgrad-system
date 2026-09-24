@@ -10,7 +10,7 @@ final class EloquentWaiverDecisions implements WaiverDecisions
 {
     public function effectiveForStudent(int $studentId): array
     {
-        return WaiverDecision::query()->where('student_id', $studentId)->orderBy('id')->get()->map(
+        return WaiverDecision::query()->effective()->where('student_id', $studentId)->orderBy('id')->get()->map(
             fn (WaiverDecision $decision): WaiverDecisionSummary => new WaiverDecisionSummary(
                 id: $decision->getKey(), requestId: $decision->waiver_request_id,
                 studentId: $decision->student_id, curriculumVersionId: $decision->curriculum_version_id,

@@ -42,6 +42,7 @@ class WaiverReviewController
      * @queryParam sort string Example: submitted_at
      * @queryParam page integer Example: 1
      * @queryParam per_page integer Capped at 100. Example: 25
+     * @queryParam include_decided boolean Include approved decision history for revocation. Example: true
      */
     #[ResponseAttribute(content: WaiverResponseExamples::REVIEW_LIST)]
     #[ResponseFieldAttribute(name: 'data.prior_enrollment_id', type: 'integer', required: false, nullable: true)]
@@ -116,7 +117,11 @@ class WaiverReviewController
     #[ResponseFieldAttribute(name: 'data.evidence.enrollment_id', type: 'integer', required: false, nullable: true)]
     public function councilQueue(Request $request, StudentDirectory $students, Directory $directory): AnonymousResourceCollection
     {
-        return $this->page($request, WaiverRequest::query()->where('status', WaiverRequestStatus::PendingCouncil), $students, $directory);
+        $statuses = $request->boolean('include_decided')
+            ? [WaiverRequestStatus::PendingCouncil, WaiverRequestStatus::Approved]
+            : [WaiverRequestStatus::PendingCouncil];
+
+        return $this->page($request, WaiverRequest::query()->whereIn('status', $statuses), $students, $directory);
     }
 
     /**
@@ -270,7 +275,7 @@ class WaiverReviewController
     {
         $collection = $this->collection($request);
         $this->apply($query, $collection, $students, $directory);
-        $paginator = $query->with(['transitions', 'decision'])->paginate($collection->perPage, page: $collection->page);
+        $paginator = $query->with(['transitions', 'decision.revocation'])->paginate($collection->perPage, page: $collection->page);
 
         return WaiverRequestResource::collection($this->decorate($paginator, $students, $directory));
     }

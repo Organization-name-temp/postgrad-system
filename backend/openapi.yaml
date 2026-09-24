@@ -9565,6 +9565,278 @@ paths:
       tags:
         - 'Credit Decisions'
       security: []
+  '/api/v1/credit-decisions/exemptions/{decision_id}/revoke':
+    post:
+      summary: 'Revoke an Exemption decision.'
+      operationId: revokeAnExemptionDecision
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 4
+                    target_course_id: 8
+                    target_course_code: PRE401
+                    credit_hours: 1
+                    source: manual
+                    effective: false
+                    revocation:
+                      id: 1
+                      revoked_by_user_id: 6
+                      reason: 'Corrected admission evidence.'
+                      created_at: '2026-09-24T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 4
+                      target_course_id:
+                        type: integer
+                        example: 8
+                      target_course_code:
+                        type: string
+                        example: PRE401
+                      credit_hours:
+                        type: integer
+                        example: 1
+                      source:
+                        type: string
+                        example: manual
+                      effective:
+                        type: boolean
+                        example: false
+                      revocation:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          revoked_by_user_id:
+                            type: integer
+                            example: 6
+                          reason:
+                            type: string
+                            example: 'Corrected admission evidence.'
+                          created_at:
+                            type: string
+                            example: '2026-09-24T10:00:00+00:00'
+      tags:
+        - 'Credit Decisions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'The attributed correction reason.'
+                  example: 'Corrected admission evidence.'
+              required:
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: decision_id
+        description: 'The Exemption decision ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/credit-decisions/transfers/{decision_id}/revoke':
+    post:
+      summary: 'Revoke a Transfer decision.'
+      operationId: revokeATransferDecision
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 4
+                    target_course_id: 5
+                    target_course_code: CSE501
+                    target_credit_hours: 3
+                    normalized_grade: A
+                    effective: false
+                    revocation:
+                      id: 1
+                      revoked_by_user_id: 9
+                      reason: 'The source transcript was corrected.'
+                      created_at: '2026-09-24T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 4
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: CSE501
+                      target_credit_hours:
+                        type: integer
+                        example: 3
+                      normalized_grade:
+                        type: string
+                        example: A
+                      effective:
+                        type: boolean
+                        example: false
+                      revocation:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          revoked_by_user_id:
+                            type: integer
+                            example: 9
+                          reason:
+                            type: string
+                            example: 'The source transcript was corrected.'
+                          created_at:
+                            type: string
+                            example: '2026-09-24T10:00:00+00:00'
+      tags:
+        - 'Credit Decisions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'The attributed correction reason.'
+                  example: 'The source transcript was corrected.'
+              required:
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: decision_id
+        description: 'The Transfer decision ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/credit-decisions/waivers/{decision_id}/revoke':
+    post:
+      summary: 'Revoke a Waiver decision.'
+      operationId: revokeAWaiverDecision
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 4
+                    target_course_id: 5
+                    target_course_code: CSE511
+                    credit_hours: 3
+                    effective: false
+                    revocation:
+                      id: 1
+                      revoked_by_user_id: 9
+                      reason: 'Coverage verification was corrected.'
+                      created_at: '2026-09-24T10:00:00+00:00'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 4
+                      target_course_id:
+                        type: integer
+                        example: 5
+                      target_course_code:
+                        type: string
+                        example: CSE511
+                      credit_hours:
+                        type: integer
+                        example: 3
+                      effective:
+                        type: boolean
+                        example: false
+                      revocation:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          revoked_by_user_id:
+                            type: integer
+                            example: 9
+                          reason:
+                            type: string
+                            example: 'Coverage verification was corrected.'
+                          created_at:
+                            type: string
+                            example: '2026-09-24T10:00:00+00:00'
+      tags:
+        - 'Credit Decisions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'The attributed correction reason.'
+                  example: 'Coverage verification was corrected.'
+              required:
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: decision_id
+        description: 'The Waiver decision ID.'
+        example: 1
+        required: true
+        schema:
+          type: integer
   /api/v1/health:
     get:
       summary: 'Service health check.'
@@ -19322,6 +19594,16 @@ paths:
             type: integer
             description: 'Capped at 100.'
             example: 25
+        -
+          in: query
+          name: include_decided
+          description: 'Include approved decision history for revocation.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Include approved decision history for revocation.'
+            example: true
       responses:
         200:
           description: ''
@@ -19351,10 +19633,10 @@ paths:
                       student_note: 'Corrected report'
                       created_at: '2026-09-04T09:00:00+00:00'
                       updated_at: '2026-09-04T10:00:00+00:00'
-                      status: PendingDepartmentHead
+                      status: Approved
                       revision: 1
                       editable: false
-                      terminal: false
+                      terminal: true
                       submitted_at: '2026-09-04T09:30:00+00:00'
                       transitions:
                         -
@@ -19414,7 +19696,41 @@ paths:
                               - 42
                           current_revision: true
                           created_at: '2026-09-04T09:45:00+00:00'
-                      decision: null
+                        -
+                          id: 4
+                          from_status: PendingDepartmentHead
+                          to_status: Approved
+                          action: approved_by_department_head
+                          actor_user_id: 16
+                          reason: null
+                          revision: 1
+                          evidence_snapshot:
+                            english_test: IELTS
+                            english_score: 7
+                            previous_degree: MSc
+                            is_ejust_graduate: true
+                            previous_ejust_program_id: 2
+                            document_ids:
+                              - 41
+                              - 42
+                          current_revision: true
+                          created_at: '2026-09-04T10:00:00+00:00'
+                      decision:
+                        id: 4
+                        student_id: 10
+                        curriculum_version_id: 3
+                        target_course_id: 5
+                        target_course_code: PRE401
+                        preparatory_requirement_role: EnglishLanguage
+                        credit_hours: 1
+                        source: manual
+                        reason_codes:
+                          - english_proficiency
+                        admission_application_id: null
+                        manual_request_id: 1
+                        approved_at: '2026-09-04T10:00:00+00:00'
+                        effective: true
+                        revocation: null
                       student:
                         student_id: 10
                         university_id: 2026-CSE-0001
@@ -19456,10 +19772,10 @@ paths:
                         student_note: 'Corrected report'
                         created_at: '2026-09-04T09:00:00+00:00'
                         updated_at: '2026-09-04T10:00:00+00:00'
-                        status: PendingDepartmentHead
+                        status: Approved
                         revision: 1
                         editable: false
-                        terminal: false
+                        terminal: true
                         submitted_at: '2026-09-04T09:30:00+00:00'
                         transitions:
                           -
@@ -19519,7 +19835,41 @@ paths:
                                 - 42
                             current_revision: true
                             created_at: '2026-09-04T09:45:00+00:00'
-                        decision: null
+                          -
+                            id: 4
+                            from_status: PendingDepartmentHead
+                            to_status: Approved
+                            action: approved_by_department_head
+                            actor_user_id: 16
+                            reason: null
+                            revision: 1
+                            evidence_snapshot:
+                              english_test: IELTS
+                              english_score: 7
+                              previous_degree: MSc
+                              is_ejust_graduate: true
+                              previous_ejust_program_id: 2
+                              document_ids:
+                                - 41
+                                - 42
+                            current_revision: true
+                            created_at: '2026-09-04T10:00:00+00:00'
+                        decision:
+                          id: 4
+                          student_id: 10
+                          curriculum_version_id: 3
+                          target_course_id: 5
+                          target_course_code: PRE401
+                          preparatory_requirement_role: EnglishLanguage
+                          credit_hours: 1
+                          source: manual
+                          reason_codes:
+                            - english_proficiency
+                          admission_application_id: null
+                          manual_request_id: 1
+                          approved_at: '2026-09-04T10:00:00+00:00'
+                          effective: true
+                          revocation: null
                         student:
                           student_id: 10
                           university_id: 2026-CSE-0001
@@ -19585,7 +19935,7 @@ paths:
                           example: '2026-09-04T10:00:00+00:00'
                         status:
                           type: string
-                          example: PendingDepartmentHead
+                          example: Approved
                         revision:
                           type: integer
                           example: 1
@@ -19594,7 +19944,7 @@ paths:
                           example: false
                         terminal:
                           type: boolean
-                          example: false
+                          example: true
                         submitted_at:
                           type: string
                           example: '2026-09-04T09:30:00+00:00'
@@ -19659,6 +20009,25 @@ paths:
                                   - 42
                               current_revision: true
                               created_at: '2026-09-04T09:45:00+00:00'
+                            -
+                              id: 4
+                              from_status: PendingDepartmentHead
+                              to_status: Approved
+                              action: approved_by_department_head
+                              actor_user_id: 16
+                              reason: null
+                              revision: 1
+                              evidence_snapshot:
+                                english_test: IELTS
+                                english_score: 7
+                                previous_degree: MSc
+                                is_ejust_graduate: true
+                                previous_ejust_program_id: 2
+                                document_ids:
+                                  - 41
+                                  - 42
+                              current_revision: true
+                              created_at: '2026-09-04T10:00:00+00:00'
                           items:
                             type: object
                             properties:
@@ -19718,7 +20087,54 @@ paths:
                                 example: '2026-09-04T09:00:00+00:00'
                         decision:
                           type: object
-                          example: null
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            student_id:
+                              type: integer
+                              example: 10
+                            curriculum_version_id:
+                              type: integer
+                              example: 3
+                            target_course_id:
+                              type: integer
+                              example: 5
+                            target_course_code:
+                              type: string
+                              example: PRE401
+                            preparatory_requirement_role:
+                              type: string
+                              example: EnglishLanguage
+                            credit_hours:
+                              type: integer
+                              example: 1
+                            source:
+                              type: string
+                              example: manual
+                            reason_codes:
+                              type: array
+                              example:
+                                - english_proficiency
+                              items:
+                                type: string
+                            admission_application_id:
+                              type: integer
+                              example: null
+                              nullable: true
+                            manual_request_id:
+                              type: integer
+                              example: 1
+                            approved_at:
+                              type: string
+                              example: '2026-09-04T10:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: string
+                              example: null
+                              nullable: true
                           description: 'The immutable effective decision when the request was approved.'
                           nullable: true
                         student:
@@ -19986,6 +20402,8 @@ paths:
                       admission_application_id: null
                       manual_request_id: 1
                       approved_at: '2026-09-04T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -20241,6 +20659,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-04T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                         description: 'The immutable effective decision when the request was approved.'
                         nullable: true
       tags:
@@ -20524,6 +20949,8 @@ paths:
                         admission_application_id: null
                         manual_request_id: 1
                         approved_at: '2026-09-04T10:00:00+00:00'
+                        effective: true
+                        revocation: null
                   links:
                     first: null
                     last: null
@@ -20657,6 +21084,8 @@ paths:
                           admission_application_id: null
                           manual_request_id: 1
                           approved_at: '2026-09-04T10:00:00+00:00'
+                          effective: true
+                          revocation: null
                     items:
                       type: object
                       properties:
@@ -20911,6 +21340,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-04T10:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: object
+                              example: null
+                              nullable: true
                           description: 'The immutable effective decision when the request was approved.'
                           nullable: true
                   links:
@@ -21439,6 +21875,8 @@ paths:
                       admission_application_id: null
                       manual_request_id: 1
                       approved_at: '2026-09-04T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -21694,6 +22132,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-04T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                         description: 'The immutable effective decision when the request was approved.'
                         nullable: true
       tags:
@@ -22972,6 +23417,8 @@ paths:
                         verified_at: '2026-09-01T10:00:00+00:00'
                         approved_by_user_id: 9
                         approved_at: '2026-09-02T10:00:00+00:00'
+                        effective: true
+                        revocation: null
                   links:
                     first: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
                     last: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
@@ -23064,6 +23511,8 @@ paths:
                           verified_at: '2026-09-01T10:00:00+00:00'
                           approved_by_user_id: 9
                           approved_at: '2026-09-02T10:00:00+00:00'
+                          effective: true
+                          revocation: null
                     items:
                       type: object
                       properties:
@@ -23309,6 +23758,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-02T10:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: string
+                              example: null
+                              nullable: true
                   links:
                     type: object
                     properties:
@@ -23531,6 +23987,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -23778,6 +24236,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - 'Transfer Review'
       requestBody:
@@ -23976,6 +24441,8 @@ paths:
                         verified_at: '2026-09-01T10:00:00+00:00'
                         approved_by_user_id: 9
                         approved_at: '2026-09-02T10:00:00+00:00'
+                        effective: true
+                        revocation: null
                   links:
                     first: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
                     last: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
@@ -24068,6 +24535,8 @@ paths:
                           verified_at: '2026-09-01T10:00:00+00:00'
                           approved_by_user_id: 9
                           approved_at: '2026-09-02T10:00:00+00:00'
+                          effective: true
+                          revocation: null
                     items:
                       type: object
                       properties:
@@ -24313,6 +24782,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-02T10:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: string
+                              example: null
+                              nullable: true
                   links:
                     type: object
                     properties:
@@ -24535,6 +25011,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -24782,6 +25260,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - 'Transfer Review'
       requestBody:
@@ -24901,6 +25386,16 @@ paths:
             type: integer
             description: 'Capped at 100.'
             example: 25
+        -
+          in: query
+          name: include_decided
+          description: 'Include approved decision history for revocation.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Include approved decision history for revocation.'
+            example: true
       responses:
         200:
           description: ''
@@ -24984,6 +25479,8 @@ paths:
                         verified_at: '2026-09-01T10:00:00+00:00'
                         approved_by_user_id: 9
                         approved_at: '2026-09-02T10:00:00+00:00'
+                        effective: true
+                        revocation: null
                   links:
                     first: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
                     last: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
@@ -25076,6 +25573,8 @@ paths:
                           verified_at: '2026-09-01T10:00:00+00:00'
                           approved_by_user_id: 9
                           approved_at: '2026-09-02T10:00:00+00:00'
+                          effective: true
+                          revocation: null
                     items:
                       type: object
                       properties:
@@ -25321,6 +25820,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-02T10:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: string
+                              example: null
+                              nullable: true
                   links:
                     type: object
                     properties:
@@ -25543,6 +26049,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -25790,6 +26298,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - 'Transfer Review'
       requestBody:
@@ -25831,8 +26346,8 @@ paths:
           type: integer
   /api/v1/credit-decisions/transfers:
     get:
-      summary: 'My effective Transfer decisions.'
-      operationId: myEffectiveTransferDecisions
+      summary: 'My Transfer decision history, including reasoned Revocations.'
+      operationId: myTransferDecisionHistoryIncludingReasonedRevocations
       description: ''
       parameters: []
       responses:
@@ -26207,6 +26722,8 @@ paths:
                         verified_at: '2026-09-01T10:00:00+00:00'
                         approved_by_user_id: 9
                         approved_at: '2026-09-02T10:00:00+00:00'
+                        effective: true
+                        revocation: null
                   links:
                     first: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
                     last: 'http://localhost/api/v1/credit-decisions/transfer-requests?page=1'
@@ -26299,6 +26816,8 @@ paths:
                           verified_at: '2026-09-01T10:00:00+00:00'
                           approved_by_user_id: 9
                           approved_at: '2026-09-02T10:00:00+00:00'
+                          effective: true
+                          revocation: null
                     items:
                       type: object
                       properties:
@@ -26432,6 +26951,7 @@ paths:
                               actor_user_id:
                                 type: integer
                                 example: 9
+                                nullable: true
                               reason:
                                 type: string
                                 example: null
@@ -26544,6 +27064,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-02T10:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: object
+                              example: null
+                              nullable: true
                   links:
                     type: object
                     properties:
@@ -26678,6 +27205,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -26925,6 +27454,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - Transfers
       requestBody:
@@ -27153,6 +27689,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -27400,6 +27938,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - Transfers
       security: []
@@ -27490,6 +28035,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -27737,6 +28284,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - Transfers
       requestBody:
@@ -27872,6 +28426,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -28119,6 +28675,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - Transfers
       requestBody:
@@ -28232,6 +28795,8 @@ paths:
                       verified_at: '2026-09-01T10:00:00+00:00'
                       approved_by_user_id: 9
                       approved_at: '2026-09-02T10:00:00+00:00'
+                      effective: true
+                      revocation: null
                 properties:
                   data:
                     type: object
@@ -28479,6 +29044,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-02T10:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
       tags:
         - Transfers
       requestBody:
@@ -28619,6 +29191,16 @@ paths:
             type: integer
             description: 'Capped at 100.'
             example: 25
+        -
+          in: query
+          name: include_decided
+          description: 'Include approved decision history for revocation.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Include approved decision history for revocation.'
+            example: true
       responses:
         200:
           description: ''
@@ -28696,6 +29278,8 @@ paths:
                         verified_at: '2026-09-05T09:00:00+00:00'
                         approved_by: 30
                         approved_at: '2026-09-06T09:00:00+00:00'
+                        effective: true
+                        revocation: null
                       created_at: '2026-09-04T09:00:00+00:00'
                       updated_at: '2026-09-04T09:00:00+00:00'
                       student:
@@ -28793,6 +29377,8 @@ paths:
                           verified_at: '2026-09-05T09:00:00+00:00'
                           approved_by: 30
                           approved_at: '2026-09-06T09:00:00+00:00'
+                          effective: true
+                          revocation: null
                         created_at: '2026-09-04T09:00:00+00:00'
                         updated_at: '2026-09-04T09:00:00+00:00'
                         student:
@@ -29034,6 +29620,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-06T09:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: string
+                              example: null
+                              nullable: true
                           description: 'The immutable effective Waiver decision after Council approval.'
                           nullable: true
                         created_at:
@@ -29291,6 +29884,8 @@ paths:
                       verified_at: '2026-09-05T09:00:00+00:00'
                       approved_by: 30
                       approved_at: '2026-09-06T09:00:00+00:00'
+                      effective: true
+                      revocation: null
                     created_at: '2026-09-04T09:00:00+00:00'
                     updated_at: '2026-09-04T09:00:00+00:00'
                 properties:
@@ -29519,6 +30114,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-06T09:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                       created_at:
                         type: string
                         example: '2026-09-04T09:00:00+00:00'
@@ -29717,6 +30319,8 @@ paths:
                         verified_at: '2026-09-05T09:00:00+00:00'
                         approved_by: 30
                         approved_at: '2026-09-06T09:00:00+00:00'
+                        effective: true
+                        revocation: null
                       created_at: '2026-09-04T09:00:00+00:00'
                       updated_at: '2026-09-04T09:00:00+00:00'
                       student:
@@ -29814,6 +30418,8 @@ paths:
                           verified_at: '2026-09-05T09:00:00+00:00'
                           approved_by: 30
                           approved_at: '2026-09-06T09:00:00+00:00'
+                          effective: true
+                          revocation: null
                         created_at: '2026-09-04T09:00:00+00:00'
                         updated_at: '2026-09-04T09:00:00+00:00'
                         student:
@@ -30055,6 +30661,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-06T09:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: string
+                              example: null
+                              nullable: true
                           description: 'The immutable effective Waiver decision after Council approval.'
                           nullable: true
                         created_at:
@@ -30312,6 +30925,8 @@ paths:
                       verified_at: '2026-09-05T09:00:00+00:00'
                       approved_by: 30
                       approved_at: '2026-09-06T09:00:00+00:00'
+                      effective: true
+                      revocation: null
                     created_at: '2026-09-04T09:00:00+00:00'
                     updated_at: '2026-09-04T09:00:00+00:00'
                 properties:
@@ -30540,6 +31155,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-06T09:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                       created_at:
                         type: string
                         example: '2026-09-04T09:00:00+00:00'
@@ -30746,6 +31368,8 @@ paths:
                         verified_at: '2026-09-05T09:00:00+00:00'
                         approved_by: 30
                         approved_at: '2026-09-06T09:00:00+00:00'
+                        effective: true
+                        revocation: null
                       created_at: '2026-09-04T09:00:00+00:00'
                       updated_at: '2026-09-04T09:00:00+00:00'
                       student:
@@ -30843,6 +31467,8 @@ paths:
                           verified_at: '2026-09-05T09:00:00+00:00'
                           approved_by: 30
                           approved_at: '2026-09-06T09:00:00+00:00'
+                          effective: true
+                          revocation: null
                         created_at: '2026-09-04T09:00:00+00:00'
                         updated_at: '2026-09-04T09:00:00+00:00'
                         student:
@@ -31084,6 +31710,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-06T09:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: string
+                              example: null
+                              nullable: true
                           description: 'The immutable effective Waiver decision after Council approval.'
                           nullable: true
                         created_at:
@@ -31341,6 +31974,8 @@ paths:
                       verified_at: '2026-09-05T09:00:00+00:00'
                       approved_by: 30
                       approved_at: '2026-09-06T09:00:00+00:00'
+                      effective: true
+                      revocation: null
                     created_at: '2026-09-04T09:00:00+00:00'
                     updated_at: '2026-09-04T09:00:00+00:00'
                 properties:
@@ -31569,6 +32204,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-06T09:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                       created_at:
                         type: string
                         example: '2026-09-04T09:00:00+00:00'
@@ -31972,6 +32614,8 @@ paths:
                         verified_at: '2026-09-05T09:00:00+00:00'
                         approved_by: 30
                         approved_at: '2026-09-06T09:00:00+00:00'
+                        effective: true
+                        revocation: null
                       created_at: '2026-09-04T09:00:00+00:00'
                       updated_at: '2026-09-04T09:00:00+00:00'
                   links:
@@ -32059,6 +32703,8 @@ paths:
                           verified_at: '2026-09-05T09:00:00+00:00'
                           approved_by: 30
                           approved_at: '2026-09-06T09:00:00+00:00'
+                          effective: true
+                          revocation: null
                         created_at: '2026-09-04T09:00:00+00:00'
                         updated_at: '2026-09-04T09:00:00+00:00'
                     items:
@@ -32199,6 +32845,7 @@ paths:
                               actor_user_id:
                                 type: integer
                                 example: 12
+                                nullable: true
                               reason:
                                 type: string
                                 example: null
@@ -32291,6 +32938,13 @@ paths:
                             approved_at:
                               type: string
                               example: '2026-09-06T09:00:00+00:00'
+                            effective:
+                              type: boolean
+                              example: true
+                            revocation:
+                              type: object
+                              example: null
+                              nullable: true
                           description: 'The immutable effective Waiver decision after Council approval.'
                           nullable: true
                         created_at:
@@ -32798,6 +33452,8 @@ paths:
                       verified_at: '2026-09-05T09:00:00+00:00'
                       approved_by: 30
                       approved_at: '2026-09-06T09:00:00+00:00'
+                      effective: true
+                      revocation: null
                     created_at: '2026-09-04T09:00:00+00:00'
                     updated_at: '2026-09-04T09:00:00+00:00'
                 properties:
@@ -33026,6 +33682,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-06T09:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                       created_at:
                         type: string
                         example: '2026-09-04T09:00:00+00:00'
@@ -33116,6 +33779,8 @@ paths:
                       verified_at: '2026-09-05T09:00:00+00:00'
                       approved_by: 30
                       approved_at: '2026-09-06T09:00:00+00:00'
+                      effective: true
+                      revocation: null
                     created_at: '2026-09-04T09:00:00+00:00'
                     updated_at: '2026-09-04T09:00:00+00:00'
                 properties:
@@ -33344,6 +34009,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-06T09:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                       created_at:
                         type: string
                         example: '2026-09-04T09:00:00+00:00'
@@ -33487,6 +34159,8 @@ paths:
                       verified_at: '2026-09-05T09:00:00+00:00'
                       approved_by: 30
                       approved_at: '2026-09-06T09:00:00+00:00'
+                      effective: true
+                      revocation: null
                     created_at: '2026-09-04T09:00:00+00:00'
                     updated_at: '2026-09-04T09:00:00+00:00'
                 properties:
@@ -33715,6 +34389,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-06T09:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                       created_at:
                         type: string
                         example: '2026-09-04T09:00:00+00:00'
@@ -33828,6 +34509,8 @@ paths:
                       verified_at: '2026-09-05T09:00:00+00:00'
                       approved_by: 30
                       approved_at: '2026-09-06T09:00:00+00:00'
+                      effective: true
+                      revocation: null
                     created_at: '2026-09-04T09:00:00+00:00'
                     updated_at: '2026-09-04T09:00:00+00:00'
                 properties:
@@ -34056,6 +34739,13 @@ paths:
                           approved_at:
                             type: string
                             example: '2026-09-06T09:00:00+00:00'
+                          effective:
+                            type: boolean
+                            example: true
+                          revocation:
+                            type: string
+                            example: null
+                            nullable: true
                       created_at:
                         type: string
                         example: '2026-09-04T09:00:00+00:00'

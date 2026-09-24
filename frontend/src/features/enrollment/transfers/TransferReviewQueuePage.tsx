@@ -37,10 +37,12 @@ import {
   useCouncilFinalTransferAction,
   useCouncilTransferQueue,
   useDepartmentHeadTransferQueue,
+  useRevokeATransferDecision,
   useScopedHeadActionOnTransferRequest,
 } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import { FormErrorText, transferReviewSchema, type TransferReviewValues } from './formSchema'
 import { TransferEvidenceSummary } from './TransferEvidenceSummary'
@@ -54,7 +56,12 @@ export function TransferReviewQueuePage({ stage }: { stage: TransferReviewStage 
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const params = { q: search || undefined, sort: 'submitted_at', page }
+  const params = {
+    q: search || undefined,
+    sort: 'submitted_at',
+    page,
+    include_decided: stage === 'council' ? true : undefined,
+  }
   const advisor = useAdvisorTransferQueue(params, { query: { enabled: stage === 'advisor' } })
   const head = useDepartmentHeadTransferQueue(params, {
     query: { enabled: stage === 'departmentHead' },
@@ -162,6 +169,7 @@ function TransferReviewCard({
 }) {
   const { t } = useTranslation('enrollment')
   const [confirmReject, setConfirmReject] = useState(false)
+  const [confirmRevoke, setConfirmRevoke] = useState(false)
   const form = useForm<TransferReviewValues>({
     resolver: zodResolver(transferReviewSchema),
     mode: 'onBlur',
@@ -170,9 +178,11 @@ function TransferReviewCard({
   const advisorAction = useAdvisorActionOnTransferRequest()
   const headAction = useScopedHeadActionOnTransferRequest()
   const councilAction = useCouncilFinalTransferAction()
+  const revoke = useRevokeATransferDecision()
   const actionId = useRetryStableActionId()
-  const pending = advisorAction.isPending || headAction.isPending || councilAction.isPending
-  const actionError = advisorAction.error ?? headAction.error ?? councilAction.error
+  const pending =
+    advisorAction.isPending || headAction.isPending || councilAction.isPending || revoke.isPending
+  const actionError = advisorAction.error ?? headAction.error ?? councilAction.error ?? revoke.error
   const id = row.id ?? 0
   const revision = row.revision ?? 1
 
@@ -210,6 +220,17 @@ function TransferReviewCard({
       // The mutation state renders the retryable error and retains this action id.
     }
   }
+  const revokeDecision = async () => {
+    const reason = form.getValues('reason').trim()
+    if (!reason) {
+      form.setError('reason', { message: 'required' })
+      return
+    }
+    await revoke.mutateAsync({ decisionId: row.decision?.id ?? 0, data: { reason } })
+    setConfirmRevoke(false)
+    form.reset()
+    await onChanged()
+  }
 
   return (
     <Paper
@@ -232,6 +253,17 @@ function TransferReviewCard({
         <TransferEvidenceSummary evidence={row} />
         {row.student_note && <Typography>{row.student_note}</Typography>}
         <TransferHistory transitions={row.transitions} />
+        {row.decision && (
+          <CreditDecisionEffect
+            effective={row.decision.effective}
+            revocation={row.decision.revocation}
+          >
+            {t('creditDecisions.transferEffective', {
+              grade: row.decision.normalized_grade,
+              count: row.decision.target_credit_hours,
+            })}
+          </CreditDecisionEffect>
+        )}
         {stage === 'departmentHead' && (
           <FormControl fullWidth error={Boolean(form.formState.errors.normalizedGrade)}>
             <InputLabel id={`transfer-grade-${id}`}>{t('transfers.normalizedGrade')}</InputLabel>
@@ -282,42 +314,61 @@ function TransferReviewCard({
             {apiErrorMessage(actionError) ?? t('transfers.actionError')}
           </Alert>
         )}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-          <Button
-            variant="outlined"
-            disabled={pending}
-            onClick={() =>
-              void act(
-                stage === 'advisor'
-                  ? 'recommend'
-                  : stage === 'departmentHead'
-                    ? 'verify'
-                    : 'approve',
-              )
-            }
-          >
-            {t(
-              `transfers.review.${stage === 'advisor' ? 'recommend' : stage === 'departmentHead' ? 'verify' : 'approve'}`,
-            )}
-          </Button>
-          <Button disabled={pending} onClick={() => void act('return')}>
-            {t('transfers.review.return')}
-          </Button>
-          <Button
-            color="error"
-            variant="outlined"
-            startIcon={<BlockIcon />}
-            disabled={pending}
-            onClick={async () => {
-              if (await form.trigger('reason')) {
-                if (form.getValues('reason').trim()) setConfirmReject(true)
-                else form.setError('reason', { message: 'required' })
+        {row.status === 'PendingCouncil' || stage !== 'council' ? (
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+            <Button
+              variant="outlined"
+              disabled={pending}
+              onClick={() =>
+                void act(
+                  stage === 'advisor'
+                    ? 'recommend'
+                    : stage === 'departmentHead'
+                      ? 'verify'
+                      : 'approve',
+                )
               }
-            }}
-          >
-            {t('transfers.review.reject')}
-          </Button>
-        </Stack>
+            >
+              {t(
+                `transfers.review.${stage === 'advisor' ? 'recommend' : stage === 'departmentHead' ? 'verify' : 'approve'}`,
+              )}
+            </Button>
+            <Button disabled={pending} onClick={() => void act('return')}>
+              {t('transfers.review.return')}
+            </Button>
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<BlockIcon />}
+              disabled={pending}
+              onClick={async () => {
+                if (await form.trigger('reason')) {
+                  if (form.getValues('reason').trim()) setConfirmReject(true)
+                  else form.setError('reason', { message: 'required' })
+                }
+              }}
+            >
+              {t('transfers.review.reject')}
+            </Button>
+          </Stack>
+        ) : (
+          row.decision?.effective !== false && (
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<BlockIcon />}
+              disabled={pending}
+              onClick={async () => {
+                if (await form.trigger('reason')) {
+                  if (form.getValues('reason').trim()) setConfirmRevoke(true)
+                  else form.setError('reason', { message: 'required' })
+                }
+              }}
+            >
+              {t('creditDecisions.revoke')}
+            </Button>
+          )
+        )}
       </Stack>
       <Dialog
         open={confirmReject}
@@ -347,6 +398,18 @@ function TransferReviewCard({
             }}
           >
             {t('transfers.confirmReject')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={confirmRevoke} onClose={() => setConfirmRevoke(false)}>
+        <DialogTitle>{t('creditDecisions.revoke')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('creditDecisions.revokeConfirm')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmRevoke(false)}>{t('transfers.cancel')}</Button>
+          <Button color="error" variant="contained" onClick={() => void revokeDecision()}>
+            {t('creditDecisions.confirmRevoke')}
           </Button>
         </DialogActions>
       </Dialog>

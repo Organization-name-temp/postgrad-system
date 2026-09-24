@@ -28,9 +28,11 @@ import {
   useAdvisorActionOnACurrentAdviseesRequest,
   useAdvisorManualExemptionQueue,
   useDepartmentHeadManualExemptionQueue,
+  useRevokeAnExemptionDecision,
   useScopedDepartmentHeadFinalAction,
 } from '../../../shared/api/generated/endpoints'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { ExemptionEvidenceSummary } from './ExemptionEvidenceSummary'
 import { ExemptionStatusChip } from './ExemptionStatusChip'
 import { ExemptionTransitionHistory } from './ExemptionTransitionHistory'
@@ -43,7 +45,11 @@ export function ExemptionReviewQueuePage({ stage }: { stage: 'advisor' | 'depart
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const queueParams = { q: search || undefined, page }
+  const queueParams = {
+    q: search || undefined,
+    page,
+    include_decided: stage === 'departmentHead' ? true : undefined,
+  }
   const advisor = useAdvisorManualExemptionQueue(queueParams, {
     query: { enabled: stage === 'advisor' },
   })
@@ -51,7 +57,7 @@ export function ExemptionReviewQueuePage({ stage }: { stage: 'advisor' | 'depart
     query: { enabled: stage === 'departmentHead' },
   })
   const query = stage === 'advisor' ? advisor : head
-  const rows: ReviewerExemptionRequestRow[] = query.data?.data ?? []
+  const rows = (query.data?.data ?? []) as ReviewerExemptionRequestRow[]
   const lastPage = Math.max(1, query.data?.meta?.last_page ?? 1)
   useEffect(() => {
     if (!query.isPending && page > lastPage) setPage(lastPage)
@@ -150,6 +156,7 @@ function ReviewCard({
 }) {
   const { t } = useTranslation('enrollment')
   const [confirmReject, setConfirmReject] = useState(false)
+  const [confirmRevoke, setConfirmRevoke] = useState(false)
   const reviewForm = useForm<ReviewReasonValues>({
     resolver: zodResolver(reviewReasonSchema),
     mode: 'onBlur',
@@ -157,9 +164,10 @@ function ReviewCard({
   })
   const advisorAction = useAdvisorActionOnACurrentAdviseesRequest()
   const headAction = useScopedDepartmentHeadFinalAction()
+  const revoke = useRevokeAnExemptionDecision()
   const actionId = useRetryStableActionId()
-  const actionError = advisorAction.isError || headAction.isError
-  const actionPending = advisorAction.isPending || headAction.isPending
+  const actionError = advisorAction.isError || headAction.isError || revoke.isError
+  const actionPending = advisorAction.isPending || headAction.isPending || revoke.isPending
 
   const act = async (action: string) => {
     if (!(await reviewForm.trigger('reason'))) return
@@ -197,6 +205,17 @@ function ReviewCard({
     }
     setConfirmReject(true)
   }
+  const revokeDecision = async () => {
+    const reason = reviewForm.getValues('reason').trim()
+    if (!reason) {
+      reviewForm.setError('reason', { message: t('manualExemptions.required') })
+      return
+    }
+    await revoke.mutateAsync({ decisionId: row.decision?.id ?? 0, data: { reason } })
+    setConfirmRevoke(false)
+    reviewForm.reset()
+    await onChanged()
+  }
 
   return (
     <Paper
@@ -220,6 +239,14 @@ function ReviewCard({
         <ExemptionEvidenceSummary evidence={row.evidence} />
         {row.student_note && <Typography>{row.student_note}</Typography>}
         <ExemptionTransitionHistory transitions={row.transitions} />
+        {row.decision && (
+          <CreditDecisionEffect
+            effective={row.decision.effective}
+            revocation={row.decision.revocation}
+          >
+            {t('manualExemptions.decision', { count: row.decision.credit_hours })}
+          </CreditDecisionEffect>
+        )}
         <TextField
           {...reviewForm.register('reason')}
           label={t('manualExemptions.reviewerReason')}
@@ -241,37 +268,51 @@ function ReviewCard({
           }
         />
         {actionError && <Alert severity="error">{t('manualExemptions.actionError')}</Alert>}
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-          {stage === 'advisor' ? (
-            <Button
-              variant="contained"
-              disabled={actionPending}
-              onClick={() => void act('recommend')}
-            >
-              {t('manualExemptions.review.recommend')}
+        {row.status === 'PendingDepartmentHead' || stage !== 'departmentHead' ? (
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+            {stage === 'advisor' ? (
+              <Button
+                variant="contained"
+                disabled={actionPending}
+                onClick={() => void act('recommend')}
+              >
+                {t('manualExemptions.review.recommend')}
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                disabled={actionPending}
+                onClick={() => void act('approve')}
+              >
+                {t('manualExemptions.review.approve')}
+              </Button>
+            )}
+            <Button disabled={actionPending} onClick={() => void act('return')}>
+              {t('manualExemptions.review.return')}
             </Button>
-          ) : (
             <Button
+              color="error"
               variant="contained"
+              startIcon={<BlockIcon />}
               disabled={actionPending}
-              onClick={() => void act('approve')}
+              onClick={() => void confirmRejection()}
             >
-              {t('manualExemptions.review.approve')}
+              {t('manualExemptions.review.reject')}
             </Button>
-          )}
-          <Button disabled={actionPending} onClick={() => void act('return')}>
-            {t('manualExemptions.review.return')}
-          </Button>
-          <Button
-            color="error"
-            variant="contained"
-            startIcon={<BlockIcon />}
-            disabled={actionPending}
-            onClick={() => void confirmRejection()}
-          >
-            {t('manualExemptions.review.reject')}
-          </Button>
-        </Stack>
+          </Stack>
+        ) : (
+          row.decision?.effective !== false && (
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<BlockIcon />}
+              disabled={actionPending}
+              onClick={() => setConfirmRevoke(true)}
+            >
+              {t('creditDecisions.revoke')}
+            </Button>
+          )
+        )}
         <Dialog
           open={confirmReject}
           onClose={() => setConfirmReject(false)}
@@ -302,6 +343,18 @@ function ReviewCard({
               }}
             >
               {t('manualExemptions.confirmReject')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={confirmRevoke} onClose={() => setConfirmRevoke(false)}>
+          <DialogTitle>{t('creditDecisions.revoke')}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{t('creditDecisions.revokeConfirm')}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setConfirmRevoke(false)}>{t('manualExemptions.cancel')}</Button>
+            <Button color="error" variant="contained" onClick={() => void revokeDecision()}>
+              {t('creditDecisions.confirmRevoke')}
             </Button>
           </DialogActions>
         </Dialog>

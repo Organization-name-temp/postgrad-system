@@ -345,6 +345,8 @@ export const ar = {
       waiverRecommended: 'طلب إعفاء من المقرر {{course_code}} بانتظار تحققك من التكافؤ.',
       waiverVerified: 'طلب إعفاء متحقق منه للمقرر {{course_code}} بانتظار قرار المجلس.',
       waiverDecided: 'اتُّخذ قرار بشأن طلب إعفائك من المقرر {{course_code}}: {{outcome}}.',
+      creditDecisionRevoked:
+        'تم إلغاء قرار {{decision_type}} للمقرر {{target_course_code}}: {{reason}}',
       waiverDecided_advisor:
         'اتُّخذ قرار بشأن طلب إعفاء من مقرر لأحد طلابك {{course_code}}: {{outcome}}.',
       waiverDecided_department_head:
@@ -1052,6 +1054,14 @@ export const ar = {
     },
   },
   enrollment: {
+    creditDecisions: {
+      revoked: 'تم إلغاء القرار',
+      revokedMeta: 'سُجّل في {{date}} بواسطة المستخدم {{actor}}.',
+      revoke: 'إلغاء القرار',
+      revokeConfirm: 'هل تريد إلغاء هذا القرار الساري؟ سيظل القرار الأصلي وسجل مراجعته محفوظين.',
+      confirmRevoke: 'إلغاء القرار',
+      transferEffective: 'تمت المعادلة بالتقدير {{grade}} مقابل {{count}} ساعة معتمدة للمقرر.',
+    },
     mustRetake: {
       label: 'إلزامي الإعادة',
     },
@@ -1181,6 +1191,7 @@ export const ar = {
       empty: 'لا توجد طلبات إعفاء يدوية بعد. ابدأ مسودة عند غياب الأدلة أو الحاجة إلى تصحيحها.',
       revision: 'المراجعة <revision>{{count}}</revision>',
       requestMeta: '{{role}} · <number>{{revision}}</number>',
+      decision: 'تم إعفاء المتطلب التمهيدي بمقدار {{count}} ساعة معتمدة.',
       history: 'سجل الطلب',
       previousReview: '{{action}} — مراجعة سابقة؛ أُبطلت المراجعة',
       evidenceSummary: {
@@ -1321,6 +1332,7 @@ export const ar = {
         approved_by_council: 'موافقة مجلس الشؤون الأكاديمية',
         returned_by_council: 'إعادة مجلس الشؤون الأكاديمية',
         rejected_by_council: 'رفض مجلس الشؤون الأكاديمية',
+        system_rejected_failed_attempt: 'رفض النظام الطلب بعد سريان تقدير رسوب',
         abandoned: 'التخلي عن المسودة',
       },
       review: {
@@ -1392,6 +1404,7 @@ export const ar = {
         legacy: 'كشف درجات رسمي · التقدير <grade>{{grade}}</grade>',
       },
       verification: 'تحقق رئيس القسم',
+      decision: 'تم اعتماد الإعفاء من المقرر بمقدار {{count}} ساعة معتمدة.',
       history: 'سجل الطلب والمراجعة',
       previousReview: '{{action}} — مراجعة سابقة؛ أُبطلت المراجعة',
       status: {
@@ -1415,6 +1428,7 @@ export const ar = {
         rejected_by_advisor: 'رفض المرشد',
         rejected_by_department_head: 'رفض رئيس القسم',
         rejected_by_council: 'رفض المجلس',
+        system_rejected_failed_attempt: 'رفض النظام الطلب بعد سريان تقدير رسوب',
         approved_by_council: 'موافقة المجلس',
         abandoned: 'التخلي عن المسودة',
       },

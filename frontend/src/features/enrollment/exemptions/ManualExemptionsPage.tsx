@@ -44,6 +44,7 @@ import {
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { ExemptionEvidenceSummary } from './ExemptionEvidenceSummary'
 import { ExemptionStatusChip } from './ExemptionStatusChip'
 import { ExemptionTransitionHistory } from './ExemptionTransitionHistory'
@@ -446,6 +447,14 @@ function StudentRequestCard({
             <ExemptionEvidenceSummary evidence={row.evidence} />
             {row.student_note && <Typography>{row.student_note}</Typography>}
           </Stack>
+        )}
+        {row.decision && (
+          <CreditDecisionEffect
+            effective={row.decision.effective}
+            revocation={row.decision.revocation}
+          >
+            {t('manualExemptions.decision', { count: row.decision.credit_hours })}
+          </CreditDecisionEffect>
         )}
         <Divider />
         <ExemptionTransitionHistory transitions={row.transitions} />

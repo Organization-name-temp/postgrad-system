@@ -2820,6 +2820,86 @@ export type MyEffectiveExemptions409 = {
   message?: string;
 };
 
+export type RevokeAnExemptionDecisionBody = {
+  /** The attributed correction reason. */
+  reason: string;
+};
+
+export type RevokeAnExemptionDecision200DataRevocation = {
+  id?: number;
+  revoked_by_user_id?: number;
+  reason?: string;
+  created_at?: string;
+};
+
+export type RevokeAnExemptionDecision200Data = {
+  id?: number;
+  student_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  source?: string;
+  effective?: boolean;
+  revocation?: RevokeAnExemptionDecision200DataRevocation;
+};
+
+export type RevokeAnExemptionDecision200 = {
+  data?: RevokeAnExemptionDecision200Data;
+};
+
+export type RevokeATransferDecisionBody = {
+  /** The attributed correction reason. */
+  reason: string;
+};
+
+export type RevokeATransferDecision200DataRevocation = {
+  id?: number;
+  revoked_by_user_id?: number;
+  reason?: string;
+  created_at?: string;
+};
+
+export type RevokeATransferDecision200Data = {
+  id?: number;
+  student_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  target_credit_hours?: number;
+  normalized_grade?: string;
+  effective?: boolean;
+  revocation?: RevokeATransferDecision200DataRevocation;
+};
+
+export type RevokeATransferDecision200 = {
+  data?: RevokeATransferDecision200Data;
+};
+
+export type RevokeAWaiverDecisionBody = {
+  /** The attributed correction reason. */
+  reason: string;
+};
+
+export type RevokeAWaiverDecision200DataRevocation = {
+  id?: number;
+  revoked_by_user_id?: number;
+  reason?: string;
+  created_at?: string;
+};
+
+export type RevokeAWaiverDecision200Data = {
+  id?: number;
+  student_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  credit_hours?: number;
+  effective?: boolean;
+  revocation?: RevokeAWaiverDecision200DataRevocation;
+};
+
+export type RevokeAWaiverDecision200 = {
+  data?: RevokeAWaiverDecision200Data;
+};
+
 export type ServiceHealthCheck200Data = {
   status?: string;
   app?: string;
@@ -5639,6 +5719,10 @@ page?: number;
  * Capped at 100.
  */
 per_page?: number;
+/**
+ * Include approved decision history for revocation.
+ */
+include_decided?: boolean;
 };
 
 export type DepartmentHeadManualExemptionQueue200DataItemEvidence = {
@@ -5678,7 +5762,24 @@ export type DepartmentHeadManualExemptionQueue200DataItemTransitionsItem = {
  * The immutable effective decision when the request was approved.
  * @nullable
  */
-export type DepartmentHeadManualExemptionQueue200DataItemDecision = { [key: string]: unknown } | null;
+export type DepartmentHeadManualExemptionQueue200DataItemDecision = {
+  id?: number;
+  student_id?: number;
+  curriculum_version_id?: number;
+  target_course_id?: number;
+  target_course_code?: string;
+  preparatory_requirement_role?: string;
+  credit_hours?: number;
+  source?: string;
+  reason_codes?: string[];
+  /** @nullable */
+  admission_application_id?: number | null;
+  manual_request_id?: number;
+  approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
+} | null;
 
 export type DepartmentHeadManualExemptionQueue200DataItemStudent = {
   student_id?: number;
@@ -5823,6 +5924,9 @@ export type ScopedDepartmentHeadFinalAction200DataDecision = {
   admission_application_id?: number | null;
   manual_request_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 } | null;
 
 export type ScopedDepartmentHeadFinalAction200Data = {
@@ -5929,6 +6033,11 @@ export type MyManualExemptionRequests200DataItemTransitionsItem = {
 };
 
 /**
+ * @nullable
+ */
+export type MyManualExemptionRequests200DataItemDecisionRevocation = { [key: string]: unknown } | null;
+
+/**
  * The immutable effective decision when the request was approved.
  * @nullable
  */
@@ -5946,6 +6055,9 @@ export type MyManualExemptionRequests200DataItemDecision = {
   admission_application_id?: number | null;
   manual_request_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: MyManualExemptionRequests200DataItemDecisionRevocation;
 } | null;
 
 export type MyManualExemptionRequests200DataItem = {
@@ -6166,6 +6278,9 @@ export type ViewOneOfMyManualExemptionRequests200DataDecision = {
   admission_application_id?: number | null;
   manual_request_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 } | null;
 
 export type ViewOneOfMyManualExemptionRequests200Data = {
@@ -6566,6 +6681,9 @@ export type AdvisorTransferQueue200DataItemDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type AdvisorTransferQueue200DataItem = {
@@ -6704,6 +6822,9 @@ export type AdvisorActionOnTransferRequest200DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type AdvisorActionOnTransferRequest200Data = {
@@ -6809,6 +6930,9 @@ export type DepartmentHeadTransferQueue200DataItemDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type DepartmentHeadTransferQueue200DataItem = {
@@ -6949,6 +7073,9 @@ export type ScopedHeadActionOnTransferRequest200DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type ScopedHeadActionOnTransferRequest200Data = {
@@ -6996,6 +7123,10 @@ page?: number;
  * Capped at 100.
  */
 per_page?: number;
+/**
+ * Include approved decision history for revocation.
+ */
+include_decided?: boolean;
 };
 
 export type CouncilTransferQueue200DataItemStudent = {
@@ -7054,6 +7185,9 @@ export type CouncilTransferQueue200DataItemDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type CouncilTransferQueue200DataItem = {
@@ -7192,6 +7326,9 @@ export type CouncilFinalTransferAction200DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type CouncilFinalTransferAction200Data = {
@@ -7228,7 +7365,7 @@ export type CouncilFinalTransferAction200 = {
   data?: CouncilFinalTransferAction200Data;
 };
 
-export type MyEffectiveTransferDecisions200DataItem = {
+export type MyTransferDecisionHistoryIncludingReasonedRevocations200DataItem = {
   id?: number;
   student_id?: number;
   curriculum_version_id?: number;
@@ -7250,8 +7387,8 @@ export type MyEffectiveTransferDecisions200DataItem = {
   transfer_request_id?: number;
 };
 
-export type MyEffectiveTransferDecisions200 = {
-  data?: MyEffectiveTransferDecisions200DataItem[];
+export type MyTransferDecisionHistoryIncludingReasonedRevocations200 = {
+  data?: MyTransferDecisionHistoryIncludingReasonedRevocations200DataItem[];
 };
 
 export type MyTransferEvidence200DataItem = {
@@ -7327,7 +7464,8 @@ export type MyTransferRequests200DataItemTransitionsItem = {
   from_status?: string;
   to_status?: string;
   action?: string;
-  actor_user_id?: number;
+  /** @nullable */
+  actor_user_id?: number | null;
   /** @nullable */
   reason?: string | null;
   revision?: number;
@@ -7336,6 +7474,11 @@ export type MyTransferRequests200DataItemTransitionsItem = {
   current_revision?: boolean;
   created_at?: string;
 };
+
+/**
+ * @nullable
+ */
+export type MyTransferRequests200DataItemDecisionRevocation = { [key: string]: unknown } | null;
 
 export type MyTransferRequests200DataItemDecision = {
   id?: number;
@@ -7357,6 +7500,9 @@ export type MyTransferRequests200DataItemDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: MyTransferRequests200DataItemDecisionRevocation;
 };
 
 export type MyTransferRequests200DataItem = {
@@ -7491,6 +7637,9 @@ export type CreateATransferDraft201DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type CreateATransferDraft201Data = {
@@ -7597,6 +7746,9 @@ export type ViewOneOfMyTransferRequests200DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type ViewOneOfMyTransferRequests200Data = {
@@ -7711,6 +7863,9 @@ export type ReviseAnEditableTransferRequest200DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type ReviseAnEditableTransferRequest200Data = {
@@ -7808,6 +7963,9 @@ export type AbandonATransferDraft200DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type AbandonATransferDraft200Data = {
@@ -7907,6 +8065,9 @@ export type SubmitOrResubmitATransferRequest200DataDecision = {
   verified_at?: string;
   approved_by_user_id?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type SubmitOrResubmitATransferRequest200Data = {
@@ -7966,6 +8127,10 @@ page?: number;
  * Capped at 100.
  */
 per_page?: number;
+/**
+ * Include approved decision history for revocation.
+ */
+include_decided?: boolean;
 };
 
 export type AdvisorWaiverQueue200DataItemEvidence = {
@@ -8040,6 +8205,9 @@ export type AdvisorWaiverQueue200DataItemDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 } | null;
 
 export type AdvisorWaiverQueue200DataItemStudent = {
@@ -8216,6 +8384,9 @@ export type AdvisorActionOnAWaiverRequest200DataDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type AdvisorActionOnAWaiverRequest200Data = {
@@ -8347,6 +8518,9 @@ export type DepartmentHeadWaiverQueue200DataItemDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 } | null;
 
 export type DepartmentHeadWaiverQueue200DataItemStudent = {
@@ -8527,6 +8701,9 @@ export type ScopedDepartmentHeadVerification200DataDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type ScopedDepartmentHeadVerification200Data = {
@@ -8658,6 +8835,9 @@ export type CouncilWaiverQueue200DataItemDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 } | null;
 
 export type CouncilWaiverQueue200DataItemStudent = {
@@ -8834,6 +9014,9 @@ export type AcademicAffairsCouncilFinalDecision200DataDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type AcademicAffairsCouncilFinalDecision200Data = {
@@ -8974,7 +9157,8 @@ export type MyWaiverRequests200DataItemTransitionsItem = {
   from_status?: string | null;
   to_status?: string;
   action?: string;
-  actor_user_id?: number;
+  /** @nullable */
+  actor_user_id?: number | null;
   /** @nullable */
   reason?: string | null;
   revision?: number;
@@ -8984,6 +9168,11 @@ export type MyWaiverRequests200DataItemTransitionsItem = {
   current_revision?: boolean;
   created_at?: string;
 };
+
+/**
+ * @nullable
+ */
+export type MyWaiverRequests200DataItemDecisionRevocation = { [key: string]: unknown } | null;
 
 /**
  * The immutable effective Waiver decision after Council approval.
@@ -9007,6 +9196,9 @@ export type MyWaiverRequests200DataItemDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: MyWaiverRequests200DataItemDecisionRevocation;
 } | null;
 
 export type MyWaiverRequests200DataItem = {
@@ -9264,6 +9456,9 @@ export type ViewOneOfMyWaiverRequests200DataDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type ViewOneOfMyWaiverRequests200Data = {
@@ -9397,6 +9592,9 @@ export type ReviseAnEditableWaiverRequest200DataDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type ReviseAnEditableWaiverRequest200Data = {
@@ -9496,6 +9694,9 @@ export type AbandonAWaiverDraft200DataDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type AbandonAWaiverDraft200Data = {
@@ -9597,6 +9798,9 @@ export type SubmitOrResubmitAWaiverRequest200DataDecision = {
   verified_at?: string;
   approved_by?: number;
   approved_at?: string;
+  effective?: boolean;
+  /** @nullable */
+  revocation?: string | null;
 };
 
 export type SubmitOrResubmitAWaiverRequest200Data = {
@@ -17232,6 +17436,204 @@ export function useMyEffectiveExemptions<TData = Awaited<ReturnType<typeof myEff
 
 
 /**
+ * @summary Revoke an Exemption decision.
+ */
+export const revokeAnExemptionDecision = (
+    decisionId: number,
+    revokeAnExemptionDecisionBody: RevokeAnExemptionDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RevokeAnExemptionDecision200>(
+      {url: `/api/v1/credit-decisions/exemptions/${decisionId}/revoke`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: revokeAnExemptionDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRevokeAnExemptionDecisionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeAnExemptionDecision>>, TError,{decisionId: number;data: RevokeAnExemptionDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof revokeAnExemptionDecision>>, TError,{decisionId: number;data: RevokeAnExemptionDecisionBody}, TContext> => {
+
+const mutationKey = ['revokeAnExemptionDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeAnExemptionDecision>>, {decisionId: number;data: RevokeAnExemptionDecisionBody}> = (props) => {
+          const {decisionId,data} = props ?? {};
+
+          return  revokeAnExemptionDecision(decisionId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeAnExemptionDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof revokeAnExemptionDecision>>>
+    export type RevokeAnExemptionDecisionMutationBody = RevokeAnExemptionDecisionBody
+    export type RevokeAnExemptionDecisionMutationError = unknown
+
+    /**
+ * @summary Revoke an Exemption decision.
+ */
+export const useRevokeAnExemptionDecision = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeAnExemptionDecision>>, TError,{decisionId: number;data: RevokeAnExemptionDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revokeAnExemptionDecision>>,
+        TError,
+        {decisionId: number;data: RevokeAnExemptionDecisionBody},
+        TContext
+      > => {
+      return useMutation(getRevokeAnExemptionDecisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Revoke a Transfer decision.
+ */
+export const revokeATransferDecision = (
+    decisionId: number,
+    revokeATransferDecisionBody: RevokeATransferDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RevokeATransferDecision200>(
+      {url: `/api/v1/credit-decisions/transfers/${decisionId}/revoke`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: revokeATransferDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRevokeATransferDecisionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeATransferDecision>>, TError,{decisionId: number;data: RevokeATransferDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof revokeATransferDecision>>, TError,{decisionId: number;data: RevokeATransferDecisionBody}, TContext> => {
+
+const mutationKey = ['revokeATransferDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeATransferDecision>>, {decisionId: number;data: RevokeATransferDecisionBody}> = (props) => {
+          const {decisionId,data} = props ?? {};
+
+          return  revokeATransferDecision(decisionId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeATransferDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof revokeATransferDecision>>>
+    export type RevokeATransferDecisionMutationBody = RevokeATransferDecisionBody
+    export type RevokeATransferDecisionMutationError = unknown
+
+    /**
+ * @summary Revoke a Transfer decision.
+ */
+export const useRevokeATransferDecision = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeATransferDecision>>, TError,{decisionId: number;data: RevokeATransferDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revokeATransferDecision>>,
+        TError,
+        {decisionId: number;data: RevokeATransferDecisionBody},
+        TContext
+      > => {
+      return useMutation(getRevokeATransferDecisionMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Revoke a Waiver decision.
+ */
+export const revokeAWaiverDecision = (
+    decisionId: number,
+    revokeAWaiverDecisionBody: RevokeAWaiverDecisionBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RevokeAWaiverDecision200>(
+      {url: `/api/v1/credit-decisions/waivers/${decisionId}/revoke`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: revokeAWaiverDecisionBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRevokeAWaiverDecisionMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeAWaiverDecision>>, TError,{decisionId: number;data: RevokeAWaiverDecisionBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof revokeAWaiverDecision>>, TError,{decisionId: number;data: RevokeAWaiverDecisionBody}, TContext> => {
+
+const mutationKey = ['revokeAWaiverDecision'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeAWaiverDecision>>, {decisionId: number;data: RevokeAWaiverDecisionBody}> = (props) => {
+          const {decisionId,data} = props ?? {};
+
+          return  revokeAWaiverDecision(decisionId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeAWaiverDecisionMutationResult = NonNullable<Awaited<ReturnType<typeof revokeAWaiverDecision>>>
+    export type RevokeAWaiverDecisionMutationBody = RevokeAWaiverDecisionBody
+    export type RevokeAWaiverDecisionMutationError = unknown
+
+    /**
+ * @summary Revoke a Waiver decision.
+ */
+export const useRevokeAWaiverDecision = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeAWaiverDecision>>, TError,{decisionId: number;data: RevokeAWaiverDecisionBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revokeAWaiverDecision>>,
+        TError,
+        {decisionId: number;data: RevokeAWaiverDecisionBody},
+        TContext
+      > => {
+      return useMutation(getRevokeAWaiverDecisionMutationOptions(options), queryClient);
+    }
+
+/**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
  * API is reachable.
  * @summary Service health check.
@@ -23961,15 +24363,15 @@ export const useCouncilFinalTransferAction = <TError = unknown,
     }
 
 /**
- * @summary My effective Transfer decisions.
+ * @summary My Transfer decision history, including reasoned Revocations.
  */
-export const myEffectiveTransferDecisions = (
+export const myTransferDecisionHistoryIncludingReasonedRevocations = (
 
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<MyEffectiveTransferDecisions200>(
+      return customInstance<MyTransferDecisionHistoryIncludingReasonedRevocations200>(
       {url: `/api/v1/credit-decisions/transfers`, method: 'GET', signal
     },
       );
@@ -23978,69 +24380,69 @@ export const myEffectiveTransferDecisions = (
 
 
 
-export const getMyEffectiveTransferDecisionsQueryKey = () => {
+export const getMyTransferDecisionHistoryIncludingReasonedRevocationsQueryKey = () => {
     return [
     `/api/v1/credit-decisions/transfers`
     ] as const;
     }
 
 
-export const getMyEffectiveTransferDecisionsQueryOptions = <TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>>, }
+export const getMyTransferDecisionHistoryIncludingReasonedRevocationsQueryOptions = <TData = Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getMyEffectiveTransferDecisionsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getMyTransferDecisionHistoryIncludingReasonedRevocationsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>> = ({ signal }) => myEffectiveTransferDecisions(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>> = ({ signal }) => myTransferDecisionHistoryIncludingReasonedRevocations(signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type MyEffectiveTransferDecisionsQueryResult = NonNullable<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>>
-export type MyEffectiveTransferDecisionsQueryError = unknown
+export type MyTransferDecisionHistoryIncludingReasonedRevocationsQueryResult = NonNullable<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>>
+export type MyTransferDecisionHistoryIncludingReasonedRevocationsQueryError = unknown
 
 
-export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>> & Pick<
+export function useMyTransferDecisionHistoryIncludingReasonedRevocations<TData = Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>,
+          Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>,
           TError,
-          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>
+          Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>> & Pick<
+export function useMyTransferDecisionHistoryIncludingReasonedRevocations<TData = Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>,
+          Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>,
           TError,
-          Awaited<ReturnType<typeof myEffectiveTransferDecisions>>
+          Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>
         > , 'initialData'
       >, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>>, }
+export function useMyTransferDecisionHistoryIncludingReasonedRevocations<TData = Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary My effective Transfer decisions.
+ * @summary My Transfer decision history, including reasoned Revocations.
  */
 
-export function useMyEffectiveTransferDecisions<TData = Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myEffectiveTransferDecisions>>, TError, TData>>, }
+export function useMyTransferDecisionHistoryIncludingReasonedRevocations<TData = Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof myTransferDecisionHistoryIncludingReasonedRevocations>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getMyEffectiveTransferDecisionsQueryOptions(options)
+  const queryOptions = getMyTransferDecisionHistoryIncludingReasonedRevocationsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

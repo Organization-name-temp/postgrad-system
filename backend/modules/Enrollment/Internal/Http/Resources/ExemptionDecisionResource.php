@@ -25,6 +25,10 @@ class ExemptionDecisionResource extends JsonResource
             'admission_application_id' => $this->admission_application_id,
             'manual_request_id' => $this->manual_request_id,
             'approved_at' => $this->approved_at->toIso8601String(),
+            'effective' => $this->revocation === null,
+            'revocation' => $this->revocation === null
+                ? null
+                : (new CreditDecisionRevocationResource($this->revocation))->resolve(),
         ];
     }
 }

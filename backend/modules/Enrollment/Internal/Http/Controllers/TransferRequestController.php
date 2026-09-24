@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Knuckles\Scribe\Attributes\Response as ResponseAttribute;
+use Knuckles\Scribe\Attributes\ResponseField as ResponseFieldAttribute;
 use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CurriculumCatalog;
@@ -107,11 +108,11 @@ class TransferRequestController
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
         abort_if($student === null, 403);
-        $existing = ExemptionDecision::query()
+        $existing = ExemptionDecision::query()->effective()
             ->where('student_id', $student->studentId)
             ->pluck('target_course_id')
-            ->merge(TransferDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
-            ->merge(WaiverDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(TransferDecision::query()->effective()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(WaiverDecision::query()->effective()->where('student_id', $student->studentId)->pluck('target_course_id'))
             ->map(fn ($id): int => (int) $id)
             ->all();
 
@@ -136,6 +137,14 @@ class TransferRequestController
      * @queryParam per_page integer Capped at 100. Example: 25
      */
     #[ResponseAttribute(content: TransferResponseExamples::LIST)]
+    #[ResponseFieldAttribute(name: 'data.decision.effective', type: 'boolean', required: false)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation', type: 'object', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.revoked_by_user_id', type: 'integer', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.reason', type: 'string', required: false)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.created_at', type: 'string', required: false)]
+    #[ResponseFieldAttribute(name: 'data.transitions.actor_user_id', type: 'integer', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.transitions.system_cause_type', type: 'string', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.transitions.system_cause_id', type: 'integer', required: false, nullable: true)]
     public function index(Request $request, StudentDirectory $students): AnonymousResourceCollection
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
@@ -144,7 +153,7 @@ class TransferRequestController
         $query = TransferRequest::query()->where('student_id', $student->studentId);
         $this->apply($query, $collection);
 
-        return TransferRequestResource::collection($query->with(['transitions', 'decision'])->paginate($collection->perPage, page: $collection->page));
+        return TransferRequestResource::collection($query->with(['transitions', 'decision.revocation'])->paginate($collection->perPage, page: $collection->page));
     }
 
     /**

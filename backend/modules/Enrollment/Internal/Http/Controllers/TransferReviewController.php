@@ -126,11 +126,16 @@ class TransferReviewController
      * @queryParam sort string Example: submitted_at
      * @queryParam page integer Example: 1
      * @queryParam per_page integer Capped at 100. Example: 25
+     * @queryParam include_decided boolean Include approved decision history for revocation. Example: true
      */
     #[ResponseAttribute(content: TransferResponseExamples::LIST)]
     public function councilQueue(Request $request, StudentDirectory $students, Directory $directory): AnonymousResourceCollection
     {
-        return $this->list($request, TransferRequest::query()->where('status', TransferRequestStatus::PendingCouncil), $students, $directory);
+        $statuses = $request->boolean('include_decided')
+            ? [TransferRequestStatus::PendingCouncil, TransferRequestStatus::Approved]
+            : [TransferRequestStatus::PendingCouncil];
+
+        return $this->list($request, TransferRequest::query()->whereIn('status', $statuses), $students, $directory);
     }
 
     /**
@@ -256,7 +261,7 @@ class TransferReviewController
         $collection = $this->query($request);
         $this->apply($query, $collection, $students, $directory);
 
-        return TransferRequestResource::collection($this->decorate($query->with(['transitions', 'decision'])->paginate($collection->perPage, page: $collection->page), $students, $directory));
+        return TransferRequestResource::collection($this->decorate($query->with(['transitions', 'decision.revocation'])->paginate($collection->perPage, page: $collection->page), $students, $directory));
     }
 
     /** @param Builder<TransferRequest> $query */

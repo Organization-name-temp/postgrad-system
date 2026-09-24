@@ -91,8 +91,8 @@ class AutomaticExemptionApplicator
                 if ($role === null || ! isset($reasonsByRole[$role->value])) {
                     continue;
                 }
-                if (TransferDecision::query()->where('student_id', $student->studentId)->where('target_course_id', $entry->courseId)->exists()
-                    || WaiverDecision::query()->where('student_id', $student->studentId)->where('target_course_id', $entry->courseId)->exists()) {
+                if (TransferDecision::query()->effective()->where('student_id', $student->studentId)->where('target_course_id', $entry->courseId)->exists()
+                    || WaiverDecision::query()->effective()->where('student_id', $student->studentId)->where('target_course_id', $entry->courseId)->exists()) {
                     continue;
                 }
 

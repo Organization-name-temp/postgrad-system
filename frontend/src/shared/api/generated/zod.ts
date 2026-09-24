@@ -2677,6 +2677,95 @@ export const MyEffectiveExemptionsResponse = zod.object({
 
 
 /**
+ * @summary Revoke an Exemption decision.
+ */
+export const RevokeAnExemptionDecisionParams = zod.object({
+  "decision_id": zod.number().describe('The Exemption decision ID.')
+})
+
+export const RevokeAnExemptionDecisionBody = zod.object({
+  "reason": zod.string().describe('The attributed correction reason.')
+})
+
+export const RevokeAnExemptionDecisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "source": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.object({
+  "id": zod.number().optional(),
+  "revoked_by_user_id": zod.number().optional(),
+  "reason": zod.string().optional(),
+  "created_at": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Revoke a Transfer decision.
+ */
+export const RevokeATransferDecisionParams = zod.object({
+  "decision_id": zod.number().describe('The Transfer decision ID.')
+})
+
+export const RevokeATransferDecisionBody = zod.object({
+  "reason": zod.string().describe('The attributed correction reason.')
+})
+
+export const RevokeATransferDecisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "target_credit_hours": zod.number().optional(),
+  "normalized_grade": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.object({
+  "id": zod.number().optional(),
+  "revoked_by_user_id": zod.number().optional(),
+  "reason": zod.string().optional(),
+  "created_at": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Revoke a Waiver decision.
+ */
+export const RevokeAWaiverDecisionParams = zod.object({
+  "decision_id": zod.number().describe('The Waiver decision ID.')
+})
+
+export const RevokeAWaiverDecisionBody = zod.object({
+  "reason": zod.string().describe('The attributed correction reason.')
+})
+
+export const RevokeAWaiverDecisionResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.object({
+  "id": zod.number().optional(),
+  "revoked_by_user_id": zod.number().optional(),
+  "reason": zod.string().optional(),
+  "created_at": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
  * A public, unauthenticated liveness probe used by the SPA to confirm the
  * API is reachable.
  * @summary Service health check.
@@ -5197,7 +5286,8 @@ export const DepartmentHeadManualExemptionQueueQueryParams = zod.object({
   "q": zod.string().optional().describe('Student, University-ID, or Course-code search.'),
   "sort": zod.string().optional(),
   "page": zod.number().optional(),
-  "per_page": zod.number().optional().describe('Capped at 100.')
+  "per_page": zod.number().optional().describe('Capped at 100.'),
+  "include_decided": zod.boolean().optional().describe('Include approved decision history for revocation.')
 })
 
 export const DepartmentHeadManualExemptionQueueResponse = zod.object({
@@ -5244,8 +5334,21 @@ export const DepartmentHeadManualExemptionQueueResponse = zod.object({
   "current_revision": zod.boolean().optional(),
   "created_at": zod.string().optional()
 })).optional(),
-  "decision": zod.looseObject({
-
+  "decision": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "target_course_id": zod.number().optional(),
+  "target_course_code": zod.string().optional(),
+  "preparatory_requirement_role": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "source": zod.string().optional(),
+  "reason_codes": zod.array(zod.string()).optional(),
+  "admission_application_id": zod.number().nullish(),
+  "manual_request_id": zod.number().optional(),
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).nullish().describe('The immutable effective decision when the request was approved.'),
   "student": zod.object({
   "student_id": zod.number().optional(),
@@ -5356,7 +5459,9 @@ export const ScopedDepartmentHeadFinalActionResponse = zod.object({
   "reason_codes": zod.array(zod.string()).optional(),
   "admission_application_id": zod.number().nullish(),
   "manual_request_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).nullish().describe('The immutable effective decision when the request was approved.')
 }).optional()
 })
@@ -5444,7 +5549,11 @@ export const MyManualExemptionRequestsResponse = zod.object({
   "reason_codes": zod.array(zod.string()).optional(),
   "admission_application_id": zod.number().nullish(),
   "manual_request_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.looseObject({
+
+}).nullish()
 }).nullish().describe('The immutable effective decision when the request was approved.')
 })).optional(),
   "links": zod.object({
@@ -5610,7 +5719,9 @@ export const ViewOneOfMyManualExemptionRequestsResponse = zod.object({
   "reason_codes": zod.array(zod.string()).optional(),
   "admission_application_id": zod.number().nullish(),
   "manual_request_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).nullish().describe('The immutable effective decision when the request was approved.')
 }).optional()
 })
@@ -5965,7 +6076,9 @@ export const AdvisorTransferQueueResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 })).optional(),
   "links": zod.object({
@@ -6091,7 +6204,9 @@ export const AdvisorActionOnTransferRequestResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
@@ -6184,7 +6299,9 @@ export const DepartmentHeadTransferQueueResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 })).optional(),
   "links": zod.object({
@@ -6311,7 +6428,9 @@ export const ScopedHeadActionOnTransferRequestResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
@@ -6327,7 +6446,8 @@ export const CouncilTransferQueueQueryParams = zod.object({
   "q": zod.string().optional(),
   "sort": zod.string().optional(),
   "page": zod.number().optional(),
-  "per_page": zod.number().optional().describe('Capped at 100.')
+  "per_page": zod.number().optional().describe('Capped at 100.'),
+  "include_decided": zod.boolean().optional().describe('Include approved decision history for revocation.')
 })
 
 export const CouncilTransferQueueResponse = zod.object({
@@ -6404,7 +6524,9 @@ export const CouncilTransferQueueResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 })).optional(),
   "links": zod.object({
@@ -6530,16 +6652,18 @@ export const CouncilFinalTransferActionResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
 
 
 /**
- * @summary My effective Transfer decisions.
+ * @summary My Transfer decision history, including reasoned Revocations.
  */
-export const MyEffectiveTransferDecisionsResponse = zod.object({
+export const MyTransferDecisionHistoryIncludingReasonedRevocationsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
   "student_id": zod.number().optional(),
@@ -6639,7 +6763,7 @@ export const MyTransferRequestsResponse = zod.object({
   "from_status": zod.string().optional(),
   "to_status": zod.string().optional(),
   "action": zod.string().optional(),
-  "actor_user_id": zod.number().optional(),
+  "actor_user_id": zod.number().nullish(),
   "reason": zod.string().nullish(),
   "revision": zod.number().optional(),
   "evidence_snapshot": zod.object({
@@ -6677,7 +6801,11 @@ export const MyTransferRequestsResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.looseObject({
+
+}).nullish()
 }).optional()
 })).optional(),
   "links": zod.object({
@@ -6787,7 +6915,9 @@ export const CreateATransferDraftResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
@@ -6890,7 +7020,9 @@ export const ViewOneOfMyTransferRequestsResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
@@ -6988,7 +7120,9 @@ export const ReviseAnEditableTransferRequestResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
@@ -7079,7 +7213,9 @@ export const AbandonATransferDraftResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
@@ -7171,7 +7307,9 @@ export const SubmitOrResubmitATransferRequestResponse = zod.object({
   "verified_by_user_id": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by_user_id": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional()
 }).optional()
 })
@@ -7201,7 +7339,8 @@ export const AdvisorWaiverQueueQueryParams = zod.object({
   "q": zod.string().optional().describe('Student, University-ID, target-code, or prior-code search.'),
   "sort": zod.string().optional(),
   "page": zod.number().optional(),
-  "per_page": zod.number().optional().describe('Capped at 100.')
+  "per_page": zod.number().optional().describe('Capped at 100.'),
+  "include_decided": zod.boolean().optional().describe('Include approved decision history for revocation.')
 })
 
 export const AdvisorWaiverQueueResponse = zod.object({
@@ -7275,7 +7414,9 @@ export const AdvisorWaiverQueueResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).nullish().describe('The immutable effective Waiver decision after Council approval.'),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional(),
@@ -7410,7 +7551,9 @@ export const AdvisorActionOnAWaiverRequestResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional(),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()
@@ -7503,7 +7646,9 @@ export const DepartmentHeadWaiverQueueResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).nullish().describe('The immutable effective Waiver decision after Council approval.'),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional(),
@@ -7640,7 +7785,9 @@ export const ScopedDepartmentHeadVerificationResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional(),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()
@@ -7733,7 +7880,9 @@ export const CouncilWaiverQueueResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).nullish().describe('The immutable effective Waiver decision after Council approval.'),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional(),
@@ -7868,7 +8017,9 @@ export const AcademicAffairsCouncilFinalDecisionResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional(),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()
@@ -7987,7 +8138,7 @@ export const MyWaiverRequestsResponse = zod.object({
   "from_status": zod.string().nullish(),
   "to_status": zod.string().optional(),
   "action": zod.string().optional(),
-  "actor_user_id": zod.number().optional(),
+  "actor_user_id": zod.number().nullish(),
   "reason": zod.string().nullish(),
   "revision": zod.number().optional(),
   "evidence_snapshot": zod.object({
@@ -8020,7 +8171,11 @@ export const MyWaiverRequestsResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.looseObject({
+
+}).nullish()
 }).nullish().describe('The immutable effective Waiver decision after Council approval.'),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()
@@ -8208,7 +8363,9 @@ export const ViewOneOfMyWaiverRequestsResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional(),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()
@@ -8307,7 +8464,9 @@ export const ReviseAnEditableWaiverRequestResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional(),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()
@@ -8397,7 +8556,9 @@ export const AbandonAWaiverDraftResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional(),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()
@@ -8488,7 +8649,9 @@ export const SubmitOrResubmitAWaiverRequestResponse = zod.object({
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional(),
   "approved_by": zod.number().optional(),
-  "approved_at": zod.string().optional()
+  "approved_at": zod.string().optional(),
+  "effective": zod.boolean().optional(),
+  "revocation": zod.string().nullish()
 }).optional(),
   "created_at": zod.string().optional(),
   "updated_at": zod.string().optional()

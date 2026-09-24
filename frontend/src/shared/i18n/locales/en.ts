@@ -368,6 +368,8 @@ export const en = {
         'A Waiver request for {{course_code}} is awaiting your equivalency verification.',
       waiverVerified: 'A verified Waiver request for {{course_code}} is awaiting Council action.',
       waiverDecided: 'Your Waiver request for {{course_code}} was decided: {{outcome}}.',
+      creditDecisionRevoked:
+        'The {{decision_type}} decision for {{target_course_code}} was revoked: {{reason}}',
       waiverDecided_advisor:
         "An advisee's Waiver request for {{course_code}} was decided: {{outcome}}.",
       waiverDecided_department_head:
@@ -1112,6 +1114,15 @@ export const en = {
     },
   },
   enrollment: {
+    creditDecisions: {
+      revoked: 'Decision revoked',
+      revokedMeta: 'Recorded {{date}} by user {{actor}}.',
+      revoke: 'Revoke decision',
+      revokeConfirm:
+        'Revoke this effective decision? The original decision and its review history will remain on record.',
+      confirmRevoke: 'Revoke decision',
+      transferEffective: 'Recognized with grade {{grade}} for {{count}} target credit hours.',
+    },
     mustRetake: {
       label: 'Must retake',
     },
@@ -1245,6 +1256,7 @@ export const en = {
         'No manual exemption requests yet. Start a Draft when evidence is missing or needs correction.',
       revision: 'Revision <revision>{{count}}</revision>',
       requestMeta: '{{role}} · <number>{{revision}}</number>',
+      decision: 'Preparatory requirement released for {{count}} CH.',
       history: 'Request history',
       previousReview: '{{action}} — previous revision; review invalidated',
       evidenceSummary: {
@@ -1388,6 +1400,7 @@ export const en = {
         approved_by_council: 'Academic Affairs Council approved',
         returned_by_council: 'Academic Affairs Council returned',
         rejected_by_council: 'Academic Affairs Council rejected',
+        system_rejected_failed_attempt: 'System rejected after a failed Grade became effective',
         abandoned: 'Draft abandoned',
       },
       review: {
@@ -1461,6 +1474,7 @@ export const en = {
         legacy: 'Official transcript · Grade <grade>{{grade}}</grade>',
       },
       verification: 'Department Head verification',
+      decision: 'Waiver approved for {{count}} CH.',
       history: 'Request and review history',
       previousReview: '{{action}} — previous revision; review invalidated',
       status: {
@@ -1484,6 +1498,7 @@ export const en = {
         rejected_by_advisor: 'Advisor rejected',
         rejected_by_department_head: 'Department Head rejected',
         rejected_by_council: 'Council rejected',
+        system_rejected_failed_attempt: 'System rejected after a failed Grade became effective',
         approved_by_council: 'Council approved',
         abandoned: 'Draft abandoned',
       },

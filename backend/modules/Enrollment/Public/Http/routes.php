@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Enrollment\Internal\Http\Controllers\AttendanceController;
+use Modules\Enrollment\Internal\Http\Controllers\CreditDecisionRevocationController;
 use Modules\Enrollment\Internal\Http\Controllers\DashboardCardController;
 use Modules\Enrollment\Internal\Http\Controllers\ExemptionDecisionController;
 use Modules\Enrollment\Internal\Http\Controllers\ExemptionRequestController;
@@ -95,6 +96,7 @@ Route::middleware(['auth:sanctum', 'can:exemption.approve'])->group(function () 
     Route::get('/credit-decisions/exemption-requests/department-head-queue', [ExemptionReviewController::class, 'departmentHeadQueue'])->middleware('role:R06');
     Route::get('/credit-decisions/exemption-requests/department-head-queue/export', [ExemptionReviewController::class, 'departmentHeadExport'])->middleware('role:R06');
     Route::post('/credit-decisions/exemption-requests/{exemption_request}/department-head-decision', [ExemptionReviewController::class, 'departmentHeadDecision'])->whereNumber('exemption_request')->middleware('role:R06');
+    Route::post('/credit-decisions/exemptions/{decision}/revoke', [CreditDecisionRevocationController::class, 'exemption'])->whereNumber('decision')->middleware('role:R06');
 });
 
 Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->group(function () {
@@ -133,6 +135,7 @@ Route::middleware(['auth:sanctum', 'can:transfer_waiver.approve'])->group(functi
     Route::get('/credit-decisions/transfer-requests/council-queue', [TransferReviewController::class, 'councilQueue'])->middleware('role:R08');
     Route::get('/credit-decisions/transfer-requests/council-queue/export', [TransferReviewController::class, 'councilExport'])->middleware('role:R08');
     Route::post('/credit-decisions/transfer-requests/{transfer_request}/council-decision', [TransferReviewController::class, 'councilDecision'])->whereNumber('transfer_request')->middleware('role:R08');
+    Route::post('/credit-decisions/transfers/{decision}/revoke', [CreditDecisionRevocationController::class, 'transfer'])->whereNumber('decision')->middleware('role:R08');
 });
 
 Route::middleware(['auth:sanctum', 'can:transfer_waiver.submit', 'role:R02'])->group(function () {
@@ -157,6 +160,7 @@ Route::middleware(['auth:sanctum', 'can:transfer_waiver.approve'])->group(functi
     Route::get('/credit-decisions/waiver-requests/council-queue', [WaiverReviewController::class, 'councilQueue'])->middleware('role:R08');
     Route::get('/credit-decisions/waiver-requests/council-queue/export', [WaiverReviewController::class, 'councilExport'])->middleware('role:R08');
     Route::post('/credit-decisions/waiver-requests/{waiver_request}/council-decision', [WaiverReviewController::class, 'councilDecision'])->whereNumber('waiver_request')->middleware('role:R08');
+    Route::post('/credit-decisions/waivers/{decision}/revoke', [CreditDecisionRevocationController::class, 'waiver'])->whereNumber('decision')->middleware('role:R08');
 });
 
 Route::middleware(['auth:sanctum', 'can:courses.register_for_student'])->group(function () {

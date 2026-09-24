@@ -7,7 +7,12 @@ import { createAppTheme } from '../../../app/theme/createAppTheme'
 import i18n from '../../../shared/i18n/config'
 import { TransferReviewQueuePage, type TransferReviewStage } from './TransferReviewQueuePage'
 
-const api = vi.hoisted(() => ({ calls: [] as AxiosRequestConfig[], failPost: false, empty: false }))
+const api = vi.hoisted(() => ({
+  calls: [] as AxiosRequestConfig[],
+  failPost: false,
+  empty: false,
+  approved: false,
+}))
 
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } }, get: vi.fn() },
@@ -38,7 +43,11 @@ vi.mock('../../../shared/api/http', () => ({
                       '/api/v1/credit-decisions/transfer-requests/9/evidence-documents/01ARZ3NDEKTSV4RRFFQ69G5FAV',
                   },
                 ],
-                status: 'PendingDepartmentHead',
+                status: api.approved
+                  ? 'Approved'
+                  : config.url?.includes('council-queue')
+                    ? 'PendingCouncil'
+                    : 'PendingDepartmentHead',
                 revision: 1,
                 student: { name: 'Sara Student', university_id: '2026-CSE-0001' },
                 transitions: [
@@ -49,6 +58,15 @@ vi.mock('../../../shared/api/http', () => ({
                     current_revision: true,
                   },
                 ],
+                decision: api.approved
+                  ? {
+                      id: 82,
+                      normalized_grade: 'A',
+                      target_credit_hours: 3,
+                      effective: true,
+                      revocation: null,
+                    }
+                  : null,
               },
             ],
         meta: { total: api.empty ? 0 : 1, last_page: 1 },
@@ -73,6 +91,7 @@ beforeEach(async () => {
   api.calls = []
   api.failPost = false
   api.empty = false
+  api.approved = false
   await i18n.changeLanguage('en')
 })
 
@@ -143,4 +162,22 @@ it('shows an explicit empty reviewer state', async () => {
   api.empty = true
   renderQueue('council')
   expect(await screen.findByText(/no Transfer requests are waiting/i)).toBeInTheDocument()
+})
+
+it('lets Council revoke an effective Transfer decision with a reason', async () => {
+  api.approved = true
+  renderQueue('council')
+  await screen.findByText('Sara Student')
+
+  fireEvent.change(screen.getByLabelText(/review reason/i), {
+    target: { value: 'Council correction.' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: /revoke decision/i }))
+  await screen.findByText(/original decision and its review history/i)
+  fireEvent.click(await screen.findByRole('button', { name: /revoke decision/i }))
+
+  await waitFor(() => {
+    const call = api.calls.find((candidate) => candidate.url?.endsWith('/transfers/82/revoke'))
+    expect(call?.data).toEqual({ reason: 'Council correction.' })
+  })
 })

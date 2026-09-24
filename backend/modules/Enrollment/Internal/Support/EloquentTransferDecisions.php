@@ -20,6 +20,7 @@ final class EloquentTransferDecisions implements TransferDecisions
         }
 
         return TransferDecision::query()
+            ->effective()
             ->whereIn('student_id', array_values(array_unique($studentIds)))
             ->orderBy('id')
             ->get()

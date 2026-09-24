@@ -8,7 +8,7 @@ type Transition = {
   current_revision?: boolean
   revision?: number
   created_at?: string
-  actor_user_id?: number
+  actor_user_id?: number | null
 }
 
 export function TransferHistory({ transitions }: { transitions?: Transition[] }) {
@@ -40,7 +40,7 @@ export function TransferHistory({ transitions }: { transitions?: Transition[] })
               {transition.reason}
             </Typography>
           )}
-          {transition.actor_user_id !== undefined && transition.created_at && (
+          {transition.actor_user_id != null && transition.created_at && (
             <Typography variant="caption" color="text.secondary">
               <Trans
                 t={t}

@@ -2,7 +2,9 @@
 
 namespace Modules\Enrollment\Internal\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -55,5 +57,18 @@ class WaiverDecision extends Model
             'verified_by' => 'integer', 'verified_at' => 'datetime',
             'approved_by' => 'integer', 'approved_at' => 'datetime',
         ];
+    }
+
+    /** @return HasOne<CreditDecisionRevocation, $this> */
+    public function revocation(): HasOne
+    {
+        return $this->hasOne(CreditDecisionRevocation::class, 'decision_id')
+            ->where('decision_type', 'waiver');
+    }
+
+    /** @param Builder<WaiverDecision> $query */
+    public function scopeEffective(Builder $query): void
+    {
+        $query->whereDoesntHave('revocation');
     }
 }

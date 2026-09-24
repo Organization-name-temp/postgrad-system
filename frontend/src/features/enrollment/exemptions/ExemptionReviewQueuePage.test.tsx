@@ -16,6 +16,7 @@ const api = vi.hoisted(() => ({
   failGets: false,
   removeLastPageOnPost: false,
   lastPageRemoved: false,
+  approved: false,
 }))
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } }, get: vi.fn() },
@@ -83,7 +84,7 @@ vi.mock('../../../shared/api/http', () => ({
             id: 9,
             target_course_code: 'PRE401',
             preparatory_requirement_role: 'EnglishLanguage',
-            status: 'PendingAdvisor',
+            status: api.approved ? 'Approved' : 'PendingAdvisor',
             revision: 1,
             student: { name: 'Sara Student', university_id: '2026-CSE-0001' },
             evidence: { english_test: 'IELTS', english_score: 7 },
@@ -95,6 +96,9 @@ vi.mock('../../../shared/api/http', () => ({
                 current_revision: true,
               },
             ],
+            decision: api.approved
+              ? { id: 81, credit_hours: 3, effective: true, revocation: null }
+              : null,
           },
         ],
         meta: { total: 1 },
@@ -109,6 +113,7 @@ beforeEach(async () => {
   api.failGets = false
   api.removeLastPageOnPost = false
   api.lastPageRemoved = false
+  api.approved = false
   URL.createObjectURL = vi.fn(() => 'blob:review')
   URL.revokeObjectURL = vi.fn()
   vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
@@ -310,4 +315,30 @@ it('exports the active search through the generated sibling client', async () =>
       ),
     ).toBe(true),
   )
+})
+
+it('lets the scoped Department Head revoke an effective decision with a reason', async () => {
+  api.approved = true
+  render(
+    <ThemeProvider theme={theme}>
+      <QueryClientProvider
+        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+      >
+        <ExemptionReviewQueuePage stage="departmentHead" />
+      </QueryClientProvider>
+    </ThemeProvider>,
+  )
+
+  await screen.findByText('Sara Student')
+  fireEvent.change(screen.getByLabelText(/review reason/i), {
+    target: { value: 'Evidence was withdrawn.' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: /revoke decision/i }))
+  await screen.findByText(/original decision and its review history/i)
+  fireEvent.click(await screen.findByRole('button', { name: /revoke decision/i }))
+
+  await vi.waitFor(() => {
+    const call = api.calls.find((candidate) => candidate.url?.endsWith('/exemptions/81/revoke'))
+    expect(call?.data).toEqual({ reason: 'Evidence was withdrawn.' })
+  })
 })

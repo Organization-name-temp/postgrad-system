@@ -7,7 +7,7 @@ import { createAppTheme } from '../../../app/theme/createAppTheme'
 import i18n from '../../../shared/i18n/config'
 import { WaiverReviewQueuePage } from './WaiverReviewQueuePage'
 
-const api = vi.hoisted(() => ({ calls: [] as AxiosRequestConfig[] }))
+const api = vi.hoisted(() => ({ calls: [] as AxiosRequestConfig[], approved: false }))
 
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } }, get: vi.fn() },
@@ -21,7 +21,11 @@ vi.mock('../../../shared/api/http', () => ({
             target_course_code: 'CSE-511',
             prior_course_code: 'CSE-411',
             prior_course_level: 400,
-            status: 'PendingDepartmentHead',
+            status: api.approved
+              ? 'Approved'
+              : config.url?.includes('council-queue')
+                ? 'PendingCouncil'
+                : 'PendingDepartmentHead',
             revision: 2,
             student: { name: 'Sara Student', university_id: '2026-CSE-0001' },
             evidence: {
@@ -39,6 +43,9 @@ vi.mock('../../../shared/api/http', () => ({
               },
             ],
             transitions: [],
+            decision: api.approved
+              ? { id: 83, credit_hours: 3, effective: true, revocation: null }
+              : null,
           },
         ],
         meta: { total: 1 },
@@ -61,6 +68,7 @@ function renderPage(stage: 'advisor' | 'departmentHead' | 'council') {
 
 beforeEach(async () => {
   api.calls = []
+  api.approved = false
   await i18n.changeLanguage('en')
 })
 
@@ -107,4 +115,22 @@ it.each([
   await screen.findByText('Sara Student')
 
   expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
+})
+
+it('lets Council revoke an effective Waiver decision with a reason', async () => {
+  api.approved = true
+  renderPage('council')
+  await screen.findByText('Sara Student')
+
+  fireEvent.change(screen.getByLabelText(/review reason/i), {
+    target: { value: 'Council correction.' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: /revoke decision/i }))
+  await screen.findByText(/original decision and its review history/i)
+  fireEvent.click(await screen.findByRole('button', { name: /revoke decision/i }))
+
+  await vi.waitFor(() => {
+    const call = api.calls.find((candidate) => candidate.url?.endsWith('/waivers/83/revoke'))
+    expect(call?.data).toEqual({ reason: 'Council correction.' })
+  })
 })

@@ -91,6 +91,9 @@ enum NotificationType: string
     case WaiverVerified = 'waiver.request_verified';
     case WaiverDecided = 'waiver.request_decided';
 
+    /** An effective Exemption, Transfer, or Waiver was revoked with a reason. */
+    case CreditDecisionRevoked = 'credit_decision.revoked';
+
     /**
      * A Student (or staff on their behalf) submitted a registration for the advisor's
      * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds

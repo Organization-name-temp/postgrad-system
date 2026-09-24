@@ -93,6 +93,7 @@ class ExemptionReviewController
      * @queryParam sort string Example: submitted_at
      * @queryParam page integer Example: 1
      * @queryParam per_page integer Capped at 100. Example: 25
+     * @queryParam include_decided boolean Include approved decision history for revocation. Example: true
      */
     #[ResponseAttribute(content: ManualExemptionResponseExamples::DEPARTMENT_HEAD_QUEUE)]
     #[ResponseFieldAttribute(name: 'data.decision', type: 'object', description: 'The immutable effective decision when the request was approved.', required: false, nullable: true)]
@@ -105,10 +106,10 @@ class ExemptionReviewController
     {
         $actorId = (int) $request->user()?->getAuthIdentifier();
         $collection = $this->query($request);
-        $query = $this->departmentHeadScopedQuery($actorId, $courses, $heads);
+        $query = $this->departmentHeadScopedQuery($actorId, $courses, $heads, $request->boolean('include_decided'));
         $this->apply($query, $collection, $students, $directory);
 
-        return ExemptionRequestResource::collection($this->decorate($query->with(['transitions', 'decision'])->paginate($collection->perPage, page: $collection->page), $students, $directory));
+        return ExemptionRequestResource::collection($this->decorate($query->with(['transitions', 'decision.revocation'])->paginate($collection->perPage, page: $collection->page), $students, $directory));
     }
 
     /**
@@ -208,9 +209,12 @@ class ExemptionReviewController
     }
 
     /** @return Builder<ExemptionRequest> */
-    private function departmentHeadScopedQuery(int $actorId, CourseCatalog $courses, DepartmentHeadAssignments $heads): Builder
+    private function departmentHeadScopedQuery(int $actorId, CourseCatalog $courses, DepartmentHeadAssignments $heads, bool $includeDecided = false): Builder
     {
-        $candidateCourseIds = ExemptionRequest::query()->where('status', ExemptionRequestStatus::PendingDepartmentHead)->distinct()->pluck('target_course_id')->map(fn ($id): int => (int) $id)->all();
+        $statuses = $includeDecided
+            ? [ExemptionRequestStatus::PendingDepartmentHead, ExemptionRequestStatus::Approved]
+            : [ExemptionRequestStatus::PendingDepartmentHead];
+        $candidateCourseIds = ExemptionRequest::query()->whereIn('status', $statuses)->distinct()->pluck('target_course_id')->map(fn ($id): int => (int) $id)->all();
         $courseSummaries = $courses->findMany($candidateCourseIds);
         $headsCache = [];
         $scopedCourseIds = array_values(array_filter($candidateCourseIds, static function (int $id) use ($actorId, $courseSummaries, $heads, &$headsCache): bool {
@@ -227,7 +231,7 @@ class ExemptionReviewController
             return in_array($actorId, $headsCache[$cacheKey], true);
         }));
 
-        return ExemptionRequest::query()->where('status', ExemptionRequestStatus::PendingDepartmentHead)->whereIn('target_course_id', $scopedCourseIds);
+        return ExemptionRequest::query()->whereIn('status', $statuses)->whereIn('target_course_id', $scopedCourseIds);
     }
 
     /** @param Builder<ExemptionRequest> $query */

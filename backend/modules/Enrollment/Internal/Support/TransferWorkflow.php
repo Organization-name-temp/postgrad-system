@@ -38,6 +38,7 @@ final class TransferWorkflow
         private readonly Directory $directory,
         private readonly Notifier $notifier,
         private readonly AuditLogger $audit,
+        private readonly EffectiveAttemptLookup $attempts,
     ) {}
 
     /** @param array<string, mixed> $evidence */
@@ -152,6 +153,7 @@ final class TransferWorkflow
             $this->assertEvidenceDocuments($student, $locked->document_ids);
             $this->targetEntry($student, $locked->target_course_id);
             $this->assertNoEffectiveDecision($locked);
+            $this->assertNoFailedTargetAttempt($locked);
             $from = $locked->status;
             $locked->update([
                 'status' => TransferRequestStatus::PendingAdvisor,
@@ -310,8 +312,11 @@ final class TransferWorkflow
                     throw new ConflictHttpException(__('credit_decisions.transfer.target_changed'));
                 }
                 $this->assertNoEffectiveDecision($locked);
+                if ($this->attempts->hasCompleted($student->studentId, $locked->target_course_id)) {
+                    throw new ConflictHttpException(__('credit_decisions.transfer.target_attempt_exists'));
+                }
                 TransferDecision::query()->where('student_id', $student->studentId)->lockForUpdate()->get();
-                $recognized = (int) TransferDecision::query()->where('student_id', $student->studentId)->sum('target_credit_hours');
+                $recognized = (int) TransferDecision::query()->effective()->where('student_id', $student->studentId)->sum('target_credit_hours');
                 if ($recognized + $entry->totalCh > (int) config('enrollment.max_transfer_credit_hours', 9)) {
                     throw new ConflictHttpException(__('credit_decisions.transfer.cap_exceeded'));
                 }
@@ -388,10 +393,17 @@ final class TransferWorkflow
 
     private function assertNoEffectiveDecision(TransferRequest $request): void
     {
-        if (TransferDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
-            || ExemptionDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
-            || WaiverDecision::query()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
+        if (TransferDecision::query()->effective()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
+            || ExemptionDecision::query()->effective()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()
+            || WaiverDecision::query()->effective()->where('student_id', $request->student_id)->where('target_course_id', $request->target_course_id)->exists()) {
             throw new ConflictHttpException(__('credit_decisions.transfer.effective_decision_exists'));
+        }
+    }
+
+    private function assertNoFailedTargetAttempt(TransferRequest $request): void
+    {
+        if ($this->attempts->hasFailed($request->student_id, $request->target_course_id)) {
+            throw new ConflictHttpException(__('credit_decisions.transfer.target_failed_attempt'));
         }
     }
 

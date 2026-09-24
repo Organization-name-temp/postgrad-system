@@ -38,6 +38,7 @@ final class WaiverResponseExamples
             'prior_letter_grade' => 'C+', 'coverage_percentage' => 85.5,
             'verified_by' => 22, 'verified_at' => '2026-09-05T09:00:00+00:00',
             'approved_by' => 30, 'approved_at' => '2026-09-06T09:00:00+00:00',
+            'effective' => true, 'revocation' => null,
         ], 'created_at' => '2026-09-04T09:00:00+00:00',
         'updated_at' => '2026-09-04T09:00:00+00:00',
     ];

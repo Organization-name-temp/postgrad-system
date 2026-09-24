@@ -13,7 +13,9 @@ use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
  * @property WaiverRequestStatus|null $from_status
  * @property WaiverRequestStatus $to_status
  * @property string $action
- * @property int $actor_user_id
+ * @property int|null $actor_user_id
+ * @property string|null $system_cause_type
+ * @property int|null $system_cause_id
  * @property int $revision
  * @property array<string, mixed> $evidence_snapshot
  * @property array<string, mixed>|null $verification_snapshot
@@ -38,7 +40,8 @@ class WaiverRequestTransition extends Model
 
     protected $fillable = [
         'waiver_request_id', 'from_status', 'to_status', 'action', 'actor_user_id',
-        'revision', 'evidence_snapshot', 'verification_snapshot', 'action_id', 'reason', 'created_at',
+        'revision', 'evidence_snapshot', 'verification_snapshot', 'action_id', 'reason',
+        'system_cause_type', 'system_cause_id', 'created_at',
     ];
 
     protected function casts(): array
@@ -46,6 +49,7 @@ class WaiverRequestTransition extends Model
         return [
             'waiver_request_id' => 'integer', 'from_status' => WaiverRequestStatus::class,
             'to_status' => WaiverRequestStatus::class, 'actor_user_id' => 'integer',
+            'system_cause_id' => 'integer',
             'revision' => 'integer', 'evidence_snapshot' => 'array',
             'verification_snapshot' => 'array', 'created_at' => 'datetime',
         ];

@@ -42,11 +42,11 @@ class WaiverRequestController
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
         abort_if($student === null, 403);
-        $recognized = ExemptionDecision::query()
+        $recognized = ExemptionDecision::query()->effective()
             ->where('student_id', $student->studentId)
             ->pluck('target_course_id')
-            ->merge(TransferDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
-            ->merge(WaiverDecision::query()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(TransferDecision::query()->effective()->where('student_id', $student->studentId)->pluck('target_course_id'))
+            ->merge(WaiverDecision::query()->effective()->where('student_id', $student->studentId)->pluck('target_course_id'))
             ->map(fn ($id): int => (int) $id)
             ->all();
 
@@ -184,6 +184,14 @@ class WaiverRequestController
     #[ResponseFieldAttribute(name: 'data.transitions.reason', type: 'string', required: false, nullable: true)]
     #[ResponseFieldAttribute(name: 'data.transitions.verification_snapshot', type: 'object', required: false, nullable: true)]
     #[ResponseFieldAttribute(name: 'data.decision', type: 'object', description: 'The immutable effective Waiver decision after Council approval.', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.effective', type: 'boolean', required: false)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation', type: 'object', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.revoked_by_user_id', type: 'integer', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.reason', type: 'string', required: false)]
+    #[ResponseFieldAttribute(name: 'data.decision.revocation.created_at', type: 'string', required: false)]
+    #[ResponseFieldAttribute(name: 'data.transitions.actor_user_id', type: 'integer', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.transitions.system_cause_type', type: 'string', required: false, nullable: true)]
+    #[ResponseFieldAttribute(name: 'data.transitions.system_cause_id', type: 'integer', required: false, nullable: true)]
     #[ResponseFieldAttribute(name: 'data.evidence.enrollment_id', type: 'integer', required: false, nullable: true)]
     public function index(Request $request, StudentDirectory $students): AnonymousResourceCollection
     {
@@ -193,7 +201,7 @@ class WaiverRequestController
         $query = WaiverRequest::query()->where('student_id', $student->studentId);
         $this->apply($query, $collection);
 
-        return WaiverRequestResource::collection($query->with(['transitions', 'decision'])->paginate($collection->perPage, page: $collection->page));
+        return WaiverRequestResource::collection($query->with(['transitions', 'decision.revocation'])->paginate($collection->perPage, page: $collection->page));
     }
 
     /**

@@ -2,7 +2,9 @@
 
 namespace Modules\Enrollment\Internal\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Modules\Catalog\Public\Enums\CourseCategory;
 
@@ -70,5 +72,18 @@ class TransferDecision extends Model
             'approved_at' => 'datetime',
             'transfer_request_id' => 'integer',
         ];
+    }
+
+    /** @return HasOne<CreditDecisionRevocation, $this> */
+    public function revocation(): HasOne
+    {
+        return $this->hasOne(CreditDecisionRevocation::class, 'decision_id')
+            ->where('decision_type', 'transfer');
+    }
+
+    /** @param Builder<TransferDecision> $query */
+    public function scopeEffective(Builder $query): void
+    {
+        $query->whereDoesntHave('revocation');
     }
 }

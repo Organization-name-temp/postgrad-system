@@ -10,6 +10,10 @@ return [
     'student_inactive' => 'A terminated Student cannot change an Exemption request.',
     'invalid_target' => 'The target must be a Preparatory Course in your bound Curriculum.',
     'target_unavailable' => 'The target Course no longer resolves.',
+    'failed_grade_rejection' => 'The request was rejected because a failed Grade became effective for the target Course.',
+    'revocation' => [
+        'already_revoked' => 'This credit decision has already been revoked.',
+    ],
     'waiver' => [
         'stale_request' => 'This Waiver request changed since you opened it. Refresh and try again.',
         'invalid_state' => 'This action is no longer available for the Waiver request.',
@@ -81,6 +85,8 @@ return [
         'invalid_target' => 'The target must be a Course in your bound Curriculum.',
         'target_unavailable' => 'The target Course no longer resolves.',
         'target_changed' => 'The target Curriculum Course credit hours no longer match the reviewed request.',
+        'target_failed_attempt' => 'A Transfer cannot target a Course with an effective failed for-credit Attempt.',
+        'target_attempt_exists' => 'A Transfer cannot duplicate a completed for-credit Attempt.',
         'statuses' => [
             'Draft' => 'Draft',
             'PendingAdvisor' => 'Pending Advisor',

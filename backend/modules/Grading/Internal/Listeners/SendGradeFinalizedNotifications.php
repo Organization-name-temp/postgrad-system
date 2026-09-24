@@ -3,9 +3,9 @@
 namespace Modules\Grading\Internal\Listeners;
 
 use Modules\Enrollment\Public\EnrollmentRecords;
-use Modules\Grading\Internal\Events\GradeFinalized;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
+use Modules\Grading\Public\Events\GradeFinalized;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;

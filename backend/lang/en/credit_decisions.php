@@ -11,6 +11,7 @@ return [
     'invalid_target' => 'The target must be a Preparatory Course in your bound Curriculum.',
     'target_unavailable' => 'The target Course no longer resolves.',
     'failed_grade_rejection' => 'The request was rejected because a failed Grade became effective for the target Course.',
+    'grade_finalization_conflict' => 'This Grade cannot be finalized while an effective Transfer or Waiver decision targets the same Course. Revoke the decision first.',
     'revocation' => [
         'already_revoked' => 'This credit decision has already been revoked.',
     ],

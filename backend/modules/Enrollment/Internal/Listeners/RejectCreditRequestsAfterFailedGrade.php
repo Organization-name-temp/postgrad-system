@@ -7,8 +7,10 @@ use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Models\TransferRequestTransition;
+use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Internal\Models\WaiverRequest;
 use Modules\Enrollment\Internal\Models\WaiverRequestTransition;
 use Modules\Enrollment\Internal\Support\EffectiveAttemptLookup;
@@ -21,6 +23,7 @@ use Modules\Identity\Public\Enums\Role;
 use Modules\Identity\Public\StudentSummary;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 final class RejectCreditRequestsAfterFailedGrade
 {
@@ -57,6 +60,22 @@ final class RejectCreditRequestsAfterFailedGrade
                 ));
                 if ($failedCourseIds === []) {
                     return;
+                }
+
+                // Approval and Grade finalization take the same Student lock. If approval
+                // committed first, finalization must roll back: only Council may revoke its
+                // decision. If finalization won first, approval observes the completed Attempt
+                // and refuses the decision instead. Neither lock order can commit both facts.
+                $approvedCollision = TransferDecision::query()->effective()
+                    ->where('student_id', $student->studentId)
+                    ->whereIn('target_course_id', $failedCourseIds)
+                    ->exists()
+                    || WaiverDecision::query()->effective()
+                        ->where('student_id', $student->studentId)
+                        ->whereIn('target_course_id', $failedCourseIds)
+                        ->exists();
+                if ($approvedCollision) {
+                    throw new ConflictHttpException(__('credit_decisions.grade_finalization_conflict'));
                 }
 
                 $transfers = TransferRequest::query()->where('student_id', $student->studentId)

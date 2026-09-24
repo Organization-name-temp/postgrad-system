@@ -12,11 +12,13 @@ use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
+use Modules\Enrollment\Internal\Enums\CreditDecisionType;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\ExemptionSource;
 use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Enums\WaiverRequestStatus;
 use Modules\Enrollment\Internal\Models\CourseOffering;
+use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
@@ -31,6 +33,7 @@ use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Notifications\Internal\Models\Notification;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 uses(RefreshDatabase::class);
 
@@ -110,6 +113,19 @@ function revocationWorld(): array
     ]);
 
     return [$student, $council, $course, $decision];
+}
+
+function endSeedTransferDecision(TransferDecision $decision): void
+{
+    CreditDecisionRevocation::query()->create([
+        'decision_type' => CreditDecisionType::Transfer,
+        'decision_id' => $decision->id,
+        'student_id' => $decision->student_id,
+        'target_course_id' => $decision->target_course_id,
+        'revoked_by_user_id' => $decision->approved_by_user_id,
+        'reason' => 'Test setup correction.',
+        'created_at' => now(),
+    ]);
 }
 
 it('lets Council append a reasoned Transfer revocation without rewriting the decision', function () {
@@ -270,7 +286,8 @@ it('lets Council revoke a Waiver decision while preserving its request and evide
 });
 
 it('idempotently rejects an in-review Transfer when a failed Grade becomes effective', function () {
-    [$student, , $course] = revocationWorld();
+    [$student, , $course, $decision] = revocationWorld();
+    endSeedTransferDecision($decision);
     $request = TransferRequest::query()->create([
         'student_id' => $student->id,
         'curriculum_version_id' => $student->curriculum_version_id,
@@ -309,8 +326,30 @@ it('idempotently rejects an in-review Transfer when a failed Grade becomes effec
         ->and(Notification::query()->where('user_id', $student->advisor_id)->where('type', 'transfer.request_decided')->count())->toBe(1);
 });
 
+it('rejects Grade finalization when a conflicting Transfer approval won the Student lock first', function () {
+    [$student, , $course, $decision] = revocationWorld();
+    $offering = CourseOffering::factory()->create(['course_id' => $course->id]);
+    $enrollment = Enrollment::factory()->create([
+        'student_id' => $student->id,
+        'course_offering_id' => $offering->id,
+        'classification' => EnrollmentClassification::Core,
+        'earned' => false,
+    ]);
+
+    expect(fn () => Event::dispatch(new GradeOutcomesFinalized(79, [$enrollment->id])))
+        ->toThrow(ConflictHttpException::class);
+
+    expect(app(TransferDecisions::class)->effectiveForStudent($student->id))->toHaveCount(1)
+        ->and($decision->fresh()->revocation)->toBeNull()
+        ->and(Notification::query()
+            ->where('user_id', $student->user_id)
+            ->where('type', 'credit_decision.revoked')
+            ->count())->toBe(0);
+});
+
 it('idempotently rejects an in-review Waiver and notifies its current Council reviewers', function () {
-    [$student, $council, $course] = revocationWorld();
+    [$student, $council, $course, $decision] = revocationWorld();
+    endSeedTransferDecision($decision);
     $priorCourse = Course::factory()->create([
         'department_id' => $course->department_id,
         'code' => 'REV-402',

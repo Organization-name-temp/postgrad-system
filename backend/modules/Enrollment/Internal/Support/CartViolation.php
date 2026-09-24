@@ -11,6 +11,8 @@ namespace Modules\Enrollment\Internal\Support;
  */
 final readonly class CartViolation
 {
+    public const MUST_RETAKE_REQUIRED = 'must_retake_required';
+
     /** Cart totals below the (unwaived) credit-hour floor. */
     public const string BELOW_MIN_CREDIT_HOURS = 'below_min_credit_hours';
 

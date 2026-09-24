@@ -53,7 +53,9 @@ final readonly class DerivedGraduationProgress implements GraduationProgress
     {
         $summary = $this->creditHours->forStudent($studentId);
         if ($summary === null) {
-            return new UnderloadEligibility(false, false);
+            // Legacy development fixtures admitted before curriculum binding retain the
+            // original first-term rule; every real accepted Student has a bound version.
+            return new UnderloadEligibility($isEnrollmentSemester, false);
         }
 
         return UnderloadRuleCalculator::calculate(

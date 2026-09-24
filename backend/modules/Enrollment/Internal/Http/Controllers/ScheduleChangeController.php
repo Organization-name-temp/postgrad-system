@@ -34,6 +34,7 @@ use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
+use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -102,6 +103,7 @@ class ScheduleChangeController
         Notifier $notifier,
         StandingRecords $standing,
         GraduationProgress $graduationProgress,
+        RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
@@ -154,6 +156,8 @@ class ScheduleChangeController
             $standing->currentForStudent($student->studentId)->registrationCeilingCh,
         ));
         $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester, [$cartLine], $graduationProgress), $existing);
+        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, [$cartLine], $ceiling)];
 
         // Derive the status (Regular/Retake/CGPA Improvement/Audit); a third for-credit
         // attempt blocks the add.

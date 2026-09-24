@@ -35,6 +35,7 @@ use Modules\Enrollment\Internal\Http\Resources\EnrollmentResource;
 use Modules\Enrollment\Internal\Http\Resources\RegistrationRequestResource;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Internal\Models\MustRetakeObligation;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Support\AutomaticExemptionReadiness;
 use Modules\Enrollment\Internal\Support\CartLine;
@@ -44,6 +45,7 @@ use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\ExistingEnrollments;
 use Modules\Enrollment\Internal\Support\RegistrationTarget;
+use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -166,6 +168,7 @@ class RegistrationController
         AutomaticExemptionReadiness $exemptionReadiness,
         StandingRecords $standing,
         GraduationProgress $graduationProgress,
+        RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
         $exemptionReadiness->ensureReconciled($student);
@@ -202,6 +205,8 @@ class RegistrationController
             $standing->currentForStudent($student->studentId)->registrationCeilingCh,
         ));
         $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $graduationProgress), $existing);
+        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $cartLines, $ceiling)];
 
         $errors = $this->errorsFrom($violations, $ineligible);
         if ($errors !== []) {
@@ -563,6 +568,7 @@ class RegistrationController
         AutomaticExemptionReadiness $exemptionReadiness,
         StandingRecords $standing,
         GraduationProgress $graduationProgress,
+        RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
         $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
@@ -600,6 +606,8 @@ class RegistrationController
             $standing->currentForStudent($student->studentId)->registrationCeilingCh,
         ));
         $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $graduationProgress), $existing);
+        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $cartLines, $ceiling)];
 
         $mintPlan = [];
         if ($bornApproved) {
@@ -845,51 +853,31 @@ class RegistrationController
      */
     private function mustRetakeMarkers(Collection $enrollments): array
     {
-        $courseIds = [];
-        $enrollmentIds = [];
-
-        $byCourse = $enrollments
-            ->filter(fn (Enrollment $enrollment): bool => $enrollment->offering !== null)
-            ->groupBy(fn (Enrollment $enrollment): int => (int) $enrollment->offering->course_id);
-
-        foreach ($byCourse as $courseId => $attempts) {
-            /** @var Enrollment|null $latest */
-            $latest = $attempts->last();
-            if (! $latest instanceof Enrollment) {
-                continue;
-            }
-
+        $studentId = $enrollments->isEmpty() ? 0 : (int) $enrollments->first()->student_id;
+        $obligations = $studentId > 0
+            ? MustRetakeObligation::query()->where('student_id', $studentId)->where('state', 'Active')->get()
+            : collect();
+        $courseIds = $obligations->pluck('course_id')->map(fn ($id): int => (int) $id)->all();
+        $enrollmentIds = $obligations->pluck('origin_enrollment_id')->map(fn ($id): int => (int) $id)->all();
+        foreach ($enrollments->filter(fn (Enrollment $item): bool => $item->offering !== null)->groupBy('offering.course_id') as $courseId => $attempts) {
             $mustRetake = false;
             foreach ($attempts as $attempt) {
-                if (
-                    $attempt->classification !== EnrollmentClassification::Preparatory
-                    && $attempt->classification !== EnrollmentClassification::Core
-                ) {
+                if (! in_array($attempt->classification, [EnrollmentClassification::Preparatory, EnrollmentClassification::Core], true)) {
                     continue;
                 }
-
-                if ($attempt->earned === true) {
-                    $mustRetake = false;
-
-                    continue;
-                }
-
-                if ($attempt->earned === false) {
-                    $mustRetake = true;
+                if ($attempt->earned !== null) {
+                    $mustRetake = $attempt->earned === false;
                 }
             }
-
-            if (! $mustRetake) {
-                continue;
+            if ($mustRetake) {
+                $courseIds[] = (int) $courseId;
+                $enrollmentIds[] = (int) $attempts->last()->getKey();
             }
-
-            $courseIds[] = (int) $courseId;
-            $enrollmentIds[] = (int) $latest->getKey();
         }
 
         return [
-            'course_ids' => $courseIds,
-            'enrollment_ids' => $enrollmentIds,
+            'course_ids' => array_values(array_unique($courseIds)),
+            'enrollment_ids' => array_values(array_unique($enrollmentIds)),
         ];
     }
 
@@ -900,13 +888,7 @@ class RegistrationController
      */
     private function mustRetakeMarkersForStudent(int $studentId): array
     {
-        $enrollments = Enrollment::query()
-            ->where('student_id', $studentId)
-            ->with('offering')
-            ->orderBy('id')
-            ->get();
-
-        return $this->mustRetakeMarkers($enrollments);
+        return $this->mustRetakeMarkers(Enrollment::query()->where('student_id', $studentId)->with('offering')->orderBy('id')->get());
     }
 
     /**

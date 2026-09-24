@@ -36,6 +36,7 @@ use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\MintPlanEntry;
+use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -236,6 +237,7 @@ class RegistrationReviewController
         AuditLogger $auditLogger,
         StandingRecords $standing,
         GraduationProgress $graduationProgress,
+        RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $userId = (int) $request->user()?->getAuthIdentifier();
 
@@ -298,6 +300,8 @@ class RegistrationReviewController
         ));
         $approvedCartLines = array_values($cartLines);
         $violations = $validator->validate($approvedCartLines, $this->exceptionsFor($student, $semester, $approvedCartLines, $graduationProgress), $existing);
+        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $approvedCartLines, $ceiling)];
 
         // Derive each approved line's status (Regular/Retake/Audit); a second retake blocks,
         // surfacing as a violation rather than a plan entry (the shared mint seam).

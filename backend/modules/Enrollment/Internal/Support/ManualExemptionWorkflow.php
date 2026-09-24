@@ -14,6 +14,7 @@ use Modules\Enrollment\Internal\Models\ExemptionRequest;
 use Modules\Enrollment\Internal\Models\ExemptionRequestTransition;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Public\MustRetakeObligations;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\StudentGuard;
@@ -33,6 +34,7 @@ final class ManualExemptionWorkflow
         private readonly ManualExemptionEligibility $eligibility,
         private readonly Notifier $notifier,
         private readonly AuditLogger $audit,
+        private readonly MustRetakeObligations $mustRetakes,
     ) {}
 
     /** @param array<string, mixed> $evidence */
@@ -242,6 +244,7 @@ final class ManualExemptionWorkflow
                     'manual_request_id' => $locked->getKey(),
                     'approved_at' => now(),
                 ]);
+                $this->mustRetakes->releaseByExemption($student->studentId, $locked->target_course_id, (int) $decision->getKey());
             }
 
             $locked->update(['status' => $to]);

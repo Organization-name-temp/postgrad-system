@@ -66,7 +66,10 @@ function CapacityCard({
 }) {
   const { t } = useTranslation('enrollment')
   const [confirmDeny, setConfirmDeny] = useState(false)
-  const form = useForm<DecisionValues>({ resolver: zodResolver(decisionSchema), defaultValues: { reason: '' } })
+  const form = useForm<DecisionValues>({
+    resolver: zodResolver(decisionSchema),
+    defaultValues: { reason: '' },
+  })
   const decision = useDecideOneScopedFullOfferingRequirement()
   const decide = async (action: 'approve' | 'deny') => {
     if (!row.id || !(await form.trigger())) return
@@ -83,7 +86,9 @@ function CapacityCard({
     >
       <Stack spacing={2}>
         <Typography variant="h6">{t('capacityReview.course', { id: row.course_id })}</Typography>
-        {row.obligation_type && <Typography>{t(`capacityReview.obligationTypes.${row.obligation_type}`)}</Typography>}
+        {row.obligation_type && (
+          <Typography>{t(`capacityReview.obligationTypes.${row.obligation_type}`)}</Typography>
+        )}
         <Typography>
           {t('capacityReview.request', {
             id: row.registration_request_id,
@@ -107,11 +112,7 @@ function CapacityCard({
           >
             {t('capacityReview.approve')}
           </Button>
-          <Button
-            color="error"
-            disabled={decision.isPending}
-            onClick={() => setConfirmDeny(true)}
-          >
+          <Button color="error" disabled={decision.isPending} onClick={() => setConfirmDeny(true)}>
             {t('capacityReview.deny')}
           </Button>
         </Stack>
@@ -119,7 +120,12 @@ function CapacityCard({
       <Dialog open={confirmDeny} onClose={() => setConfirmDeny(false)}>
         <DialogTitle>{t('capacityReview.deny')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t('capacityReview.denyConfirm', { request: row.registration_request_id, course: row.course_id })}</DialogContentText>
+          <DialogContentText>
+            {t('capacityReview.denyConfirm', {
+              request: row.registration_request_id,
+              course: row.course_id,
+            })}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmDeny(false)}>{t('capacityReview.cancel')}</Button>

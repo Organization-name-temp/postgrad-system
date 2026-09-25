@@ -54,11 +54,15 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
   const { t } = useTranslation('academicStanding')
   const [page, setPage] = useState(1)
   const params = { page, include_decided: stage === 'council' ? true : undefined }
-  const advisor = useGetApiV1TerminationCasesAdvisor(params, { query: { enabled: stage === 'advisor' } })
+  const advisor = useGetApiV1TerminationCasesAdvisor(params, {
+    query: { enabled: stage === 'advisor' },
+  })
   const head = useGetApiV1TerminationCasesDepartmentHead(params, {
     query: { enabled: stage === 'departmentHead' },
   })
-  const council = useGetApiV1TerminationCasesCouncil(params, { query: { enabled: stage === 'council' } })
+  const council = useGetApiV1TerminationCasesCouncil(params, {
+    query: { enabled: stage === 'council' },
+  })
   const query = stage === 'advisor' ? advisor : stage === 'departmentHead' ? head : council
   const rows = (query.data?.data ?? []) as CaseRow[]
   const lastPage = Math.max(1, query.data?.meta?.last_page ?? 1)
@@ -66,11 +70,12 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
     if (!query.isPending && page > lastPage) setPage(lastPage)
   }, [lastPage, page, query.isPending])
   const download = async () => {
-    const blob = stage === 'advisor'
-      ? await getApiV1TerminationCasesAdvisorExport()
-      : stage === 'departmentHead'
-        ? await getApiV1TerminationCasesDepartmentHeadExport()
-        : await getApiV1TerminationCasesCouncilExport()
+    const blob =
+      stage === 'advisor'
+        ? await getApiV1TerminationCasesAdvisorExport()
+        : stage === 'departmentHead'
+          ? await getApiV1TerminationCasesDepartmentHeadExport()
+          : await getApiV1TerminationCasesCouncilExport()
     downloadBlob(blob, `${stage}-termination-cases.xlsx`)
   }
 
@@ -82,7 +87,12 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
         </Typography>
         <Typography color="text.secondary">{t('termination.review.intro')}</Typography>
       </div>
-      <Button startIcon={<DownloadIcon />} variant="outlined" onClick={() => void download()} sx={{ alignSelf: 'flex-start' }}>
+      <Button
+        startIcon={<DownloadIcon />}
+        variant="outlined"
+        onClick={() => void download()}
+        sx={{ alignSelf: 'flex-start' }}
+      >
         {t('termination.review.export')}
       </Button>
       {query.isError && <Alert severity="error">{t('termination.review.loadError')}</Alert>}
@@ -103,7 +113,14 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
           onChanged={() => query.refetch()}
         />
       ))}
-      {lastPage > 1 && <Pagination count={lastPage} page={page} onChange={(_, next) => setPage(next)} sx={{ alignSelf: 'center' }} />}
+      {lastPage > 1 && (
+        <Pagination
+          count={lastPage}
+          page={page}
+          onChange={(_, next) => setPage(next)}
+          sx={{ alignSelf: 'center' }}
+        />
+      )}
     </Stack>
   )
 }
@@ -119,7 +136,10 @@ function TerminationCaseCard({
 }) {
   const { t } = useTranslation('academicStanding')
   const [confirmTerminate, setConfirmTerminate] = useState(false)
-  const form = useForm<ReviewValues>({ resolver: zodResolver(reviewSchema), defaultValues: { reason: '' } })
+  const form = useForm<ReviewValues>({
+    resolver: zodResolver(reviewSchema),
+    defaultValues: { reason: '' },
+  })
   const advisor = usePostApiV1TerminationCasesCaseIdAdvisorReview()
   const head = usePostApiV1TerminationCasesCaseIdDepartmentReview()
   const council = usePostApiV1TerminationCasesCaseIdCouncilDecision()
@@ -142,7 +162,13 @@ function TerminationCaseCard({
   }
   const positive =
     stage === 'advisor' ? 'continue' : stage === 'departmentHead' ? 'recommend' : 'terminate'
-  const actionable = row.state === (stage === 'advisor' ? 'AwaitingAdvisor' : stage === 'departmentHead' ? 'AwaitingDepartmentHead' : 'AwaitingCouncil')
+  const actionable =
+    row.state ===
+    (stage === 'advisor'
+      ? 'AwaitingAdvisor'
+      : stage === 'departmentHead'
+        ? 'AwaitingDepartmentHead'
+        : 'AwaitingCouncil')
 
   return (
     <Paper
@@ -170,37 +196,41 @@ function TerminationCaseCard({
         {row.advisor_assessment && <Typography>{row.advisor_assessment}</Typography>}
         {row.department_head_reason && <Typography>{row.department_head_reason}</Typography>}
         {row.council_reason && <Typography>{row.council_reason}</Typography>}
-        {actionable && <TextField
-          label={t('termination.review.reason')}
-          {...form.register('reason')}
-          error={Boolean(form.formState.errors.reason)}
-          helperText={form.formState.errors.reason ? t('termination.review.required') : undefined}
-          multiline minRows={2} required
-        />}
-        {actionable && <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-          <Button
-            variant="contained"
-            disabled={pending}
-            onClick={() => {
-              if (positive === 'terminate') setConfirmTerminate(true)
-              else void decide(positive)
-            }}
-          >
-            {t(`termination.review.actions.${positive}`)}
-          </Button>
-          <Button
-            color="error"
-            disabled={pending}
-            onClick={() => decide('dismiss')}
-          >
-            {t('termination.review.actions.dismiss')}
-          </Button>
-        </Stack>}
+        {actionable && (
+          <TextField
+            label={t('termination.review.reason')}
+            {...form.register('reason')}
+            error={Boolean(form.formState.errors.reason)}
+            helperText={form.formState.errors.reason ? t('termination.review.required') : undefined}
+            multiline
+            minRows={2}
+            required
+          />
+        )}
+        {actionable && (
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+            <Button
+              variant="contained"
+              disabled={pending}
+              onClick={() => {
+                if (positive === 'terminate') setConfirmTerminate(true)
+                else void decide(positive)
+              }}
+            >
+              {t(`termination.review.actions.${positive}`)}
+            </Button>
+            <Button color="error" disabled={pending} onClick={() => decide('dismiss')}>
+              {t('termination.review.actions.dismiss')}
+            </Button>
+          </Stack>
+        )}
       </Stack>
       <Dialog open={confirmTerminate} onClose={() => setConfirmTerminate(false)}>
         <DialogTitle>{t('termination.review.actions.terminate')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t('termination.review.terminateConfirm', { id: row.student_id })}</DialogContentText>
+          <DialogContentText>
+            {t('termination.review.terminateConfirm', { id: row.student_id })}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmTerminate(false)}>

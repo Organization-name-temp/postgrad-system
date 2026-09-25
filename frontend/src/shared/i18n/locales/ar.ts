@@ -1489,13 +1489,17 @@ export const ar = {
       empty: 'لا توجد استثناءات سعة تحتاج إلى قرارك.',
       course: 'المقرر رقم {{id}}',
       request: 'طلب التسجيل رقم {{id}} · الشعبة رقم {{offering}}',
-      obligationTypes: { MustRetake: 'إعادة مقرر عادية إلزامية', Remediation: 'معالجة إلزامية بعد إلغاء الإعفاء' },
+      obligationTypes: {
+        MustRetake: 'إعادة مقرر عادية إلزامية',
+        Remediation: 'معالجة إلزامية بعد إلغاء الإعفاء',
+      },
       reason: 'سبب القرار',
       required: 'أدخل سبب القرار.',
       approve: 'الموافقة على الاستثناء',
       deny: 'رفض الاستثناء',
       loading: 'جارٍ تحميل استثناءات السعة',
-      denyConfirm: 'هل تريد رفض استثناء السعة للطلب رقم {{request}} والمقرر رقم {{course}}؟ سيُرفض طلب التسجيل دون تغيير.',
+      denyConfirm:
+        'هل تريد رفض استثناء السعة للطلب رقم {{request}} والمقرر رقم {{course}}؟ سيُرفض طلب التسجيل دون تغيير.',
       cancel: 'إلغاء',
     },
     hints: {
@@ -1827,10 +1831,17 @@ export const ar = {
     },
     remediation: {
       title: 'التزامات المعالجة',
-      intro: 'تنشأ هذه الالتزامات من إلغاء الإعفاءات التمهيدية وتظل منفصلة عن إعادة المقررات العادية.',
+      intro:
+        'تنشأ هذه الالتزامات من إلغاء الإعفاءات التمهيدية وتظل منفصلة عن إعادة المقررات العادية.',
       item: 'المقرر رقم {{course}} — {{state}} — الموعد: {{deadline}}',
       noDeadline: 'بانتظار طرح المقرر',
-      states: { AwaitingOffering: 'بانتظار الطرح', Active: 'نشط', Evaluated: 'تم تقييمه', Satisfied: 'مستوفى', ReleasedByExemption: 'أُنهي بإعفاء بديل' },
+      states: {
+        AwaitingOffering: 'بانتظار الطرح',
+        Active: 'نشط',
+        Evaluated: 'تم تقييمه',
+        Satisfied: 'مستوفى',
+        ReleasedByExemption: 'أُنهي بإعفاء بديل',
+      },
     },
     readiness: {
       title: 'الجاهزية للتخرج',

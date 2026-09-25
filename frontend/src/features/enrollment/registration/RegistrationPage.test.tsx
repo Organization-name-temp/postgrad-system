@@ -227,7 +227,9 @@ describe('RegistrationPage', () => {
   })
 
   it('distinguishes remediation from an ordinary must-retake obligation', async () => {
-    srv.eligible = { data: { semester, courses: [eligibleLine({ obligation_type: 'Remediation' })] } }
+    srv.eligible = {
+      data: { semester, courses: [eligibleLine({ obligation_type: 'Remediation' })] },
+    }
     renderPage()
 
     expect(await screen.findByText(/required remediation/i)).toBeInTheDocument()

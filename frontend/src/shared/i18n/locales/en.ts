@@ -1560,7 +1560,10 @@ export const en = {
       empty: 'No capacity exceptions need your decision.',
       course: 'Course #{{id}}',
       request: 'Registration request #{{id}} · Offering #{{offering}}',
-      obligationTypes: { MustRetake: 'Required ordinary retake', Remediation: 'Required remediation after exemption revocation' },
+      obligationTypes: {
+        MustRetake: 'Required ordinary retake',
+        Remediation: 'Required remediation after exemption revocation',
+      },
       reason: 'Decision reason',
       required: 'Enter a decision reason.',
       approve: 'Approve exception',
@@ -1905,10 +1908,17 @@ export const en = {
     },
     remediation: {
       title: 'Remediation obligations',
-      intro: 'These obligations come from revoked Preparatory exemptions and remain distinct from ordinary retakes.',
+      intro:
+        'These obligations come from revoked Preparatory exemptions and remain distinct from ordinary retakes.',
       item: 'Course #{{course}} — {{state}} — deadline: {{deadline}}',
       noDeadline: 'waiting for an offering',
-      states: { AwaitingOffering: 'Awaiting offering', Active: 'Active', Evaluated: 'Evaluated', Satisfied: 'Satisfied', ReleasedByExemption: 'Released by replacement exemption' },
+      states: {
+        AwaitingOffering: 'Awaiting offering',
+        Active: 'Active',
+        Evaluated: 'Evaluated',
+        Satisfied: 'Satisfied',
+        ReleasedByExemption: 'Released by replacement exemption',
+      },
     },
     readiness: {
       title: 'Graduation Readiness',

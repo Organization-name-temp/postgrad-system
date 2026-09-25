@@ -26,7 +26,11 @@ afterEach(async () => {
 })
 
 it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
-  mockedRemediation.mockReturnValue({ data: { data: [] }, isPending: false, isError: false } as ReturnType<typeof useGetApiV1RegistrationRemediationObligations>)
+  mockedRemediation.mockReturnValue({
+    data: { data: [] },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useGetApiV1RegistrationRemediationObligations>)
   mockedTermination.mockReturnValue({
     data: { data: null },
     isPending: false,
@@ -106,7 +110,11 @@ it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
 })
 
 it('renders the same accounting labels in Arabic RTL', async () => {
-  mockedRemediation.mockReturnValue({ data: { data: [] }, isPending: false, isError: false } as ReturnType<typeof useGetApiV1RegistrationRemediationObligations>)
+  mockedRemediation.mockReturnValue({
+    data: { data: [] },
+    isPending: false,
+    isError: false,
+  } as ReturnType<typeof useGetApiV1RegistrationRemediationObligations>)
   mockedTermination.mockReturnValue({
     data: { data: null },
     isPending: false,

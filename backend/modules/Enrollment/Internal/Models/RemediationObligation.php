@@ -15,6 +15,7 @@ use Modules\Enrollment\Internal\Enums\RemediationState;
  * @property int|null $opportunity_offering_id
  * @property int|null $checkpoint_semester_id
  * @property Carbon|null $effective_deadline_at
+ * @property Carbon $created_at
  */
 final class RemediationObligation extends Model
 {

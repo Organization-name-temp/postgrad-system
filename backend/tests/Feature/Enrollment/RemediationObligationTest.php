@@ -115,3 +115,42 @@ it('freezes a used remediation assignment when the course is later deactivated',
         ->and($current->opportunityOfferingId)->toBe($initial->opportunityOfferingId)
         ->and($current->checkpointSemesterId)->toBe($initial->checkpointSemesterId);
 });
+
+it('does not freeze a remediation assignment because of an older enrollment in another offering', function () {
+    $student = Student::factory()->create();
+    $course = Course::factory()->create(['is_active' => true, 'total_ch' => 3]);
+    $historical = Semester::factory()->create([
+        'registration_opens_at' => now()->subMonths(14),
+        'registration_closes_at' => now()->subMonths(13),
+        'starts_at' => now()->subYear(),
+        'add_drop_ends_at' => now()->subYear()->addWeeks(2),
+        'late_add_ends_at' => now()->subYear()->addWeeks(3),
+        'withdrawal_deadline_at' => now()->subMonths(10),
+        'ends_at' => now()->subMonths(8),
+        'grade_submission_deadline_at' => now()->subMonths(7),
+    ]);
+    $historicalOffering = CourseOffering::factory()->create(['course_id' => $course->id, 'semester_id' => $historical->id]);
+    $future = Semester::factory()->create([
+        'starts_at' => now()->addMonth(),
+        'late_add_ends_at' => now()->addMonths(2),
+        'grade_submission_deadline_at' => now()->addMonths(5),
+        'ends_at' => now()->addMonths(4),
+    ]);
+    CourseOffering::factory()->create(['course_id' => $course->id, 'semester_id' => $future->id]);
+    Enrollment::factory()->create(['student_id' => $student->id, 'course_offering_id' => $historicalOffering->id, 'classification' => EnrollmentClassification::Preparatory, 'course_status' => CourseStatus::Regular, 'credit_hours' => 3, 'earned' => null]);
+    $revocation = CreditDecisionRevocation::query()->create([
+        'decision_type' => CreditDecisionType::Exemption,
+        'decision_id' => 102,
+        'student_id' => $student->id,
+        'target_course_id' => $course->id,
+        'reason' => 'corrected evidence',
+        'created_at' => now(),
+    ]);
+    $obligations = app(RemediationObligations::class);
+    $obligations->createFromRevocation($revocation->id);
+
+    $course->update(['is_active' => false]);
+    event(new CourseChanged($course->id));
+
+    expect($obligations->forStudent($student->id)[0]->state)->toBe('AwaitingOffering');
+});

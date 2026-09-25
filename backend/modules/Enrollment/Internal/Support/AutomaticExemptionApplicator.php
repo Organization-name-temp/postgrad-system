@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Admissions\Public\AdmissionAcceptanceEvidence;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CurriculumCatalog;
@@ -12,6 +13,7 @@ use Modules\Enrollment\Internal\Models\AutomaticExemptionEvidence;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Enrollment\Public\MustRetakeObligations;
 use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Identity\Public\Contracts\AuditLogger;
@@ -145,6 +147,9 @@ class AutomaticExemptionApplicator
             }
 
             $receipt->forceFill(['reconciled_at' => now()])->save();
+            if ($created > 0) {
+                DB::afterCommit(fn () => Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'automatic_exemption_reconciliation', (int) $receipt->getKey())));
+            }
 
             return $created;
         });

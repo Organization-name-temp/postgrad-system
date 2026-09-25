@@ -50,6 +50,11 @@ it('lets the council record a reasoned termination decision', async () => {
     target: { value: 'Evidence confirmed' },
   })
   fireEvent.click(screen.getByRole('button', { name: 'Confirm termination' }))
+  expect(
+    await screen.findByText(/ends the student’s active academic lifecycle/),
+  ).toBeInTheDocument()
+  const confirmations = screen.getAllByRole('button', { name: 'Confirm termination' })
+  fireEvent.click(confirmations[confirmations.length - 1])
   await vi.waitFor(() => expect(calls.some((call) => call.method === 'POST')).toBe(true))
 })
 

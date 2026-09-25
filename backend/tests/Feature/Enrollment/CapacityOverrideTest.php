@@ -25,6 +25,7 @@ use Modules\Identity\Internal\Models\DepartmentHeadAssignment;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 
 uses(RefreshDatabase::class);
 
@@ -128,3 +129,33 @@ it('rolls back capacity approval when final whole-batch revalidation finds a dup
     $this->assertDatabaseHas('registration_requests', ['id' => $registration->id, 'status' => RegistrationStatus::AwaitingCapacityOverride->value]);
     expect(Enrollment::query()->where('student_id', $student->id)->where('course_offering_id', $full->id)->count())->toBe(1);
 });
+
+it('refuses a stale capacity decision after the request is rejected or the student is terminated', function (RegistrationStatus $status, StudentLifecycleStatus $lifecycle) {
+    $department = Department::factory()->create();
+    $student = Student::factory()->create(['lifecycle_status' => $lifecycle]);
+    $registration = RegistrationRequest::factory()->create(['student_id' => $student->id, 'status' => $status]);
+    $course = Course::factory()->create(['department_id' => $department->id]);
+    $offering = CourseOffering::factory()->create(['course_id' => $course->id]);
+    $line = $registration->lines()->create(['course_offering_id' => $offering->id, 'mode' => RegistrationMode::Regular]);
+    $requirement = CapacityOverrideRequirement::query()->create([
+        'registration_request_id' => $registration->id,
+        'registration_request_line_id' => $line->id,
+        'course_offering_id' => $offering->id,
+        'course_id' => $course->id,
+        'department_id' => $department->id,
+        'state' => 'Pending',
+    ]);
+    $head = User::factory()->create();
+    $head->assignRole(Role::DepartmentHead);
+    DepartmentHeadAssignment::factory()->create(['user_id' => $head->id, 'department_id' => $department->id]);
+    Sanctum::actingAs($head);
+
+    $this->postJson("/api/v1/registration/capacity-overrides/{$requirement->id}/decision", ['action' => 'approve', 'reason' => 'Stale action.'])
+        ->assertConflict();
+
+    $this->assertDatabaseHas('capacity_override_requirements', ['id' => $requirement->id, 'state' => 'Pending']);
+    $this->assertDatabaseHas('registration_requests', ['id' => $registration->id, 'status' => $status->value]);
+})->with([
+    'request already rejected' => [RegistrationStatus::Rejected, StudentLifecycleStatus::Active],
+    'student already terminated' => [RegistrationStatus::AwaitingCapacityOverride, StudentLifecycleStatus::Terminated],
+]);

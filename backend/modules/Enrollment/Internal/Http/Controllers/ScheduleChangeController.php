@@ -5,6 +5,7 @@ namespace Modules\Enrollment\Internal\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Calendar\Public\AcademicCalendar;
@@ -32,6 +33,7 @@ use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\RegistrationPolicy;
 use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -316,6 +318,7 @@ class ScheduleChangeController
 
         // Withdrawal records W permanently — no credit-hour floor check (FR-REG-004).
         $enrollment->update(['course_status' => CourseStatus::Withdrawn]);
+        Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'enrollment_withdrawal', (int) $enrollment->getKey()));
 
         $offerings = collect([$offering]);
         $this->attachOfferingRefs($offerings, $courses, $directory);

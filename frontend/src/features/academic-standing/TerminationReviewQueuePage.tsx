@@ -1,5 +1,19 @@
 import { useState } from 'react'
-import { Alert, Button, Chip, Paper, Stack, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Paper,
+  Skeleton,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import {
   useGetApiV1TerminationCasesAdvisor,
@@ -42,6 +56,12 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
         <Typography color="text.secondary">{t('termination.review.intro')}</Typography>
       </div>
       {query.isError && <Alert severity="error">{t('termination.review.loadError')}</Alert>}
+      {query.isPending && (
+        <Stack spacing={2} aria-label={t('termination.review.loading')}>
+          <Skeleton variant="rounded" height={260} />
+          <Skeleton variant="rounded" height={260} />
+        </Stack>
+      )}
       {!query.isPending && !query.isError && rows.length === 0 && (
         <Alert severity="info">{t('termination.review.empty')}</Alert>
       )}
@@ -68,6 +88,7 @@ function TerminationCaseCard({
 }) {
   const { t } = useTranslation('academicStanding')
   const [reason, setReason] = useState('')
+  const [confirmTerminate, setConfirmTerminate] = useState(false)
   const advisor = usePostApiV1TerminationCasesCaseIdAdvisorReview()
   const head = usePostApiV1TerminationCasesCaseIdDepartmentReview()
   const council = usePostApiV1TerminationCasesCaseIdCouncilDecision()
@@ -122,7 +143,10 @@ function TerminationCaseCard({
           <Button
             variant="contained"
             disabled={pending || !reason.trim()}
-            onClick={() => decide(positive)}
+            onClick={() => {
+              if (positive === 'terminate') setConfirmTerminate(true)
+              else void decide(positive)
+            }}
           >
             {t(`termination.review.actions.${positive}`)}
           </Button>
@@ -135,6 +159,27 @@ function TerminationCaseCard({
           </Button>
         </Stack>
       </Stack>
+      <Dialog open={confirmTerminate} onClose={() => setConfirmTerminate(false)}>
+        <DialogTitle>{t('termination.review.actions.terminate')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('termination.review.terminateConfirm')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmTerminate(false)}>
+            {t('termination.review.cancel')}
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => {
+              setConfirmTerminate(false)
+              void decide('terminate')
+            }}
+          >
+            {t('termination.review.actions.terminate')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   )
 }

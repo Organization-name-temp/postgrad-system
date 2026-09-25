@@ -20,6 +20,7 @@ use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Models\RegistrationRequestLine;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Identity\Public\StudentSummary;
 
 final class CapacityOverrideFinalizer
@@ -43,6 +44,9 @@ final class CapacityOverrideFinalizer
     /** Returns true only when the unchanged batch was atomically approved and minted. */
     public function finalizeIfReady(RegistrationRequest $request): bool
     {
+        if ($request->status !== RegistrationStatus::AwaitingCapacityOverride) {
+            throw ValidationException::withMessages(['lines' => __('credit_decisions.registration.request_not_awaiting_capacity')]);
+        }
         $request->load('lines.offering.meetings');
         $approved = $request->lines->filter(fn (RegistrationRequestLine $line): bool => $line->decision === LineDecision::Approved)->values();
         if ($approved->isEmpty()) {
@@ -52,6 +56,9 @@ final class CapacityOverrideFinalizer
         $semester = $this->calendar->find((int) $request->semester_id);
         if ($student === null || $semester === null) {
             throw ValidationException::withMessages(['lines' => __('credit_decisions.registration.batch_changed')]);
+        }
+        if ($student->lifecycleStatus !== StudentLifecycleStatus::Active) {
+            throw ValidationException::withMessages(['lines' => __('credit_decisions.registration.student_inactive')]);
         }
 
         [$cartLines, $missing] = $this->resolve($approved, $student);

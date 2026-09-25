@@ -33,6 +33,7 @@ final readonly class EloquentGradingRecords implements GradingRecords
             $grade = $record->grades[$attempt->enrollmentId];
 
             return new EffectiveAttemptSummary(
+                gradeId: (int) $grade->getKey(),
                 enrollmentId: $attempt->enrollmentId,
                 courseId: $attempt->courseId,
                 classification: $enrollment->classification,

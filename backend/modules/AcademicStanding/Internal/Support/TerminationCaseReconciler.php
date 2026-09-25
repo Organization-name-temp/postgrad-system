@@ -2,17 +2,22 @@
 
 namespace Modules\AcademicStanding\Internal\Support;
 
-use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Modules\AcademicStanding\Internal\Models\TerminationCase;
 use Modules\AcademicStanding\Public\TerminationCases;
 use Modules\AcademicStanding\Public\TerminationCaseSummary;
 use Modules\Calendar\Public\AcademicCalendar;
+use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Enrollment\Public\EnrollmentRecords;
+use Modules\Enrollment\Public\EnrollmentSummary;
+use Modules\Enrollment\Public\ExemptionDecisionEvidenceSummary;
 use Modules\Enrollment\Public\ExemptionDecisions;
+use Modules\Enrollment\Public\ExemptionDecisionSummary;
 use Modules\Enrollment\Public\RemediationObligations;
+use Modules\Enrollment\Public\RemediationObligationSummary;
+use Modules\Grading\Public\EffectiveAttemptSummary;
 use Modules\Grading\Public\GradingRecords;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Notifications\Public\Contracts\Notifier;
@@ -51,6 +56,10 @@ final readonly class TerminationCaseReconciler implements TerminationCases
             if ($evidence === []) {
                 if ($open !== null) {
                     $open->update(['state' => 'TriggerCleared', 'closed_reason' => 'TriggerCleared', 'closed_at' => now()]);
+                    $payload = ['case_id' => $open->id, 'state' => 'TriggerCleared', 'change' => 'trigger_cleared'];
+                    foreach (array_unique([$student->userId, $student->advisorId]) as $recipient) {
+                        $this->notifier->notifyOnce($recipient, NotificationType::TerminationCaseChanged, "termination-case:{$open->id}:trigger-cleared:{$recipient}", $payload);
+                    }
                 }
 
                 return null;
@@ -78,10 +87,10 @@ final readonly class TerminationCaseReconciler implements TerminationCases
     {
         $attempts = $this->grading->effectiveAttemptsForStudent($studentId);
         $grades = array_values(array_map(
-            fn ($attempt): array => ['course_id' => $attempt->courseId, 'enrollment_id' => $attempt->enrollmentId, 'letter_grade' => $attempt->letterGrade],
+            fn ($attempt): array => ['course_id' => $attempt->courseId, 'grade_id' => $attempt->gradeId, 'enrollment_id' => $attempt->enrollmentId, 'letter_grade' => $attempt->letterGrade],
             array_filter($attempts, fn ($attempt): bool => in_array($attempt->letterGrade, ['D', 'F'], true)),
         ));
-        usort($grades, fn (array $a, array $b): int => $a['course_id'] <=> $b['course_id']);
+        usort($grades, fn (array $a, array $b): int => [$a['course_id'], $a['grade_id']] <=> [$b['course_id'], $b['grade_id']]);
         $components = [];
         if (count(array_unique(array_column($grades, 'course_id'))) >= 2) {
             $components['df_grades'] = $grades;
@@ -90,23 +99,34 @@ final readonly class TerminationCaseReconciler implements TerminationCases
         $enrollments = $this->enrollments->enrollmentsForStudent($studentId);
         $incompleteCourseIds = array_fill_keys(array_map(fn ($item): int => $item->courseId, array_filter($enrollments, fn ($item): bool => $item->courseStatus === 'Incomplete')), true);
         $earnedCourseIds = array_fill_keys(array_map(fn ($attempt): int => $attempt->courseId, array_filter($attempts, fn ($attempt): bool => $attempt->earned)), true);
-        $exemptCourseIds = array_fill_keys(array_map(fn ($decision): int => $decision->targetCourseId, $this->exemptions->effectiveForStudent($studentId)), true);
+        $effectiveExemptions = $this->exemptions->effectiveForStudent($studentId);
+        $exemptionEvidence = $this->exemptions->evidenceForStudent($studentId);
+        $exemptCourseIds = array_fill_keys(array_map(fn ($decision): int => $decision->targetCourseId, $effectiveExemptions), true);
         $remediation = $this->remediation->forStudent($studentId);
         $suppressedCourseIds = array_fill_keys(array_map(fn ($item): int => $item->courseId, array_filter($remediation, fn ($item): bool => in_array($item->state, ['AwaitingOffering', 'Active', 'Evaluated'], true))), true);
-        $ordinaryDeadline = $this->ordinaryDeadline($enrollmentTerm);
-        if ($ordinaryDeadline !== null && now()->greaterThanOrEqualTo($ordinaryDeadline)) {
+        $ordinaryCheckpoint = $this->ordinaryCheckpoint($enrollmentTerm);
+        if ($ordinaryCheckpoint !== null && now()->greaterThanOrEqualTo($ordinaryCheckpoint->gradeSubmissionDeadlineAt)) {
             $requirements = array_values(array_filter($this->curricula->entriesForVersion($curriculumVersionId), fn ($entry): bool => $entry->category === CourseCategory::Preparatory && ! isset($exemptCourseIds[$entry->courseId])));
+            usort($requirements, fn ($a, $b): int => [$a->courseId, $a->ordinal] <=> [$b->courseId, $b->ordinal]);
             $unsatisfied = array_values(array_filter($requirements, fn ($entry): bool => ! isset($earnedCourseIds[$entry->courseId]) && ! isset($suppressedCourseIds[$entry->courseId])));
             $deferred = array_filter($unsatisfied, fn ($entry): bool => isset($incompleteCourseIds[$entry->courseId]));
             if ($unsatisfied !== [] && $deferred === []) {
-                $components['preparatory_noncompletion'] = array_map(fn ($entry): array => ['course_id' => $entry->courseId, 'requirement_role' => $entry->preparatoryRequirementRole?->value, 'outcome' => 'unsatisfied', 'checkpoint' => $ordinaryDeadline->toIso8601String()], $unsatisfied);
+                $components['preparatory_noncompletion'] = array_map(fn ($entry): array => [
+                    'requirement_id' => $curriculumVersionId.':'.$entry->courseId,
+                    'curriculum_version_id' => $curriculumVersionId,
+                    'course_id' => $entry->courseId,
+                    'requirement_role' => $entry->preparatoryRequirementRole?->value,
+                    'outcome' => 'unsatisfied',
+                    'checkpoint' => ['source' => 'ordinary', 'semester_id' => $ordinaryCheckpoint->id, 'deadline' => $ordinaryCheckpoint->gradeSubmissionDeadlineAt->toIso8601String()],
+                    ...$this->courseEvidence($entry->courseId, $attempts, $enrollments, $effectiveExemptions, $exemptionEvidence, $remediation),
+                ], $unsatisfied);
             }
         }
 
         $expired = [];
         foreach ($remediation as $item) {
             if ($item->state === 'Evaluated' && ! isset($earnedCourseIds[$item->courseId]) && ! isset($exemptCourseIds[$item->courseId])) {
-                $expired[] = ['obligation_id' => $item->id, 'course_id' => $item->courseId, 'deadline' => $item->effectiveDeadline];
+                $expired[] = ['obligation_id' => $item->id, 'course_id' => $item->courseId, 'checkpoint' => ['source' => 'remediation', 'obligation_id' => $item->id, 'semester_id' => $item->checkpointSemesterId, 'deadline' => $item->effectiveDeadline], ...$this->courseEvidence($item->courseId, $attempts, $enrollments, $effectiveExemptions, $exemptionEvidence, $remediation)];
 
                 continue;
             }
@@ -117,20 +137,51 @@ final readonly class TerminationCaseReconciler implements TerminationCases
                 continue;
             }
             $this->remediation->markEvaluated($item->id, $item->effectiveDeadline);
-            $expired[] = ['obligation_id' => $item->id, 'course_id' => $item->courseId, 'deadline' => $item->effectiveDeadline];
+            $expired[] = ['obligation_id' => $item->id, 'course_id' => $item->courseId, 'checkpoint' => ['source' => 'remediation', 'obligation_id' => $item->id, 'semester_id' => $item->checkpointSemesterId, 'deadline' => $item->effectiveDeadline], ...$this->courseEvidence($item->courseId, $attempts, $enrollments, $effectiveExemptions, $exemptionEvidence, $remediation)];
         }
         if ($expired !== []) {
+            usort($expired, fn (array $a, array $b): int => [$a['course_id'], $a['obligation_id']] <=> [$b['course_id'], $b['obligation_id']]);
             $components['remediation'] = $expired;
         }
 
         return $components;
     }
 
-    private function ordinaryDeadline(string $enrollmentTerm): ?CarbonInterface
+    private function ordinaryCheckpoint(string $enrollmentTerm): ?SemesterSummary
     {
         $first = $this->calendar->findByNameEn($enrollmentTerm);
 
-        return $first === null ? null : $this->calendar->nextAfter($first->id)?->gradeSubmissionDeadlineAt;
+        return $first === null ? null : $this->calendar->nextAfter($first->id);
+    }
+
+    /**
+     * @param  list<EffectiveAttemptSummary>  $attempts
+     * @param  list<EnrollmentSummary>  $enrollments
+     * @param  list<ExemptionDecisionSummary>  $effectiveExemptions
+     * @param  list<ExemptionDecisionEvidenceSummary>  $exemptionEvidence
+     * @param  list<RemediationObligationSummary>  $remediation
+     * @return array<string, mixed>
+     */
+    private function courseEvidence(int $courseId, array $attempts, array $enrollments, array $effectiveExemptions, array $exemptionEvidence, array $remediation): array
+    {
+        $attempt = collect($attempts)->first(fn ($item): bool => $item->courseId === $courseId);
+        $withdrawalIds = array_values(array_map(fn ($item): int => $item->id, array_filter($enrollments, fn ($item): bool => $item->courseId === $courseId && $item->courseStatus === 'Withdrawn')));
+        $exemptionIds = array_values(array_map(fn ($item): int => $item->id, array_filter($effectiveExemptions, fn ($item): bool => $item->targetCourseId === $courseId)));
+        $revocationIds = array_values(array_map(fn ($item): int => $item->revocationId, array_filter($exemptionEvidence, fn ($item): bool => $item->targetCourseId === $courseId && $item->revocationId !== null)));
+        $obligationRevocations = array_values(array_map(fn ($item): int => $item->revocationId, array_filter($remediation, fn ($item): bool => $item->courseId === $courseId)));
+        sort($withdrawalIds);
+        sort($exemptionIds);
+        $revocationIds = array_values(array_unique([...$revocationIds, ...$obligationRevocations]));
+        sort($revocationIds);
+
+        return [
+            'effective_grade' => $attempt === null
+                ? ['kind' => 'no_attempt']
+                : ['kind' => 'grade', 'grade_id' => $attempt->gradeId, 'enrollment_id' => $attempt->enrollmentId, 'letter_grade' => $attempt->letterGrade],
+            'withdrawal_enrollment_ids' => $withdrawalIds,
+            'effective_exemption_ids' => $exemptionIds,
+            'revocation_ids' => $revocationIds,
+        ];
     }
 
     /** @return list<string> */

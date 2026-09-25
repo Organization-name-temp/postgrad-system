@@ -1560,6 +1560,10 @@ export const en = {
       reason: 'Decision reason',
       approve: 'Approve exception',
       deny: 'Deny exception',
+      loading: 'Loading capacity exceptions',
+      denyConfirm:
+        'Deny this capacity exception? The unchanged registration request will be rejected.',
+      cancel: 'Cancel',
     },
     hints: {
       ExternalElective:
@@ -1869,6 +1873,10 @@ export const en = {
         reason: 'Assessment or reason',
         empty: 'No termination cases are waiting at this stage.',
         loadError: 'Could not load termination cases.',
+        loading: 'Loading termination cases',
+        terminateConfirm:
+          'Confirm termination? This ends the student’s active academic lifecycle and closes pending academic requests.',
+        cancel: 'Cancel',
         actions: {
           continue: 'Send to Department Head',
           recommend: 'Recommend termination',

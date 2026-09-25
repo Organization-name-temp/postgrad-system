@@ -4,12 +4,14 @@ namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\CreditDecisionType;
 use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
@@ -120,6 +122,7 @@ final class CreditDecisionRevoker
                 subjectType: $type->value.'_decision',
                 subjectId: (string) $locked->getKey(),
             );
+            DB::afterCommit(fn () => Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'credit_decision_revocation', (int) $revocation->getKey())));
 
             return $locked->load('revocation');
         });

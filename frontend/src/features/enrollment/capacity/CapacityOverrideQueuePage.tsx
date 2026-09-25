@@ -1,5 +1,18 @@
 import { useState } from 'react'
-import { Alert, Button, Paper, Stack, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Paper,
+  Skeleton,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import {
   useDecideOneScopedFullOfferingRequirement,
@@ -21,6 +34,12 @@ export function CapacityOverrideQueuePage() {
         <Typography color="text.secondary">{t('capacityReview.intro')}</Typography>
       </div>
       {query.isError && <Alert severity="error">{t('capacityReview.loadError')}</Alert>}
+      {query.isPending && (
+        <Stack spacing={2} aria-label={t('capacityReview.loading')}>
+          <Skeleton variant="rounded" height={220} />
+          <Skeleton variant="rounded" height={220} />
+        </Stack>
+      )}
       {!query.isPending && !query.isError && rows.length === 0 && (
         <Alert severity="info">{t('capacityReview.empty')}</Alert>
       )}
@@ -40,6 +59,7 @@ function CapacityCard({
 }) {
   const { t } = useTranslation('enrollment')
   const [reason, setReason] = useState('')
+  const [confirmDeny, setConfirmDeny] = useState(false)
   const decision = useDecideOneScopedFullOfferingRequirement()
   const decide = async (action: 'approve' | 'deny') => {
     if (!row.id || !reason.trim()) return
@@ -80,12 +100,31 @@ function CapacityCard({
           <Button
             color="error"
             disabled={decision.isPending || !reason.trim()}
-            onClick={() => decide('deny')}
+            onClick={() => setConfirmDeny(true)}
           >
             {t('capacityReview.deny')}
           </Button>
         </Stack>
       </Stack>
+      <Dialog open={confirmDeny} onClose={() => setConfirmDeny(false)}>
+        <DialogTitle>{t('capacityReview.deny')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('capacityReview.denyConfirm')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDeny(false)}>{t('capacityReview.cancel')}</Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => {
+              setConfirmDeny(false)
+              void decide('deny')
+            }}
+          >
+            {t('capacityReview.deny')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Paper>
   )
 }

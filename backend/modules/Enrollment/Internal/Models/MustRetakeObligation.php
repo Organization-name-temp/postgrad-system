@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $category
  * @property int $credit_hours
  * @property string $state
+ * @property Carbon $created_at
  */
 final class MustRetakeObligation extends Model
 {

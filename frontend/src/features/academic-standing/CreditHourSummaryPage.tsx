@@ -1,7 +1,7 @@
 import {
   Alert,
   Box,
-  CircularProgress,
+  Skeleton,
   Paper,
   Chip,
   Table,
@@ -113,7 +113,14 @@ export function CreditHourSummaryPage() {
           <Typography variant="body2">{t('termination.explanation')}</Typography>
         </Alert>
       )}
-      {isPending && <CircularProgress aria-label={t('creditHours.loading')} />}
+      {isPending && (
+        <Stack spacing={1} aria-label={t('creditHours.loading')}>
+          <Skeleton variant="rounded" height={48} />
+          <Skeleton variant="rounded" height={44} />
+          <Skeleton variant="rounded" height={44} />
+          <Skeleton variant="rounded" height={44} />
+        </Stack>
+      )}
       {isError && <Alert severity="error">{t('creditHours.loadError')}</Alert>}
       {!isPending && !isError && (
         <TableContainer component={Paper} variant="outlined">

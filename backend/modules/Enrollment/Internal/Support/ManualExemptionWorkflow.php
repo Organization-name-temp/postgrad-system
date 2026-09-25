@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CurriculumCatalog;
@@ -14,6 +15,7 @@ use Modules\Enrollment\Internal\Models\ExemptionRequest;
 use Modules\Enrollment\Internal\Models\ExemptionRequestTransition;
 use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Enrollment\Public\MustRetakeObligations;
 use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Identity\Public\Contracts\AuditLogger;
@@ -248,6 +250,7 @@ final class ManualExemptionWorkflow
                 ]);
                 $this->mustRetakes->releaseByExemption($student->studentId, $locked->target_course_id, (int) $decision->getKey());
                 $this->remediation->releaseByExemption($student->studentId, $locked->target_course_id, (int) $decision->getKey());
+                DB::afterCommit(fn () => Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'exemption_decision', (int) $decision->getKey())));
             }
 
             $locked->update(['status' => $to]);

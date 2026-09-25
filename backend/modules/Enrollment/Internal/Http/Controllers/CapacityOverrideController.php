@@ -12,6 +12,8 @@ use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Support\CapacityOverrideFinalizer;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
+use Modules\Identity\Public\Contracts\StudentGuard;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 
 /** @group Enrollment */
 final class CapacityOverrideController
@@ -41,17 +43,23 @@ final class CapacityOverrideController
         DepartmentHeadAssignments $heads,
         AuditLogger $audit,
         CapacityOverrideFinalizer $finalizer,
+        StudentGuard $guard,
     ): JsonResponse {
         $actor = (int) $request->user()?->getAuthIdentifier();
         abort_unless(in_array($actor, $heads->headsForDepartment($requirement->department_id), true), 404);
         $validated = $request->validate(['action' => ['required', Rule::in(['approve', 'deny'])], 'reason' => ['required', 'string', 'max:2000']]);
         abort_if($requirement->state !== 'Pending', 409, __('credit_decisions.registration.capacity_decided'));
 
-        DB::transaction(function () use ($requirement, $validated, $actor, $audit, $finalizer): void {
+        $registrationSnapshot = RegistrationRequest::query()->findOrFail($requirement->registration_request_id);
+        DB::transaction(function () use ($requirement, $registrationSnapshot, $validated, $actor, $audit, $finalizer, $guard): void {
+            $student = $guard->lock((int) $registrationSnapshot->student_id);
+            abort_if($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, __('credit_decisions.registration.student_inactive'));
+            $registration = RegistrationRequest::query()->lockForUpdate()->findOrFail($registrationSnapshot->id);
+            abort_if($registration->status !== RegistrationStatus::AwaitingCapacityOverride, 409, __('credit_decisions.registration.request_not_awaiting_capacity'));
             $locked = CapacityOverrideRequirement::query()->lockForUpdate()->findOrFail($requirement->id);
+            abort_if($locked->state !== 'Pending', 409, __('credit_decisions.registration.capacity_decided'));
             $state = $validated['action'] === 'approve' ? 'Approved' : 'Denied';
             $locked->update(['state' => $state, 'decided_by' => $actor, 'reason' => $validated['reason'], 'decided_at' => now()]);
-            $registration = RegistrationRequest::query()->lockForUpdate()->findOrFail($locked->registration_request_id);
             if ($state === 'Denied') {
                 $registration->update(['status' => RegistrationStatus::Rejected]);
             } elseif (! CapacityOverrideRequirement::query()->where('registration_request_id', $registration->id)->where('state', 'Pending')->exists()) {

@@ -2,6 +2,7 @@
 
 namespace Modules\Enrollment\Internal\Support;
 
+use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
@@ -13,7 +14,7 @@ use Modules\Enrollment\Internal\Models\RemediationObligation;
 
 final class RequiredRetakeValidator
 {
-    public function __construct(private readonly ?CourseCatalog $courses = null) {}
+    public function __construct(private readonly ?CourseCatalog $courses = null, private readonly ?AcademicCalendar $calendar = null) {}
 
     /**
      * @param  list<CartLine>  $lines
@@ -21,19 +22,20 @@ final class RequiredRetakeValidator
      */
     public function validate(int $studentId, int $semesterId, array $lines, int $ceiling): array
     {
-        $mustRetakes = MustRetakeObligation::query()->where('student_id', $studentId)->where('state', 'Active')
-            ->orderByRaw("CASE WHEN category = 'Preparatory' THEN 0 ELSE 1 END")
-            ->orderBy('created_at')->orderBy('id')->get();
+        $mustRetakes = MustRetakeObligation::query()->where('student_id', $studentId)->where('state', 'Active')->orderBy('id')->get();
         $remediation = RemediationObligation::query()->where('student_id', $studentId)->where('state', RemediationState::Active)
-            ->orderBy('effective_deadline_at')->orderBy('created_at')->orderBy('id')->get();
+            ->orderBy('id')->get();
         $courses = $this->courses ?? app(CourseCatalog::class);
+        $calendar = $this->calendar ?? app(AcademicCalendar::class);
         $obligations = $remediation->map(fn (RemediationObligation $item): array => [
             'course_id' => (int) $item->course_id,
             'credit_hours' => $courses->find((int) $item->course_id)->totalCh ?? 0,
+            'priority' => [0, $item->effective_deadline_at?->getTimestamp() ?? PHP_INT_MAX, $item->created_at->getTimestamp(), $courses->find((int) $item->course_id)->code, $item->id],
         ])->concat($mustRetakes->map(fn ($item): array => [
             'course_id' => (int) $item->course_id,
             'credit_hours' => (int) $item->credit_hours,
-        ]))->unique('course_id')->values();
+            'priority' => $this->mustRetakePriority($item, $courses, $calendar),
+        ]))->sort(fn (array $a, array $b): int => $a['priority'] <=> $b['priority'])->unique('course_id')->values();
         if ($obligations->isEmpty()) {
             return [];
         }
@@ -79,6 +81,23 @@ final class RequiredRetakeValidator
             __('credit_decisions.registration.required_obligation'),
             $lines === [] ? [] : array_map(fn (CartLine $line): int => $line->offeringId, $lines),
         )];
+    }
+
+    /** @return array{int, int, int, string, int} */
+    private function mustRetakePriority(MustRetakeObligation $item, CourseCatalog $courses, AcademicCalendar $calendar): array
+    {
+        $origin = Enrollment::query()->with('offering')->find($item->origin_enrollment_id);
+        $semester = $origin?->offering === null ? null : $calendar->find((int) $origin->offering->semester_id);
+        $originTime = $semester?->startsAt->getTimestamp() ?? $item->created_at->getTimestamp();
+        $checkpoint = $semester?->gradeSubmissionDeadlineAt->getTimestamp() ?? $originTime;
+
+        return [
+            $item->category === 'Preparatory' ? 0 : 1,
+            $item->category === 'Preparatory' ? $checkpoint : $originTime,
+            $originTime,
+            $courses->find((int) $item->course_id)->code,
+            $item->id,
+        ];
     }
 
     /**

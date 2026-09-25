@@ -5,6 +5,7 @@ return [
         'student_inactive' => 'A terminated Student cannot make new academic changes.',
         'required_obligation' => 'Your registration must include every feasible offered Preparatory/Core obligation before unrelated for-credit study.',
         'capacity_decided' => 'This capacity requirement has already been decided.',
+        'request_not_awaiting_capacity' => 'This registration request is no longer awaiting a capacity decision.',
         'remediation_released' => 'This request was rejected because a replacement Exemption released its required Course.',
         'remediation_checkpoint_changed' => 'The remediation checkpoint changed; retry reconciliation.',
         'batch_changed' => 'The unchanged registration batch is no longer valid; reload the request.',

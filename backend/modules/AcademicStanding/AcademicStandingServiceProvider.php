@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\AcademicStanding\Internal\Console\Commands\ReconcileAcademicStanding;
+use Modules\AcademicStanding\Internal\Listeners\ReconcileAfterEnrollmentEvidence;
 use Modules\AcademicStanding\Internal\Listeners\ReconcileStandingAfterGrade;
 use Modules\AcademicStanding\Internal\Support\DerivedCreditHourSummaries;
 use Modules\AcademicStanding\Internal\Support\DerivedGraduationProgress;
@@ -15,6 +16,7 @@ use Modules\AcademicStanding\Public\CreditHourSummaries;
 use Modules\AcademicStanding\Public\GraduationProgress;
 use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\AcademicStanding\Public\TerminationCases;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Grading\Public\Events\GradeFinalized;
 
 final class AcademicStandingServiceProvider extends ServiceProvider
@@ -31,6 +33,7 @@ final class AcademicStandingServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
         Event::listen(GradeFinalized::class, ReconcileStandingAfterGrade::class);
+        Event::listen(AcademicEvidenceChanged::class, ReconcileAfterEnrollmentEvidence::class);
         if ($this->app->runningInConsole()) {
             $this->commands([ReconcileAcademicStanding::class]);
         }

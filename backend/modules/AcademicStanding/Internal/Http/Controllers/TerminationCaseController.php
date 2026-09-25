@@ -17,6 +17,8 @@ use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Identity\Public\Contracts\StudentLifecycleWriter;
 use Modules\Identity\Public\Enums\StudentLifecycleStatus;
+use Modules\Notifications\Public\Contracts\Notifier;
+use Modules\Notifications\Public\Enums\NotificationType;
 
 /** @group Academic Standing */
 final class TerminationCaseController
@@ -61,15 +63,20 @@ final class TerminationCaseController
      *
      * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingDepartmentHead","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null}}
      */
-    public function advisorReview(Request $request, TerminationCase $case, StudentDirectory $students, TerminationCases $cases, AuditLogger $audit): JsonResponse
+    public function advisorReview(Request $request, TerminationCase $case, StudentGuard $guard, TerminationCases $cases, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();
-        $student = $students->findByStudentId($case->student_id);
-        abort_unless($student !== null && $student->advisorId === $actor, 404);
         $validated = $request->validate(['assessment' => ['required', 'string', 'max:4000'], 'recommendation' => ['required', Rule::in(['continue', 'dismiss'])]]);
-        $current = $cases->reconcile($case->student_id);
-        abort_if($current === null || $current->id !== $case->id || $case->fresh()->state !== 'AwaitingAdvisor', 409, __('academic_standing.evidence_changed'));
-        $case->update(['state' => 'AwaitingDepartmentHead', 'advisor_user_id' => $actor, 'advisor_assessment' => $validated['assessment'], 'advisor_recommendation' => $validated['recommendation'], 'advisor_reviewed_at' => now()]);
+        DB::transaction(function () use ($case, $guard, $cases, $actor, $validated, $notifier): void {
+            $student = $guard->lock($case->student_id);
+            abort_unless($student !== null && $student->advisorId === $actor, 404);
+            abort_if($student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, __('academic_standing.lifecycle_inactive'));
+            $current = $cases->reconcile($case->student_id);
+            $locked = TerminationCase::query()->lockForUpdate()->findOrFail($case->id);
+            abort_if($current === null || $current->id !== $locked->id || $locked->state !== 'AwaitingAdvisor', 409, __('academic_standing.evidence_changed'));
+            $locked->update(['state' => 'AwaitingDepartmentHead', 'advisor_user_id' => $actor, 'advisor_assessment' => $validated['assessment'], 'advisor_recommendation' => $validated['recommendation'], 'advisor_reviewed_at' => now()]);
+            $this->notifyTransition($notifier, $student->userId, $student->advisorId, $locked, 'advisor_reviewed');
+        });
         $audit->record('termination.advisor_reviewed', $actor, $validated, 'termination_case', (string) $case->id);
 
         return response()->json(['data' => $this->resource($case->fresh())]);
@@ -81,15 +88,24 @@ final class TerminationCaseController
      *
      * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingCouncil","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":null,"council_reason":null}}
      */
-    public function departmentReview(Request $request, TerminationCase $case, StudentDirectory $students, ProgramCatalog $programs, DepartmentHeadAssignments $heads, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit): JsonResponse
+    public function departmentReview(Request $request, TerminationCase $case, StudentGuard $guard, ProgramCatalog $programs, DepartmentHeadAssignments $heads, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();
-        abort_unless($this->isDepartmentHead($actor, $case->student_id, $students, $programs, $heads), 404);
         $validated = $request->validate(['action' => ['required', Rule::in(['recommend', 'dismiss'])], 'reason' => ['required', 'string', 'max:4000']]);
-        $current = $cases->reconcile($case->student_id);
-        abort_if($current === null || $current->id !== $case->id || $case->fresh()->state !== 'AwaitingDepartmentHead', 409, __('academic_standing.evidence_changed'));
-        $state = $validated['action'] === 'recommend' ? 'AwaitingCouncil' : 'Dismissed';
-        $case->update(['state' => $state, 'department_head_user_id' => $actor, 'department_head_reason' => $validated['reason'], 'department_head_reviewed_at' => now(), 'closed_reason' => $state === 'Dismissed' ? 'Dismissed' : null, 'closed_at' => $state === 'Dismissed' ? now() : null]);
+        $state = DB::transaction(function () use ($case, $guard, $programs, $heads, $cases, $actor, $validated, $notifier): string {
+            $student = $guard->lock($case->student_id);
+            abort_if($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, __('academic_standing.lifecycle_inactive'));
+            $program = $programs->find($student->programId);
+            abort_unless($program !== null && in_array($actor, $heads->headsForDepartment($program->departmentId), true), 404);
+            $current = $cases->reconcile($case->student_id);
+            $locked = TerminationCase::query()->lockForUpdate()->findOrFail($case->id);
+            abort_if($current === null || $current->id !== $locked->id || $locked->state !== 'AwaitingDepartmentHead', 409, __('academic_standing.evidence_changed'));
+            $state = $validated['action'] === 'recommend' ? 'AwaitingCouncil' : 'Dismissed';
+            $locked->update(['state' => $state, 'department_head_user_id' => $actor, 'department_head_reason' => $validated['reason'], 'department_head_reviewed_at' => now(), 'closed_reason' => $state === 'Dismissed' ? 'Dismissed' : null, 'closed_at' => $state === 'Dismissed' ? now() : null]);
+            $this->notifyTransition($notifier, $student->userId, $student->advisorId, $locked, 'department_reviewed');
+
+            return $state;
+        });
         if ($state === 'Dismissed') {
             $standing->reconcile($case->student_id, 'termination_case', $case->id);
         }
@@ -104,11 +120,11 @@ final class TerminationCaseController
      *
      * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"Terminated","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":8,"council_reason":"Confirmed."}}
      */
-    public function councilDecision(Request $request, TerminationCase $case, StudentGuard $guard, StudentLifecycleWriter $lifecycle, AcademicRequestCloseout $closeout, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit): JsonResponse
+    public function councilDecision(Request $request, TerminationCase $case, StudentGuard $guard, StudentLifecycleWriter $lifecycle, AcademicRequestCloseout $closeout, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();
         $validated = $request->validate(['action' => ['required', Rule::in(['terminate', 'dismiss'])], 'reason' => ['required', 'string', 'max:4000']]);
-        DB::transaction(function () use ($case, $actor, $validated, $guard, $lifecycle, $closeout, $cases): void {
+        DB::transaction(function () use ($case, $actor, $validated, $guard, $lifecycle, $closeout, $cases, $notifier): void {
             $student = $guard->lock($case->student_id);
             abort_if($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, __('academic_standing.lifecycle_inactive'));
             $current = $cases->reconcile($case->student_id);
@@ -120,6 +136,7 @@ final class TerminationCaseController
                 $closeout->forTermination($case->student_id, $case->id);
             }
             $locked->update(['state' => $state, 'council_user_id' => $actor, 'council_reason' => $validated['reason'], 'council_decided_at' => now(), 'closed_reason' => $state, 'closed_at' => now()]);
+            $this->notifyTransition($notifier, $student->userId, $student->advisorId, $locked, 'council_decided');
         });
         $standing->reconcile($case->student_id, 'termination_case', $case->id);
         $audit->record('termination.council_decided', $actor, ['state' => $case->fresh()->state, 'reason' => $validated['reason']], 'termination_case', (string) $case->id);
@@ -139,5 +156,13 @@ final class TerminationCaseController
     private function resource(TerminationCase $case): array
     {
         return ['id' => $case->id, 'student_id' => $case->student_id, 'fingerprint' => $case->fingerprint, 'state' => $case->state, 'evidence' => $case->evidence, 'advisor_user_id' => $case->getAttribute('advisor_user_id'), 'advisor_assessment' => $case->getAttribute('advisor_assessment'), 'advisor_recommendation' => $case->getAttribute('advisor_recommendation'), 'department_head_user_id' => $case->getAttribute('department_head_user_id'), 'department_head_reason' => $case->getAttribute('department_head_reason'), 'council_user_id' => $case->getAttribute('council_user_id'), 'council_reason' => $case->getAttribute('council_reason')];
+    }
+
+    private function notifyTransition(Notifier $notifier, int $studentUserId, int $advisorUserId, TerminationCase $case, string $change): void
+    {
+        $payload = ['case_id' => $case->id, 'state' => $case->state, 'change' => $change];
+        foreach (array_unique([$studentUserId, $advisorUserId]) as $recipient) {
+            $notifier->notifyOnce($recipient, NotificationType::TerminationCaseChanged, "termination-case:{$case->id}:{$change}:{$recipient}", $payload);
+        }
     }
 }

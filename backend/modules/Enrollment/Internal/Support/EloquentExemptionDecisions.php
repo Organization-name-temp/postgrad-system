@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
+use Modules\Enrollment\Public\ExemptionDecisionEvidenceSummary;
 use Modules\Enrollment\Public\ExemptionDecisions;
 use Modules\Enrollment\Public\ExemptionDecisionSummary;
 
@@ -36,5 +37,15 @@ final class EloquentExemptionDecisions implements ExemptionDecisions
             reasonCodes: $decision->reason_codes,
             approvedAt: $decision->approved_at,
         ))->all())->all();
+    }
+
+    public function evidenceForStudent(int $studentId): array
+    {
+        return ExemptionDecision::query()->with('revocation')->where('student_id', $studentId)->orderBy('id')->get()
+            ->map(fn (ExemptionDecision $decision): ExemptionDecisionEvidenceSummary => new ExemptionDecisionEvidenceSummary(
+                decisionId: (int) $decision->getKey(),
+                targetCourseId: $decision->target_course_id,
+                revocationId: $decision->revocation === null ? null : (int) $decision->revocation->getKey(),
+            ))->all();
     }
 }

@@ -58,9 +58,9 @@ final readonly class RemediationReconciler implements RemediationObligations
             }
             $usedOpportunity = Enrollment::query()
                 ->where('student_id', $studentId)
+                ->where('course_offering_id', $item->opportunity_offering_id)
                 ->where('course_status', '!=', CourseStatus::Withdrawn)
                 ->where('course_status', '!=', CourseStatus::Audit)
-                ->whereHas('offering', fn ($query) => $query->where('course_id', $item->course_id))
                 ->exists();
             if ($usedOpportunity && $item->checkpoint_semester_id !== null) {
                 $semester = $this->calendar->find((int) $item->checkpoint_semester_id);

@@ -46,8 +46,8 @@ it('opens one deterministic case for effective D or F grades in two distinct cou
     $student = Student::factory()->create();
     $grading = Mockery::mock(GradingRecords::class);
     $attempts = [
-        new EffectiveAttemptSummary(11, 101, 'Core', 3, false, 'D'),
-        new EffectiveAttemptSummary(12, 102, 'Core', 3, false, 'F'),
+        new EffectiveAttemptSummary(21, 11, 101, 'Core', 3, false, 'D'),
+        new EffectiveAttemptSummary(22, 12, 102, 'Core', 3, false, 'F'),
     ];
     $grading->shouldReceive('effectiveAttemptsForStudent')->twice()->andReturn($attempts, []);
     app()->instance(GradingRecords::class, $grading);
@@ -59,6 +59,8 @@ it('opens one deterministic case for effective D or F grades in two distinct cou
 
     $opened = $cases->reconcile($student->id);
     expect($opened?->state)->toBe('AwaitingAdvisor')
+        ->and($opened?->evidence['df_grades'][0]['grade_id'])->toBe(21)
+        ->and($opened?->evidence['df_grades'][1]['grade_id'])->toBe(22)
         ->and($cases->reconcile($student->id))->toBeNull();
     $this->assertDatabaseHas('termination_cases', ['id' => $opened?->id, 'state' => 'TriggerCleared']);
 });
@@ -72,7 +74,14 @@ it('opens ordinary Preparatory noncompletion only after the second main Semester
 
     $case = app(TerminationCases::class)->reconcile($student->id);
 
-    expect($case?->evidence['preparatory_noncompletion'][0]['course_id'])->toBe($course->id);
+    $component = $case?->evidence['preparatory_noncompletion'][0];
+    expect($component['course_id'])->toBe($course->id)
+        ->and($component['requirement_id'])->toContain(':'.$course->id)
+        ->and($component['checkpoint']['source'])->toBe('ordinary')
+        ->and($component['effective_grade'])->toBe(['kind' => 'no_attempt'])
+        ->and($component['withdrawal_enrollment_ids'])->toBe([])
+        ->and($component['effective_exemption_ids'])->toBe([])
+        ->and($component['revocation_ids'])->toBe([]);
 });
 
 it('defers ordinary Preparatory noncompletion while the affected Enrollment is Incomplete', function () {

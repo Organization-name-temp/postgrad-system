@@ -5,10 +5,12 @@ namespace Modules\Enrollment\Internal\Support;
 use Illuminate\Support\Facades\DB;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
+use Modules\Identity\Public\Contracts\StudentGuard;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 
 final readonly class CapacityOverrideReconciler
 {
-    public function __construct(private CapacityOverrideFinalizer $finalizer) {}
+    public function __construct(private CapacityOverrideFinalizer $finalizer, private StudentGuard $students) {}
 
     public function reconcileOffering(int $offeringId): void
     {
@@ -31,7 +33,15 @@ final readonly class CapacityOverrideReconciler
 
     private function reconcileRequest(int $requestId): void
     {
-        DB::transaction(function () use ($requestId): void {
+        $snapshot = RegistrationRequest::query()->find($requestId);
+        if ($snapshot === null) {
+            return;
+        }
+        DB::transaction(function () use ($requestId, $snapshot): void {
+            $student = $this->students->lock((int) $snapshot->student_id);
+            if ($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active) {
+                return;
+            }
             $request = RegistrationRequest::query()->lockForUpdate()->find($requestId);
             if ($request?->status === RegistrationStatus::AwaitingCapacityOverride) {
                 $this->finalizer->finalizeIfReady($request);

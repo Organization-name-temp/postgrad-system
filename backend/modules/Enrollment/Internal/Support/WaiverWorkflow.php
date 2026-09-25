@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CourseCatalog;
@@ -14,6 +15,7 @@ use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
 use Modules\Enrollment\Internal\Models\WaiverRequest;
 use Modules\Enrollment\Internal\Models\WaiverRequestTransition;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
@@ -281,7 +283,7 @@ final class WaiverWorkflow
             if ($action === 'approve') {
                 $this->assertNoEffectiveDecision($locked->student_id, $locked->target_course_id);
                 $this->assertNoTargetAttempt($student->studentId, $locked->target_course_id);
-                WaiverDecision::query()->create([
+                $decision = WaiverDecision::query()->create([
                     'waiver_request_id' => $locked->getKey(), 'student_id' => $locked->student_id,
                     'curriculum_version_id' => $locked->curriculum_version_id,
                     'target_course_id' => $locked->target_course_id, 'target_course_code' => $locked->target_course_code,
@@ -291,6 +293,7 @@ final class WaiverWorkflow
                     'coverage_percentage' => $locked->coverage_percentage, 'verified_by' => $locked->verified_by,
                     'verified_at' => $locked->verified_at, 'approved_by' => $actorUserId, 'approved_at' => now(),
                 ]);
+                DB::afterCommit(fn () => Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'waiver_decision', (int) $decision->getKey())));
             }
             $locked->update(['status' => $to]);
             $transition = $this->transition($locked, WaiverRequestStatus::PendingCouncil, $to, $transitionAction, $actorUserId, $reason, $actionId, $this->verification($locked));

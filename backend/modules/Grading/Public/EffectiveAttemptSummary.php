@@ -6,6 +6,7 @@ namespace Modules\Grading\Public;
 final readonly class EffectiveAttemptSummary
 {
     public function __construct(
+        public int $gradeId,
         public int $enrollmentId,
         public int $courseId,
         public string $classification,

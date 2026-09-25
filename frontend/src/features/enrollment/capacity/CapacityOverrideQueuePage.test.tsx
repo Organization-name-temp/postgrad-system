@@ -70,3 +70,24 @@ it('shows the capacity queue in Arabic', async () => {
   expect(await screen.findByText('استثناءات السعة')).toBeInTheDocument()
   expect(await screen.findByText('المقرر رقم 3')).toBeInTheDocument()
 })
+
+it('requires confirmation before denying a capacity exception', async () => {
+  render(
+    <ThemeProvider theme={createAppTheme('en')}>
+      <QueryClientProvider
+        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+      >
+        <CapacityOverrideQueuePage />
+      </QueryClientProvider>
+    </ThemeProvider>,
+  )
+
+  expect(await screen.findByText('Course #3')).toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText(/Decision reason/), { target: { value: 'No capacity' } })
+  fireEvent.click(screen.getByRole('button', { name: 'Deny exception' }))
+  expect(await screen.findByText(/registration request will be rejected/)).toBeInTheDocument()
+  expect(calls.some((call) => call.method === 'POST')).toBe(false)
+  const confirmations = screen.getAllByRole('button', { name: 'Deny exception' })
+  fireEvent.click(confirmations[confirmations.length - 1])
+  await vi.waitFor(() => expect(calls.some((call) => call.method === 'POST')).toBe(true))
+})

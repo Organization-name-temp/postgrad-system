@@ -61,14 +61,14 @@ it('keeps reads side-effect free and records each real Standing transition once'
         ->and(Notification::query()->count())->toBe(0);
 
     $grading->cgpa = 2.99;
-    $grading->attempts = [new EffectiveAttemptSummary(1, 10, 'Core', 3, false, 'D')];
+    $grading->attempts = [new EffectiveAttemptSummary(11, 1, 10, 'Core', 3, false, 'D')];
     $reconciler->reconcile($student->id, 'grade_sheet', 7);
     $reconciler->reconcile($student->id, 'grade_sheet', 7);
     expect(StandingObservation::query()->count())->toBe(2)
         ->and(Notification::query()->where('type', 'academic_standing.changed')->count())->toBe(2);
 
     $grading->cgpa = 3.5;
-    $grading->attempts = [new EffectiveAttemptSummary(2, 10, 'Core', 3, true, 'B+')];
+    $grading->attempts = [new EffectiveAttemptSummary(12, 2, 10, 'Core', 3, true, 'B+')];
     $reconciler->reconcile($student->id, 'grade_sheet', 8);
     expect(StandingObservation::query()->count())->toBe(3)
         ->and(Notification::query()->where('type', 'academic_standing.changed')->count())->toBe(4);
@@ -84,7 +84,7 @@ it('applies the probation registration ceiling through the Public result', funct
     $student->user->assignRole(Role::Student);
     app()->instance(GradingRecords::class, new MutableStandingGrading(
         2.5,
-        [new EffectiveAttemptSummary(1, 10, 'Core', 3, true, 'C+')],
+        [new EffectiveAttemptSummary(11, 1, 10, 'Core', 3, true, 'C+')],
     ));
     Sanctum::actingAs($student->user);
 

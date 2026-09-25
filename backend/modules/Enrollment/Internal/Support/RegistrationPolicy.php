@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Support\Facades\DB;
+use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
@@ -15,7 +16,7 @@ use Modules\Identity\Public\StudentSummary;
 
 final readonly class RegistrationPolicy
 {
-    public function __construct(private CurriculumCatalog $curricula) {}
+    public function __construct(private CurriculumCatalog $curricula, private AcademicCalendar $calendar) {}
 
     public function ceiling(int $studentId): int
     {
@@ -76,7 +77,26 @@ final readonly class RegistrationPolicy
     /** @return array<int, true> */
     private function satisfiedCourseIds(int $studentId): array
     {
-        $ids = Enrollment::query()->where('student_id', $studentId)->where('earned', true)->with('offering')->get()->pluck('offering.course_id')->filter()->map(fn ($id): int => (int) $id)->all();
+        $latest = [];
+        foreach (Enrollment::query()->where('student_id', $studentId)->whereNotNull('earned')->with('offering')->get() as $enrollment) {
+            $offering = $enrollment->offering;
+            $semester = $offering === null ? null : $this->calendar->find((int) $offering->semester_id);
+            if ($offering === null || $semester === null) {
+                continue;
+            }
+            $courseId = (int) $offering->course_id;
+            $candidate = ['enrollment' => $enrollment, 'starts_at' => $semester->startsAt];
+            $current = $latest[$courseId] ?? null;
+            if ($current === null || $candidate['starts_at']->greaterThan($current['starts_at']) || ($candidate['starts_at']->equalTo($current['starts_at']) && $enrollment->id > $current['enrollment']->id)) {
+                $latest[$courseId] = $candidate;
+            }
+        }
+        $ids = [];
+        foreach ($latest as $courseId => $attempt) {
+            if ($attempt['enrollment']->earned === true) {
+                $ids[] = $courseId;
+            }
+        }
         foreach ([ExemptionDecision::class, TransferDecision::class, WaiverDecision::class] as $model) {
             $ids = [...$ids, ...$model::query()->where('student_id', $studentId)->whereDoesntHave('revocation')->pluck('target_course_id')->map(fn ($id): int => (int) $id)->all()];
         }

@@ -3,6 +3,7 @@
 namespace Modules\Enrollment\Internal\Support;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CourseCatalog;
@@ -13,6 +14,7 @@ use Modules\Enrollment\Internal\Models\TransferDecision;
 use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Enrollment\Internal\Models\TransferRequestTransition;
 use Modules\Enrollment\Internal\Models\WaiverDecision;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
@@ -335,6 +337,7 @@ final class TransferWorkflow
                     'approved_at' => now(),
                     'transfer_request_id' => $locked->getKey(),
                 ]);
+                DB::afterCommit(fn () => Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'transfer_decision', (int) $decision->getKey())));
             }
             $locked->update(['status' => $to]);
             $transition = $this->recordTransition($locked, TransferRequestStatus::PendingCouncil, $to, $transitionAction, $actorUserId, $reason, $actionId, [

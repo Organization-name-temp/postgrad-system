@@ -171,13 +171,64 @@ export type AScopedStudentsCurrentAcademicStandingAndObservationHistory200 = {
   data?: AScopedStudentsCurrentAcademicStandingAndObservationHistory200Data;
 };
 
-export type GetApiV1TerminationCasesMine200 = {
+export type GetApiV1TerminationCasesMine200DataEvidence = {
+  df_grades?: unknown[];
+};
+
+export type GetApiV1TerminationCasesMine200Data = {
+  id?: number;
+  student_id?: number;
+  fingerprint?: string;
+  state?: string;
+  evidence?: GetApiV1TerminationCasesMine200DataEvidence;
   /** @nullable */
-  data?: string | null;
+  advisor_user_id?: string | null;
+  /** @nullable */
+  advisor_assessment?: string | null;
+  /** @nullable */
+  advisor_recommendation?: string | null;
+  /** @nullable */
+  department_head_user_id?: string | null;
+  /** @nullable */
+  department_head_reason?: string | null;
+  /** @nullable */
+  council_user_id?: string | null;
+  /** @nullable */
+  council_reason?: string | null;
+};
+
+export type GetApiV1TerminationCasesMine200 = {
+  data?: GetApiV1TerminationCasesMine200Data;
+};
+
+export type GetApiV1TerminationCasesAdvisor200DataItemEvidence = {
+  df_grades?: unknown[];
+};
+
+export type GetApiV1TerminationCasesAdvisor200DataItem = {
+  id?: number;
+  student_id?: number;
+  fingerprint?: string;
+  state?: string;
+  evidence?: GetApiV1TerminationCasesAdvisor200DataItemEvidence;
+  /** @nullable */
+  advisor_user_id?: string | null;
+  /** @nullable */
+  advisor_assessment?: string | null;
+  /** @nullable */
+  advisor_recommendation?: string | null;
+  /** @nullable */
+  department_head_user_id?: string | null;
+  /** @nullable */
+  department_head_reason?: string | null;
+  /** @nullable */
+  council_user_id?: string | null;
+  /** @nullable */
+  council_reason?: string | null;
 };
 
 export type GetApiV1TerminationCasesAdvisor200 = {
-  data?: unknown[];
+  data?: GetApiV1TerminationCasesAdvisor200DataItem[];
 };
 
 export type PostApiV1TerminationCasesCaseIdAdvisorReviewBody = {
@@ -213,8 +264,31 @@ export type PostApiV1TerminationCasesCaseIdAdvisorReview200 = {
   data?: PostApiV1TerminationCasesCaseIdAdvisorReview200Data;
 };
 
+export type GetApiV1TerminationCasesDepartmentHead200DataItemEvidence = {
+  df_grades?: unknown[];
+};
+
+export type GetApiV1TerminationCasesDepartmentHead200DataItem = {
+  id?: number;
+  student_id?: number;
+  fingerprint?: string;
+  state?: string;
+  evidence?: GetApiV1TerminationCasesDepartmentHead200DataItemEvidence;
+  advisor_user_id?: number;
+  advisor_assessment?: string;
+  advisor_recommendation?: string;
+  /** @nullable */
+  department_head_user_id?: string | null;
+  /** @nullable */
+  department_head_reason?: string | null;
+  /** @nullable */
+  council_user_id?: string | null;
+  /** @nullable */
+  council_reason?: string | null;
+};
+
 export type GetApiV1TerminationCasesDepartmentHead200 = {
-  data?: unknown[];
+  data?: GetApiV1TerminationCasesDepartmentHead200DataItem[];
 };
 
 export type PostApiV1TerminationCasesCaseIdDepartmentReviewBody = {
@@ -246,6 +320,31 @@ export type PostApiV1TerminationCasesCaseIdDepartmentReview200Data = {
 
 export type PostApiV1TerminationCasesCaseIdDepartmentReview200 = {
   data?: PostApiV1TerminationCasesCaseIdDepartmentReview200Data;
+};
+
+export type GetApiV1TerminationCasesCouncil200DataItemEvidence = {
+  df_grades?: unknown[];
+};
+
+export type GetApiV1TerminationCasesCouncil200DataItem = {
+  id?: number;
+  student_id?: number;
+  fingerprint?: string;
+  state?: string;
+  evidence?: GetApiV1TerminationCasesCouncil200DataItemEvidence;
+  advisor_user_id?: number;
+  advisor_assessment?: string;
+  advisor_recommendation?: string;
+  department_head_user_id?: number;
+  department_head_reason?: string;
+  /** @nullable */
+  council_user_id?: string | null;
+  /** @nullable */
+  council_reason?: string | null;
+};
+
+export type GetApiV1TerminationCasesCouncil200 = {
+  data?: GetApiV1TerminationCasesCouncil200DataItem[];
 };
 
 export type PostApiV1TerminationCasesCaseIdCouncilDecisionBody = {
@@ -4037,8 +4136,19 @@ export type MyRegistrationCard403 = {
   message?: string;
 };
 
+export type GetApiV1RegistrationCapacityOverrides200DataItem = {
+  id?: number;
+  registration_request_id?: number;
+  course_offering_id?: number;
+  course_id?: number;
+  department_id?: number;
+  state?: string;
+  /** @nullable */
+  reason?: string | null;
+};
+
 export type GetApiV1RegistrationCapacityOverrides200 = {
-  data?: unknown[];
+  data?: GetApiV1RegistrationCapacityOverrides200DataItem[];
 };
 
 export type DecideOneScopedFullOfferingRequirementBody = {
@@ -6053,24 +6163,7 @@ export type DepartmentHeadManualExemptionQueue200DataItemTransitionsItem = {
  * The immutable effective decision when the request was approved.
  * @nullable
  */
-export type DepartmentHeadManualExemptionQueue200DataItemDecision = {
-  id?: number;
-  student_id?: number;
-  curriculum_version_id?: number;
-  target_course_id?: number;
-  target_course_code?: string;
-  preparatory_requirement_role?: string;
-  credit_hours?: number;
-  source?: string;
-  reason_codes?: string[];
-  /** @nullable */
-  admission_application_id?: number | null;
-  manual_request_id?: number;
-  approved_at?: string;
-  effective?: boolean;
-  /** @nullable */
-  revocation?: string | null;
-} | null;
+export type DepartmentHeadManualExemptionQueue200DataItemDecision = { [key: string]: unknown } | null;
 
 export type DepartmentHeadManualExemptionQueue200DataItemStudent = {
   student_id?: number;
@@ -11265,6 +11358,93 @@ const {mutation: mutationOptions} = options ?
       > => {
       return useMutation(getPostApiV1TerminationCasesCaseIdDepartmentReviewMutationOptions(options), queryClient);
     }
+
+export const getApiV1TerminationCasesCouncil = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<GetApiV1TerminationCasesCouncil200>(
+      {url: `/api/v1/termination-cases/council`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getGetApiV1TerminationCasesCouncilQueryKey = () => {
+    return [
+    `/api/v1/termination-cases/council`
+    ] as const;
+    }
+
+
+export const getGetApiV1TerminationCasesCouncilQueryOptions = <TData = Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiV1TerminationCasesCouncilQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>> = ({ signal }) => getApiV1TerminationCasesCouncil(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiV1TerminationCasesCouncilQueryResult = NonNullable<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>>
+export type GetApiV1TerminationCasesCouncilQueryError = unknown
+
+
+export function useGetApiV1TerminationCasesCouncil<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesCouncil<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>,
+          TError,
+          Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiV1TerminationCasesCouncil<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetApiV1TerminationCasesCouncil<TData = Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiV1TerminationCasesCouncil>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiV1TerminationCasesCouncilQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const postApiV1TerminationCasesCaseIdCouncilDecision = (
     caseId: number,

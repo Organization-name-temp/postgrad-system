@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\DB;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
+use Modules\Enrollment\Internal\Enums\RemediationState;
 use Modules\Enrollment\Internal\Models\CapacityOverrideRequirement;
 use Modules\Enrollment\Internal\Models\MustRetakeObligation;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
+use Modules\Enrollment\Internal\Models\RemediationObligation;
 
 final readonly class CapacityOverrideWorkflow
 {
@@ -26,6 +28,8 @@ final readonly class CapacityOverrideWorkflow
         }
         $active = MustRetakeObligation::query()->where('student_id', $request->student_id)->where('state', 'Active')
             ->whereIn('course_id', array_map(fn (CartLine $line): int => $line->courseId, $full))->pluck('course_id')->all();
+        $active = [...$active, ...RemediationObligation::query()->where('student_id', $request->student_id)->where('state', RemediationState::Active)
+            ->whereIn('course_id', array_map(fn (CartLine $line): int => $line->courseId, $full))->pluck('course_id')->all()];
         if (count(array_unique($active)) !== count(array_unique(array_map(fn (CartLine $line): int => $line->courseId, $full)))) {
             return false;
         }

@@ -27,7 +27,7 @@ trait ResolvesStudent
         $userId = (int) $request->user()?->getAuthIdentifier();
         $student = $students->find($userId);
         abort_if($student === null, 403, 'You do not have a student record to register with.');
-        abort_if($student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, 'A terminated Student cannot make new academic changes.');
+        abort_if($student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, __('credit_decisions.registration.student_inactive'));
 
         return $student;
     }

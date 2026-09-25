@@ -1,6 +1,14 @@
 <?php
 
 return [
+    'registration' => [
+        'student_inactive' => 'A terminated Student cannot make new academic changes.',
+        'required_obligation' => 'Your registration must include every feasible offered Preparatory/Core obligation before unrelated for-credit study.',
+        'capacity_decided' => 'This capacity requirement has already been decided.',
+        'remediation_released' => 'This request was rejected because a replacement Exemption released its required Course.',
+        'remediation_checkpoint_changed' => 'The remediation checkpoint changed; retry reconciliation.',
+        'batch_changed' => 'The unchanged registration batch is no longer valid; reload the request.',
+    ],
     'exemptions_pending' => 'Your admission exemptions are still being reconciled. Retry before composing registration.',
     'stale_request' => 'This Exemption request changed since you opened it. Refresh and try again.',
     'invalid_state' => 'This action is no longer available for the Exemption request.',

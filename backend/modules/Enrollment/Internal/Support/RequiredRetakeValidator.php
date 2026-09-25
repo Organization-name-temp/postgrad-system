@@ -2,23 +2,38 @@
 
 namespace Modules\Enrollment\Internal\Support;
 
+use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
+use Modules\Enrollment\Internal\Enums\RemediationState;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\MustRetakeObligation;
+use Modules\Enrollment\Internal\Models\RemediationObligation;
 
 final class RequiredRetakeValidator
 {
+    public function __construct(private readonly ?CourseCatalog $courses = null) {}
+
     /**
      * @param  list<CartLine>  $lines
      * @return list<CartViolation>
      */
     public function validate(int $studentId, int $semesterId, array $lines, int $ceiling): array
     {
-        $obligations = MustRetakeObligation::query()->where('student_id', $studentId)->where('state', 'Active')
+        $mustRetakes = MustRetakeObligation::query()->where('student_id', $studentId)->where('state', 'Active')
             ->orderByRaw("CASE WHEN category = 'Preparatory' THEN 0 ELSE 1 END")
             ->orderBy('created_at')->orderBy('id')->get();
+        $remediation = RemediationObligation::query()->where('student_id', $studentId)->where('state', RemediationState::Active)
+            ->orderBy('effective_deadline_at')->orderBy('created_at')->orderBy('id')->get();
+        $courses = $this->courses ?? app(CourseCatalog::class);
+        $obligations = $remediation->map(fn (RemediationObligation $item): array => [
+            'course_id' => (int) $item->course_id,
+            'credit_hours' => $courses->find((int) $item->course_id)->totalCh ?? 0,
+        ])->concat($mustRetakes->map(fn ($item): array => [
+            'course_id' => (int) $item->course_id,
+            'credit_hours' => (int) $item->credit_hours,
+        ]))->unique('course_id')->values();
         if ($obligations->isEmpty()) {
             return [];
         }
@@ -41,12 +56,12 @@ final class RequiredRetakeValidator
         $required = [];
         $selectedMeetings = [];
         foreach ($obligations as $obligation) {
-            $choices = $offerings->get($obligation->course_id, collect());
+            $choices = $offerings->get($obligation['course_id'], collect());
             foreach ($choices as $offering) {
-                $hours = (int) $obligation->credit_hours;
+                $hours = $obligation['credit_hours'];
                 $meetings = $offering->meetings->map(fn ($meeting): MeetingTime => MeetingTime::fromClock($meeting->weekday->value, $meeting->starts_at, $meeting->ends_at))->all();
                 if ($hours <= $remaining && ! $this->clashes($meetings, $selectedMeetings)) {
-                    $required[] = (int) $obligation->course_id;
+                    $required[] = $obligation['course_id'];
                     $remaining -= $hours;
                     $selectedMeetings = [...$selectedMeetings, ...$meetings];
                     break;
@@ -61,7 +76,7 @@ final class RequiredRetakeValidator
 
         return [new CartViolation(
             CartViolation::MUST_RETAKE_REQUIRED,
-            'Your registration must include every feasible offered Preparatory/Core retake before unrelated for-credit study.',
+            __('credit_decisions.registration.required_obligation'),
             $lines === [] ? [] : array_map(fn (CartLine $line): int => $line->offeringId, $lines),
         )];
     }

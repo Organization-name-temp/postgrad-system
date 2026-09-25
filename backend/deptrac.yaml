@@ -161,7 +161,6 @@ deptrac:
       - Calendar_Public
       - Notifications_Public
       - Support
-      - AcademicStanding_Public
     # Grading (Phase 4, ADR-0020) owns the Grade, the Grade Sheet and — from ticket 04 —
     # the GPA/CGPA read model. Ticket 01 opened its first edges: it reads the roster and the
     # Offering's routing facts through the newly-shipped Enrollment\Public facade (ADR-0017's
@@ -190,6 +189,7 @@ deptrac:
       - AcademicStanding_Public
       - Identity_Public
       - Catalog_Public
+      - Calendar_Public
       - Enrollment_Public
       - Grading_Public
       - Notifications_Public

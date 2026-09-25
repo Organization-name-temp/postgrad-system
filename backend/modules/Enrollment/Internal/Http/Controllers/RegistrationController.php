@@ -8,8 +8,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Modules\AcademicStanding\Public\GraduationProgress;
-use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
@@ -44,6 +42,7 @@ use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\ExistingEnrollments;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
 use Modules\Enrollment\Internal\Support\RegistrationTarget;
 use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\Directory;
@@ -166,8 +165,7 @@ class RegistrationController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         AutomaticExemptionReadiness $exemptionReadiness,
-        StandingRecords $standing,
-        GraduationProgress $graduationProgress,
+        RegistrationPolicy $registrationPolicy,
         RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
@@ -202,10 +200,10 @@ class RegistrationController
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
-            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+            $registrationPolicy->ceiling($student->studentId),
         ));
-        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $graduationProgress), $existing);
-        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
         $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $cartLines, $ceiling)];
 
         $errors = $this->errorsFrom($violations, $ineligible);
@@ -566,8 +564,7 @@ class RegistrationController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         AutomaticExemptionReadiness $exemptionReadiness,
-        StandingRecords $standing,
-        GraduationProgress $graduationProgress,
+        RegistrationPolicy $registrationPolicy,
         RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
@@ -603,10 +600,10 @@ class RegistrationController
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
-            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+            $registrationPolicy->ceiling($student->studentId),
         ));
-        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $graduationProgress), $existing);
-        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
         $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $cartLines, $ceiling)];
 
         $mintPlan = [];

@@ -13,7 +13,9 @@ use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Http\Concerns\ResolvesOfferingRefs;
 use Modules\Enrollment\Internal\Http\Resources\CourseOfferingResource;
 use Modules\Enrollment\Internal\Models\CourseOffering;
+use Modules\Enrollment\Internal\Support\CapacityOverrideReconciler;
 use Modules\Enrollment\Internal\Support\MeetingTime;
+use Modules\Enrollment\Internal\Support\RemediationReconciler;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Identity\Public\UserSummary;
@@ -65,6 +67,7 @@ class OfferingController
         CourseCatalog $courses,
         Directory $directory,
         AcademicCalendar $calendar,
+        RemediationReconciler $remediation,
     ): AnonymousResourceCollection {
         $semesterId = $this->semesterIdFromRoute($request);
         $this->assertSemesterExists($semesterId, $calendar);
@@ -128,6 +131,7 @@ class OfferingController
         CourseCatalog $courses,
         Directory $directory,
         AcademicCalendar $calendar,
+        RemediationReconciler $remediation,
     ): JsonResponse {
         $semesterId = $this->semesterIdFromRoute($request);
         $this->assertSemesterExists($semesterId, $calendar);
@@ -151,6 +155,7 @@ class OfferingController
 
         $offering->load('meetings');
         $this->attachOfferingRefs(collect([$offering]), $courses, $directory);
+        $remediation->reconcileCourse((int) $offering->course_id);
 
         return (new CourseOfferingResource($offering))->response()->setStatusCode(201);
     }
@@ -180,6 +185,8 @@ class OfferingController
         CourseOffering $offering,
         CourseCatalog $courses,
         Directory $directory,
+        RemediationReconciler $remediation,
+        CapacityOverrideReconciler $capacityOverrides,
     ): CourseOfferingResource {
         $validated = $this->validated($request, $directory, $offering->semester_id, includeCourse: false);
         $this->assertMeetings($validated['meetings']);
@@ -196,6 +203,8 @@ class OfferingController
 
         $offering->load('meetings');
         $this->attachOfferingRefs(collect([$offering]), $courses, $directory);
+        $remediation->reconcileCourse((int) $offering->course_id);
+        $capacityOverrides->reconcileOffering((int) $offering->id);
 
         return new CourseOfferingResource($offering);
     }
@@ -214,13 +223,15 @@ class OfferingController
      * @response 403 {"message": "This action is unauthorized."}
      * @response 409 {"message": "This offering has enrollments or sessions and cannot be deleted."}
      */
-    public function destroy(CourseOffering $offering): JsonResponse
+    public function destroy(CourseOffering $offering, RemediationReconciler $remediation): JsonResponse
     {
         if ($offering->isReferenced()) {
             throw new ConflictHttpException('This offering has enrollments or sessions and cannot be deleted.');
         }
 
+        $courseId = (int) $offering->course_id;
         $offering->delete();
+        $remediation->reconcileCourse($courseId);
 
         return response()->json(status: 204);
     }

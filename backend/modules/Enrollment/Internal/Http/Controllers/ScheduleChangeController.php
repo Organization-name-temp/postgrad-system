@@ -7,10 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Modules\AcademicStanding\Public\CreditHourCategory;
-use Modules\AcademicStanding\Public\GraduationProgress;
-use Modules\AcademicStanding\Public\ProposedCourse;
-use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Calendar\Public\SemesterSummary;
 use Modules\Catalog\Public\CourseCatalog;
@@ -34,6 +30,7 @@ use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
 use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -101,8 +98,7 @@ class ScheduleChangeController
         Directory $directory,
         EligibilityResolver $eligibility,
         Notifier $notifier,
-        StandingRecords $standing,
-        GraduationProgress $graduationProgress,
+        RegistrationPolicy $registrationPolicy,
         RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
@@ -153,10 +149,10 @@ class ScheduleChangeController
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
-            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+            $registrationPolicy->ceiling($student->studentId),
         ));
-        $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester, [$cartLine], $graduationProgress), $existing);
-        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester, [$cartLine], $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
         $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, [$cartLine], $ceiling)];
 
         // Derive the status (Regular/Retake/CGPA Improvement/Audit); a third for-credit
@@ -224,7 +220,7 @@ class ScheduleChangeController
         CourseCatalog $courses,
         Directory $directory,
         Notifier $notifier,
-        GraduationProgress $graduationProgress,
+        RegistrationPolicy $registrationPolicy,
     ): Response {
         $student = $this->actingStudent($request, $students);
         $this->authorizeOwnEnrollment($enrollment, $student);
@@ -248,21 +244,17 @@ class ScheduleChangeController
             ->whereKeyNot($enrollment->getKey())
             ->whereHas('offering', fn ($query) => $query->where('semester_id', $semester->id))
             ->get()
-            ->map(fn (Enrollment $line): ProposedCourse => new ProposedCourse(
+            ->map(fn (Enrollment $line): CartLine => new CartLine(
+                offeringId: (int) $line->course_offering_id,
                 courseId: (int) $line->offering->course_id,
-                category: match ($line->classification) {
-                    EnrollmentClassification::Preparatory => CreditHourCategory::Preparatory,
-                    EnrollmentClassification::Core => CreditHourCategory::ProgramCore,
-                    default => CreditHourCategory::ResearchElective,
-                },
-                creditHours: $line->credit_hours,
-                forCredit: $line->course_status !== CourseStatus::Audit,
+                courseCode: (string) $line->offering->course_id,
+                mode: $line->course_status === CourseStatus::Audit ? RegistrationMode::Audit : RegistrationMode::Regular,
+                totalCh: $line->credit_hours,
+                classification: $line->classification,
+                seatsRemaining: null,
+                meetings: [],
             ))->all();
-        $underload = $graduationProgress->underloadEligibility(
-            $student->studentId,
-            $student->enrollmentTerm === $semester->nameEn,
-            $remainingSchedule,
-        );
+        $underload = $registrationPolicy->exceptions($student, $semester->nameEn, $remainingSchedule);
 
         if (! $underload->waivesFloor() && $loadAfterDrop < $min) {
             throw ValidationException::withMessages([

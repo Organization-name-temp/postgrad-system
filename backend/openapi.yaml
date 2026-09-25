@@ -577,12 +577,70 @@ paths:
               schema:
                 type: object
                 example:
-                  data: null
+                  data:
+                    id: 1
+                    student_id: 5
+                    fingerprint: abc
+                    state: AwaitingAdvisor
+                    evidence:
+                      df_grades: []
+                    advisor_user_id: null
+                    advisor_assessment: null
+                    advisor_recommendation: null
+                    department_head_user_id: null
+                    department_head_reason: null
+                    council_user_id: null
+                    council_reason: null
                 properties:
                   data:
-                    type: string
-                    example: null
-                    nullable: true
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 5
+                      fingerprint:
+                        type: string
+                        example: abc
+                      state:
+                        type: string
+                        example: AwaitingAdvisor
+                      evidence:
+                        type: object
+                        properties:
+                          df_grades:
+                            type: array
+                            example: []
+                      advisor_user_id:
+                        type: string
+                        example: null
+                        nullable: true
+                      advisor_assessment:
+                        type: string
+                        example: null
+                        nullable: true
+                      advisor_recommendation:
+                        type: string
+                        example: null
+                        nullable: true
+                      department_head_user_id:
+                        type: string
+                        example: null
+                        nullable: true
+                      department_head_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      council_user_id:
+                        type: string
+                        example: null
+                        nullable: true
+                      council_reason:
+                        type: string
+                        example: null
+                        nullable: true
       tags:
         - 'Academic Standing'
       security: []
@@ -600,11 +658,88 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
+                  data:
+                    -
+                      id: 1
+                      student_id: 5
+                      fingerprint: abc
+                      state: AwaitingAdvisor
+                      evidence:
+                        df_grades: []
+                      advisor_user_id: null
+                      advisor_assessment: null
+                      advisor_recommendation: null
+                      department_head_user_id: null
+                      department_head_reason: null
+                      council_user_id: null
+                      council_reason: null
                 properties:
                   data:
                     type: array
-                    example: []
+                    example:
+                      -
+                        id: 1
+                        student_id: 5
+                        fingerprint: abc
+                        state: AwaitingAdvisor
+                        evidence:
+                          df_grades: []
+                        advisor_user_id: null
+                        advisor_assessment: null
+                        advisor_recommendation: null
+                        department_head_user_id: null
+                        department_head_reason: null
+                        council_user_id: null
+                        council_reason: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 5
+                        fingerprint:
+                          type: string
+                          example: abc
+                        state:
+                          type: string
+                          example: AwaitingAdvisor
+                        evidence:
+                          type: object
+                          properties:
+                            df_grades:
+                              type: array
+                              example: []
+                        advisor_user_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        advisor_assessment:
+                          type: string
+                          example: null
+                          nullable: true
+                        advisor_recommendation:
+                          type: string
+                          example: null
+                          nullable: true
+                        department_head_user_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        department_head_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        council_user_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        council_reason:
+                          type: string
+                          example: null
+                          nullable: true
       tags:
         - 'Academic Standing'
       security: []
@@ -727,11 +862,85 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
+                  data:
+                    -
+                      id: 1
+                      student_id: 5
+                      fingerprint: abc
+                      state: AwaitingDepartmentHead
+                      evidence:
+                        df_grades: []
+                      advisor_user_id: 3
+                      advisor_assessment: 'Two failures.'
+                      advisor_recommendation: continue
+                      department_head_user_id: null
+                      department_head_reason: null
+                      council_user_id: null
+                      council_reason: null
                 properties:
                   data:
                     type: array
-                    example: []
+                    example:
+                      -
+                        id: 1
+                        student_id: 5
+                        fingerprint: abc
+                        state: AwaitingDepartmentHead
+                        evidence:
+                          df_grades: []
+                        advisor_user_id: 3
+                        advisor_assessment: 'Two failures.'
+                        advisor_recommendation: continue
+                        department_head_user_id: null
+                        department_head_reason: null
+                        council_user_id: null
+                        council_reason: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 5
+                        fingerprint:
+                          type: string
+                          example: abc
+                        state:
+                          type: string
+                          example: AwaitingDepartmentHead
+                        evidence:
+                          type: object
+                          properties:
+                            df_grades:
+                              type: array
+                              example: []
+                        advisor_user_id:
+                          type: integer
+                          example: 3
+                        advisor_assessment:
+                          type: string
+                          example: 'Two failures.'
+                        advisor_recommendation:
+                          type: string
+                          example: continue
+                        department_head_user_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        department_head_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        council_user_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        council_reason:
+                          type: string
+                          example: null
+                          nullable: true
       tags:
         - 'Academic Standing'
       security: []
@@ -838,6 +1047,100 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/termination-cases/council:
+    get:
+      summary: ''
+      operationId: getApiV1TerminationCasesCouncil
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      student_id: 5
+                      fingerprint: abc
+                      state: AwaitingCouncil
+                      evidence:
+                        df_grades: []
+                      advisor_user_id: 3
+                      advisor_assessment: 'Two failures.'
+                      advisor_recommendation: continue
+                      department_head_user_id: 6
+                      department_head_reason: Actionable.
+                      council_user_id: null
+                      council_reason: null
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 1
+                        student_id: 5
+                        fingerprint: abc
+                        state: AwaitingCouncil
+                        evidence:
+                          df_grades: []
+                        advisor_user_id: 3
+                        advisor_assessment: 'Two failures.'
+                        advisor_recommendation: continue
+                        department_head_user_id: 6
+                        department_head_reason: Actionable.
+                        council_user_id: null
+                        council_reason: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 5
+                        fingerprint:
+                          type: string
+                          example: abc
+                        state:
+                          type: string
+                          example: AwaitingCouncil
+                        evidence:
+                          type: object
+                          properties:
+                            df_grades:
+                              type: array
+                              example: []
+                        advisor_user_id:
+                          type: integer
+                          example: 3
+                        advisor_assessment:
+                          type: string
+                          example: 'Two failures.'
+                        advisor_recommendation:
+                          type: string
+                          example: continue
+                        department_head_user_id:
+                          type: integer
+                          example: 6
+                        department_head_reason:
+                          type: string
+                          example: Actionable.
+                        council_user_id:
+                          type: string
+                          example: null
+                          nullable: true
+                        council_reason:
+                          type: string
+                          example: null
+                          nullable: true
+      tags:
+        - 'Academic Standing'
+      security: []
   '/api/v1/termination-cases/{case_id}/council-decision':
     post:
       summary: ''
@@ -13767,11 +14070,51 @@ paths:
               schema:
                 type: object
                 example:
-                  data: []
+                  data:
+                    -
+                      id: 1
+                      registration_request_id: 2
+                      course_offering_id: 3
+                      course_id: 4
+                      department_id: 5
+                      state: Pending
+                      reason: null
                 properties:
                   data:
                     type: array
-                    example: []
+                    example:
+                      - id: 1
+                        registration_request_id: 2
+                        course_offering_id: 3
+                        course_id: 4
+                        department_id: 5
+                        state: Pending
+                        reason: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        registration_request_id:
+                          type: integer
+                          example: 2
+                        course_offering_id:
+                          type: integer
+                          example: 3
+                        course_id:
+                          type: integer
+                          example: 4
+                        department_id:
+                          type: integer
+                          example: 5
+                        state:
+                          type: string
+                          example: Pending
+                        reason:
+                          type: string
+                          example: null
+                          nullable: true
       tags:
         - Enrollment
       security: []
@@ -20682,10 +21025,10 @@ paths:
                       student_note: 'Corrected report'
                       created_at: '2026-09-04T09:00:00+00:00'
                       updated_at: '2026-09-04T10:00:00+00:00'
-                      status: Approved
+                      status: PendingDepartmentHead
                       revision: 1
                       editable: false
-                      terminal: true
+                      terminal: false
                       submitted_at: '2026-09-04T09:30:00+00:00'
                       transitions:
                         -
@@ -20745,41 +21088,7 @@ paths:
                               - 42
                           current_revision: true
                           created_at: '2026-09-04T09:45:00+00:00'
-                        -
-                          id: 4
-                          from_status: PendingDepartmentHead
-                          to_status: Approved
-                          action: approved_by_department_head
-                          actor_user_id: 16
-                          reason: null
-                          revision: 1
-                          evidence_snapshot:
-                            english_test: IELTS
-                            english_score: 7
-                            previous_degree: MSc
-                            is_ejust_graduate: true
-                            previous_ejust_program_id: 2
-                            document_ids:
-                              - 41
-                              - 42
-                          current_revision: true
-                          created_at: '2026-09-04T10:00:00+00:00'
-                      decision:
-                        id: 4
-                        student_id: 10
-                        curriculum_version_id: 3
-                        target_course_id: 5
-                        target_course_code: PRE401
-                        preparatory_requirement_role: EnglishLanguage
-                        credit_hours: 1
-                        source: manual
-                        reason_codes:
-                          - english_proficiency
-                        admission_application_id: null
-                        manual_request_id: 1
-                        approved_at: '2026-09-04T10:00:00+00:00'
-                        effective: true
-                        revocation: null
+                      decision: null
                       student:
                         student_id: 10
                         university_id: 2026-CSE-0001
@@ -20821,10 +21130,10 @@ paths:
                         student_note: 'Corrected report'
                         created_at: '2026-09-04T09:00:00+00:00'
                         updated_at: '2026-09-04T10:00:00+00:00'
-                        status: Approved
+                        status: PendingDepartmentHead
                         revision: 1
                         editable: false
-                        terminal: true
+                        terminal: false
                         submitted_at: '2026-09-04T09:30:00+00:00'
                         transitions:
                           -
@@ -20884,41 +21193,7 @@ paths:
                                 - 42
                             current_revision: true
                             created_at: '2026-09-04T09:45:00+00:00'
-                          -
-                            id: 4
-                            from_status: PendingDepartmentHead
-                            to_status: Approved
-                            action: approved_by_department_head
-                            actor_user_id: 16
-                            reason: null
-                            revision: 1
-                            evidence_snapshot:
-                              english_test: IELTS
-                              english_score: 7
-                              previous_degree: MSc
-                              is_ejust_graduate: true
-                              previous_ejust_program_id: 2
-                              document_ids:
-                                - 41
-                                - 42
-                            current_revision: true
-                            created_at: '2026-09-04T10:00:00+00:00'
-                        decision:
-                          id: 4
-                          student_id: 10
-                          curriculum_version_id: 3
-                          target_course_id: 5
-                          target_course_code: PRE401
-                          preparatory_requirement_role: EnglishLanguage
-                          credit_hours: 1
-                          source: manual
-                          reason_codes:
-                            - english_proficiency
-                          admission_application_id: null
-                          manual_request_id: 1
-                          approved_at: '2026-09-04T10:00:00+00:00'
-                          effective: true
-                          revocation: null
+                        decision: null
                         student:
                           student_id: 10
                           university_id: 2026-CSE-0001
@@ -20984,7 +21259,7 @@ paths:
                           example: '2026-09-04T10:00:00+00:00'
                         status:
                           type: string
-                          example: Approved
+                          example: PendingDepartmentHead
                         revision:
                           type: integer
                           example: 1
@@ -20993,7 +21268,7 @@ paths:
                           example: false
                         terminal:
                           type: boolean
-                          example: true
+                          example: false
                         submitted_at:
                           type: string
                           example: '2026-09-04T09:30:00+00:00'
@@ -21058,25 +21333,6 @@ paths:
                                   - 42
                               current_revision: true
                               created_at: '2026-09-04T09:45:00+00:00'
-                            -
-                              id: 4
-                              from_status: PendingDepartmentHead
-                              to_status: Approved
-                              action: approved_by_department_head
-                              actor_user_id: 16
-                              reason: null
-                              revision: 1
-                              evidence_snapshot:
-                                english_test: IELTS
-                                english_score: 7
-                                previous_degree: MSc
-                                is_ejust_graduate: true
-                                previous_ejust_program_id: 2
-                                document_ids:
-                                  - 41
-                                  - 42
-                              current_revision: true
-                              created_at: '2026-09-04T10:00:00+00:00'
                           items:
                             type: object
                             properties:
@@ -21136,54 +21392,7 @@ paths:
                                 example: '2026-09-04T09:00:00+00:00'
                         decision:
                           type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 4
-                            student_id:
-                              type: integer
-                              example: 10
-                            curriculum_version_id:
-                              type: integer
-                              example: 3
-                            target_course_id:
-                              type: integer
-                              example: 5
-                            target_course_code:
-                              type: string
-                              example: PRE401
-                            preparatory_requirement_role:
-                              type: string
-                              example: EnglishLanguage
-                            credit_hours:
-                              type: integer
-                              example: 1
-                            source:
-                              type: string
-                              example: manual
-                            reason_codes:
-                              type: array
-                              example:
-                                - english_proficiency
-                              items:
-                                type: string
-                            admission_application_id:
-                              type: integer
-                              example: null
-                              nullable: true
-                            manual_request_id:
-                              type: integer
-                              example: 1
-                            approved_at:
-                              type: string
-                              example: '2026-09-04T10:00:00+00:00'
-                            effective:
-                              type: boolean
-                              example: true
-                            revocation:
-                              type: string
-                              example: null
-                              nullable: true
+                          example: null
                           description: 'The immutable effective decision when the request was approved.'
                           nullable: true
                         student:

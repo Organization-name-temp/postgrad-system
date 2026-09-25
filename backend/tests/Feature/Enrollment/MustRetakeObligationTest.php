@@ -8,8 +8,10 @@ use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Listeners\ReconcileMustRetakeObligations;
 use Modules\Enrollment\Internal\Models\CourseOffering;
+use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\MustRetakeObligation;
+use Modules\Enrollment\Internal\Models\RemediationObligation;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
@@ -54,6 +56,21 @@ it('creates one historical obligation for a failed preparatory or core outcome a
         'state' => 'Satisfied',
         'closed_by_enrollment_id' => $passed->id,
     ]);
+});
+
+it('gives an active Remediation Obligation the same offered-course priority', function () {
+    $student = Student::factory()->create();
+    $semester = Semester::factory()->create();
+    $requiredCourse = Course::factory()->create(['total_ch' => 1]);
+    CourseOffering::factory()->create(['course_id' => $requiredCourse->id, 'semester_id' => $semester->id]);
+    $revocation = CreditDecisionRevocation::query()->create(['decision_type' => 'exemption', 'decision_id' => 987, 'student_id' => $student->id, 'target_course_id' => $requiredCourse->id, 'reason' => 'corrected', 'created_at' => now()]);
+    RemediationObligation::query()->create(['student_id' => $student->id, 'course_id' => $requiredCourse->id, 'revocation_id' => $revocation->id, 'state' => 'Active', 'checkpoint_semester_id' => $semester->id, 'effective_deadline_at' => now()->addMonth()]);
+    $otherCourse = Course::factory()->create(['total_ch' => 3]);
+    $otherOffering = CourseOffering::factory()->create(['course_id' => $otherCourse->id, 'semester_id' => $semester->id]);
+    $line = new CartLine($otherOffering->id, $otherCourse->id, $otherCourse->code, RegistrationMode::Regular, 3, EnrollmentClassification::Core, 10, []);
+
+    expect(app(RequiredRetakeValidator::class)->validate($student->id, $semester->id, [$line], 12)[0]->code)
+        ->toBe(CartViolation::MUST_RETAKE_REQUIRED);
 });
 
 it('requires an offered feasible obligation before unrelated for-credit study', function () {

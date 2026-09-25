@@ -12,6 +12,7 @@ use Modules\Calendar\Internal\Http\Resources\SemesterResource;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Calendar\Internal\Support\SemesterCalendar;
 use Modules\Calendar\Public\Enums\Term;
+use Modules\Calendar\Public\Events\SemesterChanged;
 
 /**
  * @group Calendar
@@ -108,6 +109,7 @@ class SemesterController
         $this->assertOrdering($validated);
 
         $semester->update($validated);
+        event(new SemesterChanged((int) $semester->id));
 
         return new SemesterResource($semester);
     }

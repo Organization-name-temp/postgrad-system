@@ -8,6 +8,11 @@ export const en = {
     actions: {
       retry: 'Retry',
     },
+    lifecycle: {
+      terminatedReadOnly:
+        'Your enrollment is terminated. Academic history remains available, but new academic changes are disabled.',
+      readOnlyContent: 'Read-only academic history',
+    },
     roles: {
       R01: 'Applicant',
       R02: 'Student',
@@ -78,6 +83,10 @@ export const en = {
       waiverAdvisorQueue: 'Waiver recommendations',
       waiverHeadQueue: 'Waiver verification',
       waiverCouncilQueue: 'Waiver decisions',
+      capacityOverrides: 'Capacity exceptions',
+      terminationAdvisor: 'Termination assessments',
+      terminationHead: 'Termination recommendations',
+      terminationCouncil: 'Termination decisions',
       assignments: 'Faculty deans',
       departmentHeads: 'Department heads',
       sections: {
@@ -1541,6 +1550,17 @@ export const en = {
       ExternalElective: 'External electives',
       ResearchCourse: 'Research course',
     },
+    capacityReview: {
+      title: 'Capacity exceptions',
+      intro: 'Review required full offerings before the registration request can be finalized.',
+      loadError: 'Could not load capacity exceptions.',
+      empty: 'No capacity exceptions need your decision.',
+      course: 'Course #{{id}}',
+      request: 'Registration request #{{id}} · Offering #{{offering}}',
+      reason: 'Decision reason',
+      approve: 'Approve exception',
+      deny: 'Deny exception',
+    },
     hints: {
       ExternalElective:
         'From another program. You may use one external elective across your studies, and it needs your advisor’s approval.',
@@ -1837,6 +1857,18 @@ export const en = {
         AwaitingCouncil: 'Awaiting Council decision',
         Dismissed: 'Dismissed',
         Terminated: 'Termination confirmed',
+      },
+      review: {
+        intro: 'Review the current evidence fingerprint. Every action is revalidated against the live academic record.',
+        advisor: { title: 'Termination assessments' },
+        departmentHead: { title: 'Termination recommendations' },
+        council: { title: 'Termination decisions' },
+        student: 'Student #{{id}}',
+        fingerprint: 'Evidence fingerprint: {{value}}',
+        reason: 'Assessment or reason',
+        empty: 'No termination cases are waiting at this stage.',
+        loadError: 'Could not load termination cases.',
+        actions: { continue: 'Send to Department Head', recommend: 'Recommend termination', terminate: 'Confirm termination', dismiss: 'Dismiss case' },
       },
     },
     readiness: {

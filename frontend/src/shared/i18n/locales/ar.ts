@@ -7,6 +7,11 @@ export const ar = {
     actions: {
       retry: 'إعادة المحاولة',
     },
+    lifecycle: {
+      terminatedReadOnly:
+        'تم إنهاء قيدك. يظل السجل الأكاديمي متاحًا، لكن لا يمكن إجراء تغييرات أكاديمية جديدة.',
+      readOnlyContent: 'السجل الأكاديمي للقراءة فقط',
+    },
     roles: {
       R01: 'متقدم',
       R02: 'طالب',
@@ -77,6 +82,10 @@ export const ar = {
       waiverAdvisorQueue: 'توصيات الإعفاء من مقرر',
       waiverHeadQueue: 'التحقق من تكافؤ الإعفاء',
       waiverCouncilQueue: 'قرارات الإعفاء من مقرر',
+      capacityOverrides: 'استثناءات السعة',
+      terminationAdvisor: 'تقييمات إنهاء القيد',
+      terminationHead: 'توصيات إنهاء القيد',
+      terminationCouncil: 'قرارات إنهاء القيد',
       assignments: 'عمداء الكليات',
       departmentHeads: 'رؤساء الأقسام',
       sections: {
@@ -1470,6 +1479,17 @@ export const ar = {
       ExternalElective: 'المقررات الاختيارية الخارجية',
       ResearchCourse: 'مقرر البحث',
     },
+    capacityReview: {
+      title: 'استثناءات السعة',
+      intro: 'راجع المقررات الإلزامية مكتملة السعة قبل اعتماد طلب التسجيل.',
+      loadError: 'تعذّر تحميل استثناءات السعة.',
+      empty: 'لا توجد استثناءات سعة تحتاج إلى قرارك.',
+      course: 'المقرر رقم {{id}}',
+      request: 'طلب التسجيل رقم {{id}} · الشعبة رقم {{offering}}',
+      reason: 'سبب القرار',
+      approve: 'الموافقة على الاستثناء',
+      deny: 'رفض الاستثناء',
+    },
     hints: {
       ExternalElective:
         'من برنامج آخر. يمكنك استخدام مقرر اختياري خارجي واحد طوال دراستك، ويتطلّب موافقة مرشدك الأكاديمي.',
@@ -1761,6 +1781,18 @@ export const ar = {
         AwaitingCouncil: 'بانتظار قرار المجلس',
         Dismissed: 'رُفضت الحالة',
         Terminated: 'تم اعتماد إنهاء القيد',
+      },
+      review: {
+        intro: 'راجع بصمة الأدلة الحالية. يُعاد التحقق من كل إجراء مقابل السجل الأكاديمي الفعلي.',
+        advisor: { title: 'تقييمات إنهاء القيد' },
+        departmentHead: { title: 'توصيات إنهاء القيد' },
+        council: { title: 'قرارات إنهاء القيد' },
+        student: 'الطالب رقم {{id}}',
+        fingerprint: 'بصمة الأدلة: {{value}}',
+        reason: 'التقييم أو السبب',
+        empty: 'لا توجد حالات إنهاء قيد بانتظار هذه المرحلة.',
+        loadError: 'تعذّر تحميل حالات إنهاء القيد.',
+        actions: { continue: 'الإحالة إلى رئيس القسم', recommend: 'التوصية بإنهاء القيد', terminate: 'اعتماد إنهاء القيد', dismiss: 'رفض الحالة' },
       },
     },
     readiness: {

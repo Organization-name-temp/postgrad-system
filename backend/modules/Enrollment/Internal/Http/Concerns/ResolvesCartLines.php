@@ -2,12 +2,7 @@
 
 namespace Modules\Enrollment\Internal\Http\Concerns;
 
-use Modules\AcademicStanding\Public\CreditHourCategory;
-use Modules\AcademicStanding\Public\GraduationProgress;
-use Modules\AcademicStanding\Public\ProposedCourse;
 use Modules\Calendar\Public\SemesterSummary;
-use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
-use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
 use Modules\Enrollment\Internal\Models\CourseOffering;
@@ -15,6 +10,7 @@ use Modules\Enrollment\Internal\Models\OfferingMeeting;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CreditHoursExceptions;
 use Modules\Enrollment\Internal\Support\MeetingTime;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
 use Modules\Identity\Public\StudentSummary;
 
 /**
@@ -53,26 +49,8 @@ trait ResolvesCartLines
         StudentSummary $student,
         SemesterSummary $semester,
         array $lines,
-        GraduationProgress $progress,
+        RegistrationPolicy $policy,
     ): CreditHoursExceptions {
-        $eligibility = $progress->underloadEligibility(
-            $student->studentId,
-            $student->enrollmentTerm === $semester->nameEn,
-            array_map(fn (CartLine $line): ProposedCourse => new ProposedCourse(
-                courseId: $line->courseId,
-                category: match ($line->classification) {
-                    EnrollmentClassification::Preparatory => CreditHourCategory::Preparatory,
-                    EnrollmentClassification::Core => CreditHourCategory::ProgramCore,
-                    default => CreditHourCategory::ResearchElective,
-                },
-                creditHours: $line->totalCh,
-                forCredit: $line->mode !== RegistrationMode::Audit,
-            ), $lines),
-        );
-
-        return new CreditHoursExceptions(
-            firstSemester: $eligibility->firstSemesterCompletion,
-            approachingGraduationCompletion: $eligibility->approachingGraduationCompletion,
-        );
+        return $policy->exceptions($student, $semester->nameEn, $lines);
     }
 }

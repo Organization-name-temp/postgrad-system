@@ -28,6 +28,8 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
 import DonutLargeIcon from '@mui/icons-material/DonutLarge'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import GroupsIcon from '@mui/icons-material/Groups'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -260,6 +262,34 @@ export const navItems: NavItem[] = [
     key: 'waiverCouncilQueue',
     to: '/waivers/council',
     icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.council],
+  },
+  {
+    key: 'capacityOverrides',
+    to: '/registration/capacity-overrides',
+    icon: <GroupsIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
+  },
+  {
+    key: 'terminationAdvisor',
+    to: '/termination/advisor',
+    icon: <WarningAmberIcon />,
+    section: 'enrollment',
+    roles: [ROLE.advisor],
+  },
+  {
+    key: 'terminationHead',
+    to: '/termination/department-head',
+    icon: <WarningAmberIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
+  },
+  {
+    key: 'terminationCouncil',
+    to: '/termination/council',
+    icon: <WarningAmberIcon />,
     section: 'enrollment',
     roles: [ROLE.council],
   },

@@ -50,6 +50,9 @@ import { DepartmentHeadSheetPage } from '../features/grading/department-head/Dep
 import { MyGradesPage } from '../features/grading/student/MyGradesPage'
 import { StudentGradesPage } from '../features/grading/oversight/StudentGradesPage'
 import { CreditHourSummaryPage } from '../features/academic-standing/CreditHourSummaryPage'
+import { TerminationReviewQueuePage } from '../features/academic-standing/TerminationReviewQueuePage'
+import { CapacityOverrideQueuePage } from '../features/enrollment/capacity/CapacityOverrideQueuePage'
+import { LifecycleReadOnly } from '../features/enrollment/LifecycleReadOnly'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 // The Dashboard lives in the app shell, not in a feature: it composes Cards from many
@@ -98,11 +101,11 @@ export function App() {
                     admin who merely inherits courses.register_self is sent home and
                     the server would 403 the eligible list anyway (ticket 04). */}
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
-                  <Route path="/registration" element={<RegistrationPage />} />
-                  <Route path="/schedule" element={<SchedulePage />} />
-                  <Route path="/exemptions" element={<ManualExemptionsPage />} />
-                  <Route path="/transfers" element={<TransfersPage />} />
-                  <Route path="/waivers" element={<WaiversPage />} />
+                  <Route path="/registration" element={<LifecycleReadOnly><RegistrationPage /></LifecycleReadOnly>} />
+                  <Route path="/schedule" element={<LifecycleReadOnly><SchedulePage /></LifecycleReadOnly>} />
+                  <Route path="/exemptions" element={<LifecycleReadOnly><ManualExemptionsPage /></LifecycleReadOnly>} />
+                  <Route path="/transfers" element={<LifecycleReadOnly><TransfersPage /></LifecycleReadOnly>} />
+                  <Route path="/waivers" element={<LifecycleReadOnly><WaiversPage /></LifecycleReadOnly>} />
                   <Route path="/academic-standing" element={<CreditHourSummaryPage />} />
                 </Route>
                 {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
@@ -166,6 +169,8 @@ export function App() {
                     path="/waivers/department-head"
                     element={<WaiverReviewQueuePage stage="departmentHead" />}
                   />
+                  <Route path="/registration/capacity-overrides" element={<CapacityOverrideQueuePage />} />
+                  <Route path="/termination/department-head" element={<TerminationReviewQueuePage stage="departmentHead" />} />
                 </Route>
                 <Route element={<RequireAuth roles={[ROLE.advisor]} />}>
                   <Route
@@ -180,6 +185,7 @@ export function App() {
                     path="/waivers/advisor"
                     element={<WaiverReviewQueuePage stage="advisor" />}
                   />
+                  <Route path="/termination/advisor" element={<TerminationReviewQueuePage stage="advisor" />} />
                 </Route>
                 <Route element={<RequireAuth roles={[ROLE.council]} />}>
                   <Route
@@ -190,6 +196,7 @@ export function App() {
                     path="/waivers/council"
                     element={<WaiverReviewQueuePage stage="council" />}
                   />
+                  <Route path="/termination/council" element={<TerminationReviewQueuePage stage="council" />} />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to

@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Admissions\Public\AdmissionDocumentSummary;
+use Modules\Calendar\Internal\Models\Semester;
+use Modules\Calendar\Public\Enums\Term;
 use Modules\Catalog\Internal\Enums\VersionSubject;
 use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Course;
@@ -175,6 +177,9 @@ it('requires Council authority and a reason and never appends a second revocatio
 
 it('lets only the scoped Department Head revoke an Exemption decision', function () {
     [$student, , $course] = revocationWorld();
+    $first = Semester::factory()->create(['term' => Term::Fall, 'year' => 2024, 'registration_opens_at' => now()->subYears(2)->subMonth(), 'registration_closes_at' => now()->subYears(2)->subWeeks(3), 'starts_at' => now()->subYears(2), 'add_drop_ends_at' => now()->subYears(2)->addWeeks(2), 'late_add_ends_at' => now()->subYears(2)->addWeeks(3), 'withdrawal_deadline_at' => now()->subYears(2)->addMonths(2), 'ends_at' => now()->subYears(2)->addMonths(4), 'grade_submission_deadline_at' => now()->subYears(2)->addMonths(5)]);
+    Semester::factory()->create(['term' => Term::Spring, 'year' => 2025, 'registration_opens_at' => now()->subMonths(19), 'registration_closes_at' => now()->subMonths(18)->subWeek(), 'starts_at' => now()->subMonths(18), 'add_drop_ends_at' => now()->subMonths(18)->addWeeks(2), 'late_add_ends_at' => now()->subMonths(18)->addWeeks(3), 'withdrawal_deadline_at' => now()->subMonths(16), 'ends_at' => now()->subMonths(14), 'grade_submission_deadline_at' => now()->subMonths(13)]);
+    $student->update(['enrollment_term' => $first->name_en]);
     $decision = ExemptionDecision::query()->create([
         'student_id' => $student->id,
         'curriculum_version_id' => $student->curriculum_version_id,
@@ -220,6 +225,28 @@ it('lets only the scoped Department Head revoke an Exemption decision', function
     $this->getJson('/api/v1/credit-decisions/exemption-requests/department-head-queue?include_decided=true')
         ->assertOk()
         ->assertJsonPath('data', []);
+});
+
+it('does not create remediation when an Exemption is revoked before the ordinary checkpoint', function () {
+    [$student, , $course] = revocationWorld();
+    $first = Semester::factory()->create(['term' => Term::Fall, 'year' => 2026]);
+    Semester::factory()->create(['term' => Term::Spring, 'year' => 2027, 'starts_at' => now()->addMonths(6), 'registration_opens_at' => now()->addMonths(5), 'registration_closes_at' => now()->addMonths(5)->addWeek(), 'add_drop_ends_at' => now()->addMonths(6)->addWeeks(2), 'late_add_ends_at' => now()->addMonths(6)->addWeeks(3), 'withdrawal_deadline_at' => now()->addMonths(8), 'ends_at' => now()->addMonths(10), 'grade_submission_deadline_at' => now()->addMonths(11)]);
+    $student->update(['enrollment_term' => $first->name_en]);
+    $decision = ExemptionDecision::query()->create([
+        'student_id' => $student->id, 'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => $course->id, 'target_course_code' => $course->code,
+        'preparatory_requirement_role' => PreparatoryRequirementRole::EnglishLanguage,
+        'credit_hours' => 3, 'source' => ExemptionSource::Automatic, 'reason_codes' => ['qualifying_score'],
+        'source_evidence' => ['score' => 90], 'admission_application_id' => 902, 'approved_at' => now(),
+    ]);
+    $head = User::factory()->create();
+    $head->assignRole(Role::DepartmentHead);
+    DepartmentHeadAssignment::factory()->create(['user_id' => $head->id, 'department_id' => $course->department_id]);
+    Sanctum::actingAs($head);
+
+    $this->postJson("/api/v1/credit-decisions/exemptions/{$decision->id}/revoke", ['reason' => 'Corrected before the checkpoint.'])->assertOk();
+
+    $this->assertDatabaseCount('remediation_obligations', 0);
 });
 
 it('lets Council revoke a Waiver decision while preserving its request and evidence', function () {

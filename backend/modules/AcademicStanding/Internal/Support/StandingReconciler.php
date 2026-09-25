@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\AcademicStanding\Internal\Models\StandingObservation;
 use Modules\AcademicStanding\Public\AcademicStanding;
 use Modules\AcademicStanding\Public\StandingRecords;
+use Modules\Enrollment\Public\RegistrationPolicyWriter;
 use Modules\Grading\Public\GradingRecords;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Notifications\Public\Contracts\Notifier;
@@ -18,6 +19,7 @@ final readonly class StandingReconciler
         private StandingRecords $standing,
         private GradingRecords $grading,
         private Notifier $notifier,
+        private RegistrationPolicyWriter $registrationPolicy,
     ) {}
 
     public function reconcile(int $studentId, ?string $causeType = null, ?int $causeId = null): ?StandingObservation
@@ -28,6 +30,7 @@ final readonly class StandingReconciler
                 return null;
             }
             $current = $this->standing->currentForStudent($studentId);
+            $this->registrationPolicy->recordStanding($studentId, $current->standing->value, $current->registrationCeilingCh);
             $latest = StandingObservation::query()->where('student_id', $studentId)->lockForUpdate()->latest('id')->first();
             if ($latest !== null && $latest->standing === $current->standing) {
                 return null;

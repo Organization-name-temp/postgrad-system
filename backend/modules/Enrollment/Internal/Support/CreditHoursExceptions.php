@@ -7,8 +7,8 @@ namespace Modules\Enrollment\Internal\Support;
  * Semester — the context the pure {@see CreditHoursValidator} reads to decide whether the
  * 6-CH floor is waived (spec §Rules engines, FR-REG-001).
  *
- * Both exceptions are completion rules computed by Academic Standing from the proposed
- * for-credit schedule. There is no ceiling exception and no advisor override.
+ * Both exceptions are completion rules computed from Enrollment-owned academic facts and
+ * Catalog's immutable Curriculum Version. There is no ceiling exception or advisor override.
  *
  * An immutable value object.
  */

@@ -24,5 +24,7 @@ Route::middleware(['auth:sanctum', 'can:termination.recommend'])->group(function
     Route::get('/termination-cases/department-head', [TerminationCaseController::class, 'departmentQueue'])->middleware('role:R06');
     Route::post('/termination-cases/{case}/department-review', [TerminationCaseController::class, 'departmentReview'])->whereNumber('case')->middleware('role:R06');
 });
-Route::post('/termination-cases/{case}/council-decision', [TerminationCaseController::class, 'councilDecision'])
-    ->whereNumber('case')->middleware(['auth:sanctum', 'can:termination.approve', 'role:R08']);
+Route::middleware(['auth:sanctum', 'can:termination.approve', 'role:R08'])->group(function () {
+    Route::get('/termination-cases/council', [TerminationCaseController::class, 'councilQueue']);
+    Route::post('/termination-cases/{case}/council-decision', [TerminationCaseController::class, 'councilDecision'])->whereNumber('case');
+});

@@ -217,7 +217,7 @@ final class ManualExemptionResponseExamples
     ];
 
     public const DEPARTMENT_HEAD_QUEUE = [
-        'data' => [[...self::APPROVED_DATA, 'student' => [
+        'data' => [[...self::PENDING_HEAD_DATA, 'student' => [
             'student_id' => 10,
             'university_id' => '2026-CSE-0001',
             'name' => 'Sara Student',

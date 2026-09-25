@@ -8,8 +8,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Modules\AcademicStanding\Public\GraduationProgress;
-use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CourseSummary;
@@ -37,6 +35,7 @@ use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\MintPlanEntry;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
 use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\Directory;
@@ -236,8 +235,7 @@ class RegistrationReviewController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         AuditLogger $auditLogger,
-        StandingRecords $standing,
-        GraduationProgress $graduationProgress,
+        RegistrationPolicy $registrationPolicy,
         RequiredRetakeValidator $requiredRetakes,
         CapacityOverrideWorkflow $capacityOverrides,
     ): JsonResponse {
@@ -298,11 +296,11 @@ class RegistrationReviewController
         // $cartLines is keyed by request-line id (for the mint plan below); the batch
         // validator wants a plain list.
         $validator = new CartValidator(CreditHoursValidator::fromConfig(
-            $standing->currentForStudent($student->studentId)->registrationCeilingCh,
+            $registrationPolicy->ceiling($student->studentId),
         ));
         $approvedCartLines = array_values($cartLines);
-        $violations = $validator->validate($approvedCartLines, $this->exceptionsFor($student, $semester, $approvedCartLines, $graduationProgress), $existing);
-        $ceiling = $standing->currentForStudent($student->studentId)->registrationCeilingCh ?? (int) config('enrollment.max_credit_hours');
+        $violations = $validator->validate($approvedCartLines, $this->exceptionsFor($student, $semester, $approvedCartLines, $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
         $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $approvedCartLines, $ceiling)];
 
         // Derive each approved line's status (Regular/Retake/Audit); a second retake blocks,

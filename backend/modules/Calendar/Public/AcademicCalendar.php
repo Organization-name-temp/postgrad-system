@@ -39,6 +39,9 @@ interface AcademicCalendar
      */
     public function findMany(array $ids): array;
 
+    /** Resolve the stable English Semester name stored on the Student anchor. */
+    public function findByNameEn(string $name): ?SemesterSummary;
+
     /**
      * The Semester whose registration window is open right now, or `null` when none
      * is — the front the student registration screen reads (user story 13). If more

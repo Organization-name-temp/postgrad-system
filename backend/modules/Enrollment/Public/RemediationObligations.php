@@ -12,4 +12,6 @@ interface RemediationObligations
     public function forStudent(int $studentId): array;
 
     public function releaseByExemption(int $studentId, int $courseId, int $decisionId): void;
+
+    public function markEvaluated(int $obligationId, string $expectedEffectiveDeadline): void;
 }

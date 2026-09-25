@@ -192,4 +192,10 @@ enum NotificationType: string
 
     /** An actionable termination Case opened, changed, or cleared. */
     case TerminationCaseChanged = 'academic_standing.termination_case_changed';
+
+    /** A pending academic request was closed by a final lifecycle decision. */
+    case AcademicRequestClosed = 'academic_request.closed';
+
+    /** A post-revocation remediation obligation changed opportunity or outcome. */
+    case RemediationChanged = 'remediation.changed';
 }

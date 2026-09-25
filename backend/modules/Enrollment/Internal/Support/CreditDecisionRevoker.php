@@ -30,6 +30,7 @@ final class CreditDecisionRevoker
         private readonly Notifier $notifier,
         private readonly AuditLogger $audit,
         private readonly RemediationObligations $remediation,
+        private readonly PreparatoryCompletionCheckpoint $preparatoryCheckpoint,
     ) {}
 
     public function transfer(TransferDecision $decision, int $actorUserId, string $reason): TransferDecision
@@ -91,7 +92,7 @@ final class CreditDecisionRevoker
                 'reason' => $reason,
                 'created_at' => now(),
             ]);
-            if ($type === CreditDecisionType::Exemption) {
+            if ($type === CreditDecisionType::Exemption && $this->preparatoryCheckpoint->hasPassed($student->enrollmentTerm)) {
                 $this->remediation->createFromRevocation((int) $revocation->getKey());
             }
             $payload = [

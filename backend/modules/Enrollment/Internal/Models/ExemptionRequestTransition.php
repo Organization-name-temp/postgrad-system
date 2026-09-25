@@ -37,7 +37,8 @@ class ExemptionRequestTransition extends Model
     /** @var list<string> */
     protected $fillable = [
         'exemption_request_id', 'from_status', 'to_status', 'action', 'actor_user_id',
-        'revision', 'evidence_snapshot', 'action_id', 'reason', 'created_at',
+        'revision', 'evidence_snapshot', 'action_id', 'reason', 'system_cause_type',
+        'system_cause_id', 'created_at',
     ];
 
     /** @return array<string, string> */
@@ -48,6 +49,7 @@ class ExemptionRequestTransition extends Model
             'from_status' => ExemptionRequestStatus::class,
             'to_status' => ExemptionRequestStatus::class,
             'actor_user_id' => 'integer',
+            'system_cause_id' => 'integer',
             'revision' => 'integer',
             'evidence_snapshot' => 'array',
             'created_at' => 'datetime',

@@ -172,12 +172,42 @@ export const AScopedStudentsCurrentAcademicStandingAndObservationHistoryResponse
 
 
 export const GetApiV1TerminationCasesMineResponse = zod.object({
-  "data": zod.string().nullish()
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "fingerprint": zod.string().optional(),
+  "state": zod.string().optional(),
+  "evidence": zod.object({
+  "df_grades": zod.array().optional()
+}).optional(),
+  "advisor_user_id": zod.string().nullish(),
+  "advisor_assessment": zod.string().nullish(),
+  "advisor_recommendation": zod.string().nullish(),
+  "department_head_user_id": zod.string().nullish(),
+  "department_head_reason": zod.string().nullish(),
+  "council_user_id": zod.string().nullish(),
+  "council_reason": zod.string().nullish()
+}).optional()
 })
 
 
 export const GetApiV1TerminationCasesAdvisorResponse = zod.object({
-  "data": zod.array().optional()
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "fingerprint": zod.string().optional(),
+  "state": zod.string().optional(),
+  "evidence": zod.object({
+  "df_grades": zod.array().optional()
+}).optional(),
+  "advisor_user_id": zod.string().nullish(),
+  "advisor_assessment": zod.string().nullish(),
+  "advisor_recommendation": zod.string().nullish(),
+  "department_head_user_id": zod.string().nullish(),
+  "department_head_reason": zod.string().nullish(),
+  "council_user_id": zod.string().nullish(),
+  "council_reason": zod.string().nullish()
+})).optional()
 })
 
 
@@ -211,7 +241,22 @@ export const PostApiV1TerminationCasesCaseIdAdvisorReviewResponse = zod.object({
 
 
 export const GetApiV1TerminationCasesDepartmentHeadResponse = zod.object({
-  "data": zod.array().optional()
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "fingerprint": zod.string().optional(),
+  "state": zod.string().optional(),
+  "evidence": zod.object({
+  "df_grades": zod.array().optional()
+}).optional(),
+  "advisor_user_id": zod.number().optional(),
+  "advisor_assessment": zod.string().optional(),
+  "advisor_recommendation": zod.string().optional(),
+  "department_head_user_id": zod.string().nullish(),
+  "department_head_reason": zod.string().nullish(),
+  "council_user_id": zod.string().nullish(),
+  "council_reason": zod.string().nullish()
+})).optional()
 })
 
 
@@ -241,6 +286,26 @@ export const PostApiV1TerminationCasesCaseIdDepartmentReviewResponse = zod.objec
   "council_user_id": zod.string().nullish(),
   "council_reason": zod.string().nullish()
 }).optional()
+})
+
+
+export const GetApiV1TerminationCasesCouncilResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "fingerprint": zod.string().optional(),
+  "state": zod.string().optional(),
+  "evidence": zod.object({
+  "df_grades": zod.array().optional()
+}).optional(),
+  "advisor_user_id": zod.number().optional(),
+  "advisor_assessment": zod.string().optional(),
+  "advisor_recommendation": zod.string().optional(),
+  "department_head_user_id": zod.number().optional(),
+  "department_head_reason": zod.string().optional(),
+  "council_user_id": zod.string().nullish(),
+  "council_reason": zod.string().nullish()
+})).optional()
 })
 
 
@@ -3808,7 +3873,15 @@ export const MyRegistrationCardResponse = zod.object({
 
 
 export const GetApiV1RegistrationCapacityOverridesResponse = zod.object({
-  "data": zod.array().optional()
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "registration_request_id": zod.number().optional(),
+  "course_offering_id": zod.number().optional(),
+  "course_id": zod.number().optional(),
+  "department_id": zod.number().optional(),
+  "state": zod.string().optional(),
+  "reason": zod.string().nullish()
+})).optional()
 })
 
 
@@ -5640,21 +5713,8 @@ export const DepartmentHeadManualExemptionQueueResponse = zod.object({
   "current_revision": zod.boolean().optional(),
   "created_at": zod.string().optional()
 })).optional(),
-  "decision": zod.object({
-  "id": zod.number().optional(),
-  "student_id": zod.number().optional(),
-  "curriculum_version_id": zod.number().optional(),
-  "target_course_id": zod.number().optional(),
-  "target_course_code": zod.string().optional(),
-  "preparatory_requirement_role": zod.string().optional(),
-  "credit_hours": zod.number().optional(),
-  "source": zod.string().optional(),
-  "reason_codes": zod.array(zod.string()).optional(),
-  "admission_application_id": zod.number().nullish(),
-  "manual_request_id": zod.number().optional(),
-  "approved_at": zod.string().optional(),
-  "effective": zod.boolean().optional(),
-  "revocation": zod.string().nullish()
+  "decision": zod.looseObject({
+
 }).nullish().describe('The immutable effective decision when the request was approved.'),
   "student": zod.object({
   "student_id": zod.number().optional(),

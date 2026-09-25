@@ -18,6 +18,7 @@ use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\BoundCurriculumEntrySummary;
 use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Catalog\Public\CurriculumEntrySummary;
+use Modules\Catalog\Public\CurriculumRequirementsSummary;
 use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 use Modules\Catalog\Public\ProgramCatalog;
@@ -211,6 +212,11 @@ it('keeps acceptance committed when post-commit exemption evaluation fails and r
     app()->instance(CurriculumCatalog::class, new class($realCurricula) implements CurriculumCatalog
     {
         public function __construct(private readonly CurriculumCatalog $real) {}
+
+        public function requirementsForVersion(int $curriculumVersionId): ?CurriculumRequirementsSummary
+        {
+            return $this->real->requirementsForVersion($curriculumVersionId);
+        }
 
         /** @return array<int, CurriculumEntrySummary> */
         public function entriesForProgram(int $programId): array

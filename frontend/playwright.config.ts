@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const apiPort = process.env.PLAYWRIGHT_API_PORT ?? '18000'
+const apiUrl = `http://127.0.0.1:${apiPort}`
+
 // The headline smoke needs the whole stack, so Playwright boots BOTH servers:
-// Laravel (8000) and Vite (5173). The SPA reaches the API through the Vite
+// Laravel (an isolated test port) and Vite (5173). The SPA reaches the API through the Vite
 // proxy, exactly as in real dev. It exercises auth, the catalog browse tree and
 // Course detail, so it needs Postgres up (`docker compose up`) and the dev DB
 // migrated + seeded (`php artisan migrate --seed`) so the CatalogSeeder data exists.
@@ -43,14 +46,14 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
-      command: 'php artisan serve --host=127.0.0.1 --port=8000',
+      command: `php artisan serve --host=127.0.0.1 --port=${apiPort}`,
       cwd: '../backend',
-      url: 'http://127.0.0.1:8000/up',
+      url: `${apiUrl}/up`,
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,
     },
     {
-      command: 'npm run dev',
+      command: `VITE_API_TARGET=${apiUrl} npm run dev`,
       url: 'http://localhost:5173',
       reuseExistingServer: !process.env.CI,
       timeout: 60_000,

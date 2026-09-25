@@ -31,7 +31,7 @@ import {
   useRevokeAnExemptionDecision,
   useScopedDepartmentHeadFinalAction,
 } from '../../../shared/api/generated/endpoints'
-import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { downloadBlob } from '../../../shared/downloadBlob'
 import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { ExemptionEvidenceSummary } from './ExemptionEvidenceSummary'
 import { ExemptionStatusChip } from './ExemptionStatusChip'

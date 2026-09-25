@@ -147,9 +147,7 @@ class AutomaticExemptionApplicator
             }
 
             $receipt->forceFill(['reconciled_at' => now()])->save();
-            if ($created > 0) {
-                DB::afterCommit(fn () => Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'automatic_exemption_reconciliation', (int) $receipt->getKey())));
-            }
+            DB::afterCommit(fn () => Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'automatic_exemption_reconciliation', (int) $receipt->getKey())));
 
             return $created;
         });

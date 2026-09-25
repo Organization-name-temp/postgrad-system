@@ -34,7 +34,7 @@ import {
   useScopedDepartmentHeadVerification,
   useRevokeAWaiverDecision,
 } from '../../../shared/api/generated/endpoints'
-import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { downloadBlob } from '../../../shared/downloadBlob'
 import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import { headVerificationSchema, waiverReviewSchema, type WaiverReviewValues } from './formSchema'

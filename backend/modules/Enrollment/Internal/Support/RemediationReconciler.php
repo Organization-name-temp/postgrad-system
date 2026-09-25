@@ -8,6 +8,7 @@ use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Enums\RemediationState;
+use Modules\Enrollment\Internal\Models\CapacityOverrideRequirement;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\Enrollment;
@@ -163,10 +164,18 @@ final readonly class RemediationReconciler implements RemediationObligations
             \DB::table('registration_request_transitions')->insertOrIgnore(['registration_request_id' => $request->id, 'from_status' => $from, 'to_status' => RegistrationStatus::Rejected->value, 'action' => 'system_remediation_released', 'system_cause_type' => 'exemption_decision', 'system_cause_id' => $decisionId, 'created_at' => now()]);
             $student = $this->students->findByStudentId($studentId);
             if ($student !== null) {
-                $course = $this->courses->find($courseId);
-                $reviewers = $from === RegistrationStatus::AwaitingCapacityOverride->value && $course !== null
-                    ? $this->heads->headsForDepartment($course->departmentId)
-                    : [];
+                $reviewers = [];
+                if ($from === RegistrationStatus::AwaitingCapacityOverride->value) {
+                    $departmentIds = CapacityOverrideRequirement::query()
+                        ->where('registration_request_id', $request->id)
+                        ->where('state', 'Pending')
+                        ->whereNotNull('department_id')
+                        ->distinct()
+                        ->pluck('department_id');
+                    foreach ($departmentIds as $departmentId) {
+                        $reviewers = [...$reviewers, ...$this->heads->headsForDepartment((int) $departmentId)];
+                    }
+                }
                 foreach (array_unique([$student->userId, $student->advisorId, ...$reviewers]) as $recipient) {
                     $this->notifier->notifyOnce($recipient, NotificationType::AcademicRequestClosed, "remediation-release:{$decisionId}:registration:{$request->id}:{$recipient}", ['request_type' => 'registration', 'request_id' => $request->id, 'exemption_decision_id' => $decisionId]);
                 }

@@ -127,6 +127,10 @@ it('accepts an applicant and mints a Student', function () {
         ->and($studentSummary?->admissionEvidence?->admittedProgramDegreeLevel)->toBe(DegreeLevel::MSc->value)
         ->and($studentSummary?->admissionEvidence?->admittedDepartmentId)->toBe((int) $program->department_id);
     expect($directory->findByUniversityId($universityId)?->userId)->toBe((int) $applicant->id);
+    $this->assertDatabaseHas('registration_policy_projections', [
+        'student_id' => $studentSummary?->studentId,
+        'standing' => 'NotYetAssessed',
+    ]);
 
     // The role was replaced, not merely added: R01 gone, R02 held.
     expect($applicant->fresh()->hasRole(Role::Student))->toBeTrue();

@@ -571,7 +571,7 @@ paths:
       parameters: []
       responses:
         200:
-          description: ''
+          description: 'case history exists'
           content:
             application/json:
               schema:
@@ -616,7 +616,7 @@ paths:
                             type: array
                             example: []
                       advisor_user_id:
-                        type: string
+                        type: integer
                         example: null
                         nullable: true
                       advisor_assessment:
@@ -628,7 +628,7 @@ paths:
                         example: null
                         nullable: true
                       department_head_user_id:
-                        type: string
+                        type: integer
                         example: null
                         nullable: true
                       department_head_reason:
@@ -636,7 +636,7 @@ paths:
                         example: null
                         nullable: true
                       council_user_id:
-                        type: string
+                        type: integer
                         example: null
                         nullable: true
                       council_reason:
@@ -651,6 +651,14 @@ paths:
                         type: string
                         example: null
                         nullable: true
+                    required:
+                      - advisor_user_id
+                      - department_head_user_id
+                      - council_user_id
+                    description: 'The latest preserved case, or null when the Student has no case.'
+                    nullable: true
+                required:
+                  - data
       tags:
         - 'Academic Standing'
       security: []
@@ -782,7 +790,7 @@ paths:
                               type: array
                               example: []
                         advisor_user_id:
-                          type: string
+                          type: integer
                           example: null
                           nullable: true
                         advisor_assessment:
@@ -794,7 +802,7 @@ paths:
                           example: null
                           nullable: true
                         department_head_user_id:
-                          type: string
+                          type: integer
                           example: null
                           nullable: true
                         department_head_reason:
@@ -802,7 +810,7 @@ paths:
                           example: null
                           nullable: true
                         council_user_id:
-                          type: string
+                          type: integer
                           example: null
                           nullable: true
                         council_reason:
@@ -817,6 +825,10 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                      required:
+                        - advisor_user_id
+                        - department_head_user_id
+                        - council_user_id
                   meta:
                     type: object
                     properties:
@@ -937,6 +949,7 @@ paths:
                       advisor_user_id:
                         type: integer
                         example: 3
+                        nullable: true
                       advisor_assessment:
                         type: string
                         example: 'Two failures.'
@@ -944,7 +957,7 @@ paths:
                         type: string
                         example: continue
                       department_head_user_id:
-                        type: string
+                        type: integer
                         example: null
                         nullable: true
                       department_head_reason:
@@ -952,7 +965,7 @@ paths:
                         example: null
                         nullable: true
                       council_user_id:
-                        type: string
+                        type: integer
                         example: null
                         nullable: true
                       council_reason:
@@ -967,6 +980,10 @@ paths:
                         type: string
                         example: null
                         nullable: true
+                    required:
+                      - advisor_user_id
+                      - department_head_user_id
+                      - council_user_id
       tags:
         - 'Academic Standing'
       requestBody:
@@ -1127,6 +1144,7 @@ paths:
                         advisor_user_id:
                           type: integer
                           example: 3
+                          nullable: true
                         advisor_assessment:
                           type: string
                           example: 'Two failures.'
@@ -1134,7 +1152,7 @@ paths:
                           type: string
                           example: continue
                         department_head_user_id:
-                          type: string
+                          type: integer
                           example: null
                           nullable: true
                         department_head_reason:
@@ -1142,7 +1160,7 @@ paths:
                           example: null
                           nullable: true
                         council_user_id:
-                          type: string
+                          type: integer
                           example: null
                           nullable: true
                         council_reason:
@@ -1157,6 +1175,10 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                      required:
+                        - advisor_user_id
+                        - department_head_user_id
+                        - council_user_id
                   meta:
                     type: object
                     properties:
@@ -1277,6 +1299,7 @@ paths:
                       advisor_user_id:
                         type: integer
                         example: 3
+                        nullable: true
                       advisor_assessment:
                         type: string
                         example: 'Two failures.'
@@ -1286,11 +1309,12 @@ paths:
                       department_head_user_id:
                         type: integer
                         example: 6
+                        nullable: true
                       department_head_reason:
                         type: string
                         example: Actionable.
                       council_user_id:
-                        type: string
+                        type: integer
                         example: null
                         nullable: true
                       council_reason:
@@ -1305,6 +1329,10 @@ paths:
                         type: string
                         example: null
                         nullable: true
+                    required:
+                      - advisor_user_id
+                      - department_head_user_id
+                      - council_user_id
       tags:
         - 'Academic Standing'
       requestBody:
@@ -1475,6 +1503,7 @@ paths:
                         advisor_user_id:
                           type: integer
                           example: 3
+                          nullable: true
                         advisor_assessment:
                           type: string
                           example: 'Two failures.'
@@ -1484,11 +1513,12 @@ paths:
                         department_head_user_id:
                           type: integer
                           example: 6
+                          nullable: true
                         department_head_reason:
                           type: string
                           example: Actionable.
                         council_user_id:
-                          type: string
+                          type: integer
                           example: null
                           nullable: true
                         council_reason:
@@ -1503,6 +1533,10 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                      required:
+                        - advisor_user_id
+                        - department_head_user_id
+                        - council_user_id
                   meta:
                     type: object
                     properties:
@@ -1623,6 +1657,7 @@ paths:
                       advisor_user_id:
                         type: integer
                         example: 3
+                        nullable: true
                       advisor_assessment:
                         type: string
                         example: 'Two failures.'
@@ -1632,12 +1667,14 @@ paths:
                       department_head_user_id:
                         type: integer
                         example: 6
+                        nullable: true
                       department_head_reason:
                         type: string
                         example: Actionable.
                       council_user_id:
                         type: integer
                         example: 8
+                        nullable: true
                       council_reason:
                         type: string
                         example: Confirmed.
@@ -1647,6 +1684,10 @@ paths:
                       closed_at:
                         type: string
                         example: '2026-09-25T12:00:00+00:00'
+                    required:
+                      - advisor_user_id
+                      - department_head_user_id
+                      - council_user_id
       tags:
         - 'Academic Standing'
       requestBody:

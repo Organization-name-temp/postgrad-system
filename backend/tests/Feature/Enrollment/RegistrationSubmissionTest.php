@@ -197,13 +197,25 @@ it('rejects a cart below the credit-hour floor', function () {
     expect(RegistrationRequest::query()->count())->toBe(0);
 });
 
-it('waives the credit-hour floor in the student\'s first semester', function () {
+it('waives the first-semester floor only when the canonical basis says the cart completes Preparatory targets', function () {
     $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
     $semester = openSemester(Term::Fall, 2026);
-    // enrollment term matches the open semester → first-semester waiver applies.
-    cartStudent($program, enrollmentTerm: 'Fall 2026');
+    $student = cartStudent($program, enrollmentTerm: 'Fall 2026');
 
-    $a = offeredCore($program, $semester, totalCh: 3);
+    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    placeIn($program, $course, CourseCategory::Preparatory);
+    $a = offerWith($semester, $course);
+    DB::table('registration_policy_projections')->insert([
+        'student_id' => $student->id,
+        'standing' => 'NotYetAssessed',
+        'registration_ceiling_ch' => null,
+        'remaining_preparatory_targets' => json_encode([$course->id], JSON_THROW_ON_ERROR),
+        'remaining_exact_targets' => json_encode([$course->id], JSON_THROW_ON_ERROR),
+        'remaining_elective_ch' => 0,
+        'total_remaining_ch' => 3,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
 
     submitCart([cartItem($a)])->assertCreated();
 
@@ -350,7 +362,7 @@ it('lets a student register a different external elective after failing the firs
     $failedOffering = offerWith($previous, $failedCourse);
     submittedEnrollment($student, $failedOffering, classification: 'ExternalElective', earned: false);
 
-    $replacement = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    $replacement = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 6]);
     placeIn($otherB, $replacement, CourseCategory::ResearchElective);
     $replacementOffering = offerWith($current, $replacement, meetings: [[Weekday::Tuesday, '09:00', '11:00']]);
 
@@ -368,7 +380,7 @@ it('does not block registration just because a failed core course now carries a 
     $failedOffering = offerWith($previous, $failedCore);
     submittedEnrollment($student, $failedOffering, classification: 'Core', earned: false);
 
-    $newCourse = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    $newCourse = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 6]);
     placeIn($program, $newCourse, CourseCategory::ProgramCore);
     $newOffering = offerWith($current, $newCourse, meetings: [[Weekday::Tuesday, '09:00', '11:00']]);
 

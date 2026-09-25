@@ -43,7 +43,7 @@ import {
   useSubmitOrResubmitAnExemptionRequest,
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
-import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { downloadBlob } from '../../../shared/downloadBlob'
 import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { ExemptionEvidenceSummary } from './ExemptionEvidenceSummary'
 import { ExemptionStatusChip } from './ExemptionStatusChip'

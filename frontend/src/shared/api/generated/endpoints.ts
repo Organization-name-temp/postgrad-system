@@ -175,6 +175,10 @@ export type GetApiV1TerminationCasesMine200DataEvidence = {
   df_grades?: unknown[];
 };
 
+/**
+ * The latest preserved case, or null when the Student has no case.
+ * @nullable
+ */
 export type GetApiV1TerminationCasesMine200Data = {
   id?: number;
   student_id?: number;
@@ -182,27 +186,31 @@ export type GetApiV1TerminationCasesMine200Data = {
   state?: string;
   evidence?: GetApiV1TerminationCasesMine200DataEvidence;
   /** @nullable */
-  advisor_user_id?: string | null;
+  advisor_user_id: number | null;
   /** @nullable */
   advisor_assessment?: string | null;
   /** @nullable */
   advisor_recommendation?: string | null;
   /** @nullable */
-  department_head_user_id?: string | null;
+  department_head_user_id: number | null;
   /** @nullable */
   department_head_reason?: string | null;
   /** @nullable */
-  council_user_id?: string | null;
+  council_user_id: number | null;
   /** @nullable */
   council_reason?: string | null;
   /** @nullable */
   closed_reason?: string | null;
   /** @nullable */
   closed_at?: string | null;
-};
+} | null;
 
 export type GetApiV1TerminationCasesMine200 = {
-  data?: GetApiV1TerminationCasesMine200Data;
+  /**
+     * The latest preserved case, or null when the Student has no case.
+     * @nullable
+     */
+  data: GetApiV1TerminationCasesMine200Data;
 };
 
 export type GetApiV1TerminationCasesAdvisorParams = {
@@ -227,17 +235,17 @@ export type GetApiV1TerminationCasesAdvisor200DataItem = {
   state?: string;
   evidence?: GetApiV1TerminationCasesAdvisor200DataItemEvidence;
   /** @nullable */
-  advisor_user_id?: string | null;
+  advisor_user_id: number | null;
   /** @nullable */
   advisor_assessment?: string | null;
   /** @nullable */
   advisor_recommendation?: string | null;
   /** @nullable */
-  department_head_user_id?: string | null;
+  department_head_user_id: number | null;
   /** @nullable */
   department_head_reason?: string | null;
   /** @nullable */
-  council_user_id?: string | null;
+  council_user_id: number | null;
   /** @nullable */
   council_reason?: string | null;
   /** @nullable */
@@ -280,15 +288,16 @@ export type PostApiV1TerminationCasesCaseIdAdvisorReview200Data = {
   fingerprint?: string;
   state?: string;
   evidence?: PostApiV1TerminationCasesCaseIdAdvisorReview200DataEvidence;
-  advisor_user_id?: number;
+  /** @nullable */
+  advisor_user_id: number | null;
   advisor_assessment?: string;
   advisor_recommendation?: string;
   /** @nullable */
-  department_head_user_id?: string | null;
+  department_head_user_id: number | null;
   /** @nullable */
   department_head_reason?: string | null;
   /** @nullable */
-  council_user_id?: string | null;
+  council_user_id: number | null;
   /** @nullable */
   council_reason?: string | null;
   /** @nullable */
@@ -322,15 +331,16 @@ export type GetApiV1TerminationCasesDepartmentHead200DataItem = {
   fingerprint?: string;
   state?: string;
   evidence?: GetApiV1TerminationCasesDepartmentHead200DataItemEvidence;
-  advisor_user_id?: number;
+  /** @nullable */
+  advisor_user_id: number | null;
   advisor_assessment?: string;
   advisor_recommendation?: string;
   /** @nullable */
-  department_head_user_id?: string | null;
+  department_head_user_id: number | null;
   /** @nullable */
   department_head_reason?: string | null;
   /** @nullable */
-  council_user_id?: string | null;
+  council_user_id: number | null;
   /** @nullable */
   council_reason?: string | null;
   /** @nullable */
@@ -373,13 +383,15 @@ export type PostApiV1TerminationCasesCaseIdDepartmentReview200Data = {
   fingerprint?: string;
   state?: string;
   evidence?: PostApiV1TerminationCasesCaseIdDepartmentReview200DataEvidence;
-  advisor_user_id?: number;
+  /** @nullable */
+  advisor_user_id: number | null;
   advisor_assessment?: string;
   advisor_recommendation?: string;
-  department_head_user_id?: number;
+  /** @nullable */
+  department_head_user_id: number | null;
   department_head_reason?: string;
   /** @nullable */
-  council_user_id?: string | null;
+  council_user_id: number | null;
   /** @nullable */
   council_reason?: string | null;
   /** @nullable */
@@ -417,13 +429,15 @@ export type GetApiV1TerminationCasesCouncil200DataItem = {
   fingerprint?: string;
   state?: string;
   evidence?: GetApiV1TerminationCasesCouncil200DataItemEvidence;
-  advisor_user_id?: number;
+  /** @nullable */
+  advisor_user_id: number | null;
   advisor_assessment?: string;
   advisor_recommendation?: string;
-  department_head_user_id?: number;
+  /** @nullable */
+  department_head_user_id: number | null;
   department_head_reason?: string;
   /** @nullable */
-  council_user_id?: string | null;
+  council_user_id: number | null;
   /** @nullable */
   council_reason?: string | null;
   /** @nullable */
@@ -466,12 +480,15 @@ export type PostApiV1TerminationCasesCaseIdCouncilDecision200Data = {
   fingerprint?: string;
   state?: string;
   evidence?: PostApiV1TerminationCasesCaseIdCouncilDecision200DataEvidence;
-  advisor_user_id?: number;
+  /** @nullable */
+  advisor_user_id: number | null;
   advisor_assessment?: string;
   advisor_recommendation?: string;
-  department_head_user_id?: number;
+  /** @nullable */
+  department_head_user_id: number | null;
   department_head_reason?: string;
-  council_user_id?: number;
+  /** @nullable */
+  council_user_id: number | null;
   council_reason?: string;
   closed_reason?: string;
   closed_at?: string;

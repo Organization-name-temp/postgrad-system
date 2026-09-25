@@ -282,11 +282,10 @@ it('blocks a free drop that would take the load below the credit-hour floor', fu
     $this->assertDatabaseHas('enrollments', ['id' => $drop->id]);
 });
 
-it('allows a below-floor free drop for a legacy unbound student in the first semester', function () {
+it('fails closed on a below-floor free drop when the canonical underload basis is unavailable', function () {
     $this->travelTo(Carbon::parse(CHG_ADD_DROP));
 
     $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
-    // Legacy records without a bound Curriculum retain the old first-semester behavior.
     $student = chgStudentIn($program, chgAdvisor(), enrollmentTerm: 'Fall 2026');
     $semester = chgSemester();
     chgApprovedInitial($student, $semester);
@@ -294,8 +293,10 @@ it('allows a below-floor free drop for a legacy unbound student in the first sem
     $drop = chgEnroll($student, chgCore($program, $semester, Weekday::Monday));
     chgEnroll($student, chgCore($program, $semester, Weekday::Tuesday));
 
-    test()->deleteJson("/api/v1/registration/enrollments/{$drop->id}")->assertNoContent();
-    $this->assertDatabaseMissing('enrollments', ['id' => $drop->id]);
+    test()->deleteJson("/api/v1/registration/enrollments/{$drop->id}")
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['below_min_credit_hours']);
+    $this->assertDatabaseHas('enrollments', ['id' => $drop->id]);
 });
 
 it('refuses a free drop outside the add/drop window', function () {

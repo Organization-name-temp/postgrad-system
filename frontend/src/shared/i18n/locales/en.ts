@@ -1865,6 +1865,9 @@ export const en = {
   academicStanding: {
     termination: {
       title: 'Termination case',
+      loading: 'Loading termination case',
+      loadError: 'Could not load the termination case.',
+      empty: 'No termination case is recorded.',
       explanation:
         'The evidence and every attributed review remain available while the responsible role considers the case.',
       history: {
@@ -1917,6 +1920,9 @@ export const en = {
     },
     remediation: {
       title: 'Remediation obligations',
+      loading: 'Loading remediation obligations',
+      loadError: 'Could not load remediation obligations.',
+      empty: 'No remediation obligations are recorded.',
       intro:
         'These obligations come from revoked Preparatory exemptions and remain distinct from ordinary retakes.',
       item: 'Course #{{course}} — {{state}} — deadline: {{deadline}}',
@@ -1931,6 +1937,8 @@ export const en = {
     },
     readiness: {
       title: 'Graduation Readiness',
+      loading: 'Loading graduation readiness',
+      loadError: 'Could not load graduation readiness.',
       ready: 'Academically ready',
       notReady: 'Not yet academically ready',
       remaining: '{{count}} credit hours remaining',
@@ -1946,6 +1954,7 @@ export const en = {
     },
     standing: {
       title: 'Current Academic Standing',
+      loading: 'Loading Academic Standing',
       cardTitle: 'Academic Standing',
       values: {
         TerminationPending: 'Termination Pending',
@@ -1971,6 +1980,7 @@ export const en = {
         'Progress against your admission-bound Curriculum. Raw academic facts remain visible; Satisfied credit is target-aware and capped at each adjusted requirement.',
       loading: 'Loading credit-hour summary',
       loadError: 'Could not load your credit-hour summary.',
+      retry: 'Retry',
       category: 'Category',
       categories: {
         Preparatory: 'Preparatory',

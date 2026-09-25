@@ -48,7 +48,7 @@ import {
   type MyWaiverTranscriptEvidence200DataItem,
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
-import { downloadBlob } from '../credit-decisions/downloadBlob'
+import { downloadBlob } from '../../../shared/downloadBlob'
 import { CreditDecisionEffect } from '../credit-decisions/CreditDecisionEffect'
 import { useRetryStableActionId } from '../credit-decisions/useRetryStableActionId'
 import { waiverDraftSchema, type WaiverDraftValues } from './formSchema'

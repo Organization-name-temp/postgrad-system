@@ -1,6 +1,7 @@
 import {
   Alert,
   Box,
+  Button,
   Skeleton,
   Paper,
   Chip,
@@ -39,7 +40,7 @@ type SummaryRow = { category?: string } & Partial<Record<(typeof metrics)[number
 
 export function CreditHourSummaryPage() {
   const { t } = useTranslation('academicStanding')
-  const { data, isPending, isError } = useMyTargetAwareCreditHourSummary()
+  const { data, isPending, isError, refetch } = useMyTargetAwareCreditHourSummary()
   const standingQuery = useMyCurrentAcademicStandingAndObservationHistory()
   const readinessQuery = useMyDerivedGraduationReadiness()
   const terminationQuery = useGetApiV1TerminationCasesMine()
@@ -58,6 +59,25 @@ export function CreditHourSummaryPage() {
       <Typography color="text.secondary" sx={{ mb: 3 }}>
         {t('creditHours.intro')}
       </Typography>
+      {standingQuery.isPending && (
+        <Skeleton
+          variant="rounded"
+          height={120}
+          aria-label={t('standing.loading')}
+          sx={{ mb: 3 }}
+        />
+      )}
+      {standingQuery.isError && (
+        <Alert
+          severity="error"
+          action={
+            <Button onClick={() => void standingQuery.refetch()}>{t('creditHours.retry')}</Button>
+          }
+          sx={{ mb: 3 }}
+        >
+          {t('standing.loadError')}
+        </Alert>
+      )}
       {!standingQuery.isPending && !standingQuery.isError && standingQuery.data?.data && (
         <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
           <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
@@ -79,6 +99,25 @@ export function CreditHourSummaryPage() {
             )}
           </Stack>
         </Paper>
+      )}
+      {readinessQuery.isPending && (
+        <Skeleton
+          variant="rounded"
+          height={160}
+          aria-label={t('readiness.loading')}
+          sx={{ mb: 3 }}
+        />
+      )}
+      {readinessQuery.isError && (
+        <Alert
+          severity="error"
+          action={
+            <Button onClick={() => void readinessQuery.refetch()}>{t('creditHours.retry')}</Button>
+          }
+          sx={{ mb: 3 }}
+        >
+          {t('readiness.loadError')}
+        </Alert>
       )}
       {!readinessQuery.isPending && !readinessQuery.isError && readinessQuery.data?.data && (
         <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
@@ -106,6 +145,32 @@ export function CreditHourSummaryPage() {
             <Typography color="text.secondary">{t('readiness.completingSchedule')}</Typography>
           </Stack>
         </Paper>
+      )}
+      {terminationQuery.isPending && (
+        <Skeleton
+          variant="rounded"
+          height={110}
+          aria-label={t('termination.loading')}
+          sx={{ mb: 3 }}
+        />
+      )}
+      {terminationQuery.isError && (
+        <Alert
+          severity="error"
+          action={
+            <Button onClick={() => void terminationQuery.refetch()}>
+              {t('creditHours.retry')}
+            </Button>
+          }
+          sx={{ mb: 3 }}
+        >
+          {t('termination.loadError')}
+        </Alert>
+      )}
+      {!terminationQuery.isPending && !terminationQuery.isError && !terminationCase && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          {t('termination.empty')}
+        </Alert>
       )}
       {terminationCase && (
         <Alert
@@ -142,6 +207,34 @@ export function CreditHourSummaryPage() {
           )}
         </Alert>
       )}
+      {remediationQuery.isPending && (
+        <Skeleton
+          variant="rounded"
+          height={110}
+          aria-label={t('remediation.loading')}
+          sx={{ mb: 3 }}
+        />
+      )}
+      {remediationQuery.isError && (
+        <Alert
+          severity="error"
+          action={
+            <Button onClick={() => void remediationQuery.refetch()}>
+              {t('creditHours.retry')}
+            </Button>
+          }
+          sx={{ mb: 3 }}
+        >
+          {t('remediation.loadError')}
+        </Alert>
+      )}
+      {!remediationQuery.isPending &&
+        !remediationQuery.isError &&
+        (remediationQuery.data?.data?.length ?? 0) === 0 && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            {t('remediation.empty')}
+          </Alert>
+        )}
       {!remediationQuery.isPending &&
         !remediationQuery.isError &&
         (remediationQuery.data?.data?.length ?? 0) > 0 && (
@@ -180,7 +273,14 @@ export function CreditHourSummaryPage() {
           <Skeleton variant="rounded" height={44} />
         </Stack>
       )}
-      {isError && <Alert severity="error">{t('creditHours.loadError')}</Alert>}
+      {isError && (
+        <Alert
+          severity="error"
+          action={<Button onClick={() => void refetch()}>{t('creditHours.retry')}</Button>}
+        >
+          {t('creditHours.loadError')}
+        </Alert>
+      )}
       {!isPending && !isError && (
         <TableContainer component={Paper} variant="outlined">
           <Table size="small">

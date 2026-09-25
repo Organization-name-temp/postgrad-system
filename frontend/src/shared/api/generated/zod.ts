@@ -180,16 +180,16 @@ export const GetApiV1TerminationCasesMineResponse = zod.object({
   "evidence": zod.object({
   "df_grades": zod.array().optional()
 }).optional(),
-  "advisor_user_id": zod.string().nullish(),
+  "advisor_user_id": zod.number().nullable(),
   "advisor_assessment": zod.string().nullish(),
   "advisor_recommendation": zod.string().nullish(),
-  "department_head_user_id": zod.string().nullish(),
+  "department_head_user_id": zod.number().nullable(),
   "department_head_reason": zod.string().nullish(),
-  "council_user_id": zod.string().nullish(),
+  "council_user_id": zod.number().nullable(),
   "council_reason": zod.string().nullish(),
   "closed_reason": zod.string().nullish(),
   "closed_at": zod.string().nullish()
-}).optional()
+}).nullable().describe('The latest preserved case, or null when the Student has no case.')
 })
 
 
@@ -210,12 +210,12 @@ export const GetApiV1TerminationCasesAdvisorResponse = zod.object({
   "evidence": zod.object({
   "df_grades": zod.array().optional()
 }).optional(),
-  "advisor_user_id": zod.string().nullish(),
+  "advisor_user_id": zod.number().nullable(),
   "advisor_assessment": zod.string().nullish(),
   "advisor_recommendation": zod.string().nullish(),
-  "department_head_user_id": zod.string().nullish(),
+  "department_head_user_id": zod.number().nullable(),
   "department_head_reason": zod.string().nullish(),
-  "council_user_id": zod.string().nullish(),
+  "council_user_id": zod.number().nullable(),
   "council_reason": zod.string().nullish(),
   "closed_reason": zod.string().nullish(),
   "closed_at": zod.string().nullish()
@@ -256,12 +256,12 @@ export const PostApiV1TerminationCasesCaseIdAdvisorReviewResponse = zod.object({
   "evidence": zod.object({
   "df_grades": zod.array().optional()
 }).optional(),
-  "advisor_user_id": zod.number().optional(),
+  "advisor_user_id": zod.number().nullable(),
   "advisor_assessment": zod.string().optional(),
   "advisor_recommendation": zod.string().optional(),
-  "department_head_user_id": zod.string().nullish(),
+  "department_head_user_id": zod.number().nullable(),
   "department_head_reason": zod.string().nullish(),
-  "council_user_id": zod.string().nullish(),
+  "council_user_id": zod.number().nullable(),
   "council_reason": zod.string().nullish(),
   "closed_reason": zod.string().nullish(),
   "closed_at": zod.string().nullish()
@@ -286,12 +286,12 @@ export const GetApiV1TerminationCasesDepartmentHeadResponse = zod.object({
   "evidence": zod.object({
   "df_grades": zod.array().optional()
 }).optional(),
-  "advisor_user_id": zod.number().optional(),
+  "advisor_user_id": zod.number().nullable(),
   "advisor_assessment": zod.string().optional(),
   "advisor_recommendation": zod.string().optional(),
-  "department_head_user_id": zod.string().nullish(),
+  "department_head_user_id": zod.number().nullable(),
   "department_head_reason": zod.string().nullish(),
-  "council_user_id": zod.string().nullish(),
+  "council_user_id": zod.number().nullable(),
   "council_reason": zod.string().nullish(),
   "closed_reason": zod.string().nullish(),
   "closed_at": zod.string().nullish()
@@ -332,12 +332,12 @@ export const PostApiV1TerminationCasesCaseIdDepartmentReviewResponse = zod.objec
   "evidence": zod.object({
   "df_grades": zod.array().optional()
 }).optional(),
-  "advisor_user_id": zod.number().optional(),
+  "advisor_user_id": zod.number().nullable(),
   "advisor_assessment": zod.string().optional(),
   "advisor_recommendation": zod.string().optional(),
-  "department_head_user_id": zod.number().optional(),
+  "department_head_user_id": zod.number().nullable(),
   "department_head_reason": zod.string().optional(),
-  "council_user_id": zod.string().nullish(),
+  "council_user_id": zod.number().nullable(),
   "council_reason": zod.string().nullish(),
   "closed_reason": zod.string().nullish(),
   "closed_at": zod.string().nullish()
@@ -363,12 +363,12 @@ export const GetApiV1TerminationCasesCouncilResponse = zod.object({
   "evidence": zod.object({
   "df_grades": zod.array().optional()
 }).optional(),
-  "advisor_user_id": zod.number().optional(),
+  "advisor_user_id": zod.number().nullable(),
   "advisor_assessment": zod.string().optional(),
   "advisor_recommendation": zod.string().optional(),
-  "department_head_user_id": zod.number().optional(),
+  "department_head_user_id": zod.number().nullable(),
   "department_head_reason": zod.string().optional(),
-  "council_user_id": zod.string().nullish(),
+  "council_user_id": zod.number().nullable(),
   "council_reason": zod.string().nullish(),
   "closed_reason": zod.string().nullish(),
   "closed_at": zod.string().nullish()
@@ -409,12 +409,12 @@ export const PostApiV1TerminationCasesCaseIdCouncilDecisionResponse = zod.object
   "evidence": zod.object({
   "df_grades": zod.array().optional()
 }).optional(),
-  "advisor_user_id": zod.number().optional(),
+  "advisor_user_id": zod.number().nullable(),
   "advisor_assessment": zod.string().optional(),
   "advisor_recommendation": zod.string().optional(),
-  "department_head_user_id": zod.number().optional(),
+  "department_head_user_id": zod.number().nullable(),
   "department_head_reason": zod.string().optional(),
-  "council_user_id": zod.number().optional(),
+  "council_user_id": zod.number().nullable(),
   "council_reason": zod.string().optional(),
   "closed_reason": zod.string().optional(),
   "closed_at": zod.string().optional()

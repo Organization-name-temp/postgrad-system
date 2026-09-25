@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Knuckles\Scribe\Attributes\ResponseField;
 use Modules\AcademicStanding\Internal\Models\TerminationCase;
 use Modules\AcademicStanding\Internal\Support\StandingReconciler;
 use Modules\AcademicStanding\Public\TerminationCases;
@@ -27,7 +28,13 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /** @group Academic Standing */
 final class TerminationCaseController
 {
-    /** @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingAdvisor","evidence":{"df_grades":[]},"advisor_user_id":null,"advisor_assessment":null,"advisor_recommendation":null,"department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}} */
+    /**
+     * @response 200 scenario="case history exists" {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingAdvisor","evidence":{"df_grades":[]},"advisor_user_id":null,"advisor_assessment":null,"advisor_recommendation":null,"department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}}
+     */
+    #[ResponseField('data', 'object', 'The latest preserved case, or null when the Student has no case.', nullable: true)]
+    #[ResponseField('data.advisor_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.department_head_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.council_user_id', 'integer', nullable: true)]
     public function mine(Request $request, StudentDirectory $students, TerminationCases $cases): JsonResponse
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
@@ -45,6 +52,9 @@ final class TerminationCaseController
      *
      * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingAdvisor","evidence":{"df_grades":[]},"advisor_user_id":null,"advisor_assessment":null,"advisor_recommendation":null,"department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
      */
+    #[ResponseField('data.advisor_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.department_head_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.council_user_id', 'integer', nullable: true)]
     public function advisorQueue(Request $request, StudentDirectory $students): JsonResponse
     {
         $ids = $students->studentIdsAdvisedBy((int) $request->user()?->getAuthIdentifier());
@@ -73,6 +83,9 @@ final class TerminationCaseController
      *
      * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingDepartmentHead","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
      */
+    #[ResponseField('data.advisor_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.department_head_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.council_user_id', 'integer', nullable: true)]
     public function departmentQueue(Request $request, StudentDirectory $students, ProgramCatalog $programs, DepartmentHeadAssignments $heads): JsonResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();
@@ -106,6 +119,9 @@ final class TerminationCaseController
      *
      * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingCouncil","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
      */
+    #[ResponseField('data.advisor_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.department_head_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.council_user_id', 'integer', nullable: true)]
     public function councilQueue(Request $request): JsonResponse
     {
         $states = $request->boolean('include_decided') ? ['AwaitingCouncil', 'Dismissed', 'Terminated', 'TriggerCleared', 'EvidenceChanged'] : ['AwaitingCouncil'];
@@ -131,6 +147,9 @@ final class TerminationCaseController
      *
      * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingDepartmentHead","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}}
      */
+    #[ResponseField('data.advisor_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.department_head_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.council_user_id', 'integer', nullable: true)]
     public function advisorReview(Request $request, TerminationCase $case, StudentGuard $guard, TerminationCases $cases, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();
@@ -156,6 +175,9 @@ final class TerminationCaseController
      *
      * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingCouncil","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}}
      */
+    #[ResponseField('data.advisor_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.department_head_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.council_user_id', 'integer', nullable: true)]
     public function departmentReview(Request $request, TerminationCase $case, StudentGuard $guard, ProgramCatalog $programs, DepartmentHeadAssignments $heads, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();
@@ -188,6 +210,9 @@ final class TerminationCaseController
      *
      * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"Terminated","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":8,"council_reason":"Confirmed.","closed_reason":"Terminated","closed_at":"2026-09-25T12:00:00+00:00"}}
      */
+    #[ResponseField('data.advisor_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.department_head_user_id', 'integer', nullable: true)]
+    #[ResponseField('data.council_user_id', 'integer', nullable: true)]
     public function councilDecision(Request $request, TerminationCase $case, StudentGuard $guard, StudentLifecycleWriter $lifecycle, AcademicRequestCloseout $closeout, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();

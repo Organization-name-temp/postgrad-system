@@ -16,6 +16,8 @@ use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Enrollment\Public\RemediationObligationSummary;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Contracts\StudentGuard;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -26,11 +28,12 @@ final readonly class RemediationReconciler implements RemediationObligations
         private AcademicCalendar $calendar,
         private CourseCatalog $courses,
         private StudentDirectory $students,
+        private StudentGuard $studentGuard,
         private DepartmentHeadAssignments $heads,
         private Notifier $notifier,
     ) {}
 
-    public function createFromRevocation(int $revocationId): RemediationObligationSummary
+    public function createFromRevocation(int $revocationId, bool $studentGuardHeld = false): RemediationObligationSummary
     {
         $revocation = CreditDecisionRevocation::query()->findOrFail($revocationId);
         $item = RemediationObligation::query()->firstOrCreate(
@@ -40,12 +43,25 @@ final readonly class RemediationReconciler implements RemediationObligations
         if ($item->wasRecentlyCreated) {
             $this->notifyChange($item, -((int) $item->id), 'created');
         }
-        $this->reconcileStudent($item->student_id);
+        if ($studentGuardHeld) {
+            $this->reconcileStudentState($item->student_id);
+        } else {
+            $this->reconcileStudent($item->student_id);
+        }
 
         return $this->summary($item->fresh());
     }
 
     public function reconcileStudent(int $studentId): void
+    {
+        $student = $this->studentGuard->lock($studentId);
+        if ($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active) {
+            return;
+        }
+        $this->reconcileStudentState($studentId);
+    }
+
+    private function reconcileStudentState(int $studentId): void
     {
         foreach (RemediationObligation::query()->where('student_id', $studentId)->whereIn('state', [RemediationState::AwaitingOffering, RemediationState::Active])->get() as $item) {
             if (Enrollment::query()->where('student_id', $studentId)->where('earned', true)->whereHas('offering', fn ($query) => $query->where('course_id', $item->course_id))->exists()) {
@@ -143,7 +159,11 @@ final readonly class RemediationReconciler implements RemediationObligations
             \DB::table('registration_request_transitions')->insertOrIgnore(['registration_request_id' => $request->id, 'from_status' => $from, 'to_status' => RegistrationStatus::Rejected->value, 'action' => 'system_remediation_released', 'system_cause_type' => 'exemption_decision', 'system_cause_id' => $decisionId, 'created_at' => now()]);
             $student = $this->students->findByStudentId($studentId);
             if ($student !== null) {
-                foreach (array_unique([$student->userId, $student->advisorId]) as $recipient) {
+                $course = $this->courses->find($courseId);
+                $reviewers = $request->status === RegistrationStatus::AwaitingCapacityOverride && $course !== null
+                    ? $this->heads->headsForDepartment($course->departmentId)
+                    : [];
+                foreach (array_unique([$student->userId, $student->advisorId, ...$reviewers]) as $recipient) {
                     $this->notifier->notifyOnce($recipient, NotificationType::AcademicRequestClosed, "remediation-release:{$decisionId}:registration:{$request->id}:{$recipient}", ['request_type' => 'registration', 'request_id' => $request->id, 'exemption_decision_id' => $decisionId]);
                 }
             }

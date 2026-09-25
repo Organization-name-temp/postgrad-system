@@ -51,8 +51,8 @@ final readonly class DerivedGraduationProgress implements GraduationProgress
 
     public function underloadEligibility(int $studentId, bool $isEnrollmentSemester, array $proposedCourses): UnderloadEligibility
     {
-        $summary = $this->creditHours->forStudent($studentId);
-        if ($summary === null) {
+        $basis = $this->underloadBasis($studentId);
+        if ($basis === null) {
             // Legacy development fixtures admitted before curriculum binding retain the
             // original first-term rule; every real accepted Student has a bound version.
             return new UnderloadEligibility($isEnrollmentSemester, false);
@@ -60,12 +60,28 @@ final readonly class DerivedGraduationProgress implements GraduationProgress
 
         return UnderloadRuleCalculator::calculate(
             isEnrollmentSemester: $isEnrollmentSemester,
-            remainingPreparatoryTargets: $this->remainingExactTargets($studentId, CourseCategory::Preparatory),
-            remainingExactTargets: $this->remainingExactTargets($studentId),
-            remainingElectiveCh: $summary->rows[CreditHourCategory::ResearchElective->value]->remainingCh,
-            totalRemainingCh: $summary->rows[CreditHourCategory::Total->value]->remainingCh,
+            remainingPreparatoryTargets: $basis['remainingPreparatoryTargets'],
+            remainingExactTargets: $basis['remainingExactTargets'],
+            remainingElectiveCh: $basis['remainingElectiveCh'],
+            totalRemainingCh: $basis['totalRemainingCh'],
             proposedCourses: $proposedCourses,
         );
+    }
+
+    /** @return array{remainingPreparatoryTargets: list<int>, remainingExactTargets: list<int>, remainingElectiveCh: int, totalRemainingCh: int}|null */
+    public function underloadBasis(int $studentId): ?array
+    {
+        $summary = $this->creditHours->forStudent($studentId);
+        if ($summary === null) {
+            return null;
+        }
+
+        return [
+            'remainingPreparatoryTargets' => $this->remainingExactTargets($studentId, CourseCategory::Preparatory),
+            'remainingExactTargets' => $this->remainingExactTargets($studentId),
+            'remainingElectiveCh' => $summary->rows[CreditHourCategory::ResearchElective->value]->remainingCh,
+            'totalRemainingCh' => $summary->rows[CreditHourCategory::Total->value]->remainingCh,
+        ];
     }
 
     /** @param list<ProposedCourse> $proposedCourses */

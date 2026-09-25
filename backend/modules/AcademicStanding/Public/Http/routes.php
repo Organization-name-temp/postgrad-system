@@ -20,11 +20,14 @@ Route::middleware(['auth:sanctum', 'can:standing.monitor'])->group(function () {
 Route::get('/termination-cases/mine', [TerminationCaseController::class, 'mine'])->middleware(['auth:sanctum', 'role:R02']);
 Route::middleware(['auth:sanctum', 'can:termination.recommend'])->group(function () {
     Route::get('/termination-cases/advisor', [TerminationCaseController::class, 'advisorQueue'])->middleware('role:R03');
+    Route::get('/termination-cases/advisor/export', [TerminationCaseController::class, 'advisorExport'])->middleware('role:R03');
     Route::post('/termination-cases/{case}/advisor-review', [TerminationCaseController::class, 'advisorReview'])->whereNumber('case')->middleware('role:R03');
     Route::get('/termination-cases/department-head', [TerminationCaseController::class, 'departmentQueue'])->middleware('role:R06');
+    Route::get('/termination-cases/department-head/export', [TerminationCaseController::class, 'departmentExport'])->middleware('role:R06');
     Route::post('/termination-cases/{case}/department-review', [TerminationCaseController::class, 'departmentReview'])->whereNumber('case')->middleware('role:R06');
 });
 Route::middleware(['auth:sanctum', 'can:termination.approve', 'role:R08'])->group(function () {
     Route::get('/termination-cases/council', [TerminationCaseController::class, 'councilQueue']);
+    Route::get('/termination-cases/council/export', [TerminationCaseController::class, 'councilExport']);
     Route::post('/termination-cases/{case}/council-decision', [TerminationCaseController::class, 'councilDecision'])->whereNumber('case');
 });

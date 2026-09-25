@@ -9,6 +9,7 @@ import {
   useMyTargetAwareCreditHourSummary,
   useMyDerivedGraduationReadiness,
   useGetApiV1TerminationCasesMine,
+  useGetApiV1RegistrationRemediationObligations,
 } from '../../shared/api/generated/endpoints'
 
 vi.mock('../../shared/api/generated/endpoints')
@@ -16,6 +17,7 @@ const mockedQuery = vi.mocked(useMyTargetAwareCreditHourSummary)
 const mockedStanding = vi.mocked(useMyCurrentAcademicStandingAndObservationHistory)
 const mockedReadiness = vi.mocked(useMyDerivedGraduationReadiness)
 const mockedTermination = vi.mocked(useGetApiV1TerminationCasesMine)
+const mockedRemediation = vi.mocked(useGetApiV1RegistrationRemediationObligations)
 const theme = createTheme({ cssVariables: true, colorSchemes: { light: true, dark: true } })
 
 afterEach(async () => {
@@ -24,6 +26,7 @@ afterEach(async () => {
 })
 
 it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
+  mockedRemediation.mockReturnValue({ data: { data: [] }, isPending: false, isError: false } as ReturnType<typeof useGetApiV1RegistrationRemediationObligations>)
   mockedTermination.mockReturnValue({
     data: { data: null },
     isPending: false,
@@ -103,6 +106,7 @@ it('distinguishes raw facts from capped Satisfied and Remaining credit', () => {
 })
 
 it('renders the same accounting labels in Arabic RTL', async () => {
+  mockedRemediation.mockReturnValue({ data: { data: [] }, isPending: false, isError: false } as ReturnType<typeof useGetApiV1RegistrationRemediationObligations>)
   mockedTermination.mockReturnValue({
     data: { data: null },
     isPending: false,

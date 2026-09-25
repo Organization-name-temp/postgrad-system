@@ -4,8 +4,10 @@ namespace Modules\Grading\Internal\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentSummary;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Grading\Internal\Support\IncompleteDeadlineResolver;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -68,6 +70,7 @@ class ConvertExpiredIncompletes extends Command
             }
 
             $this->convert($incomplete, $enrollment, $enrollments);
+            Event::dispatch(new AcademicEvidenceChanged($enrollment->studentId, 'incomplete_conversion', (int) $incomplete->getKey()));
 
             $summary = $students->findByStudentId($enrollment->studentId);
             if ($summary !== null) {

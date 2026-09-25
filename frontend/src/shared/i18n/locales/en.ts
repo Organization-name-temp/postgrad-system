@@ -1137,6 +1137,9 @@ export const en = {
     mustRetake: {
       label: 'Must retake',
     },
+    remediation: {
+      label: 'Required remediation',
+    },
     // Enrollment's Dashboard Cards (phase 4.5, ticket 04). Each Card's copy lives in the namespace
     // of the feature that owns its data, per Card, EN + AR together.
     cards: {
@@ -1557,12 +1560,14 @@ export const en = {
       empty: 'No capacity exceptions need your decision.',
       course: 'Course #{{id}}',
       request: 'Registration request #{{id}} · Offering #{{offering}}',
+      obligationTypes: { MustRetake: 'Required ordinary retake', Remediation: 'Required remediation after exemption revocation' },
       reason: 'Decision reason',
+      required: 'Enter a decision reason.',
       approve: 'Approve exception',
       deny: 'Deny exception',
       loading: 'Loading capacity exceptions',
       denyConfirm:
-        'Deny this capacity exception? The unchanged registration request will be rejected.',
+        'Deny the capacity exception for request #{{request}}, course #{{course}}? The unchanged registration request will be rejected.',
       cancel: 'Cancel',
     },
     hints: {
@@ -1855,6 +1860,11 @@ export const en = {
       title: 'Termination case',
       explanation:
         'The evidence and every attributed review remain available while the responsible role considers the case.',
+      history: {
+        advisor: 'Advisor assessment: {{value}}',
+        departmentHead: 'Department Head reason: {{value}}',
+        council: 'Council reason: {{value}}',
+      },
       states: {
         AwaitingAdvisor: 'Awaiting Advisor assessment',
         AwaitingDepartmentHead: 'Awaiting Department Head review',
@@ -1871,11 +1881,19 @@ export const en = {
         student: 'Student #{{id}}',
         fingerprint: 'Evidence fingerprint: {{value}}',
         reason: 'Assessment or reason',
+        required: 'Enter an assessment or reason.',
+        evidenceTitle: 'Actionable evidence',
+        evidence: {
+          df_grades: 'Effective D/F courses',
+          preparatory_noncompletion: 'Uncompleted Preparatory requirements',
+          remediation: 'Expired remediation obligations',
+        },
         empty: 'No termination cases are waiting at this stage.',
         loadError: 'Could not load termination cases.',
         loading: 'Loading termination cases',
+        export: 'Export cases',
         terminateConfirm:
-          'Confirm termination? This ends the student’s active academic lifecycle and closes pending academic requests.',
+          'Confirm termination for Student #{{id}}? This ends the student’s active academic lifecycle and closes pending academic requests.',
         cancel: 'Cancel',
         actions: {
           continue: 'Send to Department Head',
@@ -1884,6 +1902,13 @@ export const en = {
           dismiss: 'Dismiss case',
         },
       },
+    },
+    remediation: {
+      title: 'Remediation obligations',
+      intro: 'These obligations come from revoked Preparatory exemptions and remain distinct from ordinary retakes.',
+      item: 'Course #{{course}} — {{state}} — deadline: {{deadline}}',
+      noDeadline: 'waiting for an offering',
+      states: { AwaitingOffering: 'Awaiting offering', Active: 'Active', Evaluated: 'Evaluated', Satisfied: 'Satisfied', ReleasedByExemption: 'Released by replacement exemption' },
     },
     readiness: {
       title: 'Graduation Readiness',

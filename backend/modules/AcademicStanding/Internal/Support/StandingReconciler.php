@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\AcademicStanding\Internal\Models\StandingObservation;
 use Modules\AcademicStanding\Public\AcademicStanding;
 use Modules\AcademicStanding\Public\StandingRecords;
+use Modules\AcademicStanding\Public\StandingSummary;
 use Modules\Enrollment\Public\RegistrationPolicyWriter;
 use Modules\Grading\Public\GradingRecords;
 use Modules\Identity\Public\Contracts\StudentGuard;
@@ -20,6 +21,7 @@ final readonly class StandingReconciler
         private GradingRecords $grading,
         private Notifier $notifier,
         private RegistrationPolicyWriter $registrationPolicy,
+        private DerivedGraduationProgress $graduationProgress,
     ) {}
 
     public function reconcile(int $studentId, ?string $causeType = null, ?int $causeId = null): ?StandingObservation
@@ -29,8 +31,7 @@ final readonly class StandingReconciler
             if ($student === null) {
                 return null;
             }
-            $current = $this->standing->currentForStudent($studentId);
-            $this->registrationPolicy->recordStanding($studentId, $current->standing->value, $current->registrationCeilingCh);
+            $current = $this->reconcileRegistrationPolicy($studentId);
             $latest = StandingObservation::query()->where('student_id', $studentId)->lockForUpdate()->latest('id')->first();
             if ($latest !== null && $latest->standing === $current->standing) {
                 return null;
@@ -78,5 +79,17 @@ final readonly class StandingReconciler
 
             return $observation;
         });
+    }
+
+    public function reconcileRegistrationPolicy(int $studentId): StandingSummary
+    {
+        $current = $this->standing->currentForStudent($studentId);
+        $this->registrationPolicy->recordStanding($studentId, $current->standing->value, $current->registrationCeilingCh);
+        $basis = $this->graduationProgress->underloadBasis($studentId);
+        if ($basis !== null) {
+            $this->registrationPolicy->recordUnderloadBasis($studentId, ...$basis);
+        }
+
+        return $current;
     }
 }

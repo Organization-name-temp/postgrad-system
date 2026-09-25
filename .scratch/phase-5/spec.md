@@ -1,6 +1,6 @@
 # Spec — Phase 5: Academic Standing, Credit-Hour Summary, and Credit Decisions
 
-**Status:** ready-for-agent
+**Status:** complete
 **Feature slug:** phase-5
 **Phase:** 5 of the Build Roadmap
 **Scope:** SRS §4.5, §4.6, and §4.8; BR-31–43, BR-46, BR-56, and BR-60–62

@@ -666,6 +666,9 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
   those students, filtered — and export them too.
 
 ### Phase 5 — Academic Standing + Credit-Hour Summary + Exemption/Transfer/Waiver (SRS §4.8, §4.5, §4.6)
+
+**Status: complete.** All 17 Phase-5 tickets are implemented and verified by the backend and frontend quality gates.
+
 - **`AcademicStanding` module** owns both derived read models ([ADR-0029](./adr/0029-academic-standing-owns-progress-read-models.md)):
   per-category Credit-Hour Summary (Appendix D counting) and Academic Standing
   (Not-Yet-Assessed/Good/Warning/Probation/Termination-Pending), computed on demand from the owning

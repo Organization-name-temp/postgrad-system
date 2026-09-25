@@ -2,12 +2,14 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Identity\Internal\Models\Student;
@@ -172,6 +174,17 @@ it('converts to Fail Withdrawal the day after the deadline, and notifies the stu
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.type', 'incomplete.converted')
         ->assertJsonPath('data.0.data.enrollment_id', $enrollment->id);
+});
+
+it('publishes academic evidence change after converting an expired incomplete', function () {
+    Carbon::setTestNow(Carbon::parse('2026-01-01 00:00:00'));
+    $deadline = now()->copy()->subDay();
+    [$incomplete, , $student] = icOutstandingIncomplete(now()->copy()->subDays(200), $deadline->copy()->subDays(63));
+    Event::fake([AcademicEvidenceChanged::class]);
+
+    $this->artisan('grading:convert-expired-incompletes')->assertSuccessful();
+
+    Event::assertDispatched(AcademicEvidenceChanged::class, fn (AcademicEvidenceChanged $event): bool => $event->studentId === $student->id && $event->sourceType === 'incomplete_conversion' && $event->sourceId === $incomplete->id);
 });
 
 it('skips and reports, never converting or crashing, an incomplete with no next semester yet', function () {

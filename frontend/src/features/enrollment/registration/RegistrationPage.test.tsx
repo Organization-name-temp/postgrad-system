@@ -226,6 +226,14 @@ describe('RegistrationPage', () => {
     expect(await screen.findByText(/must retake/i)).toBeInTheDocument()
   })
 
+  it('distinguishes remediation from an ordinary must-retake obligation', async () => {
+    srv.eligible = { data: { semester, courses: [eligibleLine({ obligation_type: 'Remediation' })] } }
+    renderPage()
+
+    expect(await screen.findByText(/required remediation/i)).toBeInTheDocument()
+    expect(screen.queryByText(/^must retake$/i)).not.toBeInTheDocument()
+  })
+
   it('shows automatic preparatory exemptions before the student composes registration', async () => {
     srv.eligible = { data: { semester, courses: [eligibleLine({})] } }
     srv.exemptions = {

@@ -23,6 +23,7 @@ return [
     'grade_finalization_conflict' => 'This Grade cannot be finalized while an effective Transfer or Waiver decision targets the same Course. Revoke the decision first.',
     'revocation' => [
         'already_revoked' => 'This credit decision has already been revoked.',
+        'student_inactive' => 'A terminated Student\'s credit decisions cannot be changed.',
     ],
     'waiver' => [
         'stale_request' => 'This Waiver request changed since you opened it. Refresh and try again.',

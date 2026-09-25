@@ -18,6 +18,7 @@ use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Identity\Public\Enums\Role;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -75,6 +76,7 @@ final class CreditDecisionRevoker
         return DB::transaction(function () use ($type, $decision, $actorUserId, $reason): Model {
             $student = $this->students->lock((int) $decision->getAttribute('student_id'));
             abort_if($student === null, 404);
+            abort_if($student->lifecycleStatus !== StudentLifecycleStatus::Active, 409, __('credit_decisions.revocation.student_inactive'));
 
             /** @var Model $locked */
             $locked = $decision->newQuery()->lockForUpdate()->findOrFail($decision->getKey());
@@ -95,7 +97,7 @@ final class CreditDecisionRevoker
                 'created_at' => now(),
             ]);
             if ($type === CreditDecisionType::Exemption && $this->preparatoryCheckpoint->hasPassed($student->enrollmentTerm)) {
-                $this->remediation->createFromRevocation((int) $revocation->getKey());
+                $this->remediation->createFromRevocation((int) $revocation->getKey(), studentGuardHeld: true);
             }
             $payload = [
                 'decision_type' => $type->value,

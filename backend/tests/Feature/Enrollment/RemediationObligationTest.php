@@ -12,6 +12,7 @@ use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Identity\Internal\Models\Student;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 
 uses(RefreshDatabase::class);
 
@@ -153,4 +154,20 @@ it('does not freeze a remediation assignment because of an older enrollment in a
     event(new CourseChanged($course->id));
 
     expect($obligations->forStudent($student->id)[0]->state)->toBe('AwaitingOffering');
+});
+
+it('does not mutate remediation obligations after termination', function () {
+    $student = Student::factory()->create();
+    $course = Course::factory()->create(['is_active' => true]);
+    $semester = Semester::factory()->create(['starts_at' => now()->addMonth(), 'late_add_ends_at' => now()->addMonths(2), 'grade_submission_deadline_at' => now()->addMonths(5), 'ends_at' => now()->addMonths(4)]);
+    CourseOffering::factory()->create(['course_id' => $course->id, 'semester_id' => $semester->id]);
+    $revocation = CreditDecisionRevocation::query()->create(['decision_type' => CreditDecisionType::Exemption, 'decision_id' => 103, 'student_id' => $student->id, 'target_course_id' => $course->id, 'reason' => 'corrected evidence', 'created_at' => now()]);
+    $obligations = app(RemediationObligations::class);
+    expect($obligations->createFromRevocation($revocation->id)->state)->toBe('Active');
+    $student->update(['lifecycle_status' => StudentLifecycleStatus::Terminated]);
+    $course->update(['is_active' => false]);
+
+    $obligations->reconcileStudent($student->id);
+
+    expect($obligations->forStudent($student->id)[0]->state)->toBe('Active');
 });

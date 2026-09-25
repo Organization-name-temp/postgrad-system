@@ -649,7 +649,57 @@ paths:
       summary: ''
       operationId: getApiV1TerminationCasesAdvisor
       description: ''
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '5,8'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '5,8'
+        -
+          in: query
+          name: state
+          description: ''
+          example: AwaitingAdvisor
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: AwaitingAdvisor
+        -
+          in: query
+          name: sort
+          description: ''
+          example: id
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: id
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
       responses:
         200:
           description: ''
@@ -673,6 +723,11 @@ paths:
                       department_head_reason: null
                       council_user_id: null
                       council_reason: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 25
+                    total: 1
                 properties:
                   data:
                     type: array
@@ -740,6 +795,68 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/termination-cases/advisor/export:
+    get:
+      summary: ''
+      operationId: getApiV1TerminationCasesAdvisorExport
+      description: ''
+      parameters:
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '5,8'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '5,8'
+        -
+          in: query
+          name: state
+          description: ''
+          example: AwaitingAdvisor
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: AwaitingAdvisor
+        -
+          in: query
+          name: sort
+          description: ''
+          example: id
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: id
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
       tags:
         - 'Academic Standing'
       security: []
@@ -853,7 +970,57 @@ paths:
       summary: ''
       operationId: getApiV1TerminationCasesDepartmentHead
       description: ''
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '5,8'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '5,8'
+        -
+          in: query
+          name: state
+          description: ''
+          example: AwaitingDepartmentHead
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: AwaitingDepartmentHead
+        -
+          in: query
+          name: sort
+          description: ''
+          example: id
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: id
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
       responses:
         200:
           description: ''
@@ -877,6 +1044,11 @@ paths:
                       department_head_reason: null
                       council_user_id: null
                       council_reason: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 25
+                    total: 1
                 properties:
                   data:
                     type: array
@@ -941,6 +1113,68 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/termination-cases/department-head/export:
+    get:
+      summary: ''
+      operationId: getApiV1TerminationCasesDepartmentHeadExport
+      description: ''
+      parameters:
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '5,8'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '5,8'
+        -
+          in: query
+          name: state
+          description: ''
+          example: AwaitingDepartmentHead
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: AwaitingDepartmentHead
+        -
+          in: query
+          name: sort
+          description: ''
+          example: id
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: id
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
       tags:
         - 'Academic Standing'
       security: []
@@ -1052,7 +1286,67 @@ paths:
       summary: ''
       operationId: getApiV1TerminationCasesCouncil
       description: ''
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '5,8'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '5,8'
+        -
+          in: query
+          name: state
+          description: ''
+          example: AwaitingCouncil
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: AwaitingCouncil
+        -
+          in: query
+          name: sort
+          description: ''
+          example: id
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: id
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Capped at 100.'
+            example: 25
+        -
+          in: query
+          name: include_decided
+          description: 'Include preserved final case history.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Include preserved final case history.'
+            example: true
       responses:
         200:
           description: ''
@@ -1076,6 +1370,11 @@ paths:
                       department_head_reason: Actionable.
                       council_user_id: null
                       council_reason: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 25
+                    total: 1
                 properties:
                   data:
                     type: array
@@ -1138,6 +1437,68 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/termination-cases/council/export:
+    get:
+      summary: ''
+      operationId: getApiV1TerminationCasesCouncilExport
+      description: ''
+      parameters:
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '5,8'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '5,8'
+        -
+          in: query
+          name: state
+          description: ''
+          example: AwaitingCouncil
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: AwaitingCouncil
+        -
+          in: query
+          name: sort
+          description: ''
+          example: id
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: id
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
       tags:
         - 'Academic Standing'
       security: []
@@ -12352,6 +12713,7 @@ paths:
                         seats_remaining: 30
                         total_ch: 3
                         must_retake: false
+                        obligation_type: null
                         course:
                           id: 1
                           code: DEP501
@@ -12426,6 +12788,7 @@ paths:
                             seats_remaining: 30
                             total_ch: 3
                             must_retake: false
+                            obligation_type: null
                             course:
                               id: 1
                               code: DEP501
@@ -12464,6 +12827,10 @@ paths:
                             must_retake:
                               type: boolean
                               example: false
+                            obligation_type:
+                              type: string
+                              example: null
+                              nullable: true
                             course:
                               type: object
                               properties:
@@ -13087,6 +13454,7 @@ paths:
                           seats_remaining: 28
                           total_ch: 3
                           must_retake: false
+                          obligation_type: null
                           course:
                             id: 2
                             code: DEP502
@@ -13113,6 +13481,7 @@ paths:
                           classification: Core
                           credit_hours: 3
                           must_retake: false
+                          obligation_type: null
                           course:
                             id: 1
                             code: DEP501
@@ -13166,6 +13535,7 @@ paths:
                             seats_remaining: 28
                             total_ch: 3
                             must_retake: false
+                            obligation_type: null
                             course:
                               id: 2
                               code: DEP502
@@ -13191,6 +13561,7 @@ paths:
                             classification: Core
                             credit_hours: 3
                             must_retake: false
+                            obligation_type: null
                             course:
                               id: 1
                               code: DEP501
@@ -13277,6 +13648,7 @@ paths:
                               seats_remaining: 28
                               total_ch: 3
                               must_retake: false
+                              obligation_type: null
                               course:
                                 id: 2
                                 code: DEP502
@@ -13315,6 +13687,10 @@ paths:
                               must_retake:
                                 type: boolean
                                 example: false
+                              obligation_type:
+                                type: string
+                                example: null
+                                nullable: true
                               course:
                                 type: object
                                 properties:
@@ -13383,6 +13759,7 @@ paths:
                               classification: Core
                               credit_hours: 3
                               must_retake: false
+                              obligation_type: null
                               course:
                                 id: 1
                                 code: DEP501
@@ -13426,6 +13803,10 @@ paths:
                               must_retake:
                                 type: boolean
                                 example: false
+                              obligation_type:
+                                type: string
+                                example: null
+                                nullable: true
                               course:
                                 type: object
                                 properties:
@@ -14079,6 +14460,7 @@ paths:
                       department_id: 5
                       state: Pending
                       reason: null
+                      obligation_type: Remediation
                 properties:
                   data:
                     type: array
@@ -14090,6 +14472,7 @@ paths:
                         department_id: 5
                         state: Pending
                         reason: null
+                        obligation_type: Remediation
                     items:
                       type: object
                       properties:
@@ -14115,6 +14498,9 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                        obligation_type:
+                          type: string
+                          example: Remediation
       tags:
         - Enrollment
       security: []
@@ -15581,6 +15967,7 @@ paths:
                           seats_remaining: 28
                           total_ch: 3
                           must_retake: false
+                          obligation_type: null
                           course:
                             id: 2
                             code: DEP502
@@ -15607,6 +15994,7 @@ paths:
                           classification: Core
                           credit_hours: 3
                           must_retake: false
+                          obligation_type: null
                           course:
                             id: 1
                             code: DEP501
@@ -15660,6 +16048,7 @@ paths:
                             seats_remaining: 28
                             total_ch: 3
                             must_retake: false
+                            obligation_type: null
                             course:
                               id: 2
                               code: DEP502
@@ -15685,6 +16074,7 @@ paths:
                             classification: Core
                             credit_hours: 3
                             must_retake: false
+                            obligation_type: null
                             course:
                               id: 1
                               code: DEP501
@@ -15771,6 +16161,7 @@ paths:
                               seats_remaining: 28
                               total_ch: 3
                               must_retake: false
+                              obligation_type: null
                               course:
                                 id: 2
                                 code: DEP502
@@ -15809,6 +16200,10 @@ paths:
                               must_retake:
                                 type: boolean
                                 example: false
+                              obligation_type:
+                                type: string
+                                example: null
+                                nullable: true
                               course:
                                 type: object
                                 properties:
@@ -15877,6 +16272,7 @@ paths:
                               classification: Core
                               credit_hours: 3
                               must_retake: false
+                              obligation_type: null
                               course:
                                 id: 1
                                 code: DEP501
@@ -15920,6 +16316,10 @@ paths:
                               must_retake:
                                 type: boolean
                                 example: false
+                              obligation_type:
+                                type: string
+                                example: null
+                                nullable: true
                               course:
                                 type: object
                                 properties:

@@ -2,7 +2,7 @@
 
 **Project:** Postgraduate Registration System (PRS) for E-JUST.
 **Workspace:** `postgrad-system` (git remote `MohamedYasser343/postgrad-system`).
-**Last refreshed:** end of **Phase 4.5 — Dashboards** (phase 4.5, ticket 09).
+**Last refreshed:** end of **Phase 5 — Academic Standing and Credit Decisions**.
 
 This file is the *entry point for a fresh session*. It carries only what the repo does **not**
 already record; everything else is deliberately a pointer, so it cannot drift.
@@ -38,8 +38,8 @@ already record; everything else is deliberately a pointer, so it cannot drift.
 |---|---|
 | 0 Foundations · 0.5 Design system · 1 Catalog · 2 Admissions · 2.5 Admissions fixes · 3 Enrollment · 4 Grading & GPA/CGPA | **Done, merged to `main`** (Phase 4 via PR #6) |
 | **4.5 Dashboards** | **Merged** — all nine tickets plus final two-axis review corrections |
-| **4.6 Query, Filter, Export & Reports** | **Planned, not started** — designed in a `/grill-with-docs` session; ROADMAP §3 section + ADR-0025–0028 written |
-| 5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver | After 4.6 |
+| **4.6 Query, Filter, Export & Reports** | **Done** |
+| **5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver** | **Complete** — all 17 tickets and final review corrections |
 | 6 Records & Transcript · 7 Reporting & polish | Not started (7 is now much smaller — 4.6 takes five of its eight reports) |
 
 **Phase 4.5 is a composition slice**, inserted between Phases 4 and 5 as Phase 0.5 was inserted
@@ -48,8 +48,9 @@ between 0 and 1 — it added no module, migration, Permission, Role or domain ru
 on read models Phase 5 has not built.
 
 **Working convention:** one branch per phase (`phase-N-slug`), merged to `main` by PR after the
-phase's headline demo is reviewed by hand. Seven backend modules exist:
-`Identity`, `Catalog`, `Admissions`, `Notifications`, `Calendar`, `Enrollment`, `Grading`.
+phase's headline demo is reviewed by hand. Eight backend modules exist:
+`Identity`, `Catalog`, `Admissions`, `Notifications`, `Calendar`, `Enrollment`, `Grading`,
+`AcademicStanding`.
 
 ---
 

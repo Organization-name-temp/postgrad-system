@@ -18,6 +18,7 @@ use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationKind;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
+use Modules\Enrollment\Internal\Enums\RemediationState;
 use Modules\Enrollment\Internal\Http\Concerns\ComputesAttendance;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\DescribesStudentContext;
@@ -35,6 +36,7 @@ use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\MustRetakeObligation;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
+use Modules\Enrollment\Internal\Models\RemediationObligation;
 use Modules\Enrollment\Internal\Support\AutomaticExemptionReadiness;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartValidator;
@@ -103,7 +105,7 @@ class RegistrationController
      * adds). When neither a registration nor a late-add window is open, `semester` is null
      * and the list is empty. Gated on `courses.register_self` (the acting Student, R02).
      *
-     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "courses": [{"offering_id": 1, "classification": "Core", "capacity": 30, "seats_remaining": 30, "total_ch": 3, "must_retake": false, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}}
+     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "courses": [{"offering_id": 1, "classification": "Core", "capacity": 30, "seats_remaining": 30, "total_ch": 3, "must_retake": false, "obligation_type": null, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
      */
     public function eligibleCourses(
@@ -312,7 +314,7 @@ class RegistrationController
      * recorded counts, the display percentage, and the audit-at-risk flag. Gated on
      * `courses.register_self` (the acting Student, R02).
      *
-     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": true, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": true, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "obligation_type": null, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "obligation_type": null, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
      */
     public function schedule(
@@ -347,7 +349,7 @@ class RegistrationController
      *
      * @urlParam student_id integer required The target Student anchor's id. Example: 5
      *
-     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": false, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": false, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "obligation_type": null, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "obligation_type": null, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
      * @response 403 scenario="not this advisor's advisee" {"message": "This action is unauthorized."}
      * @response 404 scenario="no such student" {"message": "No such student."}
      */
@@ -736,7 +738,7 @@ class RegistrationController
             return true;
         })->values();
 
-        $this->attachMustRetakeToOfferings($eligible, $mustRetakeCourseIds);
+        $this->attachMustRetakeToOfferings($eligible, $mustRetakeCourseIds, $student->studentId);
 
         return $eligible;
     }
@@ -834,7 +836,7 @@ class RegistrationController
             return true;
         })->values();
 
-        $this->attachMustRetakeToOfferings($addable, $mustRetakeCourseIds);
+        $this->attachMustRetakeToOfferings($addable, $mustRetakeCourseIds, $student->studentId);
 
         return EligibleCourseResource::collection($addable)->resolve();
     }
@@ -910,14 +912,16 @@ class RegistrationController
      * @param  Collection<int, CourseOffering>  $offerings
      * @param  list<int>  $mustRetakeCourseIds
      */
-    private function attachMustRetakeToOfferings(Collection $offerings, array $mustRetakeCourseIds): void
+    private function attachMustRetakeToOfferings(Collection $offerings, array $mustRetakeCourseIds, int $studentId): void
     {
         $marked = array_fill_keys($mustRetakeCourseIds, true);
+        $remediation = array_fill_keys(RemediationObligation::query()->where('student_id', $studentId)->where('state', RemediationState::Active)->pluck('course_id')->map(fn ($id): int => (int) $id)->all(), true);
 
-        $offerings->each(fn (CourseOffering $offering) => $offering->setAttribute(
-            'must_retake',
-            isset($marked[(int) $offering->course_id]),
-        ));
+        $offerings->each(function (CourseOffering $offering) use ($marked, $remediation): void {
+            $courseId = (int) $offering->course_id;
+            $offering->setAttribute('must_retake', isset($marked[$courseId]));
+            $offering->setAttribute('obligation_type', isset($remediation[$courseId]) ? 'Remediation' : (isset($marked[$courseId]) ? 'MustRetake' : null));
+        });
     }
 
     /**

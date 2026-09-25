@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\AcademicStanding\Internal\Support\AcademicStandingReconciler;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Catalog\Internal\Enums\VersionSubject;
 use Modules\Catalog\Internal\Models\CatalogVersion;
@@ -53,6 +54,7 @@ it('uses the latest effective attempt when deriving an approaching-graduation un
     $summary = app(StudentDirectory::class)->findByStudentId($student->id);
     expect($summary)->not->toBeNull();
     $line = new CartLine($proposedOffering->id, $course->id, $course->code, RegistrationMode::Regular, 3, EnrollmentClassification::Core, 10, []);
+    app(AcademicStandingReconciler::class)->reconcile($student->id, 'test');
 
     expect(app(RegistrationPolicy::class)->exceptions($summary, $registrationSemester->name_en, [$line])->approachingGraduationCompletion)->toBeTrue();
 });

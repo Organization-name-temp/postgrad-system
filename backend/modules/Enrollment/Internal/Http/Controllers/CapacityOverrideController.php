@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
 use Modules\Enrollment\Internal\Models\CapacityOverrideRequirement;
+use Modules\Enrollment\Internal\Models\MustRetakeObligation;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
+use Modules\Enrollment\Internal\Models\RemediationObligation;
 use Modules\Enrollment\Internal\Support\CapacityOverrideFinalizer;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
@@ -18,7 +20,7 @@ use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 /** @group Enrollment */
 final class CapacityOverrideController
 {
-    /** @response 200 {"data":[{"id":1,"registration_request_id":2,"course_offering_id":3,"course_id":4,"department_id":5,"state":"Pending","reason":null}]} */
+    /** @response 200 {"data":[{"id":1,"registration_request_id":2,"course_offering_id":3,"course_id":4,"department_id":5,"state":"Pending","reason":null,"obligation_type":"Remediation"}]} */
     public function index(Request $request, DepartmentHeadAssignments $heads): JsonResponse
     {
         $userId = (int) $request->user()?->getAuthIdentifier();
@@ -74,6 +76,10 @@ final class CapacityOverrideController
     /** @return array<string, mixed> */
     private function resource(CapacityOverrideRequirement $item): array
     {
-        return ['id' => $item->id, 'registration_request_id' => $item->registration_request_id, 'course_offering_id' => $item->course_offering_id, 'course_id' => $item->course_id, 'department_id' => $item->department_id, 'state' => $item->state, 'reason' => $item->getAttribute('reason')];
+        $studentId = RegistrationRequest::query()->whereKey($item->registration_request_id)->value('student_id');
+        $remediation = $studentId !== null && RemediationObligation::query()->where('student_id', $studentId)->where('course_id', $item->course_id)->where('state', 'Active')->exists();
+        $mustRetake = $studentId !== null && MustRetakeObligation::query()->where('student_id', $studentId)->where('course_id', $item->course_id)->where('state', 'Active')->exists();
+
+        return ['id' => $item->id, 'registration_request_id' => $item->registration_request_id, 'course_offering_id' => $item->course_offering_id, 'course_id' => $item->course_id, 'department_id' => $item->department_id, 'state' => $item->state, 'reason' => $item->getAttribute('reason'), 'obligation_type' => $remediation ? 'Remediation' : ($mustRetake ? 'MustRetake' : null)];
     }
 }

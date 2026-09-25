@@ -20,6 +20,7 @@ use Modules\Enrollment\Public\RemediationObligationSummary;
 use Modules\Grading\Public\EffectiveAttemptSummary;
 use Modules\Grading\Public\GradingRecords;
 use Modules\Identity\Public\Contracts\StudentGuard;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;
 
@@ -43,11 +44,18 @@ final readonly class TerminationCaseReconciler implements TerminationCases
         return $case === null ? null : $this->summary($case);
     }
 
+    public function latestForStudent(int $studentId): ?TerminationCaseSummary
+    {
+        $case = TerminationCase::query()->where('student_id', $studentId)->latest('id')->first();
+
+        return $case === null ? null : $this->summary($case);
+    }
+
     public function reconcile(int $studentId): ?TerminationCaseSummary
     {
         return DB::transaction(function () use ($studentId): ?TerminationCaseSummary {
             $student = $this->students->lock($studentId);
-            if ($student === null) {
+            if ($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active) {
                 return null;
             }
             $evidence = $this->evidence($studentId, $student->enrollmentTerm, $student->curriculumVersionId);
@@ -192,6 +200,21 @@ final readonly class TerminationCaseReconciler implements TerminationCases
 
     private function summary(TerminationCase $case): TerminationCaseSummary
     {
-        return new TerminationCaseSummary($case->id, $case->student_id, $case->fingerprint, $case->state, $case->evidence);
+        return new TerminationCaseSummary(
+            $case->id,
+            $case->student_id,
+            $case->fingerprint,
+            $case->state,
+            $case->evidence,
+            $case->getAttribute('advisor_user_id'),
+            $case->getAttribute('advisor_assessment'),
+            $case->getAttribute('advisor_recommendation'),
+            $case->getAttribute('department_head_user_id'),
+            $case->getAttribute('department_head_reason'),
+            $case->getAttribute('council_user_id'),
+            $case->getAttribute('council_reason'),
+            $case->getAttribute('closed_reason'),
+            $case->closed_at?->toIso8601String(),
+        );
     }
 }

@@ -191,6 +191,14 @@ export const GetApiV1TerminationCasesMineResponse = zod.object({
 })
 
 
+export const GetApiV1TerminationCasesAdvisorQueryParams = zod.object({
+  "student_id": zod.string().optional(),
+  "state": zod.string().optional(),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
 export const GetApiV1TerminationCasesAdvisorResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -207,8 +215,23 @@ export const GetApiV1TerminationCasesAdvisorResponse = zod.object({
   "department_head_reason": zod.string().nullish(),
   "council_user_id": zod.string().nullish(),
   "council_reason": zod.string().nullish()
-})).optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
 })
+
+
+export const GetApiV1TerminationCasesAdvisorExportQueryParams = zod.object({
+  "student_id": zod.string().optional(),
+  "state": zod.string().optional(),
+  "sort": zod.string().optional()
+})
+
+export const GetApiV1TerminationCasesAdvisorExportResponse = zod.unknown()
 
 
 export const PostApiV1TerminationCasesCaseIdAdvisorReviewParams = zod.object({
@@ -240,6 +263,14 @@ export const PostApiV1TerminationCasesCaseIdAdvisorReviewResponse = zod.object({
 })
 
 
+export const GetApiV1TerminationCasesDepartmentHeadQueryParams = zod.object({
+  "student_id": zod.string().optional(),
+  "state": zod.string().optional(),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.')
+})
+
 export const GetApiV1TerminationCasesDepartmentHeadResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -256,8 +287,23 @@ export const GetApiV1TerminationCasesDepartmentHeadResponse = zod.object({
   "department_head_reason": zod.string().nullish(),
   "council_user_id": zod.string().nullish(),
   "council_reason": zod.string().nullish()
-})).optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
 })
+
+
+export const GetApiV1TerminationCasesDepartmentHeadExportQueryParams = zod.object({
+  "student_id": zod.string().optional(),
+  "state": zod.string().optional(),
+  "sort": zod.string().optional()
+})
+
+export const GetApiV1TerminationCasesDepartmentHeadExportResponse = zod.unknown()
 
 
 export const PostApiV1TerminationCasesCaseIdDepartmentReviewParams = zod.object({
@@ -289,6 +335,15 @@ export const PostApiV1TerminationCasesCaseIdDepartmentReviewResponse = zod.objec
 })
 
 
+export const GetApiV1TerminationCasesCouncilQueryParams = zod.object({
+  "student_id": zod.string().optional(),
+  "state": zod.string().optional(),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional().describe('Capped at 100.'),
+  "include_decided": zod.boolean().optional().describe('Include preserved final case history.')
+})
+
 export const GetApiV1TerminationCasesCouncilResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -305,8 +360,23 @@ export const GetApiV1TerminationCasesCouncilResponse = zod.object({
   "department_head_reason": zod.string().optional(),
   "council_user_id": zod.string().nullish(),
   "council_reason": zod.string().nullish()
-})).optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
 })
+
+
+export const GetApiV1TerminationCasesCouncilExportQueryParams = zod.object({
+  "student_id": zod.string().optional(),
+  "state": zod.string().optional(),
+  "sort": zod.string().optional()
+})
+
+export const GetApiV1TerminationCasesCouncilExportResponse = zod.unknown()
 
 
 export const PostApiV1TerminationCasesCaseIdCouncilDecisionParams = zod.object({
@@ -3455,6 +3525,7 @@ export const ListTheActingStudentsEligibleCoursesForTheOpenSemesterResponse = zo
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
   "must_retake": zod.boolean().optional(),
+  "obligation_type": zod.string().nullish(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3649,6 +3720,7 @@ export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterRes
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
   "must_retake": zod.boolean().optional(),
+  "obligation_type": zod.string().nullish(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3677,6 +3749,7 @@ export const TheActingStudentsScheduleTheirMintedEnrollmentsGroupedBySemesterRes
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
   "must_retake": zod.boolean().optional(),
+  "obligation_type": zod.string().nullish(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -3880,7 +3953,8 @@ export const GetApiV1RegistrationCapacityOverridesResponse = zod.object({
   "course_id": zod.number().optional(),
   "department_id": zod.number().optional(),
   "state": zod.string().optional(),
-  "reason": zod.string().nullish()
+  "reason": zod.string().nullish(),
+  "obligation_type": zod.string().optional()
 })).optional()
 })
 
@@ -4293,6 +4367,7 @@ export const ViewAnyStudentsScheduleoversightResponse = zod.object({
   "seats_remaining": zod.number().optional(),
   "total_ch": zod.number().optional(),
   "must_retake": zod.boolean().optional(),
+  "obligation_type": zod.string().nullish(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),
@@ -4321,6 +4396,7 @@ export const ViewAnyStudentsScheduleoversightResponse = zod.object({
   "classification": zod.string().optional(),
   "credit_hours": zod.number().optional(),
   "must_retake": zod.boolean().optional(),
+  "obligation_type": zod.string().nullish(),
   "course": zod.object({
   "id": zod.number().optional(),
   "code": zod.string().optional(),

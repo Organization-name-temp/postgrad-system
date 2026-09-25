@@ -4,7 +4,7 @@ namespace Modules\Enrollment\Public;
 
 interface RemediationObligations
 {
-    public function createFromRevocation(int $revocationId): RemediationObligationSummary;
+    public function createFromRevocation(int $revocationId, bool $studentGuardHeld = false): RemediationObligationSummary;
 
     public function reconcileStudent(int $studentId): void;
 

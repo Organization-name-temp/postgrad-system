@@ -121,3 +121,40 @@ it('lets Council atomically terminate the student and reject open registration r
     $this->assertDatabaseHas('academic_request_closeouts', ['student_id' => $student->id, 'request_type' => 'registration', 'request_id' => $registration->id, 'termination_case_id' => $case->id]);
     $this->assertDatabaseHas('registration_request_transitions', ['registration_request_id' => $registration->id, 'action' => 'system_termination_closeout', 'system_cause_type' => 'termination_case', 'system_cause_id' => $case->id]);
 });
+
+it('preserves the final attributed case outcome for the student', function () {
+    $student = Student::factory()->create();
+    $student->user->assignRole(Role::Student);
+    TerminationCase::query()->create([
+        'student_id' => $student->id,
+        'fingerprint' => str_repeat('b', 64),
+        'state' => 'Dismissed',
+        'evidence' => ['df_grades' => []],
+        'advisor_assessment' => 'Reviewed by advisor.',
+        'department_head_reason' => 'Evidence no longer actionable.',
+        'closed_reason' => 'Dismissed',
+        'closed_at' => now(),
+    ]);
+    Sanctum::actingAs($student->user);
+
+    $this->getJson('/api/v1/termination-cases/mine')
+        ->assertOk()
+        ->assertJsonPath('data.state', 'Dismissed')
+        ->assertJsonPath('data.advisor_assessment', 'Reviewed by advisor.')
+        ->assertJsonPath('data.department_head_reason', 'Evidence no longer actionable.');
+});
+
+it('paginates preserved Council history and audits its live queue export', function () {
+    $council = User::factory()->create();
+    $council->assignRole(Role::Council);
+    $student = Student::factory()->create();
+    TerminationCase::query()->create(['student_id' => $student->id, 'fingerprint' => str_repeat('c', 64), 'state' => 'AwaitingCouncil', 'evidence' => ['df_grades' => []]]);
+    TerminationCase::query()->create(['student_id' => $student->id, 'fingerprint' => str_repeat('d', 64), 'state' => 'Dismissed', 'evidence' => ['df_grades' => []], 'closed_reason' => 'Dismissed', 'closed_at' => now()]);
+    Sanctum::actingAs($council);
+
+    $this->getJson('/api/v1/termination-cases/council?include_decided=true&per_page=1')
+        ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('meta.total', 2);
+    $this->get('/api/v1/termination-cases/council/export')
+        ->assertOk()->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $this->assertDatabaseHas('audit_log', ['action' => 'termination.cases.exported', 'actor_user_id' => $council->id]);
+});

@@ -33,6 +33,7 @@ use Modules\Identity\Internal\Models\DepartmentHeadAssignment;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Notifications\Internal\Models\Notification;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -173,6 +174,17 @@ it('requires Council authority and a reason and never appends a second revocatio
         ->assertConflict();
 
     $this->assertDatabaseCount('credit_decision_revocations', 1);
+});
+
+it('freezes effective credit decisions after the student is terminated', function () {
+    [$student, $council, , $decision] = revocationWorld();
+    $student->update(['lifecycle_status' => StudentLifecycleStatus::Terminated]);
+    Sanctum::actingAs($council);
+
+    $this->postJson("/api/v1/credit-decisions/transfers/{$decision->id}/revoke", ['reason' => 'Late correction.'])
+        ->assertConflict();
+
+    $this->assertDatabaseCount('credit_decision_revocations', 0);
 });
 
 it('lets only the scoped Department Head revoke an Exemption decision', function () {

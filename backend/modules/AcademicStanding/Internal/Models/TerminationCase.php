@@ -3,6 +3,7 @@
 namespace Modules\AcademicStanding\Internal\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -10,6 +11,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $fingerprint
  * @property string $state
  * @property array<string, mixed> $evidence
+ * @property int|null $advisor_user_id
+ * @property string|null $advisor_assessment
+ * @property string|null $advisor_recommendation
+ * @property int|null $department_head_user_id
+ * @property string|null $department_head_reason
+ * @property int|null $council_user_id
+ * @property string|null $council_reason
+ * @property string|null $closed_reason
+ * @property Carbon|null $closed_at
  */
 final class TerminationCase extends Model
 {

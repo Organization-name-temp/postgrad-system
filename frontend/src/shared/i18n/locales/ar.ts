@@ -1076,6 +1076,9 @@ export const ar = {
     mustRetake: {
       label: 'إلزامي الإعادة',
     },
+    remediation: {
+      label: 'معالجة إلزامية',
+    },
     cards: {
       myRegistration: {
         title: 'تسجيلي',
@@ -1486,11 +1489,13 @@ export const ar = {
       empty: 'لا توجد استثناءات سعة تحتاج إلى قرارك.',
       course: 'المقرر رقم {{id}}',
       request: 'طلب التسجيل رقم {{id}} · الشعبة رقم {{offering}}',
+      obligationTypes: { MustRetake: 'إعادة مقرر عادية إلزامية', Remediation: 'معالجة إلزامية بعد إلغاء الإعفاء' },
       reason: 'سبب القرار',
+      required: 'أدخل سبب القرار.',
       approve: 'الموافقة على الاستثناء',
       deny: 'رفض الاستثناء',
       loading: 'جارٍ تحميل استثناءات السعة',
-      denyConfirm: 'هل تريد رفض استثناء السعة هذا؟ سيُرفض طلب التسجيل دون تغيير.',
+      denyConfirm: 'هل تريد رفض استثناء السعة للطلب رقم {{request}} والمقرر رقم {{course}}؟ سيُرفض طلب التسجيل دون تغيير.',
       cancel: 'إلغاء',
     },
     hints: {
@@ -1778,6 +1783,11 @@ export const ar = {
     termination: {
       title: 'حالة إنهاء القيد',
       explanation: 'تظل الأدلة وجميع المراجعات المنسوبة متاحة أثناء نظر الجهة المسؤولة في الحالة.',
+      history: {
+        advisor: 'تقييم المرشد الأكاديمي: {{value}}',
+        departmentHead: 'سبب رئيس القسم: {{value}}',
+        council: 'سبب المجلس: {{value}}',
+      },
       states: {
         AwaitingAdvisor: 'بانتظار تقييم المرشد الأكاديمي',
         AwaitingDepartmentHead: 'بانتظار مراجعة رئيس القسم',
@@ -1793,11 +1803,19 @@ export const ar = {
         student: 'الطالب رقم {{id}}',
         fingerprint: 'بصمة الأدلة: {{value}}',
         reason: 'التقييم أو السبب',
+        required: 'أدخل تقييمًا أو سببًا.',
+        evidenceTitle: 'الأدلة الموجبة للإجراء',
+        evidence: {
+          df_grades: 'مقررات بتقدير D أو F سارٍ',
+          preparatory_noncompletion: 'متطلبات تمهيدية غير مكتملة',
+          remediation: 'التزامات معالجة منتهية المهلة',
+        },
         empty: 'لا توجد حالات إنهاء قيد بانتظار هذه المرحلة.',
         loadError: 'تعذّر تحميل حالات إنهاء القيد.',
         loading: 'جارٍ تحميل حالات إنهاء القيد',
+        export: 'تصدير الحالات',
         terminateConfirm:
-          'هل تريد اعتماد إنهاء القيد؟ سينتهي الوضع الأكاديمي النشط للطالب وتُغلق طلباته الأكاديمية المعلقة.',
+          'هل تريد اعتماد إنهاء قيد الطالب رقم {{id}}؟ سينتهي وضعه الأكاديمي النشط وتُغلق طلباته الأكاديمية المعلقة.',
         cancel: 'إلغاء',
         actions: {
           continue: 'الإحالة إلى رئيس القسم',
@@ -1806,6 +1824,13 @@ export const ar = {
           dismiss: 'رفض الحالة',
         },
       },
+    },
+    remediation: {
+      title: 'التزامات المعالجة',
+      intro: 'تنشأ هذه الالتزامات من إلغاء الإعفاءات التمهيدية وتظل منفصلة عن إعادة المقررات العادية.',
+      item: 'المقرر رقم {{course}} — {{state}} — الموعد: {{deadline}}',
+      noDeadline: 'بانتظار طرح المقرر',
+      states: { AwaitingOffering: 'بانتظار الطرح', Active: 'نشط', Evaluated: 'تم تقييمه', Satisfied: 'مستوفى', ReleasedByExemption: 'أُنهي بإعفاء بديل' },
     },
     readiness: {
       title: 'الجاهزية للتخرج',

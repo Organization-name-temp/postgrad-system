@@ -37,7 +37,9 @@ export function EligibleCourseRow({ course, inCart, onToggle }: EligibleCourseRo
             </Typography>{' '}
             {courseName}
           </Typography>
-          {course.must_retake && <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />}
+          {course.obligation_type === 'Remediation'
+            ? <StatusChip {...mustRetakeChip(t('remediation.label'))} />
+            : course.must_retake && <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />}
         </Stack>
       </TableCell>
       <TableCell>{course.instructor?.name}</TableCell>

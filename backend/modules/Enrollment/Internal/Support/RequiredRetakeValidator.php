@@ -11,10 +11,16 @@ use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\MustRetakeObligation;
 use Modules\Enrollment\Internal\Models\RemediationObligation;
+use Modules\Identity\Public\Contracts\StudentDirectory;
 
 final class RequiredRetakeValidator
 {
-    public function __construct(private readonly ?CourseCatalog $courses = null, private readonly ?AcademicCalendar $calendar = null) {}
+    public function __construct(
+        private readonly ?CourseCatalog $courses = null,
+        private readonly ?AcademicCalendar $calendar = null,
+        private readonly ?StudentDirectory $students = null,
+        private readonly ?PreparatoryCompletionCheckpoint $preparatoryCheckpoint = null,
+    ) {}
 
     /**
      * @param  list<CartLine>  $lines
@@ -89,7 +95,10 @@ final class RequiredRetakeValidator
         $origin = Enrollment::query()->with('offering')->find($item->origin_enrollment_id);
         $semester = $origin?->offering === null ? null : $calendar->find((int) $origin->offering->semester_id);
         $originTime = $semester?->startsAt->getTimestamp() ?? $item->created_at->getTimestamp();
-        $checkpoint = $semester?->gradeSubmissionDeadlineAt->getTimestamp() ?? $originTime;
+        $student = ($this->students ?? app(StudentDirectory::class))->findByStudentId((int) $item->student_id);
+        $checkpoint = $student === null
+            ? $originTime
+            : (($this->preparatoryCheckpoint ?? app(PreparatoryCompletionCheckpoint::class))->deadline($student->enrollmentTerm)?->getTimestamp() ?? $originTime);
 
         return [
             $item->category === 'Preparatory' ? 0 : 1,

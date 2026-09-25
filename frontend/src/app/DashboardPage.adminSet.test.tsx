@@ -62,7 +62,11 @@ const EVERYTHING_ELSE = [
 
 const ROLE_CARD_CASES = [
   ['R01', ['My application'], []],
-  ['R02', ['My registration', 'My academic record'], []],
+  [
+    'R02',
+    ['My registration', 'My academic record', 'Credit-Hour Summary', 'Academic Standing'],
+    [],
+  ],
   ['R03', ['Advisee requests'], ['registration.approve']],
   ['R04', ['My grade sheets', 'Outstanding Incompletes'], ['grades.enter', 'grades.finalize']],
   [

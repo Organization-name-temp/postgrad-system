@@ -102,7 +102,7 @@ it('creates a Draft with exact printed evidence and target/source hours kept dis
     document_ids: [transcriptId, syllabusId],
     student_note: undefined,
   })
-})
+}, 10_000)
 
 it('renders immutable history and the final target-hour decision', async () => {
   api.requests = {

@@ -44,16 +44,7 @@ export function CreditHourSummaryPage() {
   const readinessQuery = useMyDerivedGraduationReadiness()
   const terminationQuery = useGetApiV1TerminationCasesMine()
   const remediationQuery = useGetApiV1RegistrationRemediationObligations()
-  const terminationCase = terminationQuery.data?.data as
-    | {
-        state?: string
-        evidence?: Record<string, unknown>
-        advisor_assessment?: string | null
-        department_head_reason?: string | null
-        council_reason?: string | null
-      }
-    | null
-    | undefined
+  const terminationCase = terminationQuery.data?.data
   const summary = data?.data
   const rows: SummaryRow[] = summary
     ? [...(summary.categories ?? []), ...(summary.total ? [summary.total] : [])]
@@ -117,7 +108,18 @@ export function CreditHourSummaryPage() {
         </Paper>
       )}
       {terminationCase && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert
+          severity={
+            terminationCase.state === 'Terminated'
+              ? 'error'
+              : ['Dismissed', 'TriggerCleared', 'EvidenceChanged'].includes(
+                    terminationCase.state ?? '',
+                  )
+                ? 'info'
+                : 'warning'
+          }
+          sx={{ mb: 3 }}
+        >
           <Typography variant="subtitle1">{t('termination.title')}</Typography>
           <Typography>{t(`termination.states.${terminationCase.state}`)}</Typography>
           <Typography variant="body2">{t('termination.explanation')}</Typography>

@@ -591,6 +591,8 @@ paths:
                     department_head_reason: null
                     council_user_id: null
                     council_reason: null
+                    closed_reason: null
+                    closed_at: null
                 properties:
                   data:
                     type: object
@@ -638,6 +640,14 @@ paths:
                         example: null
                         nullable: true
                       council_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      closed_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      closed_at:
                         type: string
                         example: null
                         nullable: true
@@ -723,6 +733,8 @@ paths:
                       department_head_reason: null
                       council_user_id: null
                       council_reason: null
+                      closed_reason: null
+                      closed_at: null
                   meta:
                     current_page: 1
                     last_page: 1
@@ -746,6 +758,8 @@ paths:
                         department_head_reason: null
                         council_user_id: null
                         council_reason: null
+                        closed_reason: null
+                        closed_at: null
                     items:
                       type: object
                       properties:
@@ -792,6 +806,14 @@ paths:
                           example: null
                           nullable: true
                         council_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        closed_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        closed_at:
                           type: string
                           example: null
                           nullable: true
@@ -888,6 +910,8 @@ paths:
                     department_head_reason: null
                     council_user_id: null
                     council_reason: null
+                    closed_reason: null
+                    closed_at: null
                 properties:
                   data:
                     type: object
@@ -932,6 +956,14 @@ paths:
                         example: null
                         nullable: true
                       council_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      closed_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      closed_at:
                         type: string
                         example: null
                         nullable: true
@@ -1044,6 +1076,8 @@ paths:
                       department_head_reason: null
                       council_user_id: null
                       council_reason: null
+                      closed_reason: null
+                      closed_at: null
                   meta:
                     current_page: 1
                     last_page: 1
@@ -1067,6 +1101,8 @@ paths:
                         department_head_reason: null
                         council_user_id: null
                         council_reason: null
+                        closed_reason: null
+                        closed_at: null
                     items:
                       type: object
                       properties:
@@ -1110,6 +1146,14 @@ paths:
                           example: null
                           nullable: true
                         council_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        closed_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        closed_at:
                           type: string
                           example: null
                           nullable: true
@@ -1206,6 +1250,8 @@ paths:
                     department_head_reason: Actionable.
                     council_user_id: null
                     council_reason: null
+                    closed_reason: null
+                    closed_at: null
                 properties:
                   data:
                     type: object
@@ -1248,6 +1294,14 @@ paths:
                         example: null
                         nullable: true
                       council_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      closed_reason:
+                        type: string
+                        example: null
+                        nullable: true
+                      closed_at:
                         type: string
                         example: null
                         nullable: true
@@ -1370,6 +1424,8 @@ paths:
                       department_head_reason: Actionable.
                       council_user_id: null
                       council_reason: null
+                      closed_reason: null
+                      closed_at: null
                   meta:
                     current_page: 1
                     last_page: 1
@@ -1393,6 +1449,8 @@ paths:
                         department_head_reason: Actionable.
                         council_user_id: null
                         council_reason: null
+                        closed_reason: null
+                        closed_at: null
                     items:
                       type: object
                       properties:
@@ -1434,6 +1492,14 @@ paths:
                           example: null
                           nullable: true
                         council_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        closed_reason:
+                          type: string
+                          example: null
+                          nullable: true
+                        closed_at:
                           type: string
                           example: null
                           nullable: true
@@ -1530,6 +1596,8 @@ paths:
                     department_head_reason: Actionable.
                     council_user_id: 8
                     council_reason: Confirmed.
+                    closed_reason: Terminated
+                    closed_at: '2026-09-25T12:00:00+00:00'
                 properties:
                   data:
                     type: object
@@ -1573,6 +1641,12 @@ paths:
                       council_reason:
                         type: string
                         example: Confirmed.
+                      closed_reason:
+                        type: string
+                        example: Terminated
+                      closed_at:
+                        type: string
+                        example: '2026-09-25T12:00:00+00:00'
       tags:
         - 'Academic Standing'
       requestBody:
@@ -14588,17 +14662,34 @@ paths:
                       opportunity_offering_id: null
                       checkpoint_semester_id: null
                       effective_deadline: null
+                      transitions:
+                        -
+                          id: 1
+                          from_state: null
+                          to_state: AwaitingOffering
+                          evidence:
+                            revocation_id: 3
+                          created_at: '2026-09-25T12:00:00+00:00'
                 properties:
                   data:
                     type: array
                     example:
-                      - id: 1
+                      -
+                        id: 1
                         course_id: 10
                         revocation_id: 3
                         state: AwaitingOffering
                         opportunity_offering_id: null
                         checkpoint_semester_id: null
                         effective_deadline: null
+                        transitions:
+                          -
+                            id: 1
+                            from_state: null
+                            to_state: AwaitingOffering
+                            evidence:
+                              revocation_id: 3
+                            created_at: '2026-09-25T12:00:00+00:00'
                     items:
                       type: object
                       properties:
@@ -14626,6 +14717,38 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                        transitions:
+                          type: array
+                          example:
+                            -
+                              id: 1
+                              from_state: null
+                              to_state: AwaitingOffering
+                              evidence:
+                                revocation_id: 3
+                              created_at: '2026-09-25T12:00:00+00:00'
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              from_state:
+                                type: string
+                                example: null
+                                nullable: true
+                              to_state:
+                                type: string
+                                example: AwaitingOffering
+                              evidence:
+                                type: object
+                                properties:
+                                  revocation_id:
+                                    type: integer
+                                    example: 3
+                              created_at:
+                                type: string
+                                example: '2026-09-25T12:00:00+00:00'
       tags:
         - Enrollment
       security: []

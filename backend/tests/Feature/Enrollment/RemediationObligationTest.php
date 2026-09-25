@@ -39,7 +39,10 @@ it('activates a remediation obligation at the earliest future offering and keeps
     $summary = app(RemediationObligations::class)->createFromRevocation($revocation->id);
     expect($summary->state)->toBe('Active')
         ->and($summary->opportunityOfferingId)->toBe($offering->id)
-        ->and($summary->checkpointSemesterId)->toBe($semester->id);
+        ->and($summary->checkpointSemesterId)->toBe($semester->id)
+        ->and($summary->transitions)->toHaveCount(1)
+        ->and($summary->transitions[0]->toState)->toBe('Active')
+        ->and($summary->transitions[0]->evidence['opportunity_offering_id'])->toBe($offering->id);
     $this->assertDatabaseCount('remediation_obligation_transitions', 1);
     app(RemediationObligations::class)->reconcileStudent($student->id);
     $this->assertDatabaseCount('remediation_obligation_transitions', 1);

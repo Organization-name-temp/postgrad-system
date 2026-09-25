@@ -31,21 +31,17 @@ import {
   getApiV1TerminationCasesAdvisorExport,
   getApiV1TerminationCasesDepartmentHeadExport,
   getApiV1TerminationCasesCouncilExport,
+  type GetApiV1TerminationCasesAdvisor200DataItem,
+  type GetApiV1TerminationCasesCouncil200DataItem,
+  type GetApiV1TerminationCasesDepartmentHead200DataItem,
 } from '../../shared/api/generated/endpoints'
-import { downloadBlob } from '../enrollment/credit-decisions/downloadBlob'
+import { downloadBlob } from '../../shared/downloadBlob'
 
 type Stage = 'advisor' | 'departmentHead' | 'council'
-type CaseRow = {
-  id?: number
-  student_id?: number
-  fingerprint?: string
-  state?: string
-  evidence?: Record<string, unknown>
-  advisor_assessment?: string | null
-  department_head_reason?: string | null
-  council_reason?: string | null
-  closed_reason?: string | null
-}
+type CaseRow =
+  | GetApiV1TerminationCasesAdvisor200DataItem
+  | GetApiV1TerminationCasesDepartmentHead200DataItem
+  | GetApiV1TerminationCasesCouncil200DataItem
 
 const reviewSchema = z.object({ reason: z.string().trim().min(1).max(4000) })
 type ReviewValues = z.infer<typeof reviewSchema>
@@ -95,7 +91,16 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
       >
         {t('termination.review.export')}
       </Button>
-      {query.isError && <Alert severity="error">{t('termination.review.loadError')}</Alert>}
+      {query.isError && (
+        <Alert
+          severity="error"
+          action={
+            <Button onClick={() => void query.refetch()}>{t('termination.review.retry')}</Button>
+          }
+        >
+          {t('termination.review.loadError')}
+        </Alert>
+      )}
       {query.isPending && (
         <Stack spacing={2} aria-label={t('termination.review.loading')}>
           <Skeleton variant="rounded" height={260} />
@@ -136,6 +141,7 @@ function TerminationCaseCard({
 }) {
   const { t } = useTranslation('academicStanding')
   const [confirmTerminate, setConfirmTerminate] = useState(false)
+  const [confirmDismiss, setConfirmDismiss] = useState(false)
   const form = useForm<ReviewValues>({
     resolver: zodResolver(reviewSchema),
     defaultValues: { reason: '' },
@@ -219,7 +225,15 @@ function TerminationCaseCard({
             >
               {t(`termination.review.actions.${positive}`)}
             </Button>
-            <Button color="error" disabled={pending} onClick={() => decide('dismiss')}>
+            <Button
+              color="error"
+              startIcon={<BlockIcon />}
+              disabled={pending}
+              onClick={() => {
+                if (stage === 'advisor') void decide('dismiss')
+                else setConfirmDismiss(true)
+              }}
+            >
               {t('termination.review.actions.dismiss')}
             </Button>
           </Stack>
@@ -246,6 +260,28 @@ function TerminationCaseCard({
             }}
           >
             {t('termination.review.actions.terminate')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={confirmDismiss} onClose={() => setConfirmDismiss(false)}>
+        <DialogTitle>{t('termination.review.actions.dismiss')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('termination.review.dismissConfirm', { id: row.student_id })}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDismiss(false)}>{t('termination.review.cancel')}</Button>
+          <Button
+            color="error"
+            variant="contained"
+            startIcon={<BlockIcon />}
+            onClick={() => {
+              setConfirmDismiss(false)
+              void decide('dismiss')
+            }}
+          >
+            {t('termination.review.actions.dismiss')}
           </Button>
         </DialogActions>
       </Dialog>

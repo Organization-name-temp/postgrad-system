@@ -195,6 +195,10 @@ export type GetApiV1TerminationCasesMine200Data = {
   council_user_id?: string | null;
   /** @nullable */
   council_reason?: string | null;
+  /** @nullable */
+  closed_reason?: string | null;
+  /** @nullable */
+  closed_at?: string | null;
 };
 
 export type GetApiV1TerminationCasesMine200 = {
@@ -236,6 +240,10 @@ export type GetApiV1TerminationCasesAdvisor200DataItem = {
   council_user_id?: string | null;
   /** @nullable */
   council_reason?: string | null;
+  /** @nullable */
+  closed_reason?: string | null;
+  /** @nullable */
+  closed_at?: string | null;
 };
 
 export type GetApiV1TerminationCasesAdvisor200Meta = {
@@ -283,6 +291,10 @@ export type PostApiV1TerminationCasesCaseIdAdvisorReview200Data = {
   council_user_id?: string | null;
   /** @nullable */
   council_reason?: string | null;
+  /** @nullable */
+  closed_reason?: string | null;
+  /** @nullable */
+  closed_at?: string | null;
 };
 
 export type PostApiV1TerminationCasesCaseIdAdvisorReview200 = {
@@ -321,6 +333,10 @@ export type GetApiV1TerminationCasesDepartmentHead200DataItem = {
   council_user_id?: string | null;
   /** @nullable */
   council_reason?: string | null;
+  /** @nullable */
+  closed_reason?: string | null;
+  /** @nullable */
+  closed_at?: string | null;
 };
 
 export type GetApiV1TerminationCasesDepartmentHead200Meta = {
@@ -366,6 +382,10 @@ export type PostApiV1TerminationCasesCaseIdDepartmentReview200Data = {
   council_user_id?: string | null;
   /** @nullable */
   council_reason?: string | null;
+  /** @nullable */
+  closed_reason?: string | null;
+  /** @nullable */
+  closed_at?: string | null;
 };
 
 export type PostApiV1TerminationCasesCaseIdDepartmentReview200 = {
@@ -406,6 +426,10 @@ export type GetApiV1TerminationCasesCouncil200DataItem = {
   council_user_id?: string | null;
   /** @nullable */
   council_reason?: string | null;
+  /** @nullable */
+  closed_reason?: string | null;
+  /** @nullable */
+  closed_at?: string | null;
 };
 
 export type GetApiV1TerminationCasesCouncil200Meta = {
@@ -449,6 +473,8 @@ export type PostApiV1TerminationCasesCaseIdCouncilDecision200Data = {
   department_head_reason?: string;
   council_user_id?: number;
   council_reason?: string;
+  closed_reason?: string;
+  closed_at?: string;
 };
 
 export type PostApiV1TerminationCasesCaseIdCouncilDecision200 = {
@@ -4254,6 +4280,19 @@ export type DecideOneScopedFullOfferingRequirement200 = {
   data?: DecideOneScopedFullOfferingRequirement200Data;
 };
 
+export type GetApiV1RegistrationRemediationObligations200DataItemTransitionsItemEvidence = {
+  revocation_id?: number;
+};
+
+export type GetApiV1RegistrationRemediationObligations200DataItemTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_state?: string | null;
+  to_state?: string;
+  evidence?: GetApiV1RegistrationRemediationObligations200DataItemTransitionsItemEvidence;
+  created_at?: string;
+};
+
 export type GetApiV1RegistrationRemediationObligations200DataItem = {
   id?: number;
   course_id?: number;
@@ -4265,6 +4304,7 @@ export type GetApiV1RegistrationRemediationObligations200DataItem = {
   checkpoint_semester_id?: string | null;
   /** @nullable */
   effective_deadline?: string | null;
+  transitions?: GetApiV1RegistrationRemediationObligations200DataItemTransitionsItem[];
 };
 
 export type GetApiV1RegistrationRemediationObligations200 = {

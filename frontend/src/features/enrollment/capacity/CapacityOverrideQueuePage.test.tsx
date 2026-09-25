@@ -47,7 +47,7 @@ it('lets the scoped department head approve a capacity exception with a reason',
     </ThemeProvider>,
   )
 
-  expect(await screen.findByText('Course #3')).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'Course #3' })).toBeInTheDocument()
   fireEvent.change(screen.getByLabelText(/Decision reason/), {
     target: { value: 'Required course' },
   })
@@ -68,7 +68,7 @@ it('shows the capacity queue in Arabic', async () => {
   )
 
   expect(await screen.findByText('استثناءات السعة')).toBeInTheDocument()
-  expect(await screen.findByText('المقرر رقم 3')).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'المقرر #3' })).toBeInTheDocument()
 })
 
 it('requires confirmation before denying a capacity exception', async () => {
@@ -82,7 +82,7 @@ it('requires confirmation before denying a capacity exception', async () => {
     </ThemeProvider>,
   )
 
-  expect(await screen.findByText('Course #3')).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'Course #3' })).toBeInTheDocument()
   fireEvent.change(screen.getByLabelText(/Decision reason/), { target: { value: 'No capacity' } })
   fireEvent.click(screen.getByRole('button', { name: 'Deny exception' }))
   expect(await screen.findByText(/registration request will be rejected/)).toBeInTheDocument()

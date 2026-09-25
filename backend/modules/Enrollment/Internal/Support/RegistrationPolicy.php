@@ -25,7 +25,7 @@ final readonly class RegistrationPolicy
 
         $basis = DB::table('registration_policy_projections')->where('student_id', $student->studentId)->first();
         if ($basis === null || $basis->remaining_exact_targets === null) {
-            return new CreditHoursExceptions(firstSemester: $student->enrollmentTerm === $semesterName);
+            return new CreditHoursExceptions;
         }
 
         $selected = array_fill_keys(array_map(fn (CartLine $line): int => $line->courseId, array_filter($lines, fn (CartLine $line): bool => $line->mode !== RegistrationMode::Audit)), true);

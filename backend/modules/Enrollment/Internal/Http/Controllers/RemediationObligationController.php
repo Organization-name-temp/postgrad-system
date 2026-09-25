@@ -10,7 +10,7 @@ use Modules\Identity\Public\Contracts\StudentDirectory;
 /** @group Enrollment */
 final class RemediationObligationController
 {
-    /** @response 200 {"data":[{"id":1,"course_id":10,"revocation_id":3,"state":"AwaitingOffering","opportunity_offering_id":null,"checkpoint_semester_id":null,"effective_deadline":null}]} */
+    /** @response 200 {"data":[{"id":1,"course_id":10,"revocation_id":3,"state":"AwaitingOffering","opportunity_offering_id":null,"checkpoint_semester_id":null,"effective_deadline":null,"transitions":[{"id":1,"from_state":null,"to_state":"AwaitingOffering","evidence":{"revocation_id":3},"created_at":"2026-09-25T12:00:00+00:00"}]}]} */
     public function mine(Request $request, StudentDirectory $students, RemediationObligations $obligations): JsonResponse
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
@@ -24,6 +24,13 @@ final class RemediationObligationController
             'opportunity_offering_id' => $item->opportunityOfferingId,
             'checkpoint_semester_id' => $item->checkpointSemesterId,
             'effective_deadline' => $item->effectiveDeadline,
+            'transitions' => array_map(fn ($transition): array => [
+                'id' => $transition->id,
+                'from_state' => $transition->fromState,
+                'to_state' => $transition->toState,
+                'evidence' => $transition->evidence,
+                'created_at' => $transition->createdAt,
+            ], $item->transitions),
         ], $obligations->forStudent($student->studentId))]);
     }
 }

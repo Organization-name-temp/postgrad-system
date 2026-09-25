@@ -186,7 +186,9 @@ export const GetApiV1TerminationCasesMineResponse = zod.object({
   "department_head_user_id": zod.string().nullish(),
   "department_head_reason": zod.string().nullish(),
   "council_user_id": zod.string().nullish(),
-  "council_reason": zod.string().nullish()
+  "council_reason": zod.string().nullish(),
+  "closed_reason": zod.string().nullish(),
+  "closed_at": zod.string().nullish()
 }).optional()
 })
 
@@ -214,7 +216,9 @@ export const GetApiV1TerminationCasesAdvisorResponse = zod.object({
   "department_head_user_id": zod.string().nullish(),
   "department_head_reason": zod.string().nullish(),
   "council_user_id": zod.string().nullish(),
-  "council_reason": zod.string().nullish()
+  "council_reason": zod.string().nullish(),
+  "closed_reason": zod.string().nullish(),
+  "closed_at": zod.string().nullish()
 })).optional(),
   "meta": zod.object({
   "current_page": zod.number().optional(),
@@ -258,7 +262,9 @@ export const PostApiV1TerminationCasesCaseIdAdvisorReviewResponse = zod.object({
   "department_head_user_id": zod.string().nullish(),
   "department_head_reason": zod.string().nullish(),
   "council_user_id": zod.string().nullish(),
-  "council_reason": zod.string().nullish()
+  "council_reason": zod.string().nullish(),
+  "closed_reason": zod.string().nullish(),
+  "closed_at": zod.string().nullish()
 }).optional()
 })
 
@@ -286,7 +292,9 @@ export const GetApiV1TerminationCasesDepartmentHeadResponse = zod.object({
   "department_head_user_id": zod.string().nullish(),
   "department_head_reason": zod.string().nullish(),
   "council_user_id": zod.string().nullish(),
-  "council_reason": zod.string().nullish()
+  "council_reason": zod.string().nullish(),
+  "closed_reason": zod.string().nullish(),
+  "closed_at": zod.string().nullish()
 })).optional(),
   "meta": zod.object({
   "current_page": zod.number().optional(),
@@ -330,7 +338,9 @@ export const PostApiV1TerminationCasesCaseIdDepartmentReviewResponse = zod.objec
   "department_head_user_id": zod.number().optional(),
   "department_head_reason": zod.string().optional(),
   "council_user_id": zod.string().nullish(),
-  "council_reason": zod.string().nullish()
+  "council_reason": zod.string().nullish(),
+  "closed_reason": zod.string().nullish(),
+  "closed_at": zod.string().nullish()
 }).optional()
 })
 
@@ -359,7 +369,9 @@ export const GetApiV1TerminationCasesCouncilResponse = zod.object({
   "department_head_user_id": zod.number().optional(),
   "department_head_reason": zod.string().optional(),
   "council_user_id": zod.string().nullish(),
-  "council_reason": zod.string().nullish()
+  "council_reason": zod.string().nullish(),
+  "closed_reason": zod.string().nullish(),
+  "closed_at": zod.string().nullish()
 })).optional(),
   "meta": zod.object({
   "current_page": zod.number().optional(),
@@ -403,7 +415,9 @@ export const PostApiV1TerminationCasesCaseIdCouncilDecisionResponse = zod.object
   "department_head_user_id": zod.number().optional(),
   "department_head_reason": zod.string().optional(),
   "council_user_id": zod.number().optional(),
-  "council_reason": zod.string().optional()
+  "council_reason": zod.string().optional(),
+  "closed_reason": zod.string().optional(),
+  "closed_at": zod.string().optional()
 }).optional()
 })
 
@@ -3988,7 +4002,16 @@ export const GetApiV1RegistrationRemediationObligationsResponse = zod.object({
   "state": zod.string().optional(),
   "opportunity_offering_id": zod.string().nullish(),
   "checkpoint_semester_id": zod.string().nullish(),
-  "effective_deadline": zod.string().nullish()
+  "effective_deadline": zod.string().nullish(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_state": zod.string().nullish(),
+  "to_state": zod.string().optional(),
+  "evidence": zod.object({
+  "revocation_id": zod.number().optional()
+}).optional(),
+  "created_at": zod.string().optional()
+})).optional()
 })).optional()
 })
 

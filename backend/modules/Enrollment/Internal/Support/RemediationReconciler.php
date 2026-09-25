@@ -2,6 +2,7 @@
 
 namespace Modules\Enrollment\Internal\Support;
 
+use Illuminate\Support\Facades\DB;
 use Modules\Calendar\Public\AcademicCalendar;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
@@ -14,6 +15,7 @@ use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Models\RemediationObligation;
 use Modules\Enrollment\Public\RemediationObligations;
 use Modules\Enrollment\Public\RemediationObligationSummary;
+use Modules\Enrollment\Public\RemediationTransitionSummary;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\Contracts\StudentGuard;
@@ -54,11 +56,13 @@ final readonly class RemediationReconciler implements RemediationObligations
 
     public function reconcileStudent(int $studentId): void
     {
-        $student = $this->studentGuard->lock($studentId);
-        if ($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active) {
-            return;
-        }
-        $this->reconcileStudentState($studentId);
+        DB::transaction(function () use ($studentId): void {
+            $student = $this->studentGuard->lock($studentId);
+            if ($student === null || $student->lifecycleStatus !== StudentLifecycleStatus::Active) {
+                return;
+            }
+            $this->reconcileStudentState($studentId);
+        });
     }
 
     private function reconcileStudentState(int $studentId): void
@@ -160,7 +164,7 @@ final readonly class RemediationReconciler implements RemediationObligations
             $student = $this->students->findByStudentId($studentId);
             if ($student !== null) {
                 $course = $this->courses->find($courseId);
-                $reviewers = $request->status === RegistrationStatus::AwaitingCapacityOverride && $course !== null
+                $reviewers = $from === RegistrationStatus::AwaitingCapacityOverride->value && $course !== null
                     ? $this->heads->headsForDepartment($course->departmentId)
                     : [];
                 foreach (array_unique([$student->userId, $student->advisorId, ...$reviewers]) as $recipient) {
@@ -186,7 +190,20 @@ final readonly class RemediationReconciler implements RemediationObligations
 
     private function summary(RemediationObligation $item): RemediationObligationSummary
     {
-        return new RemediationObligationSummary($item->id, $item->student_id, $item->course_id, $item->revocation_id, $item->state->value, $item->opportunity_offering_id, $item->checkpoint_semester_id, $item->effective_deadline_at?->toIso8601String());
+        $transitions = DB::table('remediation_obligation_transitions')
+            ->where('remediation_obligation_id', $item->id)
+            ->orderBy('id')
+            ->get()
+            ->map(fn (object $transition): RemediationTransitionSummary => new RemediationTransitionSummary(
+                (int) $transition->id,
+                $transition->from_state,
+                $transition->to_state,
+                json_decode($transition->evidence, true, flags: JSON_THROW_ON_ERROR),
+                (string) $transition->created_at,
+            ))
+            ->all();
+
+        return new RemediationObligationSummary($item->id, $item->student_id, $item->course_id, $item->revocation_id, $item->state->value, $item->opportunity_offering_id, $item->checkpoint_semester_id, $item->effective_deadline_at?->toIso8601String(), $transitions);
     }
 
     private function notifyChange(RemediationObligation $item, int $transitionId, string $change): void

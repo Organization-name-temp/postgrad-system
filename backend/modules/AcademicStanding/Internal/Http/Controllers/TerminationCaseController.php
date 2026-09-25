@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /** @group Academic Standing */
 final class TerminationCaseController
 {
-    /** @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingAdvisor","evidence":{"df_grades":[]},"advisor_user_id":null,"advisor_assessment":null,"advisor_recommendation":null,"department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null}} */
+    /** @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingAdvisor","evidence":{"df_grades":[]},"advisor_user_id":null,"advisor_assessment":null,"advisor_recommendation":null,"department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}} */
     public function mine(Request $request, StudentDirectory $students, TerminationCases $cases): JsonResponse
     {
         $student = $students->find((int) $request->user()?->getAuthIdentifier());
@@ -43,7 +43,7 @@ final class TerminationCaseController
      * @queryParam page integer Example: 1
      * @queryParam per_page integer Capped at 100. Example: 25
      *
-     * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingAdvisor","evidence":{"df_grades":[]},"advisor_user_id":null,"advisor_assessment":null,"advisor_recommendation":null,"department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
+     * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingAdvisor","evidence":{"df_grades":[]},"advisor_user_id":null,"advisor_assessment":null,"advisor_recommendation":null,"department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
      */
     public function advisorQueue(Request $request, StudentDirectory $students): JsonResponse
     {
@@ -71,7 +71,7 @@ final class TerminationCaseController
      * @queryParam page integer Example: 1
      * @queryParam per_page integer Capped at 100. Example: 25
      *
-     * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingDepartmentHead","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
+     * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingDepartmentHead","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
      */
     public function departmentQueue(Request $request, StudentDirectory $students, ProgramCatalog $programs, DepartmentHeadAssignments $heads): JsonResponse
     {
@@ -104,7 +104,7 @@ final class TerminationCaseController
      * @queryParam per_page integer Capped at 100. Example: 25
      * @queryParam include_decided boolean Include preserved final case history. Example: true
      *
-     * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingCouncil","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":null,"council_reason":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
+     * @response 200 {"data":[{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingCouncil","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
      */
     public function councilQueue(Request $request): JsonResponse
     {
@@ -129,7 +129,7 @@ final class TerminationCaseController
      * @bodyParam assessment string required Example: Two distinct failing grades remain effective.
      * @bodyParam recommendation string required continue or dismiss. Example: continue
      *
-     * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingDepartmentHead","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null}}
+     * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingDepartmentHead","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":null,"department_head_reason":null,"council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}}
      */
     public function advisorReview(Request $request, TerminationCase $case, StudentGuard $guard, TerminationCases $cases, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
@@ -154,7 +154,7 @@ final class TerminationCaseController
      * @bodyParam action string required recommend or dismiss. Example: recommend
      * @bodyParam reason string required Example: Evidence is actionable.
      *
-     * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingCouncil","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":null,"council_reason":null}}
+     * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"AwaitingCouncil","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":null,"council_reason":null,"closed_reason":null,"closed_at":null}}
      */
     public function departmentReview(Request $request, TerminationCase $case, StudentGuard $guard, ProgramCatalog $programs, DepartmentHeadAssignments $heads, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
@@ -186,7 +186,7 @@ final class TerminationCaseController
      * @bodyParam action string required terminate or dismiss. Example: terminate
      * @bodyParam reason string required Example: Council confirmed termination.
      *
-     * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"Terminated","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":8,"council_reason":"Confirmed."}}
+     * @response 200 {"data":{"id":1,"student_id":5,"fingerprint":"abc","state":"Terminated","evidence":{"df_grades":[]},"advisor_user_id":3,"advisor_assessment":"Two failures.","advisor_recommendation":"continue","department_head_user_id":6,"department_head_reason":"Actionable.","council_user_id":8,"council_reason":"Confirmed.","closed_reason":"Terminated","closed_at":"2026-09-25T12:00:00+00:00"}}
      */
     public function councilDecision(Request $request, TerminationCase $case, StudentGuard $guard, StudentLifecycleWriter $lifecycle, AcademicRequestCloseout $closeout, TerminationCases $cases, StandingReconciler $standing, AuditLogger $audit, Notifier $notifier): JsonResponse
     {
@@ -247,13 +247,20 @@ final class TerminationCaseController
         $rows = (function () use ($query): \Generator {
             foreach ($query->lazyById(500) as $case) {
                 yield [
-                    $case->id, $case->student_id, $case->state, $case->advisor_user_id, $case->advisor_recommendation,
-                    $case->department_head_user_id, $case->council_user_id, $case->closed_reason, $case->closed_at?->toIso8601String(),
+                    $case->id, $case->student_id, __('academic_standing.exports.states.'.$case->state), $case->advisor_user_id,
+                    $case->advisor_recommendation === null ? null : __('academic_standing.exports.recommendations.'.$case->advisor_recommendation),
+                    $case->department_head_user_id, $case->council_user_id,
+                    $case->closed_reason === null ? null : __('academic_standing.exports.states.'.$case->closed_reason),
+                    $case->closed_at?->toIso8601String(),
                 ];
             }
         })();
         $count = (clone $query)->count();
-        $response = $xlsx->download($filename, ['Case ID', 'Student ID', 'State', 'Advisor ID', 'Advisor recommendation', 'Department Head ID', 'Council ID', 'Closed reason', 'Closed at'], $rows, app()->getLocale() === 'ar');
+        $headers = array_map(
+            static fn (string $key): string => __('academic_standing.exports.headers.'.$key),
+            ['case_id', 'student_id', 'state', 'advisor_id', 'advisor_recommendation', 'department_head_id', 'council_id', 'closed_reason', 'closed_at'],
+        );
+        $response = $xlsx->download($filename, $headers, $rows, app()->getLocale() === 'ar');
         $audit->record('termination.cases.exported', (int) $request->user()?->getAuthIdentifier(), ['criteria' => $collection->auditCriteria(), 'row_count' => $count], 'termination_cases');
 
         return $response;

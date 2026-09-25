@@ -20,6 +20,16 @@ use Modules\Identity\Public\Contracts\StudentDirectory;
 
 uses(RefreshDatabase::class);
 
+it('fails closed when the canonical underload projection is unavailable', function () {
+    $student = Student::factory()->create(['enrollment_term' => 'Fall 2026']);
+    $summary = app(StudentDirectory::class)->findByStudentId($student->id);
+    expect($summary)->not->toBeNull();
+
+    $line = new CartLine(1, 1, 'PREP-101', RegistrationMode::Regular, 3, EnrollmentClassification::Core, 10, []);
+
+    expect(app(RegistrationPolicy::class)->exceptions($summary, 'Fall 2026', [$line])->firstSemester)->toBeFalse();
+});
+
 it('uses the latest effective attempt when deriving an approaching-graduation underload exception', function () {
     $program = Program::factory()->create();
     $course = Course::factory()->create(['total_ch' => 3]);

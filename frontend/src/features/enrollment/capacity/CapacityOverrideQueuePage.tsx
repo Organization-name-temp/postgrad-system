@@ -40,7 +40,14 @@ export function CapacityOverrideQueuePage() {
         </Typography>
         <Typography color="text.secondary">{t('capacityReview.intro')}</Typography>
       </div>
-      {query.isError && <Alert severity="error">{t('capacityReview.loadError')}</Alert>}
+      {query.isError && (
+        <Alert
+          severity="error"
+          action={<Button onClick={() => void query.refetch()}>{t('capacityReview.retry')}</Button>}
+        >
+          {t('capacityReview.loadError')}
+        </Alert>
+      )}
       {query.isPending && (
         <Stack spacing={2} aria-label={t('capacityReview.loading')}>
           <Skeleton variant="rounded" height={220} />
@@ -85,15 +92,15 @@ function CapacityCard({
       sx={(theme) => ({ p: { xs: 2, sm: 3 }, borderRadius: theme.shape.radiusLg })}
     >
       <Stack spacing={2}>
-        <Typography variant="h6">{t('capacityReview.course', { id: row.course_id })}</Typography>
+        <Typography variant="h6">
+          {t('capacityReview.courseLabel')} <bdi dir="ltr">#{row.course_id}</bdi>
+        </Typography>
         {row.obligation_type && (
           <Typography>{t(`capacityReview.obligationTypes.${row.obligation_type}`)}</Typography>
         )}
         <Typography>
-          {t('capacityReview.request', {
-            id: row.registration_request_id,
-            offering: row.course_offering_id,
-          })}
+          {t('capacityReview.requestLabel')} <bdi dir="ltr">#{row.registration_request_id}</bdi> ·{' '}
+          {t('capacityReview.offeringLabel')} <bdi dir="ltr">#{row.course_offering_id}</bdi>
         </Typography>
         <TextField
           label={t('capacityReview.reason')}

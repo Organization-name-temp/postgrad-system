@@ -73,3 +73,23 @@ it('renders the reviewer queue in Arabic without exposing translation keys', asy
   expect(await screen.findByText('قرارات إنهاء القيد')).toBeInTheDocument()
   expect(screen.queryByText(/termination\.review/)).not.toBeInTheDocument()
 })
+
+it('requires confirmation before the council dismisses a case', async () => {
+  render(
+    <ThemeProvider theme={createAppTheme('en')}>
+      <QueryClientProvider
+        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+      >
+        <TerminationReviewQueuePage stage="council" />
+      </QueryClientProvider>
+    </ThemeProvider>,
+  )
+
+  expect(await screen.findByText('Student #19')).toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText(/Assessment or reason/), {
+    target: { value: 'Trigger is no longer actionable' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Dismiss case' }))
+  expect(await screen.findByText(/Confirm dismissal for Student #19/)).toBeInTheDocument()
+  expect(calls.some((call) => call.method === 'POST')).toBe(false)
+})

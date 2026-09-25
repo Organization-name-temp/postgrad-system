@@ -1557,9 +1557,13 @@ export const en = {
       title: 'Capacity exceptions',
       intro: 'Review required full offerings before the registration request can be finalized.',
       loadError: 'Could not load capacity exceptions.',
+      retry: 'Retry',
       empty: 'No capacity exceptions need your decision.',
       course: 'Course #{{id}}',
       request: 'Registration request #{{id}} · Offering #{{offering}}',
+      courseLabel: 'Course',
+      requestLabel: 'Registration request',
+      offeringLabel: 'Offering',
       obligationTypes: {
         MustRetake: 'Required ordinary retake',
         Remediation: 'Required remediation after exemption revocation',
@@ -1874,6 +1878,8 @@ export const en = {
         AwaitingCouncil: 'Awaiting Council decision',
         Dismissed: 'Dismissed',
         Terminated: 'Termination confirmed',
+        TriggerCleared: 'Trigger cleared',
+        EvidenceChanged: 'Closed after evidence changed',
       },
       review: {
         intro:
@@ -1893,10 +1899,13 @@ export const en = {
         },
         empty: 'No termination cases are waiting at this stage.',
         loadError: 'Could not load termination cases.',
+        retry: 'Retry',
         loading: 'Loading termination cases',
         export: 'Export cases',
         terminateConfirm:
           'Confirm termination for Student #{{id}}? This ends the student’s active academic lifecycle and closes pending academic requests.',
+        dismissConfirm:
+          'Confirm dismissal for Student #{{id}}? This closes the case as a final reviewed outcome.',
         cancel: 'Cancel',
         actions: {
           continue: 'Send to Department Head',

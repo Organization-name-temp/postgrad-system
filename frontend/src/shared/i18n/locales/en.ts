@@ -1859,7 +1859,8 @@ export const en = {
         Terminated: 'Termination confirmed',
       },
       review: {
-        intro: 'Review the current evidence fingerprint. Every action is revalidated against the live academic record.',
+        intro:
+          'Review the current evidence fingerprint. Every action is revalidated against the live academic record.',
         advisor: { title: 'Termination assessments' },
         departmentHead: { title: 'Termination recommendations' },
         council: { title: 'Termination decisions' },
@@ -1868,7 +1869,12 @@ export const en = {
         reason: 'Assessment or reason',
         empty: 'No termination cases are waiting at this stage.',
         loadError: 'Could not load termination cases.',
-        actions: { continue: 'Send to Department Head', recommend: 'Recommend termination', terminate: 'Confirm termination', dismiss: 'Dismiss case' },
+        actions: {
+          continue: 'Send to Department Head',
+          recommend: 'Recommend termination',
+          terminate: 'Confirm termination',
+          dismiss: 'Dismiss case',
+        },
       },
     },
     readiness: {

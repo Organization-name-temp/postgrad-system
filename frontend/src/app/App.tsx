@@ -101,11 +101,46 @@ export function App() {
                     admin who merely inherits courses.register_self is sent home and
                     the server would 403 the eligible list anyway (ticket 04). */}
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
-                  <Route path="/registration" element={<LifecycleReadOnly><RegistrationPage /></LifecycleReadOnly>} />
-                  <Route path="/schedule" element={<LifecycleReadOnly><SchedulePage /></LifecycleReadOnly>} />
-                  <Route path="/exemptions" element={<LifecycleReadOnly><ManualExemptionsPage /></LifecycleReadOnly>} />
-                  <Route path="/transfers" element={<LifecycleReadOnly><TransfersPage /></LifecycleReadOnly>} />
-                  <Route path="/waivers" element={<LifecycleReadOnly><WaiversPage /></LifecycleReadOnly>} />
+                  <Route
+                    path="/registration"
+                    element={
+                      <LifecycleReadOnly>
+                        <RegistrationPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/schedule"
+                    element={
+                      <LifecycleReadOnly>
+                        <SchedulePage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/exemptions"
+                    element={
+                      <LifecycleReadOnly>
+                        <ManualExemptionsPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/transfers"
+                    element={
+                      <LifecycleReadOnly>
+                        <TransfersPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/waivers"
+                    element={
+                      <LifecycleReadOnly>
+                        <WaiversPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
                   <Route path="/academic-standing" element={<CreditHourSummaryPage />} />
                 </Route>
                 {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
@@ -169,8 +204,14 @@ export function App() {
                     path="/waivers/department-head"
                     element={<WaiverReviewQueuePage stage="departmentHead" />}
                   />
-                  <Route path="/registration/capacity-overrides" element={<CapacityOverrideQueuePage />} />
-                  <Route path="/termination/department-head" element={<TerminationReviewQueuePage stage="departmentHead" />} />
+                  <Route
+                    path="/registration/capacity-overrides"
+                    element={<CapacityOverrideQueuePage />}
+                  />
+                  <Route
+                    path="/termination/department-head"
+                    element={<TerminationReviewQueuePage stage="departmentHead" />}
+                  />
                 </Route>
                 <Route element={<RequireAuth roles={[ROLE.advisor]} />}>
                   <Route
@@ -185,7 +226,10 @@ export function App() {
                     path="/waivers/advisor"
                     element={<WaiverReviewQueuePage stage="advisor" />}
                   />
-                  <Route path="/termination/advisor" element={<TerminationReviewQueuePage stage="advisor" />} />
+                  <Route
+                    path="/termination/advisor"
+                    element={<TerminationReviewQueuePage stage="advisor" />}
+                  />
                 </Route>
                 <Route element={<RequireAuth roles={[ROLE.council]} />}>
                   <Route
@@ -196,7 +240,10 @@ export function App() {
                     path="/waivers/council"
                     element={<WaiverReviewQueuePage stage="council" />}
                   />
-                  <Route path="/termination/council" element={<TerminationReviewQueuePage stage="council" />} />
+                  <Route
+                    path="/termination/council"
+                    element={<TerminationReviewQueuePage stage="council" />}
+                  />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to

@@ -75,7 +75,10 @@ function TerminationCaseCard({
   const decide = async (action: string) => {
     if (!row.id || !reason.trim()) return
     if (stage === 'advisor') {
-      await advisor.mutateAsync({ caseId: row.id, data: { assessment: reason, recommendation: action } })
+      await advisor.mutateAsync({
+        caseId: row.id,
+        data: { assessment: reason, recommendation: action },
+      })
     } else if (stage === 'departmentHead') {
       await head.mutateAsync({ caseId: row.id, data: { action, reason } })
     } else {
@@ -84,13 +87,19 @@ function TerminationCaseCard({
     setReason('')
     await onChanged()
   }
-  const positive = stage === 'advisor' ? 'continue' : stage === 'departmentHead' ? 'recommend' : 'terminate'
+  const positive =
+    stage === 'advisor' ? 'continue' : stage === 'departmentHead' ? 'recommend' : 'terminate'
 
   return (
-    <Paper variant="outlined" sx={(theme) => ({ p: { xs: 2, sm: 3 }, borderRadius: theme.shape.radiusLg })}>
+    <Paper
+      variant="outlined"
+      sx={(theme) => ({ p: { xs: 2, sm: 3 }, borderRadius: theme.shape.radiusLg })}
+    >
       <Stack spacing={2}>
         <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 1 }}>
-          <Typography variant="h6">{t('termination.review.student', { id: row.student_id })}</Typography>
+          <Typography variant="h6">
+            {t('termination.review.student', { id: row.student_id })}
+          </Typography>
           <Chip label={t(`termination.states.${row.state}`)} />
         </Stack>
         <Typography variant="body2" sx={{ overflowWrap: 'anywhere' }}>
@@ -110,10 +119,18 @@ function TerminationCaseCard({
           required
         />
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-          <Button variant="contained" disabled={pending || !reason.trim()} onClick={() => decide(positive)}>
+          <Button
+            variant="contained"
+            disabled={pending || !reason.trim()}
+            onClick={() => decide(positive)}
+          >
             {t(`termination.review.actions.${positive}`)}
           </Button>
-          <Button color="error" disabled={pending || !reason.trim()} onClick={() => decide('dismiss')}>
+          <Button
+            color="error"
+            disabled={pending || !reason.trim()}
+            onClick={() => decide('dismiss')}
+          >
             {t('termination.review.actions.dismiss')}
           </Button>
         </Stack>

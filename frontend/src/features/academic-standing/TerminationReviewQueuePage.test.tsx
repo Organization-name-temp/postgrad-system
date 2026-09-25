@@ -14,7 +14,15 @@ vi.mock('../../shared/api/http', () => ({
     calls.push(config)
     if (config.method === 'GET') {
       return Promise.resolve({
-        data: [{ id: 7, student_id: 19, fingerprint: 'evidence-123', state: 'AwaitingCouncil', evidence: { trigger: 'Preparatory' } }],
+        data: [
+          {
+            id: 7,
+            student_id: 19,
+            fingerprint: 'evidence-123',
+            state: 'AwaitingCouncil',
+            evidence: { trigger: 'Preparatory' },
+          },
+        ],
       })
     }
     return Promise.resolve({ data: { id: 7, state: 'Terminated' } })
@@ -29,14 +37,18 @@ beforeEach(async () => {
 it('lets the council record a reasoned termination decision', async () => {
   render(
     <ThemeProvider theme={createAppTheme('en')}>
-      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <QueryClientProvider
+        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+      >
         <TerminationReviewQueuePage stage="council" />
       </QueryClientProvider>
     </ThemeProvider>,
   )
 
   expect(await screen.findByText('Student #19')).toBeInTheDocument()
-  fireEvent.change(screen.getByLabelText(/Assessment or reason/), { target: { value: 'Evidence confirmed' } })
+  fireEvent.change(screen.getByLabelText(/Assessment or reason/), {
+    target: { value: 'Evidence confirmed' },
+  })
   fireEvent.click(screen.getByRole('button', { name: 'Confirm termination' }))
   await vi.waitFor(() => expect(calls.some((call) => call.method === 'POST')).toBe(true))
 })
@@ -45,7 +57,9 @@ it('renders the reviewer queue in Arabic without exposing translation keys', asy
   await i18n.changeLanguage('ar')
   render(
     <ThemeProvider theme={createAppTheme('ar')}>
-      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <QueryClientProvider
+        client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+      >
         <TerminationReviewQueuePage stage="council" />
       </QueryClientProvider>
     </ThemeProvider>,

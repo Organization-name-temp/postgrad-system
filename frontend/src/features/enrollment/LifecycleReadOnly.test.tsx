@@ -14,7 +14,9 @@ beforeEach(async () => {
 })
 
 it('keeps history visible but disables mutation controls for a terminated student', () => {
-  mockedUseAuth.mockReturnValue({ user: { student: { lifecycle_status: 'Terminated' } } } as UseAuth)
+  mockedUseAuth.mockReturnValue({
+    user: { student: { lifecycle_status: 'Terminated' } },
+  } as UseAuth)
   render(
     <ThemeProvider theme={createAppTheme('en')}>
       <LifecycleReadOnly>

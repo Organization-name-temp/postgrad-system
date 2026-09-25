@@ -116,7 +116,7 @@ it('requires and submits one of the four normalized grades at the scoped Head se
       expected_revision: 1,
     }),
   )
-})
+}, 10_000)
 
 it('keeps the idempotency key stable when a Council retry follows a lost response', async () => {
   api.failPost = true

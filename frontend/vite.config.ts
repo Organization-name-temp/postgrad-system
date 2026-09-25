@@ -26,6 +26,9 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       globals: true,
       setupFiles: './src/test/setup.ts',
+      // MUI interaction tests can exceed Vitest's 5s default when the full
+      // 80-file suite transforms and renders in parallel on CI-sized hosts.
+      testTimeout: 20_000,
       // e2e/ is Playwright's; keep it out of the Vitest run.
       exclude: ['**/node_modules/**', '**/e2e/**'],
     },

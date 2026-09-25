@@ -56,7 +56,7 @@ it('lets the council record a reasoned termination decision', async () => {
   const confirmations = screen.getAllByRole('button', { name: 'Confirm termination' })
   fireEvent.click(confirmations[confirmations.length - 1])
   await vi.waitFor(() => expect(calls.some((call) => call.method === 'POST')).toBe(true))
-}, 10_000)
+})
 
 it('renders the reviewer queue in Arabic without exposing translation keys', async () => {
   await i18n.changeLanguage('ar')

@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Catalog\Internal\Models\Course;
+use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Identity\Public\Enums\Role;
@@ -84,13 +85,57 @@ it('captures the full program aggregate — including its curriculum — in the 
     expect($latest['curriculum'][0]['category'])->toBe('ProgramCore');
 });
 
+it('marks a Program Curriculum Version complete only when all six Preparatory Roles are present', function () {
+    $program = Program::factory()->create();
+    $roles = [
+        'EnglishLanguage',
+        'ArabicLanguage',
+        'JapaneseLanguage',
+        'JapaneseCulture',
+        'KeySkills',
+        'DepartmentalRequirement',
+    ];
+
+    foreach (array_slice($roles, 0, 5) as $ordinal => $role) {
+        $course = Course::factory()->create([
+            'department_id' => $role === 'KeySkills' ? $program->department_id : null,
+        ]);
+        CurriculumEntry::factory()->create([
+            'program_id' => $program->id,
+            'course_id' => $course->id,
+            'category' => 'Preparatory',
+            'preparatory_requirement_role' => $role,
+            'ordinal' => $ordinal,
+        ]);
+    }
+
+    actingAsRole(Role::DepartmentHead);
+    $departmental = Course::factory()->create(['department_id' => $program->department_id]);
+    $this->postJson("/api/v1/programs/{$program->id}/curriculum", [
+        'course_id' => $departmental->id,
+        'category' => 'Preparatory',
+        'preparatory_requirement_role' => 'DepartmentalRequirement',
+    ])->assertCreated();
+
+    $snapshot = $this->getJson("/api/v1/programs/{$program->id}/versions")
+        ->assertOk()
+        ->json('data.0.snapshot');
+
+    expect($snapshot['preparatory_requirements_complete'])->toBeTrue()
+        ->and($snapshot['missing_preparatory_requirement_roles'])->toBe([])
+        ->and(collect($snapshot['curriculum'])->pluck('preparatory_requirement_role')->all())
+        ->toEqualCanonicalizing($roles);
+});
+
 it('records a new program version when a curriculum entry is removed', function () {
     $program = Program::factory()->create();
     $course = Course::factory()->create();
     actingAsRole(Role::DepartmentHead);
 
     $entry = $this->postJson("/api/v1/programs/{$program->id}/curriculum", [
-        'course_id' => $course->id, 'category' => 'Preparatory',
+        'course_id' => $course->id,
+        'category' => 'Preparatory',
+        'preparatory_requirement_role' => 'EnglishLanguage',
     ])->assertCreated()->json('data.id');
 
     $this->deleteJson("/api/v1/programs/{$program->id}/curriculum/{$entry}")->assertNoContent();

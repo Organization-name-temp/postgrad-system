@@ -17,14 +17,16 @@ use Modules\Admissions\Internal\Enums\IntakeTerm;
 use Modules\Admissions\Internal\Enums\InterviewMode;
 use Modules\Admissions\Internal\Enums\InterviewStatus;
 use Modules\Admissions\Internal\Enums\PreviousDegree;
-use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Models\Interview;
 use Modules\Admissions\Internal\Models\InterviewSlot;
+use Modules\Admissions\Internal\Support\AdmissionAcceptanceEvidenceFactory;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\AdmitStudent;
@@ -409,15 +411,30 @@ class AdmissionsSeeder extends Seeder
         string $nationalId,
         Gender $gender,
     ): void {
+        $admittedAt = Carbon::now()->toImmutable();
+        $catalog = app(ProgramCatalog::class);
+        $programSummary = $catalog->find((int) $program->getKey());
+        if ($programSummary === null) {
+            throw new \RuntimeException("Seed Program {$program->code} does not resolve through Catalog.");
+        }
+        $curriculumVersion = $catalog->curriculumVersionEffectiveAt((int) $program->getKey(), $admittedAt);
+        if ($curriculumVersion === null) {
+            throw new \RuntimeException("Seed Program {$program->code} has no Curriculum Version.");
+        }
+
+        $evidenceFactory = app(AdmissionAcceptanceEvidenceFactory::class);
+        $evidenceFacts = $evidenceFactory->facts($application, $programSummary);
         $result = app(StudentEnrollment::class)->admit(new AdmitStudent(
             userId: (int) $application->user_id,
             actorUserId: $deanId,
             programId: $program->getKey(),
             programCode: $program->code,
+            curriculumVersionId: $curriculumVersion->id,
             admissionYear: (int) $cycle->year,
             enrollmentTerm: $cycle->intake_term->value.' '.$cycle->year,
             admissionCycleId: $cycle->getKey(),
             advisorId: $advisorId,
+            admittedAt: $admittedAt,
             identity: new StudentIdentity(
                 nameEn: $nameEn,
                 nameAr: $nameAr,
@@ -426,11 +443,11 @@ class AdmissionsSeeder extends Seeder
                 nationality: 'EG',
                 gender: $gender->value,
             ),
+            admissionEvidence: $evidenceFacts,
         ));
 
         Event::dispatch(new AdmissionAccepted(
-            userId: (int) $application->user_id,
-            applicationId: (int) $application->getKey(),
+            evidence: $evidenceFactory->fromFacts($result->studentId, $evidenceFacts),
             universityId: $result->universityId,
         ));
     }

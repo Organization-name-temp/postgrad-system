@@ -118,9 +118,9 @@ it('lands SA-composed as a Pending request routed to the student’s advisor', f
     $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
     $semester = obSemester();
     $advisor = obAdvisor();
-    $student = obStudentIn($program, $advisor, enrollmentTerm: 'Fall 2026'); // waive the floor
+    $student = obStudentIn($program, $advisor, enrollmentTerm: 'Fall 2026');
 
-    $a = obCore($program, $semester);
+    $a = obCore($program, $semester, totalCh: 6);
 
     Sanctum::actingAs(obStudentAffairs());
     obCompose($student, [$a])
@@ -154,7 +154,7 @@ it('mints immediately when the advisor composes for their own advisee (born Appr
     $advisor = obAdvisor();
     $student = obStudentIn($program, $advisor, enrollmentTerm: 'Fall 2026');
 
-    $a = obCore($program, $semester, meetings: [[Weekday::Monday, '09:00', '11:00']]);
+    $a = obCore($program, $semester, totalCh: 6, meetings: [[Weekday::Monday, '09:00', '11:00']]);
 
     Sanctum::actingAs($advisor);
     obCompose($student, [$a])
@@ -168,7 +168,7 @@ it('mints immediately when the advisor composes for their own advisee (born Appr
         'course_offering_id' => $a->id,
         'course_status' => 'Regular',
         'classification' => 'Core',
-        'credit_hours' => 3,
+        'credit_hours' => 6,
     ]);
     $this->assertDatabaseHas('registration_requests', [
         'student_id' => $student->id,

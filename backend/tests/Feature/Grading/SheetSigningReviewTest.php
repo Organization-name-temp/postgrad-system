@@ -6,10 +6,14 @@ use Laravel\Sanctum\Sanctum;
 use Modules\Calendar\Internal\Models\Semester;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Department;
+use Modules\Catalog\Public\Enums\CourseCategory;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
+use Modules\Enrollment\Internal\Enums\TransferRequestStatus;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Internal\Models\TransferDecision;
+use Modules\Enrollment\Internal\Models\TransferRequest;
 use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
 use Modules\Grading\Internal\Models\GradeSheet;
@@ -17,6 +21,8 @@ use Modules\Identity\Internal\Models\DepartmentHeadAssignment;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
+use Modules\Notifications\Public\Contracts\Notifier;
+use Modules\Notifications\Public\Enums\NotificationType;
 
 uses(RefreshDatabase::class);
 
@@ -299,6 +305,108 @@ it('finalizes a submitted sheet, permanently closing it', function () {
 
     srFinalize($sheetId)->assertStatus(409);
     srReturn($sheetId, 'too late')->assertStatus(409);
+});
+
+it('rolls back Grade finalization when stale credit-request invalidation cannot commit', function () {
+    $department = Department::factory()->create();
+    $head = srDeptHead($department->id);
+    $instructor = srInstructor();
+    $offering = srOffering($instructor, $department->id);
+    $enrollment = srEnroll($offering);
+    $request = TransferRequest::query()->create([
+        'student_id' => $enrollment->student_id,
+        'curriculum_version_id' => 1,
+        'target_course_id' => $offering->course_id,
+        'target_course_code' => Course::query()->findOrFail($offering->course_id)->code,
+        'target_category' => 'ProgramCore',
+        'target_credit_hours' => 3,
+        'external_institution' => 'External University',
+        'external_course_code' => 'EXT-FAIL',
+        'external_course_name' => 'Failed target',
+        'source_credit_hours' => '3.00',
+        'external_grade' => 'B',
+        'document_ids' => [],
+        'status' => TransferRequestStatus::PendingAdvisor,
+        'revision' => 1,
+        'submitted_at' => now(),
+    ]);
+    Sanctum::actingAs($instructor);
+    $sheetId = srGradeAll($offering, [$enrollment], mark: 50);
+    srSign($sheetId)->assertOk();
+    app()->instance(Notifier::class, new class implements Notifier
+    {
+        public function notify(int $userId, NotificationType $type, array $payload = []): void
+        {
+            throw new RuntimeException('Notification write failed.');
+        }
+
+        public function notifyOnce(int $userId, NotificationType $type, string $key, array $payload = []): void
+        {
+            throw new RuntimeException('Notification write failed.');
+        }
+    });
+    Sanctum::actingAs($head);
+    $this->withoutExceptionHandling();
+
+    expect(fn () => srFinalize($sheetId))->toThrow(RuntimeException::class, 'Notification write failed.');
+
+    expect(GradeSheet::query()->findOrFail($sheetId)->status)->toBe(GradeSheetStatus::Submitted)
+        ->and($enrollment->fresh()->earned)->toBeNull()
+        ->and($request->fresh()->status)->toBe(TransferRequestStatus::PendingAdvisor)
+        ->and($request->transitions()->count())->toBe(0);
+});
+
+it('rolls back a failed Grade when a conflicting Transfer approval committed first', function () {
+    $department = Department::factory()->create();
+    $head = srDeptHead($department->id);
+    $instructor = srInstructor();
+    $offering = srOffering($instructor, $department->id);
+    $enrollment = srEnroll($offering);
+    $course = Course::query()->findOrFail($offering->course_id);
+    $request = TransferRequest::query()->create([
+        'student_id' => $enrollment->student_id,
+        'curriculum_version_id' => 1,
+        'target_course_id' => $course->id,
+        'target_course_code' => $course->code,
+        'target_category' => CourseCategory::ProgramCore,
+        'target_credit_hours' => 3,
+        'external_institution' => 'External University',
+        'external_course_code' => 'EXT-APPROVED',
+        'external_course_name' => 'Approved target',
+        'source_credit_hours' => '3.00',
+        'external_grade' => 'A',
+        'document_ids' => [],
+        'normalized_grade' => 'A',
+        'verified_by_user_id' => $head->id,
+        'verified_at' => now(),
+        'status' => TransferRequestStatus::Approved,
+        'revision' => 1,
+        'submitted_at' => now(),
+    ]);
+    $decision = TransferDecision::query()->create([
+        ...$request->only([
+            'student_id', 'curriculum_version_id', 'target_course_id', 'target_course_code',
+            'target_category', 'target_credit_hours', 'external_institution',
+            'external_course_code', 'external_course_name', 'source_credit_hours',
+            'external_grade', 'document_ids', 'normalized_grade', 'verified_by_user_id',
+            'verified_at',
+        ]),
+        'approved_by_user_id' => $head->id,
+        'approved_at' => now(),
+        'transfer_request_id' => $request->id,
+    ]);
+
+    Sanctum::actingAs($instructor);
+    $sheetId = srGradeAll($offering, [$enrollment], mark: 50);
+    srSign($sheetId)->assertOk();
+    Sanctum::actingAs($head);
+
+    srFinalize($sheetId)->assertConflict()
+        ->assertJsonPath('message', __('credit_decisions.grade_finalization_conflict'));
+
+    expect(GradeSheet::query()->findOrFail($sheetId)->status)->toBe(GradeSheetStatus::Submitted)
+        ->and($enrollment->fresh()->earned)->toBeNull()
+        ->and($decision->fresh()->revocation)->toBeNull();
 });
 
 it('409s finalizing a sheet that was never submitted', function () {

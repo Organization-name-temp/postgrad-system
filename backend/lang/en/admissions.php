@@ -27,6 +27,7 @@ return [
         'english_score_out_of_range' => 'The :test score must be between :min and :max.',
         // Raised when a score is supplied for the "None" test, which carries no score.
         'english_score_not_allowed' => 'The selected test does not take a score.',
+        'invalid_previous_ejust_program' => 'Choose a valid previous E-JUST MSc Program.',
     ],
     'documents' => [
         'locked' => 'Documents can no longer be changed for this application.',
@@ -78,6 +79,7 @@ return [
     // resolved, or the application has no program to admit into.
     'decision' => [
         'no_program' => 'This application has no program to admit the applicant into.',
+        'no_curriculum_version' => 'The selected program has no Curriculum Version available for admission.',
         'advisor_not_r03' => 'The selected advisor must be an academic advisor.',
         'no_advisor' => 'No academic advisor is available to assign.',
     ],

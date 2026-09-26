@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Enrollment\Public\EnrollmentRecords;
+use Modules\Enrollment\Public\Events\GradeOutcomesFinalized;
 use Modules\Enrollment\Public\OfferingSummary;
 use Modules\Grading\Internal\Enums\GradeSheetKind;
-use Modules\Grading\Internal\Events\GradeFinalized;
 use Modules\Grading\Internal\Http\Concerns\BuildsSheetPayload;
 use Modules\Grading\Internal\Http\Concerns\ScopesToDepartmentHead;
 use Modules\Grading\Internal\Models\Grade;
@@ -18,10 +18,12 @@ use Modules\Grading\Internal\Models\GradeSheet;
 use Modules\Grading\Internal\Models\Incomplete;
 use Modules\Grading\Internal\Support\CurrentGradeLookup;
 use Modules\Grading\Internal\Support\DepartmentHeadSheetQueue;
+use Modules\Grading\Public\Events\GradeFinalized;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;
 
@@ -160,14 +162,26 @@ class DepartmentHeadReviewController
         CourseCatalog $courses,
         DepartmentHeadAssignments $heads,
         AuditLogger $audit,
+        StudentGuard $studentGuard,
     ): JsonResponse {
         $this->authorizeReview($request, $gradeSheet, $enrollments, $courses, $heads);
 
         $threshold = (float) config('grading.min_grade_per_course');
         $actorId = $this->actingUserId($request);
         $auditChanges = [];
+        $affectedEnrollments = $enrollments->findManyEnrollments(
+            $gradeSheet->grades->pluck('enrollment_id')->map(fn ($id): int => (int) $id)->all(),
+        );
+        $affectedStudentIds = collect($affectedEnrollments)
+            ->pluck('studentId')->map(fn ($id): int => (int) $id)->unique()->sort()->values()->all();
+        $finalizedEnrollmentIds = $gradeSheet->grades->pluck('enrollment_id')->map(fn ($id): int => (int) $id)->all();
 
-        DB::transaction(function () use ($gradeSheet, $enrollments, $threshold, $actorId, &$auditChanges, $audit): void {
+        DB::transaction(function () use ($gradeSheet, $enrollments, $threshold, $actorId, &$auditChanges, $audit, $studentGuard, $affectedStudentIds, $finalizedEnrollmentIds): void {
+            // Identity-first locks serialize Grade finalization with credit approval and
+            // final termination for every Student affected by this Sheet.
+            foreach ($affectedStudentIds as $studentId) {
+                abort_if($studentGuard->lock($studentId) === null, 409);
+            }
             $before = $gradeSheet->kind === GradeSheetKind::Correction
                 ? CurrentGradeLookup::forEnrollments(
                     $gradeSheet->grades->pluck('enrollment_id')->map(fn ($id): int => (int) $id)->all(),
@@ -227,9 +241,14 @@ class DepartmentHeadReviewController
                     subjectId: (string) $gradeSheet->getKey(),
                 );
             }
+
+            // Eligibility invalidation is part of the same database commit as the Grade
+            // outcome. Its listener is retry-safe, but no stale review window is exposed if
+            // a notification, audit write, or transition append fails.
+            Event::dispatch(new GradeOutcomesFinalized((int) $gradeSheet->getKey(), $finalizedEnrollmentIds));
         });
 
-        Event::dispatch(new GradeFinalized((int) $gradeSheet->getKey()));
+        Event::dispatch(new GradeFinalized((int) $gradeSheet->getKey(), $finalizedEnrollmentIds));
 
         return response()->json(['data' => ['sheet' => $this->sheetArray($gradeSheet)]]);
     }

@@ -22,6 +22,9 @@ enum RegistrationStatus: string
     /** Submitted, awaiting the assigned Advisor's decision. */
     case Pending = 'Pending';
 
+    /** Advisor-approved batch awaiting scoped capacity decisions. */
+    case AwaitingCapacityOverride = 'AwaitingCapacityOverride';
+
     /** The Advisor approved ≥1 line; Enrollments were minted (ticket 06). */
     case Approved = 'Approved';
 

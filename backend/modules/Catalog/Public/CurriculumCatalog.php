@@ -22,6 +22,9 @@ use Modules\Catalog\CatalogServiceProvider;
  */
 interface CurriculumCatalog
 {
+    /** The category requirements frozen into a Program Curriculum Version. */
+    public function requirementsForVersion(int $curriculumVersionId): ?CurriculumRequirementsSummary;
+
     /**
      * The Curriculum Entries of the given Program, keyed by Course id — a Course's
      * placement (Category + ordinal) within that Program. Empty when the Program has no
@@ -33,6 +36,14 @@ interface CurriculumCatalog
      * @return array<int, CurriculumEntrySummary>
      */
     public function entriesForProgram(int $programId): array;
+
+    /**
+     * The entries frozen into one immutable Program Curriculum Version. A missing
+     * or non-Program version yields an empty list.
+     *
+     * @return list<BoundCurriculumEntrySummary>
+     */
+    public function entriesForVersion(int $curriculumVersionId): array;
 
     /**
      * For each given Course id, the ids of the **active graduate** Programs whose

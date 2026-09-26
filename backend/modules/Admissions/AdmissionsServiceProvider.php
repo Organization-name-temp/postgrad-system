@@ -10,11 +10,18 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Admissions\Internal\Console\Commands\FlagOverdueApplications;
 use Modules\Admissions\Internal\Console\Commands\SendInterviewReminders;
-use Modules\Admissions\Internal\Events\AdmissionAccepted;
+use Modules\Admissions\Internal\Enrollment\EloquentAdmissionDocuments;
 use Modules\Admissions\Internal\Listeners\SendAcceptanceNotification;
+use Modules\Admissions\Public\AdmissionDocuments;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
 
 class AdmissionsServiceProvider extends ServiceProvider
 {
+    public function register(): void
+    {
+        $this->app->bind(AdmissionDocuments::class, EloquentAdmissionDocuments::class);
+    }
+
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');

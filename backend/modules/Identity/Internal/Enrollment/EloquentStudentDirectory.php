@@ -13,6 +13,8 @@ use Modules\Identity\Public\StudentSummary;
  */
 class EloquentStudentDirectory implements StudentDirectory
 {
+    public function __construct(private readonly StudentSummaryMapper $summaries) {}
+
     public function find(int $userId): ?StudentSummary
     {
         return $this->toSummary(Student::query()->where('user_id', $userId)->first());
@@ -70,19 +72,6 @@ class EloquentStudentDirectory implements StudentDirectory
 
     private function toSummary(?Student $student): ?StudentSummary
     {
-        if ($student === null) {
-            return null;
-        }
-
-        return new StudentSummary(
-            studentId: (int) $student->getKey(),
-            userId: $student->user_id,
-            universityId: $student->university_id,
-            programId: $student->program_id,
-            enrollmentTerm: $student->enrollment_term,
-            admissionCycleId: $student->admission_cycle_id,
-            advisorId: $student->advisor_id,
-            admittedAt: $student->admitted_at,
-        );
+        return $this->summaries->fromModel($student);
     }
 }

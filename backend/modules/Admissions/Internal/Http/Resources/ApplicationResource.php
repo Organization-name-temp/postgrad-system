@@ -40,7 +40,7 @@ class ApplicationResource extends JsonResource
 
         // Resolve the chosen program(s) in one facade read (empty ids ⇒ no read).
         $programIds = array_values(array_filter(
-            [$application->primary_program_id, $application->alternative_program_id],
+            [$application->primary_program_id, $application->alternative_program_id, $application->previous_ejust_program_id],
             static fn (?int $id): bool => $id !== null,
         ));
         $programs = $programIds === [] ? [] : app(ProgramCatalog::class)->findMany($programIds);
@@ -71,6 +71,8 @@ class ApplicationResource extends JsonResource
             'graduation_cgpa' => $application->graduation_cgpa,
             'gpa_scale' => $application->gpa_scale?->value,
             'is_ejust_graduate' => $application->is_ejust_graduate,
+            'previous_ejust_program_id' => $application->previous_ejust_program_id,
+            'previous_ejust_program' => $this->programSummaryArray($programs[$application->previous_ejust_program_id] ?? null),
             'applying_for_degree' => $application->applying_for_degree?->value,
             'english_test' => $application->english_test?->value,
             'english_score' => $application->english_score,

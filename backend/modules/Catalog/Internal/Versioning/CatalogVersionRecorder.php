@@ -8,6 +8,7 @@ use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Internal\Support\PreparatoryCurriculumCompleteness;
 
 /**
  * Appends catalog version history (ADR-0011). Every create/edit/activate/deactivate
@@ -19,6 +20,8 @@ use Modules\Catalog\Internal\Models\Program;
  */
 class CatalogVersionRecorder
 {
+    public function __construct(private readonly PreparatoryCurriculumCompleteness $completeness) {}
+
     /** Record a version of a Program's full aggregate (fields + curriculum). */
     public function recordProgram(Program $program, string $changeNote): CatalogVersion
     {
@@ -63,6 +66,8 @@ class CatalogVersionRecorder
      */
     private function programSnapshot(Program $program): array
     {
+        $missingRoles = $this->completeness->missingRoles($program);
+
         return [
             'code' => $program->code,
             'name_en' => $program->name_en,
@@ -74,13 +79,20 @@ class CatalogVersionRecorder
             'elective_required_ch' => $program->elective_required_ch,
             'total_required_ch' => $program->total_required_ch,
             'is_active' => $program->is_active,
+            'preparatory_requirements_complete' => $missingRoles === [],
+            'missing_preparatory_requirement_roles' => array_map(
+                fn ($role): string => $role->value,
+                $missingRoles,
+            ),
             'curriculum' => $program->curriculumEntries()
                 ->with('course')
                 ->get()
                 ->map(fn (CurriculumEntry $entry): array => [
                     'course_id' => $entry->course_id,
                     'course_code' => $entry->course->code,
+                    'course_total_ch' => $entry->course->total_ch,
                     'category' => $entry->category->value,
+                    'preparatory_requirement_role' => $entry->preparatory_requirement_role?->value,
                     'ordinal' => $entry->ordinal,
                 ])
                 ->all(),

@@ -7,8 +7,10 @@ use Modules\Enrollment\Internal\Http\Controllers\RegistrationController;
 use Modules\Enrollment\Internal\Http\Controllers\RegistrationReviewController;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\OfferingMeeting;
+use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CreditHoursExceptions;
 use Modules\Enrollment\Internal\Support\MeetingTime;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
 use Modules\Identity\Public\StudentSummary;
 
 /**
@@ -42,10 +44,13 @@ trait ResolvesCartLines
      * Semester's display name equals the stored term, ADR-0018). Phase 5 adds the
      * approaching-graduation exception here.
      */
-    protected function exceptionsFor(StudentSummary $student, SemesterSummary $semester): CreditHoursExceptions
-    {
-        return new CreditHoursExceptions(
-            firstSemester: $student->enrollmentTerm === $semester->nameEn,
-        );
+    /** @param list<CartLine> $lines */
+    protected function exceptionsFor(
+        StudentSummary $student,
+        SemesterSummary $semester,
+        array $lines,
+        RegistrationPolicy $policy,
+    ): CreditHoursExceptions {
+        return $policy->exceptions($student, $semester->nameEn, $lines);
     }
 }

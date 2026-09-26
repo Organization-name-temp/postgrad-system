@@ -43,6 +43,15 @@ final class EloquentAcademicCalendar implements AcademicCalendar
             ->all();
     }
 
+    public function findByNameEn(string $name): ?SemesterSummary
+    {
+        $semester = Semester::query()->orderBy('starts_at')->get()->first(
+            fn (Semester $semester): bool => $semester->name_en === $name,
+        );
+
+        return $semester === null ? null : $this->toSummary($semester);
+    }
+
     public function openForRegistration(): ?SemesterSummary
     {
         $semester = Semester::query()->registrationOpen()->orderByDesc('year')->first();

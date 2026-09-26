@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Curriculum (a Program's Curriculum Entries — Courses placed into Categories)
     Route::get('/programs/{program}/curriculum', [CurriculumController::class, 'index'])->middleware('can:catalog.view');
     Route::post('/programs/{program}/curriculum', [CurriculumController::class, 'store'])->middleware('can:catalog.manage');
+    Route::patch('/programs/{program}/curriculum/{curriculum_entry}', [CurriculumController::class, 'update'])->middleware('can:catalog.manage');
     Route::delete('/programs/{program}/curriculum/{curriculum_entry}', [CurriculumController::class, 'destroy'])->middleware('can:catalog.manage');
 
     // Version history (read-only; appended on every Program/Course mutation — ADR-0011).

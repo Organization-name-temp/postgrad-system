@@ -2,6 +2,7 @@
 
 namespace Modules\Admissions\Internal\Http\Controllers;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -11,13 +12,14 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
-use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Concerns\ScopesToDeanFaculty;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Internal\Support\AdmissionAcceptanceEvidenceFactory;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\AdmitStudent;
 use Modules\Identity\Public\Contracts\DeanAssignments;
@@ -138,6 +140,7 @@ class FinalDecisionController
         StudentEnrollment $enrollment,
         Directory $directory,
         Notifier $notifier,
+        AdmissionAcceptanceEvidenceFactory $evidenceFactory,
     ): JsonResource {
         $validated = $request->validate([
             'action' => ['required', 'string', Rule::in(['accept', 'conditional', 'waitlist', 'reject'])],
@@ -157,7 +160,7 @@ class FinalDecisionController
         if ($validated['action'] === 'accept') {
             $advisorId = $request->filled('advisor_id') ? (int) $request->input('advisor_id') : null;
 
-            return $this->accept($application, $actorId, $advisorId, $catalog, $enrollment, $directory);
+            return $this->accept($application, $actorId, $advisorId, $catalog, $enrollment, $directory, $evidenceFactory);
         }
 
         // The held (conditional/waitlist) and terminal-reject outcomes: a guarded status
@@ -200,41 +203,67 @@ class FinalDecisionController
         ProgramCatalog $catalog,
         StudentEnrollment $enrollment,
         Directory $directory,
+        AdmissionAcceptanceEvidenceFactory $evidenceFactory,
     ): JsonResource {
-        $programId = $application->primary_program_id;
-        $program = $programId === null ? null : $catalog->find($programId);
+        $result = DB::transaction(function () use (
+            $application,
+            $actorId,
+            $advisorId,
+            $catalog,
+            $enrollment,
+            $directory,
+            $evidenceFactory,
+        ) {
+            $programId = $application->primary_program_id;
+            $program = $programId === null ? null : $catalog->find($programId);
 
-        if ($program === null) {
-            throw ValidationException::withMessages(['action' => __('admissions.decision.no_program')]);
-        }
+            if ($program === null) {
+                throw ValidationException::withMessages(['action' => __('admissions.decision.no_program')]);
+            }
 
-        $resolvedAdvisorId = $this->resolveAdvisor($advisorId, $enrollment, $directory);
-        $cycle = $application->admissionCycle()->firstOrFail();
+            $admittedAt = CarbonImmutable::now();
+            $curriculumVersion = $catalog->curriculumVersionEffectiveAt($program->id, $admittedAt);
+            if ($curriculumVersion === null) {
+                throw ValidationException::withMessages(['action' => __('admissions.decision.no_curriculum_version')]);
+            }
 
-        $command = new AdmitStudent(
-            userId: (int) $application->user_id,
-            actorUserId: $actorId,
-            programId: $program->id,
-            programCode: $program->code,
-            admissionYear: (int) $cycle->year,
-            enrollmentTerm: $cycle->intake_term->value.' '.$cycle->year,
-            admissionCycleId: (int) $application->admission_cycle_id,
-            advisorId: $resolvedAdvisorId,
-            identity: $application->identitySnapshot(),
-        );
+            $resolvedAdvisorId = $this->resolveAdvisor($advisorId, $enrollment, $directory);
+            $cycle = $application->admissionCycle()->firstOrFail();
+            $evidenceFacts = $evidenceFactory->facts($application, $program);
 
-        // The status change and the mint commit together inside the model (ADR-0013).
-        $result = $application->accept($actorId, $enrollment, $command);
+            $command = new AdmitStudent(
+                userId: (int) $application->user_id,
+                actorUserId: $actorId,
+                programId: $program->id,
+                programCode: $program->code,
+                curriculumVersionId: $curriculumVersion->id,
+                admissionYear: (int) $cycle->year,
+                enrollmentTerm: $cycle->intake_term->value.' '.$cycle->year,
+                admissionCycleId: (int) $application->admission_cycle_id,
+                advisorId: $resolvedAdvisorId,
+                admittedAt: $admittedAt,
+                identity: $application->identitySnapshot(),
+                admissionEvidence: $evidenceFacts,
+            );
+
+            // Application::accept joins this transaction, so version resolution, status,
+            // Student anchor and role swap commit or roll back as one decision.
+            return [
+                $application->accept($actorId, $enrollment, $command),
+                $evidenceFacts,
+            ];
+        });
+
+        [$admittedStudent, $evidenceFacts] = $result;
 
         // Side-effect only, after the mint commits: the acceptance notification (ADR-0013).
         Event::dispatch(new AdmissionAccepted(
-            userId: (int) $application->user_id,
-            applicationId: (int) $application->getKey(),
-            universityId: $result->universityId,
+            evidence: $evidenceFactory->fromFacts($admittedStudent->studentId, $evidenceFacts),
+            universityId: $admittedStudent->universityId,
         ));
 
         return (new ApplicationResource($application))
-            ->additional(['meta' => ['university_id' => $result->universityId]]);
+            ->additional(['meta' => ['university_id' => $admittedStudent->universityId]]);
     }
 
     /**

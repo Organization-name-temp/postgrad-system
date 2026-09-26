@@ -1,15 +1,18 @@
 import { Alert, CircularProgress, Paper, Stack, Typography } from '@mui/material'
+import { isAxiosError } from 'axios'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   getTheActingStudentsRegistrationRequestsForTheOpenSemesterQueryKey,
   useListTheActingStudentsEligibleCoursesForTheOpenSemester,
+  useMyEffectiveExemptions,
   useSubmitARegistrationCart,
   useTheActingStudentsRegistrationRequestsForTheOpenSemester,
 } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { useAuth } from '../../auth/useAuth'
 import { CartBuilder } from './CartBuilder'
+import { AutomaticExemptionsPanel } from './AutomaticExemptionsPanel'
 import { RequestView } from './RequestView'
 
 /**
@@ -27,10 +30,15 @@ export function RegistrationPage() {
 
   const eligibleQuery = useListTheActingStudentsEligibleCoursesForTheOpenSemester()
   const requestsQuery = useTheActingStudentsRegistrationRequestsForTheOpenSemester()
+  const exemptionsQuery = useMyEffectiveExemptions()
   const submitMutation = useSubmitARegistrationCart()
 
   const isLoading = eligibleQuery.isPending || requestsQuery.isPending
   const isError = eligibleQuery.isError || requestsQuery.isError
+  const registrationReady =
+    !isLoading && !isError && !exemptionsQuery.isPending && !exemptionsQuery.isError
+  const exemptionsReconciling =
+    isAxiosError(exemptionsQuery.error) && exemptionsQuery.error.response?.status === 409
 
   const semester = requestsQuery.data?.data?.semester ?? eligibleQuery.data?.data?.semester
   const courses = eligibleQuery.data?.data?.courses ?? []
@@ -65,14 +73,21 @@ export function RegistrationPage() {
 
       {isLoading && <CircularProgress aria-label={t('registration.loading')} />}
       {isError && <Alert severity="error">{t('registration.loadError')}</Alert>}
+      <AutomaticExemptionsPanel
+        exemptions={exemptionsQuery.data?.data ?? []}
+        isPending={exemptionsQuery.isPending}
+        isError={exemptionsQuery.isError}
+        isReconciling={exemptionsReconciling}
+        onRetry={() => {
+          void Promise.all([exemptionsQuery.refetch(), eligibleQuery.refetch()])
+        }}
+      />
 
-      {!isLoading && !isError && !semester && (
-        <Alert severity="info">{t('registration.notOpen')}</Alert>
-      )}
+      {registrationReady && !semester && <Alert severity="info">{t('registration.notOpen')}</Alert>}
 
-      {!isLoading && !isError && semester && pending && <RequestView request={pending} />}
+      {registrationReady && semester && pending && <RequestView request={pending} />}
 
-      {!isLoading && !isError && semester && !pending && (
+      {registrationReady && semester && !pending && (
         <>
           {priorRequests.map((request) => (
             <RequestView key={request.id} request={request} />

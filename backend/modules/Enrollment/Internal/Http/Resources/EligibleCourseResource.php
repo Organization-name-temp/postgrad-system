@@ -48,6 +48,7 @@ class EligibleCourseResource extends JsonResource
             'seats_remaining' => $offering->seatsRemaining(),
             'total_ch' => $course instanceof CourseSummary ? $course->totalCh : null,
             'must_retake' => (bool) $offering->getAttribute('must_retake'),
+            'obligation_type' => $offering->getAttribute('obligation_type'),
             'course' => $course instanceof CourseSummary ? $course->toArray() : null,
             'instructor' => $instructor instanceof UserSummary ? $instructor->toArray() : null,
             'meetings' => $offering->meetings->map(fn (OfferingMeeting $meeting): array => [

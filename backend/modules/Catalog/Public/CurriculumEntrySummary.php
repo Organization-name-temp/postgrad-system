@@ -4,6 +4,7 @@ namespace Modules\Catalog\Public;
 
 use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Public\Enums\CourseCategory;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 
 /**
  * A read-only view of one Curriculum Entry — the placement of a Course into a Program
@@ -23,6 +24,7 @@ final readonly class CurriculumEntrySummary
         public int $programId,
         public int $courseId,
         public CourseCategory $category,
+        public ?PreparatoryRequirementRole $preparatoryRequirementRole,
         public int $ordinal,
     ) {}
 }

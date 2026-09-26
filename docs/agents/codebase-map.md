@@ -27,6 +27,7 @@ Use this index to find the owning module and the shortest path through the repos
 | `backend/deptrac.yaml` | Allowed `Public`/`Internal` and cross-module dependency edges |
 | `backend/config/*.php` | Application and domain configuration; prefer this over new constants |
 | `backend/lang/{en,ar}/` | Server-side localized messages |
+| `backend/support/` | Domain-free collection-query parsing and constant-memory XLSX export primitives |
 | `backend/database/seeders/` | Deterministic demo world composed by `DatabaseSeeder` |
 | `backend/openapi.yaml` | Committed generated API contract |
 
@@ -43,12 +44,12 @@ modules/<Module>/
 
 | Module | Owns / handles | Public seam |
 |---|---|---|
-| `Identity` | users, fixed roles and permissions, student anchors, audit log, dean/head assignments, authentication | `Public/Contracts`, `StudentIdentity`, `AdmitStudent`, user/student DTOs |
+| `Identity` | users, fixed roles and permissions, student anchors and lifecycle projection, audit log, dean/head assignments, authentication | `Public/Contracts`, `StudentIdentity`, `AdmitStudent`, transaction-scoped `StudentGuard` / `StudentLifecycleWriter`, user/student DTOs |
 | `Catalog` | faculties, departments, programs, courses, curricula, catalog version snapshots | course/program/curriculum catalog facades and summary DTOs |
 | `Admissions` | admission cycles, applications, documents, review workflow, interviews, decisions | HTTP routes; acceptance hands student creation to Identity through its public contract |
 | `Notifications` | persisted in-app notifications and the polled notification API | `Notifier` contract and `NotificationType` |
 | `Calendar` | semesters and registration/add-drop/withdrawal/grading windows | `AcademicCalendar` and `SemesterSummary` |
-| `Enrollment` | offerings, meetings, registration requests, enrollments, class sessions, attendance, earned-credit state | `EnrollmentRecords` and enrollment/offering DTOs |
+| `Enrollment` | offerings, meetings, registration requests, enrollments, class sessions, attendance, earned-credit state, and automatic/manual Exemption decisions | `EnrollmentRecords`, `ExemptionDecisions`, and enrollment/offering/decision DTOs |
 | `Grading` | grade sheets, grades, correction rounds, Incompletes, GPA/CGPA read model | `GradingRecords` and `GradeSummary` |
 
 When changing a module, begin at its `Public/Http/routes.php`, follow the route into `Internal/Http/Controllers`, then trace models/support classes and the matching tests. When another module needs data, begin at the owner's existing `Public` facade before considering a new method.

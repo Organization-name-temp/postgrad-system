@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import i18n from '../shared/i18n/config'
 import { DashboardPage } from './DashboardPage'
@@ -115,6 +115,45 @@ describe('DashboardPage — the identity header', () => {
     renderDashboard()
 
     expect(screen.getByText('2026CE0001')).toBeInTheDocument()
+  })
+
+  it('shows the governing Curriculum Version bilingually and direction-safely', async () => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        user: {
+          name: 'Layla Samir',
+          email: 'layla@ejust.test',
+          roles: [{ code: 'R02', name: 'Student' }],
+          student: {
+            university_id: '2026CE0001',
+            curriculum_version_id: 42,
+            curriculum_version_binding_source: 'earliest_available_fallback',
+          },
+        },
+      }),
+    )
+    renderDashboard()
+
+    expect(screen.getByText('Curriculum Version')).toBeInTheDocument()
+    expect(screen.getByText('42').parentElement).toHaveTextContent('Version #42')
+    expect(screen.getByText('42')).toHaveAttribute('dir', 'ltr')
+    expect(
+      screen.getByText(
+        'This record uses the earliest available version because Catalog history starts after admission.',
+      ),
+    ).toBeInTheDocument()
+
+    await act(() => i18n.changeLanguage('ar'))
+
+    expect(document.documentElement).toHaveAttribute('dir', 'rtl')
+    expect(screen.getByText('إصدار الخطة الدراسية')).toBeInTheDocument()
+    expect(screen.getByText('42').parentElement).toHaveTextContent('الإصدار رقم 42')
+    expect(screen.getByText('42')).toHaveAttribute('dir', 'ltr')
+    expect(
+      screen.getByText(
+        'يستخدم هذا السجل أقدم إصدار متاح لأن سجل الدليل الأكاديمي يبدأ بعد القبول.',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('omits the University ID block for a user with no Student anchor', () => {

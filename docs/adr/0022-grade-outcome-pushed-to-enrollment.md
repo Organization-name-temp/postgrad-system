@@ -81,3 +81,9 @@ a status write, because that write must be atomic with the finalize.
 - If a Grade is ever corrected outside a Sheet finalize — a path deliberately not built —
   `earned` becomes the thing that must be updated with it. That is the single maintenance
   obligation this decision creates.
+- Phase 5 uses the same pushed `earned` outcome to enforce availability-aware registration
+  priority for outstanding Preparatory/Core Must-Retake Obligations
+  ([ADR-0042](0042-must-retake-courses-have-registration-priority.md)). This adds a gate
+  without adding an `Enrollment → Grading` dependency. The finalized Grade event also
+  drives idempotent rejection of an in-review Transfer/Waiver request for the newly failed
+  Course; the event remains for side effects rather than the atomic outcome write.

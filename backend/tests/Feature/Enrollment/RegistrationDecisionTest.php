@@ -218,10 +218,10 @@ it('trims a line — approves one, rejects one — minting only the approved Enr
     $program = Program::factory()->create(['degree_level' => DegreeLevel::MSc]);
     $semester = decSemester();
     $advisor = decAdvisor();
-    // First-semester student so a single 3-CH approved line clears the waived floor.
+    // A 6-CH kept line remains valid after the Advisor trims the other line.
     $student = decStudentIn($program, $advisor, enrollmentTerm: 'Fall 2026');
 
-    $keep = decCore($program, $semester, meetings: [[Weekday::Monday, '09:00', '11:00']]);
+    $keep = decCore($program, $semester, totalCh: 6, meetings: [[Weekday::Monday, '09:00', '11:00']]);
     $trim = decCore($program, $semester, meetings: [[Weekday::Tuesday, '09:00', '11:00']]);
     $request = decPending($student, $semester, [$keep, $trim]);
     $trimLineId = $request->lines->firstWhere('course_offering_id', $trim->id)->id;
@@ -310,7 +310,7 @@ it('derives a Retake when a prior for-credit enrollment of the course exists', f
 
     // A prior semester's for-credit enrollment of the same course.
     $priorSemester = decSemester(Term::Spring, 2026);
-    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 6]);
     CurriculumEntry::factory()->create([
         'program_id' => $program->id,
         'course_id' => $course->id,
@@ -346,7 +346,7 @@ it('blocks a second retake of the same course', function () {
     $advisor = decAdvisor();
     $student = decStudentIn($program, $advisor, enrollmentTerm: 'Fall 2026');
 
-    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 6]);
     CurriculumEntry::factory()->create([
         'program_id' => $program->id,
         'course_id' => $course->id,
@@ -381,7 +381,7 @@ it('does not burn the retake on a prior withdrawal — a fresh Regular', functio
     $advisor = decAdvisor();
     $student = decStudentIn($program, $advisor, enrollmentTerm: 'Fall 2026');
 
-    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 3]);
+    $course = Course::factory()->create(['level' => CourseLevel::Master, 'total_ch' => 6]);
     CurriculumEntry::factory()->create([
         'program_id' => $program->id,
         'course_id' => $course->id,
@@ -485,7 +485,7 @@ it('notifies the advisor when a student submits a registration', function () {
     $advisor = decAdvisor();
     $student = decStudentIn($program, $advisor, enrollmentTerm: 'Fall 2026');
 
-    $a = decCore($program, $semester, meetings: [[Weekday::Monday, '09:00', '11:00']]);
+    $a = decCore($program, $semester, totalCh: 6, meetings: [[Weekday::Monday, '09:00', '11:00']]);
     Sanctum::actingAs($student->user);
 
     test()->postJson('/api/v1/registration/requests', [

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
+use Modules\Identity\Public\Enums\CurriculumVersionBindingSource;
 
 /**
  * @extends Factory<Student>
@@ -33,6 +34,8 @@ class StudentFactory extends Factory
             'user_id' => User::factory(),
             'university_id' => '2026-PRG-'.fake()->unique()->numerify('####'),
             'program_id' => fake()->numberBetween(1, 1000),
+            'curriculum_version_id' => fake()->numberBetween(1, 1000),
+            'curriculum_version_binding_source' => CurriculumVersionBindingSource::AdmissionTime,
             'enrollment_term' => 'Fall 2026',
             'admission_cycle_id' => fake()->numberBetween(1, 100),
             'advisor_id' => User::factory(),

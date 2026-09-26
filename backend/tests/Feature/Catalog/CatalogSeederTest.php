@@ -2,8 +2,12 @@
 
 use Database\Seeders\CatalogSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Course;
+use Modules\Catalog\Internal\Models\CurriculumEntry;
 use Modules\Catalog\Internal\Models\Faculty;
+use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 use Modules\Identity\Public\Enums\Role;
 
 uses(RefreshDatabase::class);
@@ -69,6 +73,27 @@ it('links the shared university-wide preparatory courses into every program', fu
     expect($programIds->count())->toBeGreaterThan(1);
 });
 
+it('assigns every seeded Program exactly one of each Preparatory Requirement Role', function () {
+    $this->seed(CatalogSeeder::class);
+    $expected = collect(PreparatoryRequirementRole::cases())->map->value->sort()->values()->all();
+
+    Program::query()->with(['curriculumEntries.course'])->get()->each(function (Program $program) use ($expected): void {
+        $preparatory = $program->curriculumEntries
+            ->where('category.value', 'Preparatory');
+
+        expect($preparatory)->toHaveCount(6)
+            ->and($preparatory->pluck('preparatory_requirement_role.value')->sort()->values()->all())
+            ->toBe($expected);
+
+        /** @var CurriculumEntry $keySkills */
+        $keySkills = $preparatory->firstWhere(
+            'preparatory_requirement_role.value',
+            PreparatoryRequirementRole::KeySkills->value,
+        );
+        expect($keySkills->course->department_id)->toBe($program->department_id);
+    });
+});
+
 it('keeps every seeded course credit-hour balanced (L + T + Lab = Total)', function () {
     $this->seed(CatalogSeeder::class);
 
@@ -87,4 +112,23 @@ it('seeds idempotently', function () {
 
     expect(Faculty::count())->toBe($faculties);
     expect(Course::count())->toBe($courses);
+});
+
+it('gives every seeded Program an idempotent full Curriculum Version', function () {
+    $this->seed(CatalogSeeder::class);
+
+    Program::query()->each(function (Program $program): void {
+        $versions = CatalogVersion::query()
+            ->where('subject_type', 'program')
+            ->where('subject_id', $program->id)
+            ->get();
+
+        expect($versions)->toHaveCount(1)
+            ->and($versions->firstOrFail()->snapshot['curriculum'])->not->toBeEmpty();
+    });
+
+    $versionCount = CatalogVersion::query()->where('subject_type', 'program')->count();
+    $this->seed(CatalogSeeder::class);
+
+    expect(CatalogVersion::query()->where('subject_type', 'program')->count())->toBe($versionCount);
 });

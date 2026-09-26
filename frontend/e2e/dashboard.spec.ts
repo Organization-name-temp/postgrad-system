@@ -34,6 +34,8 @@ const CARDS = {
   sheetsAwaitingReview: 'Sheets awaiting review',
   outstandingIncompletes: 'Outstanding Incompletes',
   myAcademicRecord: 'My academic record',
+  creditHourSummary: 'Credit-Hour Summary',
+  academicStanding: 'Academic Standing',
   semesterWindows: 'Semester and open windows',
   catalogSummary: 'Catalog',
   administration: 'Administration',
@@ -184,12 +186,17 @@ test.describe('the Dashboard composes Cards from the acting user’s access (ADR
     await expectCardSet(page, ['myApplication'])
   })
 
-  test('a Student sees the two persona Cards, with a real CGPA rather than a placeholder', async ({
+  test('a Student sees the four persona Cards, with a real CGPA rather than a placeholder', async ({
     page,
   }) => {
     await loginInEnglish(page, STUDENT)
 
-    await expectCardSet(page, ['myRegistration', 'myAcademicRecord'])
+    await expectCardSet(page, [
+      'myRegistration',
+      'myAcademicRecord',
+      'creditHourSummary',
+      'academicStanding',
+    ])
 
     // `r02@` is a Student with two completed Semesters of finalized Grades (ticket 02) precisely
     // so both figures are computable. A dash means "not yet calculated" — the right rendering of

@@ -28,12 +28,15 @@ use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
 use Modules\Enrollment\Internal\Models\RegistrationRequestLine;
+use Modules\Enrollment\Internal\Support\CapacityOverrideWorkflow;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\MintPlanEntry;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
+use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
@@ -232,6 +235,9 @@ class RegistrationReviewController
         EligibilityResolver $eligibility,
         Notifier $notifier,
         AuditLogger $auditLogger,
+        RegistrationPolicy $registrationPolicy,
+        RequiredRetakeValidator $requiredRetakes,
+        CapacityOverrideWorkflow $capacityOverrides,
     ): JsonResponse {
         $userId = (int) $request->user()?->getAuthIdentifier();
 
@@ -289,13 +295,25 @@ class RegistrationReviewController
 
         // $cartLines is keyed by request-line id (for the mint plan below); the batch
         // validator wants a plain list.
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
-        $violations = $validator->validate(array_values($cartLines), $this->exceptionsFor($student, $semester), $existing);
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $registrationPolicy->ceiling($student->studentId),
+        ));
+        $approvedCartLines = array_values($cartLines);
+        $violations = $validator->validate($approvedCartLines, $this->exceptionsFor($student, $semester, $approvedCartLines, $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $approvedCartLines, $ceiling)];
 
         // Derive each approved line's status (Regular/Retake/Audit); a second retake blocks,
         // surfacing as a violation rather than a plan entry (the shared mint seam).
         [$mintPlan, $retakeViolations] = $this->buildMintPlan($cartLines, $existing);
         $violations = [...$violations, ...$retakeViolations];
+
+        $withoutCapacity = array_values(array_filter($violations, fn (CartViolation $violation): bool => $violation->code !== CartViolation::OFFERING_FULL));
+        if ($withoutCapacity === [] && $capacityOverrides->startIfRequired($registration, $decisions, $approvedCartLines, $userId, $note)) {
+            $this->afterDecision($notifier, $registration, $student, RegistrationStatus::AwaitingCapacityOverride, approvedCount: count($approvedCartLines), rejectedCount: $registration->lines->count() - count($approvedCartLines));
+
+            return $this->decidedResponse($registration, $student, $courses, $directory, $eligibility);
+        }
 
         $errors = $this->errorsFrom($violations, $ineligible);
         if ($errors !== []) {

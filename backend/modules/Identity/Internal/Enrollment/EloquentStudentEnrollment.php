@@ -2,13 +2,13 @@
 
 namespace Modules\Identity\Internal\Enrollment;
 
-use Illuminate\Support\Carbon;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\AdmitStudent;
 use Modules\Identity\Public\AdmittedStudent;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\StudentEnrollment;
+use Modules\Identity\Public\Enums\CurriculumVersionBindingSource;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Identity\Public\UserSummary;
 
@@ -38,6 +38,8 @@ class EloquentStudentEnrollment implements StudentEnrollment
             'user_id' => $command->userId,
             'university_id' => $universityId,
             'program_id' => $command->programId,
+            'curriculum_version_id' => $command->curriculumVersionId,
+            'curriculum_version_binding_source' => CurriculumVersionBindingSource::AdmissionTime,
             'enrollment_term' => $command->enrollmentTerm,
             'admission_cycle_id' => $command->admissionCycleId,
             'advisor_id' => $command->advisorId,
@@ -47,7 +49,8 @@ class EloquentStudentEnrollment implements StudentEnrollment
             'date_of_birth' => $command->identity->dateOfBirth,
             'nationality' => $command->identity->nationality,
             'gender' => $command->identity->gender,
-            'admitted_at' => Carbon::now(),
+            'admission_evidence' => $command->admissionEvidence?->toArray(),
+            'admitted_at' => $command->admittedAt,
         ]);
 
         // Replace the Applicant role with Student (R01 → R02): the accepted user is no
@@ -64,6 +67,8 @@ class EloquentStudentEnrollment implements StudentEnrollment
                 'user_id' => $command->userId,
                 'university_id' => $universityId,
                 'program_id' => $command->programId,
+                'curriculum_version_id' => $command->curriculumVersionId,
+                'curriculum_version_binding_source' => CurriculumVersionBindingSource::AdmissionTime->value,
                 'advisor_id' => $command->advisorId,
             ],
             subjectType: 'student',

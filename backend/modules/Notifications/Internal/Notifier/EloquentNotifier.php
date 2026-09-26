@@ -25,4 +25,17 @@ class EloquentNotifier implements Notifier
             'created_at' => Carbon::now(),
         ]);
     }
+
+    /** @param array<string, mixed> $payload */
+    public function notifyOnce(int $userId, NotificationType $type, string $key, array $payload = []): void
+    {
+        Notification::query()->firstOrCreate(
+            ['user_id' => $userId, 'type' => $type, 'deduplication_key' => $key],
+            [
+                'data' => $payload !== [] ? $payload : null,
+                'read_at' => null,
+                'created_at' => Carbon::now(),
+            ],
+        );
+    }
 }

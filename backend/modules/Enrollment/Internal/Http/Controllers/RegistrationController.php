@@ -18,6 +18,7 @@ use Modules\Enrollment\Internal\Enums\LineDecision;
 use Modules\Enrollment\Internal\Enums\RegistrationKind;
 use Modules\Enrollment\Internal\Enums\RegistrationMode;
 use Modules\Enrollment\Internal\Enums\RegistrationStatus;
+use Modules\Enrollment\Internal\Enums\RemediationState;
 use Modules\Enrollment\Internal\Http\Concerns\ComputesAttendance;
 use Modules\Enrollment\Internal\Http\Concerns\CountsEnrollments;
 use Modules\Enrollment\Internal\Http\Concerns\DescribesStudentContext;
@@ -33,14 +34,19 @@ use Modules\Enrollment\Internal\Http\Resources\EnrollmentResource;
 use Modules\Enrollment\Internal\Http\Resources\RegistrationRequestResource;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Internal\Models\MustRetakeObligation;
 use Modules\Enrollment\Internal\Models\RegistrationRequest;
+use Modules\Enrollment\Internal\Models\RemediationObligation;
+use Modules\Enrollment\Internal\Support\AutomaticExemptionReadiness;
 use Modules\Enrollment\Internal\Support\CartLine;
 use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
 use Modules\Enrollment\Internal\Support\ExistingEnrollments;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
 use Modules\Enrollment\Internal\Support\RegistrationTarget;
+use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -99,7 +105,7 @@ class RegistrationController
      * adds). When neither a registration nor a late-add window is open, `semester` is null
      * and the list is empty. Gated on `courses.register_self` (the acting Student, R02).
      *
-     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "courses": [{"offering_id": 1, "classification": "Core", "capacity": 30, "seats_remaining": 30, "total_ch": 3, "must_retake": false, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}}
+     * @response 200 {"data": {"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "courses": [{"offering_id": 1, "classification": "Core", "capacity": 30, "seats_remaining": 30, "total_ch": 3, "must_retake": false, "obligation_type": null, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}]}]}}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
      */
     public function eligibleCourses(
@@ -109,8 +115,10 @@ class RegistrationController
         CourseCatalog $courses,
         Directory $directory,
         EligibilityResolver $eligibility,
+        AutomaticExemptionReadiness $exemptionReadiness,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
+        $exemptionReadiness->ensureReconciled($student);
         $target = $this->resolveRegistrationTarget($calendar);
 
         // No submittable window (neither registration nor late-add) — nothing to classify.
@@ -158,8 +166,12 @@ class RegistrationController
         Directory $directory,
         EligibilityResolver $eligibility,
         Notifier $notifier,
+        AutomaticExemptionReadiness $exemptionReadiness,
+        RegistrationPolicy $registrationPolicy,
+        RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
+        $exemptionReadiness->ensureReconciled($student);
 
         $target = $this->resolveRegistrationTarget($calendar);
         if ($target === null) {
@@ -189,8 +201,12 @@ class RegistrationController
         // clash); ExistingEnrollments carries both the historical and current-semester facts.
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
-        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $registrationPolicy->ceiling($student->studentId),
+        ));
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $cartLines, $ceiling)];
 
         $errors = $this->errorsFrom($violations, $ineligible);
         if ($errors !== []) {
@@ -298,7 +314,7 @@ class RegistrationController
      * recorded counts, the display percentage, and the audit-at-risk flag. Gated on
      * `courses.register_self` (the acting Student, R02).
      *
-     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": true, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": true, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "obligation_type": null, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "obligation_type": null, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
      * @response 403 scenario="no student record" {"message": "You do not have a student record to register with."}
      */
     public function schedule(
@@ -333,7 +349,7 @@ class RegistrationController
      *
      * @urlParam student_id integer required The target Student anchor's id. Example: 5
      *
-     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": false, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
+     * @response 200 {"data": [{"semester": {"id": 1, "term": "Fall", "year": 2026, "name_en": "Fall 2026", "name_ar": "خريف 2026", "starts_at": "2026-09-01T00:00:00+00:00", "ends_at": "2026-12-20T00:00:00+00:00", "registration_opens_at": "2026-08-01T00:00:00+00:00", "registration_closes_at": "2026-09-05T00:00:00+00:00", "add_drop_ends_at": "2026-09-14T00:00:00+00:00", "late_add_ends_at": "2026-09-21T00:00:00+00:00", "withdrawal_deadline_at": "2026-11-15T00:00:00+00:00", "is_registration_open": true}, "current_period": "add_drop", "can_free_change": false, "can_withdraw": false, "addable_courses": [{"offering_id": 2, "classification": "Core", "capacity": 30, "seats_remaining": 28, "total_ch": 3, "must_retake": false, "obligation_type": null, "course": {"id": 2, "code": "DEP502", "name_en": "Distributed Systems", "name_ar": "الأنظمة الموزعة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 3, "starts_at": "13:00", "ends_at": "15:00"}]}], "enrollments": [{"id": 1, "offering_id": 1, "course_status": "Regular", "classification": "Core", "credit_hours": 3, "must_retake": false, "obligation_type": null, "course": {"id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "total_ch": 3, "research_type": null, "is_active": true}, "instructor": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "meetings": [{"weekday": 1, "starts_at": "09:00", "ends_at": "11:00"}], "attendance": {"present": 8, "recorded": 10, "percentage": 80, "at_risk": false}}]}]}
      * @response 403 scenario="not this advisor's advisee" {"message": "This action is unauthorized."}
      * @response 404 scenario="no such student" {"message": "No such student."}
      */
@@ -498,9 +514,11 @@ class RegistrationController
         AcademicCalendar $calendar,
         CourseCatalog $courses,
         EligibilityResolver $eligibility,
+        AutomaticExemptionReadiness $exemptionReadiness,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
         $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
+        $exemptionReadiness->ensureReconciled($student);
 
         $target = $this->resolveRegistrationTarget($calendar);
         if ($target === null) {
@@ -547,9 +565,13 @@ class RegistrationController
         CourseCatalog $courses,
         EligibilityResolver $eligibility,
         Notifier $notifier,
+        AutomaticExemptionReadiness $exemptionReadiness,
+        RegistrationPolicy $registrationPolicy,
+        RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $composerUserId = (int) $request->user()?->getAuthIdentifier();
         $student = $this->resolveTargetStudent($request, $composerUserId, $students, $directory);
+        $exemptionReadiness->ensureReconciled($student);
 
         $target = $this->resolveRegistrationTarget($calendar);
         if ($target === null) {
@@ -579,8 +601,12 @@ class RegistrationController
         // ExistingEnrollments read carries both.
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
-        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester), $existing);
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $registrationPolicy->ceiling($student->studentId),
+        ));
+        $violations = $validator->validate($cartLines, $this->exceptionsFor($student, $semester, $cartLines, $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, $cartLines, $ceiling)];
 
         $mintPlan = [];
         if ($bornApproved) {
@@ -712,7 +738,7 @@ class RegistrationController
             return true;
         })->values();
 
-        $this->attachMustRetakeToOfferings($eligible, $mustRetakeCourseIds);
+        $this->attachMustRetakeToOfferings($eligible, $mustRetakeCourseIds, $student->studentId);
 
         return $eligible;
     }
@@ -810,7 +836,7 @@ class RegistrationController
             return true;
         })->values();
 
-        $this->attachMustRetakeToOfferings($addable, $mustRetakeCourseIds);
+        $this->attachMustRetakeToOfferings($addable, $mustRetakeCourseIds, $student->studentId);
 
         return EligibleCourseResource::collection($addable)->resolve();
     }
@@ -826,51 +852,31 @@ class RegistrationController
      */
     private function mustRetakeMarkers(Collection $enrollments): array
     {
-        $courseIds = [];
-        $enrollmentIds = [];
-
-        $byCourse = $enrollments
-            ->filter(fn (Enrollment $enrollment): bool => $enrollment->offering !== null)
-            ->groupBy(fn (Enrollment $enrollment): int => (int) $enrollment->offering->course_id);
-
-        foreach ($byCourse as $courseId => $attempts) {
-            /** @var Enrollment|null $latest */
-            $latest = $attempts->last();
-            if (! $latest instanceof Enrollment) {
-                continue;
-            }
-
+        $studentId = $enrollments->isEmpty() ? 0 : (int) $enrollments->first()->student_id;
+        $obligations = $studentId > 0
+            ? MustRetakeObligation::query()->where('student_id', $studentId)->where('state', 'Active')->get()
+            : collect();
+        $courseIds = $obligations->pluck('course_id')->map(fn ($id): int => (int) $id)->all();
+        $enrollmentIds = $obligations->pluck('origin_enrollment_id')->map(fn ($id): int => (int) $id)->all();
+        foreach ($enrollments->filter(fn (Enrollment $item): bool => $item->offering !== null)->groupBy('offering.course_id') as $courseId => $attempts) {
             $mustRetake = false;
             foreach ($attempts as $attempt) {
-                if (
-                    $attempt->classification !== EnrollmentClassification::Preparatory
-                    && $attempt->classification !== EnrollmentClassification::Core
-                ) {
+                if (! in_array($attempt->classification, [EnrollmentClassification::Preparatory, EnrollmentClassification::Core], true)) {
                     continue;
                 }
-
-                if ($attempt->earned === true) {
-                    $mustRetake = false;
-
-                    continue;
-                }
-
-                if ($attempt->earned === false) {
-                    $mustRetake = true;
+                if ($attempt->earned !== null) {
+                    $mustRetake = $attempt->earned === false;
                 }
             }
-
-            if (! $mustRetake) {
-                continue;
+            if ($mustRetake) {
+                $courseIds[] = (int) $courseId;
+                $enrollmentIds[] = (int) $attempts->last()->getKey();
             }
-
-            $courseIds[] = (int) $courseId;
-            $enrollmentIds[] = (int) $latest->getKey();
         }
 
         return [
-            'course_ids' => $courseIds,
-            'enrollment_ids' => $enrollmentIds,
+            'course_ids' => array_values(array_unique($courseIds)),
+            'enrollment_ids' => array_values(array_unique($enrollmentIds)),
         ];
     }
 
@@ -881,13 +887,7 @@ class RegistrationController
      */
     private function mustRetakeMarkersForStudent(int $studentId): array
     {
-        $enrollments = Enrollment::query()
-            ->where('student_id', $studentId)
-            ->with('offering')
-            ->orderBy('id')
-            ->get();
-
-        return $this->mustRetakeMarkers($enrollments);
+        return $this->mustRetakeMarkers(Enrollment::query()->where('student_id', $studentId)->with('offering')->orderBy('id')->get());
     }
 
     /**
@@ -912,14 +912,16 @@ class RegistrationController
      * @param  Collection<int, CourseOffering>  $offerings
      * @param  list<int>  $mustRetakeCourseIds
      */
-    private function attachMustRetakeToOfferings(Collection $offerings, array $mustRetakeCourseIds): void
+    private function attachMustRetakeToOfferings(Collection $offerings, array $mustRetakeCourseIds, int $studentId): void
     {
         $marked = array_fill_keys($mustRetakeCourseIds, true);
+        $remediation = array_fill_keys(RemediationObligation::query()->where('student_id', $studentId)->where('state', RemediationState::Active)->pluck('course_id')->map(fn ($id): int => (int) $id)->all(), true);
 
-        $offerings->each(fn (CourseOffering $offering) => $offering->setAttribute(
-            'must_retake',
-            isset($marked[(int) $offering->course_id]),
-        ));
+        $offerings->each(function (CourseOffering $offering) use ($marked, $remediation): void {
+            $courseId = (int) $offering->course_id;
+            $offering->setAttribute('must_retake', isset($marked[$courseId]));
+            $offering->setAttribute('obligation_type', isset($remediation[$courseId]) ? 'Remediation' : (isset($marked[$courseId]) ? 'MustRetake' : null));
+        });
     }
 
     /**

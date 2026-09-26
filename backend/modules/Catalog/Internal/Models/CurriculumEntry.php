@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Catalog\Public\Enums\CourseCategory;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
 
 /**
  * A Curriculum Entry — the placement of one Course into one Program under one
@@ -17,6 +18,7 @@ use Modules\Catalog\Public\Enums\CourseCategory;
  * @property int $program_id
  * @property int $course_id
  * @property CourseCategory $category
+ * @property PreparatoryRequirementRole|null $preparatory_requirement_role
  * @property int $ordinal
  */
 class CurriculumEntry extends Model
@@ -29,6 +31,7 @@ class CurriculumEntry extends Model
         'program_id',
         'course_id',
         'category',
+        'preparatory_requirement_role',
         'ordinal',
     ];
 
@@ -37,6 +40,7 @@ class CurriculumEntry extends Model
     {
         return [
             'category' => CourseCategory::class,
+            'preparatory_requirement_role' => PreparatoryRequirementRole::class,
             'ordinal' => 'integer',
         ];
     }

@@ -9,11 +9,26 @@ import type { MyApplication200Data } from '../../../shared/api/generated/endpoin
 
 // The step never reaches the network in these tests — on-blur validation is entirely
 // client-side (RHF + Zod, ADR-0014) — so the mutator is a no-op behind the real hooks.
-const calls = vi.hoisted(() => ({ list: [] as string[] }))
+const calls = vi.hoisted(() => ({ list: [] as string[], programError: false }))
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} as Record<string, string> } } },
   customInstance: (config: { url?: string }) => {
     calls.list.push(config.url ?? '')
+    if ((config.url ?? '').endsWith('/programs')) {
+      if (calls.programError) return Promise.reject(new Error('offline'))
+      return Promise.resolve({
+        data: [
+          {
+            id: 10,
+            code: 'MSC-CE',
+            name_en: 'MSc in Computer Engineering',
+            name_ar: 'ماجستير هندسة الحاسوب',
+            degree_level: 'MSc',
+            is_active: true,
+          },
+        ],
+      })
+    }
     return Promise.resolve({ data: {} })
   },
 }))
@@ -64,6 +79,7 @@ function renderStep(application: MyApplication200Data | undefined = undefined) {
 
 beforeEach(() => {
   calls.list = []
+  calls.programError = false
 })
 
 describe('PersonalInfoStep on-blur validation', () => {
@@ -154,6 +170,34 @@ describe('PersonalInfoStep structured inputs (ticket 06)', () => {
     // The list is filtered to matching countries; picking one is how a value is set.
     expect(await screen.findByRole('option', { name: /egypt/i })).toBeInTheDocument()
   }, 15000)
+})
+
+describe('PersonalInfoStep previous E-JUST Program evidence', () => {
+  it('requires a structured MSc Program choice for an E-JUST MSc graduate', async () => {
+    const user = userEvent.setup()
+    renderStep({ ...COMPLETE, is_ejust_graduate: true, previous_degree: 'MSc' })
+
+    const previousProgram = await screen.findByRole('combobox', {
+      name: /previous e-just msc program/i,
+    })
+    await user.click(previousProgram)
+    expect(
+      await screen.findByRole('option', { name: /msc in computer engineering/i }),
+    ).toBeVisible()
+  })
+
+  it('offers retry when the asynchronous Program list fails', async () => {
+    calls.programError = true
+    renderStep({ ...COMPLETE, is_ejust_graduate: true, previous_degree: 'MSc' })
+
+    expect(await screen.findByText(/could not load e-just msc programs/i)).toBeInTheDocument()
+    calls.programError = false
+    await userEvent.click(screen.getByRole('button', { name: /retry/i }))
+
+    const input = await screen.findByRole('combobox', { name: /previous e-just msc program/i })
+    await userEvent.click(input)
+    expect(await screen.findByText(/msc in computer engineering/i)).toBeInTheDocument()
+  })
 })
 
 describe('PersonalInfoStep academic scores (ticket 07)', () => {

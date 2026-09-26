@@ -28,6 +28,12 @@ import { AssignmentsPage } from '../features/admin/assignments/AssignmentsPage'
 import { DepartmentHeadsPage } from '../features/admin/assignments/DepartmentHeadsPage'
 import { RegistrationPage } from '../features/enrollment/registration/RegistrationPage'
 import { SchedulePage } from '../features/enrollment/schedule/SchedulePage'
+import { ManualExemptionsPage } from '../features/enrollment/exemptions/ManualExemptionsPage'
+import { ExemptionReviewQueuePage } from '../features/enrollment/exemptions/ExemptionReviewQueuePage'
+import { TransfersPage } from '../features/enrollment/transfers/TransfersPage'
+import { TransferReviewQueuePage } from '../features/enrollment/transfers/TransferReviewQueuePage'
+import { WaiversPage } from '../features/enrollment/waivers/WaiversPage'
+import { WaiverReviewQueuePage } from '../features/enrollment/waivers/WaiverReviewQueuePage'
 import { AdvisingQueuePage } from '../features/enrollment/advising/AdvisingQueuePage'
 import { RegistrationReviewPage } from '../features/enrollment/advising/RegistrationReviewPage'
 import { StudentSchedulePage } from '../features/enrollment/advising/StudentSchedulePage'
@@ -43,6 +49,10 @@ import { DepartmentHeadQueuePage } from '../features/grading/department-head/Dep
 import { DepartmentHeadSheetPage } from '../features/grading/department-head/DepartmentHeadSheetPage'
 import { MyGradesPage } from '../features/grading/student/MyGradesPage'
 import { StudentGradesPage } from '../features/grading/oversight/StudentGradesPage'
+import { CreditHourSummaryPage } from '../features/academic-standing/CreditHourSummaryPage'
+import { TerminationReviewQueuePage } from '../features/academic-standing/TerminationReviewQueuePage'
+import { CapacityOverrideQueuePage } from '../features/enrollment/capacity/CapacityOverrideQueuePage'
+import { LifecycleReadOnly } from '../features/enrollment/LifecycleReadOnly'
 import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { AppThemeProvider } from './AppThemeProvider'
 // The Dashboard lives in the app shell, not in a feature: it composes Cards from many
@@ -91,8 +101,47 @@ export function App() {
                     admin who merely inherits courses.register_self is sent home and
                     the server would 403 the eligible list anyway (ticket 04). */}
                 <Route element={<RequireAuth roles={[ROLE.student]} />}>
-                  <Route path="/registration" element={<RegistrationPage />} />
-                  <Route path="/schedule" element={<SchedulePage />} />
+                  <Route
+                    path="/registration"
+                    element={
+                      <LifecycleReadOnly>
+                        <RegistrationPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/schedule"
+                    element={
+                      <LifecycleReadOnly>
+                        <SchedulePage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/exemptions"
+                    element={
+                      <LifecycleReadOnly>
+                        <ManualExemptionsPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/transfers"
+                    element={
+                      <LifecycleReadOnly>
+                        <TransfersPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route
+                    path="/waivers"
+                    element={
+                      <LifecycleReadOnly>
+                        <WaiversPage />
+                      </LifecycleReadOnly>
+                    }
+                  />
+                  <Route path="/academic-standing" element={<CreditHourSummaryPage />} />
                 </Route>
                 {/* My Grades (Phase 4, ticket 04): the Student's own Semester GPAs and CGPA.
                     Persona-guarded to R02 — an admin inheriting grades.view_own has no Student
@@ -143,6 +192,58 @@ export function App() {
                 <Route element={<RequireAuth roles={[ROLE.departmentHead]} />}>
                   <Route path="/grading/review" element={<DepartmentHeadQueuePage />} />
                   <Route path="/grading/review/:sheetId" element={<DepartmentHeadSheetPage />} />
+                  <Route
+                    path="/exemptions/department-head"
+                    element={<ExemptionReviewQueuePage stage="departmentHead" />}
+                  />
+                  <Route
+                    path="/transfers/department-head"
+                    element={<TransferReviewQueuePage stage="departmentHead" />}
+                  />
+                  <Route
+                    path="/waivers/department-head"
+                    element={<WaiverReviewQueuePage stage="departmentHead" />}
+                  />
+                  <Route
+                    path="/registration/capacity-overrides"
+                    element={<CapacityOverrideQueuePage />}
+                  />
+                  <Route
+                    path="/termination/department-head"
+                    element={<TerminationReviewQueuePage stage="departmentHead" />}
+                  />
+                </Route>
+                <Route element={<RequireAuth roles={[ROLE.advisor]} />}>
+                  <Route
+                    path="/exemptions/advisor"
+                    element={<ExemptionReviewQueuePage stage="advisor" />}
+                  />
+                  <Route
+                    path="/transfers/advisor"
+                    element={<TransferReviewQueuePage stage="advisor" />}
+                  />
+                  <Route
+                    path="/waivers/advisor"
+                    element={<WaiverReviewQueuePage stage="advisor" />}
+                  />
+                  <Route
+                    path="/termination/advisor"
+                    element={<TerminationReviewQueuePage stage="advisor" />}
+                  />
+                </Route>
+                <Route element={<RequireAuth roles={[ROLE.council]} />}>
+                  <Route
+                    path="/transfers/council"
+                    element={<TransferReviewQueuePage stage="council" />}
+                  />
+                  <Route
+                    path="/waivers/council"
+                    element={<WaiverReviewQueuePage stage="council" />}
+                  />
+                  <Route
+                    path="/termination/council"
+                    element={<TerminationReviewQueuePage stage="council" />}
+                  />
                 </Route>
                 {/* Advisor / Student Affairs registration review (ticket 06): gated on the
                     registration.approve permission (route + API). Advisors are scoped to

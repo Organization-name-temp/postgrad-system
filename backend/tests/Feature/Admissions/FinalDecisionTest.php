@@ -1,16 +1,29 @@
 <?php
 
+use Carbon\CarbonInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
-use Modules\Admissions\Internal\Events\AdmissionAccepted;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
+use Modules\Catalog\Internal\Enums\VersionSubject;
+use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\BoundCurriculumEntrySummary;
+use Modules\Catalog\Public\CurriculumCatalog;
+use Modules\Catalog\Public\CurriculumEntrySummary;
+use Modules\Catalog\Public\CurriculumRequirementsSummary;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Catalog\Public\Enums\PreparatoryRequirementRole;
+use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Catalog\Public\ProgramCurriculumVersion;
+use Modules\Catalog\Public\ProgramSummary;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
@@ -43,6 +56,13 @@ function decidableApplication(Faculty $faculty, array $overrides = []): array
     $program = Program::factory()->create([
         'department_id' => $department->id,
         'degree_level' => DegreeLevel::MSc,
+    ]);
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 1,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => now()->subMinute(),
     ]);
     $application = Application::factory()->interviewScheduled()->create(array_merge([
         'status' => ApplicationStatus::InterviewCompleted,
@@ -100,8 +120,17 @@ it('accepts an applicant and mints a Student', function () {
     // The Student is resolvable through the Identity\Public read facade — by owning
     // user and by the minted University ID.
     $directory = app(StudentDirectory::class);
-    expect($directory->find((int) $applicant->id)?->universityId)->toBe($universityId);
+    $studentSummary = $directory->find((int) $applicant->id);
+    expect($studentSummary?->universityId)->toBe($universityId)
+        ->and($studentSummary?->admissionEvidence?->applicationId)->toBe((int) $application->id)
+        ->and($studentSummary?->admissionEvidence?->admittedProgramId)->toBe((int) $program->id)
+        ->and($studentSummary?->admissionEvidence?->admittedProgramDegreeLevel)->toBe(DegreeLevel::MSc->value)
+        ->and($studentSummary?->admissionEvidence?->admittedDepartmentId)->toBe((int) $program->department_id);
     expect($directory->findByUniversityId($universityId)?->userId)->toBe((int) $applicant->id);
+    $this->assertDatabaseHas('registration_policy_projections', [
+        'student_id' => $studentSummary?->studentId,
+        'standing' => 'NotYetAssessed',
+    ]);
 
     // The role was replaced, not merely added: R01 gone, R02 held.
     expect($applicant->fresh()->hasRole(Role::Student))->toBeTrue();
@@ -119,6 +148,120 @@ it('accepts an applicant and mints a Student', function () {
         ->assertOk()
         ->assertJsonPath('data.0.type', 'application.accepted')
         ->assertJsonPath('data.0.data.university_id', $universityId);
+});
+
+it('applies qualifying automatic Exemptions after the acceptance transaction commits', function () {
+    $faculty = Faculty::factory()->create();
+    [$application, $applicant, $program] = decidableApplication($faculty, [
+        'english_test' => 'TOEFL iBT',
+        'english_score' => 79,
+    ]);
+    decisionAdvisor();
+
+    CatalogVersion::query()
+        ->where('subject_type', VersionSubject::Program->value)
+        ->where('subject_id', $program->id)
+        ->update([
+            'snapshot' => [
+                'curriculum' => [[
+                    'course_id' => 4401,
+                    'course_code' => 'BOUND-ENGLISH',
+                    'course_total_ch' => 1,
+                    'category' => 'Preparatory',
+                    'preparatory_requirement_role' => PreparatoryRequirementRole::EnglishLanguage->value,
+                    'ordinal' => 0,
+                ]],
+            ],
+        ]);
+
+    Sanctum::actingAs(decidingDean($faculty));
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertOk();
+
+    $student = Student::query()->where('user_id', $applicant->id)->firstOrFail();
+    $this->assertDatabaseHas('exemption_decisions', [
+        'student_id' => $student->id,
+        'curriculum_version_id' => $student->curriculum_version_id,
+        'target_course_id' => 4401,
+        'admission_application_id' => $application->id,
+    ]);
+
+    Sanctum::actingAs($applicant->fresh());
+    $this->getJson('/api/v1/credit-decisions/exemptions')
+        ->assertOk()
+        ->assertJsonPath('data.0.target_course_code', 'BOUND-ENGLISH');
+});
+
+it('keeps acceptance committed when post-commit exemption evaluation fails and reconciles later', function () {
+    $faculty = Faculty::factory()->create();
+    [$application, $applicant, $program] = decidableApplication($faculty);
+    decisionAdvisor();
+    CatalogVersion::query()
+        ->where('subject_type', VersionSubject::Program->value)
+        ->where('subject_id', $program->id)
+        ->update([
+            'snapshot' => [
+                'curriculum' => [[
+                    'course_id' => 4402,
+                    'course_code' => 'RECOVERED-ENGLISH',
+                    'course_total_ch' => 1,
+                    'category' => 'Preparatory',
+                    'preparatory_requirement_role' => PreparatoryRequirementRole::EnglishLanguage->value,
+                    'ordinal' => 0,
+                ]],
+            ],
+        ]);
+
+    $realCurricula = app(CurriculumCatalog::class);
+    app()->instance(CurriculumCatalog::class, new class($realCurricula) implements CurriculumCatalog
+    {
+        public function __construct(private readonly CurriculumCatalog $real) {}
+
+        public function requirementsForVersion(int $curriculumVersionId): ?CurriculumRequirementsSummary
+        {
+            return $this->real->requirementsForVersion($curriculumVersionId);
+        }
+
+        /** @return array<int, CurriculumEntrySummary> */
+        public function entriesForProgram(int $programId): array
+        {
+            return $this->real->entriesForProgram($programId);
+        }
+
+        /** @return list<BoundCurriculumEntrySummary> */
+        public function entriesForVersion(int $curriculumVersionId): array
+        {
+            throw new RuntimeException('simulated post-commit evaluation failure');
+        }
+
+        /** @return array<int, list<int>> */
+        public function programsContainingCourses(array $courseIds): array
+        {
+            return $this->real->programsContainingCourses($courseIds);
+        }
+    });
+
+    Sanctum::actingAs(decidingDean($faculty));
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertStatus(500);
+
+    // The listener ran after commit: acceptance + Student survive, while its durable
+    // evidence receipt makes the failed academic side effect recoverable.
+    expect($application->fresh()->status)->toBe(ApplicationStatus::Accepted);
+    $student = Student::query()->where('user_id', $applicant->id)->firstOrFail();
+    $this->assertDatabaseHas('automatic_exemption_evidence', [
+        'student_id' => $student->id,
+        'admission_application_id' => $application->id,
+    ]);
+    $this->assertDatabaseMissing('exemption_decisions', ['student_id' => $student->id]);
+
+    app()->instance(CurriculumCatalog::class, $realCurricula);
+    $this->artisan('enrollment:reconcile-automatic-exemptions', ['student' => $student->id])
+        ->assertSuccessful();
+    $this->assertDatabaseHas('exemption_decisions', [
+        'student_id' => $student->id,
+        'target_course_id' => 4402,
+    ]);
 });
 
 it('surfaces the University ID and Student role on /me after acceptance', function () {
@@ -140,7 +283,143 @@ it('surfaces the University ID and Student role on /me after acceptance', functi
         ->assertJsonPath('data.student.advisor_id', fn ($value) => is_int($value));
 });
 
-it('dispatches the AdmissionAccepted event on acceptance', function () {
+it('binds the accepted Student to the Program Curriculum Version effective at admission', function () {
+    $admittedAt = Carbon::parse('2026-09-04 10:00:00');
+    $this->travelTo($admittedAt);
+
+    $faculty = Faculty::factory()->create();
+    [$application, $applicant, $program] = decidableApplication($faculty);
+    decisionAdvisor();
+
+    CatalogVersion::query()
+        ->where('subject_type', VersionSubject::Program->value)
+        ->where('subject_id', $program->id)
+        ->delete();
+
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 1,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt->copy()->subDay(),
+    ]);
+    $effective = CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 2,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt,
+    ]);
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 3,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => $admittedAt->copy()->addSecond(),
+    ]);
+
+    Sanctum::actingAs(decidingDean($faculty));
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertOk();
+
+    $this->assertDatabaseHas('students', [
+        'user_id' => $applicant->id,
+        'curriculum_version_id' => $effective->id,
+        'curriculum_version_binding_source' => 'admission_time',
+    ]);
+
+    Sanctum::actingAs(User::findOrFail($applicant->id));
+    $this->getJson('/api/v1/me')
+        ->assertOk()
+        ->assertJsonPath('data.student.curriculum_version_id', (int) $effective->id)
+        ->assertJsonPath('data.student.curriculum_version_binding_source', 'admission_time')
+        ->assertJsonPath('data.student.lifecycle_status', 'Active');
+});
+
+it('resolves the admission Curriculum Version inside the acceptance transaction', function () {
+    $faculty = Faculty::factory()->create();
+    [$application] = decidableApplication($faculty);
+    decisionAdvisor();
+
+    $transaction = (object) [
+        'baseline' => DB::transactionLevel(),
+        'level' => 0,
+    ];
+    $catalog = app(ProgramCatalog::class);
+    app()->instance(ProgramCatalog::class, new class($catalog, $transaction) implements ProgramCatalog
+    {
+        public function __construct(
+            private readonly ProgramCatalog $catalog,
+            private readonly object $transaction,
+        ) {}
+
+        public function find(int $id): ?ProgramSummary
+        {
+            return $this->catalog->find($id);
+        }
+
+        public function findMany(array $ids): array
+        {
+            return $this->catalog->findMany($ids);
+        }
+
+        public function curriculumVersionEffectiveAt(int $programId, CarbonInterface $at): ?ProgramCurriculumVersion
+        {
+            $this->transaction->level = DB::transactionLevel();
+
+            return $this->catalog->curriculumVersionEffectiveAt($programId, $at);
+        }
+
+        public function earliestCurriculumVersion(int $programId): ?ProgramCurriculumVersion
+        {
+            return $this->catalog->earliestCurriculumVersion($programId);
+        }
+    });
+
+    Sanctum::actingAs(decidingDean($faculty));
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertOk();
+
+    expect($transaction->level)->toBeGreaterThan($transaction->baseline);
+});
+
+it('rejects acceptance atomically when the Program has no usable Curriculum Version', function () {
+    $faculty = Faculty::factory()->create();
+    [$application, $applicant, $program] = decidableApplication($faculty);
+    decisionAdvisor();
+    CatalogVersion::query()
+        ->where('subject_type', VersionSubject::Program->value)
+        ->where('subject_id', $program->id)
+        ->delete();
+    Sanctum::actingAs(decidingDean($faculty));
+
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('action')
+        ->assertJsonPath(
+            'errors.action.0',
+            'The selected program has no Curriculum Version available for admission.',
+        );
+
+    expect($application->fresh()->status)->toBe(ApplicationStatus::InterviewCompleted)
+        ->and($applicant->fresh()->hasRole(Role::Applicant))->toBeTrue()
+        ->and($applicant->fresh()->hasRole(Role::Student))->toBeFalse();
+    $this->assertDatabaseMissing('students', ['user_id' => $applicant->id]);
+    $this->assertDatabaseMissing('audit_log', ['action' => 'student.admitted']);
+
+    $this->postJson(
+        "/api/v1/dean/applications/{$application->id}/decide",
+        ['action' => 'accept'],
+        ['Accept-Language' => 'ar'],
+    )
+        ->assertUnprocessable()
+        ->assertJsonPath(
+            'errors.action.0',
+            'لا يحتوي البرنامج المحدد على إصدار خطة دراسية متاح للقبول.',
+        );
+});
+
+it('publishes an immutable Public acceptance-evidence snapshot after acceptance', function () {
     Event::fake([AdmissionAccepted::class]);
 
     $faculty = Faculty::factory()->create();
@@ -153,13 +432,35 @@ it('dispatches the AdmissionAccepted event on acceptance', function () {
 
     // The mint still runs (it is in-transaction, not the event); only the event is faked.
     $this->assertDatabaseHas('students', ['user_id' => $applicant->id]);
-    Event::assertDispatched(AdmissionAccepted::class, fn (AdmissionAccepted $event) => $event->userId === (int) $applicant->id);
+    Event::assertDispatched(AdmissionAccepted::class, function (AdmissionAccepted $event) use ($application, $applicant): bool {
+        $evidence = $event->evidence;
+
+        return $evidence->studentId > 0
+            && $evidence->userId === (int) $applicant->id
+            && $evidence->applicationId === (int) $application->id
+            && $evidence->admittedProgramId === (int) $application->primary_program_id
+            && $evidence->admittedProgramDegreeLevel === 'MSc'
+            && $evidence->admittedDepartmentId > 0
+            && $evidence->previousDegree === 'BSc'
+            && $evidence->previousEjustProgramId === null
+            && $evidence->previousEjustProgramDegreeLevel === null
+            && $evidence->previousEjustDepartmentId === null
+            && $evidence->englishTest === 'IELTS'
+            && $evidence->englishScore === 7.5;
+    });
 });
 
 it('mints per-(year, program) University IDs that increment and are unique', function () {
     $faculty = Faculty::factory()->create();
     $department = Department::factory()->create(['faculty_id' => $faculty->id]);
     $program = Program::factory()->create(['department_id' => $department->id, 'degree_level' => DegreeLevel::MSc]);
+    CatalogVersion::create([
+        'subject_type' => VersionSubject::Program,
+        'subject_id' => $program->id,
+        'version_no' => 1,
+        'snapshot' => ['curriculum' => []],
+        'changed_at' => now()->subMinute(),
+    ]);
     // One shared Cycle, so both admissions land in the same (year, program) bucket and
     // the sequence increments rather than restarting.
     $cycle = AdmissionCycle::factory()->open()->create();

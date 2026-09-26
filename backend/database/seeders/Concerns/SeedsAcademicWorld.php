@@ -8,6 +8,7 @@ use Modules\Calendar\Internal\Models\Semester;
 use Modules\Calendar\Public\Enums\Term;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
 use Modules\Enrollment\Internal\Enums\LineDecision;
@@ -113,15 +114,24 @@ trait SeedsAcademicWorld
         }
         $user->assignRole(Role::Applicant);
 
+        $admittedAt = Carbon::now()->toImmutable();
+        $curriculumVersion = app(ProgramCatalog::class)
+            ->curriculumVersionEffectiveAt((int) $program->getKey(), $admittedAt);
+        if ($curriculumVersion === null) {
+            throw new \RuntimeException("Seed Program {$program->code} has no Curriculum Version.");
+        }
+
         $result = app(StudentEnrollment::class)->admit(new AdmitStudent(
             userId: (int) $user->getKey(),
             actorUserId: null, // a seeded mint has no human actor.
             programId: (int) $program->getKey(),
             programCode: $program->code,
+            curriculumVersionId: $curriculumVersion->id,
             admissionYear: 2026,
             enrollmentTerm: $enrollmentTerm,
             admissionCycleId: $admissionCycleId,
             advisorId: (int) $advisor->getKey(),
+            admittedAt: $admittedAt,
             identity: new StudentIdentity(
                 nameEn: $nameEn,
                 nameAr: $nameAr,

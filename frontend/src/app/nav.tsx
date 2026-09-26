@@ -25,6 +25,11 @@ import GradingIcon from '@mui/icons-material/Grading'
 import RateReviewIcon from '@mui/icons-material/RateReview'
 import GradeIcon from '@mui/icons-material/Grade'
 import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium'
+import DonutLargeIcon from '@mui/icons-material/DonutLarge'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
+import GroupsIcon from '@mui/icons-material/Groups'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
@@ -175,6 +180,118 @@ export const navItems: NavItem[] = [
     icon: <CalendarViewWeekIcon />,
     section: 'enrollment',
     roles: [ROLE.student],
+  },
+  {
+    key: 'academicStanding',
+    to: '/academic-standing',
+    icon: <DonutLargeIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  {
+    key: 'manualExemptions',
+    to: '/exemptions',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  {
+    key: 'exemptionAdvisorQueue',
+    to: '/exemptions/advisor',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.advisor],
+  },
+  {
+    key: 'exemptionHeadQueue',
+    to: '/exemptions/department-head',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
+  },
+  {
+    key: 'transfers',
+    to: '/transfers',
+    icon: <SwapHorizIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  {
+    key: 'waivers',
+    to: '/waivers',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.student],
+  },
+  {
+    key: 'transferAdvisorQueue',
+    to: '/transfers/advisor',
+    icon: <SwapHorizIcon />,
+    section: 'enrollment',
+    roles: [ROLE.advisor],
+  },
+  {
+    key: 'waiverAdvisorQueue',
+    to: '/waivers/advisor',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.advisor],
+  },
+  {
+    key: 'transferHeadQueue',
+    to: '/transfers/department-head',
+    icon: <SwapHorizIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
+  },
+  {
+    key: 'waiverHeadQueue',
+    to: '/waivers/department-head',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
+  },
+  {
+    key: 'transferCouncilQueue',
+    to: '/transfers/council',
+    icon: <SwapHorizIcon />,
+    section: 'enrollment',
+    roles: [ROLE.council],
+  },
+  {
+    key: 'waiverCouncilQueue',
+    to: '/waivers/council',
+    icon: <WorkspacePremiumIcon />,
+    section: 'enrollment',
+    roles: [ROLE.council],
+  },
+  {
+    key: 'capacityOverrides',
+    to: '/registration/capacity-overrides',
+    icon: <GroupsIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
+  },
+  {
+    key: 'terminationAdvisor',
+    to: '/termination/advisor',
+    icon: <WarningAmberIcon />,
+    section: 'enrollment',
+    roles: [ROLE.advisor],
+  },
+  {
+    key: 'terminationHead',
+    to: '/termination/department-head',
+    icon: <WarningAmberIcon />,
+    section: 'enrollment',
+    roles: [ROLE.departmentHead],
+  },
+  {
+    key: 'terminationCouncil',
+    to: '/termination/council',
+    icon: <WarningAmberIcon />,
+    section: 'enrollment',
+    roles: [ROLE.council],
   },
   // The Advisor's registration-review queue (ticket 06): approve/trim/reject a Pending
   // request line-by-line. A capability item on registration.approve — held by Advisors

@@ -104,8 +104,12 @@ export function AddCoursePanel({ courses, onAdded }: AddCoursePanelProps) {
                         label={t(`classifications.${course.classification}`)}
                       />
                     )}
-                    {course.must_retake && (
-                      <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />
+                    {course.obligation_type === 'Remediation' ? (
+                      <StatusChip {...mustRetakeChip(t('remediation.label'))} />
+                    ) : (
+                      course.must_retake && (
+                        <StatusChip {...mustRetakeChip(t('mustRetake.label'))} />
+                      )
                     )}
                   </Stack>
                   <Box sx={{ mt: 0.5 }}>

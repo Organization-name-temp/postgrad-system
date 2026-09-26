@@ -20,6 +20,13 @@ use Modules\Grading\GradingServiceProvider;
 interface GradingRecords
 {
     /**
+     * The chronologically latest finalized CGPA-bearing Attempt for each Course.
+     *
+     * @return list<EffectiveAttemptSummary>
+     */
+    public function effectiveAttemptsForStudent(int $studentId): array;
+
+    /**
      * The Student's CGPA: `Σ(GPA points × credit hours) ÷ Σ(credit hours)` over their
      * CGPA-counting, non-superseded, graded Enrollments (spec §GPA and CGPA). `null` — never
      * `0.00` — when the Student has no CGPA-counting graded Enrollment yet, so a new record

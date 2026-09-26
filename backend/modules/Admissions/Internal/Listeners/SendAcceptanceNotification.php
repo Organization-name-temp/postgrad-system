@@ -2,7 +2,7 @@
 
 namespace Modules\Admissions\Internal\Listeners;
 
-use Modules\Admissions\Internal\Events\AdmissionAccepted;
+use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;
 
@@ -22,8 +22,8 @@ class SendAcceptanceNotification
 
     public function handle(AdmissionAccepted $event): void
     {
-        $this->notifier->notify($event->userId, NotificationType::ApplicationAccepted, [
-            'application_id' => $event->applicationId,
+        $this->notifier->notifyOnce($event->evidence->userId, NotificationType::ApplicationAccepted, 'application:'.$event->evidence->applicationId, [
+            'application_id' => $event->evidence->applicationId,
             'university_id' => $event->universityId,
         ]);
     }

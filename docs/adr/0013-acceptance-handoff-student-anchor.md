@@ -26,6 +26,10 @@ accepted Application. Identity owns only this *anchor*; the growing academic rec
 (Enrollments, Grades, CH Summary, Standing) belongs to Enrollment/Grading/Records
 (ADR-0002) and references the anchor by id.
 
+> **Amended by [ADR-0034](0034-students-bind-to-admission-curriculum-version.md):** the
+> anchor also holds the opaque id of the Program Curriculum version effective at admission,
+> so later Catalog edits cannot silently change the Student's degree requirements.
+
 ## Considered options
 
 - **Atomic Public-call mint + event for side-effects (chosen).** Correct dependency
@@ -50,5 +54,8 @@ accepted Application. Identity owns only this *anchor*; the growing academic rec
   on holding R01); re-applying in a later cycle re-grants R01.
 - Automatic exemptions (FR-ADM-008.2, BR-31/32/33) are **not** applied here — deferred to
   Phase 5 (Enrollment owns exemptions). The inputs are captured on the Application and
-  `AdmissionAccepted` is the forward hook Phase 5 can consume.
+  `AdmissionAccepted` is the forward hook Phase 5 can consume. **Amended by
+  [ADR-0032](0032-public-admission-evidence-event.md):** Phase 5 promotes that event to an
+  Admissions Public contract carrying an immutable exemption-evidence snapshot, with an
+  idempotent Enrollment listener and reconciliation command.
 - The mint is the first place the in-process event bus exists; later phases reuse it.

@@ -95,7 +95,7 @@ The Postgraduate Registration System comprises the following modules:
 
 | Category | Number of Courses | CH per Course | Total CH | Notes |
 |----------|:-:|:-:|:-:|-------|
-| Preparatory Courses | 6 | 1 | 6 | 4 University Requirements + 2 Departmental Requirements |
+| Preparatory Courses | 6 | 1 | 6 | 4 University Requirements + 2 Departmental Requirements; one departmental entry has the Key Skills role |
 | Program Core Courses | 2 | 3 | 6 | Must be from student's program |
 | Research Elective Courses | 3 | 3 | 9 | Classified by level and research type |
 | **Total** | **11** | | **21** | |
@@ -299,6 +299,7 @@ The Postgraduate Registration System comprises the following modules:
 | Graduation CGPA | Decimal | 0.00 – 4.00 (or percentage with conversion) | ✓ |
 | GPA Scale | Dropdown | 4.0, 5.0, Percentage | ✓ |
 | Is E-JUST Graduate? | Checkbox | Boolean | ✓ |
+| Previous E-JUST Program | Program selector | Required when Is E-JUST Graduate is true | Conditional |
 | Applying for Degree | Dropdown | MSc, PhD | ✓ |
 | English Proficiency Test Type | Dropdown | IELTS, TOEFL iBT, None | ✓ |
 | English Proficiency Score | Decimal | Conditional on test type | Conditional |
@@ -509,7 +510,7 @@ University
 │   │   │   │   ├── PRE402 - Arabic Language (1 CH)
 │   │   │   │   ├── PRE403 - Japanese Language (1 CH)
 │   │   │   │   ├── PRE404 - Japanese Culture (1 CH)
-│   │   │   │   ├── DEP501 - Dept. Req. 1 (1 CH)
+│   │   │   │   ├── DEP501 - Key Skills / Dept. Req. 1 (1 CH)
 │   │   │   │   └── DEP502 - Dept. Req. 2 (1 CH)
 │   │   │   ├── Program Core Courses (6 CH)
 │   │   │   └── Research Elective Courses (9 CH)
@@ -539,6 +540,15 @@ University
 3. The system SHALL prevent deletion of courses that have enrollment history.
 4. The system SHALL maintain version history for all course changes.
 5. The system SHALL support bulk import/export of courses via CSV/Excel.
+6. On admission, a Student SHALL be bound to the Program Curriculum version effective at
+   that time. Later Program or Curriculum edits SHALL NOT implicitly change that Student's
+   requirements, classifications, or credit accounting.
+7. After a Course activation-state change, Catalog SHALL publish a Public `CourseChanged`
+   event containing only the Course ID. Consumers SHALL re-read authoritative Catalog data
+   rather than rely on copied Course fields.
+7. Existing Students SHALL be backfilled to the latest Program Version at or before their
+   admission timestamp. If none predates admission, the earliest available Version SHALL be
+   used and the fallback SHALL be identified for audit and review.
 
 ---
 
@@ -558,18 +568,36 @@ University
 | Condition | Automatic Exemption | CH |
 |-----------|--------------------|----|
 | IELTS ≥ 6.5 OR TOEFL iBT ≥ 79 | PRE401 (English Language) | 1 |
-| PhD student who completed MSc at E-JUST | All 6 preparatory courses | 6 |
+| PhD student who completed an MSc at E-JUST in the same Department | All 6 preparatory courses | 6 |
 | E-JUST BSc graduate | PRE403, PRE404, Key Skills | 3 |
 
 Maximum exempted credit hours from preparatory courses: **6 credit hours**.
+
+The system SHALL resolve each named automatic Exemption through the selected Program's
+Preparatory Requirement Roles rather than hard-coded Course ids. Every Program SHALL have
+exactly one Preparatory Curriculum Entry for each of the six roles: English Language,
+Arabic Language, Japanese Language, Japanese Culture, Key Skills, and Departmental
+Requirement.
+
+A Student is Approaching Graduation only when total Remaining CH is greater than zero and
+less than 6, and the proposed for-credit schedule satisfies every remaining Course target
+or category slot. Audit Courses do not satisfy requirements. The system SHALL allow that
+completing schedule below the normal minimum; a Student with 6 or more Remaining CH may not
+use the exception by selecting only part of the remaining work.
 
 **Credit Hour Limits per Semester:**
 
 | Case | Min CH | Max CH | System Behavior |
 |------|:------:|:------:|-----------------|
 | Regular student | 6 | 12 | Block registration below 6 or above 12 CH |
-| Student approaching graduation | Remaining | 12 | Allow below 6 CH if only remaining courses |
-| First semester – exempted | < 6 | 12 | Allow below minimum in first semester only |
+| Student approaching graduation | Remaining | 12 | Allow below 6 CH only for a schedule that satisfies every remaining requirement |
+| First semester – exempted | Remaining non-exempt Preparatory load | 12 | Allow 1–5 CH only when every remaining Preparatory requirement is on the schedule |
+
+The first-semester exception applies only in the Student's enrollment Semester and only
+when the post-change schedule includes every Preparatory Course not already satisfied or
+exempted. The resulting load may be 1–5 CH. If no Preparatory requirements remain, the
+normal 6-CH floor applies; an Exemption does not create a general low-load privilege, and
+Audit Courses do not satisfy the condition.
 
 #### 4.4.2 FR-REG-002: Coursework Registration
 
@@ -599,9 +627,16 @@ Maximum exempted credit hours from preparatory courses: **6 credit hours**.
 **Acceptance Criteria:**
 
 1. The student SHALL select courses from the eligible course list and submit a registration request.
-2. The registration request SHALL be sent to the assigned Academic Advisor for approval.
-3. The Academic Advisor SHALL be able to approve, reject, or modify the registration.
-4. Registration approval status SHALL be displayed as: Pending / Approved / Rejected.
+2. The Registration Request SHALL enter `Pending Advisor` and be sent to the assigned
+   Academic Advisor for approval.
+3. The Academic Advisor SHALL be able to approve, reject, or modify the registration. If
+   approval requires the full Must-Retake Offering exception in FR-REG-006, Advisor
+   recommendation SHALL instead move it to `Awaiting Capacity Override` for the scoped
+   Department Head's final decision.
+4. Registration approval status SHALL be displayed as: Pending Advisor / Awaiting Capacity
+   Override / Approved / Rejected. The ordinary path is Pending Advisor → Approved or
+   Rejected; the exception path is Pending Advisor → Awaiting Capacity Override → Approved
+   or Rejected. Only Approved SHALL atomically create Enrollments.
 5. The system SHALL send email notifications at each status change.
 
 #### 4.4.4 FR-REG-004: Course Add/Drop/Withdrawal
@@ -622,12 +657,13 @@ Maximum exempted credit hours from preparatory courses: **6 credit hours**.
 | Audit (AU) | ✓ | ✗ | ✗ | ✓ | ✗ | Must attend ≥75% |
 | Withdrawal (W) | ✓ | ✗ | ✗ | ✗ | ✗ | Within withdrawal period |
 | CGPA Improve | ✓ | ✓(Last) | ✓ | ✓ | ✓(Last) | Max 1 per course |
-| Transfer | ✓ | ✗ | ✓ | ✗ | ✗ | Max 9 CH, min grade B |
-| Waive | ✓ | ✗ | ✓ | ✗ | ✗ | Level 400+, ≥80% coverage |
 | FW | ✓ | ✗ | ✗ | ✗ | ✗ | After deadline |
 | Incomplete (I) | ✓ | ✗* | ✗* | ✓ | ✗* | ≥70% completed |
 
 > \*until resolved
+>
+> Exemptions, Transfers, and Waivers are standalone, course-targeted decisions rather
+> than Enrollments or Course Statuses; their accounting rules are in Appendix D.
 
 #### 4.4.6 FR-REG-006: Re-Registration Rules
 
@@ -636,24 +672,198 @@ Maximum exempted credit hours from preparatory courses: **6 credit hours**.
 1. A student SHALL be allowed to re-register for a course maximum once.
 2. The latest grade SHALL replace the previous grade in CGPA calculation.
 3. Both attempts SHALL appear on the transcript.
-4. **Elective Courses:** If below C+ (2.5), student MAY register for a different elective; ALL grades count in CGPA.
-5. **Preparatory and Core Courses:** If below C+ (2.5), student MUST retake the same course; only latest grade in CGPA.
+4. **Elective Courses:** If below C+ (2.5), the Student MAY register for a different
+   elective and all Grades count in CGPA. Passing the different Course MAY satisfy the
+   curriculum slot but SHALL NOT supersede the original Course's Grade; that Grade remains
+   effective for Academic Warning and D/F termination evaluation until a successful later
+   Attempt in the same Course supersedes it.
+5. **Preparatory and Core Courses:** If below C+ (2.5), the student MUST retake the same
+   Course and only the latest Grade counts in CGPA. In a later Semester, eligible
+   Offerings for outstanding Must-Retake Obligations take priority over unrelated
+   for-credit Courses. If all offered obligations fit within the Student's dynamic load
+   ceiling, the post-change schedule SHALL include all of them before unrelated
+   for-credit Courses. If they exceed the ceiling, the schedule SHALL contain only a
+   feasible selection of those obligations up to the ceiling. Load or timetable conflicts
+   SHALL resolve deterministically: Preparatory obligations first, ordered by earliest
+   applicable termination/remediation checkpoint, then origin time (effective failed Grade
+   or Exemption Revocation), then Course code; Core obligations follow, ordered by oldest
+   failed Attempt then Course code. The validator SHALL walk that order
+   once and include a Course only when an eligible Offering fits the remaining load and
+   timetable; it SHALL NOT skip a feasible higher-priority Course to maximize Course
+   count, credit hours, or load utilization. The Student and Advisor SHALL NOT substitute
+   a lower-priority obligation. This selects required Courses, not exact sections: for
+   each required Course the Student MAY choose any eligible, non-conflicting Offering, and
+   the Advisor MAY change that Offering without changing the required Course. If none is
+   offered, other registration MAY proceed. Audit Enrollment SHALL neither satisfy nor
+   clear the rule.
+6. Whether a Must-Retake Course is offered SHALL be determined independently of unrelated
+   Courses already chosen by the Student. During a registration or modification window,
+   a conflicting unrelated Course SHALL be removed or switched so an eligible Offering
+   of the required Course can be selected. A conflict between required Courses SHALL use
+   the deterministic priority in item 5. After all applicable modification windows close,
+   the system SHALL NOT automatically drop an Enrollment; an unselected obligation SHALL
+   carry forward.
+7. A Must-Retake Course SHALL remain available for priority purposes when its eligible
+   Offering is at capacity. After the Academic Advisor recommends the registration, the
+   Department Head scoped to that Course's Department MAY give final approval to exceed
+   capacity for the required retake only. The override SHALL require a reason and an Audit
+   Log entry, SHALL be revalidated at approval, and SHALL NOT displace an existing
+   Enrollment. It SHALL be authorized by the Department Head Role plus scope to the
+   Course's Department, not by the ordinary Course Registration approval Permission; it
+   SHALL NOT expose the general registration queue or add a new Permission. Ordinary
+   registration SHALL NOT use this exception.
+8. When one Registration Request includes full Must-Retake Offerings owned by different
+   Departments, each owning Department Head SHALL record an independent decision for
+   their Offering and SHALL NOT decide another Department's capacity. The request SHALL
+   remain `Awaiting Capacity Override` until every required decision approves. Any denial
+   SHALL reject the unchanged atomic Registration Request; the system SHALL NOT silently
+   remove that mandatory line. Enrollments SHALL be created atomically only after all
+   required approvals exist and final validation passes.
+9. Capacity changes affecting an `Awaiting Capacity Override` request SHALL be reconciled
+   idempotently. If an Offering gains normal capacity, its active override requirement
+   SHALL cease without deleting any recorded decision. If no active requirement remains,
+   the system SHALL transactionally revalidate the Advisor-recommended batch and approve
+   it automatically only when every line fits normal capacity and every other rule still
+   passes. If a requested Offering that previously had capacity becomes full while the
+   request waits, reconciliation SHALL add a per-Offering override requirement routed to
+   that Course's scoped Department Head before final approval. An approval already
+   recorded for the same request and Offering SHALL remain in history and SHALL NOT be
+   duplicated. The system SHALL NOT reserve the newly available seat before that
+   transaction.
+10. A Preparatory requirement inside a post-revocation Remediation Window SHALL create a
+    distinct Remediation Obligation even when no prior Attempt exists. While active, it
+    SHALL share the Must-Retake validator's deadline-first Preparatory Course priority,
+    timetable treatment, and full-Offering Department Head capacity-exception workflow. It
+    SHALL end when the Course satisfies the requirement, a replacement Preparatory
+    Exemption closes it as `Released By Exemption`, or its remediation checkpoint is
+    evaluated; if still unsatisfied at that checkpoint, it SHALL become Preparatory
+    termination evidence. `Released By Exemption` SHALL record corrected applicability
+    evidence and SHALL NOT claim Course completion.
+11. If no future eligible Offering is scheduled, the Remediation Obligation SHALL remain
+    `Awaiting Offering` with no termination checkpoint. It SHALL contribute to Remaining
+    CH and block Graduation Readiness but SHALL NOT create termination evidence. The system
+    SHALL notify the Student, assigned Advisor, and scoped Department Head once on entering
+    that state. When a real enrollment opportunity is scheduled, idempotent reconciliation
+    SHALL assign the checkpoint, activate registration priority, and notify those actors.
+    Enrollment SHALL reconcile immediately after relevant local Course Offering changes
+    and consume Calendar's Public `SemesterChanged` event for relevant Semester-date
+    changes. The event SHALL identify the Semester rather than duplicate its dates;
+    Enrollment SHALL read authoritative Calendar data. Before checkpoint evaluation, a
+    later Grade-Submission Deadline SHALL extend the active checkpoint, while an earlier
+    deadline SHALL NOT shorten time already granted. Either edit SHALL append an auditable
+    Calendar-deadline-observed transition recording the official date and effective
+    checkpoint and SHALL notify the Student, assigned Advisor, and scoped Department Head.
+    After evaluation, the deadline used by that decision SHALL remain frozen. An idempotent
+    `enrollment:reconcile-remediation {student?}` command SHALL recover missed post-commit
+    handling globally or for one Student.
+12. When replacement Preparatory Exemption approval releases a Remediation Obligation, any
+    `Pending Advisor` or `Awaiting Capacity Override` Registration Request containing that
+    Course SHALL be terminally rejected in the same Enrollment transaction. The system
+    SHALL append a system-attributed reason, preserve all request and per-Offering capacity
+    review history, and notify the Student and current registration reviewers. It SHALL NOT
+    silently remove the Course or approve the remainder; the Student SHALL submit a newly
+    validated batch.
+13. If that Course has already become an in-progress Enrollment, replacement Exemption
+    approval SHALL NOT automatically drop, withdraw, or convert it. The Student MAY use the
+    ordinary drop or withdrawal workflow while available; otherwise the Enrollment SHALL
+    continue through normal attendance and grading. Its eventual Attempt and Grade SHALL
+    remain in history and CGPA. Raw Earned and Exempted CH MAY coexist, but the Course's
+    Earned CH SHALL be excluded from the target-matched Satisfied operand while its
+    Exemption is effective; the category cap SHALL then apply.
+14. Before the Student enrolls in the restored Course, an institution-controlled Course,
+    Offering, schedule, or Calendar change that removes the qualifying opportunity SHALL
+    trigger reconciliation. The system SHALL prefer another eligible Offering in the same
+    Semester; otherwise it SHALL assign the earliest later lawful opportunity, or return
+    the obligation to `Awaiting Offering` with no checkpoint. It SHALL append the old and
+    new opportunity/checkpoint evidence and notify the Student, assigned Advisor, and
+    scoped Department Head once per real transition. Full capacity and Student-created
+    timetable conflicts SHALL NOT withdraw an opportunity. After an Enrollment exists, the
+    opportunity SHALL count as used and SHALL NOT be reassigned.
+    Enrollment SHALL consume Catalog's Public ID-only `CourseChanged` event and run the
+    same idempotent reconciliation service used by local Offering changes, Calendar's
+    `SemesterChanged` event, and `enrollment:reconcile-remediation {student?}`.
 
 ---
 
 ### 4.5 Exemption Management Module
 
+#### Shared Manual-Request Lifecycle
+
+1. A manual Exemption, Transfer, or Waiver request SHALL begin as an editable Draft in
+   which the Student can add, replace, or remove supporting evidence.
+2. Submission SHALL lock the request and its evidence while it is under review.
+3. At each applicable review stage, the reviewer SHALL be able to advance the request,
+   reject it terminally with a reason, or return it to the Student for revision with
+   instructions.
+4. A returned request SHALL become editable. Resubmission SHALL restart review from the
+   Advisor and invalidate all earlier recommendations or verifications because the
+   evidence may have changed.
+5. Every transition SHALL be recorded in an append-only history with its actor, timestamp,
+   and optional note. Rejected and Approved are terminal states.
+6. Final approval SHALL atomically create a separate immutable Exemption, Transfer, or
+   Waiver decision linked to its source request. Draft, returned, or rejected requests
+   SHALL never affect academic accounting. Automatic Exemptions create decisions directly
+   and have no synthetic Student request.
+7. An effective decision SHALL NOT be edited or deleted. Its final authority may append a
+   Revocation with a required reason: the Department Head for an Exemption, or the Education
+   & Academic Affairs Council for a Transfer or Waiver. A replacement requires a new
+   request and full review. The original decision and Revocation remain visible in history.
+   If a Preparatory Exemption is revoked after the Student's ordinary two-Semester
+   completion checkpoint, the restored requirement SHALL receive a Remediation Window
+   through the Grade-Submission Deadline of the first main Semester in which that Course
+   has an eligible Offering and the Student can still lawfully add it at Revocation time.
+   The current Semester SHALL qualify while registration, add/drop, or late-add remains
+   open; after late-add closes, the search SHALL move forward. The Revocation SHALL NOT
+   immediately create a termination trigger.
+8. Corrected accepted evidence may trigger explicit automatic-Exemption reconciliation,
+   which appends any necessary Revocation and creates any newly justified decision
+   idempotently; it SHALL NOT silently rewrite history.
+9. A new Transfer or Waiver request SHALL NOT target a Course in which the Student already
+   has an effective for-credit Attempt that failed or earned credit. A corrected Exemption
+   remains eligible after either a failed or successful Attempt because it proves that a
+   Preparatory requirement did not apply; if approved, it releases the requirement without
+   removing the Attempt, Grade, raw Earned CH, or CGPA effect. While effective, the
+   Exemption SHALL exclude that Course's Earned CH from target-matched Satisfied CH.
+10. If a replacement Preparatory Exemption is approved while its post-Revocation
+    Remediation Obligation is active or `Awaiting Offering`, approval SHALL atomically close
+    that obligation as `Released By Exemption`. The resulting academic-change event SHALL
+    cause normal AcademicStanding reconciliation to clear matching evidence from any
+    non-final Termination Case. It SHALL NOT reverse a final termination.
+11. When finalizing an initial or correction Grade creates an effective failed Attempt in
+    the target Course of a submitted Transfer or Waiver request, the system SHALL
+    terminally reject that request in an append-only transition with the Grade event as
+    its cause. It SHALL notify the Student and the reviewers currently involved. Repeated
+    delivery of the same Grade event SHALL be idempotent.
+
 #### 4.5.1 FR-EXM-001: Course Exemption Request and Processing
 
 **Automatic Exemptions:**
 
-1. The system SHALL automatically apply exemptions upon enrollment without requiring a student request.
+1. On admission acceptance, the system SHALL idempotently create approved Exemption
+   records from the accepted Application's qualifying evidence, without requiring a
+   Student request and before the Student's first course registration.
 2. Maximum exempted credit hours from preparatory courses: 6 CH.
 
 **Manual Exemptions:**
 
-3. Students SHALL be able to submit exemption requests for MSc → PhD same track and previously studied courses.
-4. Approval workflow: Student → Academic Advisor → Department Head/Council
+3. Students SHALL be able to submit an Exemption request when evidence for an automatic
+   Preparatory exemption rule was missing, unverified, or incorrect during admission.
+4. MSc-at-E-JUST → PhD in the same Department remains an Exemption from all six
+   Preparatory Courses. The previous E-JUST Program SHALL be captured as a structured
+   Catalog Program reference; free-text major matching SHALL NOT decide eligibility.
+   Generic prior-course equivalence SHALL be processed as a Waiver under FR-TRW-002, not
+   as an Exemption.
+5. Approval workflow: Student submits → Academic Advisor recommends → Department Head
+   approves or rejects. The Department Head represents the departmental review; no
+   separate Department Council Role exists.
+6. A corrected Exemption approved after a failed or successful Attempt SHALL release the exempted
+   Preparatory requirement and any Must-Retake Obligation for it. The Attempt and Grade
+   SHALL remain visible and SHALL continue to contribute to CGPA under the normal
+   supersession rules. Raw Earned CH from a successful Attempt SHALL remain visible but
+   SHALL NOT enter Satisfied CH while the Exemption for that Course is effective.
+7. If the released Course has an existing in-progress Enrollment, approval SHALL leave it
+   unchanged. The Exemption releases the requirement rather than undoing the academic
+   commitment; ordinary drop, withdrawal, and grading rules SHALL continue to apply.
 
 ---
 
@@ -663,20 +873,45 @@ Maximum exempted credit hours from preparatory courses: **6 credit hours**.
 
 **Acceptance Criteria:**
 
-1. Maximum 9 credit hours transferable.
-2. Minimum grade B required.
+1. Maximum 9 credit hours transferable across all effective Transfer decisions. Each
+   decision recognizes the mapped target Course's credit hours from the Student's bound
+   Curriculum Version; source credit hours are retained as evidence but do not drive the
+   cap or Credit-Hour Summary. Final approval SHALL revalidate the lifetime total
+   transactionally, and a Revocation removes that decision from the active total.
+2. The Student SHALL submit the external grade exactly as printed with the supporting
+   transcript. During equivalency verification, the Department Head SHALL record its
+   normalized E-JUST Letter Grade; only A+, A, B+, or B satisfies the minimum grade.
+   The original and normalized values, verifier, and verification timestamp SHALL be
+   retained. The normalized grade decides Transfer eligibility only and SHALL NOT enter
+   GPA or CGPA.
 3. Must have equivalent course in program.
-4. Approval workflow: Student → Advisor → Dept. Council → Faculty Council.
-5. Requests MUST be submitted within 1 month of registration.
+4. Approval workflow: Student submits → Advisor recommends → Department Head verifies the
+   course equivalency → Education & Academic Affairs Council approves or rejects.
+5. Requests MUST be submitted within 1 month of the Student's admission-acceptance
+   timestamp (`admitted_at`), regardless of when the enrollment Semester begins or the
+   first Course Registration is approved. The deadline is inclusive and falls at the same
+   time one calendar month later, clamped to the destination month's last valid day.
+6. A new Transfer request SHALL be rejected when its target Course already has an
+   effective failed for-credit Attempt by that Student.
 
 #### 4.6.2 FR-TRW-002: Course Waiver
 
 **Acceptance Criteria:**
 
-1. Previously studied courses at level 400 or above may be waived.
-2. Minimum 80% course content coverage required.
-3. Waived courses do NOT affect CGPA.
-4. Appear on transcript as "Waived".
+1. Only a prior E-JUST Course at level 400 or above may support a Waiver. Study completed
+   outside E-JUST SHALL be evaluated only through the Transfer workflow and SHALL NOT use
+   a Waiver to bypass Transfer limits or deadlines.
+2. The prior E-JUST Course SHALL have an effective Grade of C+ or higher. When its academic
+   record is unavailable in PRS, the Student SHALL provide an official E-JUST transcript
+   and the Department Head SHALL verify the equivalent passing result.
+3. Minimum 80% content coverage is required and SHALL be recorded by the Department Head
+   during verification.
+4. Waived courses do NOT affect CGPA.
+5. Appear on transcript as "Waived".
+6. Approval workflow: Student submits → Advisor recommends → Department Head verifies the
+   level and content coverage → Education & Academic Affairs Council approves or rejects.
+7. A new Waiver request SHALL be rejected when its target Course already has an effective
+   failed for-credit Attempt by that Student.
 
 ---
 
@@ -731,10 +966,67 @@ Maximum exempted credit hours from preparatory courses: **6 credit hours**.
 
 | Standing | Criteria | System Action |
 |----------|----------|---------------|
+| Not Yet Assessed | No finalized CGPA-bearing Grade exists | Display as not yet assessed; no warning action |
 | Good Standing | CGPA ≥ 3.0 and all grades ≥ C+ | No action required |
-| Academic Warning | Any course < C+ but < 2 courses with D or below | Display warning, notify student and advisor |
-| Academic Probation | CGPA < 3.0 after completing coursework | Restrict to minimum courses |
-| Termination Pending | Meets termination criteria | Trigger termination workflow |
+| Academic Warning | CGPA ≥ 3.0 and any effective grade < C+ | Display warning, notify student and advisor |
+| Academic Probation | CGPA < 3.0 after any CGPA-bearing coursework is finalized | Cap Semester registration load at the configured minimum CH |
+| Termination Pending | Meets actionable termination criteria | Trigger termination workflow and apply the Probation registration ceiling until the final decision |
+
+The calculator applies the table in this precedence: Termination Pending → Not Yet
+Assessed → Academic Probation → Academic Warning → Good Standing. Exactly one value SHALL
+be returned. Termination is evaluated even when no CGPA-bearing Grade exists. “After
+completing coursework” means after at least one CGPA-bearing Grade has been finalized, not
+after all degree requirements have been satisfied. Only effective, non-superseded Grades
+participate, and CGPA is the authoritative rounded value from Grading.
+
+For a Student on Academic Probation, the configured minimum CH becomes the registration
+ceiling as well as the ordinary floor (6 CH by default). Every load-counting mode,
+including Audit, consumes that ceiling. The first-semester and Approaching Graduation
+exceptions may still permit an eligible schedule below the floor; no exception permits a
+load above the Probation ceiling.
+
+Termination Pending applies the same registration ceiling and below-minimum exceptions
+while the Student Lifecycle Status remains Active. It SHALL NOT block registration before
+the Council's final decision; only final termination blocks new registration mutations.
+
+Current Academic Standing SHALL remain derived on demand. After a relevant academic or
+termination event, the system SHALL recalculate it and append a Standing Observation only
+when the value differs from the latest Observation. Entering Warning, Probation, or
+Termination Pending and moving to a less severe Standing SHALL notify the Student and
+assigned Advisor once; the initial Not Yet Assessed Observation SHALL NOT notify. An
+Observation is history and a notification checkpoint, never the source of current Standing.
+Handlers and per-Student reconciliation SHALL be idempotent.
+
+Satisfying an elective curriculum slot with a different Course SHALL NOT supersede the
+original Course's effective below-C+ Grade. It remains part of Academic Warning and, when
+D or F, termination evaluation, as well as CGPA. Only a successful later Attempt in that
+same Course may supersede it.
+
+Academic Warning by itself SHALL NOT block graduation readiness. A Student who has
+satisfied every curriculum requirement and whose authoritative CGPA is at least 3.00
+SHALL meet the academic readiness test despite the Warning. Good Standing SHALL NOT be
+added as a separate graduation requirement.
+
+Termination Pending SHALL temporarily block graduation readiness while its actionable
+Termination Case remains open. A Department Head or Council dismissal, or an automatic
+`Trigger Cleared` transition, SHALL remove that block immediately and restore the direct
+curriculum-satisfaction plus CGPA test.
+
+Graduation Readiness SHALL be a derived advisory result only. It SHALL NOT automatically
+graduate the Student, change Student Lifecycle Status, or stand in for a formal graduation
+decision and its non-course or administrative checks.
+
+The Graduation Readiness contract SHALL return the authoritative `ready` boolean,
+Remaining CH, nullable CGPA, the separate Approaching Graduation result, and zero or more
+typed blockers from this closed set: `RemainingRequirements`, `CgpaUnavailable`,
+`CgpaBelowMinimum`, and `TerminationPending`. API, UI, Card, Report, and export consumers
+SHALL render these fields and SHALL NOT independently reconstruct readiness.
+
+Approaching Graduation SHALL remain independent of CGPA and Termination Pending. It SHALL
+be true solely when Remaining CH is 1–5 and the proposed for-credit schedule satisfies
+every remaining requirement. CGPA and termination blockers SHALL be displayed alongside
+that result and SHALL NOT suppress the below-minimum completing schedule allowed during
+Probation or termination due process.
 
 #### 4.8.2 FR-AST-002: Enrollment Termination
 
@@ -742,12 +1034,106 @@ Maximum exempted credit hours from preparatory courses: **6 credit hours**.
 
 | # | Criterion | Details |
 |---|-----------|---------|
-| 1 | Failure to complete prep courses | Fails to finish preparatory courses AND English requirement within 2 consecutive main semesters |
-| 2 | Grade D in 2+ courses | Receives grade D (1.0) or less in two or more courses |
+| 1 | Failure to complete Preparatory requirements | After the Grade-Submission Deadline of the second consecutive main Semester beginning with the enrollment Semester, any Adjusted Preparatory requirement remains unsatisfied; a requirement restored by a later Exemption Revocation instead becomes actionable after the Grade-Submission Deadline of the first main Semester in which its Course has an eligible Offering and the Student can still add it at Revocation time (current Semester only through late-add); an unresolved Incomplete at either checkpoint defers determination until resolution or expiry, and English is one Preparatory Requirement Role rather than an additional condition |
+| 2 | Effective Grade D in 2+ Courses | Two or more distinct Courses have a current effective, non-superseded Grade of D or F; D+ does not qualify, two Attempts of one Course count once, a successful later Attempt in the same Course clears it, and passing a different elective does not |
 
 **Termination Workflow:**
 
-System Flags → Student & Advisor Notified → Dept. Council Recommends → Academic Affairs Council Decides → Student Notified
+System Flags → Student & Advisor Notified → Advisor Assesses → Department Head Recommends
+or Dismisses → Education & Academic Affairs Council Terminates or Dismisses → Student and
+Advisor Notified
+
+Each Student SHALL have at most one non-terminal Termination Case. That Case SHALL aggregate
+the complete set of currently actionable Preparatory and D/F trigger components after
+excluding dismissed fingerprints. Creation, terminal transition, and `Evidence Changed`
+replacement SHALL preserve this invariant atomically and idempotently under concurrent
+events or command runs; the system SHALL NOT create parallel trigger-specific workflows.
+
+The shared `termination.recommend` Permission authorizes different transitions by Role:
+the assigned Advisor may record only the assessment, while the Department Head scoped to
+the Student's bound Program Department may record only the departmental recommendation or
+dismissal. A Case cannot reach the Council without both stages.
+
+While a Case awaits Advisor assessment, the system SHALL resolve the Student's assigned
+Advisor at action time. Reassignment SHALL remove the Case from the former Advisor's queue
+and authority and place it with the new Advisor. An assessment recorded before reassignment
+SHALL remain immutable, attributed to its actor, and valid; the Case SHALL continue at its
+current later stage without restarting. Later Advisor notifications SHALL target the
+currently assigned Advisor.
+
+Final Council termination and replacement Preparatory Exemption approval SHALL serialize
+on one transaction-scoped guard for the Identity-owned Student anchor, acquired before any
+module-owned lock. Each workflow SHALL revalidate lifecycle and current authoritative
+termination evidence after acquiring it. If Exemption approval commits first, finalization
+SHALL observe the cleared trigger and append `Trigger Cleared` rather than terminate on
+stale evidence. If termination commits first, Exemption approval SHALL fail without any
+decision, obligation, Registration Request, or notification change.
+
+Before every workflow action and after any relevant Grade, Incomplete, Exemption, Transfer,
+Waiver, or Revocation change, the system SHALL recompute the Case's derived triggers. If no
+trigger remains before the Council's final decision, the system SHALL append a terminal
+`Trigger Cleared` transition, block further review, and notify the Student and Advisor. A
+later trigger SHALL open a new Case. Remediation after a final termination SHALL NOT
+automatically reinstate the Student.
+
+If a non-terminal Case's actionable fingerprint changes while at least one trigger remains,
+the system SHALL atomically close that Case as `Evidence Changed` and open a new Case at the
+Advisor-assessment stage with the complete current fingerprint. Earlier reviews SHALL
+remain immutable history and SHALL NOT transfer to the new Case. `Evidence Changed` SHALL
+NOT suppress either fingerprint; if the former evidence later becomes current, it MAY open
+a Case. The new Case SHALL send the normal initial Student and Advisor notification. If the
+derived Standing remains Termination Pending, the system SHALL NOT append a duplicate
+Standing Observation.
+
+Because the localhost build has no scheduler, an idempotent, manually run
+`academic-standing:reconcile {student?}` command SHALL use the same per-Student service as
+the event handlers. Without an argument it SHALL inspect every active Student; with a
+Student argument it SHALL perform targeted recovery. It SHALL evaluate elapsed ordinary and
+remediation checkpoints, open a missing Termination Case or append `Trigger Cleared` when
+appropriate, and append any missing Standing Observation and once-only notifications.
+It SHALL read but SHALL NOT convert Grading-owned Incomplete outcomes. Standing and
+Graduation Readiness GET requests SHALL remain side-effect free.
+
+For a determinate remediation checkpoint, AcademicStanding SHALL atomically create or
+reconcile the Termination Case and Standing Observation and invoke Enrollment's idempotent
+Public evaluation command with the Remediation Obligation id and expected effective
+deadline. Enrollment SHALL remain the obligation's only writer. An already evaluated
+matching checkpoint SHALL be a successful no-op; an active deadline mismatch SHALL roll
+back every module's changes so reconciliation can reload after a concurrent Calendar
+extension. A valid unresolved Incomplete SHALL defer determination and leave the obligation
+active.
+
+Each Case SHALL retain a canonical, deterministically ordered fingerprint of the evidence
+that opened it. A Preparatory component SHALL contain the requirement ID, its checkpoint
+source (ordinary checkpoint identity or Remediation Obligation ID), and the effective
+Grade, Withdrawal, Exemption, and Revocation evidence IDs present at evaluation; absence of
+an Attempt SHALL be an explicit evidence value. A D/F component SHALL contain the distinct
+Course and effective Grade IDs. A Department Head or Council dismissal SHALL suppress that
+exact fingerprint from opening another Case and from producing Termination Pending.
+Standing SHALL fall through to its next applicable value. A later Attempt outcome,
+Withdrawal, decision/Revocation, or new Remediation Obligation SHALL produce materially
+changed evidence and MAY open a new Case; unchanged non-completion SHALL remain suppressed.
+
+A post-checkpoint Exemption Revocation SHALL suppress only its restored Preparatory
+requirement from termination evidence until the Remediation Window closes. Other active
+termination evidence remains actionable. If the Student holds a valid Incomplete in the
+restored Course at that deadline, the normal Incomplete deferral applies.
+An `Awaiting Offering` Remediation Obligation has no deadline and SHALL NOT become
+termination evidence until an eligible Offering with a lawful add opportunity is scheduled.
+
+A final Council termination SHALL atomically set the Identity-owned Student Lifecycle
+Status to `Terminated` while retaining the User's Student Role. In the same transaction,
+AcademicStanding SHALL invoke Enrollment's idempotent Public request-closeout command with
+the Student ID and Termination Case ID. Enrollment SHALL append a system-attributed
+`Rejected` transition to every non-terminal Registration Request and manual Exemption,
+Transfer, or Waiver request, preserve all evidence, batch lines, reviews, and capacity
+decisions, and notify the Student and current reviewers. Failure of any Case, lifecycle, or
+request change SHALL roll back all of them. Existing Enrollments and effective credit
+decisions SHALL remain unchanged. A Terminated Student may
+authenticate and read their historical Grades, Credit-Hour Summary, requests, decisions,
+and Transcript, but SHALL NOT create or change Course Registrations or manual Exemption,
+Transfer, or Waiver requests. Reinstatement requires a future explicit workflow and SHALL
+NOT follow automatically from remediation.
 
 ---
 
@@ -764,9 +1150,9 @@ System Flags → Student & Advisor Notified → Dept. Council Recommends → Aca
 
 #### 4.9.2 FR-TRN-002: Credit Hour Summary
 
-| Category | Required CH | Completed CH | Remaining CH | Status |
-|----------|:-----------:|:------------:|:------------:|:------:|
-| Preparatory Courses | 6 (adjusted) | X | Y | Status indicator |
+| Category | Adjusted Required CH | Satisfied CH | Remaining CH | Status |
+|----------|:--------------------:|:------------:|:------------:|:------:|
+| Preparatory Courses | 6 minus Exempted CH | X | Y | Status indicator |
 | Program Core Courses | 6 | X | Y | Status indicator |
 | Research Elective | 9 | X | Y | Status indicator |
 | **Total** | **21 (adjusted)** | **X** | **Y** | **Overall status** |
@@ -813,7 +1199,7 @@ System Flags → Student & Advisor Notified → Dept. Council Recommends → Aca
 | Course Registration Summary | Enrollment per course, section capacity | SA, Advisor, Dept. Head |
 | GPA Distribution | GPA/CGPA distribution by program | SA, Dean, Dept. Head |
 | Academic Standing Report | Students by standing | SA, Dean, Dept. Head, Advisor |
-| Graduation Readiness | Students approaching graduation | SA, Advisor, Dept. Head |
+| Graduation Readiness | Students approaching or academically ready for graduation; Warning alone does not exclude a Student whose curriculum is satisfied and CGPA is at least 3.00, while Termination Pending temporarily excludes them until dismissal or Trigger Cleared | SA, Advisor, Dept. Head |
 | Termination Report | Students recommended/approved for termination | SA, Dean, Council |
 | Audit Log Report | System activity logs, security events | SysAdmin, Super Admin |
 
@@ -920,13 +1306,22 @@ System Flags → Student & Advisor Notified → Dept. Council Recommends → Aca
 
 | Category | Definition |
 |----------|-----------|
-| Required CH | Total credit hours needed for degree completion (default 21, adjusted for exemptions) |
-| Attended CH | Total credit hours of courses the student has attended |
-| Earned CH | Total credit hours of courses the student has passed |
-| Remaining CH | Required CH – Earned CH – Transferred CH – Waived CH |
-| Transferred CH | Credit hours counted from transferred courses (max 9) |
-| Waived CH | Credit hours counted from waived courses |
-| Exempted CH | Credit hours from exempted courses (reduce required total) |
+| Baseline Required CH | Credit hours required by the Student's bound Curriculum Version before Exemptions |
+| Adjusted Required CH | `max(0, Baseline Required CH - Exempted CH)` |
+| Attended CH | Raw credit hours of all attendance-counting Enrollments; repeated Attempts remain included |
+| Earned CH | Raw credit hours from each Course's effective passing Attempt |
+| Transferred CH | Raw credit hours from effective Transfer decisions (max 9) |
+| Waived CH | Raw credit hours from effective Waiver decisions |
+| Exempted CH | Raw credit hours from effective Exemptions; these reduce Required rather than count as Satisfied |
+| Satisfied CH | `min(Adjusted Required CH, target-eligible Earned CH + Transferred CH + Waived CH)`; target-eligible Earned CH excludes a Course while an effective Exemption removes that same target |
+| Remaining CH | `max(0, Adjusted Required CH - Satisfied CH)` |
+
+Every figure SHALL be calculated for Preparatory, Program Core, and Research Elective,
+plus a Total row that sums the category rows. Raw measures may exceed a requirement;
+Satisfied CH SHALL allocate by Course target before applying the category cap. An effective
+Exemption and raw Earned CH for its Course SHALL remain visible but SHALL NOT both advance
+curriculum progress. Satisfied CH SHALL NOT exceed Adjusted Required CH and Remaining CH
+SHALL NOT be negative.
 
 ### 7.3 Appendix C: System Configuration Parameters
 
@@ -947,7 +1342,9 @@ System Flags → Student & Advisor Notified → Dept. Council Recommends → Aca
 | incomplete_min_completion | 70 | System Admin | Min completion for I grade |
 | audit_log_retention_years | 7 | System Admin | Audit log retention |
 
-### 7.4 Appendix D: Course Status Counting Rules
+### 7.4 Appendix D: Academic Credit Counting Rules
+
+**Enrollment Course Statuses:**
 
 | Status | Transcript | CGPA | Req. CH | Attend. CH | Earned CH |
 |--------|:----------:|:----:|:-------:|:----------:|:---------:|
@@ -957,13 +1354,24 @@ System Flags → Student & Advisor Notified → Dept. Council Recommends → Aca
 | Audit (AU) | ✓ | ✗ | ✗ | ✓ | ✗ |
 | Withdrawal (W) | ✓ | ✗ | ✗ | ✗ | ✗ |
 | CGPA Improvement | ✓ | ✓(latest) | ✓ | ✓ | ✓(latest) |
-| Transfer | ✓ | ✗ | ✓ | ✗ | ✗(noted) |
-| Waive | ✓ | ✗ | ✓ | ✗ | ✗(noted) |
 | FW | ✓ | ✗ | ✗ | ✗ | ✗ |
 | Incomplete (I) | ✓ | ✗* | ✗* | ✓ | ✗* |
-| Exempted | ✓ | ✗ | ✗(reduces) | ✗ | ✗ |
 
 > \*until resolved
+
+**Standalone course-targeted decisions:**
+
+| Record | Transcript | CGPA | Accounting effect |
+|--------|:----------:|:----:|-------------------|
+| Transfer | ✓ | ✗ | Satisfies the mapped Curriculum Course; reported as Transferred CH |
+| Waiver | ✓ | ✗ | Satisfies the targeted Curriculum Course; reported as Waived CH |
+| Exemption | ✓ | ✗ | Reduces the targeted Preparatory requirement; reported as Exempted CH |
+
+Only one approved Exemption, Transfer, or Waiver may apply to a Curriculum Course for a
+Student. Transfer and Waiver may not duplicate credit already earned through an Enrollment.
+A corrected Preparatory Exemption may coexist with an already-earned Enrollment because it
+corrects requirement applicability, but target-aware Satisfied CH SHALL give no duplicate
+progress.
 
 ---
 

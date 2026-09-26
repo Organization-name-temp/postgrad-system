@@ -5,6 +5,7 @@ namespace Modules\Enrollment\Internal\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\Calendar\Public\AcademicCalendar;
@@ -30,6 +31,9 @@ use Modules\Enrollment\Internal\Support\CartValidator;
 use Modules\Enrollment\Internal\Support\CartViolation;
 use Modules\Enrollment\Internal\Support\CreditHoursValidator;
 use Modules\Enrollment\Internal\Support\EligibilityResolver;
+use Modules\Enrollment\Internal\Support\RegistrationPolicy;
+use Modules\Enrollment\Internal\Support\RequiredRetakeValidator;
+use Modules\Enrollment\Public\Events\AcademicEvidenceChanged;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\StudentSummary;
@@ -96,6 +100,8 @@ class ScheduleChangeController
         Directory $directory,
         EligibilityResolver $eligibility,
         Notifier $notifier,
+        RegistrationPolicy $registrationPolicy,
+        RequiredRetakeValidator $requiredRetakes,
     ): JsonResponse {
         $student = $this->actingStudent($request, $students);
 
@@ -144,8 +150,12 @@ class ScheduleChangeController
 
         $existing = $this->existingEnrollments($student->studentId, $semester->id);
 
-        $validator = new CartValidator(CreditHoursValidator::fromConfig());
-        $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester), $existing);
+        $validator = new CartValidator(CreditHoursValidator::fromConfig(
+            $registrationPolicy->ceiling($student->studentId),
+        ));
+        $violations = $validator->validate([$cartLine], $this->exceptionsFor($student, $semester, [$cartLine], $registrationPolicy), $existing);
+        $ceiling = $registrationPolicy->ceiling($student->studentId);
+        $violations = [...$violations, ...$requiredRetakes->validate($student->studentId, $semester->id, [$cartLine], $ceiling)];
 
         // Derive the status (Regular/Retake/CGPA Improvement/Audit); a third for-credit
         // attempt blocks the add.
@@ -212,6 +222,7 @@ class ScheduleChangeController
         CourseCatalog $courses,
         Directory $directory,
         Notifier $notifier,
+        RegistrationPolicy $registrationPolicy,
     ): Response {
         $student = $this->actingStudent($request, $students);
         $this->authorizeOwnEnrollment($enrollment, $student);
@@ -228,7 +239,26 @@ class ScheduleChangeController
         $min = (int) config('enrollment.min_credit_hours');
         $loadAfterDrop = $existing->activeCreditHours - (int) $enrollment->credit_hours;
 
-        if (! $this->exceptionsFor($student, $semester)->waivesFloor() && $loadAfterDrop < $min) {
+        $remainingSchedule = Enrollment::query()
+            ->active()
+            ->with('offering')
+            ->where('student_id', $student->studentId)
+            ->whereKeyNot($enrollment->getKey())
+            ->whereHas('offering', fn ($query) => $query->where('semester_id', $semester->id))
+            ->get()
+            ->map(fn (Enrollment $line): CartLine => new CartLine(
+                offeringId: (int) $line->course_offering_id,
+                courseId: (int) $line->offering->course_id,
+                courseCode: (string) $line->offering->course_id,
+                mode: $line->course_status === CourseStatus::Audit ? RegistrationMode::Audit : RegistrationMode::Regular,
+                totalCh: $line->credit_hours,
+                classification: $line->classification,
+                seatsRemaining: null,
+                meetings: [],
+            ))->all();
+        $underload = $registrationPolicy->exceptions($student, $semester->nameEn, $remainingSchedule);
+
+        if (! $underload->waivesFloor() && $loadAfterDrop < $min) {
             throw ValidationException::withMessages([
                 CartViolation::BELOW_MIN_CREDIT_HOURS => "Dropping {$courseCode} would leave you below the {$min}-hour minimum load.",
             ]);
@@ -288,6 +318,7 @@ class ScheduleChangeController
 
         // Withdrawal records W permanently — no credit-hour floor check (FR-REG-004).
         $enrollment->update(['course_status' => CourseStatus::Withdrawn]);
+        Event::dispatch(new AcademicEvidenceChanged($student->studentId, 'enrollment_withdrawal', (int) $enrollment->getKey()));
 
         $offerings = collect([$offering]);
         $this->attachOfferingRefs($offerings, $courses, $directory);

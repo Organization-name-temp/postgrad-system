@@ -24,6 +24,10 @@ export const PERMISSION = {
   viewCatalog: 'catalog.view',
   manageCatalog: 'catalog.manage',
   manageCalendar: 'calendar.manage',
+  submitExemption: 'exemption.submit',
+  approveExemption: 'exemption.approve',
+  submitTransferWaiver: 'transfer_waiver.submit',
+  approveTransferWaiver: 'transfer_waiver.approve',
 } as const
 
 export type PermissionCode = (typeof PERMISSION)[keyof typeof PERMISSION]

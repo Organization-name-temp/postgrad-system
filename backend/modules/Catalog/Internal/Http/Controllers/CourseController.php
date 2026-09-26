@@ -14,6 +14,7 @@ use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Support\CreditHours;
 use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
 use Modules\Catalog\Public\Enums\CourseLevel;
+use Modules\Catalog\Public\Events\CourseChanged;
 
 /**
  * @group Catalog
@@ -116,6 +117,7 @@ class CourseController
 
         $course->update($validated);
         $this->versions->recordCourse($course, 'updated');
+        event(new CourseChanged((int) $course->id));
 
         return new CourseResource($course);
     }
@@ -131,6 +133,7 @@ class CourseController
     {
         $course->update(['is_active' => true]);
         $this->versions->recordCourse($course, 'activated');
+        event(new CourseChanged((int) $course->id));
 
         return new CourseResource($course);
     }
@@ -149,6 +152,7 @@ class CourseController
     {
         $course->update(['is_active' => false]);
         $this->versions->recordCourse($course, 'deactivated');
+        event(new CourseChanged((int) $course->id));
 
         return new CourseResource($course);
     }

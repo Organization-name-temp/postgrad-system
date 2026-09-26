@@ -1,6 +1,6 @@
 import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useAuth } from '../features/auth/useAuth'
 import { dashboardCards } from './dashboardCards'
 
@@ -86,6 +86,36 @@ export function DashboardPage() {
                     }),
                   })}
                 </Typography>
+              )}
+              {student.curriculum_version_id !== undefined && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="overline" color="text.secondary" component="p">
+                    {t('dashboard.curriculumVersion')}
+                  </Typography>
+                  <Typography variant="body1" component="p">
+                    <Trans
+                      t={t}
+                      i18nKey="dashboard.curriculumVersionValue"
+                      values={{ id: student.curriculum_version_id }}
+                      components={{
+                        id: <span dir="ltr" style={{ unicodeBidi: 'isolate' }} />,
+                      }}
+                    />
+                  </Typography>
+                  {student.curriculum_version_binding_source === 'earliest_available_fallback' && (
+                    <Typography
+                      variant="body2"
+                      sx={(theme) => ({
+                        color:
+                          theme.palette.mode === 'light'
+                            ? theme.palette.warning.dark
+                            : theme.palette.warning.main,
+                      })}
+                    >
+                      {t('dashboard.curriculumVersionFallback')}
+                    </Typography>
+                  )}
+                </Box>
               )}
             </Box>
           )}

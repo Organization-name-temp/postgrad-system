@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { AxiosRequestConfig } from 'axios'
-import '../../../shared/i18n/config' // initialise i18next so useTranslation works
+import i18n from '../../../shared/i18n/config'
 import { RegistrationPage } from './RegistrationPage'
 
 // The endpoint bodies the page reads, behind the shared Axios mutator, so the page drives
@@ -11,6 +11,7 @@ import { RegistrationPage } from './RegistrationPage'
 const srv = vi.hoisted(() => ({
   eligible: undefined as unknown,
   requests: undefined as unknown,
+  exemptions: undefined as unknown,
 }))
 
 vi.mock('../../../shared/api/http', () => ({
@@ -22,6 +23,9 @@ vi.mock('../../../shared/api/http', () => ({
     const url = config.url ?? ''
     const method = (config.method ?? 'get').toLowerCase()
     if (url.endsWith('/registration/eligible-courses')) {
+      if (srv.eligible instanceof Error) {
+        return Promise.reject(srv.eligible)
+      }
       return Promise.resolve(srv.eligible)
     }
     if (url.endsWith('/registration/requests') && method === 'get') {
@@ -29,6 +33,12 @@ vi.mock('../../../shared/api/http', () => ({
     }
     if (url.endsWith('/registration/requests') && method === 'post') {
       return Promise.resolve({ data: {} })
+    }
+    if (url.endsWith('/credit-decisions/exemptions')) {
+      if (srv.exemptions instanceof Error) {
+        return Promise.reject(srv.exemptions)
+      }
+      return Promise.resolve(srv.exemptions)
     }
     return Promise.resolve({ data: {} }) // `/me` and anything else
   },
@@ -82,6 +92,8 @@ function cartRegion() {
 beforeEach(() => {
   srv.eligible = { data: { semester, courses: [] } }
   srv.requests = { data: { semester, requests: [] } }
+  srv.exemptions = { data: [] }
+  void i18n.changeLanguage('en')
 })
 
 describe('RegistrationPage', () => {
@@ -212,5 +224,88 @@ describe('RegistrationPage', () => {
     renderPage()
 
     expect(await screen.findByText(/must retake/i)).toBeInTheDocument()
+  })
+
+  it('distinguishes remediation from an ordinary must-retake obligation', async () => {
+    srv.eligible = {
+      data: { semester, courses: [eligibleLine({ obligation_type: 'Remediation' })] },
+    }
+    renderPage()
+
+    expect(await screen.findByText(/required remediation/i)).toBeInTheDocument()
+    expect(screen.queryByText(/^must retake$/i)).not.toBeInTheDocument()
+  })
+
+  it('shows automatic preparatory exemptions before the student composes registration', async () => {
+    srv.eligible = { data: { semester, courses: [eligibleLine({})] } }
+    srv.exemptions = {
+      data: [
+        {
+          id: 15,
+          student_id: 9,
+          curriculum_version_id: 3,
+          target_course_id: 101,
+          target_course_code: 'ENG-PREP-X',
+          preparatory_requirement_role: 'EnglishLanguage',
+          credit_hours: 1,
+          source: 'automatic',
+          reason_codes: ['english_proficiency'],
+          admission_application_id: 4,
+          approved_at: '2026-09-04T10:00:00+00:00',
+        },
+      ],
+    }
+    renderPage()
+
+    await screen.findByText('ENG-PREP-X')
+    const exemptions = await screen.findByRole('region', { name: /preparatory exemptions/i })
+    expect(within(exemptions).getByText('ENG-PREP-X')).toHaveAttribute('dir', 'ltr')
+    expect(within(exemptions).getByText(/english proficiency evidence/i)).toBeInTheDocument()
+    expect(
+      exemptions.compareDocumentPosition(cartRegion()) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+  })
+
+  it('blocks registration composition until failed exemption evidence is retried', async () => {
+    srv.eligible = new Error('reconciliation pending')
+    srv.exemptions = Object.assign(new Error('reconciliation pending'), {
+      isAxiosError: true,
+      response: { status: 409 },
+    })
+    renderPage()
+
+    expect(await screen.findByText(/still being reconciled/i)).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: /your registration/i })).not.toBeInTheDocument()
+
+    srv.eligible = { data: { semester, courses: [eligibleLine({})] } }
+    srv.exemptions = { data: [] }
+    fireEvent.click(screen.getByRole('button', { name: /retry/i }))
+
+    expect(await screen.findByText(/no automatic preparatory exemptions/i)).toBeInTheDocument()
+    expect(cartRegion()).toBeInTheDocument()
+  })
+
+  it('renders automatic exemption evidence in Arabic and preserves LTR course codes', async () => {
+    await i18n.changeLanguage('ar')
+    srv.exemptions = {
+      data: [
+        {
+          target_course_code: 'JPN-CULT-X',
+          preparatory_requirement_role: 'JapaneseCulture',
+          credit_hours: 1,
+          source: 'automatic',
+          reason_codes: ['ejust_bsc'],
+        },
+      ],
+    }
+    renderPage()
+
+    await screen.findByText('JPN-CULT-X')
+    const exemptions = await screen.findByRole('region', {
+      name: /الإعفاءات من المقررات التمهيدية/,
+    })
+    expect(within(exemptions).getByText('JPN-CULT-X')).toHaveAttribute('dir', 'ltr')
+    expect(within(exemptions).getByText(/بكالوريوس/)).toBeInTheDocument()
+    expect(document.documentElement).toHaveAttribute('dir', 'rtl')
   })
 })

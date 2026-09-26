@@ -58,6 +58,42 @@ enum NotificationType: string
     /** The applicant was accepted and became a Student. Payload: `university_id`. */
     case ApplicationAccepted = 'application.accepted';
 
+    /** An admission rule released one Preparatory requirement. */
+    case AutomaticExemptionApplied = 'exemption.automatically_applied';
+
+    /** A Student submitted or resubmitted a manual Exemption request. */
+    case ManualExemptionSubmitted = 'exemption.request_submitted';
+
+    /** A reviewer returned a manual Exemption request to the Student. */
+    case ManualExemptionReturned = 'exemption.request_returned';
+
+    /** An Advisor recommended a request to its scoped Department Head. */
+    case ManualExemptionRecommended = 'exemption.request_recommended';
+
+    /** A reviewer recorded a terminal manual Exemption outcome. */
+    case ManualExemptionDecided = 'exemption.request_decided';
+
+    /** A Student submitted or resubmitted a Transfer request. */
+    case TransferRequestSubmitted = 'transfer.request_submitted';
+
+    /** A reviewer returned a Transfer request for evidence revision. */
+    case TransferRequestReturned = 'transfer.request_returned';
+
+    /** A Transfer request advanced to its next reviewer. */
+    case TransferRequestAdvanced = 'transfer.request_advanced';
+
+    /** A reviewer recorded a terminal Transfer outcome. */
+    case TransferRequestDecided = 'transfer.request_decided';
+
+    case WaiverSubmitted = 'waiver.request_submitted';
+    case WaiverReturned = 'waiver.request_returned';
+    case WaiverRecommended = 'waiver.request_recommended';
+    case WaiverVerified = 'waiver.request_verified';
+    case WaiverDecided = 'waiver.request_decided';
+
+    /** An effective Exemption, Transfer, or Waiver was revoked with a reason. */
+    case CreditDecisionRevoked = 'credit_decision.revoked';
+
     /**
      * A Student (or staff on their behalf) submitted a registration for the advisor's
      * review (Phase 3, ticket 06). Raised to the assigned Advisor so queue work finds
@@ -150,4 +186,16 @@ enum NotificationType: string
      * `course_offering_id`, `course_code`, `deadline`.
      */
     case GradesOverdue = 'grades.overdue';
+
+    /** A real derived Academic Standing transition or recovery. */
+    case StandingChanged = 'academic_standing.changed';
+
+    /** An actionable termination Case opened, changed, or cleared. */
+    case TerminationCaseChanged = 'academic_standing.termination_case_changed';
+
+    /** A pending academic request was closed by a final lifecycle decision. */
+    case AcademicRequestClosed = 'academic_request.closed';
+
+    /** A post-revocation remediation obligation changed opportunity or outcome. */
+    case RemediationChanged = 'remediation.changed';
 }

@@ -26,11 +26,13 @@ final readonly class CreditHoursValidator
      * Build the validator from `config/enrollment.php` — the env-overridable limits the
      * live registration surface enforces.
      */
-    public static function fromConfig(): self
+    public static function fromConfig(?int $standingCeiling = null): self
     {
+        $ordinaryMaximum = (int) config('enrollment.max_credit_hours');
+
         return new self(
             minCreditHours: (int) config('enrollment.min_credit_hours'),
-            maxCreditHours: (int) config('enrollment.max_credit_hours'),
+            maxCreditHours: $standingCeiling === null ? $ordinaryMaximum : min($ordinaryMaximum, $standingCeiling),
         );
     }
 

@@ -8,10 +8,10 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Grading\Internal\Console\Commands\ConvertExpiredIncompletes;
 use Modules\Grading\Internal\Console\Commands\FlagLateSheets;
 use Modules\Grading\Internal\Console\Commands\SendIncompleteReminders;
-use Modules\Grading\Internal\Events\GradeFinalized;
 use Modules\Grading\Internal\Listeners\SendGradeFinalizedNotifications;
 use Modules\Grading\Internal\Listeners\SendIncompleteDeclaredNotifications;
 use Modules\Grading\Internal\Support\EloquentGradingRecords;
+use Modules\Grading\Public\Events\GradeFinalized;
 use Modules\Grading\Public\GradingRecords;
 
 /**

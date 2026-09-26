@@ -1,6 +1,75 @@
 // English resources. Namespaces: `common` (cross-cutting chrome) and `auth`
 // (the auth feature's strings). Later features add their own namespaces.
 export const en = {
+  records: {
+    search: 'Search Students',
+    student: 'Student',
+    exportStudents: 'Export Student list',
+    feeAvailable: 'Official request fee: {{fee}} EGP',
+    serviceUnavailable:
+      'Official requests are unavailable until Student Affairs completes fee and payment setup. Unofficial viewing remains available.',
+    university: 'Egypt-Japan University of Science and Technology',
+    identityUnresolved:
+      'Admission identity is unresolved. Contact Student Affairs before official issuance.',
+    identificationTypes: {
+      national_id: 'National ID',
+      passport: 'Passport',
+      unresolved: 'Identification Type unresolved',
+    },
+    cgpa: 'CGPA',
+    semesterGpa: 'Semester GPA',
+    course: 'Course',
+    creditHours: 'CH',
+    classification: 'Classification',
+    result: 'Grade / status',
+    contribution: 'CGPA contribution',
+    contributes: 'Contributes',
+    doesNotContribute: 'Does not contribute',
+    inProgress: 'In Progress',
+    creditDecisions: 'Effective credit decisions',
+    summary: 'Credit-Hour Summary',
+    category: 'Category',
+    categories: {
+      Preparatory: 'Preparatory',
+      ProgramCore: 'Program Core',
+      ResearchElective: 'Research Elective',
+      Total: 'Total',
+    },
+    classifications: {
+      Core: 'Core',
+      Preparatory: 'Preparatory',
+      InternalElective: 'Internal Elective',
+      ExternalElective: 'External Elective',
+      ResearchCourse: 'Research Course',
+    },
+    lifecycle: { Active: 'Active', Terminated: 'Terminated' },
+    decisions: { Exemption: 'Exemption', Transfer: 'Transfer', Waiver: 'Waiver' },
+    metrics: {
+      baseline_required_ch: 'Baseline required',
+      adjusted_required_ch: 'Adjusted required',
+      attended_ch: 'Attended',
+      earned_ch: 'Earned',
+      transferred_ch: 'Transferred',
+      waived_ch: 'Waived',
+      exempted_ch: 'Exempted',
+      satisfied_ch: 'Satisfied',
+      remaining_ch: 'Remaining',
+    },
+    loading: 'Loading…',
+    loadError: 'Unable to load the Transcript service.',
+    title: 'Transcript',
+    print: 'Print',
+    unofficial: 'Unofficial Transcript',
+    fee: {
+      title: 'Transcript fee configuration',
+      amount: 'Fee (EGP)',
+      english: 'Payment instructions (English)',
+      arabic: 'Payment instructions (Arabic)',
+      save: 'Save fee configuration',
+      saved: 'Fee configuration saved.',
+      error: 'Unable to save fee configuration.',
+    },
+  },
   common: {
     appName: 'Postgraduate Registration System',
     logOut: 'Log out',
@@ -42,6 +111,8 @@ export const en = {
       system: 'System',
     },
     nav: {
+      transcript: 'Transcript',
+      transcriptFee: 'Transcript fee',
       label: 'Main navigation',
       open: 'Open navigation menu',
       skipToContent: 'Skip to main content',
@@ -331,6 +402,8 @@ export const en = {
     // sends dotted values like "interview.scheduled"). `fallback` renders any
     // type the SPA does not yet know how to phrase (a later ticket's new type).
     types: {
+      recordsRequestChanged:
+        'Transcript Request #{{request_id}} has an update. Open your request to review it.',
       applicationReturned: 'Your application was returned for revision.',
       approvedForInterview: 'Your application was approved for interview.',
       interviewScheduled: 'Your interview has been scheduled.',

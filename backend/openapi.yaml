@@ -30,6 +30,8 @@ tags:
     description: ''
   - name: Notifications
     description: "\nA signed-in user's own in-app notifications — the data behind the shell's bell\n(ticket 02). Every endpoint is scoped to the authenticated user by\n{@see Notification::scopeForUser()}, so no request can list, count, or mutate\nanother user's notifications (a foreign id simply is not found → 404). Content\nis a type + payload; the SPA renders it bilingually, so nothing here is\nlocalised server-side."
+  - name: Records
+    description: ''
   - name: 'Transfer Review'
     description: ''
   - name: Transfers
@@ -25101,6 +25103,1264 @@ paths:
         name: notification
         description: 'The ID of the notification.'
         example: 3
+        required: true
+        schema:
+          type: integer
+  /api/v1/records/students:
+    get:
+      summary: 'Transcript Student picker.'
+      operationId: transcriptStudentPicker
+      description: ''
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Search admission names or University ID.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Search admission names or University ID.'
+            example: Sara
+        -
+          in: query
+          name: id
+          description: 'Student ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Student ids.'
+            example: '1,2'
+        -
+          in: query
+          name: university_id
+          description: 'University IDs.'
+          example: 2026-CE-0001
+          required: false
+          schema:
+            type: string
+            description: 'University IDs.'
+            example: 2026-CE-0001
+        -
+          in: query
+          name: lifecycle_status
+          description: 'Lifecycle states.'
+          example: Active
+          required: false
+          schema:
+            type: string
+            description: 'Lifecycle states.'
+            example: Active
+        -
+          in: query
+          name: sort
+          description: 'Readable field sort.'
+          example: name_en
+          required: false
+          schema:
+            type: string
+            description: 'Readable field sort.'
+            example: name_en
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: ''
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      university_id: 2026-CE-0001
+                      name_en: Sara
+                      name_ar: سارة
+                      lifecycle_status: Active
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 25
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        university_id: 2026-CE-0001
+                        name_en: Sara
+                        name_ar: سارة
+                        lifecycle_status: Active
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        university_id:
+                          type: string
+                          example: 2026-CE-0001
+                        name_en:
+                          type: string
+                          example: Sara
+                        name_ar:
+                          type: string
+                          example: سارة
+                        lifecycle_status:
+                          type: string
+                          example: Active
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - Records
+      security: []
+  /api/v1/records/students/export:
+    get:
+      summary: 'Export Transcript Student picker.'
+      operationId: exportTranscriptStudentPicker
+      description: ''
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Search admission names or University ID.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Search admission names or University ID.'
+            example: Sara
+        -
+          in: query
+          name: id
+          description: 'Student ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Student ids.'
+            example: '1,2'
+        -
+          in: query
+          name: university_id
+          description: 'University IDs.'
+          example: 2026-CE-0001
+          required: false
+          schema:
+            type: string
+            description: 'University IDs.'
+            example: 2026-CE-0001
+        -
+          in: query
+          name: lifecycle_status
+          description: 'Lifecycle states.'
+          example: Active
+          required: false
+          schema:
+            type: string
+            description: 'Lifecycle states.'
+            example: Active
+        -
+          in: query
+          name: sort
+          description: 'Readable field sort.'
+          example: name_en
+          required: false
+          schema:
+            type: string
+            description: 'Readable field sort.'
+            example: name_en
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - Records
+      security: []
+  '/api/v1/records/students/{student_id}/transcript':
+    get:
+      summary: 'Current unofficial Transcript.'
+      operationId: currentUnofficialTranscript
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    student_id: 1
+                    identity:
+                      name_en: Sara
+                      name_ar: سارة
+                      identification_type: passport
+                      identification_number: AB123456
+                      ready: true
+                    university_id: 2026-CE-0001
+                    enrollment_term: 'Fall 2026'
+                    lifecycle_status: Active
+                    program:
+                      code: CE
+                      name_en: 'Computer Engineering'
+                      name_ar: 'هندسة الحاسوب'
+                      degree_level: MSc
+                      department_name_en: Engineering
+                      department_name_ar: الهندسة
+                      faculty_name_en: Engineering
+                      faculty_name_ar: الهندسة
+                    cgpa: null
+                    semesters:
+                      -
+                        semester:
+                          id: 1
+                          name_en: 'Fall 2026'
+                          name_ar: 'خريف 2026'
+                          starts_at: '2026-09-01'
+                        gpa: null
+                        courses:
+                          -
+                            enrollment_id: 1
+                            course:
+                              code: CE501
+                              name_en: Algorithms
+                              name_ar: الخوارزميات
+                            credit_hours: 3
+                            classification: Core
+                            course_status: Regular
+                            result: InProgress
+                            contributes_to_cgpa: false
+                    credit_decisions:
+                      -
+                        type: Transfer
+                        target_course_code: CE501
+                        credit_hours: 3
+                        approved_at: '2026-09-01T00:00:00Z'
+                        source_institution: 'Example University'
+                        source_course_code: EXT501
+                        source_course_name: Algorithms
+                        original_grade: Distinction
+                        normalized_grade: B
+                        reason_codes: []
+                        prior_course_code: null
+                        prior_grade: null
+                    credit_hours:
+                      student_id: 1
+                      curriculum_version_id: 1
+                      categories:
+                        -
+                          category: Core
+                          baseline_required_ch: 6
+                          adjusted_required_ch: 6
+                          attended_ch: 0
+                          earned_ch: 0
+                          transferred_ch: 0
+                          waived_ch: 0
+                          exempted_ch: 0
+                          satisfied_ch: 0
+                          remaining_ch: 6
+                      total:
+                        category: Total
+                        baseline_required_ch: 21
+                        adjusted_required_ch: 21
+                        attended_ch: 0
+                        earned_ch: 0
+                        transferred_ch: 0
+                        waived_ch: 0
+                        exempted_ch: 0
+                        satisfied_ch: 0
+                        remaining_ch: 21
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      student_id:
+                        type: integer
+                        example: 1
+                      identity:
+                        type: object
+                        properties:
+                          name_en:
+                            type: string
+                            example: Sara
+                          name_ar:
+                            type: string
+                            example: سارة
+                          identification_type:
+                            type: string
+                            example: passport
+                            nullable: true
+                          identification_number:
+                            type: string
+                            example: AB123456
+                          ready:
+                            type: boolean
+                            example: true
+                        required:
+                          - identification_type
+                      university_id:
+                        type: string
+                        example: 2026-CE-0001
+                      enrollment_term:
+                        type: string
+                        example: 'Fall 2026'
+                      lifecycle_status:
+                        type: string
+                        example: Active
+                      program:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            example: CE
+                          name_en:
+                            type: string
+                            example: 'Computer Engineering'
+                          name_ar:
+                            type: string
+                            example: 'هندسة الحاسوب'
+                          degree_level:
+                            type: string
+                            example: MSc
+                          department_name_en:
+                            type: string
+                            example: Engineering
+                          department_name_ar:
+                            type: string
+                            example: الهندسة
+                          faculty_name_en:
+                            type: string
+                            example: Engineering
+                          faculty_name_ar:
+                            type: string
+                            example: الهندسة
+                      cgpa:
+                        type: number
+                        example: null
+                        nullable: true
+                      semesters:
+                        type: array
+                        example:
+                          -
+                            semester:
+                              id: 1
+                              name_en: 'Fall 2026'
+                              name_ar: 'خريف 2026'
+                              starts_at: '2026-09-01'
+                            gpa: null
+                            courses:
+                              -
+                                enrollment_id: 1
+                                course:
+                                  code: CE501
+                                  name_en: Algorithms
+                                  name_ar: الخوارزميات
+                                credit_hours: 3
+                                classification: Core
+                                course_status: Regular
+                                result: InProgress
+                                contributes_to_cgpa: false
+                        items:
+                          type: object
+                          properties:
+                            semester:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                name_en:
+                                  type: string
+                                  example: 'Fall 2026'
+                                name_ar:
+                                  type: string
+                                  example: 'خريف 2026'
+                                starts_at:
+                                  type: string
+                                  example: '2026-09-01'
+                            gpa:
+                              type: number
+                              example: null
+                              nullable: true
+                            courses:
+                              type: array
+                              example:
+                                -
+                                  enrollment_id: 1
+                                  course:
+                                    code: CE501
+                                    name_en: Algorithms
+                                    name_ar: الخوارزميات
+                                  credit_hours: 3
+                                  classification: Core
+                                  course_status: Regular
+                                  result: InProgress
+                                  contributes_to_cgpa: false
+                              items:
+                                type: object
+                                properties:
+                                  enrollment_id:
+                                    type: integer
+                                    example: 1
+                                  course:
+                                    type: object
+                                    properties:
+                                      code: { type: string, example: CE501 }
+                                      name_en: { type: string, example: Algorithms }
+                                      name_ar: { type: string, example: الخوارزميات }
+                                  credit_hours:
+                                    type: integer
+                                    example: 3
+                                  classification:
+                                    type: string
+                                    example: Core
+                                  course_status:
+                                    type: string
+                                    example: Regular
+                                  result:
+                                    type: string
+                                    example: InProgress
+                                  contributes_to_cgpa:
+                                    type: boolean
+                                    example: false
+                          required:
+                            - gpa
+                      credit_decisions:
+                        type: array
+                        example:
+                          -
+                            type: Transfer
+                            target_course_code: CE501
+                            credit_hours: 3
+                            approved_at: '2026-09-01T00:00:00Z'
+                            source_institution: 'Example University'
+                            source_course_code: EXT501
+                            source_course_name: Algorithms
+                            original_grade: Distinction
+                            normalized_grade: B
+                            reason_codes: []
+                            prior_course_code: null
+                            prior_grade: null
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              example: Transfer
+                            target_course_code:
+                              type: string
+                              example: CE501
+                            credit_hours:
+                              type: integer
+                              example: 3
+                            approved_at:
+                              type: string
+                              example: '2026-09-01T00:00:00Z'
+                            source_institution:
+                              type: string
+                              example: 'Example University'
+                            source_course_code:
+                              type: string
+                              example: EXT501
+                            source_course_name:
+                              type: string
+                              example: Algorithms
+                            original_grade:
+                              type: string
+                              example: Distinction
+                            normalized_grade:
+                              type: string
+                              example: B
+                            reason_codes:
+                              type: array
+                              example: []
+                            prior_course_code:
+                              type: string
+                              example: null
+                              nullable: true
+                            prior_grade:
+                              type: string
+                              example: null
+                              nullable: true
+                          required:
+                            - prior_grade
+                      credit_hours:
+                        type: object
+                        properties:
+                          student_id:
+                            type: integer
+                            example: 1
+                          curriculum_version_id:
+                            type: integer
+                            example: 1
+                          categories:
+                            type: array
+                            example:
+                              - category: Core
+                                baseline_required_ch: 6
+                                adjusted_required_ch: 6
+                                attended_ch: 0
+                                earned_ch: 0
+                                transferred_ch: 0
+                                waived_ch: 0
+                                exempted_ch: 0
+                                satisfied_ch: 0
+                                remaining_ch: 6
+                            items:
+                              type: object
+                              properties:
+                                category:
+                                  type: string
+                                  example: Core
+                                baseline_required_ch:
+                                  type: integer
+                                  example: 6
+                                adjusted_required_ch:
+                                  type: integer
+                                  example: 6
+                                attended_ch:
+                                  type: integer
+                                  example: 0
+                                earned_ch:
+                                  type: integer
+                                  example: 0
+                                transferred_ch:
+                                  type: integer
+                                  example: 0
+                                waived_ch:
+                                  type: integer
+                                  example: 0
+                                exempted_ch:
+                                  type: integer
+                                  example: 0
+                                satisfied_ch:
+                                  type: integer
+                                  example: 0
+                                remaining_ch:
+                                  type: integer
+                                  example: 6
+                          total:
+                            type: object
+                            properties:
+                              category:
+                                type: string
+                                example: Total
+                              baseline_required_ch:
+                                type: integer
+                                example: 21
+                              adjusted_required_ch:
+                                type: integer
+                                example: 21
+                              attended_ch:
+                                type: integer
+                                example: 0
+                              earned_ch:
+                                type: integer
+                                example: 0
+                              transferred_ch:
+                                type: integer
+                                example: 0
+                              waived_ch:
+                                type: integer
+                                example: 0
+                              exempted_ch:
+                                type: integer
+                                example: 0
+                              satisfied_ch:
+                                type: integer
+                                example: 0
+                              remaining_ch:
+                                type: integer
+                                example: 21
+                    required:
+                      - cgpa
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Records
+      security: []
+    parameters:
+      -
+        in: path
+        name: student_id
+        description: 'Student anchor id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/v1/records/service:
+    get:
+      summary: 'Transcript service availability.'
+      operationId: transcriptServiceAvailability
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    available: true
+                    fee: '125.50'
+                    currency: EGP
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      available:
+                        type: boolean
+                        example: true
+                      fee:
+                        type: string
+                        example: '125.50'
+                        nullable: true
+                      currency:
+                        type: string
+                        example: EGP
+                    required:
+                      - fee
+      tags:
+        - Records
+      security: []
+  /api/v1/records/fee:
+    get:
+      summary: 'Transcript fee configuration.'
+      operationId: transcriptFeeConfiguration
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    available: true
+                    fee: '125.50'
+                    currency: EGP
+                    instructions_en: 'Fictional learning instructions'
+                    instructions_ar: 'تعليمات تعليمية وهمية'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      available:
+                        type: boolean
+                        example: true
+                      fee:
+                        type: string
+                        example: '125.50'
+                        nullable: true
+                      currency:
+                        type: string
+                        example: EGP
+                      instructions_en:
+                        type: string
+                        example: 'Fictional learning instructions'
+                      instructions_ar:
+                        type: string
+                        example: 'تعليمات تعليمية وهمية'
+                    required:
+                      - fee
+      tags:
+        - Records
+      security: []
+    put:
+      summary: 'Configure Transcript fee.'
+      operationId: configureTranscriptFee
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    available: true
+                    fee: '125.50'
+                    currency: EGP
+                    instructions_en: 'Fictional learning instructions'
+                    instructions_ar: 'تعليمات تعليمية وهمية'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      available:
+                        type: boolean
+                        example: true
+                      fee:
+                        type: string
+                        example: '125.50'
+                      currency:
+                        type: string
+                        example: EGP
+                      instructions_en:
+                        type: string
+                        example: 'Fictional learning instructions'
+                      instructions_ar:
+                        type: string
+                        example: 'تعليمات تعليمية وهمية'
+      tags:
+        - Records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fee:
+                  type: string
+                  description: 'Positive EGP amount, at most two decimal places.'
+                  example: '125.50'
+                instructions_en:
+                  type: string
+                  description: 'English payment instructions.'
+                  example: 'Fictional learning instructions'
+                instructions_ar:
+                  type: string
+                  description: 'Arabic payment instructions.'
+                  example: 'تعليمات تعليمية وهمية'
+              required:
+                - fee
+                - instructions_en
+                - instructions_ar
+      security: []
+  /api/v1/records/requests:
+    get:
+      summary: 'Official Transcript Request queue and history.'
+      operationId: officialTranscriptRequestQueueAndHistory
+      description: ''
+      parameters:
+        -
+          in: query
+          name: status
+          description: 'Request states.'
+          example: Submitted
+          required: false
+          schema:
+            type: string
+            description: 'Request states.'
+            example: Submitted
+        -
+          in: query
+          name: delivery_method
+          description: ''
+          example: digital
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: digital
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '1,2'
+        -
+          in: query
+          name: sort
+          description: ''
+          example: '-created_at'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '-created_at'
+        -
+          in: query
+          name: page
+          description: ''
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: ''
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: ''
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 1
+                      student_id: 1
+                      delivery_method: digital
+                      fee: '125.50'
+                      status: Submitted
+                      created_at: '2026-09-27T00:00:00Z'
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 25
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - id: 1
+                        student_id: 1
+                        delivery_method: digital
+                        fee: '125.50'
+                        status: Submitted
+                        created_at: '2026-09-27T00:00:00Z'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        student_id:
+                          type: integer
+                          example: 1
+                        delivery_method:
+                          type: string
+                          example: digital
+                        fee:
+                          type: string
+                          example: '125.50'
+                        status:
+                          type: string
+                          example: Submitted
+                        created_at:
+                          type: string
+                          example: '2026-09-27T00:00:00Z'
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - Records
+      security: []
+    post:
+      summary: 'Submit official Transcript Request.'
+      operationId: submitOfficialTranscriptRequest
+      description: ''
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 1
+                    delivery_method: digital
+                    fee: '125.50'
+                    currency: EGP
+                    status: Submitted
+                    created_at: '2026-09-27T00:00:00Z'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: null
+                        to_status: Submitted
+                        action: request_submitted
+                        reason: null
+                        actor_user_id: 1
+                        at: '2026-09-27T00:00:00Z'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 1
+                      delivery_method:
+                        type: string
+                        example: digital
+                      fee:
+                        type: string
+                        example: '125.50'
+                      currency:
+                        type: string
+                        example: EGP
+                      status:
+                        type: string
+                        example: Submitted
+                      created_at:
+                        type: string
+                        example: '2026-09-27T00:00:00Z'
+                      transitions:
+                        type: array
+                        example:
+                          - id: 1
+                            from_status: null
+                            to_status: Submitted
+                            action: request_submitted
+                            reason: null
+                            actor_user_id: 1
+                            at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: null
+                              nullable: true
+                            to_status:
+                              type: string
+                              example: Submitted
+                            action:
+                              type: string
+                              example: request_submitted
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            actor_user_id:
+                              type: integer
+                              example: 1
+                            at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+      tags:
+        - Records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                delivery_method:
+                  type: string
+                  description: 'Digital or collection.'
+                  example: digital
+              required:
+                - delivery_method
+      security: []
+  '/api/v1/records/requests/{request_id}':
+    get:
+      summary: 'Official Transcript Request details.'
+      operationId: officialTranscriptRequestDetails
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 1
+                    delivery_method: digital
+                    fee: '125.50'
+                    currency: EGP
+                    status: AwaitingPayment
+                    instructions_en: 'Fictional Bank A'
+                    instructions_ar: 'بنك وهمي أ'
+                    created_at: '2026-09-27T00:00:00Z'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: Submitted
+                        to_status: AwaitingPayment
+                        action: request_approved
+                        reason: 'Identity reviewed'
+                        actor_user_id: 5
+                        at: '2026-09-27T00:00:00Z'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 1
+                      delivery_method:
+                        type: string
+                        example: digital
+                      fee:
+                        type: string
+                        example: '125.50'
+                      currency:
+                        type: string
+                        example: EGP
+                      status:
+                        type: string
+                        example: AwaitingPayment
+                      instructions_en:
+                        type: string
+                        example: 'Fictional Bank A'
+                      instructions_ar:
+                        type: string
+                        example: 'بنك وهمي أ'
+                      created_at:
+                        type: string
+                        example: '2026-09-27T00:00:00Z'
+                      transitions:
+                        type: array
+                        example:
+                          - id: 1
+                            from_status: Submitted
+                            to_status: AwaitingPayment
+                            action: request_approved
+                            reason: 'Identity reviewed'
+                            actor_user_id: 5
+                            at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: Submitted
+                            to_status:
+                              type: string
+                              example: AwaitingPayment
+                            action:
+                              type: string
+                              example: request_approved
+                            reason:
+                              type: string
+                              example: 'Identity reviewed'
+                            actor_user_id:
+                              type: integer
+                              example: 5
+                            at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+      tags:
+        - Records
+      security: []
+    parameters:
+      -
+        in: path
+        name: request_id
+        description: 'Request id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/records/requests/{request_id}/review':
+    post:
+      summary: 'Review official Transcript Request.'
+      operationId: reviewOfficialTranscriptRequest
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 1
+                    delivery_method: digital
+                    fee: '125.50'
+                    currency: EGP
+                    status: AwaitingPayment
+                    instructions_en: 'Fictional Bank A'
+                    instructions_ar: 'بنك وهمي أ'
+                    created_at: '2026-09-27T00:00:00Z'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: Submitted
+                        to_status: AwaitingPayment
+                        action: request_approved
+                        reason: 'Identity reviewed'
+                        actor_user_id: 5
+                        at: '2026-09-27T00:00:00Z'
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 1
+                      delivery_method:
+                        type: string
+                        example: digital
+                      fee:
+                        type: string
+                        example: '125.50'
+                      currency:
+                        type: string
+                        example: EGP
+                      status:
+                        type: string
+                        example: AwaitingPayment
+                      instructions_en:
+                        type: string
+                        example: 'Fictional Bank A'
+                      instructions_ar:
+                        type: string
+                        example: 'بنك وهمي أ'
+                      created_at:
+                        type: string
+                        example: '2026-09-27T00:00:00Z'
+                      transitions:
+                        type: array
+                        example:
+                          - id: 1
+                            from_status: Submitted
+                            to_status: AwaitingPayment
+                            action: request_approved
+                            reason: 'Identity reviewed'
+                            actor_user_id: 5
+                            at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: Submitted
+                            to_status:
+                              type: string
+                              example: AwaitingPayment
+                            action:
+                              type: string
+                              example: request_approved
+                            reason:
+                              type: string
+                              example: 'Identity reviewed'
+                            actor_user_id:
+                              type: integer
+                              example: 5
+                            at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+      tags:
+        - Records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                decision:
+                  type: string
+                  description: 'Approve or reject.'
+                  example: approve
+                reason:
+                  type: string
+                  description: 'Decision reason.'
+                  example: 'Identity reviewed'
+              required:
+                - decision
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: request_id
+        description: 'Request id.'
+        example: 1
         required: true
         schema:
           type: integer

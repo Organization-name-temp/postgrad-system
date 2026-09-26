@@ -6462,6 +6462,321 @@ export const MarkOneNotificationReadResponse = zod.looseObject({
 
 
 /**
+ * @summary Transcript Student picker.
+ */
+export const TranscriptStudentPickerQueryParams = zod.object({
+  "q": zod.string().optional().describe('Search admission names or University ID.'),
+  "id": zod.string().optional().describe('Student ids.'),
+  "university_id": zod.string().optional().describe('University IDs.'),
+  "lifecycle_status": zod.string().optional().describe('Lifecycle states.'),
+  "sort": zod.string().optional().describe('Readable field sort.'),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional()
+})
+
+export const TranscriptStudentPickerResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "lifecycle_status": zod.string().optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export Transcript Student picker.
+ */
+export const ExportTranscriptStudentPickerQueryParams = zod.object({
+  "q": zod.string().optional().describe('Search admission names or University ID.'),
+  "id": zod.string().optional().describe('Student ids.'),
+  "university_id": zod.string().optional().describe('University IDs.'),
+  "lifecycle_status": zod.string().optional().describe('Lifecycle states.'),
+  "sort": zod.string().optional().describe('Readable field sort.')
+})
+
+export const ExportTranscriptStudentPickerResponse = zod.unknown()
+
+
+/**
+ * @summary Current unofficial Transcript.
+ */
+export const CurrentUnofficialTranscriptParams = zod.object({
+  "student_id": zod.number().describe('Student anchor id.')
+})
+
+export const CurrentUnofficialTranscriptResponse = zod.object({
+  "data": zod.object({
+  "student_id": zod.number().optional(),
+  "identity": zod.object({
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "identification_type": zod.string().nullable(),
+  "identification_number": zod.string().optional(),
+  "ready": zod.boolean().optional()
+}).optional(),
+  "university_id": zod.string().optional(),
+  "enrollment_term": zod.string().optional(),
+  "lifecycle_status": zod.string().optional(),
+  "program": zod.object({
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_name_en": zod.string().optional(),
+  "department_name_ar": zod.string().optional(),
+  "faculty_name_en": zod.string().optional(),
+  "faculty_name_ar": zod.string().optional()
+}).optional(),
+  "cgpa": zod.number().nullable(),
+  "semesters": zod.array(zod.object({
+  "semester": zod.object({
+  "id": zod.number().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "starts_at": zod.string().optional()
+}).optional(),
+  "gpa": zod.number().nullable(),
+  "courses": zod.array(zod.object({
+  "enrollment_id": zod.number().optional(),
+  "course": zod.object({
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional()
+}).optional(),
+  "credit_hours": zod.number().optional(),
+  "classification": zod.string().optional(),
+  "course_status": zod.string().optional(),
+  "result": zod.string().optional(),
+  "contributes_to_cgpa": zod.boolean().optional()
+})).optional()
+})).optional(),
+  "credit_decisions": zod.array(zod.object({
+  "type": zod.string().optional(),
+  "target_course_code": zod.string().optional(),
+  "credit_hours": zod.number().optional(),
+  "approved_at": zod.string().optional(),
+  "source_institution": zod.string().optional(),
+  "source_course_code": zod.string().optional(),
+  "source_course_name": zod.string().optional(),
+  "original_grade": zod.string().optional(),
+  "normalized_grade": zod.string().optional(),
+  "reason_codes": zod.array().optional(),
+  "prior_course_code": zod.string().nullish(),
+  "prior_grade": zod.string().nullable()
+})).optional(),
+  "credit_hours": zod.object({
+  "student_id": zod.number().optional(),
+  "curriculum_version_id": zod.number().optional(),
+  "categories": zod.array(zod.object({
+  "category": zod.string().optional(),
+  "baseline_required_ch": zod.number().optional(),
+  "adjusted_required_ch": zod.number().optional(),
+  "attended_ch": zod.number().optional(),
+  "earned_ch": zod.number().optional(),
+  "transferred_ch": zod.number().optional(),
+  "waived_ch": zod.number().optional(),
+  "exempted_ch": zod.number().optional(),
+  "satisfied_ch": zod.number().optional(),
+  "remaining_ch": zod.number().optional()
+})).optional(),
+  "total": zod.object({
+  "category": zod.string().optional(),
+  "baseline_required_ch": zod.number().optional(),
+  "adjusted_required_ch": zod.number().optional(),
+  "attended_ch": zod.number().optional(),
+  "earned_ch": zod.number().optional(),
+  "transferred_ch": zod.number().optional(),
+  "waived_ch": zod.number().optional(),
+  "exempted_ch": zod.number().optional(),
+  "satisfied_ch": zod.number().optional(),
+  "remaining_ch": zod.number().optional()
+}).optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Transcript service availability.
+ */
+export const TranscriptServiceAvailabilityResponse = zod.object({
+  "data": zod.object({
+  "available": zod.boolean().optional(),
+  "fee": zod.string().nullable(),
+  "currency": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Transcript fee configuration.
+ */
+export const TranscriptFeeConfigurationResponse = zod.object({
+  "data": zod.object({
+  "available": zod.boolean().optional(),
+  "fee": zod.string().nullable(),
+  "currency": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Configure Transcript fee.
+ */
+export const ConfigureTranscriptFeeBody = zod.object({
+  "fee": zod.string().describe('Positive EGP amount, at most two decimal places.'),
+  "instructions_en": zod.string().describe('English payment instructions.'),
+  "instructions_ar": zod.string().describe('Arabic payment instructions.')
+})
+
+export const ConfigureTranscriptFeeResponse = zod.object({
+  "data": zod.object({
+  "available": zod.boolean().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Official Transcript Request queue and history.
+ */
+export const OfficialTranscriptRequestQueueAndHistoryQueryParams = zod.object({
+  "status": zod.string().optional().describe('Request states.'),
+  "delivery_method": zod.string().optional(),
+  "student_id": zod.string().optional(),
+  "sort": zod.string().optional(),
+  "page": zod.number().optional(),
+  "per_page": zod.number().optional()
+})
+
+export const OfficialTranscriptRequestQueueAndHistoryResponse = zod.object({
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "status": zod.string().optional(),
+  "created_at": zod.string().optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Submit official Transcript Request.
+ */
+export const SubmitOfficialTranscriptRequestBody = zod.object({
+  "delivery_method": zod.string().describe('Digital or collection.')
+})
+
+export const SubmitOfficialTranscriptRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().nullish(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Official Transcript Request details.
+ */
+export const OfficialTranscriptRequestDetailsParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const OfficialTranscriptRequestDetailsResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Review official Transcript Request.
+ */
+export const ReviewOfficialTranscriptRequestParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const ReviewOfficialTranscriptRequestBody = zod.object({
+  "decision": zod.string().describe('Approve or reject.'),
+  "reason": zod.string().describe('Decision reason.')
+})
+
+export const ReviewOfficialTranscriptRequestResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().optional(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional()
+}).optional()
+})
+
+
+/**
  * @summary Advisor Transfer queue.
  */
 export const AdvisorTransferQueueQueryParams = zod.object({

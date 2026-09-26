@@ -242,3 +242,23 @@ describe('NotificationsBell', () => {
     expect(await screen.findByText(/طلب إعفاء متحقق منه.*CSE-511.*المجلس/i)).toBeInTheDocument()
   })
 })
+
+it('renders Transcript service updates without showing internal workflow names', async () => {
+  await i18n.changeLanguage('en')
+  srv.rows = [
+    {
+      id: 80,
+      type: 'records.request_changed',
+      data: { request_id: 7, status: 'AwaitingPayment', action: 'request_approved' },
+      read_at: null,
+      created_at: new Date().toISOString(),
+    },
+  ]
+  srv.unread = 1
+  renderBell()
+  await userEvent.click(screen.getByRole('button', { name: /notification/i }))
+  expect(
+    await screen.findByText('Transcript Request #7 has an update. Open your request to review it.'),
+  ).toBeInTheDocument()
+  expect(screen.queryByText('AwaitingPayment')).not.toBeInTheDocument()
+})

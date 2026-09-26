@@ -886,9 +886,11 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
 
 ### Phase 6 — Records & Transcript (SRS §4.9)
 
-**Status: specified, not implemented.** The approved scope is published as
+**Status: implementation in progress; acceptance verification pending.** The approved scope is published as
 [the Phase 6 specification](../.scratch/phase-6/spec.md), marked `ready-for-agent` in the
-local issue tracker.
+local issue tracker. Admission Identification Type preservation and authoritative recovery
+are implemented and narrowly verified. Ticket completion and phase completion remain
+pending the full Phase 6 verification passes and consolidated review.
 
 - **Scope expanded during design:** include Student requests for official Transcripts,
   approval queues, fees, delivery tracking, and manual refunds; these workflows are not

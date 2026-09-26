@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { TranscriptPage } from '../features/records/TranscriptPage'
+import { FeePage } from '../features/records/FeePage'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RegisterPage } from '../features/admissions/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
@@ -92,6 +94,12 @@ export function App() {
             <Route element={<RequireAuth />}>
               <Route element={<AuthenticatedLayout />}>
                 <Route path="/" element={<DashboardPage />} />
+                <Route element={<RequireAuth permission="transcript.view_unofficial" />}>
+                  <Route path="/records" element={<TranscriptPage />} />
+                </Route>
+                <Route element={<RequireAuth permission="transcript.issue_official" />}>
+                  <Route path="/records/fee" element={<FeePage />} />
+                </Route>
                 {/* Persona-guarded: only actual Applicants (R01) reach the wizard; an
                     admin who merely inherits application.submit is sent home (ticket 11). */}
                 <Route element={<RequireAuth roles={[ROLE.applicant]} />}>

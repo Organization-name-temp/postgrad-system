@@ -75,6 +75,7 @@ const TYPE_ALIAS: Record<string, string> = {
   'waiver.request_decided': 'waiverDecided',
   'credit_decision.revoked': 'creditDecisionRevoked',
   'academic_standing.changed': 'standingChanged',
+  'records.request_changed': 'recordsRequestChanged',
 }
 
 // Descending unit thresholds (ms) for a coarse localised relative time.

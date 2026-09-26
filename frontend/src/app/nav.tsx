@@ -1,3 +1,4 @@
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import TravelExploreIcon from '@mui/icons-material/TravelExplore'
@@ -49,6 +50,20 @@ import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
  * `/style` gallery link is added by the ticket that builds that route.
  */
 export const navItems: NavItem[] = [
+  {
+    key: 'transcript',
+    to: '/records',
+    icon: <ReceiptLongIcon />,
+    permission: 'transcript.view_unofficial',
+    section: 'grading',
+  },
+  {
+    key: 'transcriptFee',
+    to: '/records/fee',
+    icon: <ReceiptLongIcon />,
+    permission: 'transcript.issue_official',
+    section: 'administration',
+  },
   // Personal / persona items — header-less top group.
   { key: 'dashboard', to: '/', icon: <DashboardIcon /> },
   // "My application" is the Applicant's home (R01); an admin has no Application, so it

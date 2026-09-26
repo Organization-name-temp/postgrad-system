@@ -50,6 +50,7 @@ modules/<Module>/
 | `Notifications` | persisted in-app notifications and the polled notification API | `Notifier` contract and `NotificationType` |
 | `Calendar` | semesters and registration/add-drop/withdrawal/grading windows | `AcademicCalendar` and `SemesterSummary` |
 | `Enrollment` | offerings, meetings, registration requests, enrollments, class sessions, attendance, earned-credit state, and automatic/manual Exemption decisions | `EnrollmentRecords`, `ExemptionDecisions`, and enrollment/offering/decision DTOs |
+| `Records` | current Transcript composition, fee setup, and initial official-request submission/review; remaining Phase 6 service stages are in progress | owner Public contracts consumed by `Internal/Support`, HTTP routes |
 | `Grading` | grade sheets, grades, correction rounds, Incompletes, GPA/CGPA read model | `GradingRecords` and `GradeSummary` |
 
 When changing a module, begin at its `Public/Http/routes.php`, follow the route into `Internal/Http/Controllers`, then trace models/support classes and the matching tests. When another module needs data, begin at the owner's existing `Public` facade before considering a new method.
@@ -89,6 +90,7 @@ Feature ownership mirrors user-facing workflows:
 - `features/auth`: login, auth state, route guard, and dashboard.
 - `features/catalog`: faculty/department/program/course management, curricula, tree, and version history.
 - `features/enrollment`: registration, advising, on-behalf registration, schedules, attendance, and instructor registers.
+- `features/records`: current bilingual Transcript document/picker and staff fee setup; remaining service screens are in progress.
 - `features/grading`: instructor sheets/corrections/Incompletes, department-head review, oversight, and student grades.
 
 Vitest tests are colocated as `*.test.ts` or `*.test.tsx`. Full-stack journeys live in `frontend/e2e/*.spec.ts`; `playwright.config.ts` starts Laravel and Vite, but it expects PostgreSQL to be running and seeded.
@@ -121,3 +123,10 @@ Run `composer api:spec` in `backend/`, then `npm run api:client` in `frontend/`.
 | Local issue workflow | `docs/agents/issue-tracker.md` |
 
 The repository intentionally implements a localhost learning scope. `docs/architecture.md` and `docs/tech-stack.md` also describe production-oriented components that ADR-0005 defers. Check manifests, Compose, and the code before assuming Redis, queues, websockets, object storage, external identity, or deployment infrastructure exists.
+
+## Student Identification Type recovery
+
+Run `php artisan identity:recover-identification` from `backend/` after migrations to
+recover unresolved types from matching accepted Applications through Admissions Public.
+The command reports recovered and unresolved counts, preserves resolved admission identity,
+and does not infer type from identifier format. Missing evidence blocks official readiness.

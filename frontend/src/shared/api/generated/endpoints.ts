@@ -7152,6 +7152,367 @@ export type MarkOneNotificationRead404 = {
   message?: string;
 };
 
+export type TranscriptStudentPickerParams = {
+/**
+ * Search admission names or University ID.
+ */
+q?: string;
+/**
+ * Student ids.
+ */
+id?: string;
+/**
+ * University IDs.
+ */
+university_id?: string;
+/**
+ * Lifecycle states.
+ */
+lifecycle_status?: string;
+/**
+ * Readable field sort.
+ */
+sort?: string;
+page?: number;
+per_page?: number;
+};
+
+export type TranscriptStudentPicker200DataItem = {
+  id?: number;
+  university_id?: string;
+  name_en?: string;
+  name_ar?: string;
+  lifecycle_status?: string;
+};
+
+export type TranscriptStudentPicker200Meta = {
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
+
+export type TranscriptStudentPicker200 = {
+  data?: TranscriptStudentPicker200DataItem[];
+  meta?: TranscriptStudentPicker200Meta;
+};
+
+export type ExportTranscriptStudentPickerParams = {
+/**
+ * Search admission names or University ID.
+ */
+q?: string;
+/**
+ * Student ids.
+ */
+id?: string;
+/**
+ * University IDs.
+ */
+university_id?: string;
+/**
+ * Lifecycle states.
+ */
+lifecycle_status?: string;
+/**
+ * Readable field sort.
+ */
+sort?: string;
+};
+
+export type CurrentUnofficialTranscript200DataIdentity = {
+  name_en?: string;
+  name_ar?: string;
+  /** @nullable */
+  identification_type: string | null;
+  identification_number?: string;
+  ready?: boolean;
+};
+
+export type CurrentUnofficialTranscript200DataProgram = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type CurrentUnofficialTranscript200DataSemestersItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+};
+
+export type CurrentUnofficialTranscript200DataSemestersItemCoursesItemCourse = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type CurrentUnofficialTranscript200DataSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: CurrentUnofficialTranscript200DataSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  classification?: string;
+  course_status?: string;
+  result?: string;
+  contributes_to_cgpa?: boolean;
+};
+
+export type CurrentUnofficialTranscript200DataSemestersItem = {
+  semester?: CurrentUnofficialTranscript200DataSemestersItemSemester;
+  /** @nullable */
+  gpa: number | null;
+  courses?: CurrentUnofficialTranscript200DataSemestersItemCoursesItem[];
+};
+
+export type CurrentUnofficialTranscript200DataCreditDecisionsItem = {
+  type?: string;
+  target_course_code?: string;
+  credit_hours?: number;
+  approved_at?: string;
+  source_institution?: string;
+  source_course_code?: string;
+  source_course_name?: string;
+  original_grade?: string;
+  normalized_grade?: string;
+  reason_codes?: unknown[];
+  /** @nullable */
+  prior_course_code?: string | null;
+  /** @nullable */
+  prior_grade: string | null;
+};
+
+export type CurrentUnofficialTranscript200DataCreditHoursCategoriesItem = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type CurrentUnofficialTranscript200DataCreditHoursTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type CurrentUnofficialTranscript200DataCreditHours = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: CurrentUnofficialTranscript200DataCreditHoursCategoriesItem[];
+  total?: CurrentUnofficialTranscript200DataCreditHoursTotal;
+};
+
+export type CurrentUnofficialTranscript200Data = {
+  student_id?: number;
+  identity?: CurrentUnofficialTranscript200DataIdentity;
+  university_id?: string;
+  enrollment_term?: string;
+  lifecycle_status?: string;
+  program?: CurrentUnofficialTranscript200DataProgram;
+  /** @nullable */
+  cgpa: number | null;
+  semesters?: CurrentUnofficialTranscript200DataSemestersItem[];
+  credit_decisions?: CurrentUnofficialTranscript200DataCreditDecisionsItem[];
+  credit_hours?: CurrentUnofficialTranscript200DataCreditHours;
+};
+
+export type CurrentUnofficialTranscript200 = {
+  data?: CurrentUnofficialTranscript200Data;
+};
+
+export type CurrentUnofficialTranscript403 = {
+  message?: string;
+};
+
+export type TranscriptServiceAvailability200Data = {
+  available?: boolean;
+  /** @nullable */
+  fee: string | null;
+  currency?: string;
+};
+
+export type TranscriptServiceAvailability200 = {
+  data?: TranscriptServiceAvailability200Data;
+};
+
+export type TranscriptFeeConfiguration200Data = {
+  available?: boolean;
+  /** @nullable */
+  fee: string | null;
+  currency?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+};
+
+export type TranscriptFeeConfiguration200 = {
+  data?: TranscriptFeeConfiguration200Data;
+};
+
+export type ConfigureTranscriptFeeBody = {
+  /** Positive EGP amount, at most two decimal places. */
+  fee: string;
+  /** English payment instructions. */
+  instructions_en: string;
+  /** Arabic payment instructions. */
+  instructions_ar: string;
+};
+
+export type ConfigureTranscriptFee200Data = {
+  available?: boolean;
+  fee?: string;
+  currency?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+};
+
+export type ConfigureTranscriptFee200 = {
+  data?: ConfigureTranscriptFee200Data;
+};
+
+export type OfficialTranscriptRequestQueueAndHistoryParams = {
+/**
+ * Request states.
+ */
+status?: string;
+delivery_method?: string;
+student_id?: string;
+sort?: string;
+page?: number;
+per_page?: number;
+};
+
+export type OfficialTranscriptRequestQueueAndHistory200DataItem = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  status?: string;
+  created_at?: string;
+};
+
+export type OfficialTranscriptRequestQueueAndHistory200Meta = {
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
+
+export type OfficialTranscriptRequestQueueAndHistory200 = {
+  data?: OfficialTranscriptRequestQueueAndHistory200DataItem[];
+  meta?: OfficialTranscriptRequestQueueAndHistory200Meta;
+};
+
+export type SubmitOfficialTranscriptRequestBody = {
+  /** Digital or collection. */
+  delivery_method: string;
+};
+
+export type SubmitOfficialTranscriptRequest201DataTransitionsItem = {
+  id?: number;
+  /** @nullable */
+  from_status?: string | null;
+  to_status?: string;
+  action?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type SubmitOfficialTranscriptRequest201Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  created_at?: string;
+  transitions?: SubmitOfficialTranscriptRequest201DataTransitionsItem[];
+};
+
+export type SubmitOfficialTranscriptRequest201 = {
+  data?: SubmitOfficialTranscriptRequest201Data;
+};
+
+export type OfficialTranscriptRequestDetails200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  reason?: string;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type OfficialTranscriptRequestDetails200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  created_at?: string;
+  transitions?: OfficialTranscriptRequestDetails200DataTransitionsItem[];
+};
+
+export type OfficialTranscriptRequestDetails200 = {
+  data?: OfficialTranscriptRequestDetails200Data;
+};
+
+export type ReviewOfficialTranscriptRequestBody = {
+  /** Approve or reject. */
+  decision: string;
+  /** Decision reason. */
+  reason: string;
+};
+
+export type ReviewOfficialTranscriptRequest200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  reason?: string;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type ReviewOfficialTranscriptRequest200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  created_at?: string;
+  transitions?: ReviewOfficialTranscriptRequest200DataTransitionsItem[];
+};
+
+export type ReviewOfficialTranscriptRequest200 = {
+  data?: ReviewOfficialTranscriptRequest200Data;
+};
+
 export type AdvisorTransferQueueParams = {
 target_course_id?: string;
 student_id?: string;
@@ -25917,6 +26278,857 @@ export const useMarkOneNotificationRead = <TError = MarkOneNotificationRead404,
         TContext
       > => {
       return useMutation(getMarkOneNotificationReadMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Transcript Student picker.
+ */
+export const transcriptStudentPicker = (
+    params?: TranscriptStudentPickerParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TranscriptStudentPicker200>(
+      {url: `/api/v1/records/students`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getTranscriptStudentPickerQueryKey = (params?: TranscriptStudentPickerParams,) => {
+    return [
+    `/api/v1/records/students`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getTranscriptStudentPickerQueryOptions = <TData = Awaited<ReturnType<typeof transcriptStudentPicker>>, TError = unknown>(params?: TranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptStudentPicker>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTranscriptStudentPickerQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof transcriptStudentPicker>>> = ({ signal }) => transcriptStudentPicker(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof transcriptStudentPicker>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TranscriptStudentPickerQueryResult = NonNullable<Awaited<ReturnType<typeof transcriptStudentPicker>>>
+export type TranscriptStudentPickerQueryError = unknown
+
+
+export function useTranscriptStudentPicker<TData = Awaited<ReturnType<typeof transcriptStudentPicker>>, TError = unknown>(
+ params: undefined |  TranscriptStudentPickerParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptStudentPicker>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof transcriptStudentPicker>>,
+          TError,
+          Awaited<ReturnType<typeof transcriptStudentPicker>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTranscriptStudentPicker<TData = Awaited<ReturnType<typeof transcriptStudentPicker>>, TError = unknown>(
+ params?: TranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptStudentPicker>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof transcriptStudentPicker>>,
+          TError,
+          Awaited<ReturnType<typeof transcriptStudentPicker>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTranscriptStudentPicker<TData = Awaited<ReturnType<typeof transcriptStudentPicker>>, TError = unknown>(
+ params?: TranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptStudentPicker>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Transcript Student picker.
+ */
+
+export function useTranscriptStudentPicker<TData = Awaited<ReturnType<typeof transcriptStudentPicker>>, TError = unknown>(
+ params?: TranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptStudentPicker>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTranscriptStudentPickerQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export Transcript Student picker.
+ */
+export const exportTranscriptStudentPicker = (
+    params?: ExportTranscriptStudentPickerParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/records/students/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportTranscriptStudentPickerQueryKey = (params?: ExportTranscriptStudentPickerParams,) => {
+    return [
+    `/api/v1/records/students/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportTranscriptStudentPickerQueryOptions = <TData = Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError = unknown>(params?: ExportTranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportTranscriptStudentPickerQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>> = ({ signal }) => exportTranscriptStudentPicker(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportTranscriptStudentPickerQueryResult = NonNullable<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>>
+export type ExportTranscriptStudentPickerQueryError = unknown
+
+
+export function useExportTranscriptStudentPicker<TData = Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError = unknown>(
+ params: undefined |  ExportTranscriptStudentPickerParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportTranscriptStudentPicker>>,
+          TError,
+          Awaited<ReturnType<typeof exportTranscriptStudentPicker>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportTranscriptStudentPicker<TData = Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError = unknown>(
+ params?: ExportTranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportTranscriptStudentPicker>>,
+          TError,
+          Awaited<ReturnType<typeof exportTranscriptStudentPicker>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportTranscriptStudentPicker<TData = Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError = unknown>(
+ params?: ExportTranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Transcript Student picker.
+ */
+
+export function useExportTranscriptStudentPicker<TData = Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError = unknown>(
+ params?: ExportTranscriptStudentPickerParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTranscriptStudentPicker>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportTranscriptStudentPickerQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Current unofficial Transcript.
+ */
+export const currentUnofficialTranscript = (
+    studentId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CurrentUnofficialTranscript200>(
+      {url: `/api/v1/records/students/${studentId}/transcript`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getCurrentUnofficialTranscriptQueryKey = (studentId: number,) => {
+    return [
+    `/api/v1/records/students/${studentId}/transcript`
+    ] as const;
+    }
+
+
+export const getCurrentUnofficialTranscriptQueryOptions = <TData = Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError = CurrentUnofficialTranscript403>(studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCurrentUnofficialTranscriptQueryKey(studentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof currentUnofficialTranscript>>> = ({ signal }) => currentUnofficialTranscript(studentId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: studentId !== null && studentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CurrentUnofficialTranscriptQueryResult = NonNullable<Awaited<ReturnType<typeof currentUnofficialTranscript>>>
+export type CurrentUnofficialTranscriptQueryError = CurrentUnofficialTranscript403
+
+
+export function useCurrentUnofficialTranscript<TData = Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError = CurrentUnofficialTranscript403>(
+ studentId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof currentUnofficialTranscript>>,
+          TError,
+          Awaited<ReturnType<typeof currentUnofficialTranscript>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCurrentUnofficialTranscript<TData = Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError = CurrentUnofficialTranscript403>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof currentUnofficialTranscript>>,
+          TError,
+          Awaited<ReturnType<typeof currentUnofficialTranscript>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCurrentUnofficialTranscript<TData = Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError = CurrentUnofficialTranscript403>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Current unofficial Transcript.
+ */
+
+export function useCurrentUnofficialTranscript<TData = Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError = CurrentUnofficialTranscript403>(
+ studentId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentUnofficialTranscript>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCurrentUnofficialTranscriptQueryOptions(studentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Transcript service availability.
+ */
+export const transcriptServiceAvailability = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TranscriptServiceAvailability200>(
+      {url: `/api/v1/records/service`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTranscriptServiceAvailabilityQueryKey = () => {
+    return [
+    `/api/v1/records/service`
+    ] as const;
+    }
+
+
+export const getTranscriptServiceAvailabilityQueryOptions = <TData = Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTranscriptServiceAvailabilityQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof transcriptServiceAvailability>>> = ({ signal }) => transcriptServiceAvailability(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TranscriptServiceAvailabilityQueryResult = NonNullable<Awaited<ReturnType<typeof transcriptServiceAvailability>>>
+export type TranscriptServiceAvailabilityQueryError = unknown
+
+
+export function useTranscriptServiceAvailability<TData = Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof transcriptServiceAvailability>>,
+          TError,
+          Awaited<ReturnType<typeof transcriptServiceAvailability>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTranscriptServiceAvailability<TData = Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof transcriptServiceAvailability>>,
+          TError,
+          Awaited<ReturnType<typeof transcriptServiceAvailability>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTranscriptServiceAvailability<TData = Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Transcript service availability.
+ */
+
+export function useTranscriptServiceAvailability<TData = Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptServiceAvailability>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTranscriptServiceAvailabilityQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Transcript fee configuration.
+ */
+export const transcriptFeeConfiguration = (
+
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<TranscriptFeeConfiguration200>(
+      {url: `/api/v1/records/fee`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getTranscriptFeeConfigurationQueryKey = () => {
+    return [
+    `/api/v1/records/fee`
+    ] as const;
+    }
+
+
+export const getTranscriptFeeConfigurationQueryOptions = <TData = Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTranscriptFeeConfigurationQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof transcriptFeeConfiguration>>> = ({ signal }) => transcriptFeeConfiguration(signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type TranscriptFeeConfigurationQueryResult = NonNullable<Awaited<ReturnType<typeof transcriptFeeConfiguration>>>
+export type TranscriptFeeConfigurationQueryError = unknown
+
+
+export function useTranscriptFeeConfiguration<TData = Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof transcriptFeeConfiguration>>,
+          TError,
+          Awaited<ReturnType<typeof transcriptFeeConfiguration>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTranscriptFeeConfiguration<TData = Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof transcriptFeeConfiguration>>,
+          TError,
+          Awaited<ReturnType<typeof transcriptFeeConfiguration>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useTranscriptFeeConfiguration<TData = Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Transcript fee configuration.
+ */
+
+export function useTranscriptFeeConfiguration<TData = Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof transcriptFeeConfiguration>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getTranscriptFeeConfigurationQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Configure Transcript fee.
+ */
+export const configureTranscriptFee = (
+    configureTranscriptFeeBody: ConfigureTranscriptFeeBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ConfigureTranscriptFee200>(
+      {url: `/api/v1/records/fee`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: configureTranscriptFeeBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getConfigureTranscriptFeeMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof configureTranscriptFee>>, TError,{data: ConfigureTranscriptFeeBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof configureTranscriptFee>>, TError,{data: ConfigureTranscriptFeeBody}, TContext> => {
+
+const mutationKey = ['configureTranscriptFee'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof configureTranscriptFee>>, {data: ConfigureTranscriptFeeBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  configureTranscriptFee(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfigureTranscriptFeeMutationResult = NonNullable<Awaited<ReturnType<typeof configureTranscriptFee>>>
+    export type ConfigureTranscriptFeeMutationBody = ConfigureTranscriptFeeBody
+    export type ConfigureTranscriptFeeMutationError = unknown
+
+    /**
+ * @summary Configure Transcript fee.
+ */
+export const useConfigureTranscriptFee = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof configureTranscriptFee>>, TError,{data: ConfigureTranscriptFeeBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof configureTranscriptFee>>,
+        TError,
+        {data: ConfigureTranscriptFeeBody},
+        TContext
+      > => {
+      return useMutation(getConfigureTranscriptFeeMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Official Transcript Request queue and history.
+ */
+export const officialTranscriptRequestQueueAndHistory = (
+    params?: OfficialTranscriptRequestQueueAndHistoryParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OfficialTranscriptRequestQueueAndHistory200>(
+      {url: `/api/v1/records/requests`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getOfficialTranscriptRequestQueueAndHistoryQueryKey = (params?: OfficialTranscriptRequestQueueAndHistoryParams,) => {
+    return [
+    `/api/v1/records/requests`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getOfficialTranscriptRequestQueueAndHistoryQueryOptions = <TData = Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError = unknown>(params?: OfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOfficialTranscriptRequestQueueAndHistoryQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>> = ({ signal }) => officialTranscriptRequestQueueAndHistory(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OfficialTranscriptRequestQueueAndHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>>
+export type OfficialTranscriptRequestQueueAndHistoryQueryError = unknown
+
+
+export function useOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params: undefined |  OfficialTranscriptRequestQueueAndHistoryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>,
+          TError,
+          Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params?: OfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>,
+          TError,
+          Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params?: OfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Official Transcript Request queue and history.
+ */
+
+export function useOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params?: OfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestQueueAndHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOfficialTranscriptRequestQueueAndHistoryQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Submit official Transcript Request.
+ */
+export const submitOfficialTranscriptRequest = (
+    submitOfficialTranscriptRequestBody: SubmitOfficialTranscriptRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<SubmitOfficialTranscriptRequest201>(
+      {url: `/api/v1/records/requests`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submitOfficialTranscriptRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitOfficialTranscriptRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOfficialTranscriptRequest>>, TError,{data: SubmitOfficialTranscriptRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitOfficialTranscriptRequest>>, TError,{data: SubmitOfficialTranscriptRequestBody}, TContext> => {
+
+const mutationKey = ['submitOfficialTranscriptRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitOfficialTranscriptRequest>>, {data: SubmitOfficialTranscriptRequestBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitOfficialTranscriptRequest(data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitOfficialTranscriptRequestMutationResult = NonNullable<Awaited<ReturnType<typeof submitOfficialTranscriptRequest>>>
+    export type SubmitOfficialTranscriptRequestMutationBody = SubmitOfficialTranscriptRequestBody
+    export type SubmitOfficialTranscriptRequestMutationError = unknown
+
+    /**
+ * @summary Submit official Transcript Request.
+ */
+export const useSubmitOfficialTranscriptRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitOfficialTranscriptRequest>>, TError,{data: SubmitOfficialTranscriptRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitOfficialTranscriptRequest>>,
+        TError,
+        {data: SubmitOfficialTranscriptRequestBody},
+        TContext
+      > => {
+      return useMutation(getSubmitOfficialTranscriptRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Official Transcript Request details.
+ */
+export const officialTranscriptRequestDetails = (
+    requestId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<OfficialTranscriptRequestDetails200>(
+      {url: `/api/v1/records/requests/${requestId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getOfficialTranscriptRequestDetailsQueryKey = (requestId: number,) => {
+    return [
+    `/api/v1/records/requests/${requestId}`
+    ] as const;
+    }
+
+
+export const getOfficialTranscriptRequestDetailsQueryOptions = <TData = Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError = unknown>(requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getOfficialTranscriptRequestDetailsQueryKey(requestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>> = ({ signal }) => officialTranscriptRequestDetails(requestId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: requestId !== null && requestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type OfficialTranscriptRequestDetailsQueryResult = NonNullable<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>>
+export type OfficialTranscriptRequestDetailsQueryError = unknown
+
+
+export function useOfficialTranscriptRequestDetails<TData = Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError = unknown>(
+ requestId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof officialTranscriptRequestDetails>>,
+          TError,
+          Awaited<ReturnType<typeof officialTranscriptRequestDetails>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOfficialTranscriptRequestDetails<TData = Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError = unknown>(
+ requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof officialTranscriptRequestDetails>>,
+          TError,
+          Awaited<ReturnType<typeof officialTranscriptRequestDetails>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useOfficialTranscriptRequestDetails<TData = Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError = unknown>(
+ requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Official Transcript Request details.
+ */
+
+export function useOfficialTranscriptRequestDetails<TData = Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError = unknown>(
+ requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof officialTranscriptRequestDetails>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getOfficialTranscriptRequestDetailsQueryOptions(requestId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Review official Transcript Request.
+ */
+export const reviewOfficialTranscriptRequest = (
+    requestId: number,
+    reviewOfficialTranscriptRequestBody: ReviewOfficialTranscriptRequestBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReviewOfficialTranscriptRequest200>(
+      {url: `/api/v1/records/requests/${requestId}/review`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: reviewOfficialTranscriptRequestBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getReviewOfficialTranscriptRequestMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewOfficialTranscriptRequest>>, TError,{requestId: number;data: ReviewOfficialTranscriptRequestBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof reviewOfficialTranscriptRequest>>, TError,{requestId: number;data: ReviewOfficialTranscriptRequestBody}, TContext> => {
+
+const mutationKey = ['reviewOfficialTranscriptRequest'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewOfficialTranscriptRequest>>, {requestId: number;data: ReviewOfficialTranscriptRequestBody}> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  reviewOfficialTranscriptRequest(requestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviewOfficialTranscriptRequestMutationResult = NonNullable<Awaited<ReturnType<typeof reviewOfficialTranscriptRequest>>>
+    export type ReviewOfficialTranscriptRequestMutationBody = ReviewOfficialTranscriptRequestBody
+    export type ReviewOfficialTranscriptRequestMutationError = unknown
+
+    /**
+ * @summary Review official Transcript Request.
+ */
+export const useReviewOfficialTranscriptRequest = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewOfficialTranscriptRequest>>, TError,{requestId: number;data: ReviewOfficialTranscriptRequestBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reviewOfficialTranscriptRequest>>,
+        TError,
+        {requestId: number;data: ReviewOfficialTranscriptRequestBody},
+        TContext
+      > => {
+      return useMutation(getReviewOfficialTranscriptRequestMutationOptions(options), queryClient);
     }
 
 /**

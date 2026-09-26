@@ -6725,6 +6725,128 @@ export const ExportOfficialTranscriptRequestQueueAndHistoryResponse = zod.unknow
 
 
 /**
+ * @summary Submit Transcript payment evidence.
+ */
+export const SubmitTranscriptPaymentEvidenceParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const SubmitTranscriptPaymentEvidenceBody = zod.object({
+  "reference": zod.string().describe('Payment reference.'),
+  "receipt": zod.instanceof(File)
+})
+
+export const SubmitTranscriptPaymentEvidenceResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional(),
+  "payments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "reference": zod.string().optional(),
+  "submitted_by": zod.number().optional(),
+  "submitted_at": zod.string().optional(),
+  "receipt_url": zod.string().optional(),
+  "decision": zod.object({
+  "decision": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+}).optional()
+})).optional(),
+  "verified_payment": zod.object({
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Verify or return Transcript payment.
+ */
+export const VerifyOrReturnTranscriptPaymentParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const VerifyOrReturnTranscriptPaymentBody = zod.object({
+  "decision": zod.string().describe('Verify or return.'),
+  "amount": zod.string().optional().describe('Exact captured EGP fee when verifying.'),
+  "reason": zod.string().optional().describe('Required when returning evidence.')
+})
+
+export const VerifyOrReturnTranscriptPaymentResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional(),
+  "payments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "reference": zod.string().optional(),
+  "submitted_by": zod.number().optional(),
+  "submitted_at": zod.string().optional(),
+  "receipt_url": zod.string().optional(),
+  "decision": zod.object({
+  "decision": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+}).optional()
+})).optional(),
+  "verified_payment": zod.object({
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Private Transcript payment receipt.
+ */
+export const PrivateTranscriptPaymentReceiptParams = zod.object({
+  "request_id": zod.number().describe('Request id.'),
+  "submission_id": zod.number().describe('Submission id.')
+})
+
+export const PrivateTranscriptPaymentReceiptResponse = zod.unknown()
+
+
+/**
  * @summary Official Transcript Request details.
  */
 export const OfficialTranscriptRequestDetailsParams = zod.object({
@@ -6739,18 +6861,37 @@ export const OfficialTranscriptRequestDetailsResponse = zod.object({
   "fee": zod.string().optional(),
   "currency": zod.string().optional(),
   "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
   "instructions_en": zod.string().optional(),
   "instructions_ar": zod.string().optional(),
-  "created_at": zod.string().optional(),
   "transitions": zod.array(zod.object({
   "id": zod.number().optional(),
   "from_status": zod.string().optional(),
   "to_status": zod.string().optional(),
   "action": zod.string().optional(),
-  "reason": zod.string().optional(),
+  "reason": zod.string().nullish(),
   "actor_user_id": zod.number().optional(),
   "at": zod.string().optional()
-})).optional()
+})).optional(),
+  "payments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "reference": zod.string().optional(),
+  "submitted_by": zod.number().optional(),
+  "submitted_at": zod.string().optional(),
+  "receipt_url": zod.string().optional(),
+  "decision": zod.object({
+  "decision": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+}).optional()
+})).optional(),
+  "verified_payment": zod.object({
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional()
 }).optional()
 })
 
@@ -6775,18 +6916,37 @@ export const ReviewOfficialTranscriptRequestResponse = zod.object({
   "fee": zod.string().optional(),
   "currency": zod.string().optional(),
   "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
   "instructions_en": zod.string().optional(),
   "instructions_ar": zod.string().optional(),
-  "created_at": zod.string().optional(),
   "transitions": zod.array(zod.object({
   "id": zod.number().optional(),
   "from_status": zod.string().optional(),
   "to_status": zod.string().optional(),
   "action": zod.string().optional(),
-  "reason": zod.string().optional(),
+  "reason": zod.string().nullish(),
   "actor_user_id": zod.number().optional(),
   "at": zod.string().optional()
-})).optional()
+})).optional(),
+  "payments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "reference": zod.string().optional(),
+  "submitted_by": zod.number().optional(),
+  "submitted_at": zod.string().optional(),
+  "receipt_url": zod.string().optional(),
+  "decision": zod.object({
+  "decision": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+}).optional()
+})).optional(),
+  "verified_payment": zod.object({
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional()
 }).optional()
 })
 

@@ -7467,14 +7467,171 @@ student_id?: string;
 sort?: string;
 };
 
+export type SubmitTranscriptPaymentEvidenceBody = {
+  /** Payment reference. */
+  reference: string;
+  /** Private PDF/JPEG/PNG receipt up to 10 MB. */
+  receipt: Blob;
+};
+
+export type SubmitTranscriptPaymentEvidence200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type SubmitTranscriptPaymentEvidence200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type SubmitTranscriptPaymentEvidence200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: SubmitTranscriptPaymentEvidence200DataPaymentsItemDecision;
+};
+
+export type SubmitTranscriptPaymentEvidence200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type SubmitTranscriptPaymentEvidence200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  created_at?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  transitions?: SubmitTranscriptPaymentEvidence200DataTransitionsItem[];
+  payments?: SubmitTranscriptPaymentEvidence200DataPaymentsItem[];
+  verified_payment?: SubmitTranscriptPaymentEvidence200DataVerifiedPayment;
+};
+
+export type SubmitTranscriptPaymentEvidence200 = {
+  data?: SubmitTranscriptPaymentEvidence200Data;
+};
+
+export type VerifyOrReturnTranscriptPaymentBody = {
+  /** Verify or return. */
+  decision: string;
+  /** Exact captured EGP fee when verifying. */
+  amount?: string;
+  /** Required when returning evidence. */
+  reason?: string;
+};
+
+export type VerifyOrReturnTranscriptPayment200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type VerifyOrReturnTranscriptPayment200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type VerifyOrReturnTranscriptPayment200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: VerifyOrReturnTranscriptPayment200DataPaymentsItemDecision;
+};
+
+export type VerifyOrReturnTranscriptPayment200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type VerifyOrReturnTranscriptPayment200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  created_at?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  transitions?: VerifyOrReturnTranscriptPayment200DataTransitionsItem[];
+  payments?: VerifyOrReturnTranscriptPayment200DataPaymentsItem[];
+  verified_payment?: VerifyOrReturnTranscriptPayment200DataVerifiedPayment;
+};
+
+export type VerifyOrReturnTranscriptPayment200 = {
+  data?: VerifyOrReturnTranscriptPayment200Data;
+};
+
+export type PrivateTranscriptPaymentReceipt401 = {
+  message?: string;
+};
+
+export type PrivateTranscriptPaymentReceipt403 = {
+  message?: string;
+};
+
 export type OfficialTranscriptRequestDetails200DataTransitionsItem = {
   id?: number;
   from_status?: string;
   to_status?: string;
   action?: string;
-  reason?: string;
+  /** @nullable */
+  reason?: string | null;
   actor_user_id?: number;
   at?: string;
+};
+
+export type OfficialTranscriptRequestDetails200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type OfficialTranscriptRequestDetails200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: OfficialTranscriptRequestDetails200DataPaymentsItemDecision;
+};
+
+export type OfficialTranscriptRequestDetails200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
 };
 
 export type OfficialTranscriptRequestDetails200Data = {
@@ -7484,10 +7641,12 @@ export type OfficialTranscriptRequestDetails200Data = {
   fee?: string;
   currency?: string;
   status?: string;
+  created_at?: string;
   instructions_en?: string;
   instructions_ar?: string;
-  created_at?: string;
   transitions?: OfficialTranscriptRequestDetails200DataTransitionsItem[];
+  payments?: OfficialTranscriptRequestDetails200DataPaymentsItem[];
+  verified_payment?: OfficialTranscriptRequestDetails200DataVerifiedPayment;
 };
 
 export type OfficialTranscriptRequestDetails200 = {
@@ -7506,9 +7665,34 @@ export type ReviewOfficialTranscriptRequest200DataTransitionsItem = {
   from_status?: string;
   to_status?: string;
   action?: string;
-  reason?: string;
+  /** @nullable */
+  reason?: string | null;
   actor_user_id?: number;
   at?: string;
+};
+
+export type ReviewOfficialTranscriptRequest200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type ReviewOfficialTranscriptRequest200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: ReviewOfficialTranscriptRequest200DataPaymentsItemDecision;
+};
+
+export type ReviewOfficialTranscriptRequest200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
 };
 
 export type ReviewOfficialTranscriptRequest200Data = {
@@ -7518,10 +7702,12 @@ export type ReviewOfficialTranscriptRequest200Data = {
   fee?: string;
   currency?: string;
   status?: string;
+  created_at?: string;
   instructions_en?: string;
   instructions_ar?: string;
-  created_at?: string;
   transitions?: ReviewOfficialTranscriptRequest200DataTransitionsItem[];
+  payments?: ReviewOfficialTranscriptRequest200DataPaymentsItem[];
+  verified_payment?: ReviewOfficialTranscriptRequest200DataVerifiedPayment;
 };
 
 export type ReviewOfficialTranscriptRequest200 = {
@@ -27070,6 +27256,242 @@ export function useExportOfficialTranscriptRequestQueueAndHistory<TData = Awaite
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getExportOfficialTranscriptRequestQueueAndHistoryQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Submit Transcript payment evidence.
+ */
+export const submitTranscriptPaymentEvidence = (
+    requestId: number,
+    submitTranscriptPaymentEvidenceBody: SubmitTranscriptPaymentEvidenceBody,
+ signal?: AbortSignal
+) => {
+
+      const formData = new FormData();
+formData.append(`reference`, submitTranscriptPaymentEvidenceBody.reference);
+formData.append(`receipt`, submitTranscriptPaymentEvidenceBody.receipt);
+
+      return customInstance<SubmitTranscriptPaymentEvidence200>(
+      {url: `/api/v1/records/requests/${requestId}/payment`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
+    },
+      );
+    }
+
+
+
+
+export const getSubmitTranscriptPaymentEvidenceMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitTranscriptPaymentEvidence>>, TError,{requestId: number;data: SubmitTranscriptPaymentEvidenceBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitTranscriptPaymentEvidence>>, TError,{requestId: number;data: SubmitTranscriptPaymentEvidenceBody}, TContext> => {
+
+const mutationKey = ['submitTranscriptPaymentEvidence'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitTranscriptPaymentEvidence>>, {requestId: number;data: SubmitTranscriptPaymentEvidenceBody}> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  submitTranscriptPaymentEvidence(requestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitTranscriptPaymentEvidenceMutationResult = NonNullable<Awaited<ReturnType<typeof submitTranscriptPaymentEvidence>>>
+    export type SubmitTranscriptPaymentEvidenceMutationBody = SubmitTranscriptPaymentEvidenceBody
+    export type SubmitTranscriptPaymentEvidenceMutationError = unknown
+
+    /**
+ * @summary Submit Transcript payment evidence.
+ */
+export const useSubmitTranscriptPaymentEvidence = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitTranscriptPaymentEvidence>>, TError,{requestId: number;data: SubmitTranscriptPaymentEvidenceBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitTranscriptPaymentEvidence>>,
+        TError,
+        {requestId: number;data: SubmitTranscriptPaymentEvidenceBody},
+        TContext
+      > => {
+      return useMutation(getSubmitTranscriptPaymentEvidenceMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Verify or return Transcript payment.
+ */
+export const verifyOrReturnTranscriptPayment = (
+    requestId: number,
+    verifyOrReturnTranscriptPaymentBody: VerifyOrReturnTranscriptPaymentBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<VerifyOrReturnTranscriptPayment200>(
+      {url: `/api/v1/records/requests/${requestId}/payment-review`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: verifyOrReturnTranscriptPaymentBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getVerifyOrReturnTranscriptPaymentMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyOrReturnTranscriptPayment>>, TError,{requestId: number;data: VerifyOrReturnTranscriptPaymentBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof verifyOrReturnTranscriptPayment>>, TError,{requestId: number;data: VerifyOrReturnTranscriptPaymentBody}, TContext> => {
+
+const mutationKey = ['verifyOrReturnTranscriptPayment'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyOrReturnTranscriptPayment>>, {requestId: number;data: VerifyOrReturnTranscriptPaymentBody}> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  verifyOrReturnTranscriptPayment(requestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyOrReturnTranscriptPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof verifyOrReturnTranscriptPayment>>>
+    export type VerifyOrReturnTranscriptPaymentMutationBody = VerifyOrReturnTranscriptPaymentBody
+    export type VerifyOrReturnTranscriptPaymentMutationError = unknown
+
+    /**
+ * @summary Verify or return Transcript payment.
+ */
+export const useVerifyOrReturnTranscriptPayment = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyOrReturnTranscriptPayment>>, TError,{requestId: number;data: VerifyOrReturnTranscriptPaymentBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof verifyOrReturnTranscriptPayment>>,
+        TError,
+        {requestId: number;data: VerifyOrReturnTranscriptPaymentBody},
+        TContext
+      > => {
+      return useMutation(getVerifyOrReturnTranscriptPaymentMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Private Transcript payment receipt.
+ */
+export const privateTranscriptPaymentReceipt = (
+    requestId: number,
+    submissionId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/records/requests/${requestId}/payments/${submissionId}/receipt`, method: 'GET',
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getPrivateTranscriptPaymentReceiptQueryKey = (requestId: number,
+    submissionId: number,) => {
+    return [
+    `/api/v1/records/requests/${requestId}/payments/${submissionId}/receipt`
+    ] as const;
+    }
+
+
+export const getPrivateTranscriptPaymentReceiptQueryOptions = <TData = Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError = PrivateTranscriptPaymentReceipt401 | PrivateTranscriptPaymentReceipt403>(requestId: number,
+    submissionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPrivateTranscriptPaymentReceiptQueryKey(requestId,submissionId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>> = ({ signal }) => privateTranscriptPaymentReceipt(requestId,submissionId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: requestId !== null && requestId !== undefined && submissionId !== null && submissionId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PrivateTranscriptPaymentReceiptQueryResult = NonNullable<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>>
+export type PrivateTranscriptPaymentReceiptQueryError = PrivateTranscriptPaymentReceipt401 | PrivateTranscriptPaymentReceipt403
+
+
+export function usePrivateTranscriptPaymentReceipt<TData = Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError = PrivateTranscriptPaymentReceipt401 | PrivateTranscriptPaymentReceipt403>(
+ requestId: number,
+    submissionId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePrivateTranscriptPaymentReceipt<TData = Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError = PrivateTranscriptPaymentReceipt401 | PrivateTranscriptPaymentReceipt403>(
+ requestId: number,
+    submissionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePrivateTranscriptPaymentReceipt<TData = Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError = PrivateTranscriptPaymentReceipt401 | PrivateTranscriptPaymentReceipt403>(
+ requestId: number,
+    submissionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Private Transcript payment receipt.
+ */
+
+export function usePrivateTranscriptPaymentReceipt<TData = Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError = PrivateTranscriptPaymentReceipt401 | PrivateTranscriptPaymentReceipt403>(
+ requestId: number,
+    submissionId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptPaymentReceipt>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPrivateTranscriptPaymentReceiptQueryOptions(requestId,submissionId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

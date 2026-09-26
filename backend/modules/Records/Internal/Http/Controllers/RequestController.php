@@ -59,7 +59,7 @@ final class RequestController
      *
      * @urlParam request_id integer required Request id. Example: 1
      *
-     * @response 200 {"data":{"id":1,"student_id":1,"delivery_method":"digital","fee":"125.50","currency":"EGP","status":"AwaitingPayment","instructions_en":"Fictional Bank A","instructions_ar":"بنك وهمي أ","created_at":"2026-09-27T00:00:00Z","transitions":[{"id":1,"from_status":"Submitted","to_status":"AwaitingPayment","action":"request_approved","reason":"Identity reviewed","actor_user_id":5,"at":"2026-09-27T00:00:00Z"}]}}
+     * @responseFile 200 modules/Records/Public/Http/responses/request.json
      */
     public function show(Request $http, int $request_id, RecordsAccess $access, RequestWorkflow $workflow): JsonResponse
     {
@@ -78,7 +78,7 @@ final class RequestController
      * @bodyParam decision string required Approve or reject. Example: approve
      * @bodyParam reason string required Decision reason. Example: Identity reviewed
      *
-     * @response 200 {"data":{"id":1,"student_id":1,"delivery_method":"digital","fee":"125.50","currency":"EGP","status":"AwaitingPayment","instructions_en":"Fictional Bank A","instructions_ar":"بنك وهمي أ","created_at":"2026-09-27T00:00:00Z","transitions":[{"id":1,"from_status":"Submitted","to_status":"AwaitingPayment","action":"request_approved","reason":"Identity reviewed","actor_user_id":5,"at":"2026-09-27T00:00:00Z"}]}}
+     * @responseFile 200 modules/Records/Public/Http/responses/request.json
      */
     public function review(Request $http, int $request_id, RequestWorkflow $workflow): JsonResponse
     {

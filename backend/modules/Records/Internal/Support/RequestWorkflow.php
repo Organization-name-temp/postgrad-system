@@ -46,6 +46,18 @@ final readonly class RequestWorkflow
                 'action' => $t->action, 'reason' => $t->reason, 'actor_user_id' => $t->actor_user_id, 'at' => $t->created_at,
             ])->all(),
         ];
+        $data['payments'] = DB::table('transcript_payment_submissions')->where('transcript_request_id', $request->id)->orderBy('id')->get()->map(function ($submission) use ($request): array {
+            $decision = DB::table('transcript_payment_decisions')->where('submission_id', $submission->id)->first();
+
+            return ['id' => $submission->id, 'reference' => $submission->reference, 'submitted_by' => $submission->submitted_by,
+                'submitted_at' => $submission->created_at, 'receipt_url' => '/api/v1/records/requests/'.$request->id.'/payments/'.$submission->id.'/receipt',
+                'decision' => $decision === null ? null : ['decision' => $decision->decision, 'reason' => $decision->reason,
+                    'actor_user_id' => $decision->actor_user_id, 'at' => $decision->created_at]];
+        })->all();
+        $data['verified_payment'] = $request->verified_minor === null ? null : [
+            'amount' => TranscriptFee::format($request->verified_minor), 'currency' => 'EGP',
+            'verified_by' => $request->verified_by, 'verified_at' => $request->verified_at?->toIso8601String(),
+        ];
         if ($staff || $request->approved_at !== null) {
             $data['instructions_en'] = $request->instructions_en;
             $data['instructions_ar'] = $request->instructions_ar;

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Records\Internal\Http\Controllers\FeeController;
+use Modules\Records\Internal\Http\Controllers\PaymentController;
 use Modules\Records\Internal\Http\Controllers\RequestController;
 use Modules\Records\Internal\Http\Controllers\TranscriptController;
 
@@ -23,6 +24,9 @@ Route::middleware(['auth:sanctum', 'can:transcript.view_unofficial'])->prefix('r
     Route::get('/', [RequestController::class, 'index']);
     Route::get('/export', [RequestController::class, 'export']);
     Route::post('/', [RequestController::class, 'store'])->middleware('role:R02');
+    Route::post('/{request_id}/payment', [PaymentController::class, 'submit'])->whereNumber('request_id')->middleware('role:R02');
+    Route::post('/{request_id}/payment-review', [PaymentController::class, 'review'])->whereNumber('request_id')->middleware('can:transcript.issue_official');
+    Route::get('/{request_id}/payments/{submission_id}/receipt', [PaymentController::class, 'receipt'])->whereNumber(['request_id', 'submission_id']);
     Route::get('/{request_id}', [RequestController::class, 'show'])->whereNumber('request_id');
     Route::post('/{request_id}/review', [RequestController::class, 'review'])->whereNumber('request_id')->middleware('can:transcript.issue_official');
 });

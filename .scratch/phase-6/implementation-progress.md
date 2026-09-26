@@ -11,12 +11,14 @@ Initial working tree was clean.
 - Records discovered module/routes and deptrac edges; current transcript composition from Identity/Catalog/Calendar/Enrollment/Grading/AcademicStanding owner Public contracts; effective Exemption/Transfer/Waiver projection without evidence. Scoped picker and audited XLSX export.
 - Bilingual document component and current record page, all CH summary columns, semester grouping, finalized grade projection, owner-derived contribution and GPA. Shell print styles hide chrome. Browser print/a11y/theme checks NOT yet run.
 - Positive integer-minor-unit EGP fee singleton, bilingual instructions, preapproval nondisclosure, staff fee form/page.
-- Initial request model/migration/controller/workflow: Student submission snapshots fee/instructions/delivery, StudentGuard lock + partial unique open-request index, staff approve/reject reasons, private owner/staff details, transitions/audit/typed once notifications. Includes Terminated Students. Queue q/search + export + stricter service scope implemented next and narrowly verified; request UI is NOT built yet.
+- Initial request model/migration/controller/workflow: Student submission snapshots fee/instructions/delivery, StudentGuard lock + partial unique open-request index, staff approve/reject reasons, private owner/staff details, transitions/audit/typed once notifications. Includes Terminated Students. Queue q/search + export + stricter service scope implemented and narrowly verified (cbbcf28); request UI is NOT built yet.
+
+- Payment backend added test-first: retained private PDF/JPEG/PNG submissions, return/correct/verify, exact minor-unit amount, attributed decisions, owner/staff private receipts, duplicate refusal. Payment tests pass (2 tests, 26 assertions). No payment UI yet.
 
 ## Tests and checks
 - TDD red and green observed for identity HTTP/recovery, Records current record/status/scope/picker/export/decisions, fee setup, initial requests, FeeForm, TranscriptDocument, notification renderer.
 - Identity narrow tests: 29 passed, 150 assertions (FinalDecisionTest + recovery). Later broad filter Records|StudentIdentificationRecoveryTest: 77 passed, 270 assertions (matches other owner Records tests too).
-- PHPStan and deptrac pass on new initial request backend; Pint passed through foundation; latest queue checks pending.
+- PHPStan and deptrac pass on new initial request backend; Pint passed through foundation; queue checks passed; latest payment static checks pending.
 - Frontend typecheck/lint green after corrected Scribe numeric GPA metadata. Focused UI 1 document, 2 fee, 15 dashboard, 8 notifications tests passing individually; combined focused UI command passed 26 tests.
 - OpenAPI and Orval regenerated through initial request endpoints. Source ResponseField paths through array use `data.semesters.gpa` (custom Support generator reuses parent path for items), not [] or *.
 - No tickets marked complete. No full gates, Playwright, actual concurrency, browser print/accessibility, or consolidated review run yet.

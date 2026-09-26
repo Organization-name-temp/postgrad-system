@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Identity\Internal\Assignments\EloquentDeanAssignments;
 use Modules\Identity\Internal\Assignments\EloquentDepartmentHeadAssignments;
 use Modules\Identity\Internal\Audit\EloquentAuditLogger;
+use Modules\Identity\Internal\Console\Commands\RecoverStudentIdentification;
 use Modules\Identity\Internal\Directory\EloquentDirectory;
 use Modules\Identity\Internal\Enrollment\EloquentStudentCurriculumBindings;
 use Modules\Identity\Internal\Enrollment\EloquentStudentDirectory;
@@ -52,6 +53,10 @@ class IdentityServiceProvider extends ServiceProvider
 
     public function boot(Router $router): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([RecoverStudentIdentification::class]);
+        }
+
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
 
         $this->registerPermissionGates();

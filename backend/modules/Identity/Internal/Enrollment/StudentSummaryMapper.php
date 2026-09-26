@@ -4,6 +4,7 @@ namespace Modules\Identity\Internal\Enrollment;
 
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Public\AdmissionEvidenceSnapshot;
+use Modules\Identity\Public\StudentIdentity;
 use Modules\Identity\Public\StudentSummary;
 
 /** The single Identity-internal mapper from the owned model to its Public read DTO. */
@@ -27,6 +28,15 @@ final class StudentSummaryMapper
             advisorId: $student->advisor_id,
             admittedAt: $student->admitted_at,
             lifecycleStatus: $student->lifecycle_status,
+            identity: new StudentIdentity(
+                nameEn: $student->name_en,
+                nameAr: $student->name_ar,
+                nationalId: $student->national_id,
+                dateOfBirth: $student->date_of_birth->format('Y-m-d'),
+                nationality: $student->nationality,
+                gender: $student->gender,
+                identificationType: $student->identification_type,
+            ),
             admissionEvidence: $student->admission_evidence === null
                 ? null
                 : AdmissionEvidenceSnapshot::fromArray($student->admission_evidence),

@@ -96,6 +96,7 @@ deptrac:
     Identity_Public:
       - Identity_Internal
     Identity_Internal:
+      - Admissions_Public
       - Identity_Public
       - Support
     # Catalog may reach Identity only through Identity\Public (never Internal).

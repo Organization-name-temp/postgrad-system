@@ -78,6 +78,23 @@ export function DashboardPage() {
               <Typography variant="body1" component="p" dir="ltr" sx={{ unicodeBidi: 'isolate' }}>
                 {student.university_id}
               </Typography>
+              {student.identity && (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="overline" color="text.secondary" component="p">
+                    {student.identity.identification_type
+                      ? t(`dashboard.identificationTypes.${student.identity.identification_type}`)
+                      : t('dashboard.identificationType')}
+                  </Typography>
+                  <Typography component="p" dir="ltr" sx={{ unicodeBidi: 'isolate' }}>
+                    {student.identity.identification_number}
+                  </Typography>
+                  {!student.identity.ready && (
+                    <Typography variant="body2" color="text.secondary">
+                      {t('dashboard.identityUnresolved')}
+                    </Typography>
+                  )}
+                </Box>
+              )}
               {student.enrollment_term && (
                 <Typography variant="body2" color="text.secondary">
                   {t('dashboard.enrollmentTerm', {

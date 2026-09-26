@@ -11740,6 +11740,12 @@ paths:
                       advisor_id: 3
                       admitted_at: '2026-07-15T10:00:00+00:00'
                       lifecycle_status: Active
+                      identity:
+                        name_en: 'Sara Applicant'
+                        name_ar: 'سارة المتقدمة'
+                        identification_number: '29001010101010'
+                        identification_type: national_id
+                        ready: true
                 properties:
                   data:
                     type: object
@@ -11813,6 +11819,24 @@ paths:
                           lifecycle_status:
                             type: string
                             example: Active
+                          identity:
+                            type: object
+                            properties:
+                              name_en:
+                                type: string
+                                example: 'Sara Applicant'
+                              name_ar:
+                                type: string
+                                example: 'سارة المتقدمة'
+                              identification_number:
+                                type: string
+                                example: '29001010101010'
+                              identification_type:
+                                type: string
+                                example: national_id
+                              ready:
+                                type: boolean
+                                example: true
         401:
           description: ''
           content:

@@ -449,6 +449,7 @@ class Application extends Model
             dateOfBirth: $this->date_of_birth?->format('Y-m-d') ?? '',
             nationality: (string) $this->nationality,
             gender: $this->gender->value,
+            identificationType: $this->id_type?->value,
         );
     }
 

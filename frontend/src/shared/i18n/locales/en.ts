@@ -105,6 +105,10 @@ export const en = {
     // from many features, so its chrome lives in `common` while each Card's copy stays in
     // its owning feature's namespace.
     dashboard: {
+      identificationType: 'Identification Type',
+      identificationTypes: { national_id: 'National ID', passport: 'Passport' },
+      identityUnresolved:
+        'Identification Type is unresolved. Contact Student Affairs; official issuance requires admission evidence.',
       title: 'Dashboard',
       universityId: 'University ID',
       enrollmentTerm: 'Enrolled {{term}}',

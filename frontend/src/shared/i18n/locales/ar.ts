@@ -101,6 +101,10 @@ export const ar = {
       account: 'قائمة الحساب',
     },
     dashboard: {
+      identificationType: 'نوع إثبات الهوية',
+      identificationTypes: { national_id: 'الرقم القومي', passport: 'جواز السفر' },
+      identityUnresolved:
+        'نوع إثبات الهوية غير محسوم. تواصل مع شؤون الطلاب؛ يتطلب الإصدار الرسمي أدلة القبول.',
       title: 'لوحة التحكم',
       universityId: 'الرقم الجامعي',
       enrollmentTerm: 'التحق في {{term}}',

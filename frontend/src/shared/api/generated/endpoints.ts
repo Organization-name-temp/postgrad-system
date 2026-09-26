@@ -3423,6 +3423,14 @@ export type CurrentUser200DataRolesItem = {
   name?: string;
 };
 
+export type CurrentUser200DataStudentIdentity = {
+  name_en?: string;
+  name_ar?: string;
+  identification_number?: string;
+  identification_type?: string;
+  ready?: boolean;
+};
+
 export type CurrentUser200DataStudent = {
   university_id?: string;
   program_id?: number;
@@ -3433,6 +3441,7 @@ export type CurrentUser200DataStudent = {
   advisor_id?: number;
   admitted_at?: string;
   lifecycle_status?: string;
+  identity?: CurrentUser200DataStudentIdentity;
 };
 
 export type CurrentUser200Data = {

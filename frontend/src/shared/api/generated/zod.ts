@@ -3256,7 +3256,14 @@ export const CurrentUserResponse = zod.object({
   "admission_cycle_id": zod.number().optional(),
   "advisor_id": zod.number().optional(),
   "admitted_at": zod.string().optional(),
-  "lifecycle_status": zod.string().optional()
+  "lifecycle_status": zod.string().optional(),
+  "identity": zod.object({
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "identification_number": zod.string().optional(),
+  "identification_type": zod.string().optional(),
+  "ready": zod.boolean().optional()
+}).optional()
 }).optional()
 }).optional()
 })

@@ -156,6 +156,53 @@ describe('DashboardPage — the identity header', () => {
     ).toBeInTheDocument()
   })
 
+  it('shows the admission identifier and type bilingually without mirroring the number', async () => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        user: {
+          name: 'Layla',
+          roles: [{ code: 'R02' }],
+          student: {
+            university_id: '2026CE0001',
+            identity: {
+              name_en: 'Layla',
+              name_ar: 'ليلى',
+              identification_number: 'AB123456',
+              identification_type: 'passport',
+              ready: true,
+            },
+          },
+        },
+      }),
+    )
+    renderDashboard()
+    expect(screen.getByText('Passport')).toBeInTheDocument()
+    expect(screen.getByText('AB123456')).toHaveAttribute('dir', 'ltr')
+    await act(() => i18n.changeLanguage('ar'))
+    expect(screen.getByText('جواز السفر')).toBeInTheDocument()
+    expect(screen.getByText('AB123456')).toHaveAttribute('dir', 'ltr')
+  })
+
+  it('explains unresolved identification instead of guessing from a numeric identifier', () => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        user: {
+          name: 'Layla',
+          student: {
+            university_id: '2026CE0001',
+            identity: {
+              identification_number: '29001010101010',
+              ready: false,
+            },
+          },
+        },
+      }),
+    )
+    renderDashboard()
+    expect(screen.getByText(/Identification Type is unresolved/)).toBeInTheDocument()
+    expect(screen.queryByText('National ID')).not.toBeInTheDocument()
+  })
+
   it('omits the University ID block for a user with no Student anchor', () => {
     mockedUseAuth.mockReturnValue(authState({}))
     renderDashboard()

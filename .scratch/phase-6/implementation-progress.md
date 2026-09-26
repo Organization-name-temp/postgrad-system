@@ -33,3 +33,8 @@ Initial working tree was clean.
 
 Local PostgreSQL service was started with docker compose up -d. Commands use backend PostgreSQL prs_test; do not run backend tests concurrently since shared DB.
 No external blocker found.
+
+## Latest backend frontier
+- Cancellation/full-refund backend committed as 04ba239. Private evidence retained; exact prior-stage restoration and full settlement tested (12 tests,153 assertions).
+- Coherent preview/issuance, digital/collection handover, public validity/revocation and scoped issuance history implemented. Focused issuance HTTP suite:12 tests,146 assertions; real PostgreSQL identity writer/certification lock test:1 test,13 assertions. PHPStan/Pint/deptrac green. ADR0050 documents owner Public table guards and complete reviewed-content contract.
+- This remains implementation-pass evidence only. No ticket marked complete; final gates/review/browser acceptance pending. Service request UI, official/public UI and QR still pending.

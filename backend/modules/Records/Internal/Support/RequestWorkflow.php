@@ -59,6 +59,7 @@ final readonly class RequestWorkflow
             'verified_by' => $request->verified_by, 'verified_at' => $request->verified_at?->toIso8601String(),
         ];
         $data['cancellation_prior_status'] = $request->cancellation_prior_status;
+        $data['issuance_id'] = DB::table('transcript_issuances')->where('transcript_request_id', $request->id)->value('id');
         $refund = DB::table('transcript_refunds')->where('transcript_request_id', $request->id)->first();
         $data['refund'] = $refund === null ? null : [
             'id' => $refund->id, 'amount' => TranscriptFee::format((int) $refund->amount_minor), 'currency' => 'EGP',

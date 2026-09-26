@@ -7537,6 +7537,7 @@ export type CompleteFullManualTranscriptRefund200Data = {
   verified_payment?: CompleteFullManualTranscriptRefund200DataVerifiedPayment;
   cancellation_prior_status?: string;
   refund?: CompleteFullManualTranscriptRefund200DataRefund;
+  issuance_id?: number;
 };
 
 export type CompleteFullManualTranscriptRefund200 = {
@@ -7617,6 +7618,7 @@ export type RequestTranscriptCancellation200Data = {
   verified_payment?: RequestTranscriptCancellation200DataVerifiedPayment;
   cancellation_prior_status?: string;
   refund?: RequestTranscriptCancellation200DataRefund;
+  issuance_id?: number;
 };
 
 export type RequestTranscriptCancellation200 = {
@@ -7691,6 +7693,7 @@ export type DecideTranscriptCancellation200Data = {
   verified_payment?: DecideTranscriptCancellation200DataVerifiedPayment;
   cancellation_prior_status?: string;
   refund?: DecideTranscriptCancellation200DataRefund;
+  issuance_id?: number;
 };
 
 export type DecideTranscriptCancellation200 = {
@@ -7765,6 +7768,7 @@ export type SubmitTranscriptPaymentEvidence200Data = {
   verified_payment?: SubmitTranscriptPaymentEvidence200DataVerifiedPayment;
   cancellation_prior_status?: string;
   refund?: SubmitTranscriptPaymentEvidence200DataRefund;
+  issuance_id?: number;
 };
 
 export type SubmitTranscriptPaymentEvidence200 = {
@@ -7841,6 +7845,7 @@ export type VerifyOrReturnTranscriptPayment200Data = {
   verified_payment?: VerifyOrReturnTranscriptPayment200DataVerifiedPayment;
   cancellation_prior_status?: string;
   refund?: VerifyOrReturnTranscriptPayment200DataRefund;
+  issuance_id?: number;
 };
 
 export type VerifyOrReturnTranscriptPayment200 = {
@@ -7916,6 +7921,7 @@ export type OfficialTranscriptRequestDetails200Data = {
   verified_payment?: OfficialTranscriptRequestDetails200DataVerifiedPayment;
   cancellation_prior_status?: string;
   refund?: OfficialTranscriptRequestDetails200DataRefund;
+  issuance_id?: number;
 };
 
 export type OfficialTranscriptRequestDetails200 = {
@@ -7990,10 +7996,817 @@ export type ReviewOfficialTranscriptRequest200Data = {
   verified_payment?: ReviewOfficialTranscriptRequest200DataVerifiedPayment;
   cancellation_prior_status?: string;
   refund?: ReviewOfficialTranscriptRequest200DataRefund;
+  issuance_id?: number;
 };
 
 export type ReviewOfficialTranscriptRequest200 = {
   data?: ReviewOfficialTranscriptRequest200Data;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotIdentity = {
+  name_en?: string;
+  name_ar?: string;
+  identification_type?: string;
+  identification_number?: string;
+  ready?: boolean;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotProgram = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItemCoursesItemCourse = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  classification?: string;
+  course_status?: string;
+  result?: string;
+  contributes_to_cgpa?: boolean;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItem = {
+  semester?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItemSemester;
+  /** @nullable */
+  gpa: number | null;
+  courses?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItemCoursesItem[];
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditDecisionsItem = {
+  type?: string;
+  target_course_code?: string;
+  credit_hours?: number;
+  approved_at?: string;
+  source_institution?: string;
+  source_course_code?: string;
+  source_course_name?: string;
+  original_grade?: string;
+  normalized_grade?: string;
+  reason_codes?: unknown[];
+  /** @nullable */
+  prior_course_code?: string | null;
+  /** @nullable */
+  prior_grade?: string | null;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditHoursCategoriesItem = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditHoursTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditHours = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditHoursCategoriesItem[];
+  total?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditHoursTotal;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200DataSnapshot = {
+  student_id?: number;
+  identity?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotIdentity;
+  university_id?: string;
+  enrollment_term?: string;
+  lifecycle_status?: string;
+  program?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotProgram;
+  /** @nullable */
+  cgpa: number | null;
+  semesters?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotSemestersItem[];
+  credit_decisions?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditDecisionsItem[];
+  credit_hours?: ReviewCoherentOfficialTranscriptPreview200DataSnapshotCreditHours;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200Data = {
+  review_token?: string;
+  snapshot?: ReviewCoherentOfficialTranscriptPreview200DataSnapshot;
+};
+
+export type ReviewCoherentOfficialTranscriptPreview200 = {
+  data?: ReviewCoherentOfficialTranscriptPreview200Data;
+};
+
+export type CertifyReviewedOfficialTranscriptBody = {
+  /** Reviewed content token. */
+  review_token: string;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotIdentity = {
+  name_en?: string;
+  name_ar?: string;
+  identification_type?: string;
+  identification_number?: string;
+  ready?: boolean;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotProgram = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotSemestersItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotSemestersItemCoursesItemCourse = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: CertifyReviewedOfficialTranscript201DataSnapshotSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  classification?: string;
+  course_status?: string;
+  result?: string;
+  contributes_to_cgpa?: boolean;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotSemestersItem = {
+  semester?: CertifyReviewedOfficialTranscript201DataSnapshotSemestersItemSemester;
+  /** @nullable */
+  gpa: number | null;
+  courses?: CertifyReviewedOfficialTranscript201DataSnapshotSemestersItemCoursesItem[];
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotCreditDecisionsItem = {
+  type?: string;
+  target_course_code?: string;
+  credit_hours?: number;
+  approved_at?: string;
+  source_institution?: string;
+  source_course_code?: string;
+  source_course_name?: string;
+  original_grade?: string;
+  normalized_grade?: string;
+  reason_codes?: unknown[];
+  /** @nullable */
+  prior_course_code?: string | null;
+  /** @nullable */
+  prior_grade?: string | null;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotCreditHoursCategoriesItem = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotCreditHoursTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshotCreditHours = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: CertifyReviewedOfficialTranscript201DataSnapshotCreditHoursCategoriesItem[];
+  total?: CertifyReviewedOfficialTranscript201DataSnapshotCreditHoursTotal;
+};
+
+export type CertifyReviewedOfficialTranscript201DataSnapshot = {
+  student_id?: number;
+  identity?: CertifyReviewedOfficialTranscript201DataSnapshotIdentity;
+  university_id?: string;
+  enrollment_term?: string;
+  lifecycle_status?: string;
+  program?: CertifyReviewedOfficialTranscript201DataSnapshotProgram;
+  /** @nullable */
+  cgpa: number | null;
+  semesters?: CertifyReviewedOfficialTranscript201DataSnapshotSemestersItem[];
+  credit_decisions?: CertifyReviewedOfficialTranscript201DataSnapshotCreditDecisionsItem[];
+  credit_hours?: CertifyReviewedOfficialTranscript201DataSnapshotCreditHours;
+};
+
+export type CertifyReviewedOfficialTranscript201DataRevocation = {
+  reason?: string;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type CertifyReviewedOfficialTranscript201Data = {
+  id?: number;
+  student_id?: number;
+  reference?: string;
+  status?: string;
+  issuer_name?: string;
+  issued_at?: string;
+  snapshot?: CertifyReviewedOfficialTranscript201DataSnapshot;
+  verification_url?: string;
+  revocation?: CertifyReviewedOfficialTranscript201DataRevocation;
+};
+
+export type CertifyReviewedOfficialTranscript201 = {
+  data?: CertifyReviewedOfficialTranscript201Data;
+};
+
+export type ScopedOfficialIssuanceHistoryParams = {
+/**
+ * Search names, University ID or reference.
+ */
+q?: string;
+/**
+ * Issuance ids.
+ */
+id?: string;
+/**
+ * Student ids.
+ */
+student_id?: string;
+/**
+ * Valid or Revoked.
+ */
+status?: string;
+/**
+ * Issuance references.
+ */
+reference?: string;
+/**
+ * Readable field sort.
+ */
+sort?: string;
+page?: number;
+per_page?: number;
+};
+
+export type ScopedOfficialIssuanceHistory200DataItem = {
+  id?: number;
+  student_id?: number;
+  reference?: string;
+  status?: string;
+  issuer_name?: string;
+  issued_at?: string;
+};
+
+export type ScopedOfficialIssuanceHistory200Meta = {
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
+
+export type ScopedOfficialIssuanceHistory200 = {
+  data?: ScopedOfficialIssuanceHistory200DataItem[];
+  meta?: ScopedOfficialIssuanceHistory200Meta;
+};
+
+export type ExportScopedIssuanceHistoryWithoutBearerTokensParams = {
+/**
+ * Search names, University ID or reference.
+ */
+q?: string;
+/**
+ * Issuance ids.
+ */
+id?: string;
+/**
+ * Student ids.
+ */
+student_id?: string;
+/**
+ * Valid or Revoked.
+ */
+status?: string;
+/**
+ * Issuance references.
+ */
+reference?: string;
+/**
+ * Readable field sort.
+ */
+sort?: string;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotIdentity = {
+  name_en?: string;
+  name_ar?: string;
+  identification_type?: string;
+  identification_number?: string;
+  ready?: boolean;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotProgram = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItemCoursesItemCourse = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  classification?: string;
+  course_status?: string;
+  result?: string;
+  contributes_to_cgpa?: boolean;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItem = {
+  semester?: ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItemSemester;
+  /** @nullable */
+  gpa: number | null;
+  courses?: ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItemCoursesItem[];
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotCreditDecisionsItem = {
+  type?: string;
+  target_course_code?: string;
+  credit_hours?: number;
+  approved_at?: string;
+  source_institution?: string;
+  source_course_code?: string;
+  source_course_name?: string;
+  original_grade?: string;
+  normalized_grade?: string;
+  reason_codes?: unknown[];
+  /** @nullable */
+  prior_course_code?: string | null;
+  /** @nullable */
+  prior_grade?: string | null;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotCreditHoursCategoriesItem = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotCreditHoursTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshotCreditHours = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: ImmutableOfficialTranscriptDetail200DataSnapshotCreditHoursCategoriesItem[];
+  total?: ImmutableOfficialTranscriptDetail200DataSnapshotCreditHoursTotal;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataSnapshot = {
+  student_id?: number;
+  identity?: ImmutableOfficialTranscriptDetail200DataSnapshotIdentity;
+  university_id?: string;
+  enrollment_term?: string;
+  lifecycle_status?: string;
+  program?: ImmutableOfficialTranscriptDetail200DataSnapshotProgram;
+  /** @nullable */
+  cgpa: number | null;
+  semesters?: ImmutableOfficialTranscriptDetail200DataSnapshotSemestersItem[];
+  credit_decisions?: ImmutableOfficialTranscriptDetail200DataSnapshotCreditDecisionsItem[];
+  credit_hours?: ImmutableOfficialTranscriptDetail200DataSnapshotCreditHours;
+};
+
+export type ImmutableOfficialTranscriptDetail200DataRevocation = {
+  reason?: string;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type ImmutableOfficialTranscriptDetail200Data = {
+  id?: number;
+  student_id?: number;
+  reference?: string;
+  status?: string;
+  issuer_name?: string;
+  issued_at?: string;
+  snapshot?: ImmutableOfficialTranscriptDetail200DataSnapshot;
+  verification_url?: string;
+  revocation?: ImmutableOfficialTranscriptDetail200DataRevocation;
+};
+
+export type ImmutableOfficialTranscriptDetail200 = {
+  data?: ImmutableOfficialTranscriptDetail200Data;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotIdentity = {
+  name_en?: string;
+  name_ar?: string;
+  identification_type?: string;
+  identification_number?: string;
+  ready?: boolean;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotProgram = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItemCoursesItemCourse = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  classification?: string;
+  course_status?: string;
+  result?: string;
+  contributes_to_cgpa?: boolean;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItem = {
+  semester?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItemSemester;
+  /** @nullable */
+  gpa: number | null;
+  courses?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItemCoursesItem[];
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditDecisionsItem = {
+  type?: string;
+  target_course_code?: string;
+  credit_hours?: number;
+  approved_at?: string;
+  source_institution?: string;
+  source_course_code?: string;
+  source_course_name?: string;
+  original_grade?: string;
+  normalized_grade?: string;
+  reason_codes?: unknown[];
+  /** @nullable */
+  prior_course_code?: string | null;
+  /** @nullable */
+  prior_grade?: string | null;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditHoursCategoriesItem = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditHoursTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditHours = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditHoursCategoriesItem[];
+  total?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditHoursTotal;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200DataSnapshot = {
+  identity?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotIdentity;
+  university_id?: string;
+  enrollment_term?: string;
+  lifecycle_status?: string;
+  program?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotProgram;
+  /** @nullable */
+  cgpa: number | null;
+  semesters?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotSemestersItem[];
+  credit_decisions?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditDecisionsItem[];
+  credit_hours?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshotCreditHours;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200Data = {
+  reference?: string;
+  status?: string;
+  issuer_name?: string;
+  issued_at?: string;
+  snapshot?: PublicBearerVerificationOfAnOfficialCopy200DataSnapshot;
+};
+
+export type PublicBearerVerificationOfAnOfficialCopy200 = {
+  data?: PublicBearerVerificationOfAnOfficialCopy200Data;
+};
+
+export type RecordCollectionHandover200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type RecordCollectionHandover200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type RecordCollectionHandover200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: RecordCollectionHandover200DataPaymentsItemDecision;
+};
+
+export type RecordCollectionHandover200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type RecordCollectionHandover200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
+export type RecordCollectionHandover200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  created_at?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  transitions?: RecordCollectionHandover200DataTransitionsItem[];
+  payments?: RecordCollectionHandover200DataPaymentsItem[];
+  verified_payment?: RecordCollectionHandover200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: RecordCollectionHandover200DataRefund;
+  issuance_id?: number;
+};
+
+export type RecordCollectionHandover200 = {
+  data?: RecordCollectionHandover200Data;
+};
+
+export type RevokeOfficialCopyValidityBody = {
+  /** Revocation reason. */
+  reason: string;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotIdentity = {
+  name_en?: string;
+  name_ar?: string;
+  identification_type?: string;
+  identification_number?: string;
+  ready?: boolean;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotProgram = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_name_en?: string;
+  department_name_ar?: string;
+  faculty_name_en?: string;
+  faculty_name_ar?: string;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotSemestersItemSemester = {
+  id?: number;
+  name_en?: string;
+  name_ar?: string;
+  starts_at?: string;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotSemestersItemCoursesItemCourse = {
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotSemestersItemCoursesItem = {
+  enrollment_id?: number;
+  course?: RevokeOfficialCopyValidity200DataSnapshotSemestersItemCoursesItemCourse;
+  credit_hours?: number;
+  classification?: string;
+  course_status?: string;
+  result?: string;
+  contributes_to_cgpa?: boolean;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotSemestersItem = {
+  semester?: RevokeOfficialCopyValidity200DataSnapshotSemestersItemSemester;
+  /** @nullable */
+  gpa?: string | null;
+  courses?: RevokeOfficialCopyValidity200DataSnapshotSemestersItemCoursesItem[];
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotCreditDecisionsItem = {
+  type?: string;
+  target_course_code?: string;
+  credit_hours?: number;
+  approved_at?: string;
+  source_institution?: string;
+  source_course_code?: string;
+  source_course_name?: string;
+  original_grade?: string;
+  normalized_grade?: string;
+  reason_codes?: unknown[];
+  /** @nullable */
+  prior_course_code?: string | null;
+  /** @nullable */
+  prior_grade?: string | null;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotCreditHoursCategoriesItem = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotCreditHoursTotal = {
+  category?: string;
+  baseline_required_ch?: number;
+  adjusted_required_ch?: number;
+  attended_ch?: number;
+  earned_ch?: number;
+  transferred_ch?: number;
+  waived_ch?: number;
+  exempted_ch?: number;
+  satisfied_ch?: number;
+  remaining_ch?: number;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshotCreditHours = {
+  student_id?: number;
+  curriculum_version_id?: number;
+  categories?: RevokeOfficialCopyValidity200DataSnapshotCreditHoursCategoriesItem[];
+  total?: RevokeOfficialCopyValidity200DataSnapshotCreditHoursTotal;
+};
+
+export type RevokeOfficialCopyValidity200DataSnapshot = {
+  student_id?: number;
+  identity?: RevokeOfficialCopyValidity200DataSnapshotIdentity;
+  university_id?: string;
+  enrollment_term?: string;
+  lifecycle_status?: string;
+  program?: RevokeOfficialCopyValidity200DataSnapshotProgram;
+  /** @nullable */
+  cgpa?: string | null;
+  semesters?: RevokeOfficialCopyValidity200DataSnapshotSemestersItem[];
+  credit_decisions?: RevokeOfficialCopyValidity200DataSnapshotCreditDecisionsItem[];
+  credit_hours?: RevokeOfficialCopyValidity200DataSnapshotCreditHours;
+};
+
+export type RevokeOfficialCopyValidity200DataRevocation = {
+  reason?: string;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type RevokeOfficialCopyValidity200Data = {
+  id?: number;
+  student_id?: number;
+  reference?: string;
+  status?: string;
+  issuer_name?: string;
+  issued_at?: string;
+  snapshot?: RevokeOfficialCopyValidity200DataSnapshot;
+  verification_url?: string;
+  revocation?: RevokeOfficialCopyValidity200DataRevocation;
+};
+
+export type RevokeOfficialCopyValidity200 = {
+  data?: RevokeOfficialCopyValidity200Data;
 };
 
 export type AdvisorTransferQueueParams = {
@@ -28239,6 +29052,639 @@ export const useReviewOfficialTranscriptRequest = <TError = unknown,
         TContext
       > => {
       return useMutation(getReviewOfficialTranscriptRequestMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Review coherent official Transcript preview.
+ */
+export const reviewCoherentOfficialTranscriptPreview = (
+    requestId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ReviewCoherentOfficialTranscriptPreview200>(
+      {url: `/api/v1/records/requests/${requestId}/preview`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getReviewCoherentOfficialTranscriptPreviewMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewCoherentOfficialTranscriptPreview>>, TError,{requestId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof reviewCoherentOfficialTranscriptPreview>>, TError,{requestId: number}, TContext> => {
+
+const mutationKey = ['reviewCoherentOfficialTranscriptPreview'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewCoherentOfficialTranscriptPreview>>, {requestId: number}> = (props) => {
+          const {requestId} = props ?? {};
+
+          return  reviewCoherentOfficialTranscriptPreview(requestId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviewCoherentOfficialTranscriptPreviewMutationResult = NonNullable<Awaited<ReturnType<typeof reviewCoherentOfficialTranscriptPreview>>>
+
+    export type ReviewCoherentOfficialTranscriptPreviewMutationError = unknown
+
+    /**
+ * @summary Review coherent official Transcript preview.
+ */
+export const useReviewCoherentOfficialTranscriptPreview = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewCoherentOfficialTranscriptPreview>>, TError,{requestId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reviewCoherentOfficialTranscriptPreview>>,
+        TError,
+        {requestId: number},
+        TContext
+      > => {
+      return useMutation(getReviewCoherentOfficialTranscriptPreviewMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Certify reviewed official Transcript.
+ */
+export const certifyReviewedOfficialTranscript = (
+    requestId: number,
+    certifyReviewedOfficialTranscriptBody: CertifyReviewedOfficialTranscriptBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CertifyReviewedOfficialTranscript201>(
+      {url: `/api/v1/records/requests/${requestId}/issue`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: certifyReviewedOfficialTranscriptBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getCertifyReviewedOfficialTranscriptMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof certifyReviewedOfficialTranscript>>, TError,{requestId: number;data: CertifyReviewedOfficialTranscriptBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof certifyReviewedOfficialTranscript>>, TError,{requestId: number;data: CertifyReviewedOfficialTranscriptBody}, TContext> => {
+
+const mutationKey = ['certifyReviewedOfficialTranscript'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof certifyReviewedOfficialTranscript>>, {requestId: number;data: CertifyReviewedOfficialTranscriptBody}> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  certifyReviewedOfficialTranscript(requestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CertifyReviewedOfficialTranscriptMutationResult = NonNullable<Awaited<ReturnType<typeof certifyReviewedOfficialTranscript>>>
+    export type CertifyReviewedOfficialTranscriptMutationBody = CertifyReviewedOfficialTranscriptBody
+    export type CertifyReviewedOfficialTranscriptMutationError = unknown
+
+    /**
+ * @summary Certify reviewed official Transcript.
+ */
+export const useCertifyReviewedOfficialTranscript = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof certifyReviewedOfficialTranscript>>, TError,{requestId: number;data: CertifyReviewedOfficialTranscriptBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof certifyReviewedOfficialTranscript>>,
+        TError,
+        {requestId: number;data: CertifyReviewedOfficialTranscriptBody},
+        TContext
+      > => {
+      return useMutation(getCertifyReviewedOfficialTranscriptMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Scoped official issuance history.
+ */
+export const scopedOfficialIssuanceHistory = (
+    params?: ScopedOfficialIssuanceHistoryParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScopedOfficialIssuanceHistory200>(
+      {url: `/api/v1/records/issuances`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getScopedOfficialIssuanceHistoryQueryKey = (params?: ScopedOfficialIssuanceHistoryParams,) => {
+    return [
+    `/api/v1/records/issuances`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getScopedOfficialIssuanceHistoryQueryOptions = <TData = Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError = unknown>(params?: ScopedOfficialIssuanceHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getScopedOfficialIssuanceHistoryQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>> = ({ signal }) => scopedOfficialIssuanceHistory(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ScopedOfficialIssuanceHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>>
+export type ScopedOfficialIssuanceHistoryQueryError = unknown
+
+
+export function useScopedOfficialIssuanceHistory<TData = Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError = unknown>(
+ params: undefined |  ScopedOfficialIssuanceHistoryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>,
+          TError,
+          Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScopedOfficialIssuanceHistory<TData = Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError = unknown>(
+ params?: ScopedOfficialIssuanceHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>,
+          TError,
+          Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScopedOfficialIssuanceHistory<TData = Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError = unknown>(
+ params?: ScopedOfficialIssuanceHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Scoped official issuance history.
+ */
+
+export function useScopedOfficialIssuanceHistory<TData = Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError = unknown>(
+ params?: ScopedOfficialIssuanceHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedOfficialIssuanceHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getScopedOfficialIssuanceHistoryQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export scoped issuance history without bearer tokens.
+ */
+export const exportScopedIssuanceHistoryWithoutBearerTokens = (
+    params?: ExportScopedIssuanceHistoryWithoutBearerTokensParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/records/issuances/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportScopedIssuanceHistoryWithoutBearerTokensQueryKey = (params?: ExportScopedIssuanceHistoryWithoutBearerTokensParams,) => {
+    return [
+    `/api/v1/records/issuances/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportScopedIssuanceHistoryWithoutBearerTokensQueryOptions = <TData = Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError = unknown>(params?: ExportScopedIssuanceHistoryWithoutBearerTokensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportScopedIssuanceHistoryWithoutBearerTokensQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>> = ({ signal }) => exportScopedIssuanceHistoryWithoutBearerTokens(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportScopedIssuanceHistoryWithoutBearerTokensQueryResult = NonNullable<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>>
+export type ExportScopedIssuanceHistoryWithoutBearerTokensQueryError = unknown
+
+
+export function useExportScopedIssuanceHistoryWithoutBearerTokens<TData = Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError = unknown>(
+ params: undefined |  ExportScopedIssuanceHistoryWithoutBearerTokensParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>,
+          TError,
+          Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportScopedIssuanceHistoryWithoutBearerTokens<TData = Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError = unknown>(
+ params?: ExportScopedIssuanceHistoryWithoutBearerTokensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>,
+          TError,
+          Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportScopedIssuanceHistoryWithoutBearerTokens<TData = Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError = unknown>(
+ params?: ExportScopedIssuanceHistoryWithoutBearerTokensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export scoped issuance history without bearer tokens.
+ */
+
+export function useExportScopedIssuanceHistoryWithoutBearerTokens<TData = Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError = unknown>(
+ params?: ExportScopedIssuanceHistoryWithoutBearerTokensParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScopedIssuanceHistoryWithoutBearerTokens>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportScopedIssuanceHistoryWithoutBearerTokensQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Immutable official Transcript detail.
+ */
+export const immutableOfficialTranscriptDetail = (
+    issuanceId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ImmutableOfficialTranscriptDetail200>(
+      {url: `/api/v1/records/issuances/${issuanceId}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getImmutableOfficialTranscriptDetailQueryKey = (issuanceId: number,) => {
+    return [
+    `/api/v1/records/issuances/${issuanceId}`
+    ] as const;
+    }
+
+
+export const getImmutableOfficialTranscriptDetailQueryOptions = <TData = Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError = unknown>(issuanceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getImmutableOfficialTranscriptDetailQueryKey(issuanceId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>> = ({ signal }) => immutableOfficialTranscriptDetail(issuanceId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: issuanceId !== null && issuanceId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ImmutableOfficialTranscriptDetailQueryResult = NonNullable<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>>
+export type ImmutableOfficialTranscriptDetailQueryError = unknown
+
+
+export function useImmutableOfficialTranscriptDetail<TData = Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError = unknown>(
+ issuanceId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>,
+          TError,
+          Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useImmutableOfficialTranscriptDetail<TData = Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError = unknown>(
+ issuanceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>,
+          TError,
+          Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useImmutableOfficialTranscriptDetail<TData = Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError = unknown>(
+ issuanceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Immutable official Transcript detail.
+ */
+
+export function useImmutableOfficialTranscriptDetail<TData = Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError = unknown>(
+ issuanceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof immutableOfficialTranscriptDetail>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getImmutableOfficialTranscriptDetailQueryOptions(issuanceId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Public bearer verification of an official copy.
+ */
+export const publicBearerVerificationOfAnOfficialCopy = (
+    token: string,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<PublicBearerVerificationOfAnOfficialCopy200>(
+      {url: `/api/v1/records/verify/${token}`, method: 'GET', signal
+    },
+      );
+    }
+
+
+
+
+export const getPublicBearerVerificationOfAnOfficialCopyQueryKey = (token: string,) => {
+    return [
+    `/api/v1/records/verify/${token}`
+    ] as const;
+    }
+
+
+export const getPublicBearerVerificationOfAnOfficialCopyQueryOptions = <TData = Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError = unknown>(token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPublicBearerVerificationOfAnOfficialCopyQueryKey(token);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>> = ({ signal }) => publicBearerVerificationOfAnOfficialCopy(token, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: token !== null && token !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PublicBearerVerificationOfAnOfficialCopyQueryResult = NonNullable<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>>
+export type PublicBearerVerificationOfAnOfficialCopyQueryError = unknown
+
+
+export function usePublicBearerVerificationOfAnOfficialCopy<TData = Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError = unknown>(
+ token: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>,
+          TError,
+          Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicBearerVerificationOfAnOfficialCopy<TData = Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError = unknown>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>,
+          TError,
+          Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePublicBearerVerificationOfAnOfficialCopy<TData = Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError = unknown>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Public bearer verification of an official copy.
+ */
+
+export function usePublicBearerVerificationOfAnOfficialCopy<TData = Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError = unknown>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicBearerVerificationOfAnOfficialCopy>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPublicBearerVerificationOfAnOfficialCopyQueryOptions(token,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Record collection handover.
+ */
+export const recordCollectionHandover = (
+    requestId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RecordCollectionHandover200>(
+      {url: `/api/v1/records/requests/${requestId}/collection`, method: 'POST', signal
+    },
+      );
+    }
+
+
+
+
+export const getRecordCollectionHandoverMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollectionHandover>>, TError,{requestId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordCollectionHandover>>, TError,{requestId: number}, TContext> => {
+
+const mutationKey = ['recordCollectionHandover'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordCollectionHandover>>, {requestId: number}> = (props) => {
+          const {requestId} = props ?? {};
+
+          return  recordCollectionHandover(requestId,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordCollectionHandoverMutationResult = NonNullable<Awaited<ReturnType<typeof recordCollectionHandover>>>
+
+    export type RecordCollectionHandoverMutationError = unknown
+
+    /**
+ * @summary Record collection handover.
+ */
+export const useRecordCollectionHandover = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordCollectionHandover>>, TError,{requestId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordCollectionHandover>>,
+        TError,
+        {requestId: number},
+        TContext
+      > => {
+      return useMutation(getRecordCollectionHandoverMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Revoke official copy validity.
+ */
+export const revokeOfficialCopyValidity = (
+    issuanceId: number,
+    revokeOfficialCopyValidityBody: RevokeOfficialCopyValidityBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RevokeOfficialCopyValidity200>(
+      {url: `/api/v1/records/issuances/${issuanceId}/revocation`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: revokeOfficialCopyValidityBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRevokeOfficialCopyValidityMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeOfficialCopyValidity>>, TError,{issuanceId: number;data: RevokeOfficialCopyValidityBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof revokeOfficialCopyValidity>>, TError,{issuanceId: number;data: RevokeOfficialCopyValidityBody}, TContext> => {
+
+const mutationKey = ['revokeOfficialCopyValidity'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof revokeOfficialCopyValidity>>, {issuanceId: number;data: RevokeOfficialCopyValidityBody}> = (props) => {
+          const {issuanceId,data} = props ?? {};
+
+          return  revokeOfficialCopyValidity(issuanceId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RevokeOfficialCopyValidityMutationResult = NonNullable<Awaited<ReturnType<typeof revokeOfficialCopyValidity>>>
+    export type RevokeOfficialCopyValidityMutationBody = RevokeOfficialCopyValidityBody
+    export type RevokeOfficialCopyValidityMutationError = unknown
+
+    /**
+ * @summary Revoke official copy validity.
+ */
+export const useRevokeOfficialCopyValidity = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof revokeOfficialCopyValidity>>, TError,{issuanceId: number;data: RevokeOfficialCopyValidityBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof revokeOfficialCopyValidity>>,
+        TError,
+        {issuanceId: number;data: RevokeOfficialCopyValidityBody},
+        TContext
+      > => {
+      return useMutation(getRevokeOfficialCopyValidityMutationOptions(options), queryClient);
     }
 
 /**

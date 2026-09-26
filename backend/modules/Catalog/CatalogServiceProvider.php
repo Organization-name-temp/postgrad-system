@@ -7,14 +7,17 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Catalog\Internal\Support\EloquentCourseCatalog;
 use Modules\Catalog\Internal\Support\EloquentCurriculumCatalog;
 use Modules\Catalog\Internal\Support\EloquentProgramCatalog;
+use Modules\Catalog\Internal\Support\PostgresTranscriptReadGuard;
 use Modules\Catalog\Public\CourseCatalog;
 use Modules\Catalog\Public\CurriculumCatalog;
 use Modules\Catalog\Public\ProgramCatalog;
+use Modules\Catalog\Public\TranscriptReadGuard;
 
 class CatalogServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(TranscriptReadGuard::class, PostgresTranscriptReadGuard::class);
         // The cross-module read facades (ADR-0012): consumers depend on the
         // Catalog\Public contracts; the Eloquent readers live in Catalog\Internal.
         $this->app->bind(ProgramCatalog::class, EloquentProgramCatalog::class);

@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'identity_unresolved' => 'Admission Identification Type or bilingual identity is unresolved. Ask Student Affairs to recover the admission identity before official issuance.',
+    'review_changed' => 'The Transcript content has changed or has not been reviewed. Refresh and review the complete preview before issuing.',
     'full_refund' => 'Record one full refund for exactly the verified EGP payment; partial refunds and deductions are unavailable.',
     'receipt_required' => 'Upload a private payment receipt.',
     'exact_payment' => 'Verify one EGP payment for exactly the captured fee.',

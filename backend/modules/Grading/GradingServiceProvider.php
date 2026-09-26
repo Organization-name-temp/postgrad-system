@@ -11,8 +11,10 @@ use Modules\Grading\Internal\Console\Commands\SendIncompleteReminders;
 use Modules\Grading\Internal\Listeners\SendGradeFinalizedNotifications;
 use Modules\Grading\Internal\Listeners\SendIncompleteDeclaredNotifications;
 use Modules\Grading\Internal\Support\EloquentGradingRecords;
+use Modules\Grading\Internal\Support\PostgresTranscriptReadGuard;
 use Modules\Grading\Public\Events\GradeFinalized;
 use Modules\Grading\Public\GradingRecords;
+use Modules\Grading\Public\TranscriptReadGuard;
 
 /**
  * The Grading domain module (ADR-0020): it owns the Grade, the Grade Sheet, and — from ticket
@@ -35,6 +37,7 @@ class GradingServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(TranscriptReadGuard::class, PostgresTranscriptReadGuard::class);
         $this->app->bind(GradingRecords::class, EloquentGradingRecords::class);
     }
 

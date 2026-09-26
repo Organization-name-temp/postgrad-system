@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Records\Internal\Http\Controllers\CancellationController;
+use Modules\Records\Internal\Http\Controllers\DeliveryController;
 use Modules\Records\Internal\Http\Controllers\FeeController;
+use Modules\Records\Internal\Http\Controllers\IssuanceController;
 use Modules\Records\Internal\Http\Controllers\PaymentController;
 use Modules\Records\Internal\Http\Controllers\RefundController;
 use Modules\Records\Internal\Http\Controllers\RequestController;
@@ -36,3 +38,15 @@ Route::middleware(['auth:sanctum', 'can:transcript.view_unofficial'])->prefix('r
     Route::get('/{request_id}', [RequestController::class, 'show'])->whereNumber('request_id');
     Route::post('/{request_id}/review', [RequestController::class, 'review'])->whereNumber('request_id')->middleware('can:transcript.issue_official');
 });
+
+Route::middleware(['auth:sanctum', 'can:transcript.issue_official'])->prefix('records/requests')->group(function (): void {
+    Route::post('/{request_id}/preview', [IssuanceController::class, 'preview'])->whereNumber('request_id');
+    Route::post('/{request_id}/issue', [IssuanceController::class, 'issue'])->whereNumber('request_id');
+});
+Route::get('records/issuances', [IssuanceController::class, 'index'])->middleware(['auth:sanctum', 'can:transcript.view_unofficial']);
+Route::get('records/issuances/export', [IssuanceController::class, 'export'])->middleware(['auth:sanctum', 'can:transcript.view_unofficial']);
+Route::get('records/issuances/{issuance_id}', [IssuanceController::class, 'show'])->whereNumber('issuance_id')->middleware(['auth:sanctum', 'can:transcript.view_unofficial']);
+Route::get('records/verify/{token}', [IssuanceController::class, 'verify']);
+
+Route::post('records/requests/{request_id}/collection', [DeliveryController::class, 'collect'])->whereNumber('request_id')->middleware(['auth:sanctum', 'can:transcript.issue_official']);
+Route::post('records/issuances/{issuance_id}/revocation', [DeliveryController::class, 'revoke'])->whereNumber('issuance_id')->middleware(['auth:sanctum', 'can:transcript.issue_official']);

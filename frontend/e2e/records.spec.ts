@@ -82,6 +82,7 @@ async function checkReadAndPrintMatrix(
   name: string,
   publicView: boolean,
   testInfo: TestInfo,
+  revokedPublic = false,
 ) {
   for (const scheme of ['light', 'dark'] as const) {
     for (const language of ['en', 'ar'] as const) {
@@ -100,19 +101,35 @@ async function checkReadAndPrintMatrix(
       }
       await expect(page.locator('html')).toHaveAttribute('dir', language === 'ar' ? 'rtl' : 'ltr')
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
-      await expect(page.getByText('31000000000004')).toBeVisible()
+      if (name.includes('revoked')) {
+        await expect(
+          page
+            .getByText(language === 'ar' ? 'نسخة رسمية ملغاة الصلاحية' : 'Revoked official copy', {
+              exact: true,
+            })
+            .first(),
+        ).toBeVisible()
+      }
+      if (revokedPublic) {
+        await expect(page.getByText('31000000000004')).toHaveCount(0)
+        await expect(page.locator('article')).toHaveCount(0)
+      } else {
+        await expect(page.getByText('31000000000004')).toBeVisible()
+      }
       await accessible(page)
       await page.emulateMedia({ media: 'print' })
       if (!publicView) await expect(page.getByRole('banner')).toBeHidden()
-      await expect(page.locator('article')).toBeVisible()
-      const fits = await page
-        .locator('article')
-        .evaluate((article) =>
-          [...article.querySelectorAll('table')].every(
-            (table) =>
-              table.getBoundingClientRect().width <= article.getBoundingClientRect().width + 1,
-          ),
-        )
+      if (!revokedPublic) await expect(page.locator('article')).toBeVisible()
+      const fits =
+        revokedPublic ||
+        (await page
+          .locator('article')
+          .evaluate((article) =>
+            [...article.querySelectorAll('table')].every(
+              (table) =>
+                table.getBoundingClientRect().width <= article.getBoundingClientRect().width + 1,
+            ),
+          ))
       expect(fits, 'Every printed transcript table must fit its document width').toBe(true)
       const colors = await page
         .locator('main')
@@ -204,14 +221,9 @@ test('Phase 6 serial journey: payment correction, bilingual certification/QR, re
     await expect(recipient.getByText('نسخة رسمية ملغاة الصلاحية')).toBeVisible()
     await expect(recipient.locator('article')).toHaveCount(0)
     await accessible(recipient)
-    await recipient.emulateMedia({ media: 'print' })
-    await expect(recipient.getByText('نسخة رسمية ملغاة الصلاحية')).toBeVisible()
-    await expect(recipient.locator('article')).toHaveCount(0)
-    await testInfo.attach('public-revoked-print-ar', {
-      body: await recipient.screenshot({ fullPage: true }),
-      contentType: 'image/png',
-    })
-    await recipient.emulateMedia({ media: 'screen' })
+    await checkReadAndPrintMatrix(recipient, 'public-revoked', true, testInfo, true)
+    await checkReadAndPrintMatrix(staff, 'official-revoked', false, testInfo)
+    await staff.getByRole('button', { name: 'English', exact: true }).click()
 
     const refund = await submitRequest(student, 'digital')
     await approveAndPay(student, staff, refund)

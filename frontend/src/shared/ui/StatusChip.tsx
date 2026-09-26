@@ -49,7 +49,7 @@ function chipSx(tone: StatusTone, variant: StatusChipVariant): SxProps<Theme> | 
     if (variant === 'outlined') return undefined
     return (theme) => ({
       backgroundColor: theme.vars.palette.action.hover,
-      color: theme.vars.palette.text.secondary,
+      color: theme.vars.palette.text.primary,
       ...iconInherits,
     })
   }

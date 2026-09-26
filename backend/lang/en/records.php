@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'full_refund' => 'Record one full refund for exactly the verified EGP payment; partial refunds and deductions are unavailable.',
     'receipt_required' => 'Upload a private payment receipt.',
     'exact_payment' => 'Verify one EGP payment for exactly the captured fee.',
 

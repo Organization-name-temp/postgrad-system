@@ -6725,6 +6725,214 @@ export const ExportOfficialTranscriptRequestQueueAndHistoryResponse = zod.unknow
 
 
 /**
+ * @summary Complete full manual Transcript refund.
+ */
+export const CompleteFullManualTranscriptRefundParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const CompleteFullManualTranscriptRefundBody = zod.object({
+  "amount": zod.string().describe('Full verified EGP payment.'),
+  "reference": zod.string().describe('External manual refund reference.'),
+  "receipt": zod.instanceof(File)
+})
+
+export const CompleteFullManualTranscriptRefundResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional(),
+  "payments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "reference": zod.string().optional(),
+  "submitted_by": zod.number().optional(),
+  "submitted_at": zod.string().optional(),
+  "receipt_url": zod.string().optional(),
+  "decision": zod.object({
+  "decision": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+}).optional()
+})).optional(),
+  "verified_payment": zod.object({
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "cancellation_prior_status": zod.string().optional(),
+  "refund": zod.object({
+  "id": zod.number().optional(),
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "reference": zod.string().optional(),
+  "completed_by": zod.number().optional(),
+  "completed_at": zod.string().optional(),
+  "receipt_url": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Private Transcript refund receipt.
+ */
+export const PrivateTranscriptRefundReceiptParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const PrivateTranscriptRefundReceiptResponse = zod.unknown()
+
+
+/**
+ * @summary Request Transcript cancellation.
+ */
+export const RequestTranscriptCancellationParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const RequestTranscriptCancellationBody = zod.object({
+  "reason": zod.string().optional().describe('Optional Student explanation.')
+})
+
+export const RequestTranscriptCancellationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional(),
+  "payments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "reference": zod.string().optional(),
+  "submitted_by": zod.number().optional(),
+  "submitted_at": zod.string().optional(),
+  "receipt_url": zod.string().optional(),
+  "decision": zod.object({
+  "decision": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+}).optional()
+})).optional(),
+  "verified_payment": zod.object({
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "cancellation_prior_status": zod.string().optional(),
+  "refund": zod.object({
+  "id": zod.number().optional(),
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "reference": zod.string().optional(),
+  "completed_by": zod.number().optional(),
+  "completed_at": zod.string().optional(),
+  "receipt_url": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Decide Transcript cancellation.
+ */
+export const DecideTranscriptCancellationParams = zod.object({
+  "request_id": zod.number().describe('Request id.')
+})
+
+export const DecideTranscriptCancellationBody = zod.object({
+  "decision": zod.string().describe('Approve or reject.'),
+  "reason": zod.string().describe('Decision reason.')
+})
+
+export const DecideTranscriptCancellationResponse = zod.object({
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "student_id": zod.number().optional(),
+  "delivery_method": zod.string().optional(),
+  "fee": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "status": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "instructions_en": zod.string().optional(),
+  "instructions_ar": zod.string().optional(),
+  "transitions": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "action": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+})).optional(),
+  "payments": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "reference": zod.string().optional(),
+  "submitted_by": zod.number().optional(),
+  "submitted_at": zod.string().optional(),
+  "receipt_url": zod.string().optional(),
+  "decision": zod.object({
+  "decision": zod.string().optional(),
+  "reason": zod.string().nullish(),
+  "actor_user_id": zod.number().optional(),
+  "at": zod.string().optional()
+}).optional()
+})).optional(),
+  "verified_payment": zod.object({
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "verified_by": zod.number().optional(),
+  "verified_at": zod.string().optional()
+}).optional(),
+  "cancellation_prior_status": zod.string().optional(),
+  "refund": zod.object({
+  "id": zod.number().optional(),
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "reference": zod.string().optional(),
+  "completed_by": zod.number().optional(),
+  "completed_at": zod.string().optional(),
+  "receipt_url": zod.string().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
  * @summary Submit Transcript payment evidence.
  */
 export const SubmitTranscriptPaymentEvidenceParams = zod.object({
@@ -6774,6 +6982,17 @@ export const SubmitTranscriptPaymentEvidenceResponse = zod.object({
   "currency": zod.string().optional(),
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional()
+}).optional(),
+  "cancellation_prior_status": zod.string().optional(),
+  "refund": zod.object({
+  "id": zod.number().optional(),
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "reference": zod.string().optional(),
+  "completed_by": zod.number().optional(),
+  "completed_at": zod.string().optional(),
+  "receipt_url": zod.string().optional()
 }).optional()
 }).optional()
 })
@@ -6830,6 +7049,17 @@ export const VerifyOrReturnTranscriptPaymentResponse = zod.object({
   "currency": zod.string().optional(),
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional()
+}).optional(),
+  "cancellation_prior_status": zod.string().optional(),
+  "refund": zod.object({
+  "id": zod.number().optional(),
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "reference": zod.string().optional(),
+  "completed_by": zod.number().optional(),
+  "completed_at": zod.string().optional(),
+  "receipt_url": zod.string().optional()
 }).optional()
 }).optional()
 })
@@ -6891,6 +7121,17 @@ export const OfficialTranscriptRequestDetailsResponse = zod.object({
   "currency": zod.string().optional(),
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional()
+}).optional(),
+  "cancellation_prior_status": zod.string().optional(),
+  "refund": zod.object({
+  "id": zod.number().optional(),
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "reference": zod.string().optional(),
+  "completed_by": zod.number().optional(),
+  "completed_at": zod.string().optional(),
+  "receipt_url": zod.string().optional()
 }).optional()
 }).optional()
 })
@@ -6946,6 +7187,17 @@ export const ReviewOfficialTranscriptRequestResponse = zod.object({
   "currency": zod.string().optional(),
   "verified_by": zod.number().optional(),
   "verified_at": zod.string().optional()
+}).optional(),
+  "cancellation_prior_status": zod.string().optional(),
+  "refund": zod.object({
+  "id": zod.number().optional(),
+  "amount": zod.string().optional(),
+  "currency": zod.string().optional(),
+  "created_at": zod.string().optional(),
+  "reference": zod.string().optional(),
+  "completed_by": zod.number().optional(),
+  "completed_at": zod.string().optional(),
+  "receipt_url": zod.string().optional()
 }).optional()
 }).optional()
 })

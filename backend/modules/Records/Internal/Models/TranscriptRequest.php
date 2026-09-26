@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property int $fee_minor
  * @property string $instructions_en
  * @property string $instructions_ar
+ * @property string|null $cancellation_prior_status
  * @property string $status
  * @property int|null $verified_minor
  * @property int|null $verified_by

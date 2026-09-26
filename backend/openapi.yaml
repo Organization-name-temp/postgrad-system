@@ -26203,10 +26203,10 @@ paths:
       tags:
         - Records
       security: []
-  '/api/v1/records/requests/{request_id}/payment':
+  '/api/v1/records/requests/{request_id}/refund':
     post:
-      summary: 'Submit Transcript payment evidence.'
-      operationId: submitTranscriptPaymentEvidence
+      summary: 'Complete full manual Transcript refund.'
+      operationId: completeFullManualTranscriptRefund
       description: ''
       parameters: []
       responses:
@@ -26253,6 +26253,16 @@ paths:
                       currency: EGP
                       verified_by: 5
                       verified_at: '2026-09-27T00:00:00Z'
+                    cancellation_prior_status: ReadyForIssuance
+                    refund:
+                      id: 1
+                      amount: '125.50'
+                      currency: EGP
+                      created_at: '2026-09-27T00:00:00Z'
+                      reference: REF-ONE
+                      completed_by: 5
+                      completed_at: '2026-09-27T00:00:00Z'
+                      receipt_url: /api/v1/records/requests/1/refund/receipt
                 properties:
                   data:
                     type: object
@@ -26382,6 +26392,831 @@ paths:
                           verified_at:
                             type: string
                             example: '2026-09-27T00:00:00Z'
+                      cancellation_prior_status:
+                        type: string
+                        example: ReadyForIssuance
+                      refund:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          created_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          reference:
+                            type: string
+                            example: REF-ONE
+                          completed_by:
+                            type: integer
+                            example: 5
+                          completed_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          receipt_url:
+                            type: string
+                            example: /api/v1/records/requests/1/refund/receipt
+      tags:
+        - Records
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: string
+                  description: 'Full verified EGP payment.'
+                  example: '125.50'
+                reference:
+                  type: string
+                  description: 'External manual refund reference.'
+                  example: REF-ONE
+                receipt:
+                  type: string
+                  format: binary
+                  description: 'Private PDF/JPEG/PNG refund receipt up to 10 MB.'
+              required:
+                - amount
+                - reference
+                - receipt
+      security: []
+    parameters:
+      -
+        in: path
+        name: request_id
+        description: 'Request id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/records/requests/{request_id}/refund/receipt':
+    get:
+      summary: 'Private Transcript refund receipt.'
+      operationId: privateTranscriptRefundReceipt
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: Unauthenticated.
+                properties:
+                  message:
+                    type: string
+                    example: Unauthenticated.
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Records
+      security: []
+    parameters:
+      -
+        in: path
+        name: request_id
+        description: 'Request id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/records/requests/{request_id}/cancellation':
+    post:
+      summary: 'Request Transcript cancellation.'
+      operationId: requestTranscriptCancellation
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 1
+                    delivery_method: digital
+                    fee: '125.50'
+                    currency: EGP
+                    status: ReadyForIssuance
+                    created_at: '2026-09-27T00:00:00Z'
+                    instructions_en: 'Fictional learning payment instructions'
+                    instructions_ar: 'تعليمات دفع تعليمية وهمية'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: PaymentUnderReview
+                        to_status: ReadyForIssuance
+                        action: payment_verified
+                        reason: null
+                        actor_user_id: 5
+                        at: '2026-09-27T00:00:00Z'
+                    payments:
+                      -
+                        id: 1
+                        reference: PAY-ONE
+                        submitted_by: 2
+                        submitted_at: '2026-09-27T00:00:00Z'
+                        receipt_url: /api/v1/records/requests/1/payments/1/receipt
+                        decision:
+                          decision: verify
+                          reason: null
+                          actor_user_id: 5
+                          at: '2026-09-27T00:00:00Z'
+                    verified_payment:
+                      amount: '125.50'
+                      currency: EGP
+                      verified_by: 5
+                      verified_at: '2026-09-27T00:00:00Z'
+                    cancellation_prior_status: ReadyForIssuance
+                    refund:
+                      id: 1
+                      amount: '125.50'
+                      currency: EGP
+                      created_at: '2026-09-27T00:00:00Z'
+                      reference: REF-ONE
+                      completed_by: 5
+                      completed_at: '2026-09-27T00:00:00Z'
+                      receipt_url: /api/v1/records/requests/1/refund/receipt
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 1
+                      delivery_method:
+                        type: string
+                        example: digital
+                      fee:
+                        type: string
+                        example: '125.50'
+                      currency:
+                        type: string
+                        example: EGP
+                      status:
+                        type: string
+                        example: ReadyForIssuance
+                      created_at:
+                        type: string
+                        example: '2026-09-27T00:00:00Z'
+                      instructions_en:
+                        type: string
+                        example: 'Fictional learning payment instructions'
+                      instructions_ar:
+                        type: string
+                        example: 'تعليمات دفع تعليمية وهمية'
+                      transitions:
+                        type: array
+                        example:
+                          - id: 1
+                            from_status: PaymentUnderReview
+                            to_status: ReadyForIssuance
+                            action: payment_verified
+                            reason: null
+                            actor_user_id: 5
+                            at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: PaymentUnderReview
+                            to_status:
+                              type: string
+                              example: ReadyForIssuance
+                            action:
+                              type: string
+                              example: payment_verified
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            actor_user_id:
+                              type: integer
+                              example: 5
+                            at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+                      payments:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            reference: PAY-ONE
+                            submitted_by: 2
+                            submitted_at: '2026-09-27T00:00:00Z'
+                            receipt_url: /api/v1/records/requests/1/payments/1/receipt
+                            decision:
+                              decision: verify
+                              reason: null
+                              actor_user_id: 5
+                              at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            reference:
+                              type: string
+                              example: PAY-ONE
+                            submitted_by:
+                              type: integer
+                              example: 2
+                            submitted_at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+                            receipt_url:
+                              type: string
+                              example: /api/v1/records/requests/1/payments/1/receipt
+                            decision:
+                              type: object
+                              properties:
+                                decision:
+                                  type: string
+                                  example: verify
+                                reason:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                actor_user_id:
+                                  type: integer
+                                  example: 5
+                                at:
+                                  type: string
+                                  example: '2026-09-27T00:00:00Z'
+                      verified_payment:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          verified_by:
+                            type: integer
+                            example: 5
+                          verified_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                      cancellation_prior_status:
+                        type: string
+                        example: ReadyForIssuance
+                      refund:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          created_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          reference:
+                            type: string
+                            example: REF-ONE
+                          completed_by:
+                            type: integer
+                            example: 5
+                          completed_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          receipt_url:
+                            type: string
+                            example: /api/v1/records/requests/1/refund/receipt
+      tags:
+        - Records
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  description: 'Optional Student explanation.'
+                  example: 'No longer needed'
+      security: []
+    parameters:
+      -
+        in: path
+        name: request_id
+        description: 'Request id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/records/requests/{request_id}/cancellation-review':
+    post:
+      summary: 'Decide Transcript cancellation.'
+      operationId: decideTranscriptCancellation
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 1
+                    delivery_method: digital
+                    fee: '125.50'
+                    currency: EGP
+                    status: ReadyForIssuance
+                    created_at: '2026-09-27T00:00:00Z'
+                    instructions_en: 'Fictional learning payment instructions'
+                    instructions_ar: 'تعليمات دفع تعليمية وهمية'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: PaymentUnderReview
+                        to_status: ReadyForIssuance
+                        action: payment_verified
+                        reason: null
+                        actor_user_id: 5
+                        at: '2026-09-27T00:00:00Z'
+                    payments:
+                      -
+                        id: 1
+                        reference: PAY-ONE
+                        submitted_by: 2
+                        submitted_at: '2026-09-27T00:00:00Z'
+                        receipt_url: /api/v1/records/requests/1/payments/1/receipt
+                        decision:
+                          decision: verify
+                          reason: null
+                          actor_user_id: 5
+                          at: '2026-09-27T00:00:00Z'
+                    verified_payment:
+                      amount: '125.50'
+                      currency: EGP
+                      verified_by: 5
+                      verified_at: '2026-09-27T00:00:00Z'
+                    cancellation_prior_status: ReadyForIssuance
+                    refund:
+                      id: 1
+                      amount: '125.50'
+                      currency: EGP
+                      created_at: '2026-09-27T00:00:00Z'
+                      reference: REF-ONE
+                      completed_by: 5
+                      completed_at: '2026-09-27T00:00:00Z'
+                      receipt_url: /api/v1/records/requests/1/refund/receipt
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 1
+                      delivery_method:
+                        type: string
+                        example: digital
+                      fee:
+                        type: string
+                        example: '125.50'
+                      currency:
+                        type: string
+                        example: EGP
+                      status:
+                        type: string
+                        example: ReadyForIssuance
+                      created_at:
+                        type: string
+                        example: '2026-09-27T00:00:00Z'
+                      instructions_en:
+                        type: string
+                        example: 'Fictional learning payment instructions'
+                      instructions_ar:
+                        type: string
+                        example: 'تعليمات دفع تعليمية وهمية'
+                      transitions:
+                        type: array
+                        example:
+                          - id: 1
+                            from_status: PaymentUnderReview
+                            to_status: ReadyForIssuance
+                            action: payment_verified
+                            reason: null
+                            actor_user_id: 5
+                            at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: PaymentUnderReview
+                            to_status:
+                              type: string
+                              example: ReadyForIssuance
+                            action:
+                              type: string
+                              example: payment_verified
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            actor_user_id:
+                              type: integer
+                              example: 5
+                            at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+                      payments:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            reference: PAY-ONE
+                            submitted_by: 2
+                            submitted_at: '2026-09-27T00:00:00Z'
+                            receipt_url: /api/v1/records/requests/1/payments/1/receipt
+                            decision:
+                              decision: verify
+                              reason: null
+                              actor_user_id: 5
+                              at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            reference:
+                              type: string
+                              example: PAY-ONE
+                            submitted_by:
+                              type: integer
+                              example: 2
+                            submitted_at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+                            receipt_url:
+                              type: string
+                              example: /api/v1/records/requests/1/payments/1/receipt
+                            decision:
+                              type: object
+                              properties:
+                                decision:
+                                  type: string
+                                  example: verify
+                                reason:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                actor_user_id:
+                                  type: integer
+                                  example: 5
+                                at:
+                                  type: string
+                                  example: '2026-09-27T00:00:00Z'
+                      verified_payment:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          verified_by:
+                            type: integer
+                            example: 5
+                          verified_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                      cancellation_prior_status:
+                        type: string
+                        example: ReadyForIssuance
+                      refund:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          created_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          reference:
+                            type: string
+                            example: REF-ONE
+                          completed_by:
+                            type: integer
+                            example: 5
+                          completed_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          receipt_url:
+                            type: string
+                            example: /api/v1/records/requests/1/refund/receipt
+      tags:
+        - Records
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                decision:
+                  type: string
+                  description: 'Approve or reject.'
+                  example: approve
+                reason:
+                  type: string
+                  description: 'Decision reason.'
+                  example: 'Full refund owed'
+              required:
+                - decision
+                - reason
+      security: []
+    parameters:
+      -
+        in: path
+        name: request_id
+        description: 'Request id.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  '/api/v1/records/requests/{request_id}/payment':
+    post:
+      summary: 'Submit Transcript payment evidence.'
+      operationId: submitTranscriptPaymentEvidence
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    id: 1
+                    student_id: 1
+                    delivery_method: digital
+                    fee: '125.50'
+                    currency: EGP
+                    status: ReadyForIssuance
+                    created_at: '2026-09-27T00:00:00Z'
+                    instructions_en: 'Fictional learning payment instructions'
+                    instructions_ar: 'تعليمات دفع تعليمية وهمية'
+                    transitions:
+                      -
+                        id: 1
+                        from_status: PaymentUnderReview
+                        to_status: ReadyForIssuance
+                        action: payment_verified
+                        reason: null
+                        actor_user_id: 5
+                        at: '2026-09-27T00:00:00Z'
+                    payments:
+                      -
+                        id: 1
+                        reference: PAY-ONE
+                        submitted_by: 2
+                        submitted_at: '2026-09-27T00:00:00Z'
+                        receipt_url: /api/v1/records/requests/1/payments/1/receipt
+                        decision:
+                          decision: verify
+                          reason: null
+                          actor_user_id: 5
+                          at: '2026-09-27T00:00:00Z'
+                    verified_payment:
+                      amount: '125.50'
+                      currency: EGP
+                      verified_by: 5
+                      verified_at: '2026-09-27T00:00:00Z'
+                    cancellation_prior_status: ReadyForIssuance
+                    refund:
+                      id: 1
+                      amount: '125.50'
+                      currency: EGP
+                      created_at: '2026-09-27T00:00:00Z'
+                      reference: REF-ONE
+                      completed_by: 5
+                      completed_at: '2026-09-27T00:00:00Z'
+                      receipt_url: /api/v1/records/requests/1/refund/receipt
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      student_id:
+                        type: integer
+                        example: 1
+                      delivery_method:
+                        type: string
+                        example: digital
+                      fee:
+                        type: string
+                        example: '125.50'
+                      currency:
+                        type: string
+                        example: EGP
+                      status:
+                        type: string
+                        example: ReadyForIssuance
+                      created_at:
+                        type: string
+                        example: '2026-09-27T00:00:00Z'
+                      instructions_en:
+                        type: string
+                        example: 'Fictional learning payment instructions'
+                      instructions_ar:
+                        type: string
+                        example: 'تعليمات دفع تعليمية وهمية'
+                      transitions:
+                        type: array
+                        example:
+                          - id: 1
+                            from_status: PaymentUnderReview
+                            to_status: ReadyForIssuance
+                            action: payment_verified
+                            reason: null
+                            actor_user_id: 5
+                            at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            from_status:
+                              type: string
+                              example: PaymentUnderReview
+                            to_status:
+                              type: string
+                              example: ReadyForIssuance
+                            action:
+                              type: string
+                              example: payment_verified
+                            reason:
+                              type: string
+                              example: null
+                              nullable: true
+                            actor_user_id:
+                              type: integer
+                              example: 5
+                            at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+                      payments:
+                        type: array
+                        example:
+                          -
+                            id: 1
+                            reference: PAY-ONE
+                            submitted_by: 2
+                            submitted_at: '2026-09-27T00:00:00Z'
+                            receipt_url: /api/v1/records/requests/1/payments/1/receipt
+                            decision:
+                              decision: verify
+                              reason: null
+                              actor_user_id: 5
+                              at: '2026-09-27T00:00:00Z'
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            reference:
+                              type: string
+                              example: PAY-ONE
+                            submitted_by:
+                              type: integer
+                              example: 2
+                            submitted_at:
+                              type: string
+                              example: '2026-09-27T00:00:00Z'
+                            receipt_url:
+                              type: string
+                              example: /api/v1/records/requests/1/payments/1/receipt
+                            decision:
+                              type: object
+                              properties:
+                                decision:
+                                  type: string
+                                  example: verify
+                                reason:
+                                  type: string
+                                  example: null
+                                  nullable: true
+                                actor_user_id:
+                                  type: integer
+                                  example: 5
+                                at:
+                                  type: string
+                                  example: '2026-09-27T00:00:00Z'
+                      verified_payment:
+                        type: object
+                        properties:
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          verified_by:
+                            type: integer
+                            example: 5
+                          verified_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                      cancellation_prior_status:
+                        type: string
+                        example: ReadyForIssuance
+                      refund:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          created_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          reference:
+                            type: string
+                            example: REF-ONE
+                          completed_by:
+                            type: integer
+                            example: 5
+                          completed_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          receipt_url:
+                            type: string
+                            example: /api/v1/records/requests/1/refund/receipt
       tags:
         - Records
       requestBody:
@@ -26462,6 +27297,16 @@ paths:
                       currency: EGP
                       verified_by: 5
                       verified_at: '2026-09-27T00:00:00Z'
+                    cancellation_prior_status: ReadyForIssuance
+                    refund:
+                      id: 1
+                      amount: '125.50'
+                      currency: EGP
+                      created_at: '2026-09-27T00:00:00Z'
+                      reference: REF-ONE
+                      completed_by: 5
+                      completed_at: '2026-09-27T00:00:00Z'
+                      receipt_url: /api/v1/records/requests/1/refund/receipt
                 properties:
                   data:
                     type: object
@@ -26591,6 +27436,36 @@ paths:
                           verified_at:
                             type: string
                             example: '2026-09-27T00:00:00Z'
+                      cancellation_prior_status:
+                        type: string
+                        example: ReadyForIssuance
+                      refund:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          created_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          reference:
+                            type: string
+                            example: REF-ONE
+                          completed_by:
+                            type: integer
+                            example: 5
+                          completed_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          receipt_url:
+                            type: string
+                            example: /api/v1/records/requests/1/refund/receipt
       tags:
         - Records
       requestBody:
@@ -26732,6 +27607,16 @@ paths:
                       currency: EGP
                       verified_by: 5
                       verified_at: '2026-09-27T00:00:00Z'
+                    cancellation_prior_status: ReadyForIssuance
+                    refund:
+                      id: 1
+                      amount: '125.50'
+                      currency: EGP
+                      created_at: '2026-09-27T00:00:00Z'
+                      reference: REF-ONE
+                      completed_by: 5
+                      completed_at: '2026-09-27T00:00:00Z'
+                      receipt_url: /api/v1/records/requests/1/refund/receipt
                 properties:
                   data:
                     type: object
@@ -26861,6 +27746,36 @@ paths:
                           verified_at:
                             type: string
                             example: '2026-09-27T00:00:00Z'
+                      cancellation_prior_status:
+                        type: string
+                        example: ReadyForIssuance
+                      refund:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          created_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          reference:
+                            type: string
+                            example: REF-ONE
+                          completed_by:
+                            type: integer
+                            example: 5
+                          completed_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          receipt_url:
+                            type: string
+                            example: /api/v1/records/requests/1/refund/receipt
       tags:
         - Records
       security: []
@@ -26923,6 +27838,16 @@ paths:
                       currency: EGP
                       verified_by: 5
                       verified_at: '2026-09-27T00:00:00Z'
+                    cancellation_prior_status: ReadyForIssuance
+                    refund:
+                      id: 1
+                      amount: '125.50'
+                      currency: EGP
+                      created_at: '2026-09-27T00:00:00Z'
+                      reference: REF-ONE
+                      completed_by: 5
+                      completed_at: '2026-09-27T00:00:00Z'
+                      receipt_url: /api/v1/records/requests/1/refund/receipt
                 properties:
                   data:
                     type: object
@@ -27052,6 +27977,36 @@ paths:
                           verified_at:
                             type: string
                             example: '2026-09-27T00:00:00Z'
+                      cancellation_prior_status:
+                        type: string
+                        example: ReadyForIssuance
+                      refund:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          amount:
+                            type: string
+                            example: '125.50'
+                          currency:
+                            type: string
+                            example: EGP
+                          created_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          reference:
+                            type: string
+                            example: REF-ONE
+                          completed_by:
+                            type: integer
+                            example: 5
+                          completed_at:
+                            type: string
+                            example: '2026-09-27T00:00:00Z'
+                          receipt_url:
+                            type: string
+                            example: /api/v1/records/requests/1/refund/receipt
       tags:
         - Records
       requestBody:

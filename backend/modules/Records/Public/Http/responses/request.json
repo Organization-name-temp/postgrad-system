@@ -40,6 +40,17 @@
       "currency": "EGP",
       "verified_by": 5,
       "verified_at": "2026-09-27T00:00:00Z"
+    },
+    "cancellation_prior_status": "ReadyForIssuance",
+    "refund": {
+      "id": 1,
+      "amount": "125.50",
+      "currency": "EGP",
+      "created_at": "2026-09-27T00:00:00Z",
+      "reference": "REF-ONE",
+      "completed_by": 5,
+      "completed_at": "2026-09-27T00:00:00Z",
+      "receipt_url": "/api/v1/records/requests/1/refund/receipt"
     }
   }
 }

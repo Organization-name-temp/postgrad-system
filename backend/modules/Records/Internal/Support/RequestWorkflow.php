@@ -58,6 +58,14 @@ final readonly class RequestWorkflow
             'amount' => TranscriptFee::format($request->verified_minor), 'currency' => 'EGP',
             'verified_by' => $request->verified_by, 'verified_at' => $request->verified_at?->toIso8601String(),
         ];
+        $data['cancellation_prior_status'] = $request->cancellation_prior_status;
+        $refund = DB::table('transcript_refunds')->where('transcript_request_id', $request->id)->first();
+        $data['refund'] = $refund === null ? null : [
+            'id' => $refund->id, 'amount' => TranscriptFee::format((int) $refund->amount_minor), 'currency' => 'EGP',
+            'created_at' => $refund->created_at, 'reference' => $refund->reference,
+            'completed_by' => $refund->completed_by, 'completed_at' => $refund->completed_at,
+            'receipt_url' => $refund->completed_at === null ? null : '/api/v1/records/requests/'.$request->id.'/refund/receipt',
+        ];
         if ($staff || $request->approved_at !== null) {
             $data['instructions_en'] = $request->instructions_en;
             $data['instructions_ar'] = $request->instructions_ar;

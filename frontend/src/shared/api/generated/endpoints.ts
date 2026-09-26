@@ -7467,6 +7467,236 @@ student_id?: string;
 sort?: string;
 };
 
+export type CompleteFullManualTranscriptRefundBody = {
+  /** Full verified EGP payment. */
+  amount: string;
+  /** External manual refund reference. */
+  reference: string;
+  /** Private PDF/JPEG/PNG refund receipt up to 10 MB. */
+  receipt: Blob;
+};
+
+export type CompleteFullManualTranscriptRefund200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type CompleteFullManualTranscriptRefund200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type CompleteFullManualTranscriptRefund200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: CompleteFullManualTranscriptRefund200DataPaymentsItemDecision;
+};
+
+export type CompleteFullManualTranscriptRefund200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type CompleteFullManualTranscriptRefund200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
+export type CompleteFullManualTranscriptRefund200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  created_at?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  transitions?: CompleteFullManualTranscriptRefund200DataTransitionsItem[];
+  payments?: CompleteFullManualTranscriptRefund200DataPaymentsItem[];
+  verified_payment?: CompleteFullManualTranscriptRefund200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: CompleteFullManualTranscriptRefund200DataRefund;
+};
+
+export type CompleteFullManualTranscriptRefund200 = {
+  data?: CompleteFullManualTranscriptRefund200Data;
+};
+
+export type PrivateTranscriptRefundReceipt401 = {
+  message?: string;
+};
+
+export type PrivateTranscriptRefundReceipt403 = {
+  message?: string;
+};
+
+export type RequestTranscriptCancellationBody = {
+  /** Optional Student explanation. */
+  reason?: string;
+};
+
+export type RequestTranscriptCancellation200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type RequestTranscriptCancellation200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type RequestTranscriptCancellation200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: RequestTranscriptCancellation200DataPaymentsItemDecision;
+};
+
+export type RequestTranscriptCancellation200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type RequestTranscriptCancellation200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
+export type RequestTranscriptCancellation200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  created_at?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  transitions?: RequestTranscriptCancellation200DataTransitionsItem[];
+  payments?: RequestTranscriptCancellation200DataPaymentsItem[];
+  verified_payment?: RequestTranscriptCancellation200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: RequestTranscriptCancellation200DataRefund;
+};
+
+export type RequestTranscriptCancellation200 = {
+  data?: RequestTranscriptCancellation200Data;
+};
+
+export type DecideTranscriptCancellationBody = {
+  /** Approve or reject. */
+  decision: string;
+  /** Decision reason. */
+  reason: string;
+};
+
+export type DecideTranscriptCancellation200DataTransitionsItem = {
+  id?: number;
+  from_status?: string;
+  to_status?: string;
+  action?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type DecideTranscriptCancellation200DataPaymentsItemDecision = {
+  decision?: string;
+  /** @nullable */
+  reason?: string | null;
+  actor_user_id?: number;
+  at?: string;
+};
+
+export type DecideTranscriptCancellation200DataPaymentsItem = {
+  id?: number;
+  reference?: string;
+  submitted_by?: number;
+  submitted_at?: string;
+  receipt_url?: string;
+  decision?: DecideTranscriptCancellation200DataPaymentsItemDecision;
+};
+
+export type DecideTranscriptCancellation200DataVerifiedPayment = {
+  amount?: string;
+  currency?: string;
+  verified_by?: number;
+  verified_at?: string;
+};
+
+export type DecideTranscriptCancellation200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
+export type DecideTranscriptCancellation200Data = {
+  id?: number;
+  student_id?: number;
+  delivery_method?: string;
+  fee?: string;
+  currency?: string;
+  status?: string;
+  created_at?: string;
+  instructions_en?: string;
+  instructions_ar?: string;
+  transitions?: DecideTranscriptCancellation200DataTransitionsItem[];
+  payments?: DecideTranscriptCancellation200DataPaymentsItem[];
+  verified_payment?: DecideTranscriptCancellation200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: DecideTranscriptCancellation200DataRefund;
+};
+
+export type DecideTranscriptCancellation200 = {
+  data?: DecideTranscriptCancellation200Data;
+};
+
 export type SubmitTranscriptPaymentEvidenceBody = {
   /** Payment reference. */
   reference: string;
@@ -7509,6 +7739,17 @@ export type SubmitTranscriptPaymentEvidence200DataVerifiedPayment = {
   verified_at?: string;
 };
 
+export type SubmitTranscriptPaymentEvidence200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
 export type SubmitTranscriptPaymentEvidence200Data = {
   id?: number;
   student_id?: number;
@@ -7522,6 +7763,8 @@ export type SubmitTranscriptPaymentEvidence200Data = {
   transitions?: SubmitTranscriptPaymentEvidence200DataTransitionsItem[];
   payments?: SubmitTranscriptPaymentEvidence200DataPaymentsItem[];
   verified_payment?: SubmitTranscriptPaymentEvidence200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: SubmitTranscriptPaymentEvidence200DataRefund;
 };
 
 export type SubmitTranscriptPaymentEvidence200 = {
@@ -7572,6 +7815,17 @@ export type VerifyOrReturnTranscriptPayment200DataVerifiedPayment = {
   verified_at?: string;
 };
 
+export type VerifyOrReturnTranscriptPayment200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
 export type VerifyOrReturnTranscriptPayment200Data = {
   id?: number;
   student_id?: number;
@@ -7585,6 +7839,8 @@ export type VerifyOrReturnTranscriptPayment200Data = {
   transitions?: VerifyOrReturnTranscriptPayment200DataTransitionsItem[];
   payments?: VerifyOrReturnTranscriptPayment200DataPaymentsItem[];
   verified_payment?: VerifyOrReturnTranscriptPayment200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: VerifyOrReturnTranscriptPayment200DataRefund;
 };
 
 export type VerifyOrReturnTranscriptPayment200 = {
@@ -7634,6 +7890,17 @@ export type OfficialTranscriptRequestDetails200DataVerifiedPayment = {
   verified_at?: string;
 };
 
+export type OfficialTranscriptRequestDetails200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
 export type OfficialTranscriptRequestDetails200Data = {
   id?: number;
   student_id?: number;
@@ -7647,6 +7914,8 @@ export type OfficialTranscriptRequestDetails200Data = {
   transitions?: OfficialTranscriptRequestDetails200DataTransitionsItem[];
   payments?: OfficialTranscriptRequestDetails200DataPaymentsItem[];
   verified_payment?: OfficialTranscriptRequestDetails200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: OfficialTranscriptRequestDetails200DataRefund;
 };
 
 export type OfficialTranscriptRequestDetails200 = {
@@ -7695,6 +7964,17 @@ export type ReviewOfficialTranscriptRequest200DataVerifiedPayment = {
   verified_at?: string;
 };
 
+export type ReviewOfficialTranscriptRequest200DataRefund = {
+  id?: number;
+  amount?: string;
+  currency?: string;
+  created_at?: string;
+  reference?: string;
+  completed_by?: number;
+  completed_at?: string;
+  receipt_url?: string;
+};
+
 export type ReviewOfficialTranscriptRequest200Data = {
   id?: number;
   student_id?: number;
@@ -7708,6 +7988,8 @@ export type ReviewOfficialTranscriptRequest200Data = {
   transitions?: ReviewOfficialTranscriptRequest200DataTransitionsItem[];
   payments?: ReviewOfficialTranscriptRequest200DataPaymentsItem[];
   verified_payment?: ReviewOfficialTranscriptRequest200DataVerifiedPayment;
+  cancellation_prior_status?: string;
+  refund?: ReviewOfficialTranscriptRequest200DataRefund;
 };
 
 export type ReviewOfficialTranscriptRequest200 = {
@@ -27267,6 +27549,302 @@ export function useExportOfficialTranscriptRequestQueueAndHistory<TData = Awaite
 
 
 
+
+/**
+ * @summary Complete full manual Transcript refund.
+ */
+export const completeFullManualTranscriptRefund = (
+    requestId: number,
+    completeFullManualTranscriptRefundBody: CompleteFullManualTranscriptRefundBody,
+ signal?: AbortSignal
+) => {
+
+      const formData = new FormData();
+formData.append(`amount`, completeFullManualTranscriptRefundBody.amount);
+formData.append(`reference`, completeFullManualTranscriptRefundBody.reference);
+formData.append(`receipt`, completeFullManualTranscriptRefundBody.receipt);
+
+      return customInstance<CompleteFullManualTranscriptRefund200>(
+      {url: `/api/v1/records/requests/${requestId}/refund`, method: 'POST',
+      headers: {'Content-Type': 'multipart/form-data', },
+       data: formData, signal
+    },
+      );
+    }
+
+
+
+
+export const getCompleteFullManualTranscriptRefundMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeFullManualTranscriptRefund>>, TError,{requestId: number;data: CompleteFullManualTranscriptRefundBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof completeFullManualTranscriptRefund>>, TError,{requestId: number;data: CompleteFullManualTranscriptRefundBody}, TContext> => {
+
+const mutationKey = ['completeFullManualTranscriptRefund'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeFullManualTranscriptRefund>>, {requestId: number;data: CompleteFullManualTranscriptRefundBody}> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  completeFullManualTranscriptRefund(requestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteFullManualTranscriptRefundMutationResult = NonNullable<Awaited<ReturnType<typeof completeFullManualTranscriptRefund>>>
+    export type CompleteFullManualTranscriptRefundMutationBody = CompleteFullManualTranscriptRefundBody
+    export type CompleteFullManualTranscriptRefundMutationError = unknown
+
+    /**
+ * @summary Complete full manual Transcript refund.
+ */
+export const useCompleteFullManualTranscriptRefund = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeFullManualTranscriptRefund>>, TError,{requestId: number;data: CompleteFullManualTranscriptRefundBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof completeFullManualTranscriptRefund>>,
+        TError,
+        {requestId: number;data: CompleteFullManualTranscriptRefundBody},
+        TContext
+      > => {
+      return useMutation(getCompleteFullManualTranscriptRefundMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Private Transcript refund receipt.
+ */
+export const privateTranscriptRefundReceipt = (
+    requestId: number,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/records/requests/${requestId}/refund/receipt`, method: 'GET',
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getPrivateTranscriptRefundReceiptQueryKey = (requestId: number,) => {
+    return [
+    `/api/v1/records/requests/${requestId}/refund/receipt`
+    ] as const;
+    }
+
+
+export const getPrivateTranscriptRefundReceiptQueryOptions = <TData = Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError = PrivateTranscriptRefundReceipt401 | PrivateTranscriptRefundReceipt403>(requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPrivateTranscriptRefundReceiptQueryKey(requestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>> = ({ signal }) => privateTranscriptRefundReceipt(requestId, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: requestId !== null && requestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PrivateTranscriptRefundReceiptQueryResult = NonNullable<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>>
+export type PrivateTranscriptRefundReceiptQueryError = PrivateTranscriptRefundReceipt401 | PrivateTranscriptRefundReceipt403
+
+
+export function usePrivateTranscriptRefundReceipt<TData = Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError = PrivateTranscriptRefundReceipt401 | PrivateTranscriptRefundReceipt403>(
+ requestId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePrivateTranscriptRefundReceipt<TData = Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError = PrivateTranscriptRefundReceipt401 | PrivateTranscriptRefundReceipt403>(
+ requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>,
+          TError,
+          Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePrivateTranscriptRefundReceipt<TData = Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError = PrivateTranscriptRefundReceipt401 | PrivateTranscriptRefundReceipt403>(
+ requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Private Transcript refund receipt.
+ */
+
+export function usePrivateTranscriptRefundReceipt<TData = Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError = PrivateTranscriptRefundReceipt401 | PrivateTranscriptRefundReceipt403>(
+ requestId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof privateTranscriptRefundReceipt>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPrivateTranscriptRefundReceiptQueryOptions(requestId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Request Transcript cancellation.
+ */
+export const requestTranscriptCancellation = (
+    requestId: number,
+    requestTranscriptCancellationBody?: RequestTranscriptCancellationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<RequestTranscriptCancellation200>(
+      {url: `/api/v1/records/requests/${requestId}/cancellation`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: requestTranscriptCancellationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getRequestTranscriptCancellationMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestTranscriptCancellation>>, TError,{requestId: number;data?: RequestTranscriptCancellationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof requestTranscriptCancellation>>, TError,{requestId: number;data?: RequestTranscriptCancellationBody}, TContext> => {
+
+const mutationKey = ['requestTranscriptCancellation'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestTranscriptCancellation>>, {requestId: number;data?: RequestTranscriptCancellationBody}> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  requestTranscriptCancellation(requestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestTranscriptCancellationMutationResult = NonNullable<Awaited<ReturnType<typeof requestTranscriptCancellation>>>
+    export type RequestTranscriptCancellationMutationBody = RequestTranscriptCancellationBody | undefined
+    export type RequestTranscriptCancellationMutationError = unknown
+
+    /**
+ * @summary Request Transcript cancellation.
+ */
+export const useRequestTranscriptCancellation = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestTranscriptCancellation>>, TError,{requestId: number;data?: RequestTranscriptCancellationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof requestTranscriptCancellation>>,
+        TError,
+        {requestId: number;data?: RequestTranscriptCancellationBody},
+        TContext
+      > => {
+      return useMutation(getRequestTranscriptCancellationMutationOptions(options), queryClient);
+    }
+
+/**
+ * @summary Decide Transcript cancellation.
+ */
+export const decideTranscriptCancellation = (
+    requestId: number,
+    decideTranscriptCancellationBody: DecideTranscriptCancellationBody,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<DecideTranscriptCancellation200>(
+      {url: `/api/v1/records/requests/${requestId}/cancellation-review`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: decideTranscriptCancellationBody, signal
+    },
+      );
+    }
+
+
+
+
+export const getDecideTranscriptCancellationMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideTranscriptCancellation>>, TError,{requestId: number;data: DecideTranscriptCancellationBody}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof decideTranscriptCancellation>>, TError,{requestId: number;data: DecideTranscriptCancellationBody}, TContext> => {
+
+const mutationKey = ['decideTranscriptCancellation'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof decideTranscriptCancellation>>, {requestId: number;data: DecideTranscriptCancellationBody}> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  decideTranscriptCancellation(requestId,data,)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DecideTranscriptCancellationMutationResult = NonNullable<Awaited<ReturnType<typeof decideTranscriptCancellation>>>
+    export type DecideTranscriptCancellationMutationBody = DecideTranscriptCancellationBody
+    export type DecideTranscriptCancellationMutationError = unknown
+
+    /**
+ * @summary Decide Transcript cancellation.
+ */
+export const useDecideTranscriptCancellation = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof decideTranscriptCancellation>>, TError,{requestId: number;data: DecideTranscriptCancellationBody}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof decideTranscriptCancellation>>,
+        TError,
+        {requestId: number;data: DecideTranscriptCancellationBody},
+        TContext
+      > => {
+      return useMutation(getDecideTranscriptCancellationMutationOptions(options), queryClient);
+    }
 
 /**
  * @summary Submit Transcript payment evidence.

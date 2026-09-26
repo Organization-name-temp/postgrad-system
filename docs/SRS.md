@@ -1141,6 +1141,28 @@ NOT follow automatically from remediation.
 
 #### 4.9.1 FR-TRN-001: Transcript Generation
 
+> **Localhost scope amendment ([ADR-0045](adr/0045-phase-6-print-and-verification-scope.md)):**
+> Phase 6 delivers bilingual on-screen and browser-printable Transcripts, immutable official
+> issuances with seal/watermark and QR verification. Server-generated PDF and cryptographic
+> digital signatures below are deferred production requirements. Issuer attribution is
+> required but is not a digital signature. See [ADR-0044](adr/0044-official-transcripts-preserve-issued-snapshots.md)
+> for immutable issuance semantics.
+
+> **Verification disclosure ([ADR-0046](adr/0046-qr-links-disclose-full-issued-transcripts.md)):**
+> An official issuance's unguessable QR link publicly displays the full issued Transcript
+> without login. It grants access only to that snapshot, not current records, other
+> issuances, evidence attachments, review notes, or Audit Logs.
+
+> Verification links have no automatic expiry. They retain access to the issued snapshot
+> until explicit Student Affairs revocation; graduation, termination, account changes,
+> and newer issuances do not invalidate them.
+
+> **Revocation ([ADR-0047](adr/0047-official-transcript-revocation-preserves-history.md)):**
+> Student Affairs may explicitly revoke an issuance with a mandatory reason and recorded
+> actor/timestamp while retaining its immutable snapshot internally. Public verification
+> then reveals only its reference and Revoked status. New issuance alone does not revoke
+> earlier copies.
+
 **Acceptance Criteria:**
 
 1. The system SHALL generate transcripts in two formats:
@@ -1149,6 +1171,194 @@ NOT follow automatically from remediation.
 2. The system SHALL export transcripts in PDF format with university branding, anti-tampering watermark, digital signature, and QR code for verification.
 
 #### 4.9.2 FR-TRN-002: Credit Hour Summary
+
+**Official Transcript Request workflow (Phase 6 scope extension):**
+
+- Records owns requests, Transcript fee configuration, payment verification, refund
+  obligations, delivery tracking, and official issuances. Phase 6 introduces no general
+  Finance module. Academic and identity facts remain with their existing owners and are
+  consumed through Public contracts (ADR-0049).
+- Phase 6 includes Student requests, approval queues, fees, and delivery tracking.
+- Student Affairs is the sole request approval authority and records a reason when
+  approving or rejecting a request. Advisors, Department Heads, and Deans have no request
+  approval stage.
+- Request approval authorizes processing, not certification of an academic snapshot.
+  Official issuance remains a separate action after the fee requirement is satisfied;
+  the academic snapshot is captured at issuance, not request submission or approval.
+- Every official issuance must belong to an approved Student request with verified
+  payment. Student Affairs has no direct-issuance bypass.
+- Each request produces exactly one issuance. Another issuance with a new reference
+  requires a new request; viewing or printing an existing issuance does not create one.
+- Submission fixes the delivery method and captured fee. Neither may be edited afterward;
+  changing delivery method requires cancellation and a new request under the one-open
+  request limit. Payment evidence may be submitted or corrected only at the approved
+  workflow steps. Rejected requests remain terminal and cannot be resubmitted.
+- Student Affairs must preview the Transcript before issuing it. If academic or identity
+  content changes before issuance, refuse the stale preview and require review of updated
+  content. The committed issuance must match the reviewed preview, including both
+  language versions and summaries; consistency must cover all contributing Public
+  owner-provided facts and cannot rely only on request state.
+- A Student may have at most one open Official Transcript Request. It remains open through
+  review, payment, issuance, and delivery, or until rejection or cancellation. A cancelled
+  request with an outstanding refund remains open until that refund is completed.
+- Delivery completion, rejection, cancellation without a refund obligation, or completed
+  cancellation refund releases the limit. Enforce the limit transactionally so concurrent
+  submissions cannot create multiple open requests.
+- Request lifecycle:
+
+| Status | Allowed progression |
+|--------|---------------------|
+| Submitted | Student Affairs approves to Awaiting Payment or rejects to Rejected |
+| Awaiting Payment | Student submits evidence to Payment Under Review |
+| Payment Under Review | Student Affairs verifies to Ready for Issuance or returns to Payment Correction Required |
+| Payment Correction Required | Student resubmits to Payment Under Review |
+| Ready for Issuance | Student Affairs issues to Completed (digital) or Ready for Collection |
+| Ready for Collection | Student Affairs records handover to Completed |
+| Cancellation Pending | Student Affairs denies and restores the previous stage, or approves to Refund Pending / Cancelled |
+| Refund Pending | Student Affairs records the full refund to Cancelled |
+| Completed / Rejected / Cancelled | Terminal request outcomes |
+
+Cancellation Pending is available before issuance and pauses processing. Approved
+cancellation enters Refund Pending if a verified payment is owed, otherwise Cancelled.
+Preserve attributed, timestamped transition history and notify the Student of decisions
+and required actions. Issuance validity and revocation remain separate from request status;
+revoking an issued copy does not reopen its completed request.
+
+Audit fee changes and every request, payment, cancellation, refund, issuance, revocation,
+and collection action through Identity's audit writer. Notify the owning Student in-app
+when a decision, correction, issuance, revocation, refund, or collection event affects
+them. Student Affairs processes work from queues; no email or SMS is added. Public QR
+reads are read-only and do not notify the Student on every scan. Request transition
+history remains distinct from the security Audit Log.
+
+Terminated Students may request official Transcripts and complete payment, cancellation,
+refund, and delivery steps. These historical document services do not change academic
+facts, restore enrollment rights, or reactivate the Student. Final termination leaves
+pending Transcript Requests intact; Enrollment's academic-request closeout does not
+apply to Records-owned Transcript Requests.
+
+**Transcript payment handling (Phase 6):**
+
+- Only the request-owning Student and Student Affairs may view payment references,
+  receipts, refund evidence, and request processing history. Preserve the existing
+  administrator override. Advisors' Transcript and issuance-history access does not
+  include requests or financial processing, and public QR pages expose none of it.
+- The Student submits a payment reference and receipt for the Official Transcript Request.
+- Student Affairs manually verifies payment and records the amount, verifier, and
+  verification timestamp. Submitting evidence alone does not satisfy the fee requirement
+  or permit issuance.
+- Online payment-gateway integration is explicitly deferred for the localhost build.
+- Student Affairs manages one standard Transcript fee in EGP. Each request captures the
+  applicable fee at submission, and later price changes affect only new requests.
+- Student Affairs must configure a positive EGP fee and bilingual payment instructions
+  before official requests open. Until configured, Transcript viewing remains available
+  but official request submission is blocked. Each submitted request preserves its fee
+  and both language versions of the payment instructions; later edits do not change
+  existing requests. Instructions are shown to the Student only after approval.
+- Payment verification requires one payment in EGP for exactly the request's captured
+  fee. Return mismatched evidence for correction. Phase 6 does not support installments,
+  combining receipts, or overpayment balances; a cancellation refund returns that exact
+  verified fee.
+- Payment instructions become available after request approval. Fee waivers are outside
+  Phase 6.
+- Student Affairs may return payment evidence for correction with a mandatory reason.
+  The Transcript Request remains approved, but issuance is blocked until payment is
+  verified. The Student may submit corrected evidence; earlier submissions and verification
+  decisions remain in history. Returning evidence does not reject the Transcript Request.
+
+**Transcript cancellation and refunds (Phase 6):**
+
+- Before official issuance, the Student may request cancellation, including after payment
+  verification. Student Affairs approves or rejects cancellation with a mandatory reason.
+- Approved cancellation stops issuance and creates a refund obligation for the verified
+  payment. No verified payment means no verified-payment refund obligation.
+- Student Affairs records the manual refund's amount, reference, receipt, and completion
+  time. Refund processing is in Phase 6; online payment integration remains deferred.
+- After issuance, Transcript Revocation is separate and does not automatically trigger
+  a refund. This pre-issuance cancellation workflow does not apply to issued copies.
+- A pending cancellation blocks issuance and payment verification until Student Affairs
+  decides it. Rejection resumes processing; approval permanently stops issuance.
+- Cancellation submission, issuance, and payment verification serialize on the request
+  and revalidate its state. If issuance commits first, cancellation is refused because an
+  official copy already exists; if cancellation submission commits first, issuance and
+  payment verification are blocked. Stale concurrent actions cannot both commit.
+- Approved cancellation requires one full manual refund of the verified payment, without
+  deductions or partial refunds. Completion requires the refund reference and receipt,
+  amount, staff attribution, and completion time.
+- A refund obligation may be completed only once; repeated completion submissions cannot
+  record a second refund. This prevents duplicate recording in PRS, not duplicate
+  transfers made outside the system.
+
+**Transcript delivery (Phase 6):**
+
+- The Student chooses digital access or collection from Student Affairs when submitting
+  an Official Transcript Request. Postal delivery and courier integration are outside
+  Phase 6.
+- Digital delivery completes when the issued copy becomes available in PRS, with an
+  in-app notification. Completion does not require proof that the Student opened it.
+- Collection progresses from Ready for Collection to Collected. Student Affairs records
+  the handover time and staff member.
+- Delivery completion is distinct from request approval, payment verification, and
+  official issuance; it does not change the immutable issued academic content.
+
+**Authenticated Transcript access (Phase 6):**
+
+- Students may view their own current unofficial Transcript and their own official
+  issuance history, including revoked snapshots.
+- Advisors may view current advisees' unofficial Transcripts and official issuance
+  history, including revoked snapshots. Scope follows live Advisor assignment; former
+  Advisors lose access on reassignment.
+- Student Affairs may view all Students' unofficial Transcripts and official issuance
+  history, including revoked snapshots, and may issue or explicitly revoke official copies.
+- Other Roles receive no additional Transcript access in Phase 6. Preserve the existing
+  administrator override. The public per-issuance QR access is governed separately by
+  ADR-0046/0047 and does not grant authenticated browse access to other records.
+- Revoked snapshots are visibly marked Revoked for authorized internal viewers. Historical
+  read access remains available for Terminated Students under ADR-0040.
+- No new Role or Permission is introduced: authenticated reads use the existing Transcript
+  viewing permission and these scopes; issuance and revocation require the existing
+  official-issuance permission. Deferred PDF export does not broaden read scope.
+
+**Transcript content (Phase 6):**
+
+- Each official issuance supports English/LTR and Arabic/RTL viewing and printing from
+  the same frozen snapshot. Preserve both language versions of names and academic labels
+  at issuance so later identity or Catalog edits cannot change an old copy. Language
+  switching requires no new request, issuance, or payment.
+- Header fields are Student name, University ID, Identification Type and its National ID
+  or passport number, Faculty, Department, Program, degree level, admission term, and
+  Student Lifecycle Status. The National ID/passport number is included in the full public
+  QR view of a valid issuance, an explicitly approved disclosure.
+- Transcript personal identity comes from Identity's admission-time Student identity
+  snapshot. Phase 6 must preserve Identification Type explicitly in the admission
+  handoff alongside the existing identifier; do not infer National ID versus Passport
+  from number format. Recover existing Students' types from their accepted Applications
+  through owner Public contracts. If required identity data cannot be recovered, block
+  official issuance with a clear correction message.
+- Academic rows show Course code/title, credit hours, classification, Grade or status,
+  and an indicator when an Attempt no longer contributes to CGPA. Summaries include
+  Semester GPA, CGPA, and the full per-category Credit-Hour Summary.
+- Official certification shows issuance reference, date, issuer, seal/watermark, and QR.
+  Contact details, payment information, review notes, and termination-case evidence do
+  not appear in the Transcript or its public verification view.
+- Official and unofficial Transcripts include all approved Enrollments grouped by Semester,
+  including unfinished Courses labelled **In Progress**. Pending Registration Requests are
+  not Enrollments and do not appear.
+- Only finalized Grades are displayed, using Grading's authoritative current Grade at
+  composition time; Draft or under-review marks never appear. All retake Attempts remain
+  visible even when an earlier Attempt no longer contributes to CGPA.
+- Audit, Withdrawal, Incomplete, and Fail Withdrawal display AU/W/I/FW as applicable under
+  the established Course Status and Grade rules (ADR-0023).
+- Effective Exemptions, Transfers, and Waivers appear in a separate credit-decisions
+  section rather than as synthetic Enrollments. Their accounting and summaries remain
+  authoritative owner-provided results.
+- Credit-decision rows show target Course, recognized/released CH, decision type, and
+  approval date. Transfers also show source institution, source Course, original Grade,
+  and normalized E-JUST Grade; Waivers show the prior E-JUST Course and Grade; Exemptions
+  show the qualification-based reason. Only effective decisions appear, without evidence
+  attachments or reviewer notes. These fields appear in the full public QR view too.
+- Official issuance may occur during an ongoing Semester and uses these same content
+  rules; its content is frozen at issuance under ADR-0044.
 
 | Category | Adjusted Required CH | Satisfied CH | Remaining CH | Status |
 |----------|:--------------------:|:------------:|:------------:|:------:|

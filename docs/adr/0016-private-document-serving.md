@@ -32,3 +32,10 @@ unauthenticated handler **always renders `401` JSON**, never a redirect.
   whole API, not just document downloads.
 - All private-file downloads (Phase 3+ transcripts, official documents) follow the
   fetch-as-blob pattern rather than linking directly.
+
+## Phase 6 scoped exception
+
+[ADR-0046](0046-qr-links-disclose-full-issued-transcripts.md) permits an unguessable public
+per-issuance verification link to the full valid official Transcript. This is a deliberate
+exception for shared issued records, not a change to private attachment/download access.
+Revoked links show reference/status only under ADR-0047.

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Modules\Catalog\Internal\Models\Course;
@@ -136,3 +138,39 @@ it('invalidates complete reviewed content after contributing academic or bilingu
     $this->postJson("/api/v1/records/requests/{$id}/issue", ['review_token' => $review['review_token']])->assertConflict();
     $this->assertDatabaseCount('transcript_issuances', 0);
 })->with(['grade', 'incomplete', 'catalog', 'program', 'lifecycle', 'decision']);
+
+it('keeps Terminated Student services and older official copies valid across later certifications', function () {
+    [$student, $id] = transcriptAtStage('ReadyForIssuance');
+    $student->update(['lifecycle_status' => 'Terminated']);
+    $staff = auth()->user();
+    $preview = $this->postJson("/api/v1/records/requests/{$id}/preview")->assertOk()->assertJsonPath('data.snapshot.lifecycle_status', 'Terminated')->json('data');
+    $first = $this->postJson("/api/v1/records/requests/{$id}/issue", ['review_token' => $preview['review_token']])->assertCreated()->json('data');
+    $student->update(['name_en' => 'Changed admission record label']);
+    Sanctum::actingAs($student->user);
+    $secondId = $this->postJson('/api/v1/records/requests', ['delivery_method' => 'digital'])->assertCreated()->json('data.id');
+    Sanctum::actingAs($staff);
+    $this->postJson("/api/v1/records/requests/{$secondId}/review", ['decision' => 'approve', 'reason' => 'New copy requested'])->assertOk();
+    Sanctum::actingAs($student->user);
+    $this->postJson("/api/v1/records/requests/{$secondId}/payment", ['reference' => 'PAY-SECOND', 'receipt' => UploadedFile::fake()->create('second.pdf', 10, 'application/pdf')])->assertOk();
+    Sanctum::actingAs($staff);
+    $this->postJson("/api/v1/records/requests/{$secondId}/payment-review", ['decision' => 'verify', 'amount' => '125.50'])->assertOk();
+    $secondPreview = $this->postJson("/api/v1/records/requests/{$secondId}/preview")->assertOk()->json('data');
+    $second = $this->postJson("/api/v1/records/requests/{$secondId}/issue", ['review_token' => $secondPreview['review_token']])->assertCreated()->json('data');
+    expect($second['reference'])->not->toBe($first['reference'])->and($second['verification_url'])->not->toBe($first['verification_url']);
+    $this->getJson($first['verification_url'])->assertOk()->assertJsonPath('data.status', 'Valid')->assertJsonPath('data.snapshot.identity.name_en', $first['snapshot']['identity']['name_en']);
+    $this->getJson($second['verification_url'])->assertOk()->assertJsonPath('data.snapshot.identity.name_en', 'Changed admission record label');
+    Sanctum::actingAs($student->user);
+    $this->getJson('/api/v1/records/issuances')->assertOk()->assertJsonPath('meta.total', 2);
+    $this->getJson('/api/v1/records/requests')->assertOk()->assertJsonPath('meta.total', 2);
+});
+
+it('records the actual certification instant even when the PostgreSQL session uses Cairo time', function () {
+    [$student, $id] = transcriptAtStage('ReadyForIssuance');
+    DB::statement("SET TIME ZONE 'Africa/Cairo'");
+    $this->travelTo(Carbon::parse('2026-09-27T00:30:00Z'));
+    $preview = $this->postJson("/api/v1/records/requests/{$id}/preview")->assertOk()->json('data');
+    $issued = $this->postJson("/api/v1/records/requests/{$id}/issue", ['review_token' => $preview['review_token']])->assertCreated()->json('data');
+    expect(Carbon::parse($issued['issued_at'])->utc()->toIso8601String())->toBe('2026-09-27T00:30:00+00:00');
+    $history = $this->getJson("/api/v1/records/requests/{$id}")->assertOk()->json('data.transitions');
+    expect(Carbon::parse(end($history)['at'])->utc()->toIso8601String())->toBe('2026-09-27T00:30:00+00:00');
+});

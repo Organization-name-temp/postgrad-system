@@ -19,7 +19,7 @@ final readonly class RequestWorkflow
         $request->save();
         $transition = DB::table('transcript_request_transitions')->insertGetId([
             'transcript_request_id' => $request->id, 'from_status' => $from,
-            'to_status' => $to, 'action' => $action, 'reason' => $reason, 'actor_user_id' => $actor, 'created_at' => now(),
+            'to_status' => $to, 'action' => $action, 'reason' => $reason, 'actor_user_id' => $actor, 'created_at' => now()->toIso8601String(),
         ]);
         $this->audit->record(action: 'records.'.$action, actorUserId: $actor,
             metadata: ['from_status' => $from, 'to_status' => $to, 'transition_id' => $transition],

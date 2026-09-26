@@ -34,7 +34,7 @@ export function RequestsPage() {
   const [delivery, setDelivery] = useState('digital')
   const [page, setPage] = useState(1)
   const [error, setError] = useState('')
-  const params = { q: search, status, page, per_page: 25 }
+  const params = { q: search || undefined, status: status || undefined, page, per_page: 25 }
   const queue = useOfficialTranscriptRequestQueueAndHistory(params, {
     query: { enabled: permitted },
   })

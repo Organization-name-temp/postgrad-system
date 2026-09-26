@@ -26,6 +26,11 @@ final class TranscriptRequest extends Model
 {
     protected $guarded = [];
 
+    public function getDateFormat(): string
+    {
+        return 'Y-m-d H:i:sP';
+    }
+
     protected function casts(): array
     {
         return ['student_id' => 'integer', 'user_id' => 'integer', 'fee_minor' => 'integer', 'approved_at' => 'datetime', 'verified_minor' => 'integer', 'verified_by' => 'integer', 'verified_at' => 'datetime'];

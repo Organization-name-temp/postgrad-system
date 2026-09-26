@@ -47,7 +47,7 @@ final class PaymentController
                 abort_if($path === false, 500);
                 DB::table('transcript_payment_submissions')->insert([
                     'transcript_request_id' => $request->id, 'reference' => $data['reference'], 'stored_path' => $path,
-                    'mime' => $file->getMimeType(), 'submitted_by' => $actor, 'created_at' => now(),
+                    'mime' => $file->getMimeType(), 'submitted_by' => $actor, 'created_at' => now()->toIso8601String(),
                 ]);
                 $workflow->transition($request, 'PaymentUnderReview', 'payment_submitted', $actor, notify: false);
 
@@ -91,7 +91,7 @@ final class PaymentController
             }
             DB::table('transcript_payment_decisions')->insert([
                 'submission_id' => $submission->id, 'decision' => $data['decision'], 'reason' => $data['reason'] ?? null,
-                'amount_minor' => $amount, 'actor_user_id' => $actor, 'created_at' => now(),
+                'amount_minor' => $amount, 'actor_user_id' => $actor, 'created_at' => now()->toIso8601String(),
             ]);
             if ($data['decision'] === 'verify') {
                 $request->verified_minor = $amount;

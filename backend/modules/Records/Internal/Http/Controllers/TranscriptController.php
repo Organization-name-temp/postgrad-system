@@ -58,7 +58,7 @@ final class TranscriptController
         $audit->record(action: 'records.students_exported', actorUserId: $actor, metadata: ['criteria' => $query->auditCriteria()]);
 
         return $xlsx->download('transcript-students.xlsx', ['Student ID', 'University ID', 'Name EN', 'Name AR', 'Lifecycle Status'],
-            array_map(fn (array $row): array => array_values($row), $rows), app()->getLocale() === 'ar');
+            array_map(fn (array $row): array => [(string) $row['id'], $row['university_id'], $row['name_en'], $row['name_ar'], $row['lifecycle_status']], $rows), app()->getLocale() === 'ar');
     }
 
     /**

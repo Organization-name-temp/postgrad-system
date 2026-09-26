@@ -1,3 +1,4 @@
+import { transcriptPrintSx } from './transcriptPrint'
 import { useParams } from 'react-router-dom'
 import { Alert, Box, Button, Container, Stack, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
@@ -11,7 +12,7 @@ export function PublicVerificationPage() {
     query: { refetchOnWindowFocus: 'always', staleTime: 0, gcTime: 0, retry: false },
   })
   return (
-    <Container component="main" maxWidth="lg" sx={{ py: 3 }}>
+    <Container component="main" maxWidth="lg" sx={[{ py: 3 }, transcriptPrintSx]}>
       <Box sx={{ '@media print': { display: 'none' }, mb: 2 }}>
         <Stack direction="row" spacing={2}>
           <Button onClick={() => void i18n.changeLanguage(i18n.language === 'ar' ? 'en' : 'ar')}>

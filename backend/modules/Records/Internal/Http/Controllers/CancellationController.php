@@ -61,7 +61,7 @@ final class CancellationController
             } elseif ($request->verified_minor !== null) {
                 $to = 'RefundPending';
                 DB::table('transcript_refunds')->insert([
-                    'transcript_request_id' => $request->id, 'amount_minor' => $request->verified_minor, 'created_at' => now(),
+                    'transcript_request_id' => $request->id, 'amount_minor' => $request->verified_minor, 'created_at' => now()->toIso8601String(),
                 ]);
             } else {
                 $to = 'Cancelled';

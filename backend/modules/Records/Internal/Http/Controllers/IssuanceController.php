@@ -60,7 +60,7 @@ final class IssuanceController
         $audit->record(action: 'records.issuances_exported', actorUserId: $actor, metadata: ['criteria' => $query->auditCriteria()]);
 
         return $xlsx->download('transcript-issuances.xlsx', ['Issuance ID', 'Student ID', 'Reference', 'Status', 'Issuer', 'Issued at'],
-            array_map(fn (array $row): array => array_values($row), $rows), app()->getLocale() === 'ar');
+            array_map(fn (array $row): array => [(string) $row['id'], (string) $row['student_id'], $row['reference'], $row['status'], $row['issuer_name'], $row['issued_at']], $rows), app()->getLocale() === 'ar');
     }
 
     /**

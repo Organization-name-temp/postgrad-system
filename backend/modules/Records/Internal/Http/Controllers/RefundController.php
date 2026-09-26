@@ -55,7 +55,7 @@ final class RefundController
                 $actor = (int) $http->user()?->getAuthIdentifier();
                 DB::table('transcript_refunds')->where('id', $refund->id)->update([
                     'reference' => $data['reference'], 'stored_path' => $path, 'mime' => $file->getMimeType(),
-                    'completed_by' => $actor, 'completed_at' => now(),
+                    'completed_by' => $actor, 'completed_at' => now()->toIso8601String(),
                 ]);
                 $workflow->transition($request, 'Cancelled', 'refund_completed', $actor);
 

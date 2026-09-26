@@ -1,3 +1,4 @@
+import { transcriptPrintSx } from './transcriptPrint'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import {
@@ -34,7 +35,7 @@ export function TranscriptPage() {
   })
   const service = useTranscriptServiceAvailability()
   return (
-    <Box>
+    <Box sx={transcriptPrintSx}>
       <Typography variant="h4" component="h1" gutterBottom>
         {t('title')}
       </Typography>

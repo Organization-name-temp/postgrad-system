@@ -66,7 +66,7 @@ final class FeeController
         DB::transaction(function () use ($data, $minor, $request, $audit): void {
             DB::table('transcript_fee')->upsert([
                 'id' => 1, 'fee_minor' => $minor, 'instructions_en' => $data['instructions_en'],
-                'instructions_ar' => $data['instructions_ar'], 'created_at' => now(), 'updated_at' => now(),
+                'instructions_ar' => $data['instructions_ar'], 'created_at' => now()->toIso8601String(), 'updated_at' => now()->toIso8601String(),
             ], ['id'], ['fee_minor', 'instructions_en', 'instructions_ar', 'updated_at']);
             $audit->record(action: 'records.fee_updated', actorUserId: (int) $request->user()?->getAuthIdentifier(),
                 metadata: ['fee_minor' => $minor, 'currency' => 'EGP'], subjectType: 'transcript_fee', subjectId: '1');

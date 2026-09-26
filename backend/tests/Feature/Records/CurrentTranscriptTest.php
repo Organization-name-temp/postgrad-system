@@ -2,9 +2,12 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Modules\Calendar\Internal\Models\Semester;
 use Modules\Catalog\Internal\Enums\VersionSubject;
 use Modules\Catalog\Internal\Models\CatalogVersion;
+use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Program;
+use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\CreditDecisionRevocation;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Internal\Models\ExemptionDecision;
@@ -159,4 +162,49 @@ it('exposes only approved Transfer and Waiver source details rather than financi
         ->assertJsonPath('data.credit_decisions.1.prior_course_code', 'OLD401')
         ->assertJsonPath('data.credit_decisions.1.prior_grade', 'B+')
         ->assertDontSee('private-transfer')->assertDontSee('private-waiver');
+});
+
+it('retains every Attempt and owner-derived supersession and retroactive Semester GPAs', function () {
+    $student = recordsStudent();
+    $course = Course::factory()->create();
+    $firstSemester = Semester::factory()->create(['starts_at' => '2025-02-01']);
+    $laterSemester = Semester::factory()->create(['starts_at' => '2026-02-01']);
+    $firstOffering = CourseOffering::factory()->create(['course_id' => $course->id, 'semester_id' => $firstSemester->id]);
+    $laterOffering = CourseOffering::factory()->create(['course_id' => $course->id, 'semester_id' => $laterSemester->id]);
+    $first = Enrollment::factory()->create(['student_id' => $student->id, 'course_offering_id' => $firstOffering->id, 'credit_hours' => 2]);
+    $retake = Enrollment::factory()->create(['student_id' => $student->id, 'course_offering_id' => $laterOffering->id, 'credit_hours' => 2, 'course_status' => 'Retake']);
+    foreach ([[$first, 60], [$retake, 80]] as [$enrollment, $mark]) {
+        $sheet = GradeSheet::factory()->create(['course_offering_id' => $enrollment->course_offering_id, 'status' => GradeSheetStatus::Finalized, 'reviewed_at' => now()]);
+        Grade::factory()->withMark($mark)->create(['grade_sheet_id' => $sheet->id, 'enrollment_id' => $enrollment->id]);
+    }
+    Sanctum::actingAs($student->user);
+    $this->getJson("/api/v1/records/students/{$student->id}/transcript")->assertOk()
+        ->assertJsonCount(2, 'data.semesters')->assertJsonPath('data.semesters.0.courses.0.result', 'D')
+        ->assertJsonPath('data.semesters.0.courses.0.contributes_to_cgpa', false)->assertJsonPath('data.semesters.0.gpa', null)
+        ->assertJsonPath('data.semesters.1.courses.0.contributes_to_cgpa', true)->assertJsonPath('data.cgpa', 3);
+    // A finalized Correction is a new owner round, not an edit to the old Grade.
+    $correction = GradeSheet::factory()->create(['course_offering_id' => $laterOffering->id, 'kind' => 'Correction', 'status' => GradeSheetStatus::Finalized, 'reviewed_at' => now()->addMinute()]);
+    Grade::factory()->withMark(95)->create(['grade_sheet_id' => $correction->id, 'enrollment_id' => $retake->id]);
+    $this->getJson("/api/v1/records/students/{$student->id}/transcript")->assertOk()->assertJsonPath('data.semesters.1.courses.0.result', 'A+')
+        ->assertJsonPath('data.cgpa', 4)->assertJsonPath('data.semesters.0.courses.0.result', 'D');
+});
+
+it('preserves owner target accounting when an exempted Course also earns credit', function () {
+    $student = recordsStudent();
+    $course = Course::factory()->create(['total_ch' => 1, 'lecture_ch' => 1, 'tutorial_ch' => 0, 'lab_ch' => 0]);
+    $version = CatalogVersion::query()->findOrFail($student->curriculum_version_id);
+    $version->update(['snapshot' => ['prep_required_ch' => 6, 'core_required_ch' => 6, 'elective_required_ch' => 9, 'curriculum' => [
+        ['course_id' => $course->id, 'course_code' => $course->code, 'course_total_ch' => 1, 'category' => 'Preparatory', 'preparatory_requirement_role' => 'EnglishLanguage', 'ordinal' => 0],
+    ]]]);
+    $offering = CourseOffering::factory()->create(['course_id' => $course->id]);
+    $enrollment = Enrollment::factory()->create(['student_id' => $student->id, 'course_offering_id' => $offering->id, 'credit_hours' => 1, 'classification' => 'Preparatory', 'earned' => true]);
+    $sheet = GradeSheet::factory()->create(['course_offering_id' => $offering->id, 'status' => GradeSheetStatus::Finalized, 'reviewed_at' => now()]);
+    Grade::factory()->withMark(95)->create(['grade_sheet_id' => $sheet->id, 'enrollment_id' => $enrollment->id]);
+    ExemptionDecision::create(['student_id' => $student->id, 'curriculum_version_id' => $version->id, 'target_course_id' => $course->id, 'target_course_code' => $course->code,
+        'preparatory_requirement_role' => 'EnglishLanguage', 'credit_hours' => 1, 'source' => 'automatic', 'reason_codes' => ['IELTS'], 'source_evidence' => [], 'approved_at' => now()]);
+    Sanctum::actingAs($student->user);
+    $owner = $this->getJson('/api/v1/academic-standing/me/credit-hours')->assertOk()->json('data');
+    $this->getJson("/api/v1/records/students/{$student->id}/transcript")->assertOk()->assertJsonPath('data.credit_hours', $owner)
+        ->assertJsonPath('data.credit_hours.categories.0.earned_ch', 1)->assertJsonPath('data.credit_hours.categories.0.exempted_ch', 1)
+        ->assertJsonPath('data.credit_hours.categories.0.remaining_ch', 5);
 });

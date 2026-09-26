@@ -1,3 +1,4 @@
+import { transcriptPrintSx } from './transcriptPrint'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Alert, Button, Stack, TextField, Typography } from '@mui/material'
@@ -22,7 +23,7 @@ export function IssuancePage() {
   if (query.isError || !query.data?.data) return <Alert severity="error">{t('loadError')}</Alert>
   const issuance = query.data.data
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={transcriptPrintSx}>
       <Typography variant="h4" component="h1">
         {t('service.official')}
       </Typography>

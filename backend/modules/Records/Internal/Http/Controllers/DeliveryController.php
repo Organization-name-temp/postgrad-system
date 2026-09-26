@@ -53,7 +53,7 @@ final class DeliveryController
             $issuance = DB::table('transcript_issuances')->where('id', $issuance_id)->lockForUpdate()->first();
             abort_if($issuance === null, 404);
             abort_if(DB::table('transcript_revocations')->where('issuance_id', $issuance_id)->exists(), 409, __('records.wrong_state'));
-            DB::table('transcript_revocations')->insert(['issuance_id' => $issuance_id, 'reason' => $input['reason'], 'actor_user_id' => $actor, 'created_at' => now()]);
+            DB::table('transcript_revocations')->insert(['issuance_id' => $issuance_id, 'reason' => $input['reason'], 'actor_user_id' => $actor, 'created_at' => now()->toIso8601String()]);
             $audit->record(action: 'records.revoked', actorUserId: $actor, subjectType: 'transcript_issuance', subjectId: (string) $issuance_id);
             $request = TranscriptRequest::query()->findOrFail($issuance->transcript_request_id);
             $notifier->notifyOnce($request->user_id, NotificationType::RecordsRequestChanged, 'records-revocation:'.$issuance_id,

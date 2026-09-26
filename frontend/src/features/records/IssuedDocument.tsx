@@ -1,3 +1,4 @@
+import { transcriptPrintSx } from './transcriptPrint'
 import { Alert, Box, Link, Stack, Typography, useTheme } from '@mui/material'
 import { QRCodeSVG } from 'qrcode.react'
 import { useTranslation } from 'react-i18next'
@@ -24,7 +25,7 @@ export function IssuedDocument({
   const revoked = issuance.status === 'Revoked'
   const url = new URL(verificationPath, window.location.origin).href
   return (
-    <Stack spacing={2} dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
+    <Stack spacing={2} sx={transcriptPrintSx} dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}>
       <Alert severity={revoked ? 'warning' : 'success'}>
         {t(revoked ? 'service.revoked' : 'service.valid')}
       </Alert>

@@ -19,6 +19,7 @@ it('shows null GPAs as dashes, preserves CH and Attempts, and switches academic 
           ready: true,
         },
         university_id: '2026-CE-0001',
+        enrollment_term: 'Fall 2026',
         cgpa: null,
         semesters: [
           {
@@ -36,7 +37,13 @@ it('shows null GPAs as dashes, preserves CH and Attempts, and switches academic 
             ],
           },
         ],
-        credit_decisions: [],
+        credit_decisions: [
+          {
+            type: 'Exemption',
+            target_course_code: 'PRE501',
+            reason_codes: ['english_proficiency'],
+          },
+        ],
       }}
     />,
   )
@@ -48,5 +55,7 @@ it('shows null GPAs as dashes, preserves CH and Attempts, and switches academic 
   expect(screen.getByText('الخوارزميات')).toBeInTheDocument()
   expect(screen.getByText('قيد الدراسة')).toBeInTheDocument()
   expect(screen.getByText('خريف 2026')).toBeInTheDocument()
+  expect(screen.getByText(/الخريف 2026/)).toBeInTheDocument()
+  expect(screen.queryByText('english_proficiency')).not.toBeInTheDocument()
   expect(screen.queryByText('Algorithms')).not.toBeInTheDocument()
 })

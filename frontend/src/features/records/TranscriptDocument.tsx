@@ -1,3 +1,4 @@
+import { transcriptPrintSx } from './transcriptPrint'
 import {
   Box,
   Table,
@@ -48,12 +49,19 @@ export function TranscriptDocument({
   const name = (value: { name_en?: string; name_ar?: string } | undefined) =>
     arabic ? value?.name_ar : value?.name_en
   const program = record.program
+  const admissionTerm = record.enrollment_term?.replace(
+    /^(Fall|Spring|Summer)(\s+\d{4})$/,
+    (_, term: string, year: string) => `${t(`terms.${term}`)}${year}`,
+  )
   const number = (value: number | null | undefined) => (value == null ? '—' : value.toFixed(2))
   return (
     <Box
       component="article"
       dir={arabic ? 'rtl' : 'ltr'}
-      sx={{ bgcolor: 'background.paper', color: 'text.primary', p: 2, '@media print': { p: 0 } }}
+      sx={[
+        { bgcolor: 'background.paper', color: 'text.primary', p: 2, '@media print': { p: 0 } },
+        transcriptPrintSx,
+      ]}
     >
       <Box
         component="img"
@@ -83,7 +91,7 @@ export function TranscriptDocument({
         {arabic ? program?.faculty_name_ar : program?.faculty_name_en}
       </Typography>
       <Typography>
-        {record.enrollment_term} · {t(`lifecycle.${record.lifecycle_status}`)}
+        {admissionTerm} · {t(`lifecycle.${record.lifecycle_status}`)}
       </Typography>
       <Typography>
         {t('cgpa')}:{' '}
@@ -170,7 +178,9 @@ export function TranscriptDocument({
           {decision.type === 'Exemption' && (
             <Typography>
               {(decision.reason_codes ?? [])
-                .map((reason) => t(`reasons.${reason}`, { defaultValue: reason }))
+                .map((reason) =>
+                  t(`enrollment:exemptions.reasons.${reason}`, { defaultValue: reason }),
+                )
                 .join(' · ')}
             </Typography>
           )}

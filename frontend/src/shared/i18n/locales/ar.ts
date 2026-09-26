@@ -1,6 +1,7 @@
 // Arabic resources (RTL). Mirrors the English namespace structure.
 export const ar = {
   records: {
+    terms: { Fall: 'الخريف', Spring: 'الربيع', Summer: 'الصيف' },
     service: {
       title: 'طلبات السجل الأكاديمي',
       history: 'النسخ الرسمية',

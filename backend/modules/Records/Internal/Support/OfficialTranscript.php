@@ -42,7 +42,7 @@ final readonly class OfficialTranscript
             $token = bin2hex(random_bytes(32));
             DB::table('transcript_reviews')->insert(['transcript_request_id' => $requestId,
                 'token_hash' => hash('sha256', $token), 'content_hash' => $this->digest($snapshot),
-                'actor_user_id' => $actor, 'created_at' => now()]);
+                'actor_user_id' => $actor, 'created_at' => now()->toIso8601String()]);
 
             return ['review_token' => $token, 'snapshot' => $snapshot];
         }, 5);
@@ -64,7 +64,7 @@ final readonly class OfficialTranscript
                 'transcript_request_id' => $requestId, 'student_id' => $request->student_id,
                 'reference' => (string) Str::uuid(), 'verification_token' => bin2hex(random_bytes(32)),
                 'issuer_user_id' => $actor, 'issuer_name' => $issuer->name,
-                'snapshot' => json_encode($snapshot, JSON_THROW_ON_ERROR), 'issued_at' => now(),
+                'snapshot' => json_encode($snapshot, JSON_THROW_ON_ERROR), 'issued_at' => now()->toIso8601String(),
             ]);
             $this->workflow->transition($request, $request->delivery_method === 'digital' ? 'Completed' : 'ReadyForCollection', 'issued', $actor);
 

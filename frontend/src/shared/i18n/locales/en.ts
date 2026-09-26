@@ -2,6 +2,7 @@
 // (the auth feature's strings). Later features add their own namespaces.
 export const en = {
   records: {
+    terms: { Fall: 'Fall', Spring: 'Spring', Summer: 'Summer' },
     service: {
       title: 'Transcript Requests',
       history: 'Official copies',

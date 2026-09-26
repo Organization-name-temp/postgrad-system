@@ -14,7 +14,7 @@ export function IssuanceHistoryPage() {
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
   const [error, setError] = useState(false)
-  const params = { q: search, status, page, per_page: 25 }
+  const params = { q: search || undefined, status: status || undefined, page, per_page: 25 }
   const query = useScopedOfficialIssuanceHistory(params)
   return (
     <Stack spacing={2}>

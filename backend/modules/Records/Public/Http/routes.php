@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->prefix('records')->group(function (): void {
 
 Route::middleware(['auth:sanctum', 'can:transcript.view_unofficial'])->prefix('records/requests')->group(function (): void {
     Route::get('/', [RequestController::class, 'index']);
+    Route::get('/export', [RequestController::class, 'export']);
     Route::post('/', [RequestController::class, 'store'])->middleware('role:R02');
     Route::get('/{request_id}', [RequestController::class, 'show'])->whereNumber('request_id');
     Route::post('/{request_id}/review', [RequestController::class, 'review'])->whereNumber('request_id')->middleware('can:transcript.issue_official');

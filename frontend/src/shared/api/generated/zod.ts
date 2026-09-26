@@ -6654,6 +6654,7 @@ export const ConfigureTranscriptFeeResponse = zod.object({
  * @summary Official Transcript Request queue and history.
  */
 export const OfficialTranscriptRequestQueueAndHistoryQueryParams = zod.object({
+  "q": zod.string().optional().describe('Search admission names or University ID.'),
   "status": zod.string().optional().describe('Request states.'),
   "delivery_method": zod.string().optional(),
   "student_id": zod.string().optional(),
@@ -6707,6 +6708,20 @@ export const SubmitOfficialTranscriptRequestResponse = zod.object({
 })).optional()
 }).optional()
 })
+
+
+/**
+ * @summary Export official Transcript Request queue and history.
+ */
+export const ExportOfficialTranscriptRequestQueueAndHistoryQueryParams = zod.object({
+  "q": zod.string().optional().describe('Search admission names or University ID.'),
+  "status": zod.string().optional(),
+  "delivery_method": zod.string().optional(),
+  "student_id": zod.string().optional(),
+  "sort": zod.string().optional()
+})
+
+export const ExportOfficialTranscriptRequestQueueAndHistoryResponse = zod.unknown()
 
 
 /**

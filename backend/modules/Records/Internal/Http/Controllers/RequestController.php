@@ -2,17 +2,24 @@
 
 namespace Modules\Records\Internal\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Modules\Identity\Public\Contracts\AuditLogger;
+use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\Contracts\StudentGuard;
+use Modules\Identity\Public\Enums\Role;
 use Modules\Records\Internal\Models\TranscriptRequest;
 use Modules\Records\Internal\Support\RecordsAccess;
 use Modules\Records\Internal\Support\RequestWorkflow;
 use Modules\Records\Internal\Support\TranscriptFee;
+use Support\Export\XlsxExporter;
+use Support\Query\ArabicNormalizer;
 use Support\Query\CollectionQuery;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /** @group Records */
 final class RequestController
@@ -94,6 +101,7 @@ final class RequestController
     /**
      * Official Transcript Request queue and history.
      *
+     * @queryParam q string Search admission names or University ID. Example: Sara
      * @queryParam status string Request states. Example: Submitted
      * @queryParam delivery_method string Example: digital
      * @queryParam student_id string Example: 1,2
@@ -103,9 +111,42 @@ final class RequestController
      *
      * @response 200 {"data":[{"id":1,"student_id":1,"delivery_method":"digital","fee":"125.50","status":"Submitted","created_at":"2026-09-27T00:00:00Z"}],"meta":{"current_page":1,"last_page":1,"per_page":25,"total":1}}
      */
-    public function index(Request $http, RecordsAccess $access): JsonResponse
+    public function index(Request $http, RecordsAccess $access, Directory $directory, StudentDirectory $students): JsonResponse
+    {
+        [$query, $collection] = $this->collection($http, $access, $directory, $students);
+        $page = $query->paginate($collection->perPage, ['*'], 'page', $collection->page);
+
+        return response()->json(['data' => $page->getCollection()->map(fn (TranscriptRequest $r): array => [
+            'id' => $r->id, 'student_id' => $r->student_id, 'delivery_method' => $r->delivery_method,
+            'fee' => TranscriptFee::format($r->fee_minor), 'status' => $r->status, 'created_at' => $r->created_at->toIso8601String(),
+        ])->all(), 'meta' => ['current_page' => $page->currentPage(), 'last_page' => $page->lastPage(), 'per_page' => $page->perPage(), 'total' => $page->total()]]);
+    }
+
+    /**
+     * Export official Transcript Request queue and history.
+     *
+     * @queryParam q string Search admission names or University ID. Example: Sara
+     * @queryParam status string Example: Submitted
+     * @queryParam delivery_method string Example: digital
+     * @queryParam student_id string Example: 1,2
+     * @queryParam sort string Example: -created_at
+     *
+     * @response 200 <<binary>>
+     */
+    public function export(Request $http, RecordsAccess $access, Directory $directory, StudentDirectory $students, AuditLogger $audit, XlsxExporter $xlsx): BinaryFileResponse
+    {
+        [$query, $collection] = $this->collection($http, $access, $directory, $students);
+        $audit->record(action: 'records.requests_exported', actorUserId: (int) $http->user()?->getAuthIdentifier(), metadata: ['criteria' => $collection->auditCriteria()]);
+        $rows = $query->lazy()->map(fn (TranscriptRequest $r): array => [(string) $r->id, (string) $r->student_id, $r->delivery_method, TranscriptFee::format($r->fee_minor), 'EGP', $r->status]);
+
+        return $xlsx->download('transcript-requests.xlsx', ['Request ID', 'Student ID', 'Delivery', 'Fee', 'Currency', 'Status'], $rows, app()->getLocale() === 'ar');
+    }
+
+    /** @return array{Builder<TranscriptRequest>, CollectionQuery} */
+    private function collection(Request $http, RecordsAccess $access, Directory $directory, StudentDirectory $students): array
     {
         $actor = (int) $http->user()?->getAuthIdentifier();
+        abort_unless($access->staff($actor) || $directory->hasRole($actor, Role::Student), 403);
         $collection = CollectionQuery::from($http->query(), knownFilters: ['status', 'delivery_method', 'student_id'],
             readableFilters: ['status', 'delivery_method', 'student_id'], sortable: ['id', 'created_at', 'status', 'student_id', 'delivery_method'], integerFilters: ['student_id']);
         $query = TranscriptRequest::query();
@@ -120,11 +161,21 @@ final class RequestController
         foreach ($collection->sorts as $sort) {
             $query->orderBy($sort['field'], $sort['direction']);
         }
-        $page = $query->paginate($collection->perPage, ['*'], 'page', $collection->page);
 
-        return response()->json(['data' => $page->getCollection()->map(fn (TranscriptRequest $r): array => [
-            'id' => $r->id, 'student_id' => $r->student_id, 'delivery_method' => $r->delivery_method,
-            'fee' => TranscriptFee::format($r->fee_minor), 'status' => $r->status, 'created_at' => $r->created_at->toIso8601String(),
-        ])->all(), 'meta' => ['current_page' => $page->currentPage(), 'last_page' => $page->lastPage(), 'per_page' => $page->perPage(), 'total' => $page->total()]]);
+        if ($collection->search !== null) {
+            $matching = [];
+            foreach ($students->findManyByStudentId($students->allStudentIds()) as $student) {
+                if (! $access->staff($actor) && $student->userId !== $actor) {
+                    continue;
+                }
+                $text = $student->universityId.' '.($student->identity->nameEn ?? '').' '.($student->identity->nameAr ?? '');
+                if (str_contains(ArabicNormalizer::normalize($text), ArabicNormalizer::normalize($collection->search))) {
+                    $matching[] = $student->studentId;
+                }
+            }
+            $query->whereIn('student_id', $matching);
+        }
+
+        return [$query, $collection];
     }
 }

@@ -25891,6 +25891,16 @@ paths:
       parameters:
         -
           in: query
+          name: q
+          description: 'Search admission names or University ID.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Search admission names or University ID.'
+            example: Sara
+        -
+          in: query
           name: status
           description: 'Request states.'
           example: Submitted
@@ -26125,6 +26135,73 @@ paths:
                   example: digital
               required:
                 - delivery_method
+      security: []
+  /api/v1/records/requests/export:
+    get:
+      summary: 'Export official Transcript Request queue and history.'
+      operationId: exportOfficialTranscriptRequestQueueAndHistory
+      description: ''
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Search admission names or University ID.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Search admission names or University ID.'
+            example: Sara
+        -
+          in: query
+          name: status
+          description: ''
+          example: Submitted
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: Submitted
+        -
+          in: query
+          name: delivery_method
+          description: ''
+          example: digital
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: digital
+        -
+          in: query
+          name: student_id
+          description: ''
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '1,2'
+        -
+          in: query
+          name: sort
+          description: ''
+          example: '-created_at'
+          required: false
+          schema:
+            type: string
+            description: ''
+            example: '-created_at'
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - Records
       security: []
   '/api/v1/records/requests/{request_id}':
     get:

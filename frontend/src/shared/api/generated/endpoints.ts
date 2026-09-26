@@ -7389,6 +7389,10 @@ export type ConfigureTranscriptFee200 = {
 
 export type OfficialTranscriptRequestQueueAndHistoryParams = {
 /**
+ * Search admission names or University ID.
+ */
+q?: string;
+/**
  * Request states.
  */
 status?: string;
@@ -7450,6 +7454,17 @@ export type SubmitOfficialTranscriptRequest201Data = {
 
 export type SubmitOfficialTranscriptRequest201 = {
   data?: SubmitOfficialTranscriptRequest201Data;
+};
+
+export type ExportOfficialTranscriptRequestQueueAndHistoryParams = {
+/**
+ * Search admission names or University ID.
+ */
+q?: string;
+status?: string;
+delivery_method?: string;
+student_id?: string;
+sort?: string;
 };
 
 export type OfficialTranscriptRequestDetails200DataTransitionsItem = {
@@ -26971,6 +26986,101 @@ export const useSubmitOfficialTranscriptRequest = <TError = unknown,
       > => {
       return useMutation(getSubmitOfficialTranscriptRequestMutationOptions(options), queryClient);
     }
+
+/**
+ * @summary Export official Transcript Request queue and history.
+ */
+export const exportOfficialTranscriptRequestQueueAndHistory = (
+    params?: ExportOfficialTranscriptRequestQueueAndHistoryParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/records/requests/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportOfficialTranscriptRequestQueueAndHistoryQueryKey = (params?: ExportOfficialTranscriptRequestQueueAndHistoryParams,) => {
+    return [
+    `/api/v1/records/requests/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportOfficialTranscriptRequestQueueAndHistoryQueryOptions = <TData = Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError = unknown>(params?: ExportOfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportOfficialTranscriptRequestQueueAndHistoryQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>> = ({ signal }) => exportOfficialTranscriptRequestQueueAndHistory(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportOfficialTranscriptRequestQueueAndHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>>
+export type ExportOfficialTranscriptRequestQueueAndHistoryQueryError = unknown
+
+
+export function useExportOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params: undefined |  ExportOfficialTranscriptRequestQueueAndHistoryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>,
+          TError,
+          Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params?: ExportOfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>,
+          TError,
+          Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params?: ExportOfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export official Transcript Request queue and history.
+ */
+
+export function useExportOfficialTranscriptRequestQueueAndHistory<TData = Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError = unknown>(
+ params?: ExportOfficialTranscriptRequestQueueAndHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportOfficialTranscriptRequestQueueAndHistory>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportOfficialTranscriptRequestQueueAndHistoryQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * @summary Official Transcript Request details.

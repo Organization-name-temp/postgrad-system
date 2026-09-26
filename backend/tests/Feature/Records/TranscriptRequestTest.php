@@ -50,3 +50,19 @@ it('rejection releases the request limit and Terminated Students retain the serv
     $this->postJson('/api/v1/records/requests', ['delivery_method' => 'digital'])->assertCreated();
     $this->getJson('/api/v1/records/requests')->assertOk()->assertJsonPath('meta.total', 2);
 });
+
+it('keeps the service queue unavailable to Advisors and filters staff search through readable admission names', function () {
+    $student = recordsStudent();
+    $student->update(['name_ar' => 'طالبة خدمة فريدة']);
+    configureRecordsFee();
+    Sanctum::actingAs($student->user);
+    $id = $this->postJson('/api/v1/records/requests', ['delivery_method' => 'digital'])->assertCreated()->json('data.id');
+    Sanctum::actingAs($student->advisor);
+    $this->getJson('/api/v1/records/requests')->assertForbidden();
+    actingAsRole(Role::StudentAffairs);
+    $this->getJson('/api/v1/records/requests?q=فريدة')->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.id', $id);
+    $this->getJson('/api/v1/records/requests?q=absent-name')->assertOk()->assertJsonPath('meta.total', 0);
+    $this->get('/api/v1/records/requests/export?q=فريدة')->assertOk()->assertDownload('transcript-requests.xlsx');
+    $this->assertDatabaseHas('audit_log', ['action' => 'records.requests_exported']);
+    $this->getJson('/api/v1/records/requests?verification_token=hidden')->assertUnprocessable();
+});

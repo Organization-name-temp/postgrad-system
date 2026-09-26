@@ -442,6 +442,7 @@ class AdmissionsSeeder extends Seeder
                 dateOfBirth: '1998-05-20',
                 nationality: 'EG',
                 gender: $gender->value,
+                identificationType: $application->id_type->value,
             ),
             admissionEvidence: $evidenceFacts,
         ));

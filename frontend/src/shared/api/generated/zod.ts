@@ -6611,7 +6611,8 @@ export const TranscriptServiceAvailabilityResponse = zod.object({
   "data": zod.object({
   "available": zod.boolean().optional(),
   "fee": zod.string().nullable(),
-  "currency": zod.string().optional()
+  "currency": zod.string().optional(),
+  "open_request_id": zod.number().nullable()
 }).optional()
 })
 
@@ -6787,7 +6788,8 @@ export const CompleteFullManualTranscriptRefundResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 
@@ -6863,7 +6865,8 @@ export const RequestTranscriptCancellationResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 
@@ -6930,7 +6933,8 @@ export const DecideTranscriptCancellationResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 
@@ -6997,7 +7001,8 @@ export const SubmitTranscriptPaymentEvidenceResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 
@@ -7065,7 +7070,8 @@ export const VerifyOrReturnTranscriptPaymentResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 
@@ -7138,7 +7144,8 @@ export const OfficialTranscriptRequestDetailsResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 
@@ -7205,7 +7212,8 @@ export const ReviewOfficialTranscriptRequestResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 
@@ -7750,7 +7758,8 @@ export const RecordCollectionHandoverResponse = zod.object({
   "completed_at": zod.string().optional(),
   "receipt_url": zod.string().optional()
 }).optional(),
-  "issuance_id": zod.number().optional()
+  "issuance_id": zod.number().optional(),
+  "is_owner": zod.boolean().optional()
 }).optional()
 })
 

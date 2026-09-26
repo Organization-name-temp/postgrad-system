@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import {
   Alert,
@@ -68,6 +69,12 @@ export function TranscriptPage() {
           }}
         />
         <Stack direction="row" spacing={1}>
+          <Button component={Link} to="/records/requests">
+            {t('service.title')}
+          </Button>
+          <Button component={Link} to="/records/history">
+            {t('service.history')}
+          </Button>
           <Button onClick={() => window.print()} disabled={!record.data?.data}>
             {t('print')}
           </Button>

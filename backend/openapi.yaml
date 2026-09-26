@@ -25755,6 +25755,7 @@ paths:
                     available: true
                     fee: '125.50'
                     currency: EGP
+                    open_request_id: 1
                 properties:
                   data:
                     type: object
@@ -25769,8 +25770,13 @@ paths:
                       currency:
                         type: string
                         example: EGP
+                      open_request_id:
+                        type: integer
+                        example: 1
+                        nullable: true
                     required:
                       - fee
+                      - open_request_id
       tags:
         - Records
       security: []
@@ -26264,6 +26270,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -26426,6 +26433,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       requestBody:
@@ -26572,6 +26582,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -26734,6 +26745,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       requestBody:
@@ -26818,6 +26832,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -26980,6 +26995,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       requestBody:
@@ -27071,6 +27089,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -27233,6 +27252,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       requestBody:
@@ -27324,6 +27346,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -27486,6 +27509,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       requestBody:
@@ -27638,6 +27664,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -27800,6 +27827,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       security: []
@@ -27873,6 +27903,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -28035,6 +28066,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       requestBody:
@@ -30036,6 +30070,7 @@ paths:
                       completed_at: '2026-09-27T00:00:00Z'
                       receipt_url: /api/v1/records/requests/1/refund/receipt
                     issuance_id: 1
+                    is_owner: true
                 properties:
                   data:
                     type: object
@@ -30198,6 +30233,9 @@ paths:
                       issuance_id:
                         type: integer
                         example: 1
+                      is_owner:
+                        type: boolean
+                        example: true
       tags:
         - Records
       security: []

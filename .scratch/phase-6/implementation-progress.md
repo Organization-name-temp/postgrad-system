@@ -38,3 +38,8 @@ No external blocker found.
 - Cancellation/full-refund backend committed as 04ba239. Private evidence retained; exact prior-stage restoration and full settlement tested (12 tests,153 assertions).
 - Coherent preview/issuance, digital/collection handover, public validity/revocation and scoped issuance history implemented. Focused issuance HTTP suite:12 tests,146 assertions; real PostgreSQL identity writer/certification lock test:1 test,13 assertions. PHPStan/Pint/deptrac green. ADR0050 documents owner Public table guards and complete reviewed-content contract.
 - This remains implementation-pass evidence only. No ticket marked complete; final gates/review/browser acceptance pending. Service request UI, official/public UI and QR still pending.
+
+## Latest UI frontier
+- Backend certification slice committed 8325cfa. Full focused Records directory passes56 tests474 assertions. No full gates/review yet.
+- Bilingual service request queue/create/detail/actions, receipts, refund/history, full both-language preview and stale refresh, collection, official history/detail, QR seal/print layout, and unauthenticated public verification now wired via generated client. Owner-specific UI metadata added/tested at HTTP (1 test6 assertions). QR generated locally with qrcode.react.
+- Focused Records frontend:10 tests passed (fee,document,request controls,preview/public revocation). Typecheck/lint green. Still need serial browser journey, expanded source/concurrency coverage, full gates, actual four-theme/direction/print/accessibility checks and ONE consolidated review.

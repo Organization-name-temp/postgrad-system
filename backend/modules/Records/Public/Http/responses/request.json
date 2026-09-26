@@ -52,6 +52,7 @@
       "completed_at": "2026-09-27T00:00:00Z",
       "receipt_url": "/api/v1/records/requests/1/refund/receipt"
     },
-    "issuance_id": 1
+    "issuance_id": 1,
+    "is_owner": true
   }
 }

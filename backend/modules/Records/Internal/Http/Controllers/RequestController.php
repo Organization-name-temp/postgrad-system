@@ -67,7 +67,10 @@ final class RequestController
         $actor = (int) $http->user()?->getAuthIdentifier();
         abort_unless($access->staff($actor) || $request->user_id === $actor, 403);
 
-        return response()->json(['data' => $workflow->detail($request, $access->staff($actor))]);
+        $detail = $workflow->detail($request, $access->staff($actor));
+        $detail['is_owner'] = $request->user_id === $actor;
+
+        return response()->json(['data' => $detail]);
     }
 
     /**

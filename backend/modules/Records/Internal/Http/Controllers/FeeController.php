@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Knuckles\Scribe\Attributes\ResponseField;
 use Modules\Identity\Public\Contracts\AuditLogger;
+use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Records\Internal\Models\TranscriptRequest;
 use Modules\Records\Internal\Support\TranscriptFee;
 
 /** @group Records */
@@ -16,12 +18,18 @@ final class FeeController
     /**
      * Transcript service availability.
      *
-     * @response 200 {"data":{"available":true,"fee":"125.50","currency":"EGP"}}
+     * @response 200 {"data":{"available":true,"fee":"125.50","currency":"EGP","open_request_id":1}}
      */
     #[ResponseField('data.fee', 'string', nullable: true)]
-    public function availability(TranscriptFee $fee): JsonResponse
+    #[ResponseField('data.open_request_id', 'integer', nullable: true)]
+    public function availability(Request $request, TranscriptFee $fee, StudentDirectory $students): JsonResponse
     {
-        return response()->json(['data' => $fee->read()]);
+        $student = $students->find((int) $request->user()?->getAuthIdentifier());
+        $data = $fee->read();
+        $data['open_request_id'] = $student === null ? null : TranscriptRequest::query()->where('student_id', $student->studentId)
+            ->whereNotIn('status', ['Completed', 'Rejected', 'Cancelled'])->value('id');
+
+        return response()->json(['data' => $data]);
     }
 
     /**

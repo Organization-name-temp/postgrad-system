@@ -9,7 +9,18 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import type { CurrentUnofficialTranscript200Data } from '../../shared/api/generated/endpoints'
+import type {
+  CurrentUnofficialTranscript200Data,
+  ReviewCoherentOfficialTranscriptPreview200DataSnapshot,
+  ImmutableOfficialTranscriptDetail200DataSnapshot,
+  PublicBearerVerificationOfAnOfficialCopy200DataSnapshot,
+} from '../../shared/api/generated/endpoints'
+
+export type TranscriptDocumentRecord =
+  | CurrentUnofficialTranscript200Data
+  | ReviewCoherentOfficialTranscriptPreview200DataSnapshot
+  | ImmutableOfficialTranscriptDetail200DataSnapshot
+  | PublicBearerVerificationOfAnOfficialCopy200DataSnapshot
 
 const metrics = [
   'baseline_required_ch',
@@ -23,9 +34,17 @@ const metrics = [
   'remaining_ch',
 ] as const
 
-export function TranscriptDocument({ record }: { record: CurrentUnofficialTranscript200Data }) {
-  const { t, i18n } = useTranslation('records')
-  const arabic = i18n.language === 'ar'
+export function TranscriptDocument({
+  record,
+  language,
+  official = false,
+}: {
+  record: TranscriptDocumentRecord
+  language?: 'en' | 'ar'
+  official?: boolean
+}) {
+  const { t, i18n } = useTranslation('records', { lng: language })
+  const arabic = (language ?? i18n.language) === 'ar'
   const name = (value: { name_en?: string; name_ar?: string } | undefined) =>
     arabic ? value?.name_ar : value?.name_en
   const program = record.program
@@ -43,7 +62,7 @@ export function TranscriptDocument({ record }: { record: CurrentUnofficialTransc
         sx={{ maxWidth: '100%', width: (theme) => theme.spacing(40), mb: 2 }}
       />
       <Typography variant="h5" component="h2">
-        {t('unofficial')}
+        {t(official ? 'service.official' : 'unofficial')}
       </Typography>
       <Typography variant="h6">{name(record.identity)}</Typography>
       <Typography dir="ltr" sx={{ unicodeBidi: 'isolate' }}>

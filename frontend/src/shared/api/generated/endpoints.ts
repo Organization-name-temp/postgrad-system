@@ -7347,6 +7347,8 @@ export type TranscriptServiceAvailability200Data = {
   /** @nullable */
   fee: string | null;
   currency?: string;
+  /** @nullable */
+  open_request_id: number | null;
 };
 
 export type TranscriptServiceAvailability200 = {
@@ -7538,6 +7540,7 @@ export type CompleteFullManualTranscriptRefund200Data = {
   cancellation_prior_status?: string;
   refund?: CompleteFullManualTranscriptRefund200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type CompleteFullManualTranscriptRefund200 = {
@@ -7619,6 +7622,7 @@ export type RequestTranscriptCancellation200Data = {
   cancellation_prior_status?: string;
   refund?: RequestTranscriptCancellation200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type RequestTranscriptCancellation200 = {
@@ -7694,6 +7698,7 @@ export type DecideTranscriptCancellation200Data = {
   cancellation_prior_status?: string;
   refund?: DecideTranscriptCancellation200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type DecideTranscriptCancellation200 = {
@@ -7769,6 +7774,7 @@ export type SubmitTranscriptPaymentEvidence200Data = {
   cancellation_prior_status?: string;
   refund?: SubmitTranscriptPaymentEvidence200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type SubmitTranscriptPaymentEvidence200 = {
@@ -7846,6 +7852,7 @@ export type VerifyOrReturnTranscriptPayment200Data = {
   cancellation_prior_status?: string;
   refund?: VerifyOrReturnTranscriptPayment200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type VerifyOrReturnTranscriptPayment200 = {
@@ -7922,6 +7929,7 @@ export type OfficialTranscriptRequestDetails200Data = {
   cancellation_prior_status?: string;
   refund?: OfficialTranscriptRequestDetails200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type OfficialTranscriptRequestDetails200 = {
@@ -7997,6 +8005,7 @@ export type ReviewOfficialTranscriptRequest200Data = {
   cancellation_prior_status?: string;
   refund?: ReviewOfficialTranscriptRequest200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type ReviewOfficialTranscriptRequest200 = {
@@ -8663,6 +8672,7 @@ export type RecordCollectionHandover200Data = {
   cancellation_prior_status?: string;
   refund?: RecordCollectionHandover200DataRefund;
   issuance_id?: number;
+  is_owner?: boolean;
 };
 
 export type RecordCollectionHandover200 = {

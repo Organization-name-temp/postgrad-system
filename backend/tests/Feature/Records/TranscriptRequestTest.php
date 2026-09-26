@@ -66,3 +66,15 @@ it('keeps the service queue unavailable to Advisors and filters staff search thr
     $this->assertDatabaseHas('audit_log', ['action' => 'records.requests_exported']);
     $this->getJson('/api/v1/records/requests?verification_token=hidden')->assertUnprocessable();
 });
+
+it('reports the owners open request independently of filtered staff or Student queues', function () {
+    $student = recordsStudent();
+    configureRecordsFee();
+    Sanctum::actingAs($student->user);
+    $id = $this->postJson('/api/v1/records/requests', ['delivery_method' => 'digital'])->assertCreated()->json('data.id');
+    $this->getJson('/api/v1/records/service')->assertJsonPath('data.open_request_id', $id);
+    $this->getJson("/api/v1/records/requests/{$id}")->assertJsonPath('data.is_owner', true);
+    actingAsRole(Role::StudentAffairs);
+    $this->getJson('/api/v1/records/service')->assertJsonPath('data.open_request_id', null);
+    $this->getJson("/api/v1/records/requests/{$id}")->assertJsonPath('data.is_owner', false);
+});

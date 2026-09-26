@@ -1,6 +1,11 @@
 import { lazy, Suspense } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { RequestsPage } from '../features/records/RequestsPage'
+import { RequestPage } from '../features/records/RequestPage'
+import { IssuancePage } from '../features/records/IssuancePage'
+import { IssuanceHistoryPage } from '../features/records/IssuanceHistoryPage'
+import { PublicVerificationPage } from '../features/records/PublicVerificationPage'
 import { TranscriptPage } from '../features/records/TranscriptPage'
 import { FeePage } from '../features/records/FeePage'
 import { LoginPage } from '../features/auth/LoginPage'
@@ -81,6 +86,7 @@ export function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/records/verify/:token" element={<PublicVerificationPage />} />
             {StyleGallery && (
               <Route
                 path="/style"
@@ -96,6 +102,10 @@ export function App() {
                 <Route path="/" element={<DashboardPage />} />
                 <Route element={<RequireAuth permission="transcript.view_unofficial" />}>
                   <Route path="/records" element={<TranscriptPage />} />
+                  <Route path="/records/requests" element={<RequestsPage />} />
+                  <Route path="/records/requests/:requestId" element={<RequestPage />} />
+                  <Route path="/records/history" element={<IssuanceHistoryPage />} />
+                  <Route path="/records/issuances/:issuanceId" element={<IssuancePage />} />
                 </Route>
                 <Route element={<RequireAuth permission="transcript.issue_official" />}>
                   <Route path="/records/fee" element={<FeePage />} />

@@ -35,13 +35,13 @@ export function GraduationReportPage() {
         values={collection.values}
         onChange={collection.setCriteria}
       />
-      {report.isPending && <CircularProgress aria-label={t('report.loading')} />}
+      {report.isPending && <CircularProgress aria-label={t('graduationReport.loading')} />}
       {report.isError && (
         <Alert
           severity="error"
           action={<Button onClick={() => void report.refetch()}>{t('report.retry')}</Button>}
         >
-          {t('report.loadError')}
+          {t('graduationReport.loadError')}
         </Alert>
       )}
       {summary && !report.isError && (

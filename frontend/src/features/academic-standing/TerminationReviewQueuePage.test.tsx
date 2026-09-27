@@ -45,7 +45,7 @@ it('lets the council record a reasoned termination decision', async () => {
     </ThemeProvider>,
   )
 
-  expect(await screen.findByText('Student #19')).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'Student #19' })).toBeInTheDocument()
   fireEvent.change(screen.getByLabelText(/Assessment or reason/), {
     target: { value: 'Evidence confirmed' },
   })
@@ -72,6 +72,13 @@ it('renders the reviewer queue in Arabic without exposing translation keys', asy
 
   expect(await screen.findByText('قرارات إنهاء القيد')).toBeInTheDocument()
   expect(screen.queryByText(/termination\.review/)).not.toBeInTheDocument()
+  const student = await screen.findByText('19')
+  expect(student.tagName).toBe('BDI')
+  expect(student).toHaveAttribute('dir', 'ltr')
+  const fingerprint = screen.getByText('evidence-123')
+  expect(fingerprint.tagName).toBe('BDI')
+  expect(fingerprint).toHaveAttribute('dir', 'ltr')
+  expect(student.parentElement).not.toHaveAttribute('dir', 'ltr')
 })
 
 it('requires confirmation before the council dismisses a case', async () => {
@@ -85,7 +92,7 @@ it('requires confirmation before the council dismisses a case', async () => {
     </ThemeProvider>,
   )
 
-  expect(await screen.findByText('Student #19')).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'Student #19' })).toBeInTheDocument()
   fireEvent.change(screen.getByLabelText(/Assessment or reason/), {
     target: { value: 'Trigger is no longer actionable' },
   })

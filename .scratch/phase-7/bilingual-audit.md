@@ -49,3 +49,9 @@ from dictionary parity alone.
 
 These fixes do not establish complete existing-surface audit coverage. Four-state
 responsive/browser checks and runtime message paths remain on the acceptance frontier.
+
+| B04-04 | Narrow Catalog collections | Read-only browser audit reproduced document overflow at 390px on Faculties (EN) and Departments (AR). | Shell main flex child must shrink below intrinsic table width; add `minWidth: 0`, retain local TableContainer scrolling. Four-state Catalog verification running; initial EN/AR light checks now pass. |
+| B05-02 | Termination reviewer mixed-script identifiers | Source inspection found the entire translated Student/fingerprint sentence forced LTR. Arabic regression confirms no isolated identifier nodes. | Pending paired rich-text labels with LTR `bdi` values and inherited Arabic sentence direction; preserve evidence/review authority. |
+
+| B04-05 | Public login/registration language choice | Native public-auth matrix timed out waiting for the absent language switcher; these routes only rendered the forms. | App composes a public auth header using existing language/theme controls. Anonymous choice stays local; explicit test caught unnecessary persistence before conditional authentication guard. Browser matrix rerunning. |
+| B03-01 | New Report feedback | Generated-hook pending/error scenarios for Readiness/Termination showed Academic Standing messages. Case List loading/error/empty messages referred to Students instead of Cases. | Paired owner messages; Report scenarios passed 12 focused tests, Case feedback/List regressions passed 17. No arithmetic, scope or workflow changes. |

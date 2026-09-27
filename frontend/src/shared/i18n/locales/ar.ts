@@ -2067,6 +2067,11 @@ export const ar = {
   },
   academicStanding: {
     terminationReport: {
+      listLoading: 'جارٍ تحميل حالات إنهاء القيد المطابقة',
+      listError: 'تعذّر تحميل حالات إنهاء القيد المطابقة.',
+      empty: 'لا توجد حالات إنهاء قيد مطابقة لهذه المعايير ضمن نطاقك المسموح.',
+      loading: 'جارٍ تحميل تقرير إنهاء القيد',
+      loadError: 'تعذّر تحميل تقرير إنهاء القيد.',
       viewCases: 'عرض الحالات المطابقة',
       title: 'تقرير إنهاء القيد',
       listTitle: 'قائمة حالات إنهاء القيد',
@@ -2109,6 +2114,8 @@ export const ar = {
       caseId: 'ترتيب رقم الحالة',
     },
     graduationReport: {
+      loading: 'جارٍ تحميل تقرير جاهزية التخرج',
+      loadError: 'تعذّر تحميل تقرير جاهزية التخرج.',
       studentTable: 'الطلاب المطابقون والجاهزية الاسترشادية',
       columns: {
         readiness: 'جاهزية أكاديمية استرشادية',
@@ -2245,8 +2252,8 @@ export const ar = {
         advisor: { title: 'تقييمات إنهاء القيد' },
         departmentHead: { title: 'توصيات إنهاء القيد' },
         council: { title: 'قرارات إنهاء القيد' },
-        student: 'الطالب رقم {{id}}',
-        fingerprint: 'بصمة الأدلة: {{value}}',
+        student: 'الطالب رقم <id>{{id}}</id>',
+        fingerprint: 'بصمة الأدلة: <value>{{value}}</value>',
         reason: 'التقييم أو السبب',
         required: 'أدخل تقييمًا أو سببًا.',
         evidenceTitle: 'الأدلة الموجبة للإجراء',

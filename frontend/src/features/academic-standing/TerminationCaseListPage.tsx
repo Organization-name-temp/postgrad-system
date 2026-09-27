@@ -100,13 +100,13 @@ export function TerminationCaseListPage() {
       ]}
     >
       <FilterBar fields={fields} values={collection.values} onChange={collection.setCriteria} />
-      {query.isPending && <CircularProgress aria-label={t('report.studentsLoading')} />}
+      {query.isPending && <CircularProgress aria-label={t('terminationReport.listLoading')} />}
       {query.isError && (
         <Alert
           severity="error"
           action={<Button onClick={() => void query.refetch()}>{t('report.retry')}</Button>}
         >
-          {t('report.studentsError')}
+          {t('terminationReport.listError')}
         </Alert>
       )}
       {meta && !query.isError && (
@@ -124,7 +124,7 @@ export function TerminationCaseListPage() {
         />
       )}
       {!query.isPending && !query.isError && rows.length === 0 && (
-        <Alert severity="info">{t('report.empty')}</Alert>
+        <Alert severity="info">{t('terminationReport.empty')}</Alert>
       )}
       {!query.isError && rows.length > 0 && (
         <TableContainer>

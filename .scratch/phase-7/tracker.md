@@ -27,9 +27,9 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 | Ticket | State | Evidence |
 | --- | --- | --- |
 | 01 Standing | Implemented; final acceptance pending | Owner summary/List/export, protected EN/AR UI and four native journeys verified below; final gates/review pending |
-| 02 Readiness | Implementation/verification in progress | Bounded owner parity, scoped summary/List/export and focused EN/AR UI verified below; native journeys in progress |
-| 03 Termination | Pending 01 | Existing operational queues are not Reports |
-| 04 Shell/Catalog/Admissions polish | Pending audit | |
+| 02 Readiness | Implemented; final acceptance pending | Bounded owner parity, scoped summary/List/export, EN/AR UI and four native journeys verified below; final gates/review pending |
+| 03 Termination | Implemented; final acceptance pending | Scoped minimal Case summary/List/export, authorized review links, worked seed evidence, EN/AR UI and four native journeys verified below |
+| 04 Shell/Catalog/Admissions polish | Audit in progress | Session/control labels and Pipeline count wording fixed test-first; narrow Catalog overflow reproduced; four-state audit running |
 | 05 Enrollment/Grading/progress polish | Audit in progress | B05-01 Arabic Waiver download message fixed; page regression passes EN/AR |
 | 06 Records polish | Pending audit | Existing Records print regressions to retain |
 | 07 Acceptance | Pending 01–06 | Human demo review remains required before phase acceptance |
@@ -1285,3 +1285,30 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   screen correctness from dictionary parity. #04–#07, final gates/review pending.
 - Pipeline EN/AR focused Report tests passed **2 / 2, 15.32s**; frontend typecheck
   and lint passed for this polish slice. Full four-state surface audit remains pending.
+- Catalog narrow overflow RED reproduced in English Faculties and Arabic
+  Departments. Main shell flex child now permits shrinkage (`minWidth: 0`) while
+  local tables retain scrolling. Read-only Catalog matrix passed **4 / 4, 2.5m**:
+  tree, Faculties, Departments, Programs, Courses at 390/1280px, all EN/AR × themes,
+  raw-key checks and axe without serious/critical violations.
+- Termination reviewer Arabic labels now inherit sentence direction with separate
+  LTR bdi Student ID/fingerprint values. Regression captured RED; **3 focused
+  review tests passed, 7.66s**, preserving Council decision confirmation.
+- Readiness/Termination pending/error messages previously named Academic Standing.
+  Actual generated-hook feedback tests captured **8 failures** before paired owner
+  messages; focused feedback and Report regressions passed **12 / 3 files, 21.55s**.
+  Case List feedback checks and public-auth matrix are running; no outcome claimed.
+- Public-auth routes lacked a language control. Native RED captured that absence;
+  app-owned header now composes existing controls. A separate anonymous interaction
+  captured unnecessary `/me` locale persistence; the shared app switcher now
+  persists only for authenticated users. **8 switcher/registration tests passed,
+  16.61s**. Native public login/registration matrix passed **4 / 4, 41.2s**, covering
+  EN/AR × light/dark, 390/1280px, axe and preserved populated email/password inputs.
+- Case loading/error/empty feedback regressions passed **17 tests / 2 files,
+  14.04s** after six new expected RED failures. These owner messages distinguish
+  absence of Cases from absence of Students. Existing review regressions pass.
+- Remaining existing-surface browser matrix is running serially with stop-on-first
+  failure. A cross-Report scoped headline with workbook membership read-back is
+  authored but not yet run. Final package gates and review remain pending.
+- Frontend typecheck, lint and full format check passed for the public controls,
+  shell width, identifier isolation and owner feedback slice. Broader acceptance
+  coverage remains pending; no consolidated code review has been run yet.

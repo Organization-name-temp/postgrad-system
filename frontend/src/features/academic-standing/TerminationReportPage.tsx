@@ -31,13 +31,13 @@ export function TerminationReportPage() {
         values={collection.values}
         onChange={collection.setCriteria}
       />
-      {report.isPending && <CircularProgress aria-label={t('report.loading')} />}
+      {report.isPending && <CircularProgress aria-label={t('terminationReport.loading')} />}
       {report.isError && (
         <Alert
           severity="error"
           action={<Button onClick={() => void report.refetch()}>{t('report.retry')}</Button>}
         >
-          {t('report.loadError')}
+          {t('terminationReport.loadError')}
         </Alert>
       )}
       {summary && !report.isError && (
@@ -48,7 +48,9 @@ export function TerminationReportPage() {
           <Typography>
             {t('terminationReport.students', { count: summary.student_count ?? 0 })}
           </Typography>
-          {summary.case_count === 0 && <Alert severity="info">{t('report.empty')}</Alert>}
+          {summary.case_count === 0 && (
+            <Alert severity="info">{t('terminationReport.empty')}</Alert>
+          )}
           <Chart
             layout="horizontal"
             label={t('terminationReport.chart')}

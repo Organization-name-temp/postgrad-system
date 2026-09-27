@@ -2145,6 +2145,11 @@ export const en = {
   },
   academicStanding: {
     terminationReport: {
+      listLoading: 'Loading matching Termination Cases',
+      listError: 'The matching Termination Cases could not be loaded.',
+      empty: 'No Termination Cases match these criteria within your authorized scope.',
+      loading: 'Loading Termination Report',
+      loadError: 'The Termination Report could not be loaded.',
       viewCases: 'View matching Cases',
       title: 'Termination Report',
       listTitle: 'Termination Case List',
@@ -2187,6 +2192,8 @@ export const en = {
       caseId: 'Case ID order',
     },
     graduationReport: {
+      loading: 'Loading Graduation Readiness Report',
+      loadError: 'The Graduation Readiness Report could not be loaded.',
       studentTable: 'Matching Students and advisory readiness',
       columns: {
         readiness: 'Advisory readiness',
@@ -2325,8 +2332,8 @@ export const en = {
         advisor: { title: 'Termination assessments' },
         departmentHead: { title: 'Termination recommendations' },
         council: { title: 'Termination decisions' },
-        student: 'Student #{{id}}',
-        fingerprint: 'Evidence fingerprint: {{value}}',
+        student: 'Student #<id>{{id}}</id>',
+        fingerprint: 'Evidence fingerprint: <value>{{value}}</value>',
         reason: 'Assessment or reason',
         required: 'Enter an assessment or reason.',
         evidenceTitle: 'Actionable evidence',

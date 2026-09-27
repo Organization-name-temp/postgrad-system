@@ -11,12 +11,12 @@ import { useAuth } from '../features/auth/useAuth'
  */
 export function LanguageSwitcher() {
   const { t, i18n } = useTranslation('common')
-  const { persistLocale } = useAuth()
+  const { persistLocale, isAuthenticated } = useAuth()
 
   const handleChange = (_event: MouseEvent<HTMLElement>, next: string | null) => {
     if (next && next !== i18n.language) {
       void i18n.changeLanguage(next)
-      void persistLocale(next)
+      if (isAuthenticated) void persistLocale(next)
     }
   }
 

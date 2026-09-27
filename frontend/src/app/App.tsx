@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { PublicAuthLayout } from './PublicAuthLayout'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { RequestsPage } from '../features/records/RequestsPage'
@@ -92,8 +93,10 @@ export function App() {
       <AppThemeProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route element={<PublicAuthLayout />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
             <Route path="/records/verify/:token" element={<PublicVerificationPage />} />
             {StyleGallery && (
               <Route

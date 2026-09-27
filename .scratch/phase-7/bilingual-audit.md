@@ -103,10 +103,10 @@ serially. A pending entry below is not reported as a pass.
 | Login/register and populated language switching | RequireAuth, RegisterPage, LanguageSwitcher and localeControls regressions | `auth-bilingual-audit.spec.ts`: 4 passed |
 | Shell, nav, Dashboard and typed notification bell | SideNav, DashboardPage and NotificationsBell interactions; labels use owner typed data | Nine core audit groups each passed all four states; full combined run pending |
 | Catalog tree/lists, curriculum, versions, detail dialogs | Owner Catalog/Curriculum regressions, immutable history and generated reference tests | Core Catalog 4 and detail/dialog 4 passed, 390/1280px |
-| Applicant personal info/email/documents/program/review/status | Existing wizard interactions and Admissions headline; paired dictionaries, identifier/number inputs and owner validation | Applicant detail matrix running; extended existing headline audits populated wizard states in all four combinations, unrun |
-| Screening/Dean detail, scheduling/slots/interviewer | ApplicationReviewPage historical read-only regression; DeanDecisionPage and SlotFormDialog paired runtime validation | Staff/Dean core groups passed all four; detail/Interviewer matrix running; owner Admissions journey pending extended audit |
-| Registration/advising/on-behalf, schedules | RegistrationPage, RegistrationReviewPage, ComposeForStudentPage, SchedulePage interactions; LifecycleReadOnly | Core Student/Advisor groups passed all four; Advisor detail matrix running; owner Enrollment journey retained |
-| Offerings/attendance | Existing RegisterGrid interaction and multi-role Enrollment journey; percentages remain owner-derived | Instructor attendance detail matrix running |
+| Applicant personal info/email/documents/program/review/status | Existing wizard interactions and Admissions headline; paired dictionaries, identifier/number inputs and owner validation | Applicant detail matrix: four states passed; expanded Admissions journey passed (4.6m), including populated wizard and owner decision states |
+| Screening/Dean detail, scheduling/slots/interviewer | ApplicationReviewPage historical read-only regression; DeanDecisionPage and SlotFormDialog paired runtime validation | Staff/Dean core groups and detail/Interviewer matrix passed all four; expanded owner Admissions journey passed |
+| Registration/advising/on-behalf, schedules | RegistrationPage, RegistrationReviewPage, ComposeForStudentPage, SchedulePage interactions; LifecycleReadOnly | Core Student/Advisor groups and Advisor detail matrix passed all four; expanded owner Enrollment journey rerunning |
+| Offerings/attendance | Existing RegisterGrid interaction and multi-role Enrollment journey; percentages remain owner-derived | Instructor attendance detail matrix passed all four |
 | Capacity/Exemptions/Transfers/Waivers | Owner review/form interactions, paired reviewer validation, Arabic numeric/code isolation and B05-01 failure path | Head/Council core passed all four; expanded Student/Advisor/Head credit surfaces await final gate; Exemptions prior art covers all four |
 | Grade sheets, corrections/Incompletes, Student Grades | Owner grading interactions; unchanged supersession/math; correction and unavailable states | Existing `grading.spec.ts` four-state populated editors/invalid marks/Incomplete fields/resolution/central entry/My Grades retained for final gate |
 | Credit-Hour Summary/Standing/Termination review | Owner academic and lifecycle interactions; paired status loading and B05-02 isolated identifiers | Core Student/Advisor/Head/Council groups passed all four; three new Reports separately passed all four and paper inspection |
@@ -142,4 +142,14 @@ Card verification passed **58 / 7 files**. Both final gates are running.
 
 | ID | Surface | Evidence | Disposition |
 | --- | --- | --- | --- |
-| B04-12 | Populated Applicant “None” English-score guidance | Extended real Admissions journey reproduced 2.57:1 on the disabled score helper; paired EN/AR focused regressions failed. | Keep score input disabled/omitted for None and enable its instructional helper, as with GPA scale guidance. Focused owner tests and serial populated-state journey rerunning. |
+| B04-12 | Populated Applicant “None” English-score guidance | Extended real Admissions journey reproduced 2.57:1 on the disabled score helper; paired EN/AR focused regressions failed. | Keep score input disabled/omitted for None and enable its instructional helper, as with GPA scale guidance. Sixteen PersonalInfoStep tests passed; expanded Admissions populated-state journey passed (4.6m). |
+
+### Final verification frontier
+
+The complete workflow-detail matrix passed **24 tests in 7.4m**, covering
+Applicant, Screening, Dean, Advisor, Instructor attendance and Interviewer detail
+surfaces in all four combinations. The expanded Admissions owner journey passed
+**4.6m**, including populated wizard inputs, validation and actual transitions.
+Correction-dialog and extended Enrollment/Records checks are rerunning serially
+after harness fixes; final package gates and the single consolidated review remain
+pending. Chronological pending entries above do not override these later results.

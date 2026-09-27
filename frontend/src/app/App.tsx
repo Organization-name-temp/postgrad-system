@@ -11,6 +11,8 @@ import { FeePage } from '../features/records/FeePage'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RegisterPage } from '../features/admissions/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
+import { GraduationReportPage } from '../features/academic-standing/GraduationReportPage'
+import { GraduationStudentListPage } from '../features/academic-standing/GraduationStudentListPage'
 import { StandingReportPage } from '../features/academic-standing/StandingReportPage'
 import { StandingStudentListPage } from '../features/academic-standing/StandingStudentListPage'
 import { ACADEMIC_REPORT_ROLES } from '../features/academic-standing/academicReportAccess'
@@ -293,6 +295,14 @@ export function App() {
                     />
                   }
                 >
+                  <Route
+                    path="/analytics/graduation-readiness"
+                    element={<GraduationReportPage />}
+                  />
+                  <Route
+                    path="/analytics/graduation-readiness/students"
+                    element={<GraduationStudentListPage />}
+                  />
                   <Route path="/analytics/academic-standing" element={<StandingReportPage />} />
                   <Route
                     path="/analytics/academic-standing/students"

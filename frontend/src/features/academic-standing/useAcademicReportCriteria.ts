@@ -18,7 +18,7 @@ export const ACADEMIC_STANDINGS = [
 ] as const
 
 /** Shared only by the AcademicStanding owner's Report and ordinary Student List. */
-export function useAcademicReportCriteria() {
+export function useAcademicReportCriteria(includeStanding = true) {
   const { t, i18n } = useTranslation('academicStanding')
   const collection = useCollectionQuery()
   const [facultySearch, setFacultySearch] = useState<string | null>(null)
@@ -169,8 +169,8 @@ export function useAcademicReportCriteria() {
   ]
   return {
     ...collection,
-    fields,
-    criteria,
+    fields: includeStanding ? fields : fields.filter((field) => field.key !== 'standing'),
+    criteria: includeStanding ? criteria : criteria.slice(0, -1),
     values: {
       ...collection.params,
       lifecycle: collection.searchParams.get('lifecycle') ?? 'Active',

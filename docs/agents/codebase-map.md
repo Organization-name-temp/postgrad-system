@@ -52,7 +52,7 @@ modules/<Module>/
 | `Enrollment` | offerings, meetings, registration requests, enrollments, class sessions, attendance, earned-credit state, and automatic/manual Exemption decisions | `EnrollmentRecords`, `ExemptionDecisions`, and enrollment/offering/decision DTOs |
 | `Records` | current Transcripts, official requests/issuances, fee/payment/refund evidence, cancellation, collection, revocation, and bearer verification | owner Public contracts and transactional `TranscriptReadGuard` seams consumed by `Internal/Support`; HTTP routes |
 | `Grading` | grade sheets, grades, correction rounds, Incompletes, GPA/CGPA read model | `GradingRecords` and `GradeSummary` |
-| `AcademicStanding` | current Academic Standing and scoped Standing Report/List/export, Credit-Hour Summary, advisory Graduation Readiness, Termination Cases | `StandingRecords`, `CreditHourSummaries`, `GraduationProgress`, `TerminationCases` |
+| `AcademicStanding` | current Academic Standing and scoped Standing Report/List/export, Credit-Hour Summary, advisory Graduation Readiness and scoped readiness Report/List/export, Termination Cases | `StandingRecords`, `CreditHourSummaries`, `GraduationProgress`, `TerminationCases` |
 
 When changing a module, begin at its `Public/Http/routes.php`, follow the route into `Internal/Http/Controllers`, then trace models/support classes and the matching tests. When another module needs data, begin at the owner's existing `Public` facade before considering a new method.
 
@@ -94,7 +94,7 @@ Feature ownership mirrors user-facing workflows:
 - `features/enrollment`: registration, advising, on-behalf registration, schedules, attendance, and instructor registers.
 - `features/records`: bilingual current/official Transcript documents, service queues/actions/evidence, issuance history, staff fee setup, and public verification outside the authenticated shell.
 - `features/grading`: instructor sheets/corrections/Incompletes, department-head review, oversight, and student grades.
-- `features/academic-standing`: Student credit/standing summaries, scoped Academic Standing Report and pageable Student List, advisory readiness, and Termination review surfaces. The app composes protected `/analytics/academic-standing` and `/analytics/academic-standing/students` routes; Report downloads use the owner API.
+- `features/academic-standing`: Student credit/standing summaries, scoped Academic Standing Report and pageable Student List, advisory readiness Report/List and Termination review surfaces. The app composes protected `/analytics/academic-standing` and `/analytics/academic-standing/students` routes; The same staff gate composes `/analytics/graduation-readiness` and its `/students` List. Report downloads use the owner API.
 
 The shell composes owner Reports beneath permission-filtered Analytics navigation.
 Shared `FilterBar`, `Chart`/`ChartDataTable`, and `ReportDocument` supply parameter,

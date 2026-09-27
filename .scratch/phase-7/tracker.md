@@ -26,8 +26,8 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 
 | Ticket | State | Evidence |
 | --- | --- | --- |
-| 01 Standing | Pending prerequisites | No report implementation yet |
-| 02 Readiness | Pending 01 | No report implementation yet |
+| 01 Standing | Implemented; final acceptance pending | Owner summary/List/export, protected EN/AR UI and four native journeys verified below; final gates/review pending |
+| 02 Readiness | Implementation/verification in progress | Bounded owner parity, scoped summary/List/export and focused EN/AR UI verified below; native journeys in progress |
 | 03 Termination | Pending 01 | Existing operational queues are not Reports |
 | 04 Shell/Catalog/Admissions polish | Pending audit | |
 | 05 Enrollment/Grading/progress polish | Audit in progress | B05-01 Arabic Waiver download message fixed; page regression passes EN/AR |
@@ -1180,3 +1180,37 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   no generated file hand-edits. UI/browser evidence and remaining worked HTTP
   acceptance scenarios are still required before #02 completion. Full gates and
   the consolidated review remain pending.
+
+### Bilingual Readiness Report/List, shell composition and native journeys
+
+- The owner UI presents three advisory groups and all four overlapping blocker
+  bands with identical accessible tables. Common named academic criteria are reused
+  without the Standing-only field; readiness, blocker, numeric ranges, CGPA
+  availability and the explicitly labelled 1–5 CH proximity selection use the URL.
+  Historical selections retain an explicit ineligibility/advisory notice.
+- The ordinary Student List renders every typed blocker, nullable readiness/CGPA,
+  remaining CH, owner's no-proposal Approaching Graduation, safe Program facts,
+  permission-gated existing grade links, URL sorting/pages and canonical download.
+  Focused regressions prove real 0.00 versus unavailable evidence and exact drill
+  URLs in EN/AR. An added accessible table-name regression caught a copied Standing
+  label; it now names advisory readiness in both languages.
+- Navigation first failed for seven eligible personas before the new item existed;
+  protected Report/List routes require the same permission and academic Roles as
+  #01. The final focused Readiness Report/List/SideNav run passed **27 tests /
+  3 files, 20.23s**. Existing Standing Report regressions also passed during the
+  combined run. Typecheck, lint and full formatting passed.
+- Backend and frontend post-commit API drift checks passed for f0baffb. Native
+  Readiness journeys passed **4 tests, 2.2m**, serial Student Affairs/Dean in EN/AR
+  light/dark: scoped group/table counts, exact full blocker membership, keyboard
+  List drill, detail access, workbook download, Back and no serious/critical axe
+  findings on Report and List.
+- Initial native failures were locator defects: literal parentheses interpreted
+  as regex syntax, then duplicated CGPA-unavailable text in the value and blocker.
+  Exact row-header and cell role locators corrected the harness without changing
+  business behavior. All four real PDFs contain two A4 pages. English and dark
+  Arabic paper inspection confirms complete readable criteria, charts/tables,
+  overlapping-blocker explanation, correct direction and white paper.
+- Artifacts are reproducible through graduation-readiness-report.spec.ts under
+  ignored test-results. Human presentation acceptance is not claimed. Remaining
+  worked HTTP acceptance scenarios, #03–#07, full gates and the consolidated final
+  review remain pending; no per-ticket review was run.

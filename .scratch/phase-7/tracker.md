@@ -747,3 +747,20 @@ Faculty picker final verification after the reset fix: frontend
 new-Department Faculty lookup/selection with serious/critical axe checks
 **2 browser tests passed, 1.1m**. API artifacts unchanged. Other Catalog pickers
 and the remaining prerequisite/ticket/final gate/review requirements remain pending.
+
+### Program Department type-ahead
+
+- EN/AR tests first reproduced the blank out-of-range existing Department and
+  non-searchable Program form select. The owner feature's Department picker now
+  uses the existing detail route for ownership hydration and the normalized
+  collection search with a bounded 100-row reference page. Local filtering stays
+  disabled; bilingual display and accessible controls reuse Catalog message keys.
+- Tests hydrate Department 207, retain a new Arabic search while invalidating its
+  old selection, disable Save until explicit selection and PATCH owner ID 309.
+  Program and Department form regression **2 files / 5 tests passed, 16.12s**.
+  Frontend **typecheck/lint/full format passed**.
+- Expanded serial Catalog browser exercises new Program Department search and
+  choice in EN/AR alongside the existing Faculty form, criteria/download and
+  serious/critical axe checks: **2 passed, 1.1m**. No API contract change.
+- Course creation/edit and curriculum references remain next #06 work; Pipeline,
+  print and all Phase 7 ticket/final gate/consolidated review requirements remain.

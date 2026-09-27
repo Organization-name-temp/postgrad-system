@@ -52,6 +52,29 @@ for (const locale of ['en', 'ar'] as const) {
         ).toEqual([])
         await form.getByRole('button', { name: locale === 'ar' ? 'إلغاء' : 'Cancel' }).click()
       }
+      if (resource === 'programs') {
+        await page
+          .getByRole('button', { name: locale === 'ar' ? 'برنامج جديد' : 'New program' })
+          .click()
+        const form = page.getByRole('dialog', {
+          name: locale === 'ar' ? 'برنامج جديد' : 'New program',
+        })
+        const department = form.getByRole('combobox', {
+          name: locale === 'ar' ? 'القسم' : 'Department',
+        })
+        await department.fill('CE')
+        await page
+          .getByRole('option', { name: locale === 'ar' ? /هندسة الحاسوب/ : /Computer Engineering/ })
+          .click()
+        await expect(department).toHaveValue(
+          locale === 'ar' ? /هندسة الحاسوب/ : /Computer Engineering/,
+        )
+        const formScan = await new AxeBuilder({ page }).analyze()
+        expect(
+          formScan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+        ).toEqual([])
+        await form.getByRole('button', { name: locale === 'ar' ? 'إلغاء' : 'Cancel' }).click()
+      }
     }
     await page.getByRole('button', { name: 'English' }).click()
   })

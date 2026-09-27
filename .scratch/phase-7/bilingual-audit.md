@@ -91,3 +91,37 @@ are fixed and covered separately; waiting for data is not used to hide them.
   fee surfaces passed all four core matrix states. Combined final subgroup result:
   20 tests passed in 6.0m. This covers loaded queue/list screens; full detail/service
   state-machine and paper evidence are recorded separately when run.
+
+## Acceptance coverage map (current frontier)
+
+The source/interaction column identifies the actual owning rendering seams, not
+proof of every browser state. Final package gates will rerun the owner journeys
+serially. A pending entry below is not reported as a pass.
+
+| Required surface | Source / interaction evidence | Native four-state evidence |
+| --- | --- | --- |
+| Login/register and populated language switching | RequireAuth, RegisterPage, LanguageSwitcher and localeControls regressions | `auth-bilingual-audit.spec.ts`: 4 passed |
+| Shell, nav, Dashboard and typed notification bell | SideNav, DashboardPage and NotificationsBell interactions; labels use owner typed data | Nine core audit groups each passed all four states; full combined run pending |
+| Catalog tree/lists, curriculum, versions, detail dialogs | Owner Catalog/Curriculum regressions, immutable history and generated reference tests | Core Catalog 4 and detail/dialog 4 passed, 390/1280px |
+| Applicant personal info/email/documents/program/review/status | Existing wizard interactions and Admissions headline; paired dictionaries, identifier/number inputs and owner validation | Applicant detail matrix running; extended existing headline audits populated wizard states in all four combinations, unrun |
+| Screening/Dean detail, scheduling/slots/interviewer | ApplicationReviewPage historical read-only regression; DeanDecisionPage and SlotFormDialog paired runtime validation | Staff/Dean core groups passed all four; detail/Interviewer matrix running; owner Admissions journey pending extended audit |
+| Registration/advising/on-behalf, schedules | RegistrationPage, RegistrationReviewPage, ComposeForStudentPage, SchedulePage interactions; LifecycleReadOnly | Core Student/Advisor groups passed all four; Advisor detail matrix running; owner Enrollment journey retained |
+| Offerings/attendance | Existing RegisterGrid interaction and multi-role Enrollment journey; percentages remain owner-derived | Instructor attendance detail matrix running |
+| Capacity/Exemptions/Transfers/Waivers | Owner review/form interactions, paired reviewer validation, Arabic numeric/code isolation and B05-01 failure path | Head/Council core passed all four; expanded Student/Advisor/Head credit surfaces await final gate; Exemptions prior art covers all four |
+| Grade sheets, corrections/Incompletes, Student Grades | Owner grading interactions; unchanged supersession/math; correction and unavailable states | Existing `grading.spec.ts` four-state populated editors/invalid marks/Incomplete fields/resolution/central entry/My Grades retained for final gate |
+| Credit-Hour Summary/Standing/Termination review | Owner academic and lifecycle interactions; paired status loading and B05-02 isolated identifiers | Core Student/Advisor/Head/Council groups passed all four; three new Reports separately passed all four and paper inspection |
+| Records requests/queues/fee/payment/correction/cancellation/refund/preview/collection/history | Existing RequestActions, FeeForm, RequestPage and issuance interactions; backend service HTTP tests | Core Student/staff Records passed all four; full service journey passed; additional populated action-state four-state audit pending |
+| Current/official Transcript and public valid/revoked/invalid | TranscriptDocument/IssuedDocument, safe revoked payload and immutable snapshot service tests | Full Records journey plus invalid verifier: 6 passed; all four read/print states, actual A4 pages inspected |
+
+B04-01–09 and B05-01–03/B06-01 are fixed with focused regressions and native
+checks recorded in the tracker. B04-03's paired Report checks passed; B04-04–07's
+core browser matrices passed; the earlier “running/pending” rows above are
+chronological discovery notes, superseded by these executed results.
+
+| ID | Surface | Evidence | Disposition |
+| --- | --- | --- | --- |
+| B04-10 | Applicant GPA scale guidance | Native light EN measured 2.57:1 on meaningful helper text inherited from disabled GPA inputs; two EN/AR focused tests failed. | Keep the actual GPA inputs disabled until scale selection, but the instructional helper is enabled/readable. All 14 PersonalInfoStep tests passed; Applicant four-state native matrix now passes. |
+
+No certified academic content, domain transition, authority or disclosure contract
+was changed by these fixes. Native inspection is not human demo/translation/paper
+signoff; Phase 7 acceptance remains pending that review.

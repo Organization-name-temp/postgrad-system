@@ -1395,3 +1395,13 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 - Additional read-only detail audit is running for Applicant draft/populated
   language switching, Screening/Dean/Advisor details, attendance register and
   Interviewer in all four states, narrow/wide. Full package gates still pending.
+- B04-10: native Applicant draft audit reproduced meaningful disabled-helper
+  contrast of 2.57:1. EN/AR focused tests captured two RED failures; helper state
+  now remains enabled while GPA controls retain the scale gate. All **14
+  PersonalInfoStep tests passed, 27.57s**, and native Applicant four-state checks
+  passed. Remaining detail matrix continues; no whole matrix result claimed yet.
+- Added explicit surface/seam coverage map to the bilingual audit. Extended existing
+  Admissions/Records owner journeys reuse live populated states for four-state
+  presentation checks without repeating transitions; those extensions are unrun.
+- Corrected ROADMAP/HANDOFF Phase 4.6 planning-versus-executable status and Phase 7
+  branch/frontier. Full gates, consolidated review and human acceptance stay pending.

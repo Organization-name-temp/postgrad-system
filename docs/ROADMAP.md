@@ -544,6 +544,12 @@ wall of raw permission chips. The composition rule is recorded in
   page rather than everyone else's work queues.
 
 ### Phase 4.6 — Query, Filter, Export & Reports (SRS §4.12, FR-PCM-003.5, NFR-PRF-010)
+**Executable status correction:** this section records the approved phase scope, not proof
+of its completion. Git/code inspection for Phase 7 found executable Support prior art but
+planning-only prerequisites. Phase 7 implements the bounded closure of tickets 01, 02,
+03, 04, 05, 06, 08 and 15; the other Phase 4.6 tickets remain outside its goal.
+See the [Phase 7 tracker](../.scratch/phase-7/tracker.md) for per-capability evidence.
+
 A **platform-plus-analytics slice**, inserted between Phase 4.5 and Phase 5 for one structural
 reason: it changes the shape of **every list endpoint in the system**, and doing that before
 Phases 5, 6 and 7 means their lists are *born* filterable and exportable rather than retrofitted
@@ -1039,12 +1045,20 @@ coherent owner-managed certification reads.
   manual refund, and official revocation → reference/status-only QR response, in EN/AR.
 
 ### Phase 7 — Reporting & polish (SRS §4.12)
+**Current status:** implementation and verification in progress on
+`phase-7-academic-reports-bilingual`. The three owner-backed Reports and demonstrated
+EN/AR presentation fixes are committed. Final package gates, one consolidated
+Standards/Spec review and human demo acceptance remain pending; no phase acceptance,
+push or merge is claimed. Evidence: [tracker](../.scratch/phase-7/tracker.md),
+[audit](../.scratch/phase-7/bilingual-audit.md).
+
 **Keeps its position after Phases 5 and 6, and is now much smaller than it was.** The original
 reasoning held that Phase 7 could not be pulled forward because three of its eight reports —
 **Academic Standing, Graduation Readiness and Termination** — read models Phase 5 has not built.
-That was true of those three and of **no others**, which is what Phase 4.6 acted on: it built the
+That was true of those three and of **no others**, which is why Phase 4.6 planned the
 query/export platform and **five** of the eight (application pipeline, enrollment summary, course
-registration summary, GPA distribution, audit log) plus an attendance report §4.12 never listed.
+registration summary, GPA distribution, audit log), plus an attendance report §4.12 never listed.
+The executable status correction above distinguishes that plan from shipped capabilities.
 The earlier finding that Phase 7 was mis-positioned produced Phase 4.5; this one produced Phase 4.6.
 
 There is **no Reporting module** — [ADR-0026](./adr/0026-reports-owned-by-modules.md) records why,

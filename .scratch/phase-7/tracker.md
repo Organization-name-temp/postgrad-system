@@ -259,3 +259,16 @@ Reference collection commit `487964d`: `composer api:check` and
 - Decision worklist, other Admissions collections, type-ahead pickers, full package
   gates and the consolidated final review remain pending. This is a prerequisite
   slice, not completion of #06 or any Phase 7 Report ticket.
+
+Dean review commit `dd10e42`: both `composer api:check` and `npm run api:check`
+**passed**. Final headline helper rerun **1 passed, 1.6m**, completing the full
+Admissions journey with URL search on the newly paginated Dean review queue.
+
+Decision-worklist continuation in progress (not marked complete): red HTTP tests
+showed ignored decision-state pagination and missing `/dean/decisions/export`.
+The in-progress backend now shares the awaiting-decision status definition with the
+Dashboard Card and uses Dean-Faculty collection/export scope. Initial queue/Card/
+final-decision regression run **38 passed, 165 assertions, 9.04s**; subsequent focused
+queue/export run **6 passed, 24 assertions, 3.41s**. Controller query/response docs,
+generated API artifacts, UI controls, dataset registration and static/browser
+verification for this next slice remain pending.

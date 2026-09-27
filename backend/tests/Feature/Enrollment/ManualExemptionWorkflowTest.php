@@ -35,6 +35,7 @@ use Modules\Identity\Public\Enums\Role;
 use Modules\Identity\Public\StudentSummary;
 use Modules\Notifications\Internal\Models\Notification;
 use OpenSpout\Reader\XLSX\Reader;
+use Support\Query\CollectionQuery;
 
 uses(RefreshDatabase::class);
 
@@ -309,6 +310,11 @@ it('streams a search-filtered reviewer export through bounded Identity batches',
         public function allStudentIds(): array
         {
             return $this->inner->allStudentIds();
+        }
+
+        public function studentIdsMatching(CollectionQuery $query): array
+        {
+            return $this->inner->studentIdsMatching($query);
         }
     };
     app()->instance(StudentDirectory::class, $batchProbe);

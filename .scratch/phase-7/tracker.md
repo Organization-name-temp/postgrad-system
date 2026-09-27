@@ -1435,3 +1435,12 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   The only demonstrated defect was B04-10, fixed and independently regressed.
 - Full development fixture refresh started only after the serial browser finished,
   preparing the required final frontend gate. Backend gate continues on prs_test.
+- First backend gate: Pint/PHPStan/deptrac passed, then Pest stopped at the older
+  ManualExemptionWorkflowTest Identity forwarding probe missing newly added
+  `studentIdsMatching`. Updated that probe to delegate the Public method without
+  altering its bounded hydration assertion. Other explicit contract doubles checked.
+  Focused rerun: **22 tests / 274 assertions passed, 11.49s**. Full backend gate
+  restarted; initial failed log retained as `/tmp/phase7-backend-gate-attempt1.log`.
+- `php artisan migrate:fresh --seed --force` passed for the final development
+  fixture. `npm run gate` started (`/tmp/phase7-frontend-gate.log`), with serial
+  Playwright and no reseed/competing native journey.

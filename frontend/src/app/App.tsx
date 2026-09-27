@@ -11,6 +11,9 @@ import { FeePage } from '../features/records/FeePage'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RegisterPage } from '../features/admissions/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
+import { StandingReportPage } from '../features/academic-standing/StandingReportPage'
+import { StandingStudentListPage } from '../features/academic-standing/StandingStudentListPage'
+import { ACADEMIC_REPORT_ROLES } from '../features/academic-standing/academicReportAccess'
 import { FacultiesPage } from '../features/catalog/faculties/FacultiesPage'
 import { DepartmentsPage } from '../features/catalog/departments/DepartmentsPage'
 import { ProgramsPage } from '../features/catalog/programs/ProgramsPage'
@@ -280,6 +283,20 @@ export function App() {
                   <Route
                     path="/analytics/application-pipeline"
                     element={<ApplicationPipelineReportPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <RequireAuth
+                      permission={PERMISSION.monitorAcademicStanding}
+                      roles={ACADEMIC_REPORT_ROLES}
+                    />
+                  }
+                >
+                  <Route path="/analytics/academic-standing" element={<StandingReportPage />} />
+                  <Route
+                    path="/analytics/academic-standing/students"
+                    element={<StandingStudentListPage />}
                   />
                 </Route>
                 <Route path="/screening" element={<ScreeningQueuePage />} />

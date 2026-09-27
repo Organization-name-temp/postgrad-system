@@ -1098,3 +1098,28 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   protected routes/navigation are next, followed by native browser/second Report
   print verification. #01 and all subsequent ticket acceptance remain pending.
 - Final focused ESLint/Prettier rechecks passed before the page commit.
+
+### Standing Student List, protected shell routes and native verification
+
+- The ordinary Student List shares the Report's URL criteria, owner references and
+  effective lifecycle. It renders nullable CGPA explicitly, localized neutral
+  explanations, safe Program data and permission-gated grade-detail links. Sorting
+  and pagination stay in the URL; workbook download exports the complete selection.
+- Protected Report/List routes and navigation require standing.monitor plus an
+  eligible academic Role. Focused tests first failed on the absent List/navigation;
+  final Report/List/SideNav run passed **27 tests across 3 files, 26.93s**. Frontend
+  typecheck, lint and full format passed. Native test code passed Prettier; the
+  repository intentionally excludes e2e files from ESLint.
+- Native serial Standing journeys passed **4 tests, 1.6m**: Student Affairs and Dean
+  in EN/AR, light/dark themes. They check scoped owner counts, named criteria,
+  keyboard table drill-through, matching pageable rows, authorized grade-detail
+  access, workbook download, language/history preservation and no serious/critical
+  axe findings on Report and List.
+- All four real browser PDFs contain one A4 page. Visual inspection of English and
+  dark-theme Arabic paper confirms readable criteria, five bands, matching count
+  table, white paper and correct direction. Reproducible artifacts are generated
+  under ignored frontend/test-results by academic-standing-report.spec.ts.
+- Together with the recorded Pipeline print journeys, this supplies the executable
+  two-Report EN/AR proof for prerequisite #15. Human paper/design acceptance is not
+  claimed. Full package gates, remaining Phase 7 tickets and the single consolidated
+  baseline review remain pending.

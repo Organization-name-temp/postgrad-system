@@ -1,6 +1,6 @@
 # Spec — Phase 6: Records, Transcript Requests, Fees, Refunds, and Delivery
 
-**Status:** ready-for-agent
+**Status:** complete
 **Feature slug:** phase-6
 **Phase:** 6 of the Build Roadmap
 **Scope:** SRS §4.9 and the approved Transcript service extensions; BR-63–65
@@ -358,5 +358,11 @@ content, retains attributed history, and sends in-app notifications for relevant
   derived in their owners. Fee, refund, and delivery mutations never become academic facts.
 - Testing seams were presented to the user for confirmation as required by to-spec;
   use the repository's existing HTTP/facade and full-stack seams unless redirected.
-- This is a specification publication, not authorization to begin implementation or
-  mark Phase 6 complete. Subsequent tickets should be vertical slices of this contract.
+- The specification publication did not authorize implementation or completion.
+  Subsequent authorized implementation and verified completion are recorded below.
+
+## Verified implementation
+
+All 13 tickets are complete on `phase-6/records-transcript`. The three verification
+passes, consolidated review and resolved findings are recorded in [verification.md](verification.md).
+No merge or push was performed. Approved business rules and deferred features remain as specified.

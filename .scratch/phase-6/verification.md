@@ -18,9 +18,9 @@ Branch: `phase-6/records-transcript`. No worktree, branch switch, merge, or push
    Prettier, TypeScript, all 86 Vitest files / 528 tests, and all 66 serial Playwright
    tests (17.7 minutes). The full Transcript journey passed in 3.5 minutes.
 3. One consolidated Standards/Spec review of the complete Phase 6 diff found four
-   Standards and two Spec gaps. Their fixes have narrow regression evidence; complete
-   the backend rerun passed 1,216 tests / 6,066 assertions and all static/drift
-   checks. The frontend rerun remains pending. See [review.md](review.md).
+   Standards and two Spec gaps. Narrow regressions passed; the backend rerun passed
+   1,216 tests / 6,066 assertions and all static/drift checks. The frontend rerun passed 88 Vitest files / 534 tests and all 66 serial
+   Playwright tests (18.4m), including the complete A4 watermark/print matrix. See [review.md](review.md).
 
 ## Acceptance coverage by ticket
 
@@ -58,8 +58,8 @@ is needed or claimed.
 ## Consolidated review
 
 The one consolidated review is recorded in [review.md](review.md). All six findings
-are implemented, with narrow regression checks. Ticket completion and verified phase
-status await the complete gate reruns after those fixes.
+are resolved, with narrow regressions and complete affected gate reruns. All 13 ticket
+acceptance checklists and verified phase status are complete.
 
 ## Re-verification failures and fixes
 
@@ -73,7 +73,7 @@ behavior or weakening acceptance.
 A stronger portrait-paper print check then reproduced an over-wide CH Summary at A4
 width. Scoped print-only fixed table layout, smaller token-based cell text/padding, and
 wrapping retain every value and column; the real browser regression passed (15.3 seconds).
-The complete print matrix now checks the same A4 width; its full-gate rerun is pending.
+The complete print matrix checks the same A4 width; its complete frontend gate rerun passed.
 The focused browser also waits for the authenticated heading before reading record data,
 rather than mistaking a cold session loader for a missing document.
 
@@ -82,7 +82,7 @@ session/data loading remained visible (Dashboard, Department Heads, enrollment).
 Functional polling now permits 20 seconds; Dashboard setup waits for authenticated
 content and its locale save before context closure. All content/access/a11y assertions
 remain. The three originally failing tests passed together (4.4 minutes), including
-the full four-user enrollment loop. The complete gate rerun follows a fresh seed.
+the full four-user enrollment loop. The subsequent full gate rerun used a fresh seed.
 
 The subsequent full frontend gate passed all 534 unit tests and 65 browser tests;
 the Transcript journey exposed a serious axe contrast finding on faint HTML watermark
@@ -91,4 +91,42 @@ alongside the readable official heading. The focused image-contract test failed 
 the fix and passed afterward; TypeScript and the complete Transcript journey passed
 (3.5 minutes), including axe, image loading, A4 print, public revocation, refund and
 collection. Arabic official/revoked A4 screenshot artifacts were inspected. No axe
-rule or content assertion was disabled. Complete gate re-verification follows.
+rule or content assertion was disabled. The complete gate rerun passed afterward.
+
+## Final reproducible verification
+
+- Backend: `COMPOSER_PROCESS_TIMEOUT=0 composer gate` — Pint, PHPStan, deptrac,
+  1,216 tests / 6,066 assertions, and OpenAPI regeneration/drift passed.
+- Frontend: `npm run gate` — client regeneration/drift, lint, format, typecheck,
+  88 Vitest files / 534 tests, and 66 serial Playwright tests passed.
+- Real PostgreSQL concurrency: 11 controlled cases passed within the backend gate.
+- Browser: current, official, valid public, revoked public and revoked authenticated
+  views passed EN/AR × light/dark, RTL/LTR, serious/critical axe, A4 width, print contrast,
+  chrome removal and SVG watermark checks. Playwright report contains per-combination screenshots.
+- One consolidated review: four Standards and two Spec findings, all resolved.
+- Required checks unrun: none. External blockers: none.
+
+The complete demo is `frontend/e2e/records.spec.ts`: after migrating/seeding the localhost
+fixture, run `npm run e2e -- e2e/records.spec.ts` from `frontend/`. It uses seeded learning
+accounts and clearly fictional fee/instructions; requests close via real workflow actions.
+
+## Implementation commits
+
+```text
+ce1ef25 feat(identity): preserve and recover admission identification type
+9a4cd83 feat(records): add bilingual transcripts and service request foundation
+cbbcf28 feat(records): scope searchable request queues and audited exports
+a1743de feat(records): retain private payment evidence and verify exact fees
+04ba239 feat(records): serialize cancellation and settle full private refunds
+8325cfa feat(records): certify coherent immutable transcripts and manage copy validity
+5645c78 feat(records): deliver bilingual transcript service and public QR screens
+4ca9024 test(records): verify workflow races, exports and bilingual printing
+015f418 test(records): cover revoked bilingual access and print matrix
+e8d06ec docs(records): record complete acceptance gate evidence
+d97cb96 fix(records): resolve consolidated contract and bilingual presentation review
+36d3f33 fix(records): fit portrait printing and bound test runner contention
+2593537 test(e2e): await authenticated data and saved language preferences
+7e53ded fix(records): render the bilingual watermark as a decorative graphic
+```
+
+The following documentation commit records verified ticket and phase completion.

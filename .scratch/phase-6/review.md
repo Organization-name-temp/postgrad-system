@@ -58,7 +58,8 @@ Fixes preserve business rules and disclosure:
   include retry and loading uses skeletons.
 - All Records XLSX headers and descriptive lifecycle/status/delivery cells are localized.
   The Arabic HTTP/XLSX regression failed before the change and passes afterward.
-- Official academic documents contain a decorative bilingual watermark using theme tokens.
+- Official academic documents contain a decorative bilingual SVG watermark using theme tokens,
+  with an empty image alternative beside the readable heading.
   It is excluded from current unofficial and reference/status-only public revoked views.
   Existing seal/issuer/QR remain; no signing or server PDF infrastructure was added.
 
@@ -66,9 +67,10 @@ Focused export/recovery checks passed 6 tests / 58 assertions; focused Records U
 passed 17 tests, including reproduced red/green presentation regressions. Schema changes
 required one legacy Dashboard fixture to represent Identification Type as explicit null.
 The backend affected gate rerun passed 1,216 tests / 6,066 assertions and all static/drift
-checks. The complete frontend gate rerun remains pending. Additional A4 print and runner
+checks. The complete frontend gate rerun passed all 534 unit tests and 66 serial browser tests,
+including the A4 watermark/print matrix. Additional A4 print and runner
 contention failures were reproduced and narrowly resolved during verification; see
 [verification.md](verification.md) for the final results.
 
 Summary: Standards 4 findings, worst nullable owner API contract; Spec 2 findings, worst
-requester-language Export contract. All six are implemented and awaiting final gate evidence.
+requester-language Export contract. All six are resolved and complete affected gate evidence is green.

@@ -886,11 +886,17 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
 
 ### Phase 6 — Records & Transcript (SRS §4.9)
 
-**Status: implementation in progress; acceptance verification pending.** The approved scope is published as
-[the Phase 6 specification](../.scratch/phase-6/spec.md), marked `ready-for-agent` in the
-local issue tracker. Admission Identification Type preservation and authoritative recovery
-are implemented and narrowly verified. Ticket completion and phase completion remain
-pending the full Phase 6 verification passes and consolidated review.
+**Status: complete and verified on `phase-6/records-transcript`.** All 13 tickets in
+[the Phase 6 specification](../.scratch/phase-6/spec.md) are complete. Admission identity
+recovery, current and immutable bilingual Transcripts, private requests/fees/payments,
+cancellation/full refunds, digital delivery/collection, public QR verification/revocation,
+scoped history/exports, audit and notifications are implemented. Backend and frontend
+gates, generated-contract drift, real PostgreSQL concurrency, serial Playwright, EN/AR,
+RTL/LTR, accessibility and A4 browser printing passed. The single consolidated review's
+six findings are resolved; [verification evidence](../.scratch/phase-6/verification.md)
+records commands, results and failure resolutions. No merge or push was performed.
+[ADR-0050](./adr/0050-transcript-consistent-certification.md) documents
+coherent owner-managed certification reads.
 
 - **Scope expanded during design:** include Student requests for official Transcripts,
   approval queues, fees, delivery tracking, and manual refunds; these workflows are not
@@ -965,7 +971,7 @@ pending the full Phase 6 verification passes and consolidated review.
 - **Delivery resolved:** the Student selects digital access or collection from Student
   Affairs at request submission. Digital delivery completes when the issued copy is
   available in PRS and sends an in-app notification. Collection progresses from Ready
-  for Collection to Collected; Student Affairs records handover time and staff member.
+  for Collection to Completed; Student Affairs records handover time and staff member.
   Postal delivery and courier integration are outside Phase 6.
 - **Issuance semantics resolved:** unofficial Transcripts reflect current academic records;
   each official issuance preserves an immutable snapshot, issuer, and timestamp. Later

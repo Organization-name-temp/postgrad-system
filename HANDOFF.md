@@ -2,7 +2,7 @@
 
 **Project:** Postgraduate Registration System (PRS) for E-JUST.
 **Workspace:** `postgrad-system` (git remote `MohamedYasser343/postgrad-system`).
-**Last refreshed:** end of **Phase 5 — Academic Standing and Credit Decisions**.
+**Last refreshed:** verified **Phase 6 — Records & Transcript** on `phase-6/records-transcript`.
 
 This file is the *entry point for a fresh session*. It carries only what the repo does **not**
 already record; everything else is deliberately a pointer, so it cannot drift.
@@ -18,8 +18,8 @@ already record; everything else is deliberately a pointer, so it cannot drift.
   [docs/business-requirements.md](docs/business-requirements.md)
 - **Ubiquitous language:** [CONTEXT.md](CONTEXT.md) — the resolved glossary. Read it before
   naming anything.
-- **Load-bearing decisions:** [docs/adr/](docs/adr/) — 0001–0024. Where an ADR contradicts an
-  older document it says so explicitly (0020 amends architecture.md §5; 0021 replaces SRS
+- **Load-bearing decisions:** [docs/adr/](docs/adr/) — accepted decisions through 0050; later ADRs
+  amend earlier text. Where an ADR contradicts an older document it says so explicitly (0020 amends architecture.md §5; 0021 replaces SRS
   Appendix A's grading bands; 0024 departs from SRS §2.3 and architecture.md on "each role sees
   a tailored dashboard").
 - **Structure and seams:** [docs/architecture.md](docs/architecture.md) ·
@@ -40,45 +40,29 @@ already record; everything else is deliberately a pointer, so it cannot drift.
 | **4.5 Dashboards** | **Merged** — all nine tickets plus final two-axis review corrections |
 | **4.6 Query, Filter, Export & Reports** | **Done** |
 | **5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver** | **Complete** — all 17 tickets and final review corrections |
-| 6 Records & Transcript · 7 Reporting & polish | Not started (7 is now much smaller — 4.6 takes five of its eight reports) |
+| **6 Records & Transcript** | **Complete and verified on `phase-6/records-transcript`** — all 13 tickets, full gates, one consolidated review resolved; not merged or pushed |
+| **7 Reporting & polish** | Not started; use ROADMAP for its remaining scope |
 
 **Phase 4.5 is a composition slice**, inserted between Phases 4 and 5 as Phase 0.5 was inserted
 between 0 and 1 — it added no module, migration, Permission, Role or domain rule. Phases 5, 6 and
-7 keep their numbers and order; **Phase 7 stays last** because three of its eight reports depend
-on read models Phase 5 has not built.
+7 keep their numbers and order; **Phase 7 stays last** for the remaining reporting and
+polish scope after the academic and Records read models.
 
 **Working convention:** one branch per phase (`phase-N-slug`), merged to `main` by PR after the
-phase's headline demo is reviewed by hand. Eight backend modules exist:
-`Identity`, `Catalog`, `Admissions`, `Notifications`, `Calendar`, `Enrollment`, `Grading`,
-`AcademicStanding`.
+phase's headline demo is reviewed by hand. See [the codebase map](docs/agents/codebase-map.md)
+for current module owners and entry points.
 
 ---
 
 ## Environment — how to actually run it
 
-Everything below is verified; the details that bite are marked.
-
-```bash
-docker compose up -d                          # repo root: Postgres 17 (prs + prs_test)
-cd backend && php artisan migrate:fresh --seed --force
-composer gate                                 # Pint, PHPStan L6, deptrac, Pest, openapi drift
-cd ../frontend && npm run gate                # api:check, ESLint, Prettier, tsc, Vitest, Playwright
-```
-
-- **PHP 8.4 and Composer come from Laravel Herd.** ⚠ The `php` on Git Bash's PATH is **8.2**
-  and fails the project's `>= 8.4.1` platform check — run artisan/pint/phpstan/pest **from
-  PowerShell**, where `php` resolves to Herd's `php.bat`.
-- `backend/.env` is gitignored. Recreate with `cp .env.example .env && php artisan key:generate`;
-  `.env.example` already carries the real Postgres + Sanctum config.
-- **Playwright:** run it from PowerShell too (its `webServer` spawns `php artisan serve`), and
-  **seed first** — the seeder-driven smokes are only re-runnable against a fresh seed
-  (`php artisan migrate:fresh --seed --force`; stop any leftover `artisan serve` first, or the
-  drop blocks on its connection). The suite is **serial by config** and must stay that way: it
-  shares one database and one set of seeded accounts whose UI language is server-persisted, so a
-  parallel run flips another test's locale mid-flow. See `frontend/playwright.config.ts`.
-- `git config core.autocrlf` is `true`, so `frontend/.prettierrc` sets `endOfLine: "auto"`;
-  generated API artifacts are pinned LF via the root `.gitattributes`.
-- **No `gh` CLI**, which is why the issue tracker is local markdown.
+Use [AGENTS.md](AGENTS.md) for setup and package commands. Phase 6 was verified in this
+Linux workspace with PHP 8.4.25 and the repository's PostgreSQL service.
+Run `COMPOSER_PROCESS_TIMEOUT=0 composer gate` from `backend/` to accommodate the full
+suite, and `npm run gate` from `frontend/` after a fresh migrated/seeded development fixture.
+The serial browser suite shares persisted account preferences and mutable seeded data;
+do not run it alongside another journey or reseed while it is running. Unit workers
+are bounded to two for this shared host. The issue tracker remains local Markdown.
 
 ---
 
@@ -87,10 +71,8 @@ cd ../frontend && npm run gate                # api:check, ESLint, Prettier, tsc
 - **Modules are auto-discovered** by `backend/bootstrap/providers.php` (globs
   `modules/*/*ServiceProvider.php`). Every new module must also add its `Public`/`Internal`
   layers **and its allowed edges** to `backend/deptrac.yaml`, or deptrac silently permits
-  nothing. ⚠ **Known drift, recorded not fixed** (found in Phase 4.5, which did not need it):
-  deptrac's `App` layer lists five module `Public` layers but neither `Admissions` nor
-  `Notifications`, though the ROADMAP records Phase 2 as having added those edges. Worth fixing
-  the next time something in `app/` needs to reach either.
+  nothing. The executable ruleset is authoritative; avoid inferring dependencies from
+  historical phase descriptions.
 - **Cross-module references are opaque ids with no FK** (ADR-0012) — so there is no relation to
   join through, and a consumer resolves the other side through that module's `Public` facade.
   Everything crossing a seam is a DTO, never an Eloquent model.
@@ -104,8 +86,9 @@ cd ../frontend && npm run gate                # api:check, ESLint, Prettier, tsc
   ESLint and Prettier; both `composer api:check` and `npm run api:check` are `git diff
   --exit-code` gates, so they only mean something once the generated files are committed.
 - **Derived, never stored** is the house rule: period state, attendance percentage, Incomplete
-  deadlines, grade supersession and GPA/CGPA are all recomputed on read. Nothing is cached (no
-  Redis in this build, ADR-0005), so nothing can drift.
+  deadlines, grade supersession and GPA/CGPA are all recomputed on read. Official issuances
+  preserve dated bilingual document snapshots, including derived figures,
+  under ADR-0044; those figures are historical content rather than live academic balances.
 - **Scheduled work is hand-run artisan commands**, and every one of them is *flag-and-notify
   only* except `grading:convert-expired-incompletes`, which the SRS explicitly mandates as a
   state change.
@@ -134,30 +117,16 @@ password for every account: `password`.
 - **What each phase's demo drives** is the corresponding Playwright smoke: `admissions.spec.ts`,
   `enrollment.spec.ts`, `grading.spec.ts` (the headline test at the bottom of the file),
   `dashboard.spec.ts` (Phase 4.5 — seven logins, each asserting its Card set presence *and*
-  absence), plus `headline.spec.ts` for the Phase-0/1 walking skeleton.
+  absence), `records.spec.ts` (Phase 6 service/QR/refund/collection and bilingual A4 print),
+  plus `headline.spec.ts` for the Phase-0/1 walking skeleton.
 
 ---
 
 ## Immediate next steps
 
-1. **Start Phase 4.6** (Query, Filter, Export & Reports) with the usual loop: `/to-prd` →
-   `/to-issues` → `/tdd` per ticket → `/code-review`. It is designed but not built: the ROADMAP §3
-   section and [ADR-0025](docs/adr/0025-support-layer-query-contract.md)–
-   [0028](docs/adr/0028-aggregate-facades-sql-php-parity.md) are written, ADR-0024 carries a Phase-4.6
-   amendment, and CONTEXT.md has the new **Report** and **Export** entries. Its 17 tickets are
-   sequenced **before** Phase 5 for one reason: it changes the
-   response envelope of every collection endpoint, so Phases 5–7 are born filterable rather than
-   retrofitted. Two things to know going in — the envelope change forces an `openapi.yaml` + Orval
-   regeneration across every named collection endpoint (both `api:check` gates are `git diff --exit-code`), and
-   `backend/support/` is the project's **first shared backend code**, so `deptrac.yaml` gains a
-   layer with seven inbound and **zero** outbound edges.
-2. **Then Phase 5** (SRS §4.8, §4.5, §4.6 — Academic Standing, Credit-Hour Summary,
-   Exemption/Transfer/Waiver). Phase 4 left it two hooks: the `GradeFinalized` domain event, and
-   `Grading\Public::GradingRecords` for CGPA/Semester GPA — Phase 5 must consume that contract
-   rather than re-deriving the arithmetic (ADR-0020). The three `CourseStatus` values still
-   unreachable (`Transfer`, `Waive`, `Exempted`) are exactly Phase 5's remit, at which point the
-   Appendix-D counting matrix is fully live. Phase 4.5 left it one more: **Phase 5 ships its own
-   Dashboard Cards** (Academic Standing, Credit-Hour Summary) as part of its own work — one row in
-   `frontend/src/app/dashboardCards.tsx`, one component inside its own feature, one `can:`-gated
-   read endpoint in its own module. The Dashboard grows with the system rather than being
-   revisited, and no placeholder Card was left behind for it (ADR-0024).
+Phase 6 implementation is complete on the existing branch. Its acceptance evidence and
+reproducible headline demo are in [.scratch/phase-6/verification.md](.scratch/phase-6/verification.md);
+the one consolidated review and six resolved findings are in
+[.scratch/phase-6/review.md](.scratch/phase-6/review.md). No merge or push was performed.
+The next planning frontier is Phase 7's remaining reporting/polish scope in ROADMAP;
+server PDF, cryptographic signing, payment gateways, postal delivery and email/SMS remain deferred.

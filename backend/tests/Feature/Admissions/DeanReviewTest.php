@@ -106,6 +106,40 @@ it('shows an empty queue to a Dean with no assigned faculty', function () {
         ->assertJsonCount(0, 'data');
 });
 
+it('narrows the existing Dean scope by Faculty IDs without disclosing outside rows', function () {
+    $faculty = Faculty::factory()->create();
+    $secondFaculty = Faculty::factory()->create();
+    $outsideFaculty = Faculty::factory()->create();
+    [$mine] = underDeanReviewApplication($faculty->id);
+    underDeanReviewApplication($secondFaculty->id);
+    underDeanReviewApplication($outsideFaculty->id);
+    $dean = deanAssignedTo($faculty->id);
+    $dean->assignRole(Role::StudentAffairs);
+    FacultyDeanAssignment::create(['user_id' => $dean->id, 'faculty_id' => $secondFaculty->id]);
+    Sanctum::actingAs($dean);
+
+    $this->getJson('/api/v1/dean/applications?faculty_id='.$faculty->id)
+        ->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.id', $mine->id);
+    $this->getJson('/api/v1/dean/applications?faculty_id='.$outsideFaculty->id)
+        ->assertOk()->assertJsonPath('meta.total', 0)->assertJsonCount(0, 'data');
+    $this->getJson('/api/v1/dean/applications?faculty_id='.$faculty->id.','.$secondFaculty->id.','.$outsideFaculty->id)
+        ->assertOk()->assertJsonPath('meta.total', 2);
+    $response = $this->get('/api/v1/dean/applications/export?faculty_id='.$faculty->id.'&per_page=1')->assertOk();
+    $reader = new Reader;
+    $reader->open($response->baseResponse->getFile()->getPathname());
+    $rows = [];
+    foreach ($reader->getSheetIterator() as $sheet) {
+        foreach ($sheet->getRowIterator() as $row) {
+            $rows[] = $row->toArray();
+        }
+    }
+    $reader->close();
+    expect($rows)->toHaveCount(2)->and($rows[1][0])->toBe((string) $mine->id);
+    $audit = AuditLog::query()->where('action', 'admissions.applications_exported')->sole();
+    expect($audit->metadata['criteria']['faculty_id'])->toBe([(string) $faculty->id])
+        ->and($audit->metadata['row_count'])->toBe(1);
+});
+
 it('exports every matching Dean review row without disclosing another faculty to a multirole Dean', function () {
     $faculty = Faculty::factory()->create();
     [$first] = underDeanReviewApplication($faculty->id, ['name_en' => 'Export A']);

@@ -684,3 +684,29 @@ expanded admissions headline **1 passed, 1.8m**, including owner advisor presele
 and final acceptance. No generated artifacts changed. Faculty criterion work has
 started test-first; remaining Catalog references/Pipeline/print and Phase 7
 acceptance/final gates/consolidated review still remain.
+
+### Application Faculty criterion
+
+- HTTP test first reproduced `faculty_id` returning 422. The shared Application
+  selection now validates Faculty ID tokens, resolves only scoped candidate Program
+  IDs through bounded Catalog Public reads and narrows the result. No Catalog joins,
+  cross-owner foreign keys or widening of any actor base scope were introduced.
+  Both assigned Faculties combine with CSV criteria; an outside Faculty returns
+  an empty page, including when the Dean also holds Student Affairs.
+- Workbook read-back verifies the Faculty-filtered selection and audit criteria/row
+  count. Focused backend **36 tests / 178 assertions passed, 8.09s**. Backend
+  PHPStan/deptrac passed; affected Pint check passed after documentation updates.
+- Source controllers document the criterion for screening, Dean review/decisions
+  and awaiting-interview collections/exports. OpenAPI and Orval client regenerated.
+  Four URL filter bars expose the paired EN/AR label; test first failed on the
+  absent control, then passed with filter/reset-page/export forwarding coverage.
+  Focused frontend **4 files / 10 tests passed, 21.83s**.
+- Frontend static and EN/AR Dean browser bookmark/download/axe reruns pending.
+  Post-commit API drift checks remain required. Catalog type-aheads, Pipeline and
+  print prerequisites, all Phase 7 ticket acceptance and final gates/review remain.
+
+Faculty final focused verification: frontend **typecheck/lint/full format passed**.
+EN/AR Dean review and decisions bookmarks retain comma-separated Faculty criteria
+through reload and authenticated workbook downloads; serious/critical axe scans
+passed: **2 browser tests, 53.7s**. Final package gates and consolidated review have
+not run. Post-commit generated drift checks are next.

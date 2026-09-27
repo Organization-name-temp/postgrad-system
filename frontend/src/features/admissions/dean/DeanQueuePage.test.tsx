@@ -81,6 +81,21 @@ it('restores bookmarked criteria, resets pagination on search, and restores the 
   await vi.waitFor(() => expect(screen.getByLabelText('Search applicants')).toHaveValue('احمد'))
   expect(screen.getByLabelText('URL')).toHaveTextContent('page=2')
 })
+it('narrows the URL and export by Faculty IDs', async () => {
+  renderPage()
+  await screen.findByText('Ahmed Applicant')
+  fireEvent.change(screen.getByLabelText('Faculty IDs'), { target: { value: '8,9' } })
+  await vi.waitFor(() =>
+    expect(api.calls.at(-1)?.params).toMatchObject({ faculty_id: '8,9', page: 1 }),
+  )
+  fireEvent.click(await screen.findByRole('button', { name: 'Export all filtered rows' }))
+  await vi.waitFor(() =>
+    expect(api.calls.find((call) => call.url?.endsWith('/export'))?.params).toMatchObject({
+      faculty_id: '8,9',
+    }),
+  )
+})
+
 it('exports bookmarked criteria through the authenticated client as a blob', async () => {
   renderPage()
   await screen.findByText('Ahmed Applicant')

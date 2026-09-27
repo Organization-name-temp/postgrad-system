@@ -29,9 +29,9 @@ final readonly class ApplicationCollection
         $input['sort'] ??= 'finalized_at';
 
         return CollectionQuery::from($input,
-            knownFilters: ['status', 'program_id', 'admission_cycle_id', 'degree_level', 'age_days_min', 'age_days_max'],
-            readableFilters: ['status', 'program_id', 'admission_cycle_id', 'degree_level', 'age_days_min', 'age_days_max'],
-            sortable: ['id', 'status', 'name_en', 'name_ar', 'national_id', 'finalized_at', 'age_days'], integerFilters: ['program_id', 'admission_cycle_id']);
+            knownFilters: ['status', 'faculty_id', 'program_id', 'admission_cycle_id', 'degree_level', 'age_days_min', 'age_days_max'],
+            readableFilters: ['status', 'faculty_id', 'program_id', 'admission_cycle_id', 'degree_level', 'age_days_min', 'age_days_max'],
+            sortable: ['id', 'status', 'name_en', 'name_ar', 'national_id', 'finalized_at', 'age_days'], integerFilters: ['faculty_id', 'program_id', 'admission_cycle_id']);
     }
 
     /**
@@ -105,7 +105,22 @@ final readonly class ApplicationCollection
      */
     private function selection(int $actor, CollectionQuery $query, array $statuses, ApplicationCollectionScope $scope): Builder
     {
-        return SqlCollectionQuery::apply($this->scoped($actor, $statuses, $scope), $query, self::COLUMNS, ['name_en', 'name_ar', 'national_id'], ! $this->derived($query));
+        $builder = SqlCollectionQuery::apply($this->scoped($actor, $statuses, $scope), $query, self::COLUMNS, ['name_en', 'name_ar', 'national_id'], ! $this->derived($query));
+        if (isset($query->filters['faculty_id'])) {
+            $faculties = array_map('intval', $query->filters['faculty_id']);
+            $programIds = $builder->clone()->reorder()->whereNotNull('primary_program_id')->distinct()->pluck('primary_program_id')->all();
+            $matching = [];
+            foreach (array_chunk($programIds, 100) as $batch) {
+                foreach ($this->catalog->findMany($batch) as $program) {
+                    if (in_array($program->facultyId, $faculties, true)) {
+                        $matching[] = $program->id;
+                    }
+                }
+            }
+            $builder->whereIn('primary_program_id', $matching);
+        }
+
+        return $builder;
     }
 
     private function derived(CollectionQuery $query): bool

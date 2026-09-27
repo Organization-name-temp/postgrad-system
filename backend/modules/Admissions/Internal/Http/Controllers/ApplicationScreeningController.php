@@ -53,6 +53,7 @@ class ApplicationScreeningController
      * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
      * @queryParam status string Comma-separated statuses within the queue. Example: under_sa_review
      * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam faculty_id string Faculty ids, narrowing the actor scope. Example: 1,2
      * @queryParam admission_cycle_id string Cycle ids. Example: 1
      * @queryParam degree_level string Degree levels. Example: MSc
      * @queryParam age_days_min integer Minimum whole days in current review. Example: 7
@@ -86,6 +87,7 @@ class ApplicationScreeningController
      * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
      * @queryParam status string Comma-separated statuses. Example: under_sa_review
      * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam faculty_id string Faculty ids, narrowing the actor scope. Example: 1,2
      * @queryParam admission_cycle_id string Cycle ids. Example: 1
      * @queryParam degree_level string Degree levels. Example: MSc
      * @queryParam age_days_min integer Minimum whole days in current review. Example: 7

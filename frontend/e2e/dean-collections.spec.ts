@@ -16,12 +16,15 @@ for (const locale of ['en', 'ar'] as const) {
       ['/dean/decisions', 'dean-decisions'],
     ] as const) {
       await page.goto(
-        `${path}?q=NoSuchPhase7Candidate&degree_level=MSc&sort=-age_days${path.endsWith('decisions') ? '&status=waitlisted' : ''}`,
+        `${path}?q=NoSuchPhase7Candidate&faculty_id=1,2&degree_level=MSc&sort=-age_days${path.endsWith('decisions') ? '&status=waitlisted' : ''}`,
       )
       const search = page.getByLabel(locale === 'ar' ? 'البحث عن المتقدمين' : 'Search applicants')
       await expect(search).toHaveValue('NoSuchPhase7Candidate')
+      const faculty = page.getByLabel(locale === 'ar' ? 'معرّفات الكليات' : 'Faculty IDs')
+      await expect(faculty).toHaveValue('1,2')
       await page.reload()
       await expect(search).toHaveValue('NoSuchPhase7Candidate')
+      await expect(faculty).toHaveValue('1,2')
       const pending = page.waitForEvent('download')
       await page
         .getByRole('button', {

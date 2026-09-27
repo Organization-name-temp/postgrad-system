@@ -2209,6 +2209,10 @@ interviewer_id?: string;
  */
 program_id?: string;
 /**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
+/**
  * Comma-separated Cycle ids.
  */
 admission_cycle_id?: string;
@@ -2275,6 +2279,10 @@ interviewer_id?: string;
  * Comma-separated primary Program ids.
  */
 program_id?: string;
+/**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
 /**
  * Comma-separated Cycle ids.
  */
@@ -2503,6 +2511,10 @@ status?: string;
  */
 program_id?: string;
 /**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
+/**
  * Cycle ids.
  */
 admission_cycle_id?: string;
@@ -2597,6 +2609,10 @@ status?: string;
  * Program ids.
  */
 program_id?: string;
+/**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
 /**
  * Cycle ids.
  */
@@ -2797,6 +2813,10 @@ status?: string;
  */
 program_id?: string;
 /**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
+/**
  * Cycle ids.
  */
 admission_cycle_id?: string;
@@ -2892,6 +2912,10 @@ status?: string;
  */
 program_id?: string;
 /**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
+/**
  * Cycle ids.
  */
 admission_cycle_id?: string;
@@ -2972,6 +2996,10 @@ status?: string;
  * Program ids.
  */
 program_id?: string;
+/**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
 /**
  * Cycle ids.
  */
@@ -3067,6 +3095,10 @@ status?: string;
  * Program ids.
  */
 program_id?: string;
+/**
+ * Faculty ids, narrowing the actor scope.
+ */
+faculty_id?: string;
 /**
  * Cycle ids.
  */

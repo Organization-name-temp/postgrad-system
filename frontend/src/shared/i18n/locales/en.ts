@@ -711,6 +711,7 @@ export const en = {
       filters: {
         search: 'Search applicants',
         program: 'Program IDs',
+        faculty: 'Faculty IDs',
         cycle: 'Admission Cycle IDs',
         all: 'All degrees',
         msc: 'Master of Science',

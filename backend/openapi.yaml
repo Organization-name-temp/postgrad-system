@@ -6802,6 +6802,16 @@ paths:
             example: '1'
         -
           in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
+            example: '1,2'
+        -
+          in: query
           name: admission_cycle_id
           description: 'Comma-separated Cycle ids.'
           example: '1'
@@ -6977,6 +6987,16 @@ paths:
             type: string
             description: 'Comma-separated primary Program ids.'
             example: '1'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
+            example: '1,2'
         -
           in: query
           name: admission_cycle_id
@@ -7698,6 +7718,16 @@ paths:
             example: '1,2'
         -
           in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
+            example: '1,2'
+        -
+          in: query
           name: admission_cycle_id
           description: 'Cycle ids.'
           example: '1'
@@ -7974,6 +8004,16 @@ paths:
           schema:
             type: string
             description: 'Program ids.'
+            example: '1,2'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
             example: '1,2'
         -
           in: query
@@ -8638,6 +8678,16 @@ paths:
             example: '1,2'
         -
           in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
+            example: '1,2'
+        -
+          in: query
           name: admission_cycle_id
           description: 'Cycle ids.'
           example: '1'
@@ -8917,6 +8967,16 @@ paths:
             example: '1,2'
         -
           in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
+            example: '1,2'
+        -
+          in: query
           name: admission_cycle_id
           description: 'Cycle ids.'
           example: '1'
@@ -9168,6 +9228,16 @@ paths:
           schema:
             type: string
             description: 'Program ids.'
+            example: '1,2'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
             example: '1,2'
         -
           in: query
@@ -9447,6 +9517,16 @@ paths:
           schema:
             type: string
             description: 'Program ids.'
+            example: '1,2'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids, narrowing the actor scope.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids, narrowing the actor scope.'
             example: '1,2'
         -
           in: query

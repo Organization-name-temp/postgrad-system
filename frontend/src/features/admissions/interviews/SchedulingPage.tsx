@@ -105,6 +105,7 @@ export function SchedulingPage() {
           fields={[
             { key: 'q', label: t('screening.filters.search') },
             { key: 'program_id', label: t('screening.filters.program') },
+            { key: 'faculty_id', label: t('screening.filters.faculty') },
             { key: 'admission_cycle_id', label: t('screening.filters.cycle') },
             {
               key: 'degree_level',

@@ -1495,3 +1495,12 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   before saved account locale applied. Await actual Applicant detail heading and
   authenticated `/me` preferences, and await persisted language GET data when
   switching. Product behavior unchanged. Revised eight-test serial run active.
+- Explicit operational Case controller URL examples regenerated without further
+  tracked OpenAPI drift (`composer api:check`). Complete backend gate attempt 4
+  is running; attempt 3 retained in `/tmp/phase7-backend-gate-attempt3.log`.
+- Revised expanded owner audit: Admissions passed **4.6m**. Correction audit
+  selected the first CSE511 row, which is Draft, rather than an existing Finalized
+  round. Corrected the harness to filter Finalized while English is applied, then
+  switch using persisted authenticated locale. No grade workflow write or fixture
+  change was needed. Remaining seven checks rerunning serially; unrun checks on
+  the stopped attempt are not claimed as passing.

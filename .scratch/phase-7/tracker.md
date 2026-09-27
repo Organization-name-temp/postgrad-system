@@ -634,3 +634,30 @@ pending. No API artifacts changed in this UI-only slice.
   remain #06 work. This slice does not complete #06 or any Phase 7 ticket; Pipeline,
   print, all seven ticket acceptance checks, final gates and consolidated review
   remain required.
+
+Staff collection contract checkpoint committed as `fe9e1e3`. Post-commit backend
+`composer api:check` and frontend `npm run api:check` passed. Serial admissions
+headline after the nullable-advisor fix **1 passed, 1.7m**.
+
+### Interviewer type-ahead
+
+- New EN/AR tests first failed because the slot-form select could not accept search
+  text. Its Autocomplete now sends normalized search to the owner's reference API,
+  disables local filtering and retains the explicitly selected owner DTO/ID.
+  Typing a new query invalidates the prior choice. Existing assignments hydrate by
+  ID through the same scoped owner API, including assignments beyond page one.
+- Focused regression **3 files / 8 tests passed, 21.27s**. The additional existing
+  assignment hydration check passed with the full slot-form file **4 tests, 11.83s**.
+  Loading/no-match text added in EN and AR together. Headline now searches for its
+  named interviewer before creating both run-owned slots.
+- Static and serial browser reruns pending. Advisor type-ahead, Catalog references
+  and Faculty criterion remain prerequisite work; no final ticket/gate/review
+  completion is claimed.
+
+Interviewer final verification: enhanced EN/AR tests prove a new query disables Save
+until another explicit selection, and the submitted mutation carries owner ID 207.
+Slot-form file **4 tests passed, 18.71s**. Frontend typecheck/lint/full format passed;
+serial expanded admissions headline **1 passed, 2.0m**, exercising staff interviewer
+search, both slot creations, Applicant reschedule/confirmation and final admission.
+No API changes in this UI slice. Advisor/Catalog/Faculty prerequisites, Pipeline,
+print and all Phase 7 acceptance/final gate/review requirements remain pending.

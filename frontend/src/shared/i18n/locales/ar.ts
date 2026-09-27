@@ -822,6 +822,8 @@ export const ar = {
         duration: 'المدة (بالدقائق)',
         interviewer: 'المُقابِل',
         interviewersError: 'تعذّر تحميل قائمة المُقابِلين.',
+        interviewersLoading: 'جارٍ تحميل المُقابِلين',
+        noMatchingInterviewers: 'لا يوجد مُقابِلون مؤهلون مطابقون للبحث.',
         mode: 'النمط',
         location: 'المكان',
         meetingLink: 'رابط الاجتماع',

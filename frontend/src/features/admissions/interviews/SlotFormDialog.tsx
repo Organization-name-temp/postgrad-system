@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   Alert,
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -18,7 +19,10 @@ import {
   useListAssignableInterviewers,
   useUpdateAnInterviewSlot,
 } from '../../../shared/api/generated/endpoints'
-import type { ListInterviewSlots200DataItem } from '../../../shared/api/generated/endpoints'
+import type {
+  ListAssignableInterviewers200DataItem,
+  ListInterviewSlots200DataItem,
+} from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { isoToInputValue } from '../../../shared/datetime'
 
@@ -45,9 +49,17 @@ export function SlotFormDialog({ open, onClose, slot }: SlotFormDialogProps) {
   const queryClient = useQueryClient()
   const isEdit = slot !== undefined
 
+  const [interviewerSearch, setInterviewerSearch] = useState('')
+  const [interviewerInput, setInterviewerInput] = useState('')
+  const [selectedInterviewer, setSelectedInterviewer] =
+    useState<ListAssignableInterviewers200DataItem | null>(null)
   const interviewers = useListAssignableInterviewers(
-    { per_page: 100 },
+    { per_page: 100, q: interviewerSearch || undefined },
     { query: { enabled: open } },
+  )
+  const existingInterviewer = useListAssignableInterviewers(
+    { id: String(slot?.interviewer_id ?? ''), per_page: 100 },
+    { query: { enabled: open && slot?.interviewer_id !== undefined } },
   )
 
   const [scheduledAt, setScheduledAt] = useState('')
@@ -62,11 +74,24 @@ export function SlotFormDialog({ open, onClose, slot }: SlotFormDialogProps) {
       setScheduledAt(isoToInputValue(slot?.scheduled_at))
       setDuration(slot?.duration_minutes !== undefined ? String(slot.duration_minutes) : '30')
       setInterviewerId(slot?.interviewer_id !== undefined ? String(slot.interviewer_id) : '')
+      setInterviewerSearch('')
+      setInterviewerInput('')
+      setSelectedInterviewer(null)
       setMode(slot?.mode ?? 'in_person')
       setLocation(slot?.location ?? '')
       setMeetingLink(slot?.meeting_link ?? '')
     }
   }, [open, slot])
+
+  useEffect(() => {
+    const person = existingInterviewer.data?.data?.find(
+      (candidate) => String(candidate.id) === interviewerId,
+    )
+    if (person && selectedInterviewer === null && interviewerSearch === '') {
+      setSelectedInterviewer(person)
+      setInterviewerInput(person.name ?? '')
+    }
+  }, [existingInterviewer.data, interviewerId, selectedInterviewer, interviewerSearch])
 
   const create = useCreateAnInterviewSlot()
   const update = useUpdateAnInterviewSlot()
@@ -129,22 +154,42 @@ export function SlotFormDialog({ open, onClose, slot }: SlotFormDialogProps) {
             required
             fullWidth
           />
-          <TextField
-            select
-            label={t('interviews.slots.interviewer')}
-            value={interviewerId}
-            onChange={(event) => setInterviewerId(event.target.value)}
-            required
-            fullWidth
-            helperText={interviewers.isError ? t('interviews.slots.interviewersError') : undefined}
-            error={interviewers.isError}
-          >
-            {(interviewers.data?.data ?? []).map((person) => (
-              <MenuItem key={person.id} value={String(person.id)}>
-                {person.name}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Autocomplete
+            options={interviewers.data?.data ?? []}
+            value={selectedInterviewer}
+            inputValue={interviewerInput}
+            filterOptions={(options) => options}
+            getOptionLabel={(person) => person.name ?? ''}
+            getOptionKey={(person) => person.id ?? ''}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            loading={interviewers.isFetching}
+            loadingText={t('interviews.slots.interviewersLoading')}
+            noOptionsText={t('interviews.slots.noMatchingInterviewers')}
+            onInputChange={(_event, value, reason) => {
+              setInterviewerInput(value)
+              if (reason === 'input' || reason === 'clear') {
+                setInterviewerSearch(value)
+                setSelectedInterviewer(null)
+                setInterviewerId('')
+              }
+            }}
+            onChange={(_event, person) => {
+              setSelectedInterviewer(person)
+              setInterviewerId(person?.id !== undefined ? String(person.id) : '')
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t('interviews.slots.interviewer')}
+                required
+                fullWidth
+                helperText={
+                  interviewers.isError ? t('interviews.slots.interviewersError') : undefined
+                }
+                error={interviewers.isError}
+              />
+            )}
+          />
           <TextField
             select
             label={t('interviews.slots.mode')}

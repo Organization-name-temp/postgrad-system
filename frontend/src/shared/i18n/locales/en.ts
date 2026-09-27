@@ -864,6 +864,8 @@ export const en = {
         duration: 'Duration (minutes)',
         interviewer: 'Interviewer',
         interviewersError: 'Could not load the interviewers.',
+        interviewersLoading: 'Loading interviewers',
+        noMatchingInterviewers: 'No matching eligible interviewers.',
         mode: 'Mode',
         location: 'Location',
         meetingLink: 'Meeting link',

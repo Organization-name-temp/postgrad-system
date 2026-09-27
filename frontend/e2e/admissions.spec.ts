@@ -219,7 +219,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await slotForm
     .getByLabel('Date & time')
     .fill(new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 16))
-  await slotForm.getByRole('combobox', { name: 'Interviewer' }).click()
+  await slotForm.getByRole('combobox', { name: 'Interviewer' }).fill('Hoda')
   await page.getByRole('option', { name: 'Dr. Hoda Mansour', exact: true }).click()
   const slotLocation = `Smoke room ${UNIQUE}`
   await slotForm.getByLabel('Location').fill(slotLocation)
@@ -230,7 +230,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await slotForm
     .getByLabel('Date & time')
     .fill(new Date(Date.now() + 4 * 86400000).toISOString().slice(0, 16))
-  await slotForm.getByRole('combobox', { name: 'Interviewer' }).click()
+  await slotForm.getByRole('combobox', { name: 'Interviewer' }).fill('Hoda')
   await page.getByRole('option', { name: 'Dr. Hoda Mansour', exact: true }).click()
   await slotForm.getByLabel('Location').fill(replacementLocation)
   await slotForm.getByRole('button', { name: 'Save', exact: true }).click()

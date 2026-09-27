@@ -36,7 +36,9 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 
 ## Commands and results
 
-Full package gates remain pending. Starting commit and initial clean worktree verified.
+Complete backend gate passed (1,329 tests / 8,421 assertions; details below).
+Complete frontend gate and consolidated review remain pending. Starting commit and
+initial clean worktree verified.
 
 ### Shared frontend prerequisites (#02/#03/#05 slices)
 
@@ -1410,7 +1412,7 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 
 | Phase 4.6 ticket | Executable disposition | Evidence seam |
 | --- | --- | --- |
-| 01 | Implemented bounded fixture/assertion closure; final gate pending | GeneratedCohortSeederTest, named-persona seeder tests, collection/journey counts audited throughout |
+| 01 | Implemented bounded fixture/assertion closure; backend gate passed, frontend gate pending | GeneratedCohortSeederTest, named-persona seeder tests, collection/journey counts audited throughout |
 | 02 | Existing Support parser verified; shared URL/filter/page controls and scoped screening tracer implemented | CollectionQueryTest, CollectionContractTest, ScreeningQueuePage interactions and serial collections |
 | 03 | Existing OpenSpout writer verified; canonical full-selection audited exports wired | Screening/collection and Report export HTTP tests, workbook readback, scoped native exports |
 | 04 | Required owner aggregate/batch closure implemented; no foreign Internal calls | BatchCgpaSeededParityTest, aggregate parity tests, GraduationBatchSeededParityTest, owner Curriculum/Credit-Hour/Standing batches |
@@ -1522,3 +1524,9 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
 - Preparing a fresh migrated/seeded development fixture after all browser contexts
   ended, then rerunning the required complete frontend gate. No browser suite
   was reseeded or competed with another journey.
+
+- Required fresh development migration/seed completed successfully before final
+  frontend gate attempt 3. Generated cohort layer took **13.376s**; academic
+  Case fixture took **2.318s**. `npm run gate` is active from `frontend/` (log:
+  `/tmp/phase7-frontend-gate.log`); regenerated API, lint, formatting and typecheck
+  passed. Full unit and serial browser results remain pending.

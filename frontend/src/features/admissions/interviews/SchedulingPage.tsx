@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next'
 import {
   getBookedInterviewsQueryKey,
   exportApplicationsAwaitingInterviewScheduling,
+  exportBookedInterviews,
   useApplicationsAwaitingInterviewScheduling,
   useBookedInterviews,
   useMarkAnInterviewComplete,
@@ -53,7 +54,17 @@ export function SchedulingPage() {
       : undefined,
   }
   const awaiting = useApplicationsAwaitingInterviewScheduling(params)
-  const booked = useBookedInterviews()
+  const bookedCollection = useCollectionQuery(25, 'booked')
+  const bookedParams = {
+    ...bookedCollection.params,
+    evaluation_score_min: bookedCollection.searchParams.has('evaluation_score_min')
+      ? Number(bookedCollection.searchParams.get('evaluation_score_min'))
+      : undefined,
+    evaluation_score_max: bookedCollection.searchParams.has('evaluation_score_max')
+      ? Number(bookedCollection.searchParams.get('evaluation_score_max'))
+      : undefined,
+  }
+  const booked = useBookedInterviews(bookedParams)
   const complete = useMarkAnInterviewComplete()
 
   const [target, setTarget] = useState<
@@ -181,6 +192,59 @@ export function SchedulingPage() {
         <Divider id="booked-interviews-heading" textAlign="left" sx={{ my: 2, mt: 4 }}>
           {t('interviews.scheduling.booked')}
         </Divider>
+        <FilterBar
+          values={bookedCollection.params}
+          onChange={bookedCollection.setCriteria}
+          fields={[
+            { key: 'q', label: t('screening.filters.search') },
+            {
+              key: 'status',
+              label: t('interviews.columns.confirmation'),
+              options: [
+                { value: '', label: t('interviews.filters.allStates') },
+                {
+                  value: 'pending_confirmation',
+                  label: t('interviews.status.pending_confirmation'),
+                },
+                { value: 'confirmed', label: t('interviews.status.confirmed') },
+              ],
+            },
+            {
+              key: 'mode',
+              label: t('interviews.filters.mode'),
+              options: [
+                { value: '', label: t('interviews.filters.allModes') },
+                { value: 'in_person', label: t('interviews.modes.in_person') },
+                { value: 'virtual', label: t('interviews.modes.virtual') },
+              ],
+            },
+            { key: 'scheduled_at_min', label: t('interviews.filters.from'), type: 'date' },
+            { key: 'scheduled_at_max', label: t('interviews.filters.to'), type: 'date' },
+            {
+              key: 'evaluation_score_min',
+              label: t('interviews.filters.minScore'),
+              type: 'number',
+            },
+            {
+              key: 'evaluation_score_max',
+              label: t('interviews.filters.maxScore'),
+              type: 'number',
+            },
+            { key: 'sort', label: t('screening.filters.sort') },
+          ]}
+        />
+        {booked.data?.meta && (
+          <DataToolbar
+            total={booked.data.meta.total ?? 0}
+            page={booked.data.meta.current_page ?? bookedParams.page}
+            lastPage={booked.data.meta.last_page ?? 1}
+            onPageChange={bookedCollection.setPage}
+            onExport={async () =>
+              downloadBlob(await exportBookedInterviews(bookedParams), 'interviews.xlsx')
+            }
+          />
+        )}
+
         {complete.isError && (
           <Alert severity="error">{t('interviews.scheduling.completeError')}</Alert>
         )}

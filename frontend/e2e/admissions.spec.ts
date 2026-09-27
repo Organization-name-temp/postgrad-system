@@ -246,6 +246,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await login(page, 'interviewer.hoda@ejust.test')
   await page.getByRole('link', { name: 'My interviews' }).first().click()
   await expect(page).toHaveURL(/\/interviews\/mine$/)
+  await page.getByLabel('Search applicants').fill(APPLICANT.name)
   await page
     .getByRole('row', { name: new RegExp(APPLICANT.name) })
     .getByRole('button', { name: 'Record evaluation' })
@@ -259,6 +260,10 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   // ── 7. Student Affairs marks the interview complete ──────────────────────────────
   await login(page, 'r05@ejust.test')
   await page.getByRole('link', { name: 'Interview scheduling' }).first().click()
+  await page
+    .getByRole('region', { name: 'Scheduled interviews' })
+    .getByLabel('Search applicants')
+    .fill(APPLICANT.name)
   await page
     .getByRole('row', { name: new RegExp(APPLICANT.name) })
     .getByRole('button', { name: 'Mark complete' })

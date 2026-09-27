@@ -5,6 +5,7 @@ use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Models\Interview;
+use Modules\Admissions\Internal\Models\InterviewSlot;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
@@ -138,6 +139,32 @@ foreach (['programs' => Program::class, 'departments' => Department::class, 'fac
 }
 
 dataset('collection contracts', [
+    'Booked interviews' => ['/api/v1/interviews', function (): array {
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+        Interview::factory()->confirmed()->create(['application_id' => Application::factory()->interviewScheduled()->create(['phone' => '+201088888888'])->id]);
+        $latest = Interview::factory()->confirmed()->create(['application_id' => Application::factory()->interviewScheduled()->create(['phone' => '+201088888888'])->id]);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $latest->id,
+            'outside_filter' => 'application_id=999999', 'private_probe' => 'q=1088888888'];
+    }],
+    'Assigned interviews' => ['/api/v1/interviews/assigned', function (): array {
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Instructor);
+        $first = null;
+        foreach (range(1, 2) as $index) {
+            $interview = Interview::factory()->confirmed()->create([
+                'application_id' => Application::factory()->interviewScheduled()->create(['phone' => '+201088888888'])->id,
+                'interview_slot_id' => InterviewSlot::factory()->create(['interviewer_id' => $actor->id, 'scheduled_at' => now()->addDay()->startOfDay()])->id,
+            ]);
+            $first ??= $interview->id;
+        }
+        $outside = InterviewSlot::factory()->create();
+        Interview::factory()->confirmed()->create(['interview_slot_id' => $outside->id]);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first,
+            'outside_filter' => 'interviewer_id='.$outside->interviewer_id, 'private_probe' => 'q=1088888888'];
+    }],
     ...$catalogReferenceContracts,
     'Awaiting interview scheduling' => ['/api/v1/applications/awaiting-interview', function (): array {
         $first = Application::factory()->interviewScheduled()->create(['phone' => '+201088888888', 'finalized_at' => now()->subDays(2)]);

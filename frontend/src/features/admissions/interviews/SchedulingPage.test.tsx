@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { ThemeProvider } from '@mui/material/styles'
 import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
 import type { AxiosRequestConfig } from 'axios'
@@ -13,7 +13,11 @@ vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } } },
   customInstance: (config: AxiosRequestConfig) => {
     api.calls.push(config)
-    if (config.url?.endsWith('/interviews')) return Promise.resolve({ data: [] })
+    if (config.url?.endsWith('/interviews'))
+      return Promise.resolve({
+        data: [],
+        meta: { current_page: config.params?.page ?? 1, last_page: 3, total: 51, per_page: 25 },
+      })
     if (config.url?.endsWith('/export')) return Promise.resolve(new Blob(['workbook']))
     return Promise.resolve({
       data: [
@@ -67,7 +71,11 @@ beforeEach(async () => {
 it('restores bookmarked criteria, resets pagination on search, and restores the view with Back', async () => {
   renderPage()
   expect(await screen.findByText('Ahmed Applicant')).toBeInTheDocument()
-  expect(screen.getByLabelText('Search applicants')).toHaveValue('احمد')
+  expect(
+    within(screen.getByRole('region', { name: 'Awaiting scheduling' })).getByLabelText(
+      'Search applicants',
+    ),
+  ).toHaveValue('احمد')
   expect(
     api.calls.filter((call) => call.url?.endsWith('/applications/awaiting-interview')).at(-1)
       ?.params,
@@ -79,7 +87,12 @@ it('restores bookmarked criteria, resets pagination on search, and restores the 
     sort: '-age_days',
     page: 2,
   })
-  fireEvent.change(screen.getByLabelText('Search applicants'), { target: { value: 'Sara' } })
+  fireEvent.change(
+    within(screen.getByRole('region', { name: 'Awaiting scheduling' })).getByLabelText(
+      'Search applicants',
+    ),
+    { target: { value: 'Sara' } },
+  )
   await vi.waitFor(() =>
     expect(
       api.calls.filter((call) => call.url?.endsWith('/applications/awaiting-interview')).at(-1)
@@ -87,14 +100,24 @@ it('restores bookmarked criteria, resets pagination on search, and restores the 
     ).toMatchObject({ q: 'Sara', page: 1 }),
   )
   fireEvent.click(screen.getByRole('button', { name: 'Back' }))
-  await vi.waitFor(() => expect(screen.getByLabelText('Search applicants')).toHaveValue('احمد'))
+  await vi.waitFor(() =>
+    expect(
+      within(screen.getByRole('region', { name: 'Awaiting scheduling' })).getByLabelText(
+        'Search applicants',
+      ),
+    ).toHaveValue('احمد'),
+  )
   expect(screen.getByLabelText('URL')).toHaveTextContent('awaiting_page=2')
   expect(screen.getByLabelText('URL')).toHaveTextContent('booked_q=Other')
 })
 it('exports bookmarked criteria through the authenticated client as a blob', async () => {
   renderPage()
   await screen.findByText('Ahmed Applicant')
-  fireEvent.click(screen.getByRole('button', { name: 'Export all filtered rows' }))
+  fireEvent.click(
+    within(screen.getByRole('region', { name: 'Awaiting scheduling' })).getByRole('button', {
+      name: 'Export all filtered rows',
+    }),
+  )
   await vi.waitFor(() =>
     expect(download).toHaveBeenCalledWith(expect.any(Blob), 'applications.xlsx'),
   )
@@ -102,4 +125,34 @@ it('exports bookmarked criteria through the authenticated client as a blob', asy
     responseType: 'blob',
     params: { q: 'احمد', program_id: '4', age_days_min: 7, page: 2 },
   })
+})
+
+it('uses an independent bookmarked booked query and exports its complete filtered selection', async () => {
+  renderPage()
+  const region = screen.getByRole('region', { name: 'Scheduled interviews' })
+  expect(within(region).getByLabelText('Search applicants')).toHaveValue('Other')
+  await vi.waitFor(() =>
+    expect(
+      api.calls.filter((call) => call.url?.endsWith('/interviews')).at(-1)?.params,
+    ).toMatchObject({ q: 'Other', page: 1 }),
+  )
+  fireEvent.change(within(region).getByLabelText('Search applicants'), {
+    target: { value: 'Booked name' },
+  })
+  await vi.waitFor(() =>
+    expect(
+      api.calls.filter((call) => call.url?.endsWith('/interviews')).at(-1)?.params,
+    ).toMatchObject({ q: 'Booked name', page: 1 }),
+  )
+  expect(screen.getByLabelText('URL')).toHaveTextContent('awaiting_page=2')
+  fireEvent.click(await within(region).findByRole('button', { name: 'Export all filtered rows' }))
+  await vi.waitFor(() => expect(download).toHaveBeenCalledWith(expect.any(Blob), 'interviews.xlsx'))
+  expect(api.calls.find((call) => call.url === '/api/v1/interviews/export')).toMatchObject({
+    responseType: 'blob',
+    params: { q: 'Booked name', page: 1 },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+  await vi.waitFor(() =>
+    expect(within(region).getByLabelText('Search applicants')).toHaveValue('Other'),
+  )
 })

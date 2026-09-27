@@ -453,3 +453,27 @@ and EN/AR collection verification; this checkpoint remains partial #06 progress.
 Checkpoint `fc4b154`: sequential `composer api:check` and `npm run api:check`
 passed after commit, with no generated drift. Working tree was clean. This is
 implementation progress on #06, not completion of #06 or any full Phase 7 ticket.
+
+### Booked worklist URL controls and shared collection registry
+
+- A red frontend HTTP-boundary test proved booked criteria were ignored and controls
+  absent. Booked worklist now consumes its own `booked_*` URL state, preserving
+  awaiting criteria independently; supports applicant search, confirmation/mode,
+  scheduled/score bounds, sort, paging and authenticated full-selection export.
+- Existing awaiting tests now scope repeated labels/export controls to their named
+  region. New test covers booked criteria, Back, filtered blob download and preserving
+  `awaiting_page`. **2 files / 5 tests passed, 11.86s**.
+- Both Interview endpoints now have shared collection-contract dataset rows, proving
+  unknown-key rejection, outside filters, private phone search exclusion and truthful
+  pagination within their original actor scope. Focused backend regression:
+  **36 passed, 240 assertions, 8.61s**. Pint passed.
+- Frontend typecheck, lint and formatting passed. Headline journey now searches its
+  unique Applicant in assigned and booked paginated worklists. Serial browser run
+  includes headline, awaiting EN/AR and booked/assigned EN/AR criteria/download/axe;
+  results pending. No full package gates or consolidated review claimed.
+
+Serial Interview browser verification: **7 passed, 3.4m** — complete admissions
+headline plus awaiting/booked/assigned EN/AR bookmarked criteria, reload, authentic
+workbook downloads and serious/critical axe checks. This closes the Interview
+collection slice; slot pool/pickers, Catalog type-ahead, direct Faculty criterion,
+Pipeline/print prerequisites and all seven Phase 7 acceptance items remain pending.

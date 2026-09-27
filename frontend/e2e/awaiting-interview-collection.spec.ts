@@ -14,12 +14,15 @@ for (const locale of ['en', 'ar'] as const) {
     await page.goto(
       '/interviews/scheduling?awaiting_q=NoSuchSchedulingApplicant&awaiting_sort=-age_days&booked_q=Other',
     )
-    const search = page.getByLabel(locale === 'ar' ? 'البحث عن المتقدمين' : 'Search applicants')
+    const region = page.getByRole('region', {
+      name: locale === 'ar' ? 'بانتظار الجدولة' : 'Awaiting scheduling',
+    })
+    const search = region.getByLabel(locale === 'ar' ? 'البحث عن المتقدمين' : 'Search applicants')
     await expect(search).toHaveValue('NoSuchSchedulingApplicant')
     await page.reload()
     await expect(search).toHaveValue('NoSuchSchedulingApplicant')
     const pending = page.waitForEvent('download')
-    await page
+    await region
       .getByRole('button', {
         name: locale === 'ar' ? 'تصدير جميع الصفوف المطابقة' : 'Export all filtered rows',
       })

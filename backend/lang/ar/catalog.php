@@ -3,6 +3,26 @@
 // Arabic Catalog domain validation lines. Selected by the Accept-Language
 // middleware; mirrors lang/en/catalog.php.
 return [
+    'export_columns' => [
+        'id' => 'مرجع المقرر',
+        'department_id' => 'مرجع القسم',
+        'code' => 'رمز المقرر',
+        'name_en' => 'الاسم بالإنجليزية',
+        'name_ar' => 'الاسم بالعربية',
+        'level' => 'المستوى',
+        'research_type' => 'نوع البحث',
+        'lecture_ch' => 'ساعات المحاضرات',
+        'tutorial_ch' => 'ساعات التمارين',
+        'lab_ch' => 'ساعات المعمل',
+        'total_ch' => 'إجمالي الساعات',
+        'is_active' => 'حالة التفعيل',
+    ],
+    'export_values' => [
+        'PBL' => 'التعلّم القائم على المشكلات',
+        'Seminar' => 'حلقة بحث',
+        'active' => 'نشط',
+        'inactive' => 'غير نشط',
+    ],
     'credit_hours_unbalanced' => 'يجب أن يساوي مجموع ساعات المحاضرات والتمارين والمعمل الإجمالي.',
     'curriculum_duplicate' => 'هذا المقرر مُدرج بالفعل ضمن هذه الفئة في هذا البرنامج.',
     'preparatory_role_duplicate' => 'دور المتطلب التمهيدي هذا مُعيّن بالفعل في هذا البرنامج.',

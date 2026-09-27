@@ -3,6 +3,7 @@
 use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
@@ -120,6 +121,15 @@ function facultyInterviewer(): User
  * collection contract. Keep this registry distinct from owner workflow datasets.
  */
 dataset('collection contracts', [
+    'Courses for a catalog viewer' => ['/api/v1/courses', function (): array {
+        $first = Course::factory()->create(['code' => 'CSE511']);
+        Course::factory()->create(['code' => 'CSE512']);
+        $viewer = User::factory()->create();
+        $viewer->assignRole(Role::Student);
+
+        return ['actor' => $viewer->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'department_id=999999', 'private_probe' => 'q=1088888888'];
+    }],
     'Dean screening queue' => ['/api/v1/applications', function (): array {
         $insideProgram = Program::factory()->create();
         $outsideProgram = Program::factory()->create();

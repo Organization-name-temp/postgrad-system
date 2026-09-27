@@ -11,10 +11,13 @@ use Illuminate\Validation\Validator as ValidatorInstance;
 use Modules\Catalog\Internal\Enums\ResearchType;
 use Modules\Catalog\Internal\Http\Resources\CourseResource;
 use Modules\Catalog\Internal\Models\Course;
+use Modules\Catalog\Internal\Support\CourseCollection;
+use Modules\Catalog\Internal\Support\CourseExport;
 use Modules\Catalog\Internal\Support\CreditHours;
 use Modules\Catalog\Internal\Versioning\CatalogVersionRecorder;
 use Modules\Catalog\Public\Enums\CourseLevel;
 use Modules\Catalog\Public\Events\CourseChanged;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * @group Catalog
@@ -36,11 +39,50 @@ class CourseController
     /**
      * List Courses.
      *
-     * @response 200 {"data": [{"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}]}
+     * @queryParam q string Bilingual names or Course code fragment. Example: CSE5
+     * @queryParam department_id string Owning Department ids. Example: 1
+     * @queryParam level string Course levels. Example: 500,600
+     * @queryParam total_ch string Credit-hour totals. Example: 3
+     * @queryParam total_ch_min integer Minimum total credit hours. Example: 0
+     * @queryParam total_ch_max integer Maximum total credit hours. Example: 6
+     * @queryParam research_type string Research Types. Example: PBL,Seminar
+     * @queryParam is_active string Active states. Example: true
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: code,-level
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Page size, capped at 100. Example: 100
+     *
+     * @response 200 {"data": [{"id": 1, "department_id": 1, "code": "DEP501", "name_en": "Advanced Algorithms", "name_ar": "خوارزميات متقدمة", "level": 500, "research_type": "PBL", "lecture_ch": 3, "tutorial_ch": 0, "lab_ch": 0, "total_ch": 3, "is_active": true}], "links": {"first": "http://localhost/api/v1/courses?page=1", "last": "http://localhost/api/v1/courses?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 100, "total": 1, "last_page": 1}}
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request, CourseCollection $collection): AnonymousResourceCollection
     {
-        return CourseResource::collection(Course::query()->orderBy('code')->get());
+        $query = $collection->query($request);
+
+        return CourseResource::collection($collection->selection($query)->paginate($query->perPage, ['*'], 'page', $query->page)->withQueryString());
+    }
+
+    /**
+     * Export Courses.
+     *
+     * Canonical localized import template for every scoped match, ignoring paging.
+     *
+     * @queryParam q string Bilingual names or Course code fragment. Example: CSE5
+     * @queryParam department_id string Owning Department ids. Example: 1
+     * @queryParam level string Course levels. Example: 500,600
+     * @queryParam total_ch string Credit-hour totals. Example: 3
+     * @queryParam total_ch_min integer Minimum total credit hours. Example: 0
+     * @queryParam total_ch_max integer Maximum total credit hours. Example: 6
+     * @queryParam research_type string Research Types. Example: PBL,Seminar
+     * @queryParam is_active string Active states. Example: true
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: code,-level
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Page size, capped at 100. Example: 100
+     *
+     * @response 200 <<binary>>
+     * @response 403 {"message":"This action is unauthorized."}
+     */
+    public function export(Request $request, CourseExport $export): BinaryFileResponse
+    {
+        return $export->download($request);
     }
 
     /**

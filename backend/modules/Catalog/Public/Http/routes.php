@@ -67,8 +67,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses/{course}/versions', [CatalogVersionController::class, 'forCourse'])->middleware('can:catalog.view');
 
     // Courses
+    Route::get('/courses/export', [CourseController::class, 'export'])->middleware('can:catalog.view');
     Route::get('/courses', [CourseController::class, 'index'])->middleware('can:catalog.view');
-    Route::get('/courses/{course}', [CourseController::class, 'show'])->middleware('can:catalog.view');
+    Route::get('/courses/{course}', [CourseController::class, 'show'])->whereNumber('course')->middleware('can:catalog.view');
     Route::post('/courses', [CourseController::class, 'store'])->middleware('can:catalog.manage');
     Route::patch('/courses/{course}', [CourseController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/courses/{course}/activate', [CourseController::class, 'activate'])->middleware('can:catalog.manage');

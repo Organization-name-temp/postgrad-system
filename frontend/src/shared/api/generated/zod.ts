@@ -2932,8 +2932,43 @@ export const ListACoursesVersionHistoryResponse = zod.object({
 
 
 /**
+ * Canonical localized import template for every scoped match, ignoring paging.
+ * @summary Export Courses.
+ */
+export const ExportCoursesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual names or Course code fragment.'),
+  "department_id": zod.string().optional().describe('Owning Department ids.'),
+  "level": zod.string().optional().describe('Course levels.'),
+  "total_ch": zod.string().optional().describe('Credit-hour totals.'),
+  "total_ch_min": zod.number().optional().describe('Minimum total credit hours.'),
+  "total_ch_max": zod.number().optional().describe('Maximum total credit hours.'),
+  "research_type": zod.string().optional().describe('Research Types.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
+export const ExportCoursesResponse = zod.unknown()
+
+
+/**
  * @summary List Courses.
  */
+export const ListCoursesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual names or Course code fragment.'),
+  "department_id": zod.string().optional().describe('Owning Department ids.'),
+  "level": zod.string().optional().describe('Course levels.'),
+  "total_ch": zod.string().optional().describe('Credit-hour totals.'),
+  "total_ch_min": zod.number().optional().describe('Minimum total credit hours.'),
+  "total_ch_max": zod.number().optional().describe('Maximum total credit hours.'),
+  "research_type": zod.string().optional().describe('Research Types.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ListCoursesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2948,7 +2983,19 @@ export const ListCoursesResponse = zod.object({
   "lab_ch": zod.number().optional(),
   "total_ch": zod.number().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 

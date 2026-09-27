@@ -5,6 +5,26 @@
 // (required, unique, exists, enum) cover the rest; this file holds only the custom
 // domain messages the Catalog controllers raise.
 return [
+    'export_columns' => [
+        'id' => 'Course reference',
+        'department_id' => 'Department reference',
+        'code' => 'Course code',
+        'name_en' => 'English name',
+        'name_ar' => 'Arabic name',
+        'level' => 'Level',
+        'research_type' => 'Research Type',
+        'lecture_ch' => 'Lecture CH',
+        'tutorial_ch' => 'Tutorial CH',
+        'lab_ch' => 'Lab CH',
+        'total_ch' => 'Total CH',
+        'is_active' => 'Active state',
+    ],
+    'export_values' => [
+        'PBL' => 'Problem-based learning',
+        'Seminar' => 'Seminar',
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+    ],
     'credit_hours_unbalanced' => 'The lecture, tutorial and lab hours must add up to the total.',
     'curriculum_duplicate' => 'This course is already in that category for this program.',
     'preparatory_role_duplicate' => 'This Preparatory Requirement Role is already assigned in this Program.',

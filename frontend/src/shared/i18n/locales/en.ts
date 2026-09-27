@@ -296,6 +296,16 @@ export const en = {
     },
   },
   catalog: {
+    filters: {
+      search: 'Search by code or name',
+      all: 'All',
+      minCredits: 'Minimum credit hours',
+      maxCredits: 'Maximum credit hours',
+      sort: 'Sort by',
+      englishName: 'English name',
+      arabicName: 'Arabic name',
+      levelDescending: 'Highest level first',
+    },
     status: { active: 'Active', inactive: 'Inactive' },
     // Catalog's Dashboard Card (phase 4.5, ticket 06). Each Card's copy lives in the namespace
     // of the feature that owns its data, per Card, EN + AR together.

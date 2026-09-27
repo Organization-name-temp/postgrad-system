@@ -3186,6 +3186,104 @@ export type ListACoursesVersionHistory200 = {
   data?: ListACoursesVersionHistory200DataItem[];
 };
 
+export type ExportCoursesParams = {
+/**
+ * Bilingual names or Course code fragment.
+ */
+q?: string;
+/**
+ * Owning Department ids.
+ */
+department_id?: string;
+/**
+ * Course levels.
+ */
+level?: string;
+/**
+ * Credit-hour totals.
+ */
+total_ch?: string;
+/**
+ * Minimum total credit hours.
+ */
+total_ch_min?: number;
+/**
+ * Maximum total credit hours.
+ */
+total_ch_max?: number;
+/**
+ * Research Types.
+ */
+research_type?: string;
+/**
+ * Active states.
+ */
+is_active?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
+export type ExportCourses403 = {
+  message?: string;
+};
+
+export type ListCoursesParams = {
+/**
+ * Bilingual names or Course code fragment.
+ */
+q?: string;
+/**
+ * Owning Department ids.
+ */
+department_id?: string;
+/**
+ * Course levels.
+ */
+level?: string;
+/**
+ * Credit-hour totals.
+ */
+total_ch?: string;
+/**
+ * Minimum total credit hours.
+ */
+total_ch_min?: number;
+/**
+ * Maximum total credit hours.
+ */
+total_ch_max?: number;
+/**
+ * Research Types.
+ */
+research_type?: string;
+/**
+ * Active states.
+ */
+is_active?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type ListCourses200DataItem = {
   id?: number;
   department_id?: number;
@@ -3201,8 +3299,26 @@ export type ListCourses200DataItem = {
   is_active?: boolean;
 };
 
+export type ListCourses200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ListCourses200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type ListCourses200 = {
   data?: ListCourses200DataItem[];
+  links?: ListCourses200Links;
+  meta?: ListCourses200Meta;
 };
 
 export type CreateACourseBody = {
@@ -20848,16 +20964,19 @@ export function useListACoursesVersionHistory<TData = Awaited<ReturnType<typeof 
 
 
 /**
- * @summary List Courses.
+ * Canonical localized import template for every scoped match, ignoring paging.
+ * @summary Export Courses.
  */
-export const listCourses = (
-
+export const exportCourses = (
+    params?: ExportCoursesParams,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<ListCourses200>(
-      {url: `/api/v1/courses`, method: 'GET', signal
+      return customInstance<Blob>(
+      {url: `/api/v1/courses/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
     },
       );
     }
@@ -20865,23 +20984,117 @@ export const listCourses = (
 
 
 
-export const getListCoursesQueryKey = () => {
+export const getExportCoursesQueryKey = (params?: ExportCoursesParams,) => {
     return [
-    `/api/v1/courses`
+    `/api/v1/courses/export`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListCoursesQueryOptions = <TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+export const getExportCoursesQueryOptions = <TData = Awaited<ReturnType<typeof exportCourses>>, TError = ExportCourses403>(params?: ExportCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCourses>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListCoursesQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getExportCoursesQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCourses>>> = ({ signal }) => listCourses(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportCourses>>> = ({ signal }) => exportCourses(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportCourses>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportCoursesQueryResult = NonNullable<Awaited<ReturnType<typeof exportCourses>>>
+export type ExportCoursesQueryError = ExportCourses403
+
+
+export function useExportCourses<TData = Awaited<ReturnType<typeof exportCourses>>, TError = ExportCourses403>(
+ params: undefined |  ExportCoursesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCourses>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCourses>>,
+          TError,
+          Awaited<ReturnType<typeof exportCourses>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCourses<TData = Awaited<ReturnType<typeof exportCourses>>, TError = ExportCourses403>(
+ params?: ExportCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCourses>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCourses>>,
+          TError,
+          Awaited<ReturnType<typeof exportCourses>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCourses<TData = Awaited<ReturnType<typeof exportCourses>>, TError = ExportCourses403>(
+ params?: ExportCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCourses>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Courses.
+ */
+
+export function useExportCourses<TData = Awaited<ReturnType<typeof exportCourses>>, TError = ExportCourses403>(
+ params?: ExportCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCourses>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportCoursesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary List Courses.
+ */
+export const listCourses = (
+    params?: ListCoursesParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListCourses200>(
+      {url: `/api/v1/courses`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getListCoursesQueryKey = (params?: ListCoursesParams,) => {
+    return [
+    `/api/v1/courses`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListCoursesQueryOptions = <TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(params?: ListCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCoursesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCourses>>> = ({ signal }) => listCourses(params, signal);
 
 
 
@@ -20895,7 +21108,7 @@ export type ListCoursesQueryError = unknown
 
 
 export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
+ params: undefined |  ListCoursesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listCourses>>,
           TError,
@@ -20905,7 +21118,7 @@ export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, 
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
+ params?: ListCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listCourses>>,
           TError,
@@ -20915,7 +21128,7 @@ export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, 
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+ params?: ListCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -20923,11 +21136,11 @@ export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, 
  */
 
 export function useListCourses<TData = Awaited<ReturnType<typeof listCourses>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
+ params?: ListCoursesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCourses>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListCoursesQueryOptions(options)
+  const queryOptions = getListCoursesQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -174,3 +174,30 @@ Reserved until all tickets and prerequisite changes are implemented.
   #04's executable aggregate capabilities are now present. Required full backend
   gate and final consolidated review remain pending; no whole-ticket acceptance
   is claimed before those verification results.
+
+### Admissions/Catalog prerequisite (#06), Courses slice
+
+- Courses now filter by Department, level, credit totals/ranges, Research Type and
+  active state, search normalized bilingual names/code fragments, and paginate
+  stored fields in SQL with a stable id tie. Reference default is 100; work-page
+  URL state requests 25. Shared contract dataset extended with the Course endpoint.
+- Added canonical localized export/import-template columns, retaining both names,
+  the credit split and string reference/code cells. Export shares list selection,
+  streams all matches, independently enforces the actor's catalog-view projection,
+  localizes Research Type/active state and records criteria/count in Audit Log.
+  No importer added (#16 stays outside this goal). `/courses/export` precedes the
+  numeric detail route; aggregate tree/history endpoints remain whole.
+- Red API tests failed for absent pagination and export route; green focused backend
+  run: **25 passed, 152 assertions, 4.93s** including original Course management
+  authorization/domain rules and both shared collection dataset rows.
+- Frontend red failed for missing controls. Green: **1 focused page test** verifies
+  URL criteria, reset to page 1 and authenticated generated blob export. Backend
+  OpenAPI and frontend hooks/Zod regenerated. Typecheck, lint, format, Pint,
+  PHPStan and deptrac passed.
+- Serial `npm run e2e -- e2e/course-collections.spec.ts e2e/headline.spec.ts`:
+  **4 passed, 57.4s**. EN/AR bookmarked Course filters survive language switch and
+  reload, private-client downloads succeed, both Course pages pass existing
+  serious/critical axe threshold, and the unchanged complete tree/detail journey
+  passes including RTL switch. Local report includes screenshots and EN/AR XLSX.
+- Other Catalog resources, Admissions collections/pickers and #06 full gates remain
+  pending. API drift checks after this slice commit and final review remain pending.

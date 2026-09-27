@@ -289,6 +289,16 @@ export const ar = {
     },
   },
   catalog: {
+    filters: {
+      search: 'البحث بالرمز أو الاسم',
+      all: 'الكل',
+      minCredits: 'الحد الأدنى للساعات المعتمدة',
+      maxCredits: 'الحد الأقصى للساعات المعتمدة',
+      sort: 'الترتيب حسب',
+      englishName: 'الاسم بالإنجليزية',
+      arabicName: 'الاسم بالعربية',
+      levelDescending: 'المستوى الأعلى أولًا',
+    },
     status: { active: 'مُفعَّلة', inactive: 'مُعطَّلة' },
     cards: {
       summary: {

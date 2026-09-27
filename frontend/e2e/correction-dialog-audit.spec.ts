@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
+import { loginInEnglish, selectAuthenticatedLanguage } from './authenticatedLanguage'
 
 for (const scheme of ['light', 'dark'] as const) {
   for (const locale of ['en', 'ar'] as const) {
@@ -8,20 +9,18 @@ for (const scheme of ['light', 'dark'] as const) {
     }) => {
       test.setTimeout(90_000)
       await page.addInitScript((mode) => localStorage.setItem('mui-mode', mode), scheme)
-      await page.goto('/login')
-      await page.getByLabel('Email').fill('interviewer.hoda@ejust.test')
-      await page.getByLabel('Password').fill('password')
-      await page.getByRole('button', { name: 'Sign in' }).click()
-      await expect(page).toHaveURL(/\/$/)
-      await page
-        .getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English', exact: true })
-        .click()
+      await loginInEnglish(page, 'interviewer.hoda@ejust.test')
       await page.goto('/grading')
       await page
         .getByRole('row', { name: /CSE511/ })
+        .filter({ hasText: 'Finalized' })
         .first()
         .getByRole('link')
         .click()
+      await expect(
+        page.getByRole('button', { name: 'Start correction round', exact: true }),
+      ).toBeVisible()
+      await selectAuthenticatedLanguage(page, locale)
       const start = locale === 'ar' ? 'بدء جولة تصحيح' : 'Start correction round'
       await page.getByRole('button', { name: start, exact: true }).click()
       const dialog = page.getByRole('dialog')
@@ -44,7 +43,7 @@ for (const scheme of ['light', 'dark'] as const) {
         .getByRole('button', { name: locale === 'ar' ? 'إلغاء' : 'Cancel', exact: true })
         .click()
       await expect(dialog).toBeHidden()
-      await page.getByRole('button', { name: 'English', exact: true }).click()
+      await selectAuthenticatedLanguage(page, 'en')
     })
   }
 }

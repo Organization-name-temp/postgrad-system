@@ -1,3 +1,4 @@
+import { loginInEnglish as login } from './authenticatedLanguage'
 import { auditPresentation } from './presentationAudit'
 import { test, expect } from '@playwright/test'
 import type { Locator, Page, TestInfo } from '@playwright/test'
@@ -19,19 +20,6 @@ const ADMIN = 'r05@ejust.test' // Student Affairs — holds calendar.manage
 const STUDENT = 'student.smoke@seed.ejust.test' // R02, advised by Dr. Amina, no Fall request yet
 const ADVISOR = 'advisor.amina@ejust.test' // R03 — the Student's advisor
 const INSTRUCTOR = 'r04@ejust.test' // R04 — teaches the Student's audited Spring offering
-
-async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  // Pin English. The locale is persisted per user (`preferred_locale` on /me), and the bilingual
-  // axe specs sign in as these same seeded accounts and leave Arabic behind — so a flow that
-  // asserts English copy must state that rather than inherit whatever ran before it.
-  await page.getByRole('button', { name: 'English' }).click()
-  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
-}
 
 async function logout(page: Page) {
   await page.getByRole('button', { name: 'Account menu' }).click()

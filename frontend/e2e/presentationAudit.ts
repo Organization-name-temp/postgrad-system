@@ -1,8 +1,11 @@
+import { selectAuthenticatedLanguage } from './authenticatedLanguage'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page } from '@playwright/test'
 
 /** Reuse an owner's live workflow state; never replay its mutation for presentation. */
 export async function auditPresentation(page: Page) {
+  await expect(page.locator('main').getByRole('progressbar')).toHaveCount(0)
+  await expect(page.locator('main .MuiSkeleton-root')).toHaveCount(0)
   const originalScheme = await page.locator('html').getAttribute('data-mui-color-scheme')
   const viewport = page.viewportSize()
   const values = () =>
@@ -17,14 +20,12 @@ export async function auditPresentation(page: Page) {
         .click()
     }
     for (const locale of ['en', 'ar'] as const) {
-      await page
-        .getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English', exact: true })
-        .click()
+      await selectAuthenticatedLanguage(page, locale)
       await expect(page.locator('html')).toHaveAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr')
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
-      expect(await values()).toEqual(originalValues)
       await expect(page.locator('main').getByRole('progressbar')).toHaveCount(0)
       await expect(page.locator('main .MuiSkeleton-root')).toHaveCount(0)
+      await expect.poll(values).toEqual(originalValues)
       for (const width of [390, 1280]) {
         await page.setViewportSize({ width, height: 900 })
         expect(
@@ -40,7 +41,7 @@ export async function auditPresentation(page: Page) {
       ).toEqual([])
     }
   }
-  await page.getByRole('button', { name: 'English', exact: true }).click()
+  await selectAuthenticatedLanguage(page, 'en')
   if ((await page.locator('html').getAttribute('data-mui-color-scheme')) !== originalScheme) {
     await page.getByRole('button', { name: 'Toggle light and dark theme', exact: true }).click()
   }

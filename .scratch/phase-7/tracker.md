@@ -1513,3 +1513,12 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   (13.3s / 19.7s / 12.8s / 19.2s), including validation, keyboard selection and
   narrow/wide axe. Expanded Enrollment passed **4.2m**; Phase 7 exact-population/
   workbook/language/investigation headline passed **59.9s**. Records remains active.
+- Remaining expanded owner run **PASSED (exit 0): 7 tests, 15.2m**.
+  Records expanded service/presentation/print journey passed **8.9m**; all 20
+  EN/AR/light/dark current, official and public/private revoked A4 PDFs produced.
+  Admissions separately passed **4.6m** in the immediately preceding serial run.
+  Harness fixes are committed with these observed results; Prettier passed for
+  all affected browser files. Log: `/tmp/phase7-owner-audit-remaining.log`.
+- Preparing a fresh migrated/seeded development fixture after all browser contexts
+  ended, then rerunning the required complete frontend gate. No browser suite
+  was reseeded or competed with another journey.

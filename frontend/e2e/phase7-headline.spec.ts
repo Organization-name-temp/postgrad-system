@@ -1,3 +1,4 @@
+import { loginInEnglish, selectAuthenticatedLanguage } from './authenticatedLanguage'
 import { execFileSync } from 'node:child_process'
 import { expect, test } from '@playwright/test'
 
@@ -20,12 +21,7 @@ test('Phase 7 headline: scoped academic populations, canonical exports, language
   page,
 }, testInfo) => {
   test.setTimeout(180_000)
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('r03@ejust.test')
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  await page.getByRole('button', { name: 'English', exact: true }).click()
+  await loginInEnglish(page, 'r03@ejust.test')
   const reports = [
     {
       route: 'academic-standing',
@@ -77,11 +73,11 @@ test('Phase 7 headline: scoped academic populations, canonical exports, language
     expect(report.api === 'termination' ? summary.case_count : summary.total).toBe(3)
     if (report.api === 'termination') expect(summary.student_count).toBe(3)
     await expect(page.getByRole('heading', { name: report.title, exact: true })).toBeVisible()
-    await page.getByRole('button', { name: 'العربية', exact: true }).click()
+    await selectAuthenticatedLanguage(page, 'ar')
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
     await expect(page).toHaveURL(new RegExp(`${criteria.replaceAll('+', '\\+')}$`))
     await expect(page.getByRole('textbox').first()).toHaveValue('Phase 7 report')
-    await page.getByRole('button', { name: 'English', exact: true }).click()
+    await selectAuthenticatedLanguage(page, 'en')
     await expect(page.getByRole('heading', { name: report.title, exact: true })).toBeVisible()
     await page
       .getByRole('region', { name: report.table, exact: true })

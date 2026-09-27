@@ -1,3 +1,4 @@
+import { loginInEnglish as login } from './authenticatedLanguage'
 import { auditPresentation } from './presentationAudit'
 import { test, expect } from '@playwright/test'
 import type { Page, TestInfo } from '@playwright/test'
@@ -26,19 +27,6 @@ const PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
   'base64',
 )
-
-async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  // Pin English. The locale is persisted per user (`preferred_locale` on /me), and the bilingual
-  // axe specs sign in as these same seeded accounts and leave Arabic behind — so a flow that
-  // asserts English copy must state that rather than inherit whatever ran before it.
-  await page.getByRole('button', { name: 'English' }).click()
-  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
-}
 
 async function logout(page: Page) {
   await page.getByRole('button', { name: 'Account menu' }).click()
@@ -83,6 +71,9 @@ async function openApplicantRow(page: Page) {
   const row = page.getByRole('row', { name: new RegExp(APPLICANT.name) })
   await expect(row).toBeVisible()
   await row.getByRole('link', { name: 'Open' }).click()
+  await expect(
+    page.getByRole('heading', { level: 1, name: APPLICANT.name, exact: true }),
+  ).toBeVisible()
 }
 
 test('headline: a stranger applies and is admitted as a Student across every role', async ({

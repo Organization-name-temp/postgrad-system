@@ -1444,3 +1444,16 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
 - `php artisan migrate:fresh --seed --force` passed for the final development
   fixture. `npm run gate` started (`/tmp/phase7-frontend-gate.log`), with serial
   Playwright and no reseed/competing native journey.
+- Frontend gate attempt 1: generated drift, lint, format and typecheck passed; stopped
+  deliberately during Vitest before any Playwright started after actual i18next
+  source/runtime audit demonstrated Arabic plural categories rendering “one” for
+  other owner counts. No unit/full-gate pass claimed. Log retained as
+  `/tmp/phase7-frontend-gate-attempt1.log`; development fixture remains untouched.
+- B04-11/B05-04: sixteen actual Admissions/Enrollment/Grading Card regressions
+  captured RED across Arabic plural categories. Count-neutral paired base/other
+  Arabic wording now preserves owner numbers, with English messages and domain
+  counts/empty-state rules intact. Affected seven-Card suite is running.
+- B04-11/B05-04 affected suite passed **58 tests / 7 files, 28.89s** after the
+  sixteen RED regressions. Full frontend gate restarted against the same untouched
+  freshly seeded fixture; its static stages rerun rather than reusing the aborted
+  attempt. No browser reseed occurred during a suite.

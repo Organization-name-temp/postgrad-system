@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { MemoryRouter } from 'react-router-dom'
@@ -151,3 +151,22 @@ describe('ScreeningQueueCard', () => {
     expect(refetch).toHaveBeenCalledOnce()
   })
 })
+
+it.each([1, 2, 3, 11, 100])(
+  'shows the actual Arabic waiting count %i across plural categories',
+  async (count) => {
+    const { default: i18n } = await import('../../../shared/i18n/config')
+    await i18n.changeLanguage('ar')
+    try {
+      mockedQuery.mockReturnValue(
+        queryResult({
+          data: { data: { pending_count: count, overdue_count: 0, sla_days: 5, applications: [] } },
+        }),
+      )
+      renderCard()
+      expect(screen.getByText(`عدد الطلبات في الانتظار: ${count}`)).toBeInTheDocument()
+    } finally {
+      await act(() => i18n.changeLanguage('en'))
+    }
+  },
+)

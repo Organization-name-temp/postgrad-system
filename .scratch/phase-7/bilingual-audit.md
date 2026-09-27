@@ -125,3 +125,12 @@ chronological discovery notes, superseded by these executed results.
 No certified academic content, domain transition, authority or disclosure contract
 was changed by these fixes. Native inspection is not human demo/translation/paper
 signoff; Phase 7 acceptance remains pending that review.
+
+| ID | Surface | Evidence | Disposition |
+| --- | --- | --- | --- |
+| B04-11 / B05-04 | Arabic Dashboard/grade workflow counts | Actual i18next rendering returned “one” for 0/2/3/6/11 in legacy Arabic singular base keys because their plural categories were absent. Sixteen actual Admissions, Enrollment and Grading Card interaction regressions failed across plural categories. | Use count-neutral Arabic labels retaining the actual owner-provided count in base/other values for the affected waiting, aging, load, sheet and Incomplete labels. Keep English messages, keys, owner counts and empty-state rules unchanged. Focused affected Card suite and restarted frontend gate pending. |
+
+Final source dictionary audit: **2,104 leaves in each frontend locale**, no missing
+or extra keys; **10 backend EN/AR dictionary pairs** have matching keys. Interpolation
+inspection found the singular fallback defect above rather than treating matching
+keys as proof of correct runtime counts.

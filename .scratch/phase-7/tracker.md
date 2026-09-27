@@ -1530,3 +1530,6 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   Case fixture took **2.318s**. `npm run gate` is active from `frontend/` (log:
   `/tmp/phase7-frontend-gate.log`); regenerated API, lint, formatting and typecheck
   passed. Full unit and serial browser results remain pending.
+- Frontend gate attempt 3 unit stage passed: **121 files / 676 tests, 429.95s**.
+  Required complete serial Playwright stage now running in the same invocation;
+  no full frontend-gate pass is claimed until its final exit status is observed.

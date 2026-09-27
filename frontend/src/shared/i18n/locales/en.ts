@@ -794,6 +794,8 @@ export const en = {
       advisor: 'Advisor',
       advisorHelp: 'The least-loaded advisor is pre-selected; you may choose another.',
       advisorsError: 'Could not load the advisors.',
+      advisorsLoading: 'Loading advisors',
+      noMatchingAdvisors: 'No matching eligible advisors.',
       noAdvisors: 'No academic advisor is available to assign.',
       held: 'This offer is on hold — resolve it to accepted or rejected.',
       conditionsShown: 'Conditions',

@@ -661,3 +661,26 @@ serial expanded admissions headline **1 passed, 2.0m**, exercising staff intervi
 search, both slot creations, Applicant reschedule/confirmation and final admission.
 No API changes in this UI slice. Advisor/Catalog/Faculty prerequisites, Pipeline,
 print and all Phase 7 acceptance/final gate/review requirements remain pending.
+
+### Advisor type-ahead
+
+- EN/AR HTTP-boundary tests first reproduced the blank out-of-range suggestion
+  when the least-loaded advisor lies beyond the first 100 rows. The form now
+  hydrates that suggestion through the scoped owner reference ID query and uses
+  server search without local filtering. The baseline response supplies global
+  availability; an empty search does not disable the field or mean no advisors.
+- Explicit search/clear invalidates selection and disables acceptance. A one-way
+  edited flag prevents async suggestion refresh from overwriting the Dean's search
+  or override. Selected DTOs remain available independently of search results.
+- EN/AR tests cover suggestion 207, empty search, Arabic-normalized advisor lookup,
+  explicit override and mutation advisor 309. Existing no-advisor and reason tests
+  remain green: **5 tests passed, 12.09s**.
+- Paired loading and no-match messages added; API contract unchanged. Frontend static
+  and serial headline reruns pending. Remaining prerequisite and final Phase 7
+  gates/review requirements are unchanged.
+
+Advisor final verification: frontend **typecheck/lint/full format passed**; serial
+expanded admissions headline **1 passed, 1.8m**, including owner advisor preselection
+and final acceptance. No generated artifacts changed. Faculty criterion work has
+started test-first; remaining Catalog references/Pipeline/print and Phase 7
+acceptance/final gates/consolidated review still remain.

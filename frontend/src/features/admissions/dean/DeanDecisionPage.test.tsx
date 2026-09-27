@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import type { AxiosRequestConfig } from 'axios'
-import '../../../shared/i18n/config' // initialise i18next so useTranslation works
+import i18n from '../../../shared/i18n/config'
 import { DeanDecisionPage } from './DeanDecisionPage'
 
 // A tiny in-memory server behind the shared mutator so the decision form drives the
@@ -13,6 +13,7 @@ import { DeanDecisionPage } from './DeanDecisionPage'
 // decide POST are observed end-to-end (its action + advisor body), not stubbed.
 const calls = vi.hoisted(() => ({
   noAdvisor: false,
+  searchable: false,
   list: [] as Array<{ method?: string; url?: string; data?: unknown }>,
 }))
 
@@ -28,6 +29,25 @@ vi.mock('../../../shared/api/http', () => ({
     if (url.endsWith('/dean/advisors')) {
       if (calls.noAdvisor)
         return Promise.resolve({ data: [], meta: { total: 0, suggested_advisor_id: null } })
+      if (calls.searchable) {
+        const id = config.params?.id === '207' ? 207 : config.params?.q === 'احمد' ? 309 : 1
+        return Promise.resolve({
+          data:
+            config.params?.q === 'missing'
+              ? []
+              : [
+                  {
+                    id,
+                    name: id === 207 ? 'Dr. Suggested' : id === 309 ? 'أحمد مرشد' : 'First advisor',
+                    email: 'advisor@example.test',
+                  },
+                ],
+          meta: {
+            total: config.params?.q === 'missing' ? 0 : id === 1 ? 101 : 1,
+            suggested_advisor_id: 207,
+          },
+        })
+      }
       return Promise.resolve({
         data: [
           { id: 3, name: 'Dr. Busy', email: 'busy@ejust.test' },
@@ -78,10 +98,40 @@ function renderPage() {
 }
 
 describe('DeanDecisionPage', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     calls.list = []
     calls.noAdvisor = false
+    calls.searchable = false
+    await i18n.changeLanguage('en')
   })
+
+  it.each(['en', 'ar'] as const)(
+    'hydrates the owner suggestion and searches beyond the first advisor page in %s',
+    async (locale) => {
+      calls.searchable = true
+      await i18n.changeLanguage(locale)
+      renderPage()
+      const picker = await screen.findByRole('combobox', {
+        name: i18n.t('decisions.advisor', { ns: 'admissions' }),
+      })
+      await waitFor(() => expect(picker).toHaveValue('Dr. Suggested · advisor@example.test'))
+      const accept = screen.getByRole('button', {
+        name: i18n.t('decisions.actions.accept', { ns: 'admissions' }),
+      })
+      fireEvent.change(picker, { target: { value: 'missing' } })
+      expect(accept).toBeDisabled()
+      fireEvent.change(picker, { target: { value: 'احمد' } })
+      fireEvent.click(await screen.findByRole('option', { name: /أحمد مرشد/ }))
+      expect(accept).toBeEnabled()
+      fireEvent.click(accept)
+      await waitFor(() =>
+        expect(calls.list.find((call) => call.method === 'POST')?.data).toMatchObject({
+          action: 'accept',
+          advisor_id: 309,
+        }),
+      )
+    },
+  )
 
   // These drive the real generated hooks (detail + advisor reads, then a mutation) and
   // are userEvent-paced, so they get headroom beyond the 5s default — the full Vitest
@@ -93,7 +143,11 @@ describe('DeanDecisionPage', () => {
 
     // The applicant loads, and the least-loaded advisor (Dr. Free, id 4) is pre-selected.
     await screen.findByRole('heading', { name: 'Sara Applicant' })
-    expect(await screen.findByText(/Dr. Free/)).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getByRole('combobox', { name: 'Advisor' })).toHaveValue(
+        'Dr. Free · free@ejust.test',
+      ),
+    )
 
     // Accept enables only once the suggested advisor has pre-filled (never posts null).
     const accept = screen.getByRole('button', { name: /accept & admit/i })

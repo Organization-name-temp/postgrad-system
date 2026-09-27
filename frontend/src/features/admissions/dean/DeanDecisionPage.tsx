@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import {
   Alert,
   AlertTitle,
+  Autocomplete,
   Box,
   Button,
   CircularProgress,
   Divider,
-  MenuItem,
   Paper,
   Stack,
   TextField,
@@ -23,7 +23,10 @@ import {
   useReviewAnApplication,
   useStatusTimeline,
 } from '../../../shared/api/generated/endpoints'
-import type { RecordTheFinalDecision200 } from '../../../shared/api/generated/endpoints'
+import type {
+  AdvisorsForTheDecisionForm200DataItem,
+  RecordTheFinalDecision200,
+} from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { ApplicationStatusChip } from '../ApplicationStatusChip'
@@ -57,11 +60,16 @@ export function DeanDecisionPage() {
 
   const detail = useReviewAnApplication(id)
   const timeline = useStatusTimeline(id)
-  const advisors = useAdvisorsForTheDecisionForm()
+  const advisors = useAdvisorsForTheDecisionForm({ per_page: 100 })
   const decide = useRecordTheFinalDecision()
 
   const [pending, setPending] = useState<PendingDecision>(null)
-  const [advisorId, setAdvisorId] = useState<number | ''>('')
+  const [selectedAdvisor, setSelectedAdvisor] =
+    useState<AdvisorsForTheDecisionForm200DataItem | null>(null)
+  const [advisorSearch, setAdvisorSearch] = useState('')
+  const [advisorInput, setAdvisorInput] = useState('')
+  const [advisorEdited, setAdvisorEdited] = useState(false)
+  const advisorId = selectedAdvisor?.id ?? ''
   const [conditions, setConditions] = useState('')
   const [waitlistPosition, setWaitlistPosition] = useState('')
   const [note, setNote] = useState('')
@@ -70,21 +78,35 @@ export function DeanDecisionPage() {
   // Pre-fill the advisor with the server's least-loaded suggestion once it arrives,
   // leaving the Dean free to override (spec §Advisor assignment).
   const suggestedAdvisorId = advisors.data?.meta?.suggested_advisor_id
+  const suggestion = useAdvisorsForTheDecisionForm(
+    { id: String(suggestedAdvisorId ?? ''), per_page: 100 },
+    { query: { enabled: suggestedAdvisorId != null && !advisorEdited } },
+  )
+  const searchedAdvisors = useAdvisorsForTheDecisionForm(
+    { q: advisorSearch || undefined, per_page: 100 },
+    { query: { enabled: advisorSearch !== '' } },
+  )
   useEffect(() => {
-    if (advisorId === '' && suggestedAdvisorId !== undefined && suggestedAdvisorId !== null) {
-      setAdvisorId(suggestedAdvisorId)
+    const person =
+      (advisors.data?.data ?? []).find((advisor) => advisor.id === suggestedAdvisorId) ??
+      suggestion.data?.data?.find((advisor) => advisor.id === suggestedAdvisorId)
+    if (!advisorEdited && person) {
+      setSelectedAdvisor(person)
+      setAdvisorInput(`${person.name ?? ''} · ${person.email ?? ''}`)
     }
-  }, [advisorId, suggestedAdvisorId])
+  }, [advisorEdited, advisors.data, suggestion.data, suggestedAdvisorId])
 
   const application = detail.data?.data
-  const advisorOptions = advisors.data?.data ?? []
+  const advisorResults = advisorSearch === '' ? advisors : searchedAdvisors
+  const advisorOptions = advisorResults.data?.data ?? []
   // Disable the advisor select only once the query has *settled* with no advisors —
   // never merely while it is loading. A field disabled during the load flips to enabled
   // when advisors arrive (and the suggestion pre-fills), animating its label's colour up
   // from the muted disabled tone to the resting tone; that transition passes through a
   // sub-AA grey axe can catch mid-flight. Staying enabled keeps the label at its resting
   // (accessible) colour throughout, so only the shrink transform animates (phase 2.5).
-  const noAdvisors = !advisors.isPending && advisorOptions.length === 0
+  const noAdvisors =
+    !advisors.isPending && (advisors.data?.meta?.total ?? advisors.data?.data?.length) === 0
   const actionError = decide.isError
     ? (apiErrorMessage(decide.error) ?? t('decisions.actionError'))
     : undefined
@@ -242,22 +264,41 @@ export function DeanDecisionPage() {
 
           {!admitted && (
             <>
-              <TextField
-                select
-                label={t('decisions.advisor')}
-                helperText={noAdvisors ? t('decisions.noAdvisors') : t('decisions.advisorHelp')}
-                value={advisorId === '' ? '' : String(advisorId)}
-                onChange={(event) => setAdvisorId(Number(event.target.value))}
-                fullWidth
+              <Autocomplete
+                options={advisorOptions}
+                value={selectedAdvisor}
+                inputValue={advisorInput}
+                filterOptions={(options) => options}
+                getOptionLabel={(advisor) => `${advisor.name ?? ''} · ${advisor.email ?? ''}`}
+                getOptionKey={(advisor) => advisor.id ?? ''}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                loading={advisorResults.isFetching}
+                loadingText={t('decisions.advisorsLoading')}
+                noOptionsText={t('decisions.noMatchingAdvisors')}
+                onInputChange={(_event, value, reason) => {
+                  setAdvisorInput(value)
+                  if (reason === 'input' || reason === 'clear') {
+                    setAdvisorEdited(true)
+                    setAdvisorSearch(value)
+                    setSelectedAdvisor(null)
+                  }
+                }}
+                onChange={(_event, advisor) => {
+                  setAdvisorEdited(true)
+                  setSelectedAdvisor(advisor)
+                }}
                 disabled={noAdvisors}
                 sx={{ mb: 2, maxWidth: 480 }}
-              >
-                {advisorOptions.map((advisor) => (
-                  <MenuItem key={advisor.id} value={String(advisor.id)}>
-                    {advisor.name} · {advisor.email}
-                  </MenuItem>
-                ))}
-              </TextField>
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('decisions.advisor')}
+                    helperText={noAdvisors ? t('decisions.noAdvisors') : t('decisions.advisorHelp')}
+                    error={advisorResults.isError}
+                    fullWidth
+                  />
+                )}
+              />
 
               {pending !== null && (
                 <TextField

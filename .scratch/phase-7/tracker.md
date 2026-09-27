@@ -309,3 +309,17 @@ The first isolated-slot headline rerun failed on the test's exact `Location` lab
 locator because the required-field marker is part of that label. The rendered form
 had the correct date and named interviewer. Corrected the locator to the scoped
 label match used by the other required inputs; the next headline rerun is active.
+
+Decision commit `bd30df4`: `composer api:check` then `npm run api:check`
+**passed**, generated artifacts have no drift. Corrected isolated-slot headline
+rerun **1 passed, 1.4m** — complete application/SA/Dean/interview/admission journey,
+including paginated decisions and existing accessibility checks. Final modified
+browser files pass Prettier. ESLint intentionally ignores `e2e/`; the targeted
+invocation emitted ignored-file warnings and is not claimed as browser-file lint
+coverage. The earlier configured package lint/typecheck passed.
+
+Next dependency frontier: Admission Cycle management/public lookup, awaiting/booked/
+assigned interviews and slot pool, advisor/interviewer/applicant pickers with
+contract/type-ahead adoption, and Dean Faculty criterion. Then the Pipeline Report
+and print prerequisite unlock Phase 7 academic Reports. All seven Phase 7 ticket
+acceptance, full package gates and consolidated review remain outstanding.

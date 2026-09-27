@@ -409,6 +409,7 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
           disabled={gpaDisabled}
           error={Boolean(fieldState.error)}
           helperText={fieldState.error?.message ?? gpaHint}
+          slotProps={{ formHelperText: { disabled: false } }}
         />
       )}
     />

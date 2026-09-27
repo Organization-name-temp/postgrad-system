@@ -1,3 +1,4 @@
+import { auditPresentation } from './presentationAudit'
 import { test, expect } from '@playwright/test'
 import type { Page, TestInfo } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
@@ -89,7 +90,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
 }, testInfo) => {
   // The flow spans ~nine sign-ins and the whole pipeline; give it room — but cap each
   // individual action so a wrong locator fails fast rather than eating the whole budget.
-  test.setTimeout(300_000)
+  test.setTimeout(900_000)
   page.setDefaultTimeout(20_000)
 
   // ── 1. Register into the open cycle ─────────────────────────────────────────────
@@ -138,6 +139,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await selectOption(page, 'Applying for', 'MSc')
   // "None" avoids the conditional English-certificate requirement at finalize.
   await selectOption(page, 'English proficiency test', 'None')
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Save & continue' }).click()
 
   // ── 2b. Email verification (link shown on screen, no mail sent) ──────────────────
@@ -146,6 +148,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   // "Verify email" button, whose fetch is cross-origin under the split dev servers
   // (SPA :5173, API :8000) — the link itself is the intended verification path.
   await expect(page.getByRole('heading', { name: 'Verify your email' })).toBeVisible()
+  await auditPresentation(page)
   const verifyHref = await page.getByRole('link', { name: /verify-email/ }).getAttribute('href')
   expect(verifyHref).toBeTruthy()
   await page.goto(verifyHref as string)
@@ -171,6 +174,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await expect(page.getByText('transcript.pdf')).toBeVisible()
   await expect(page.getByText('national-id.pdf')).toBeVisible()
   await expect(page.getByText('photo.png')).toBeVisible()
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Continue to program selection' }).click()
 
   // ── 2d. Program selection (a qualifying MSc program) ─────────────────────────────
@@ -178,10 +182,12 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   const programNode = page.getByRole('treeitem', { name: /MSc in Computer Engineering/ })
   await expect(programNode).toBeVisible()
   await programNode.getByText('Primary', { exact: true }).click()
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Save & continue' }).click()
 
   // ── 2e. Review & finalize ────────────────────────────────────────────────────────
   await expect(page.getByRole('heading', { name: 'Review & submit' })).toBeVisible()
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Finalize application' }).click()
 
   // The wizard flips to the read-only status view: the application is in review.
@@ -194,6 +200,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await page.getByRole('link', { name: 'Screening queue' }).first().click()
   await expect(page).toHaveURL(/\/screening$/)
   await openApplicantRow(page)
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Approve for Dean review' }).click()
   await expect(page).toHaveURL(/\/screening$/)
   await capture(page, testInfo, '2-sa-approved')
@@ -204,6 +211,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await page.getByRole('link', { name: 'Dean review' }).first().click()
   await expect(page).toHaveURL(/\/dean$/)
   await openApplicantRow(page)
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Approve for interview' }).click()
   await expect(page).toHaveURL(/\/dean$/)
   await capture(page, testInfo, '3-dean-approved-for-interview')
@@ -261,6 +269,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await page.getByRole('option', { name: new RegExp(replacementLocation) }).click()
   await page.getByRole('button', { name: 'Move to this slot' }).click()
   await expect(page.getByRole('button', { name: 'Reschedule', exact: true })).not.toBeVisible()
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Confirm attendance' }).click()
   await expect(page.getByText('Confirmed', { exact: true })).toBeVisible()
   await expectNoSeriousA11y(page)

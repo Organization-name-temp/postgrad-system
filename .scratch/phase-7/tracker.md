@@ -1405,3 +1405,33 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   presentation checks without repeating transitions; those extensions are unrun.
 - Corrected ROADMAP/HANDOFF Phase 4.6 planning-versus-executable status and Phase 7
   branch/frontier. Full gates, consolidated review and human acceptance stay pending.
+
+### Consolidated prerequisite dispositions
+
+| Phase 4.6 ticket | Executable disposition | Evidence seam |
+| --- | --- | --- |
+| 01 | Implemented bounded fixture/assertion closure; final gate pending | GeneratedCohortSeederTest, named-persona seeder tests, collection/journey counts audited throughout |
+| 02 | Existing Support parser verified; shared URL/filter/page controls and scoped screening tracer implemented | CollectionQueryTest, CollectionContractTest, ScreeningQueuePage interactions and serial collections |
+| 03 | Existing OpenSpout writer verified; canonical full-selection audited exports wired | Screening/collection and Report export HTTP tests, workbook readback, scoped native exports |
+| 04 | Required owner aggregate/batch closure implemented; no foreign Internal calls | BatchCgpaSeededParityTest, aggregate parity tests, GraduationBatchSeededParityTest, owner Curriculum/Credit-Hour/Standing batches |
+| 05 | Shared chart primitive implemented with all three chart types and exact keyboard table | Shared Chart tests and four-state style gallery |
+| 06 | Admissions/Catalog collection/picker contract implemented and generated | Owner collection HTTP tests, typed picker interactions, native collection and full owner journeys |
+| 08 | Analytics composition/Pipeline scoped Report and exact drill-through implemented | ApplicationPipelineReportTest, aggregate tests, application-pipeline native four-state journey |
+| 15 | Browser Report print implemented and native papers inspected across Pipeline, Standing, Readiness and Termination | ReportDocument/Chart print tests and real EN/AR A4 artifacts; human paper signoff still required |
+
+Other Phase 4.6 tickets remain outside this goal. This table records executable
+implementation, not whole Phase 4.6 completion or passing an unrun final gate.
+
+### Final package verification underway
+
+- `COMPOSER_PROCESS_TIMEOUT=0 composer gate` started against PostgreSQL (log:
+  `/tmp/phase7-backend-gate.log`). Native detail audit remains serial on the separate
+  development fixture; no competing Pest process or browser journey is running.
+- Frontend typecheck, lint and full format checks passed for B04-10 and authored
+  presentation audit additions. Final `npm run gate` remains pending.
+- Additional detail audit passed **24 / 24, 7.4m**: Applicant unsaved input
+  continuity, Screening/Dean/Advisor details, Instructor offerings/register and
+  Interviewer, all four language/theme states at 390/1280px with loaded axe checks.
+  The only demonstrated defect was B04-10, fixed and independently regressed.
+- Full development fixture refresh started only after the serial browser finished,
+  preparing the required final frontend gate. Backend gate continues on prs_test.

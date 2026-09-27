@@ -45,7 +45,10 @@ export function SlotFormDialog({ open, onClose, slot }: SlotFormDialogProps) {
   const queryClient = useQueryClient()
   const isEdit = slot !== undefined
 
-  const interviewers = useListAssignableInterviewers({ query: { enabled: open } })
+  const interviewers = useListAssignableInterviewers(
+    { per_page: 100 },
+    { query: { enabled: open } },
+  )
 
   const [scheduledAt, setScheduledAt] = useState('')
   const [duration, setDuration] = useState('30')

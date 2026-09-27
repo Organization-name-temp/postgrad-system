@@ -12,6 +12,7 @@ import { DeanDecisionPage } from './DeanDecisionPage'
 // REAL generated hooks: the application detail + timeline + advisor reads and the
 // decide POST are observed end-to-end (its action + advisor body), not stubbed.
 const calls = vi.hoisted(() => ({
+  noAdvisor: false,
   list: [] as Array<{ method?: string; url?: string; data?: unknown }>,
 }))
 
@@ -25,6 +26,8 @@ vi.mock('../../../shared/api/http', () => ({
       return Promise.resolve({ data: [] })
     }
     if (url.endsWith('/dean/advisors')) {
+      if (calls.noAdvisor)
+        return Promise.resolve({ data: [], meta: { total: 0, suggested_advisor_id: null } })
       return Promise.resolve({
         data: [
           { id: 3, name: 'Dr. Busy', email: 'busy@ejust.test' },
@@ -77,6 +80,7 @@ function renderPage() {
 describe('DeanDecisionPage', () => {
   beforeEach(() => {
     calls.list = []
+    calls.noAdvisor = false
   })
 
   // These drive the real generated hooks (detail + advisor reads, then a mutation) and
@@ -108,6 +112,13 @@ describe('DeanDecisionPage', () => {
     // The minted University ID is surfaced.
     expect(await screen.findByText(/2026-MSC-CE-0001/)).toBeInTheDocument()
   }, 20_000)
+
+  it('keeps acceptance disabled when the owner returns no suggested advisor', async () => {
+    calls.noAdvisor = true
+    renderPage()
+    await screen.findByText('No academic advisor is available to assign.')
+    expect(screen.getByRole('button', { name: /accept & admit/i })).toBeDisabled()
+  })
 
   it('requires a reason before a reject can be confirmed', async () => {
     const user = userEvent.setup()

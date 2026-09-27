@@ -607,3 +607,30 @@ reschedule-budget exhaustion, confirmation and subsequent staff completion/accep
 remain executable. #06 still needs staff/Catalog type-aheads and direct Faculty
 criteria; all seven Phase 7 Report/polish acceptance and final gates/review remain
 pending. No API artifacts changed in this UI-only slice.
+
+### Staff reference collection contract
+
+- Interviewer and advisor references now use role-constrained Identity Public
+  pagination DTOs, with normalized name/email search, ID criteria, stable multi-sort
+  and a 100-row default/cap. Admissions never reads Identity tables directly.
+  The explicit Identity Public-to-Support edge permits the shared query value DTO.
+- HTTP tests first reproduced ignored criteria and missing pagination. Both endpoints
+  now preserve their backend gates and role base constraints, reject unknown fields,
+  keep private tokens outside search and expose no export route. Shared contract
+  registry covers tied adjacent pages and cross-role ID probes.
+- Advisor suggestion remains the owner's global least-loaded result, independently
+  of filtered choices. Its documented nullable type exposed an existing UI bug:
+  a null suggestion enabled acceptance. A focused failing test preceded the explicit
+  null guard; absence now leaves acceptance disabled.
+- Focused backend rerun: **55 tests / 376 assertions passed, 12.40s**. Focused frontend:
+  **3 files / 6 tests passed, 17.37s**. Frontend typecheck/lint/full format passed.
+  Backend Pint/PHPStan/deptrac passed (zero boundary violations). Serial headline
+  rerun is pending at this checkpoint.
+- OpenAPI and Orval client regenerated from controllers/resources. Slot-form caller
+  now supplies lookup parameters in the regenerated hook's first argument; the
+  HTTP-boundary test first failed on the misplaced query options before the fix.
+  Post-commit generated drift verification remains pending.
+- Staff type-ahead UI, Catalog parent references and direct Faculty criterion still
+  remain #06 work. This slice does not complete #06 or any Phase 7 ticket; Pipeline,
+  print, all seven ticket acceptance checks, final gates and consolidated review
+  remain required.

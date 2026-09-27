@@ -3,10 +3,10 @@
 namespace Modules\Admissions\Internal\Http\Controllers;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
@@ -19,10 +19,12 @@ use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Concerns\ScopesToDeanFaculty;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
+use Modules\Admissions\Internal\Http\Resources\DirectoryUserResource;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Support\AdmissionAcceptanceEvidenceFactory;
 use Modules\Admissions\Internal\Support\ApplicationCollection;
 use Modules\Admissions\Internal\Support\ApplicationExport;
+use Modules\Admissions\Internal\Support\StaffPickerQuery;
 use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\AdmitStudent;
@@ -131,21 +133,23 @@ class FinalDecisionController
      * pre-selected in `meta.suggested_advisor_id` (null when no advisor exists). Gated
      * on `applicant.decide`.
      *
-     * @response 200 {"data": [{"id": 3, "name": "Dr. Advisor", "email": "advisor@ejust.test"}], "meta": {"suggested_advisor_id": 3}}
+     * @queryParam q string Normalized staff name or email search. Example: Advisor
+     * @queryParam id string Comma-separated eligible staff ids. Example: 3,4
+     * @queryParam sort string Comma-separated id, name or email; '-' descends. Example: name,-id
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Reference size, capped at 100. Example: 100
+     *
+     * @response 200 {"data": [{"id": 3, "name": "Dr. Advisor", "email": "advisor@ejust.test"}], "links": {"first": "http://localhost/api/v1/dean/advisors?page=1", "last": "http://localhost/api/v1/dean/advisors?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 100, "total": 1, "last_page": 1, "suggested_advisor_id": 3}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function advisors(Directory $directory, StudentEnrollment $enrollment): JsonResponse
+    #[ResponseField('meta.suggested_advisor_id', 'integer', nullable: true)]
+    public function advisors(Request $request, Directory $directory, StudentEnrollment $enrollment): AnonymousResourceCollection
     {
-        $advisors = $directory->usersByRole(Role::Advisor);
-        $suggested = $enrollment->suggestAdvisor();
+        $page = $directory->pageByRole(Role::Advisor, StaffPickerQuery::from($request));
+        $paginator = new LengthAwarePaginator($page->items, $page->total, $page->perPage, $page->page,
+            ['path' => $request->url(), 'query' => $request->query()]);
 
-        return response()->json([
-            'data' => array_map(
-                static fn (UserSummary $advisor): array => $advisor->toArray(),
-                $advisors,
-            ),
-            'meta' => ['suggested_advisor_id' => $suggested?->id],
-        ]);
+        return DirectoryUserResource::collection($paginator)->additional(['meta' => ['suggested_advisor_id' => $enrollment->suggestAdvisor()?->id]]);
     }
 
     /**

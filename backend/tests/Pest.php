@@ -139,6 +139,30 @@ foreach (['programs' => Program::class, 'departments' => Department::class, 'fac
 }
 
 dataset('collection contracts', [
+    'Interviewer picker' => ['/api/v1/interview-slots/interviewers', function (): array {
+        $first = User::factory()->create(['name' => 'Same staff', 'remember_token' => 'private-picker-probe']);
+        $first->assignRole(Role::Instructor);
+        User::factory()->create(['name' => 'Same staff'])->assignRole(Role::Instructor);
+        $outside = User::factory()->create();
+        $outside->assignRole(Role::Applicant);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$outside->id, 'private_probe' => 'q=private-picker-probe'];
+    }],
+    'Advisor picker' => ['/api/v1/dean/advisors', function (): array {
+        $first = User::factory()->create(['name' => 'Same staff', 'remember_token' => 'private-picker-probe']);
+        $first->assignRole(Role::Advisor);
+        User::factory()->create(['name' => 'Same staff'])->assignRole(Role::Advisor);
+        $outside = User::factory()->create();
+        $outside->assignRole(Role::Applicant);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Dean);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$outside->id, 'private_probe' => 'q=private-picker-probe'];
+    }],
     'Interview slot pool' => ['/api/v1/interview-slots', function (): array {
         $first = InterviewSlot::factory()->create(['scheduled_at' => now()->addDay()->startOfDay(), 'meeting_link' => 'https://meet.test/private-slot-probe']);
         InterviewSlot::factory()->create(['scheduled_at' => $first->scheduled_at]);

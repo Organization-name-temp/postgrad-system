@@ -705,6 +705,8 @@ it('lists advisors with the least-loaded one suggested', function () {
         ->assertOk()
         ->assertJsonCount(2, 'data')
         ->assertJsonPath('meta.suggested_advisor_id', (int) $free->id);
+    $this->getJson('/api/v1/dean/advisors?q=NoMatchingStaff')->assertOk()->assertJsonPath('meta.total', 0)
+        ->assertJsonPath('meta.suggested_advisor_id', (int) $free->id);
 });
 
 it('validates the detail each held/rejected decision requires', function () {

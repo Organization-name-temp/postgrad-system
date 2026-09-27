@@ -1409,12 +1409,32 @@ export const ExportApplicationsAwaitingInterviewSchedulingResponse = zod.unknown
  * source for the slot form's interviewer picker. Gated on `interview.schedule`.
  * @summary List assignable interviewers.
  */
+export const ListAssignableInterviewersQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized staff name or email search.'),
+  "id": zod.string().optional().describe('Comma-separated eligible staff ids.'),
+  "sort": zod.string().optional().describe('Comma-separated id, name or email; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Reference size, capped at 100.')
+})
+
 export const ListAssignableInterviewersResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
   "name": zod.string().optional(),
   "email": zod.string().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2201,14 +2221,32 @@ export const ExportDeanDecisionWorklistResponse = zod.unknown()
  * on `applicant.decide`.
  * @summary Advisors for the decision form.
  */
+export const AdvisorsForTheDecisionFormQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized staff name or email search.'),
+  "id": zod.string().optional().describe('Comma-separated eligible staff ids.'),
+  "sort": zod.string().optional().describe('Comma-separated id, name or email; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Reference size, capped at 100.')
+})
+
 export const AdvisorsForTheDecisionFormResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
   "name": zod.string().optional(),
   "email": zod.string().optional()
 })).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
   "meta": zod.object({
-  "suggested_advisor_id": zod.number().optional()
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "suggested_advisor_id": zod.number().nullable()
 }).optional()
 })
 

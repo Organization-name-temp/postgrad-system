@@ -1874,14 +1874,55 @@ export type ExportApplicationsAwaitingInterviewScheduling403 = {
   message?: string;
 };
 
+export type ListAssignableInterviewersParams = {
+/**
+ * Normalized staff name or email search.
+ */
+q?: string;
+/**
+ * Comma-separated eligible staff ids.
+ */
+id?: string;
+/**
+ * Comma-separated id, name or email; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Reference size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type ListAssignableInterviewers200DataItem = {
   id?: number;
   name?: string;
   email?: string;
 };
 
+export type ListAssignableInterviewers200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ListAssignableInterviewers200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type ListAssignableInterviewers200 = {
   data?: ListAssignableInterviewers200DataItem[];
+  links?: ListAssignableInterviewers200Links;
+  meta?: ListAssignableInterviewers200Meta;
 };
 
 export type ListAssignableInterviewers403 = {
@@ -3060,18 +3101,56 @@ export type ExportDeanDecisionWorklist403 = {
   message?: string;
 };
 
+export type AdvisorsForTheDecisionFormParams = {
+/**
+ * Normalized staff name or email search.
+ */
+q?: string;
+/**
+ * Comma-separated eligible staff ids.
+ */
+id?: string;
+/**
+ * Comma-separated id, name or email; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Reference size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type AdvisorsForTheDecisionForm200DataItem = {
   id?: number;
   name?: string;
   email?: string;
 };
 
+export type AdvisorsForTheDecisionForm200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
 export type AdvisorsForTheDecisionForm200Meta = {
-  suggested_advisor_id?: number;
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+  /** @nullable */
+  suggested_advisor_id: number | null;
 };
 
 export type AdvisorsForTheDecisionForm200 = {
   data?: AdvisorsForTheDecisionForm200DataItem[];
+  links?: AdvisorsForTheDecisionForm200Links;
   meta?: AdvisorsForTheDecisionForm200Meta;
 };
 
@@ -17677,13 +17756,14 @@ export function useExportApplicationsAwaitingInterviewScheduling<TData = Awaited
  * @summary List assignable interviewers.
  */
 export const listAssignableInterviewers = (
-
+    params?: ListAssignableInterviewersParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<ListAssignableInterviewers200>(
-      {url: `/api/v1/interview-slots/interviewers`, method: 'GET', signal
+      {url: `/api/v1/interview-slots/interviewers`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -17691,23 +17771,23 @@ export const listAssignableInterviewers = (
 
 
 
-export const getListAssignableInterviewersQueryKey = () => {
+export const getListAssignableInterviewersQueryKey = (params?: ListAssignableInterviewersParams,) => {
     return [
-    `/api/v1/interview-slots/interviewers`
+    `/api/v1/interview-slots/interviewers`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListAssignableInterviewersQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+export const getListAssignableInterviewersQueryOptions = <TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(params?: ListAssignableInterviewersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListAssignableInterviewersQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListAssignableInterviewersQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableInterviewers>>> = ({ signal }) => listAssignableInterviewers(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAssignableInterviewers>>> = ({ signal }) => listAssignableInterviewers(params, signal);
 
 
 
@@ -17721,7 +17801,7 @@ export type ListAssignableInterviewersQueryError = ListAssignableInterviewers403
 
 
 export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
+ params: undefined |  ListAssignableInterviewersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listAssignableInterviewers>>,
           TError,
@@ -17731,7 +17811,7 @@ export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof 
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
+ params?: ListAssignableInterviewersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listAssignableInterviewers>>,
           TError,
@@ -17741,7 +17821,7 @@ export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof 
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+ params?: ListAssignableInterviewersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -17749,11 +17829,11 @@ export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof 
  */
 
 export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof listAssignableInterviewers>>, TError = ListAssignableInterviewers403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
+ params?: ListAssignableInterviewersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAssignableInterviewers>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListAssignableInterviewersQueryOptions(options)
+  const queryOptions = getListAssignableInterviewersQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -19537,13 +19617,14 @@ export function useExportDeanDecisionWorklist<TData = Awaited<ReturnType<typeof 
  * @summary Advisors for the decision form.
  */
 export const advisorsForTheDecisionForm = (
-
+    params?: AdvisorsForTheDecisionFormParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<AdvisorsForTheDecisionForm200>(
-      {url: `/api/v1/dean/advisors`, method: 'GET', signal
+      {url: `/api/v1/dean/advisors`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -19551,23 +19632,23 @@ export const advisorsForTheDecisionForm = (
 
 
 
-export const getAdvisorsForTheDecisionFormQueryKey = () => {
+export const getAdvisorsForTheDecisionFormQueryKey = (params?: AdvisorsForTheDecisionFormParams,) => {
     return [
-    `/api/v1/dean/advisors`
+    `/api/v1/dean/advisors`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getAdvisorsForTheDecisionFormQueryOptions = <TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+export const getAdvisorsForTheDecisionFormQueryOptions = <TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(params?: AdvisorsForTheDecisionFormParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getAdvisorsForTheDecisionFormQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getAdvisorsForTheDecisionFormQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>> = ({ signal }) => advisorsForTheDecisionForm(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>> = ({ signal }) => advisorsForTheDecisionForm(params, signal);
 
 
 
@@ -19581,7 +19662,7 @@ export type AdvisorsForTheDecisionFormQueryError = AdvisorsForTheDecisionForm403
 
 
 export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
+ params: undefined |  AdvisorsForTheDecisionFormParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof advisorsForTheDecisionForm>>,
           TError,
@@ -19591,7 +19672,7 @@ export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof 
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
+ params?: AdvisorsForTheDecisionFormParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof advisorsForTheDecisionForm>>,
           TError,
@@ -19601,7 +19682,7 @@ export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof 
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+ params?: AdvisorsForTheDecisionFormParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -19609,11 +19690,11 @@ export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof 
  */
 
 export function useAdvisorsForTheDecisionForm<TData = Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError = AdvisorsForTheDecisionForm403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
+ params?: AdvisorsForTheDecisionFormParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisorsForTheDecisionForm>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getAdvisorsForTheDecisionFormQueryOptions(options)
+  const queryOptions = getAdvisorsForTheDecisionFormQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

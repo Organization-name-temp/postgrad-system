@@ -71,7 +71,7 @@ export function DeanDecisionPage() {
   // leaving the Dean free to override (spec §Advisor assignment).
   const suggestedAdvisorId = advisors.data?.meta?.suggested_advisor_id
   useEffect(() => {
-    if (advisorId === '' && suggestedAdvisorId !== undefined) {
+    if (advisorId === '' && suggestedAdvisorId !== undefined && suggestedAdvisorId !== null) {
       setAdvisorId(suggestedAdvisorId)
     }
   }, [advisorId, suggestedAdvisorId])

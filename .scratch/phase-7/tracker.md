@@ -102,3 +102,30 @@ workaround was introduced. The interrupted run itself is not counted as a pass.
 ## Consolidated review
 
 Reserved until all tickets and prerequisite changes are implemented.
+
+### Screening collection/export prerequisite (#02/#03)
+
+- Added owner-scoped screening selection with SQL stored-field filtering/search,
+  derived age selection before slicing, stable id ties, capped pagination and a
+  sibling XLSX export reusing the exact selection. Dean scope reads live Faculty
+  assignments; Student Affairs/admin privileges combine without reducing scope.
+- Arabic SQL search normalizes both sides and treats `%` as literal text. Shared
+  `SqlCollectionQuery` knows only trusted column names, never domain concepts.
+- Canonical actor-readable spreadsheet projection includes readable detail fields
+  independently of query allowlists. Localized EN/AR headers/statuses, text IDs,
+  RTL sheet direction and audit criteria/count verified with OpenSpout readback.
+- Added shared `collection contracts` Pest dataset/HTTP test with screening as its
+  first row: unknown input, scope narrowing, private-field search exclusion and
+  truthful envelope. Existing Support parser tests remain green.
+- Frontend queue uses URL criteria, paging and authenticated generated blob export.
+  Focused RTL red tests failed for absent filters/export, then **2 passed** for
+  bookmarked criteria, filter page reset, browser Back and download parameters.
+  `npm run typecheck` and `npm run lint` passed.
+- Backend focused run: **25 passed, 128 assertions, 5.95s**. Pint, PHPStan and
+  deptrac passed. OpenAPI and both generated frontend outputs regenerated.
+- Serial `npm run e2e -- e2e/admissions.spec.ts`: **1 passed, 1.3m** against
+  generated cohort fixture, spanning registration, review, interviews, admission
+  and Student login, with existing axe checks. Queue helper now searches its own
+  named applicant so first-page assumptions do not hide pagination regressions.
+- Full package gates, API drift checks after commit and final consolidated review
+  remain pending. No whole prerequisite or Phase 7 ticket is claimed complete yet.

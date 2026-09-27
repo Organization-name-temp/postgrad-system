@@ -6,6 +6,8 @@
 // messages live in lang/{locale}/validation.php; this file holds only the custom
 // domain messages the Admissions controllers raise directly.
 return [
+    'export_columns' => ['id' => 'Application reference', 'name_en' => 'English name', 'name_ar' => 'Arabic name', 'national_id' => 'National ID / passport', 'degree' => 'Degree', 'program' => 'Program', 'status' => 'Status', 'age_days' => 'Days in review', 'date_of_birth' => 'Date of birth', 'nationality' => 'Nationality', 'phone' => 'Phone', 'address' => 'Address', 'finalized_at' => 'Finalized at'],
+    'statuses' => ['draft' => 'Draft', 'submitted' => 'Submitted', 'email_verified' => 'Email verified', 'under_sa_review' => 'Under Student Affairs review', 'sa_approved' => 'Student Affairs approved', 'returned_for_revision' => 'Returned for revision', 'under_dean_review' => 'Under Dean review', 'interview_scheduled' => 'Interview scheduled', 'interview_completed' => 'Interview completed', 'accepted' => 'Accepted', 'conditionally_accepted' => 'Conditionally accepted', 'waitlisted' => 'Waitlisted', 'rejected' => 'Rejected'],
     // Locale-aware separator for lists built in a message (e.g. the missing-documents
     // enumeration) — Arabic uses its own comma, so it must not be hardcoded.
     'list_separator' => ', ',

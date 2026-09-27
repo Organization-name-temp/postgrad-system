@@ -141,6 +141,7 @@ Route::middleware('auth:sanctum')
 // the screen action, all gated on `application.screen` (SA / Dean).
 Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
     Route::get('/applications', [ApplicationScreeningController::class, 'index']);
+    Route::get('/applications/export', [ApplicationScreeningController::class, 'export']);
     Route::get('/applications/{application}', [ApplicationScreeningController::class, 'show'])->whereNumber('application');
     Route::post('/applications/{application}/screen', [ApplicationScreeningController::class, 'screen'])->whereNumber('application');
 

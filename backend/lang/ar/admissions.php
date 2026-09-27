@@ -2,6 +2,8 @@
 
 // Arabic Admissions domain lines, selected when the request negotiates `ar`.
 return [
+    'export_columns' => ['id' => 'مرجع الطلب', 'name_en' => 'الاسم بالإنجليزية', 'name_ar' => 'الاسم بالعربية', 'national_id' => 'الرقم القومي / جواز السفر', 'degree' => 'الدرجة', 'program' => 'البرنامج', 'status' => 'الحالة', 'age_days' => 'أيام المراجعة', 'date_of_birth' => 'تاريخ الميلاد', 'nationality' => 'الجنسية', 'phone' => 'الهاتف', 'address' => 'العنوان', 'finalized_at' => 'وقت الإرسال النهائي'],
+    'statuses' => ['draft' => 'مسودة', 'submitted' => 'تم الإرسال', 'email_verified' => 'تم التحقق من البريد', 'under_sa_review' => 'قيد مراجعة شؤون الطلاب', 'sa_approved' => 'وافقت شؤون الطلاب', 'returned_for_revision' => 'أُعيد للتعديل', 'under_dean_review' => 'قيد مراجعة العميد', 'interview_scheduled' => 'تم تحديد المقابلة', 'interview_completed' => 'اكتملت المقابلة', 'accepted' => 'مقبول', 'conditionally_accepted' => 'مقبول بشروط', 'waitlisted' => 'قائمة الانتظار', 'rejected' => 'مرفوض'],
     // فاصل القوائم المبنية داخل رسالة (مثل تعداد المستندات الناقصة) — بالفاصلة العربية.
     'list_separator' => '، ',
     'registration' => [

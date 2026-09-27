@@ -3,6 +3,8 @@
 use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Catalog\Internal\Models\Program;
+use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 use Tests\TestCase;
@@ -112,3 +114,23 @@ function facultyInterviewer(): User
 
     return $user;
 }
+
+/**
+ * Owner fixture closures return primitive scope expectations for the shared HTTP
+ * collection contract. Keep this registry distinct from owner workflow datasets.
+ */
+dataset('collection contracts', [
+    'Dean screening queue' => ['/api/v1/applications', function (): array {
+        $insideProgram = Program::factory()->create();
+        $outsideProgram = Program::factory()->create();
+        $inside = Application::factory()->underReview()->create(['primary_program_id' => $insideProgram->id, 'phone' => '+201088888888']);
+        Application::factory()->underReview()->create(['primary_program_id' => $insideProgram->id, 'phone' => '+201088888888']);
+        Application::factory()->underReview()->create(['primary_program_id' => $outsideProgram->id]);
+        $dean = User::factory()->create();
+        $dean->assignRole(Role::Dean);
+        FacultyDeanAssignment::create(['user_id' => $dean->id, 'faculty_id' => $insideProgram->department->faculty_id]);
+
+        return ['actor' => $dean->id, 'total' => 2, 'first' => $inside->id,
+            'outside_filter' => 'program_id='.$outsideProgram->id, 'private_probe' => 'q=1088888888'];
+    }],
+]);

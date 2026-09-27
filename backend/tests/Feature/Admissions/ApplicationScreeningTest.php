@@ -10,6 +10,7 @@ use Modules\Admissions\Internal\Models\ApplicationDocument;
 use Modules\Admissions\Internal\Models\ApplicationStatusTransition;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 
@@ -81,6 +82,46 @@ it('refuses the queue to a user without application.screen', function () {
     actingAsRole(Role::Applicant); // holds application.submit, not application.screen
 
     $this->getJson('/api/v1/applications')->assertForbidden();
+});
+
+it('filters Arabic names and derived queue age before stable pagination', function () {
+    [$first] = underReviewApplication(['name_ar' => 'أَحْمَد علي', 'name_en' => 'Ahmed', 'national_id' => '29000000000001']);
+    [$second] = underReviewApplication(['primary_program_id' => $first->primary_program_id, 'admission_cycle_id' => $first->admission_cycle_id, 'name_ar' => 'أحمد حسن', 'name_en' => 'Ahmed', 'national_id' => '29000000000002']);
+    [$young] = underReviewApplication(['primary_program_id' => $first->primary_program_id, 'name_ar' => 'أحمد عمر']);
+    foreach ([[$first, 9], [$second, 9], [$young, 2]] as [$application, $age]) {
+        ApplicationStatusTransition::factory()->enteredAt(ApplicationStatus::UnderSAReview, now()->subDays($age))->create(['application_id' => $application->id]);
+    }
+    actingAsRole(Role::StudentAffairs);
+    $criteria = '?q='.urlencode('احمد').'&age_days_min=7&sort=-age_days,name_en&per_page=1';
+    $this->getJson('/api/v1/applications'.$criteria)->assertOk()->assertJsonPath('meta.total', 2)->assertJsonPath('data.0.id', $first->id);
+    $this->getJson('/api/v1/applications'.$criteria.'&page=2')->assertOk()->assertJsonPath('meta.total', 2)->assertJsonPath('data.0.id', $second->id);
+    $this->getJson('/api/v1/applications?unexpected=value')->assertUnprocessable();
+});
+
+it('applies stored queue criteria in SQL and returns truthful capped metadata', function () {
+    [$wanted] = underReviewApplication(['name_ar' => 'آمنة مصطفى', 'national_id' => '29012345000001']);
+    underReviewApplication(['name_ar' => 'سارة أحمد']);
+    actingAsRole(Role::StudentAffairs);
+    $this->getJson('/api/v1/applications?q='.urlencode('امنه مصطفي').'&per_page=5000')
+        ->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('meta.per_page', 100)->assertJsonPath('data.0.id', $wanted->id);
+    $this->getJson('/api/v1/applications?q=12345&program_id='.$wanted->primary_program_id.'&admission_cycle_id='.$wanted->admission_cycle_id.'&degree_level=MSc')
+        ->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.id', $wanted->id);
+    $this->getJson('/api/v1/applications?q=%25')->assertOk()->assertJsonPath('meta.total', 0);
+    $this->getJson('/api/v1/applications?status=draft')->assertOk()->assertJsonPath('meta.total', 0);
+});
+
+it('scopes Dean screening reads to live assignments while combining Student Affairs access', function () {
+    [$inside] = underReviewApplication();
+    [$outside] = underReviewApplication();
+    $program = Program::query()->with('department')->findOrFail($inside->primary_program_id);
+    $dean = actingAsRole(Role::Dean);
+    $assignment = FacultyDeanAssignment::create(['user_id' => $dean->id, 'faculty_id' => $program->department->faculty_id]);
+    $this->getJson('/api/v1/applications')->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.id', $inside->id);
+    $this->getJson('/api/v1/applications?program_id='.$outside->primary_program_id)->assertOk()->assertJsonPath('meta.total', 0);
+    $assignment->delete();
+    $this->getJson('/api/v1/applications')->assertOk()->assertJsonPath('meta.total', 0);
+    $dean->assignRole(Role::StudentAffairs);
+    $this->getJson('/api/v1/applications')->assertOk()->assertJsonPath('meta.total', 2);
 });
 
 it('lets a reviewer open an application with its documents', function () {

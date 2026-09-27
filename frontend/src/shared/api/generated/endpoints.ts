@@ -1777,6 +1777,49 @@ export type StatusTimeline403 = {
   message?: string;
 };
 
+export type ScreeningQueueParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses within the queue.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type ScreeningQueue200DataItemPrimaryProgram = {
   id?: number;
   code?: string;
@@ -1799,14 +1842,80 @@ export type ScreeningQueue200DataItem = {
   primary_program?: ScreeningQueue200DataItemPrimaryProgram;
   finalized_at?: string;
   review_entered_at?: string;
-  age_days?: number;
+  /** @nullable */
+  age_days: number | null;
+};
+
+export type ScreeningQueue200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ScreeningQueue200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
 };
 
 export type ScreeningQueue200 = {
   data?: ScreeningQueue200DataItem[];
+  links?: ScreeningQueue200Links;
+  meta?: ScreeningQueue200Meta;
 };
 
 export type ScreeningQueue403 = {
+  message?: string;
+};
+
+export type ExportScreeningQueueParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Ignored by export.
+ */
+page?: number;
+/**
+ * Ignored by export.
+ */
+per_page?: number;
+};
+
+export type ExportScreeningQueue403 = {
   message?: string;
 };
 
@@ -16715,13 +16824,14 @@ export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeli
  * @summary Screening queue.
  */
 export const screeningQueue = (
-
+    params?: ScreeningQueueParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<ScreeningQueue200>(
-      {url: `/api/v1/applications`, method: 'GET', signal
+      {url: `/api/v1/applications`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -16729,23 +16839,23 @@ export const screeningQueue = (
 
 
 
-export const getScreeningQueueQueryKey = () => {
+export const getScreeningQueueQueryKey = (params?: ScreeningQueueParams,) => {
     return [
-    `/api/v1/applications`
+    `/api/v1/applications`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getScreeningQueueQueryOptions = <TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+export const getScreeningQueueQueryOptions = <TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(params?: ScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getScreeningQueueQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getScreeningQueueQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof screeningQueue>>> = ({ signal }) => screeningQueue(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof screeningQueue>>> = ({ signal }) => screeningQueue(params, signal);
 
 
 
@@ -16759,7 +16869,7 @@ export type ScreeningQueueQueryError = ScreeningQueue403
 
 
 export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
+ params: undefined |  ScreeningQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof screeningQueue>>,
           TError,
@@ -16769,7 +16879,7 @@ export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQue
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
+ params?: ScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof screeningQueue>>,
           TError,
@@ -16779,7 +16889,7 @@ export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQue
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+ params?: ScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -16787,11 +16897,108 @@ export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQue
  */
 
 export function useScreeningQueue<TData = Awaited<ReturnType<typeof screeningQueue>>, TError = ScreeningQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
+ params?: ScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof screeningQueue>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getScreeningQueueQueryOptions(options)
+  const queryOptions = getScreeningQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Canonical authorized columns, localized to the request language. Includes
+ * all scoped matches; page and per_page never limit the file. No evidence files.
+ * @summary Export screening queue.
+ */
+export const exportScreeningQueue = (
+    params?: ExportScreeningQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/applications/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportScreeningQueueQueryKey = (params?: ExportScreeningQueueParams,) => {
+    return [
+    `/api/v1/applications/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportScreeningQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportScreeningQueue>>, TError = ExportScreeningQueue403>(params?: ExportScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScreeningQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportScreeningQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportScreeningQueue>>> = ({ signal }) => exportScreeningQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportScreeningQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportScreeningQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportScreeningQueue>>>
+export type ExportScreeningQueueQueryError = ExportScreeningQueue403
+
+
+export function useExportScreeningQueue<TData = Awaited<ReturnType<typeof exportScreeningQueue>>, TError = ExportScreeningQueue403>(
+ params: undefined |  ExportScreeningQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScreeningQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportScreeningQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportScreeningQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportScreeningQueue<TData = Awaited<ReturnType<typeof exportScreeningQueue>>, TError = ExportScreeningQueue403>(
+ params?: ExportScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScreeningQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportScreeningQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportScreeningQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportScreeningQueue<TData = Awaited<ReturnType<typeof exportScreeningQueue>>, TError = ExportScreeningQueue403>(
+ params?: ExportScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScreeningQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export screening queue.
+ */
+
+export function useExportScreeningQueue<TData = Awaited<ReturnType<typeof exportScreeningQueue>>, TError = ExportScreeningQueue403>(
+ params?: ExportScreeningQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportScreeningQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportScreeningQueueQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

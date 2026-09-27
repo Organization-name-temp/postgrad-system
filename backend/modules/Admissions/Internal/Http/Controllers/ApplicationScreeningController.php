@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Knuckles\Scribe\Attributes\ResponseField;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
@@ -13,9 +14,12 @@ use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationStatusTransitionResource;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Internal\Support\ApplicationCollection;
+use Modules\Admissions\Internal\Support\ApplicationExport;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\Enums\Permission;
 use Modules\Notifications\Public\Contracts\Notifier;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * @group Admissions
@@ -46,24 +50,56 @@ class ApplicationScreeningController
      * **derived age** — whole days waited since entering review, computed from the
      * timeline, never stored. Gated on `application.screen`.
      *
-     * @response 200 {"data": [{"id": 1, "status": "under_sa_review", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-10T10:00:00+00:00", "age_days": 4}]}
+     * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
+     * @queryParam status string Comma-separated statuses within the queue. Example: under_sa_review
+     * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam admission_cycle_id string Cycle ids. Example: 1
+     * @queryParam degree_level string Degree levels. Example: MSc
+     * @queryParam age_days_min integer Minimum whole days in current review. Example: 7
+     * @queryParam age_days_max integer Maximum whole days in current review. Example: 30
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: -age_days,name_en
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Page size, capped at 100. Example: 25
+     *
+     * @response 200 {"data": [{"id": 1, "status": "under_sa_review", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-10T10:00:00+00:00", "age_days": 4}], "links": {"first": "http://localhost/api/v1/applications?page=1", "last": "http://localhost/api/v1/applications?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 25, "total": 1, "last_page": 1}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function index(ProgramCatalog $catalog): AnonymousResourceCollection
+    #[ResponseField('data.age_days', 'integer', nullable: true)]
+    public function index(Request $request, ProgramCatalog $catalog, ApplicationCollection $collection): AnonymousResourceCollection
     {
-        $applications = Application::query()
-            ->with('statusTransitions')
-            ->where('status', ApplicationStatus::UnderSAReview)
-            ->orderBy('finalized_at')
-            ->orderBy('id')
-            ->get();
+        $applications = $collection->page($request, $collection->query($request), [ApplicationStatus::UnderSAReview]);
 
         // Resolve every queued application's primary Program in one facade read
         // (ADR-0012) and stash it per row, so rendering the queue is a single Catalog
         // read rather than one per application (shared with the Dean queue).
-        $this->attachPrimaryPrograms($applications, $catalog);
+        $this->attachPrimaryPrograms($applications->getCollection(), $catalog);
 
         return ApplicationQueueResource::collection($applications);
+    }
+
+    /**
+     * Export screening queue.
+     *
+     * Canonical authorized columns, localized to the request language. Includes
+     * all scoped matches; page and per_page never limit the file. No evidence files.
+     *
+     * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
+     * @queryParam status string Comma-separated statuses. Example: under_sa_review
+     * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam admission_cycle_id string Cycle ids. Example: 1
+     * @queryParam degree_level string Degree levels. Example: MSc
+     * @queryParam age_days_min integer Minimum whole days in current review. Example: 7
+     * @queryParam age_days_max integer Maximum whole days in current review. Example: 30
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: -age_days,name_en
+     * @queryParam page integer Ignored by export. Example: 1
+     * @queryParam per_page integer Ignored by export. Example: 25
+     *
+     * @response 200 <<binary>>
+     * @response 403 {"message":"This action is unauthorized."}
+     */
+    public function export(Request $request, ApplicationExport $export): BinaryFileResponse
+    {
+        return $export->download($request, [ApplicationStatus::UnderSAReview]);
     }
 
     /**

@@ -14,13 +14,21 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
-import { useListDepartments, useListFaculties } from '../../../shared/api/generated/endpoints'
+import {
+  exportDepartments,
+  useListDepartments,
+  useListFaculties,
+} from '../../../shared/api/generated/endpoints'
 import type { ListDepartments200DataItem } from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
 import { PERMISSION } from '../../../shared/access/permissions'
 import { pickLocaleName } from '../localeName'
 import { DepartmentRow } from './DepartmentRow'
 import { DepartmentFormDialog } from './DepartmentFormDialog'
+
+import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
+import { downloadBlob } from '../../../shared/downloadBlob'
+import { ReferenceCollectionControls } from '../ReferenceCollectionControls'
 
 /**
  * The Departments admin screen. Everyone with catalog.view sees the list (code,
@@ -34,7 +42,8 @@ export function DepartmentsPage() {
   const { hasPermission } = usePermissions()
   const canManage = hasPermission(PERMISSION.manageCatalog)
 
-  const { data, isPending, isError } = useListDepartments()
+  const collection = useCollectionQuery()
+  const { data, isPending, isError } = useListDepartments(collection.params)
   const departments = data?.data ?? []
   const { data: facultiesData } = useListFaculties()
   const faculties = facultiesData?.data ?? []
@@ -71,6 +80,27 @@ export function DepartmentsPage() {
           </Button>
         )}
       </Stack>
+
+      <ReferenceCollectionControls
+        collection={collection}
+        meta={isError ? undefined : data?.meta}
+        fields={[
+          {
+            key: 'faculty_id',
+            label: t('departments.faculty'),
+            options: [
+              { value: '', label: t('filters.all') },
+              ...faculties.map((item) => ({
+                value: String(item.id),
+                label: pickLocaleName(item, i18n.language, item.code ?? ''),
+              })),
+            ],
+          },
+        ]}
+        onExport={async () =>
+          downloadBlob(await exportDepartments(collection.params), 'departments.xlsx')
+        }
+      />
 
       {isPending && <CircularProgress aria-label={t('departments.loading')} />}
       {isError && <Alert severity="error">{t('departments.loadError')}</Alert>}

@@ -14,12 +14,20 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
-import { useListDepartments, useListPrograms } from '../../../shared/api/generated/endpoints'
+import {
+  exportPrograms,
+  useListDepartments,
+  useListPrograms,
+} from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
 import { PERMISSION } from '../../../shared/access/permissions'
 import { pickLocaleName } from '../localeName'
 import { ProgramRow } from './ProgramRow'
 import { ProgramFormDialog } from './ProgramFormDialog'
+
+import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
+import { downloadBlob } from '../../../shared/downloadBlob'
+import { ReferenceCollectionControls } from '../ReferenceCollectionControls'
 
 /**
  * The Programs admin screen. Everyone with catalog.view sees the list (code, name,
@@ -33,7 +41,8 @@ export function ProgramsPage() {
   const { hasPermission } = usePermissions()
   const canManage = hasPermission(PERMISSION.manageCatalog)
 
-  const { data, isPending, isError } = useListPrograms()
+  const collection = useCollectionQuery()
+  const { data, isPending, isError } = useListPrograms(collection.params)
   const programs = data?.data ?? []
   const { data: departmentsData } = useListDepartments()
   const departments = departmentsData?.data ?? []
@@ -62,6 +71,36 @@ export function ProgramsPage() {
           </Button>
         )}
       </Stack>
+
+      <ReferenceCollectionControls
+        collection={collection}
+        meta={isError ? undefined : data?.meta}
+        fields={[
+          {
+            key: 'department_id',
+            label: t('programs.department'),
+            options: [
+              { value: '', label: t('filters.all') },
+              ...departments.map((item) => ({
+                value: String(item.id),
+                label: pickLocaleName(item, i18n.language, item.code ?? ''),
+              })),
+            ],
+          },
+          {
+            key: 'degree_level',
+            label: t('programs.degreeLevel'),
+            options: [
+              { value: '', label: t('filters.all') },
+              { value: 'MSc', label: t('programs.degreeLevels.MSc') },
+              { value: 'PhD', label: t('programs.degreeLevels.PhD') },
+            ],
+          },
+        ]}
+        onExport={async () =>
+          downloadBlob(await exportPrograms(collection.params), 'programs.xlsx')
+        }
+      />
 
       {isPending && <CircularProgress aria-label={t('programs.loading')} />}
       {isError && <Alert severity="error">{t('programs.loadError')}</Alert>}

@@ -201,3 +201,29 @@ Reserved until all tickets and prerequisite changes are implemented.
   passes including RTL switch. Local report includes screenshots and EN/AR XLSX.
 - Other Catalog resources, Admissions collections/pickers and #06 full gates remain
   pending. API drift checks after this slice commit and final review remain pending.
+
+### Admissions/Catalog prerequisite (#06), reference collections
+
+- Programs, Departments and Faculties now return the same always-paginated shape,
+  reference default 100, stable id ties, normalized name/code search, active filters
+  and parent/degree criteria. Program Faculty filtering stays within Catalog's own
+  Department relation. Parent aggregate tree/curriculum/history endpoints unchanged.
+- Canonical actor-readable reference exports include both names, string identifiers,
+  localized degree/active values and derived Program total via its existing owner
+  accessor. Each file covers the full matching selection and records criteria/count.
+- Red HTTP tests demonstrated missing envelopes and export routes. Green whole
+  affected Catalog/shared-contract run: **131 passed, 724 assertions, 17.69s**.
+  All four Catalog collection endpoints now have shared dataset rows. Original
+  mutations, authorization, Catalog tree, curriculum/version and facade tests pass.
+- Focused page tests: **4 passed** across Courses and the three reference pages,
+  proving bookmarked criteria, page reset and private-client blob exports.
+  Generated hook signature changes exposed two old admin-picker callers; corrected
+  options argument positions and reran their existing tests: **16 passed, 10.43s**.
+- Typecheck, lint, format, Pint, PHPStan and deptrac passed. OpenAPI and generated
+  client/Zod artifacts regenerated. Courses commit `43a9949` passed both API drift
+  checks before the reference migration; repeat for the reference commit pending.
+- Serial `npm run e2e -- e2e/reference-collections.spec.ts`: **2 passed, 45.4s**,
+  each traversing all three collections with EN/AR filters, successful workbook
+  downloads and serious/critical axe checks. Workbook artifacts in the local report.
+- Admissions collections and type-ahead picker adoption remain pending for #06;
+  full package gates and the one consolidated final review are still reserved.

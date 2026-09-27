@@ -8810,12 +8810,161 @@ paths:
       tags:
         - Catalog
       security: []
+  /api/v1/faculties/export:
+    get:
+      summary: 'Export Faculties.'
+      operationId: exportFaculties
+      description: 'All matching authorized rows with canonical localized columns; paging is ignored.'
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Bilingual name or code fragment.'
+          example: A
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual name or code fragment.'
+            example: A
+        -
+          in: query
+          name: code
+          description: 'Exact codes.'
+          example: A001
+          required: false
+          schema:
+            type: string
+            description: 'Exact codes.'
+            example: A001
+        -
+          in: query
+          name: is_active
+          description: 'Active states.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Active states.'
+            example: 'true'
+        -
+          in: query
+          name: sort
+          description: 'Comma-separated readable fields; minus descends.'
+          example: 'code,-name_en'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated readable fields; minus descends.'
+            example: 'code,-name_en'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size capped at 100.'
+          example: 100
+          required: false
+          schema:
+            type: integer
+            description: 'Page size capped at 100.'
+            example: 100
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Catalog
+      security: []
   /api/v1/faculties:
     get:
       summary: 'List Faculties.'
       operationId: listFaculties
       description: ''
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Bilingual name or code fragment.'
+          example: A
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual name or code fragment.'
+            example: A
+        -
+          in: query
+          name: code
+          description: 'Exact codes.'
+          example: A001
+          required: false
+          schema:
+            type: string
+            description: 'Exact codes.'
+            example: A001
+        -
+          in: query
+          name: is_active
+          description: 'Active states.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Active states.'
+            example: 'true'
+        -
+          in: query
+          name: sort
+          description: 'Comma-separated readable fields; minus descends.'
+          example: 'code,-name_en'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated readable fields; minus descends.'
+            example: 'code,-name_en'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size capped at 100.'
+          example: 100
+          required: false
+          schema:
+            type: integer
+            description: 'Page size capped at 100.'
+            example: 100
       responses:
         200:
           description: ''
@@ -8831,6 +8980,16 @@ paths:
                       name_en: 'Faculty of Engineering'
                       name_ar: 'كلية الهندسة'
                       is_active: true
+                  links:
+                    first: 'http://localhost/api/v1/faculties?page=1'
+                    last: 'http://localhost/api/v1/faculties?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 100
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -8858,6 +9017,38 @@ paths:
                         is_active:
                           type: boolean
                           example: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/faculties?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/faculties?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 100
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
       tags:
         - Catalog
       security: []
@@ -9166,12 +9357,181 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/departments/export:
+    get:
+      summary: 'Export Departments.'
+      operationId: exportDepartments
+      description: 'All matching authorized rows with canonical localized columns; paging is ignored.'
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Bilingual name or code fragment.'
+          example: A
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual name or code fragment.'
+            example: A
+        -
+          in: query
+          name: code
+          description: 'Exact codes.'
+          example: A001
+          required: false
+          schema:
+            type: string
+            description: 'Exact codes.'
+            example: A001
+        -
+          in: query
+          name: is_active
+          description: 'Active states.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Active states.'
+            example: 'true'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids.'
+            example: '1'
+        -
+          in: query
+          name: sort
+          description: 'Comma-separated readable fields; minus descends.'
+          example: 'code,-name_en'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated readable fields; minus descends.'
+            example: 'code,-name_en'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size capped at 100.'
+          example: 100
+          required: false
+          schema:
+            type: integer
+            description: 'Page size capped at 100.'
+            example: 100
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Catalog
+      security: []
   /api/v1/departments:
     get:
       summary: 'List Departments.'
       operationId: listDepartments
       description: ''
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Bilingual name or code fragment.'
+          example: A
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual name or code fragment.'
+            example: A
+        -
+          in: query
+          name: code
+          description: 'Exact codes.'
+          example: A001
+          required: false
+          schema:
+            type: string
+            description: 'Exact codes.'
+            example: A001
+        -
+          in: query
+          name: is_active
+          description: 'Active states.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Active states.'
+            example: 'true'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids.'
+            example: '1'
+        -
+          in: query
+          name: sort
+          description: 'Comma-separated readable fields; minus descends.'
+          example: 'code,-name_en'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated readable fields; minus descends.'
+            example: 'code,-name_en'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size capped at 100.'
+          example: 100
+          required: false
+          schema:
+            type: integer
+            description: 'Page size capped at 100.'
+            example: 100
       responses:
         200:
           description: ''
@@ -9188,6 +9548,16 @@ paths:
                       name_en: 'Computer Engineering'
                       name_ar: 'هندسة الحاسبات'
                       is_active: true
+                  links:
+                    first: 'http://localhost/api/v1/departments?page=1'
+                    last: 'http://localhost/api/v1/departments?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 100
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -9219,6 +9589,38 @@ paths:
                         is_active:
                           type: boolean
                           example: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/departments?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/departments?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 100
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
       tags:
         - Catalog
       security: []
@@ -9557,12 +9959,221 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/programs/export:
+    get:
+      summary: 'Export Programs.'
+      operationId: exportPrograms
+      description: 'All matching authorized rows with canonical localized columns; paging is ignored.'
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Bilingual name or code fragment.'
+          example: A
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual name or code fragment.'
+            example: A
+        -
+          in: query
+          name: code
+          description: 'Exact codes.'
+          example: A001
+          required: false
+          schema:
+            type: string
+            description: 'Exact codes.'
+            example: A001
+        -
+          in: query
+          name: is_active
+          description: 'Active states.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Active states.'
+            example: 'true'
+        -
+          in: query
+          name: department_id
+          description: 'Department ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Department ids.'
+            example: '1'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Degree levels.'
+          example: 'MSc,PhD'
+          required: false
+          schema:
+            type: string
+            description: 'Degree levels.'
+            example: 'MSc,PhD'
+        -
+          in: query
+          name: sort
+          description: 'Comma-separated readable fields; minus descends.'
+          example: 'code,-name_en'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated readable fields; minus descends.'
+            example: 'code,-name_en'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size capped at 100.'
+          example: 100
+          required: false
+          schema:
+            type: integer
+            description: 'Page size capped at 100.'
+            example: 100
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Catalog
+      security: []
   /api/v1/programs:
     get:
       summary: 'List Programs.'
       operationId: listPrograms
       description: ''
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Bilingual name or code fragment.'
+          example: A
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual name or code fragment.'
+            example: A
+        -
+          in: query
+          name: code
+          description: 'Exact codes.'
+          example: A001
+          required: false
+          schema:
+            type: string
+            description: 'Exact codes.'
+            example: A001
+        -
+          in: query
+          name: is_active
+          description: 'Active states.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Active states.'
+            example: 'true'
+        -
+          in: query
+          name: department_id
+          description: 'Department ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Department ids.'
+            example: '1'
+        -
+          in: query
+          name: faculty_id
+          description: 'Faculty ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Faculty ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Degree levels.'
+          example: 'MSc,PhD'
+          required: false
+          schema:
+            type: string
+            description: 'Degree levels.'
+            example: 'MSc,PhD'
+        -
+          in: query
+          name: sort
+          description: 'Comma-separated readable fields; minus descends.'
+          example: 'code,-name_en'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated readable fields; minus descends.'
+            example: 'code,-name_en'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size capped at 100.'
+          example: 100
+          required: false
+          schema:
+            type: integer
+            description: 'Page size capped at 100.'
+            example: 100
       responses:
         200:
           description: ''
@@ -9584,6 +10195,16 @@ paths:
                       elective_required_ch: 9
                       total_required_ch: 21
                       is_active: true
+                  links:
+                    first: 'http://localhost/api/v1/programs?page=1'
+                    last: 'http://localhost/api/v1/programs?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 100
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -9635,6 +10256,38 @@ paths:
                         is_active:
                           type: boolean
                           example: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/programs?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/programs?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 100
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
       tags:
         - Catalog
       security: []

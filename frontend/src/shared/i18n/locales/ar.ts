@@ -290,6 +290,8 @@ export const ar = {
   },
   catalog: {
     filters: {
+      activeState: 'حالة التفعيل',
+      code: 'الرمز',
       search: 'البحث بالرمز أو الاسم',
       all: 'الكل',
       minCredits: 'الحد الأدنى للساعات المعتمدة',

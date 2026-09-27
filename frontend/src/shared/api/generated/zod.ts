@@ -2342,8 +2342,33 @@ export const CatalogSummaryCardResponse = zod.object({
 
 
 /**
+ * All matching authorized rows with canonical localized columns; paging is ignored.
+ * @summary Export Faculties.
+ */
+export const ExportFacultiesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const ExportFacultiesResponse = zod.unknown()
+
+
+/**
  * @summary List Faculties.
  */
+export const ListFacultiesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
 export const ListFacultiesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2351,7 +2376,19 @@ export const ListFacultiesResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2456,8 +2493,35 @@ export const DeactivateAFacultyResponse = zod.object({
 
 
 /**
+ * All matching authorized rows with canonical localized columns; paging is ignored.
+ * @summary Export Departments.
+ */
+export const ExportDepartmentsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const ExportDepartmentsResponse = zod.unknown()
+
+
+/**
  * @summary List Departments.
  */
+export const ListDepartmentsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
 export const ListDepartmentsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2466,7 +2530,19 @@ export const ListDepartmentsResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2578,8 +2654,39 @@ export const DeactivateADepartmentResponse = zod.object({
 
 
 /**
+ * All matching authorized rows with canonical localized columns; paging is ignored.
+ * @summary Export Programs.
+ */
+export const ExportProgramsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "department_id": zod.string().optional().describe('Department ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const ExportProgramsResponse = zod.unknown()
+
+
+/**
  * @summary List Programs.
  */
+export const ListProgramsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "department_id": zod.string().optional().describe('Department ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
 export const ListProgramsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2593,7 +2700,19 @@ export const ListProgramsResponse = zod.object({
   "elective_required_ch": zod.number().optional(),
   "total_required_ch": zod.number().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 

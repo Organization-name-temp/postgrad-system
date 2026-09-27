@@ -48,7 +48,7 @@ export function AssignmentFormDialog({ open, onClose }: AssignmentFormDialogProp
   }, [open])
 
   const deans = useListAssignableDeans({ query: { enabled: open } }).data?.data ?? []
-  const faculties = useListFaculties({ query: { enabled: open } }).data?.data ?? []
+  const faculties = useListFaculties(undefined, { query: { enabled: open } }).data?.data ?? []
 
   const assign = useAssignADeanToAFaculty()
 

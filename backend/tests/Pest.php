@@ -4,6 +4,8 @@ use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Internal\Models\Course;
+use Modules\Catalog\Internal\Models\Department;
+use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
@@ -120,7 +122,21 @@ function facultyInterviewer(): User
  * Owner fixture closures return primitive scope expectations for the shared HTTP
  * collection contract. Keep this registry distinct from owner workflow datasets.
  */
+$catalogReferenceContracts = [];
+foreach (['programs' => Program::class, 'departments' => Department::class, 'faculties' => Faculty::class] as $resource => $model) {
+    $catalogReferenceContracts[$resource.' for a Catalog viewer'] = ['/api/v1/'.$resource, function () use ($model): array {
+        $first = $model::factory()->create(['code' => 'A001']);
+        $model::factory()->create(['code' => 'A002']);
+        $viewer = User::factory()->create();
+        $viewer->assignRole(Role::Student);
+
+        return ['actor' => $viewer->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'code=NOT-IN-CATALOG', 'private_probe' => 'q=1088888888'];
+    }];
+}
+
 dataset('collection contracts', [
+    ...$catalogReferenceContracts,
     'Courses for a catalog viewer' => ['/api/v1/courses', function (): array {
         $first = Course::factory()->create(['code' => 'CSE511']);
         Course::factory()->create(['code' => 'CSE512']);

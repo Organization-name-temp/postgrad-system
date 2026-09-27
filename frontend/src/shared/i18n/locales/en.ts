@@ -297,6 +297,8 @@ export const en = {
   },
   catalog: {
     filters: {
+      activeState: 'Active state',
+      code: 'Code',
       search: 'Search by code or name',
       all: 'All',
       minCredits: 'Minimum credit hours',

@@ -5,6 +5,20 @@
 // (required, unique, exists, enum) cover the rest; this file holds only the custom
 // domain messages the Catalog controllers raise.
 return [
+    'reference_columns' => [
+        'id' => 'Reference',
+        'code' => 'Code',
+        'name_en' => 'English name',
+        'name_ar' => 'Arabic name',
+        'is_active' => 'Active state',
+        'department_id' => 'Department reference',
+        'faculty_id' => 'Faculty reference',
+        'degree_level' => 'Degree',
+        'prep_required_ch' => 'Preparatory required CH',
+        'core_required_ch' => 'Core required CH',
+        'elective_required_ch' => 'Elective required CH',
+        'total_required_ch' => 'Total required CH',
+    ],
     'export_columns' => [
         'id' => 'Course reference',
         'department_id' => 'Department reference',
@@ -20,6 +34,8 @@ return [
         'is_active' => 'Active state',
     ],
     'export_values' => [
+        'MSc' => 'Master of Science',
+        'PhD' => 'Doctor of Philosophy',
         'PBL' => 'Problem-based learning',
         'Seminar' => 'Seminar',
         'active' => 'Active',

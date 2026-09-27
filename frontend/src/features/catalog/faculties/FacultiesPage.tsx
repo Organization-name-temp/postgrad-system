@@ -14,12 +14,16 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
-import { useListFaculties } from '../../../shared/api/generated/endpoints'
+import { exportFaculties, useListFaculties } from '../../../shared/api/generated/endpoints'
 import type { ListFaculties200DataItem } from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
 import { PERMISSION } from '../../../shared/access/permissions'
 import { FacultyRow } from './FacultyRow'
 import { FacultyFormDialog } from './FacultyFormDialog'
+
+import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
+import { downloadBlob } from '../../../shared/downloadBlob'
+import { ReferenceCollectionControls } from '../ReferenceCollectionControls'
 
 /**
  * The Faculties admin screen. Everyone with catalog.view sees the list (code,
@@ -32,7 +36,8 @@ export function FacultiesPage() {
   const { hasPermission } = usePermissions()
   const canManage = hasPermission(PERMISSION.manageCatalog)
 
-  const { data, isPending, isError } = useListFaculties()
+  const collection = useCollectionQuery()
+  const { data, isPending, isError } = useListFaculties(collection.params)
   const faculties = data?.data ?? []
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -62,6 +67,15 @@ export function FacultiesPage() {
           </Button>
         )}
       </Stack>
+
+      <ReferenceCollectionControls
+        collection={collection}
+        meta={isError ? undefined : data?.meta}
+
+        onExport={async () =>
+          downloadBlob(await exportFaculties(collection.params), 'faculties.xlsx')
+        }
+      />
 
       {isPending && <CircularProgress aria-label={t('faculties.loading')} />}
       {isError && <Alert severity="error">{t('faculties.loadError')}</Alert>}

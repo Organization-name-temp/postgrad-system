@@ -119,72 +119,76 @@ export function ApplicationReviewPage() {
           }}
         />
 
-        <Paper variant="outlined" sx={{ p: 2 }}>
-          <Divider textAlign="left" sx={{ mb: 1 }}>
-            {t('screening.decide')}
-          </Divider>
+        {application.status === 'under_sa_review' ? (
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Divider textAlign="left" sx={{ mb: 1 }}>
+              {t('screening.decide')}
+            </Divider>
 
-          {actionError && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {actionError}
-            </Alert>
-          )}
-
-          {pending !== null && (
-            <TextField
-              label={t('screening.noteLabel')}
-              helperText={t('screening.noteHelp')}
-              value={note}
-              onChange={(event) => setNote(event.target.value)}
-              multiline
-              minRows={3}
-              fullWidth
-              sx={{ mb: 2 }}
-            />
-          )}
-
-          <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
-            {pending === null ? (
-              <>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => submit('approve')}
-                  disabled={screen.isPending}
-                >
-                  {t('screening.actions.approve')}
-                </Button>
-                <Button variant="outlined" color="warning" onClick={() => setPending('return')}>
-                  {t('screening.actions.return')}
-                </Button>
-                <Button variant="outlined" color="error" onClick={() => setPending('reject')}>
-                  {t('screening.actions.reject')}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="contained"
-                  color={pending === 'reject' ? 'error' : 'warning'}
-                  onClick={() => submit(pending)}
-                  disabled={screen.isPending || note.trim() === ''}
-                >
-                  {screen.isPending ? t('screening.working') : t('screening.confirm')}
-                </Button>
-                <Button
-                  variant="text"
-                  onClick={() => {
-                    setPending(null)
-                    setNote('')
-                  }}
-                  disabled={screen.isPending}
-                >
-                  {t('screening.cancel')}
-                </Button>
-              </>
+            {actionError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {actionError}
+              </Alert>
             )}
-          </Stack>
-        </Paper>
+
+            {pending !== null && (
+              <TextField
+                label={t('screening.noteLabel')}
+                helperText={t('screening.noteHelp')}
+                value={note}
+                onChange={(event) => setNote(event.target.value)}
+                multiline
+                minRows={3}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+            )}
+
+            <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
+              {pending === null ? (
+                <>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => submit('approve')}
+                    disabled={screen.isPending}
+                  >
+                    {t('screening.actions.approve')}
+                  </Button>
+                  <Button variant="outlined" color="warning" onClick={() => setPending('return')}>
+                    {t('screening.actions.return')}
+                  </Button>
+                  <Button variant="outlined" color="error" onClick={() => setPending('reject')}>
+                    {t('screening.actions.reject')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="contained"
+                    color={pending === 'reject' ? 'error' : 'warning'}
+                    onClick={() => submit(pending)}
+                    disabled={screen.isPending || note.trim() === ''}
+                  >
+                    {screen.isPending ? t('screening.working') : t('screening.confirm')}
+                  </Button>
+                  <Button
+                    variant="text"
+                    onClick={() => {
+                      setPending(null)
+                      setNote('')
+                    }}
+                    disabled={screen.isPending}
+                  >
+                    {t('screening.cancel')}
+                  </Button>
+                </>
+              )}
+            </Stack>
+          </Paper>
+        ) : (
+          <Alert severity="info">{t('screening.readOnly')}</Alert>
+        )}
       </Stack>
     </Box>
   )

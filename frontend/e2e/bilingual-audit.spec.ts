@@ -70,6 +70,8 @@ for (const surface of surfaces) {
           await expect(page).toHaveURL(new RegExp(`${path.replaceAll('/', '\\/')}$`))
           await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
           await expect(page.locator('main').getByRole('progressbar')).toHaveCount(0)
+          await expect(page.locator('main .MuiSkeleton-root')).toHaveCount(0)
+          await expect(page.locator('main [aria-busy="true"]')).toHaveCount(0)
           await expect(page.locator('html')).toHaveAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr')
           await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
           const text = await page.locator('main').innerText()

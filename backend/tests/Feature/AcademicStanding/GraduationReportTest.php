@@ -6,9 +6,12 @@ use Modules\AcademicStanding\Internal\Models\StandingObservation;
 use Modules\AcademicStanding\Internal\Models\TerminationCase;
 use Modules\Catalog\Internal\Enums\VersionSubject;
 use Modules\Catalog\Internal\Models\CatalogVersion;
+use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Public\EnrollmentRecords;
+use Modules\Grading\Internal\Enums\GradeSheetKind;
 use Modules\Grading\Internal\Enums\GradeSheetStatus;
 use Modules\Grading\Internal\Models\Grade;
 use Modules\Grading\Internal\Models\GradeSheet;
@@ -118,5 +121,44 @@ it('keeps Warning readiness advisory and reflects pending dismissed and cleared 
     expect(TerminationCase::query()->count())->toBe(1)
         ->and($case->fresh()->state)->toBe('TriggerCleared')
         ->and(StandingObservation::query()->count())->toBe(0)
+        ->and(Notification::query()->count())->toBe(0);
+});
+
+it('reads corrected effective Grades and the Student bound Curriculum instead of a newer Programme version', function () {
+    $actor = User::factory()->create();
+    $actor->assignRole(Role::StudentAffairs);
+    $program = Program::factory()->create();
+    $course = Course::factory()->create(['department_id' => $program->department_id, 'total_ch' => 3]);
+    $snapshot = ['prep_required_ch' => 0, 'core_required_ch' => 3, 'elective_required_ch' => 0,
+        'curriculum' => [['course_id' => $course->id, 'course_code' => $course->code, 'category' => 'ProgramCore', 'course_total_ch' => 3, 'ordinal' => 1]]];
+    $version = CatalogVersion::query()->create(['subject_type' => VersionSubject::Program, 'subject_id' => $program->id,
+        'version_no' => 1, 'changed_at' => now()->subDay(), 'snapshot' => $snapshot]);
+    $student = Student::factory()->create(['program_id' => $program->id, 'curriculum_version_id' => $version->id]);
+    $offering = CourseOffering::factory()->create(['course_id' => $course->id]);
+    $enrollment = Enrollment::factory()->create(['student_id' => $student->id, 'course_offering_id' => $offering->id,
+        'classification' => 'Core', 'course_status' => 'Regular', 'credit_hours' => 3, 'earned' => false]);
+    $initial = GradeSheet::factory()->inStatus(GradeSheetStatus::Finalized)->create(['course_offering_id' => $offering->id, 'reviewed_at' => now()->subMinute()]);
+    Grade::factory()->withMark(45)->create(['grade_sheet_id' => $initial->id, 'enrollment_id' => $enrollment->id]);
+    Sanctum::actingAs($actor);
+    $url = '/api/v1/academic-standing/reports/graduation-readiness/students';
+    $this->getJson($url)->assertOk()->assertJsonPath('data.0.readiness.cgpa', 0)
+        ->assertJsonPath('data.0.readiness.remaining_credit_hours', 3)->assertJsonPath('data.0.readiness.ready', false);
+    $this->getJson($url.'?cgpa_min=0&cgpa_max=0')->assertOk()->assertJsonPath('meta.total', 1);
+    $this->getJson('/api/v1/academic-standing/reports/standing')->assertOk()->assertJsonPath('data.counts.AcademicProbation', 1);
+    CatalogVersion::query()->create(['subject_type' => VersionSubject::Program, 'subject_id' => $program->id,
+        'version_no' => 2, 'changed_at' => now(), 'snapshot' => [...$snapshot, 'core_required_ch' => 30]]);
+    $program->update(['core_required_ch' => 30]);
+    $correction = GradeSheet::factory()->inStatus(GradeSheetStatus::Finalized)->create([
+        'course_offering_id' => $offering->id, 'kind' => GradeSheetKind::Correction,
+        'reviewed_at' => now(),
+    ]);
+    Grade::factory()->withMark(97)->create(['grade_sheet_id' => $correction->id, 'enrollment_id' => $enrollment->id]);
+    app(EnrollmentRecords::class)->recordOutcome($enrollment->id, true);
+    $this->getJson($url.'?readiness=ready')->assertOk()->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.readiness.cgpa', 4)->assertJsonPath('data.0.readiness.remaining_credit_hours', 0)
+        ->assertJsonPath('data.0.readiness.ready', true)->assertJsonPath('data.0.readiness.approaching_graduation', false);
+    $this->getJson('/api/v1/academic-standing/reports/graduation-readiness')->assertOk()->assertJsonPath('data.groups.ready', 1);
+    $this->getJson('/api/v1/academic-standing/reports/standing')->assertOk()->assertJsonPath('data.counts.GoodStanding', 1);
+    expect(TerminationCase::query()->count())->toBe(0)->and(StandingObservation::query()->count())->toBe(0)
         ->and(Notification::query()->count())->toBe(0);
 });

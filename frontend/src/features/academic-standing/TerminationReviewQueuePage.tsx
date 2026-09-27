@@ -102,7 +102,7 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
         </Alert>
       )}
       {query.isPending && (
-        <Stack spacing={2} aria-label={t('termination.review.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('termination.review.loading')}>
           <Skeleton variant="rounded" height={260} />
           <Skeleton variant="rounded" height={260} />
         </Stack>

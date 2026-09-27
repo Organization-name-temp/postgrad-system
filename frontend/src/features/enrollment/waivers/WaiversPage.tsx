@@ -183,7 +183,7 @@ export function WaiversPage() {
       </Stack>
 
       {loading && !failed && (
-        <Stack spacing={2} aria-label={t('waivers.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('waivers.loading')}>
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(24) })} />
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(24) })} />
         </Stack>

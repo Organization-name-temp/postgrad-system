@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material'
 import { expect, it, vi } from 'vitest'
-import '../../shared/i18n/config'
+import i18n from '../../shared/i18n/config'
 import { RequestsPage } from './RequestsPage'
 
 const queue = vi.hoisted(() => vi.fn())
@@ -50,3 +50,15 @@ it('offers retry after a queue failure and never presents that failure as an emp
   await userEvent.setup().click(screen.getByRole('button', { name: 'Retry' }))
   expect(refetch).toHaveBeenCalledOnce()
 })
+
+it.each(['en', 'ar'])(
+  'provides a named loading status for the request queue in %s',
+  async (locale) => {
+    await i18n.changeLanguage(locale)
+    queue.mockReturnValue({ isPending: true, isError: false })
+    renderPage()
+    expect(
+      screen.getByRole('status', { name: i18n.t('loading', { ns: 'records' }) }),
+    ).toBeInTheDocument()
+  },
+)

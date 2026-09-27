@@ -748,6 +748,8 @@ export const en = {
       },
     },
     screening: {
+      readOnly:
+        'This Application is not awaiting Student Affairs screening. Its record is read-only.',
       defaultStage: 'Awaiting Student Affairs (default)',
       selectedIntro: 'Applications matching the selected criteria.',
       selectedEmpty: 'No Applications match the selected criteria.',

@@ -49,7 +49,7 @@ export function CapacityOverrideQueuePage() {
         </Alert>
       )}
       {query.isPending && (
-        <Stack spacing={2} aria-label={t('capacityReview.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('capacityReview.loading')}>
           <Skeleton variant="rounded" height={220} />
           <Skeleton variant="rounded" height={220} />
         </Stack>

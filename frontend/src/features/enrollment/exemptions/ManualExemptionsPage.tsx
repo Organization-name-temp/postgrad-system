@@ -211,7 +211,7 @@ export function ManualExemptionsPage() {
       </Stack>
 
       {requestViewState === 'loading' && (
-        <Stack spacing={2} aria-label={t('manualExemptions.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('manualExemptions.loading')}>
           <Skeleton variant="rounded" height={180} />
           <Skeleton variant="rounded" height={180} />
         </Stack>

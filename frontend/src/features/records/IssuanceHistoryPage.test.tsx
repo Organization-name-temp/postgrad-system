@@ -2,7 +2,7 @@ import { ThemeProvider, createTheme } from '@mui/material'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { expect, it, vi } from 'vitest'
-import '../../shared/i18n/config'
+import i18n from '../../shared/i18n/config'
 import { IssuanceHistoryPage } from './IssuanceHistoryPage'
 
 const history = vi.hoisted(() => vi.fn())
@@ -38,4 +38,19 @@ it('explains successful empty history without confusing it with loading or failu
     </ThemeProvider>,
   )
   expect(screen.getByText('No official copies match these filters.')).toBeInTheDocument()
+})
+
+it.each(['en', 'ar'])('provides a named issuance-history loading status in %s', async (locale) => {
+  await i18n.changeLanguage(locale)
+  history.mockReturnValue({ isPending: true, isError: false })
+  render(
+    <ThemeProvider theme={createTheme({ cssVariables: true })}>
+      <MemoryRouter>
+        <IssuanceHistoryPage />
+      </MemoryRouter>
+    </ThemeProvider>,
+  )
+  expect(
+    screen.getByRole('status', { name: i18n.t('loading', { ns: 'records' }) }),
+  ).toBeInTheDocument()
 })

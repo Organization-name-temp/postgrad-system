@@ -1312,3 +1312,35 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 - Frontend typecheck, lint and full format check passed for the public controls,
   shell width, identifier isolation and owner feedback slice. Broader acceptance
   coverage remains pending; no consolidated code review has been run yet.
+- Worked HTTP verification reads an F/zero CGPA, then a newer Finalized Correction
+  Grade and Enrollment owner outcome, while a new Programme Curriculum version
+  changes current requirements. Standing and Readiness follow the corrected owner
+  facts and Student-bound version, retain no-proposal approaching=false, and create
+  no Cases/Observations/notifications. **4 readiness tests / 68 assertions passed,
+  3.92s**. Existing capability verified; no new academic calculation introduced.
+- Remaining matrix stopped at demonstrated dark Screening Queue age contrast
+  (**2.89:1**). Light EN/AR staff paths passed before the failure; 29 subsequent
+  tests did not run. Static palette-mode branching replaced with CSS-variable
+  tokens and existing dark applyStyles. Four-state staff verification rerunning.
+- Dark staff matrix passed **4 / 4, 2.2m** after token repair. Focused Screening
+  Queue/typed-notification regressions passed **14 tests / 2 files, 9.68s**.
+- Accepted/Dean-review screening records now show paired read-only notice rather
+  than illegal decision buttons. **3 focused tests passed, 7.30s** after two RED
+  failures. Backend transition and permission guards remain authoritative.
+- Academic loading Skeletons reproduced serious invalid ARIA naming in the native
+  Student audit. Academic EN/AR RED and Records EN/AR RED cover role/status repair;
+  owner loading groups follow existing status prior art. Focused academic/review/
+  Records checks passed **16 tests / 4 files, 14.26s**. Credit-queue regressions,
+  all-four loaded Student audit and static checks are running.
+- Earlier static check caught Playwright's exact option copied into two RTL role
+  queries; removed the unsupported option. Its lint/format stages did not run.
+  A fresh static command is running; no failed/unrun check is reported passed.
+- Affected credit-decision/capacity queue regressions passed **54 tests / 7 files,
+  55.35s**. Fresh typecheck, lint and full format checks passed, including corrected
+  RTL role-query options and owner loading semantics. Worked correction/bound-
+  Curriculum Report check now additionally proves real zero CGPA matches an
+  inclusive 0–0 range: **4 tests / 70 assertions, 4.07s**.
+- Loaded Student Dashboard/registration/schedule/academic progress/My Grades
+  matrix passed **4 / 4, 2.4m**, at 390/1280px in all language/theme states. Proper
+  loading semantics are covered separately rather than scanning Skeletons as
+  completed content. Advisor/Head/Council/Records remain on the audit frontier.

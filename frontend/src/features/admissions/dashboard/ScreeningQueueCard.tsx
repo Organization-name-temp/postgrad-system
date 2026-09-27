@@ -83,11 +83,13 @@ export function ScreeningQueueCard() {
                 // overdue rows carry their own word for it.
                 sx={(theme) => ({
                   ...tabularNums,
-                  color: application.is_overdue
-                    ? theme.palette.mode === 'light'
-                      ? theme.palette.warning.dark
-                      : theme.palette.warning.main
-                    : theme.palette.text.secondary,
+                  color: theme.vars.palette.text.secondary,
+                  ...(application.is_overdue
+                    ? {
+                        color: theme.vars.palette.warning.dark,
+                        ...theme.applyStyles('dark', { color: theme.vars.palette.warning.light }),
+                      }
+                    : {}),
                 })}
               >
                 {application.is_overdue

@@ -154,7 +154,7 @@ export function RequestsPage() {
             onChange={(_, value) => setPage(value)}
           />
           {queue.isPending && (
-            <Skeleton variant="rectangular" height={96} aria-label={t('loading')} />
+            <Skeleton role="status" variant="rectangular" height={96} aria-label={t('loading')} />
           )}
           {!queue.isPending && !queue.isError && queue.data?.data?.length === 0 && (
             <Alert severity="info" icon={<InboxOutlined />}>

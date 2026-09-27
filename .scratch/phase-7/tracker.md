@@ -1607,3 +1607,10 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   journeys passed in 1.5m** on independent PRS servers; both ports were free
   again at completion. Static formatting of the config passed. Next full gate
   uses this isolated origin from a fresh fixture.
+- Isolated-origin frontend gate attempt 7: fresh seed completed; regenerated API,
+  lint, full format, typecheck and **121 unit files / 676 tests (446.85s)** passed.
+  The serial **179-test** Playwright stage is active on verified PRS servers
+  5177/18001; the unrelated 5173 service is untouched. Standing, Admissions,
+  Pipeline, public auth and early core bilingual states passed so far. Exit
+  marker and exact log are in `backend/storage/logs/phase7-verification/`;
+  complete gate success remains pending its terminal exit.

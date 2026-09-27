@@ -558,8 +558,13 @@ export const ar = {
   admissions: {
     pipeline: {
       title: 'مسار طلبات القبول',
-      cycle: 'معرّف دورة القبول',
-      program: 'معرّف البرنامج',
+      cycle: 'دورة القبول',
+      program: 'البرنامج',
+      referenceLoading: 'جارٍ تحميل الخيارات',
+      noMatches: 'لا توجد خيارات مطابقة',
+      clear: 'مسح الاختيار',
+      open: 'فتح الخيارات',
+      close: 'إغلاق الخيارات',
       selectCycle: 'اختر دورة قبول لعرض طلباتها.',
       loading: 'جارٍ تحميل مسار طلبات القبول',
       loadError: 'تعذّر تحميل مسار طلبات القبول.',
@@ -696,6 +701,10 @@ export const ar = {
       },
     },
     screening: {
+      defaultStage: 'بانتظار شؤون الطلاب (الافتراضي)',
+      selectedIntro: 'الطلبات المطابقة للمعايير المحددة.',
+      selectedEmpty: 'لا توجد طلبات مطابقة للمعايير المحددة.',
+      ageUnavailable: 'وقت دخول الحالة غير متاح',
       filters: {
         search: 'البحث عن المتقدمين',
         program: 'معرّفات البرامج',

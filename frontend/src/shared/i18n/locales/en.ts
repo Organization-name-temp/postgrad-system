@@ -584,8 +584,13 @@ export const en = {
   admissions: {
     pipeline: {
       title: 'Application Pipeline',
-      cycle: 'Admission Cycle ID',
-      program: 'Program ID',
+      cycle: 'Admission Cycle',
+      program: 'Program',
+      referenceLoading: 'Loading choices',
+      noMatches: 'No matching choices',
+      clear: 'Clear selection',
+      open: 'Open choices',
+      close: 'Close choices',
       selectCycle: 'Select an Admission Cycle to inspect its Applications.',
       loading: 'Loading Application Pipeline',
       loadError: 'Could not load the Application Pipeline.',
@@ -737,6 +742,10 @@ export const en = {
       },
     },
     screening: {
+      defaultStage: 'Awaiting Student Affairs (default)',
+      selectedIntro: 'Applications matching the selected criteria.',
+      selectedEmpty: 'No Applications match the selected criteria.',
+      ageUnavailable: 'Entry time unavailable',
       filters: {
         search: 'Search applicants',
         program: 'Program IDs',

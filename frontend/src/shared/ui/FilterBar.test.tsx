@@ -3,6 +3,68 @@ import userEvent from '@testing-library/user-event'
 import { expect, it, vi } from 'vitest'
 import { FilterBar } from './FilterBar'
 
+it('distinguishes an empty reference search from the selected criterion label', () => {
+  render(
+    <FilterBar
+      values={{ program_id: '207' }}
+      onChange={vi.fn()}
+      fields={[
+        {
+          key: 'program_id',
+          label: 'Program',
+          reference: {
+            query: '',
+            onSearch: vi.fn(),
+            selected: { value: '207', label: 'Existing Program' },
+            options: [],
+            loading: false,
+            noOptionsText: 'No matching Programs',
+            clearText: 'Clear',
+            openText: 'Open',
+            closeText: 'Close',
+          },
+        },
+      ]}
+    />,
+  )
+  expect(screen.getByRole('combobox', { name: 'Program' })).toHaveValue('')
+})
+
+it('lets the owner search references without local filtering or changing the active criterion', async () => {
+  const user = userEvent.setup()
+  const search = vi.fn()
+  const change = vi.fn()
+  render(
+    <FilterBar
+      values={{ program_id: '207' }}
+      onChange={change}
+      fields={[
+        {
+          key: 'program_id',
+          label: 'Program',
+          reference: {
+            query: 'هندسة',
+            onSearch: search,
+            selected: { value: '207', label: 'Existing Program' },
+            options: [{ value: '309', label: 'Computer Engineering' }],
+            loading: false,
+            noOptionsText: 'No matching Programs',
+            clearText: 'Clear',
+            openText: 'Open',
+            closeText: 'Close',
+          },
+        },
+      ]}
+    />,
+  )
+  const input = screen.getByRole('combobox', { name: 'Program' })
+  expect(input).toHaveValue('هندسة')
+  await user.click(input)
+  await user.click(await screen.findByRole('option', { name: 'Computer Engineering' }))
+  expect(change).toHaveBeenCalledWith({ program_id: '309' })
+  expect(search).toHaveBeenCalledWith(null)
+})
+
 it('submits labelled text and select criteria and lets the owner clear criteria', async () => {
   const user = userEvent.setup()
   const change = vi.fn()

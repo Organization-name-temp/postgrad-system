@@ -8,7 +8,11 @@ import { createAppTheme } from '../../../app/theme/createAppTheme'
 import i18n from '../../../shared/i18n/config'
 import { ScreeningQueuePage } from './ScreeningQueuePage'
 
-const api = vi.hoisted(() => ({ calls: [] as AxiosRequestConfig[] }))
+const api = vi.hoisted(() => ({
+  calls: [] as AxiosRequestConfig[],
+  status: 'under_sa_review',
+  age: 8 as number | null,
+}))
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } } },
   customInstance: (config: AxiosRequestConfig) => {
@@ -21,7 +25,8 @@ vi.mock('../../../shared/api/http', () => ({
           name_en: 'Ahmed Applicant',
           name_ar: 'أحمد المتقدم',
           national_id: '01234567890123',
-          age_days: 8,
+          age_days: api.age,
+          status: api.status,
         },
       ],
       meta: { current_page: config.params?.page ?? 1, last_page: 3, total: 51, per_page: 25 },
@@ -40,17 +45,15 @@ function History() {
     </>
   )
 }
-function renderPage() {
+function renderPage(
+  path = '/screening?q=احمد&program_id=4&admission_cycle_id=2&age_days_min=7&sort=-age_days&page=2',
+) {
   return render(
     <ThemeProvider theme={createAppTheme('en')}>
       <QueryClientProvider
         client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
       >
-        <MemoryRouter
-          initialEntries={[
-            '/screening?q=احمد&program_id=4&admission_cycle_id=2&age_days_min=7&sort=-age_days&page=2',
-          ]}
-        >
+        <MemoryRouter initialEntries={[path]}>
           <ScreeningQueuePage />
           <History />
         </MemoryRouter>
@@ -60,8 +63,21 @@ function renderPage() {
 }
 beforeEach(async () => {
   api.calls = []
+  api.status = 'under_sa_review'
+  api.age = 8
   download.mockClear()
   await i18n.changeLanguage('en')
+})
+it('labels a drilled stage and distinguishes unavailable status age from zero', async () => {
+  api.status = 'accepted'
+  api.age = null
+  renderPage('/screening?status=accepted&admission_cycle_id=7')
+  await screen.findByText('Ahmed Applicant')
+  expect(screen.getByRole('combobox', { name: 'Application Status' })).toHaveTextContent('Accepted')
+  expect(screen.getByRole('columnheader', { name: 'Application Status' })).toBeInTheDocument()
+  expect(screen.getByText('Entry time unavailable')).toBeInTheDocument()
+  expect(screen.queryByText('0 days')).not.toBeInTheDocument()
+  expect(screen.getByText('Applications matching the selected criteria.')).toBeInTheDocument()
 })
 it('restores bookmarked criteria, resets pagination on search, and restores the view with Back', async () => {
   renderPage()

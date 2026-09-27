@@ -20,6 +20,8 @@ import { FilterBar } from '../../../shared/ui/FilterBar'
 import { DataToolbar } from '../../../shared/ui/DataToolbar'
 import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
 import { downloadBlob } from '../../../shared/downloadBlob'
+import { APPLICATION_STATUSES } from '../applicationStatus'
+import { ApplicationStatusChip } from '../ApplicationStatusChip'
 
 /**
  * The Student Affairs screening queue (ticket 07). Lists the applications awaiting
@@ -63,6 +65,17 @@ export function ScreeningQueuePage() {
         onChange={collection.setCriteria}
         fields={[
           { key: 'q', label: t('screening.filters.search') },
+          {
+            key: 'status',
+            label: t('pipeline.stage'),
+            options: [
+              { value: '', label: t('screening.defaultStage') },
+              ...APPLICATION_STATUSES.map((status) => ({
+                value: status,
+                label: t(`status.${status}`),
+              })),
+            ],
+          },
           { key: 'program_id', label: t('screening.filters.program') },
           { key: 'faculty_id', label: t('screening.filters.faculty') },
           { key: 'admission_cycle_id', label: t('screening.filters.cycle') },
@@ -102,7 +115,7 @@ export function ScreeningQueuePage() {
         />
       )}
       <Typography variant="body2" color="text.secondary" gutterBottom>
-        {t('screening.intro')}
+        {t(collection.searchParams.has('status') ? 'screening.selectedIntro' : 'screening.intro')}
       </Typography>
 
       {isPending && <CircularProgress aria-label={t('screening.loading')} sx={{ mt: 2 }} />}
@@ -114,7 +127,7 @@ export function ScreeningQueuePage() {
 
       {!isPending && !isError && applications.length === 0 && (
         <Typography color="text.secondary" sx={{ mt: 2 }}>
-          {t('screening.empty')}
+          {t(collection.searchParams.has('status') ? 'screening.selectedEmpty' : 'screening.empty')}
         </Typography>
       )}
 
@@ -127,6 +140,7 @@ export function ScreeningQueuePage() {
                 <TableCell>{t('screening.columns.nationalId')}</TableCell>
                 <TableCell>{t('screening.columns.degree')}</TableCell>
                 <TableCell>{t('screening.columns.program')}</TableCell>
+                <TableCell>{t('pipeline.stage')}</TableCell>
                 <TableCell>{t('screening.columns.waiting')}</TableCell>
                 <TableCell align="right">{t('screening.columns.actions')}</TableCell>
               </TableRow>
@@ -141,9 +155,16 @@ export function ScreeningQueuePage() {
                   <TableCell>{application.applying_for_degree}</TableCell>
                   <TableCell>{programName(application)}</TableCell>
                   <TableCell>
+                    <ApplicationStatusChip status={application.status} />
+                  </TableCell>
+                  <TableCell>
                     <Chip
                       size="small"
-                      label={t('screening.waitingDays', { count: application.age_days ?? 0 })}
+                      label={
+                        application.age_days == null
+                          ? t('screening.ageUnavailable')
+                          : t('screening.waitingDays', { count: application.age_days })
+                      }
                     />
                   </TableCell>
                   <TableCell align="right">

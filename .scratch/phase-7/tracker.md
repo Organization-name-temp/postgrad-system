@@ -903,3 +903,30 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   parameter choices, language-switch/Back coverage and live EN/AR browser
   drill/export/accessibility verification remain next. Print and Phase 7 ticket
   delivery/full gates/consolidated review remain pending.
+
+### Pipeline named parameter choices and live stage journey
+
+- EN/AR tests first reproduced missing names for bookmarked Cycle/Program IDs
+  beyond the first reference page. The Report now searches the owning collections
+  in bounded 100-row requests and resolves selected opaque IDs separately. Shared
+  FilterBar accepts owner-supplied reference choices, selection, query state and
+  localized accessibility copy; it has no Admissions/Catalog rules or local
+  filtering. Owner-normalized Arabic queries can select English-labelled results.
+- URL/history coverage exposed MUI clearing the effective Program criterion while
+  only its lookup text was being cleared. Typing now leaves the Report selection
+  intact; choosing a result or the explicit clear button changes the URL. An empty
+  search is distinct from displaying a selected label. EN/AR language switches and
+  Back restore selection without losing Cycle/Program/degree criteria.
+- Ordinary drilled Applications now show their selected status criterion and each
+  row's owner status. Copy describes matching Applications rather than claiming
+  every stage is waiting for screening. Missing status-entry age is unavailable,
+  not fabricated as zero days. Focused tests first reproduced these omissions.
+- Frontend **3 files / 9 tests passed, 15.96s**; typecheck/lint/full format passed.
+  The browser harness initially failed because direct session HTTP lacked Sanctum's
+  required frontend Referer; matching the SPA's stateful request fixed the harness.
+  Live serial Student Affairs/Dean EN/AR **4 tests passed, 1.5m**, proving all 13 table
+  stages, exact keyboard drill URL, API/list count parity, authenticated workbook,
+  Back, owner parameter names and serious/critical axe checks. Screenshots inspected.
+- The chart's axis skips some long stage labels at desktop density. A focused
+  layout follow-up is next before print. Prerequisite #08 full gates and #15 second
+  Report print verification remain pending alongside actual Phase 7 acceptance.

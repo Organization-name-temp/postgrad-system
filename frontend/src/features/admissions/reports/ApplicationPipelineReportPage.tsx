@@ -11,15 +11,54 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useApplicationPipelineReport } from '../../../shared/api/generated/endpoints'
+import { useState } from 'react'
+import {
+  useApplicationPipelineReport,
+  useListAdmissionCycles,
+  useListPrograms,
+} from '../../../shared/api/generated/endpoints'
+import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { Chart } from '../../../shared/ui/Chart'
 import { FilterBar } from '../../../shared/ui/FilterBar'
 import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
 
 export function ApplicationPipelineReportPage() {
-  const { t } = useTranslation('admissions')
+  const { t, i18n } = useTranslation('admissions')
+  const [cycleSearch, setCycleSearch] = useState<string | null>(null)
+  const [programSearch, setProgramSearch] = useState<string | null>(null)
   const collection = useCollectionQuery()
   const cycle = collection.searchParams.get('admission_cycle_id')
+  const program = collection.searchParams.get('program_id')
+  const cycles = useListAdmissionCycles({ q: cycleSearch ?? undefined, per_page: 100 })
+  const programs = useListPrograms({ q: programSearch ?? undefined, per_page: 100 })
+  const selectedCycle = useListAdmissionCycles(
+    { id: cycle ?? undefined, per_page: 100 },
+    { query: { enabled: Boolean(cycle) } },
+  )
+  const selectedProgram = useListPrograms(
+    { id: program ?? undefined, per_page: 100 },
+    { query: { enabled: Boolean(program) } },
+  )
+  const cycleOption = (row: { id?: number; name_en?: string; name_ar?: string }) => ({
+    value: String(row.id),
+    label: pickLocaleName(row, i18n.language, String(row.id)),
+  })
+  const programOption = (row: {
+    id?: number
+    code?: string
+    name_en?: string
+    name_ar?: string
+  }) => ({
+    value: String(row.id),
+    label: pickLocaleName(row, i18n.language, row.code ?? String(row.id)),
+  })
+  const referenceCopy = {
+    loadingText: t('pipeline.referenceLoading'),
+    noOptionsText: t('pipeline.noMatches'),
+    clearText: t('pipeline.clear'),
+    openText: t('pipeline.open'),
+    closeText: t('pipeline.close'),
+  }
   const params = {
     ...collection.params,
     admission_cycle_id: Number(cycle),
@@ -47,8 +86,40 @@ export function ApplicationPipelineReportPage() {
         values={collection.params}
         onChange={collection.setCriteria}
         fields={[
-          { key: 'admission_cycle_id', label: t('pipeline.cycle'), type: 'number' },
-          { key: 'program_id', label: t('pipeline.program'), type: 'number' },
+          {
+            key: 'admission_cycle_id',
+            label: t('pipeline.cycle'),
+            reference: {
+              ...referenceCopy,
+              options: (cycles.data?.data ?? []).map(cycleOption),
+              selected: selectedCycle.data?.data?.find((row) => String(row.id) === cycle)
+                ? cycleOption(selectedCycle.data.data.find((row) => String(row.id) === cycle)!)
+                : cycle
+                  ? { value: cycle, label: cycle }
+                  : undefined,
+              query: cycleSearch,
+              onSearch: setCycleSearch,
+              loading: cycles.isPending,
+            },
+          },
+          {
+            key: 'program_id',
+            label: t('pipeline.program'),
+            reference: {
+              ...referenceCopy,
+              options: (programs.data?.data ?? []).map(programOption),
+              selected: selectedProgram.data?.data?.find((row) => String(row.id) === program)
+                ? programOption(
+                    selectedProgram.data.data.find((row) => String(row.id) === program)!,
+                  )
+                : program
+                  ? { value: program, label: program }
+                  : undefined,
+              query: programSearch,
+              onSearch: setProgramSearch,
+              loading: programs.isPending,
+            },
+          },
           {
             key: 'degree_level',
             label: t('screening.columns.degree'),

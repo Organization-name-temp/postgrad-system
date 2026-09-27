@@ -1545,3 +1545,8 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   Archived interrupted artifacts under ignored backend private storage. Repeating
   the full gate from a fresh seed with durable workspace logs under
   `backend/storage/logs/phase7-verification/`, without any competing browser.
+- Recovery frontend gate: generated client drift, lint, format and typecheck passed;
+  **121 unit files / 676 tests passed (545.89s)**. Complete Playwright stage
+  started with **175 tests / one worker** against the fresh fixture. Durable log:
+  `backend/storage/logs/phase7-verification/frontend-gate.log`. Its terminal result
+  remains pending; the interrupted earlier run is not claimed complete.

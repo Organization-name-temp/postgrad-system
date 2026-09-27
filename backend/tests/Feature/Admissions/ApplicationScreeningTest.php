@@ -285,3 +285,22 @@ it('forbids a stranger from reading another applicant’s timeline', function ()
 
     $this->getJson("/api/v1/applications/{$application->id}/timeline")->assertForbidden();
 });
+
+it('preserves SQL nullable ordering when an age filter selects the same queue', function (string $field, string $direction) {
+    [$missing] = underReviewApplication([$field => null]);
+    [$populated] = underReviewApplication([$field => $field === 'national_id' ? '29000000000001' : now()->subDay()]);
+    foreach ([$missing, $populated] as $application) {
+        ApplicationStatusTransition::factory()->enteredAt(ApplicationStatus::UnderSAReview, now()->subDays(2))
+            ->create(['application_id' => $application->id]);
+    }
+    actingAsRole(Role::StudentAffairs);
+    $sort = $direction === 'asc' ? $field : '-'.$field;
+    $stored = $this->getJson('/api/v1/applications?sort='.$sort)->assertOk()->assertJsonPath('meta.total', 2)->json('data');
+    $derived = $this->getJson('/api/v1/applications?sort='.$sort.'&age_days_min=0')->assertOk()->assertJsonPath('meta.total', 2)->json('data');
+    $expected = $direction === 'asc' ? [$populated->id, $missing->id] : [$missing->id, $populated->id];
+    expect(array_column($stored, 'id'))->toBe($expected)
+        ->and(array_column($derived, 'id'))->toBe($expected);
+})->with([
+    ['national_id', 'asc'], ['national_id', 'desc'],
+    ['finalized_at', 'asc'], ['finalized_at', 'desc'],
+]);

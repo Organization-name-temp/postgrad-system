@@ -2146,6 +2146,7 @@ export const ar = {
         unavailable: 'جاهزية التخرج غير متاحة',
       },
       blocker: 'العائق',
+      blockerAll: 'العوائق المطلوبة (جميعها)',
       blockers: {
         RemainingRequirements: 'متطلبات خطة دراسية متبقية',
         CgpaUnavailable: 'المعدل التراكمي غير متاح',

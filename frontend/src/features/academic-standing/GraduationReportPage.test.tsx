@@ -46,7 +46,7 @@ it.each(['en', 'ar'] as const)(
         >
           <MemoryRouter
             initialEntries={[
-              '/analytics/graduation-readiness?lifecycle=Terminated&proximity=remaining_1_5',
+              '/analytics/graduation-readiness?lifecycle=Terminated&proximity=remaining_1_5&blocker=RemainingRequirements,TerminationPending&blocker_all=RemainingRequirements',
             ]}
           >
             <GraduationReportPage />
@@ -79,7 +79,7 @@ it.each(['en', 'ar'] as const)(
     })
     expect(within(row).getByRole('link')).toHaveAttribute(
       'href',
-      '/analytics/graduation-readiness/students?lifecycle=Terminated&proximity=remaining_1_5&blocker=CgpaUnavailable',
+      '/analytics/graduation-readiness/students?lifecycle=Terminated&proximity=remaining_1_5&blocker=RemainingRequirements%2CTerminationPending&blocker_all=RemainingRequirements%2CCgpaUnavailable',
     )
     const before = screen.getByLabelText('URL').textContent
     await act(async () => {

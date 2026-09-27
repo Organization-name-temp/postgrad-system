@@ -19,6 +19,7 @@ use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Notifications\Internal\Models\Notification;
+use OpenSpout\Reader\XLSX\Reader;
 
 uses(RefreshDatabase::class);
 
@@ -161,4 +162,43 @@ it('reads corrected effective Grades and the Student bound Curriculum instead of
     $this->getJson('/api/v1/academic-standing/reports/standing')->assertOk()->assertJsonPath('data.counts.GoodStanding', 1);
     expect(TerminationCase::query()->count())->toBe(0)->and(StandingObservation::query()->count())->toBe(0)
         ->and(Notification::query()->count())->toBe(0);
+});
+
+it('intersects blocker drill-through with the original OR selection across summary list and export', function () {
+    $actor = User::factory()->create();
+    $actor->assignRole(Role::StudentAffairs);
+    $program = Program::factory()->create();
+    $students = [];
+    foreach ([3, 0] as $offset => $required) {
+        $version = CatalogVersion::query()->create([
+            'subject_type' => VersionSubject::Program, 'subject_id' => $program->id,
+            'version_no' => $offset + 1, 'changed_at' => now(),
+            'snapshot' => ['prep_required_ch' => 0, 'core_required_ch' => $required,
+                'elective_required_ch' => 0, 'curriculum' => []],
+        ]);
+        $students[] = Student::factory()->create(['program_id' => $program->id, 'curriculum_version_id' => $version->id]);
+    }
+    Sanctum::actingAs($actor);
+    $base = '/api/v1/academic-standing/reports/graduation-readiness';
+    $this->getJson($base.'?blocker=RemainingRequirements,TerminationPending')
+        ->assertOk()->assertJsonPath('data.total', 1)->assertJsonPath('data.blockers.CgpaUnavailable', 1);
+    $criteria = '?blocker=RemainingRequirements,TerminationPending&blocker_all=CgpaUnavailable';
+    $this->getJson($base.$criteria)->assertOk()->assertJsonPath('data.total', 1);
+    $this->getJson($base.'/students'.$criteria)->assertOk()->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.student_id', $students[0]->id);
+    $response = $this->get($base.'/students/export'.$criteria)->assertOk();
+    $reader = new Reader;
+    $reader->open($response->baseResponse->getFile()->getPathname());
+    $ids = [];
+    foreach ($reader->getSheetIterator() as $sheet) {
+        foreach ($sheet->getRowIterator() as $index => $row) {
+            if ($index > 1) {
+                $ids[] = $row->toArray()[0];
+            }
+        }
+    }
+    $reader->close();
+    expect($ids)->toBe([(string) $students[0]->id]);
+    $this->getJson($base.'/students?blocker_all=CgpaUnavailable,RemainingRequirements')
+        ->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.student_id', $students[0]->id);
 });

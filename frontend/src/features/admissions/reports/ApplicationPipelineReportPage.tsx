@@ -1,7 +1,6 @@
 import {
   Alert,
   Button,
-  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -19,6 +18,7 @@ import {
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { Chart } from '../../../shared/ui/Chart'
 import { FilterBar } from '../../../shared/ui/FilterBar'
+import { ReportLoading } from '../../../shared/ui/ReportLoading'
 import { ReportDocument } from '../../../shared/ui/ReportDocument'
 import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
 
@@ -147,7 +147,7 @@ export function ApplicationPipelineReportPage() {
         ]}
       />
       {!cycle && <Typography>{t('pipeline.selectCycle')}</Typography>}
-      {cycle && report.isPending && <CircularProgress aria-label={t('pipeline.loading')} />}
+      {cycle && report.isPending && <ReportLoading label={t('pipeline.loading')} />}
       {cycle && report.isError && (
         <Alert
           severity="error"

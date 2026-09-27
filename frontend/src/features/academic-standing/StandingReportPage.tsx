@@ -1,9 +1,10 @@
-import { Alert, Button, CircularProgress, Stack, Typography } from '@mui/material'
+import { Alert, Button, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useCurrentAcademicStandingCountsForTheAuthorizedFullSelection as useStandingReport } from '../../shared/api/generated/endpoints'
 import { Chart } from '../../shared/ui/Chart'
 import { FilterBar } from '../../shared/ui/FilterBar'
+import { ReportLoading } from '../../shared/ui/ReportLoading'
 import { ReportDocument } from '../../shared/ui/ReportDocument'
 import { ACADEMIC_STANDINGS, useAcademicReportCriteria } from './useAcademicReportCriteria'
 
@@ -28,7 +29,7 @@ export function StandingReportPage() {
         values={collection.values}
         onChange={collection.setCriteria}
       />
-      {report.isPending && <CircularProgress aria-label={t('report.loading')} />}
+      {report.isPending && <ReportLoading label={t('report.loading')} />}
       {report.isError && (
         <Alert
           severity="error"

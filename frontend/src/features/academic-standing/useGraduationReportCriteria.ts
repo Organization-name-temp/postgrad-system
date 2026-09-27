@@ -38,6 +38,17 @@ export function useGraduationReportCriteria() {
       ],
     },
     {
+      key: 'blocker_all',
+      label: t('graduationReport.blockerAll'),
+      options: [
+        all,
+        ...GRADUATION_BLOCKERS.map((value) => ({
+          value,
+          label: t(`graduationReport.blockers.${value}`),
+        })),
+      ],
+    },
+    {
       key: 'proximity',
       label: t('graduationReport.proximity'),
       options: [all, { value: 'remaining_1_5', label: t('graduationReport.proximityChoice') }],

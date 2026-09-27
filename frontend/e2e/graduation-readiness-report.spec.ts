@@ -39,7 +39,7 @@ for (const account of ['r05', 'r07']) {
         | undefined
       expect(candidate, 'The seeded persona needs a visible academic cohort').toBeDefined()
       if (!candidate) throw new Error('No seeded academic cohort')
-      const criteria = `program_id=${candidate.program.id}&degree_level=${candidate.program.degree_level}`
+      const criteria = `program_id=${candidate.program.id}&degree_level=${candidate.program.degree_level}&blocker=RemainingRequirements`
       const pendingReport = page.waitForResponse(
         (response) =>
           response.url().includes('/api/v1/academic-standing/reports/graduation-readiness?') &&
@@ -141,10 +141,10 @@ for (const account of ['r05', 'r07']) {
         else {
           await expect(row.getByRole('link')).toHaveAttribute(
             'href',
-            `/analytics/graduation-readiness/students?${criteria}&blocker=${blocker}`,
+            `/analytics/graduation-readiness/students?${criteria}&blocker_all=${blocker}`,
           )
           const matching = await page.request.get(
-            `/api/v1/academic-standing/reports/graduation-readiness/students?${criteria}&blocker=${blocker}`,
+            `/api/v1/academic-standing/reports/graduation-readiness/students?${criteria}&blocker_all=${blocker}`,
             { headers: { ...headers, Referer: page.url() } },
           )
           expect(matching.ok()).toBeTruthy()

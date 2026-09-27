@@ -1,7 +1,6 @@
 import {
   Alert,
   Button,
-  CircularProgress,
   Link,
   Table,
   TableBody,
@@ -21,6 +20,7 @@ import { downloadBlob } from '../../shared/downloadBlob'
 import { pickLocaleName } from '../../shared/i18n/localeName'
 import { DataToolbar } from '../../shared/ui/DataToolbar'
 import { FilterBar } from '../../shared/ui/FilterBar'
+import { ReportLoading } from '../../shared/ui/ReportLoading'
 import { ReportDocument } from '../../shared/ui/ReportDocument'
 import { StatusChip, type StatusTone } from '../../shared/ui/StatusChip'
 import { ROLE } from '../../shared/access/roles'
@@ -100,7 +100,9 @@ export function TerminationCaseListPage() {
       ]}
     >
       <FilterBar fields={fields} values={collection.values} onChange={collection.setCriteria} />
-      {query.isPending && <CircularProgress aria-label={t('terminationReport.listLoading')} />}
+      {query.isPending && (
+        <ReportLoading label={t('terminationReport.listLoading')} layout="table" />
+      )}
       {query.isError && (
         <Alert
           severity="error"

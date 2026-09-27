@@ -307,6 +307,10 @@ readiness?: string;
  */
 blocker?: string;
 /**
+ * Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.
+ */
+blocker_all?: string;
+/**
  * Inclusive remaining-CH lower bound.
  */
 remaining_ch_min?: number;
@@ -377,6 +381,10 @@ readiness?: string;
  * CSV overlapping typed blockers; any selected blocker matches.
  */
 blocker?: string;
+/**
+ * Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.
+ */
+blocker_all?: string;
 /**
  * Inclusive remaining-CH lower bound.
  */
@@ -501,6 +509,10 @@ readiness?: string;
  * CSV overlapping typed blockers; any selected blocker matches.
  */
 blocker?: string;
+/**
+ * Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.
+ */
+blocker_all?: string;
 /**
  * Inclusive remaining-CH lower bound.
  */
@@ -2923,10 +2935,6 @@ interviewer_id?: string;
  */
 program_id?: string;
 /**
- * Faculty ids, narrowing the actor scope.
- */
-faculty_id?: string;
-/**
  * Comma-separated Cycle ids.
  */
 admission_cycle_id?: string;
@@ -2993,10 +3001,6 @@ interviewer_id?: string;
  * Comma-separated primary Program ids.
  */
 program_id?: string;
-/**
- * Faculty ids, narrowing the actor scope.
- */
-faculty_id?: string;
 /**
  * Comma-separated Cycle ids.
  */

@@ -1,9 +1,10 @@
-import { Alert, Button, CircularProgress, Stack, Typography } from '@mui/material'
+import { Alert, Button, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection as useReadinessReport } from '../../shared/api/generated/endpoints'
 import { Chart } from '../../shared/ui/Chart'
 import { FilterBar } from '../../shared/ui/FilterBar'
+import { ReportLoading } from '../../shared/ui/ReportLoading'
 import { ReportDocument } from '../../shared/ui/ReportDocument'
 import {
   GRADUATION_BLOCKERS,
@@ -21,7 +22,11 @@ export function GraduationReportPage() {
   selection.delete('per_page')
   const drill = (field: string, value: string) => {
     const query = new URLSearchParams(selection)
-    query.set(field, value)
+    if (field === 'blocker') {
+      const required = new Set((query.get('blocker_all') ?? '').split(',').filter(Boolean))
+      required.add(value)
+      query.set('blocker_all', [...required].join(','))
+    } else query.set(field, value)
     return `/analytics/graduation-readiness/students?${query.toString()}`
   }
   return (
@@ -35,7 +40,7 @@ export function GraduationReportPage() {
         values={collection.values}
         onChange={collection.setCriteria}
       />
-      {report.isPending && <CircularProgress aria-label={t('graduationReport.loading')} />}
+      {report.isPending && <ReportLoading label={t('graduationReport.loading')} chartCount={2} />}
       {report.isError && (
         <Alert
           severity="error"

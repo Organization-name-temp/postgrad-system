@@ -143,7 +143,12 @@ final readonly class ApplicationCollection
         usort($rows, function (Application $a, Application $b) use ($query): int {
             foreach ($query->sorts as $sort) {
                 $field = $sort['field'];
-                $comparison = $this->sortValue($a, $field) <=> $this->sortValue($b, $field);
+                $first = $this->sortValue($a, $field);
+                $second = $this->sortValue($b, $field);
+                // Match PostgreSQL's ASC NULLS LAST / DESC NULLS FIRST ordering.
+                $comparison = ($first === null) !== ($second === null)
+                    ? ($first === null ? 1 : -1)
+                    : $first <=> $second;
                 if ($comparison !== 0) {
                     return $sort['direction'] === 'asc' ? $comparison : -$comparison;
                 }

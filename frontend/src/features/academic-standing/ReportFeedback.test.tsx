@@ -6,6 +6,9 @@ import type { AxiosRequestConfig } from 'axios'
 import { it, expect, vi } from 'vitest'
 import { createAppTheme } from '../../app/theme/createAppTheme'
 import i18n from '../../shared/i18n/config'
+import { StandingReportPage } from './StandingReportPage'
+import { StandingStudentListPage } from './StandingStudentListPage'
+import { GraduationStudentListPage } from './GraduationStudentListPage'
 import { GraduationReportPage } from './GraduationReportPage'
 import { TerminationCaseListPage } from './TerminationCaseListPage'
 import { TerminationReportPage } from './TerminationReportPage'
@@ -64,7 +67,7 @@ for (const locale of ['en', 'ar'] as const) {
       }
       const message = labels[owner][mode as 'pending' | 'error'][locale]
       if (mode === 'pending')
-        expect(await screen.findByRole('progressbar', { name: message })).toBeInTheDocument()
+        expect(await screen.findByRole('status', { name: message })).toBeInTheDocument()
       else expect(await screen.findByText(message)).toBeInTheDocument()
     })
   }
@@ -101,7 +104,36 @@ for (const locale of ['en', 'ar'] as const) {
     }
     const message = messages[mode as keyof typeof messages][locale]
     if (mode === 'pending')
-      expect(await screen.findByRole('progressbar', { name: message })).toBeInTheDocument()
+      expect(await screen.findByRole('status', { name: message })).toBeInTheDocument()
     else expect(await screen.findByText(message)).toBeInTheDocument()
   })
+}
+
+for (const locale of ['en', 'ar'] as const) {
+  it.each([
+    [StandingReportPage, 'report.loading'],
+    [StandingStudentListPage, 'report.studentsLoading'],
+    [GraduationStudentListPage, 'report.studentsLoading'],
+  ] as const)(
+    `provides an announced skeleton instead of a spinner for %s in ${locale}`,
+    async (Page, key) => {
+      state.mode = 'pending'
+      await i18n.changeLanguage(locale)
+      render(
+        <ThemeProvider theme={createAppTheme(locale)}>
+          <QueryClientProvider
+            client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+          >
+            <MemoryRouter>
+              <Page />
+            </MemoryRouter>
+          </QueryClientProvider>
+        </ThemeProvider>,
+      )
+      expect(
+        await screen.findByRole('status', { name: i18n.t(key, { ns: 'academicStanding' }) }),
+      ).toBeVisible()
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
+    },
+  )
 }

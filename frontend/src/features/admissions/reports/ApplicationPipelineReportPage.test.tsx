@@ -9,7 +9,7 @@ import { createAppTheme } from '../../../app/theme/createAppTheme'
 import i18n from '../../../shared/i18n/config'
 import { ApplicationPipelineReportPage } from './ApplicationPipelineReportPage'
 
-const api = vi.hoisted(() => ({ calls: [] as AxiosRequestConfig[] }))
+const api = vi.hoisted(() => ({ calls: [] as AxiosRequestConfig[], pending: false }))
 vi.mock('../../../shared/api/http', () => ({
   http: { defaults: { headers: { common: {} } } },
   customInstance: (config: AxiosRequestConfig) => {
@@ -45,6 +45,7 @@ vi.mock('../../../shared/api/http', () => ({
       })
     }
     if (config.url?.includes('application-pipeline')) {
+      if (api.pending) return new Promise(() => {})
       return Promise.resolve({
         data: {
           total: 3,
@@ -67,6 +68,7 @@ vi.mock('../../../shared/api/http', () => ({
 
 beforeEach(() => {
   api.calls = []
+  api.pending = false
 })
 function History() {
   const location = useLocation()
@@ -157,5 +159,28 @@ it.each(['en', 'ar'] as const)(
       ),
     ).toBeInTheDocument()
     expect(screen.getByLabelText('URL')).toHaveTextContent('program_id=4')
+  },
+)
+
+it.each(['en', 'ar'] as const)(
+  'announces the %s Pipeline skeleton without a spinner',
+  async (locale) => {
+    api.pending = true
+    await i18n.changeLanguage(locale)
+    render(
+      <ThemeProvider theme={createAppTheme(locale)}>
+        <QueryClientProvider
+          client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+        >
+          <MemoryRouter initialEntries={['/analytics/application-pipeline?admission_cycle_id=7']}>
+            <ApplicationPipelineReportPage />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </ThemeProvider>,
+    )
+    expect(
+      await screen.findByRole('status', { name: i18n.t('pipeline.loading', { ns: 'admissions' }) }),
+    ).toBeVisible()
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument()
   },
 )

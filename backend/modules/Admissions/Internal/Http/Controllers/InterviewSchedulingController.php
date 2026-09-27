@@ -64,7 +64,6 @@ class InterviewSchedulingController
      * @queryParam status string Comma-separated confirmation states. Example: confirmed
      * @queryParam interviewer_id string Comma-separated interviewer ids, within actor scope. Example: 4
      * @queryParam program_id string Comma-separated primary Program ids. Example: 1
-     * @queryParam faculty_id string Faculty ids, narrowing the actor scope. Example: 1,2
      * @queryParam admission_cycle_id string Comma-separated Cycle ids. Example: 1
      * @queryParam degree_level string Comma-separated applying degrees. Example: MSc
      * @queryParam mode string Comma-separated interview modes. Example: in_person
@@ -104,7 +103,6 @@ class InterviewSchedulingController
      * @queryParam status string Comma-separated confirmation states. Example: confirmed
      * @queryParam interviewer_id string Comma-separated interviewer ids, within actor scope. Example: 4
      * @queryParam program_id string Comma-separated primary Program ids. Example: 1
-     * @queryParam faculty_id string Faculty ids, narrowing the actor scope. Example: 1,2
      * @queryParam admission_cycle_id string Comma-separated Cycle ids. Example: 1
      * @queryParam degree_level string Comma-separated applying degrees. Example: MSc
      * @queryParam mode string Comma-separated interview modes. Example: in_person

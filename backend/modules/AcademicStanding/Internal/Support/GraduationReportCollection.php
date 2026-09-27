@@ -19,7 +19,7 @@ final readonly class GraduationReportCollection
             'proximity' => 'nullable|in:remaining_1_5',
         ])->validate();
         $filters = ['faculty_id', 'department_id', 'program_id', 'degree_level', 'lifecycle',
-            'readiness', 'blocker', 'remaining_ch_min', 'remaining_ch_max', 'cgpa_min', 'cgpa_max', 'cgpa_availability', 'proximity'];
+            'readiness', 'blocker', 'blocker_all', 'remaining_ch_min', 'remaining_ch_max', 'cgpa_min', 'cgpa_max', 'cgpa_availability', 'proximity'];
 
         return CollectionQuery::from($input, $filters, $filters,
             ['student_id', 'name_en', 'name_ar', 'university_id', 'program_id', 'lifecycle', 'readiness', 'remaining_ch', 'cgpa'],
@@ -68,6 +68,9 @@ final readonly class GraduationReportCollection
         }
         $readiness = $row->readiness;
         if (($filters['blocker'] ?? []) !== [] && ($readiness === null || array_intersect($filters['blocker'], array_column($readiness->blockers, 'value')) === [])) {
+            return false;
+        }
+        if (($filters['blocker_all'] ?? []) !== [] && ($readiness === null || array_diff($filters['blocker_all'], array_column($readiness->blockers, 'value')) !== [])) {
             return false;
         }
         if (($filters['proximity'] ?? []) !== [] && ($readiness === null || $readiness->remainingCreditHours < 1 || $readiness->remainingCreditHours > 5)) {

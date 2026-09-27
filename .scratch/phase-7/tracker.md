@@ -1632,3 +1632,52 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   The matrix now starts its `/me` response wait before reload and waits for the
   returned preference on the document before choosing its target print language.
   Remaining browser checks continue serially; this run is not a green gate.
+
+
+## Consolidated final review — one native run
+
+The code-review skill ran its required read-only Standards and Spec reviewers in
+parallel against the fixed baseline and tip `48e5e99`. It covered every Phase 7
+ticket and the eight executable prerequisites; root retains all implementation.
+The reports remain separate in [review](review.md): Standards found three P2
+contract/design issues; Spec found one P1 exact-population issue. No per-ticket
+formal reviews were run.
+
+- S1: nullable SQL versus derived PHP ordering reproduced in **4 RED** queue
+  comparisons (ascending/descending National ID and finalization timestamp).
+- P1: overlapping blocker drill reproduced as **1 RED** PostgreSQL HTTP test
+  (unknown intersection criterion) and **2 RED** EN/AR frontend link assertions.
+  The HTTP regression includes a Student outside the original blocker selection,
+  an OR multi-selection, conjunctive required blockers, exact List membership,
+  summary counts and XLSX readback.
+- Root fixed S1 and the P1 backend seam; **5 tests / 37 assertions passed (3.80s)**.
+  The original blocker CSV remains OR; `blocker_all` additionally requires every
+  selected blocker, so drill-through intersects instead of replacing the cohort.
+  Controller documentation includes the new criterion on summary/List/export.
+- S2: **14 RED / 10 passed** loading feedback tests (29.49s). They require named
+  status skeletons rather than bare spinners across the new Report/List surfaces,
+  in EN and AR. The root-created shared layout is domain-free; consumption and
+  green verification remain pending the current serial run's completion.
+- S3: remove the copied `faculty_id` annotations from booked Interview list/export
+  instead of adding an unrequested filter; regeneration and drift verification
+  remain pending. Existing Interview actor scope and filters are preserved.
+
+- Attempt 7 browser stage completed **178 passed / 1 failed (1.1h)**. Only the
+  Records watermark locale assertion failed. The command session ended with 143,
+  leaving its durable marker at running; processes are no longer alive. This is
+  explicitly **not a green frontend gate**. Browser output contains the complete
+  179-test summary; no missing final result is inferred as success.
+- Consolidated fixes: affected owner **33 tests / 262 assertions passed (7.79s)**;
+  affected frontend **26 tests passed (24.66s)**; lint, full format and typecheck
+  passed. Controller-generated changes inspected separately: only three new
+  blocker_all query declarations and two removed Faculty declarations, with
+  synchronized generated client/Zod parameters. Native Readiness exact-blocker
+  journeys **4/4 passed**, all language/theme states. Records recheck is active.
+- Spec reviewer confirmed P1 resolved. Standards confirmed S1/S3 and requested
+  matching two-chart Readiness skeleton footprint; root added the second section
+  while retaining a single named status announcement. Final confirmation pending.
+
+- Final Readiness two-chart skeleton refinement: **20 loading tests passed
+  (15.43s)**. The Standards reviewer confirmed all S1–S3 resolved; Spec confirmed
+  P1 resolved. The single consolidated review has **no remaining actionable
+  findings**. Final gates and Records affected recheck remain pending.

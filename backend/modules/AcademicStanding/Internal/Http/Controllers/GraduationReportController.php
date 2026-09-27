@@ -31,6 +31,7 @@ final class GraduationReportController
      * @queryParam per_page integer Accepted but does not truncate summary. Example: 25
      * @queryParam readiness string CSV ready, not_ready or unavailable groups. Example: not_ready
      * @queryParam blocker string CSV overlapping typed blockers; any selected blocker matches. Example: RemainingRequirements
+     * @queryParam blocker_all string Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through. Example: CgpaUnavailable
      * @queryParam remaining_ch_min integer Inclusive remaining-CH lower bound. Example: 1
      * @queryParam remaining_ch_max integer Inclusive remaining-CH upper bound. Example: 5
      * @queryParam cgpa_min number Inclusive CGPA lower bound; unknown values excluded. Example: 3
@@ -74,6 +75,7 @@ final class GraduationReportController
      * @queryParam per_page integer Accepted but does not truncate summary. Example: 25
      * @queryParam readiness string CSV ready, not_ready or unavailable groups. Example: not_ready
      * @queryParam blocker string CSV overlapping typed blockers; any selected blocker matches. Example: RemainingRequirements
+     * @queryParam blocker_all string Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through. Example: CgpaUnavailable
      * @queryParam remaining_ch_min integer Inclusive remaining-CH lower bound. Example: 1
      * @queryParam remaining_ch_max integer Inclusive remaining-CH upper bound. Example: 5
      * @queryParam cgpa_min number Inclusive CGPA lower bound; unknown values excluded. Example: 3
@@ -114,6 +116,7 @@ final class GraduationReportController
      * @queryParam per_page integer Accepted but does not truncate summary. Example: 25
      * @queryParam readiness string CSV ready, not_ready or unavailable groups. Example: not_ready
      * @queryParam blocker string CSV overlapping typed blockers; any selected blocker matches. Example: RemainingRequirements
+     * @queryParam blocker_all string Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through. Example: CgpaUnavailable
      * @queryParam remaining_ch_min integer Inclusive remaining-CH lower bound. Example: 1
      * @queryParam remaining_ch_max integer Inclusive remaining-CH upper bound. Example: 5
      * @queryParam cgpa_min number Inclusive CGPA lower bound; unknown values excluded. Example: 3

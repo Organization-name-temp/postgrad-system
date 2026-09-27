@@ -809,6 +809,16 @@ paths:
             example: RemainingRequirements
         -
           in: query
+          name: blocker_all
+          description: 'Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'
+          example: CgpaUnavailable
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'
+            example: CgpaUnavailable
+        -
+          in: query
           name: remaining_ch_min
           description: 'Inclusive remaining-CH lower bound.'
           example: 1
@@ -994,6 +1004,16 @@ paths:
             type: string
             description: 'CSV overlapping typed blockers; any selected blocker matches.'
             example: RemainingRequirements
+        -
+          in: query
+          name: blocker_all
+          description: 'Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'
+          example: CgpaUnavailable
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'
+            example: CgpaUnavailable
         -
           in: query
           name: remaining_ch_min
@@ -1341,6 +1361,16 @@ paths:
             type: string
             description: 'CSV overlapping typed blockers; any selected blocker matches.'
             example: RemainingRequirements
+        -
+          in: query
+          name: blocker_all
+          description: 'Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'
+          example: CgpaUnavailable
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'
+            example: CgpaUnavailable
         -
           in: query
           name: remaining_ch_min
@@ -8731,16 +8761,6 @@ paths:
             example: '1'
         -
           in: query
-          name: faculty_id
-          description: 'Faculty ids, narrowing the actor scope.'
-          example: '1,2'
-          required: false
-          schema:
-            type: string
-            description: 'Faculty ids, narrowing the actor scope.'
-            example: '1,2'
-        -
-          in: query
           name: admission_cycle_id
           description: 'Comma-separated Cycle ids.'
           example: '1'
@@ -8916,16 +8936,6 @@ paths:
             type: string
             description: 'Comma-separated primary Program ids.'
             example: '1'
-        -
-          in: query
-          name: faculty_id
-          description: 'Faculty ids, narrowing the actor scope.'
-          example: '1,2'
-          required: false
-          schema:
-            type: string
-            description: 'Faculty ids, narrowing the actor scope.'
-            example: '1,2'
         -
           in: query
           name: admission_cycle_id

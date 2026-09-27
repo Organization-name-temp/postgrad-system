@@ -2225,6 +2225,7 @@ export const en = {
         unavailable: 'Readiness unavailable',
       },
       blocker: 'Blocker',
+      blockerAll: 'Required blockers (all)',
       blockers: {
         RemainingRequirements: 'Remaining curriculum requirements',
         CgpaUnavailable: 'CGPA unavailable',

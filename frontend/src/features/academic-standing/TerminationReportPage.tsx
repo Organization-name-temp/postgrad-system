@@ -1,9 +1,10 @@
-import { Alert, Button, CircularProgress, Stack, Typography } from '@mui/material'
+import { Alert, Button, Stack, Typography } from '@mui/material'
 import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useScopedTerminationCaseCountsAndDistinctStudents as useTerminationReport } from '../../shared/api/generated/endpoints'
 import { Chart } from '../../shared/ui/Chart'
 import { FilterBar } from '../../shared/ui/FilterBar'
+import { ReportLoading } from '../../shared/ui/ReportLoading'
 import { ReportDocument } from '../../shared/ui/ReportDocument'
 import {
   TERMINATION_REPORT_STATES,
@@ -31,7 +32,7 @@ export function TerminationReportPage() {
         values={collection.values}
         onChange={collection.setCriteria}
       />
-      {report.isPending && <CircularProgress aria-label={t('terminationReport.loading')} />}
+      {report.isPending && <ReportLoading label={t('terminationReport.loading')} />}
       {report.isError && (
         <Alert
           severity="error"

@@ -129,6 +129,20 @@ interface EnrollmentRecords
     public function enrollmentsForStudents(array $studentIds): array;
 
     /**
+     * @param  list<int>  $enrollmentIds  authorized candidates
+     * @return array<int, AttendanceSummary> missing Enrollments are omitted
+     */
+    public function attendanceForEnrollments(array $enrollmentIds): array;
+
+    /**
+     * Counts all accounting statuses, optionally within one Semester.
+     *
+     * @param  list<int>  $studentIds  authorized candidates
+     * @return array<int, int> includes zero for an empty roster
+     */
+    public function enrollmentCountsForStudents(array $studentIds, ?int $semesterId = null): array;
+
+    /**
      * Write the single `earned` bit onto an Enrollment — "this Attempt reached C+ and earned
      * its credit hours" (ADR-0022). The **only** writer of this column: called by Grading from
      * inside the same transaction as a Sheet's finalize, never on its own. `$earned` is

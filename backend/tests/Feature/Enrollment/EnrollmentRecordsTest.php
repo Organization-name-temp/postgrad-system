@@ -5,6 +5,8 @@ use Modules\Calendar\Internal\Models\Semester;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Enums\EnrollmentClassification;
+use Modules\Enrollment\Internal\Models\AttendanceMark;
+use Modules\Enrollment\Internal\Models\ClassSession;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
 use Modules\Enrollment\Public\EnrollmentRecords;
@@ -342,4 +344,21 @@ it('bulk resolves bounded student rosters as owner DTOs including empty and non-
         ->and($batch[$first->student_id])->toEqual(enrollmentRecords()->enrollmentsForStudent($first->student_id))
         ->and($batch[$second->student_id][0])->toBeInstanceOf(EnrollmentSummary::class)
         ->and($batch[$second->student_id][0]->countsTowardCgpa)->toBeFalse();
+});
+
+it('batches owner attendance and enrollment counts excluding cancelled sessions and preserving no data', function () {
+    $offering = erOffering(User::factory()->create()->id);
+    $audit = erEnroll($offering, CourseStatus::Audit);
+    $unmarked = erEnroll($offering);
+    $session = ClassSession::factory()->create(['course_offering_id' => $offering->id]);
+    $cancelled = ClassSession::factory()->cancelled()->on('2026-09-14')->create(['course_offering_id' => $offering->id]);
+    AttendanceMark::factory()->create(['class_session_id' => $session->id, 'enrollment_id' => $audit->id, 'present' => false]);
+    AttendanceMark::factory()->create(['class_session_id' => $cancelled->id, 'enrollment_id' => $audit->id, 'present' => true]);
+    $attendance = enrollmentRecords()->attendanceForEnrollments([$audit->id, $unmarked->id, 999999]);
+    expect($attendance[$audit->id]->recorded)->toBe(1)->and($attendance[$audit->id]->present)->toBe(0)
+        ->and($attendance[$audit->id]->percentage)->toBe(0.0)->and($attendance[$audit->id]->atRisk)->toBeTrue()
+        ->and($attendance[$unmarked->id]->percentage)->toBeNull()->and($attendance)->not->toHaveKey(999999);
+    expect(enrollmentRecords()->enrollmentCountsForStudents([$audit->student_id, $unmarked->student_id, 999999]))
+        ->toBe([$audit->student_id => 1, $unmarked->student_id => 1, 999999 => 0]);
+    expect(enrollmentRecords()->enrollmentCountsForStudents([$audit->student_id], 999999))->toBe([$audit->student_id => 0]);
 });

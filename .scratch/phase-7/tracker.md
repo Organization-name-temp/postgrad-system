@@ -151,3 +151,26 @@ Reserved until all tickets and prerequisite changes are implemented.
   **passed** after committing generated artifacts. Frontend `npm run format` passed.
 - #04 remains incomplete: attendance/enrollment aggregates and Admissions pipeline
   aggregate still required. Full package gates and final review remain pending.
+
+### Owner batch prerequisite (#04), remaining aggregates
+
+- Enrollment Public facade adds attendance DTOs and per-Student Enrollment counts,
+  with optional Semester selection. Attendance retains null for no recorded marks
+  and true zero for recorded absences; the existing calculator owns the percentage
+  and Audit at-risk threshold. Extracted the existing non-cancelled-session tally
+  so existing register/schedule reads and the new facade use one owner query.
+- Admissions Public `ApplicationPipelines` returns typed current-status counts and
+  measured per-transition conversion rates within a Cycle, optionally Program/
+  degree. Uses the same live actor scope as collections; no transitions, events or
+  notifications are created. Rates count each Application once per recorded edge,
+  divide by Applications known to have visited its source status, and are null
+  for zero denominators. Missing historical transitions are never inferred.
+- Red: absent owner methods/facade failed. Green:
+  `php artisan test --filter='ApplicationPipelineAggregateTest|EnrollmentRecordsTest|AttendanceTest|AttendanceCalculatorTest'`:
+  **53 passed, 181 assertions, 7.54s**. Covers cancelled attendance, no-data vs
+  zero, empty counts, current statuses, conversion, Cycle selection, live Dean
+  reassignment, multi-role union and denied Applicant.
+- Pint, PHPStan and deptrac passed. Together with the prior CGPA parity slice,
+  #04's executable aggregate capabilities are now present. Required full backend
+  gate and final consolidated review remain pending; no whole-ticket acceptance
+  is claimed before those verification results.

@@ -93,11 +93,11 @@ it('drills a pipeline stage into exactly its ordinary application population', f
     $this->getJson('/api/v1/applications'.$criteria)->assertOk()->assertJsonPath('meta.total', 1)->assertJsonPath('data.0.status', 'under_sa_review');
 });
 
-it('orders mixed pipeline stages by their domain values before derived pagination', function () {
+it('orders mixed pipeline stages by their domain values before derived pagination', function (array $insertionOrder) {
     $cycle = AdmissionCycle::factory()->create();
     $program = Program::factory()->create();
     $ids = [];
-    foreach ([ApplicationStatus::UnderSAReview, ApplicationStatus::Accepted, ApplicationStatus::Rejected] as $status) {
+    foreach ($insertionOrder as $status) {
         $application = Application::factory()->underReview()->create(['admission_cycle_id' => $cycle->id, 'primary_program_id' => $program->id, 'status' => $status]);
         ApplicationStatusTransition::factory()->enteredAt($status, now()->subDays(5))->create(['application_id' => $application->id]);
         $ids[$status->value] = $application->id;
@@ -107,4 +107,11 @@ it('orders mixed pipeline stages by their domain values before derived paginatio
     $this->getJson($url)->assertOk()->assertJsonPath('meta.total', 3)->assertJsonPath('data.0.id', $ids['accepted']);
     $this->getJson($url.'&page=2')->assertOk()->assertJsonPath('data.0.id', $ids['rejected']);
     $this->getJson($url.'&page=3')->assertOk()->assertJsonPath('data.0.id', $ids['under_sa_review']);
-});
+})->with([
+    'review accepted rejected' => [[ApplicationStatus::UnderSAReview, ApplicationStatus::Accepted, ApplicationStatus::Rejected]],
+    'review rejected accepted' => [[ApplicationStatus::UnderSAReview, ApplicationStatus::Rejected, ApplicationStatus::Accepted]],
+    'accepted review rejected' => [[ApplicationStatus::Accepted, ApplicationStatus::UnderSAReview, ApplicationStatus::Rejected]],
+    'accepted rejected review' => [[ApplicationStatus::Accepted, ApplicationStatus::Rejected, ApplicationStatus::UnderSAReview]],
+    'rejected accepted review' => [[ApplicationStatus::Rejected, ApplicationStatus::Accepted, ApplicationStatus::UnderSAReview]],
+    'rejected review accepted' => [[ApplicationStatus::Rejected, ApplicationStatus::UnderSAReview, ApplicationStatus::Accepted]],
+]);

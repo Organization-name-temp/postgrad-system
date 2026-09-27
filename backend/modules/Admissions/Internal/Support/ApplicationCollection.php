@@ -143,8 +143,7 @@ final readonly class ApplicationCollection
         usort($rows, function (Application $a, Application $b) use ($query): int {
             foreach ($query->sorts as $sort) {
                 $field = $sort['field'];
-                $comparison = ($field === 'age_days' ? $this->age($a) : $a->getAttribute(self::COLUMNS[$field]))
-                    <=> ($field === 'age_days' ? $this->age($b) : $b->getAttribute(self::COLUMNS[$field]));
+                $comparison = $this->sortValue($a, $field) <=> $this->sortValue($b, $field);
                 if ($comparison !== 0) {
                     return $sort['direction'] === 'asc' ? $comparison : -$comparison;
                 }
@@ -154,6 +153,15 @@ final readonly class ApplicationCollection
         });
 
         return $rows;
+    }
+
+    private function sortValue(Application $application, string $field): mixed
+    {
+        return match ($field) {
+            'age_days' => $this->age($application),
+            'status' => $application->status->value,
+            default => $application->getAttribute(self::COLUMNS[$field]),
+        };
     }
 
     private function age(Application $application): ?int

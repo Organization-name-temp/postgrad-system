@@ -1461,3 +1461,19 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   keys and zero interpolation mismatches**. Backend source audit: **10 paired
   dictionaries**, no key differences. These supplement actual rendering tests and
   browser checks; they do not substitute for translation quality/human acceptance.
+- Backend gate attempt 2: **1 failed / 1,323 passed, 8,384 assertions, 782.05s**.
+  Failure exposed enum-object comparison in mixed-status derived pagination.
+  A single focused run happened to pass; six insertion-order permutations reproduced
+  **5 RED / 1 pass**. Direct PHP probe showed both enum comparison directions
+  return 1, whereas string values are antisymmetric. Sort now explicitly reads
+  status domain values before the common comparator; focused API checks running.
+- Frontend gate attempt 2: generated drift/lint/format/typecheck and **121 files /
+  674 unit tests passed, 487.01s**. Stopped deliberately after three Standing
+  browser checks passed, before changing the live backend sorter. Full browser/
+  gate pass is not claimed. Log retained as `/tmp/phase7-frontend-gate-attempt2.log`.
+- Newly expanded existing Admissions/Enrollment/Records journeys and correction
+  dialog four-state audit are now running serially with max-failures=1 to verify
+  their live presentation seams before the required complete frontend gate.
+- Enum sort fix focused verification passed **28 tests / 291 assertions, 6.07s**
+  (all insertion permutations plus shared actor-scope collection contracts); Pint
+  passed. Repeating the required full backend gate after this concrete failure.

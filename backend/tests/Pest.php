@@ -138,6 +138,23 @@ foreach (['programs' => Program::class, 'departments' => Department::class, 'fac
 
 dataset('collection contracts', [
     ...$catalogReferenceContracts,
+    'Admission Cycle management' => ['/api/v1/admission-cycles', function (): array {
+        $first = AdmissionCycle::factory()->open()->create(['year' => 2026]);
+        AdmissionCycle::factory()->closed()->create(['year' => 2025]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id=999999', 'private_probe' => 'q=1088888888'];
+    }],
+    'Public open Admission Cycles' => ['/api/v1/admission-cycles/open', function (): array {
+        $first = AdmissionCycle::factory()->open()->create(['year' => 2026]);
+        AdmissionCycle::factory()->open()->create(['year' => 2025]);
+        $closed = AdmissionCycle::factory()->closed()->create(['year' => 2027]);
+
+        return ['actor' => null, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$closed->id, 'private_probe' => 'q=1088888888'];
+    }],
     'Dean decision worklist' => ['/api/v1/dean/decisions', function (): array {
         $program = Program::factory()->create();
         $outside = Program::factory()->create();

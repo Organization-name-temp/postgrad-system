@@ -2,18 +2,19 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   CircularProgress,
   Container,
   Link,
-  MenuItem,
   TextField,
   Typography,
 } from '@mui/material'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useListCurrentlyOpenAdmissionCycles } from '../../shared/api/generated/endpoints'
+import type { ListCurrentlyOpenAdmissionCycles200DataItem } from '../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../shared/api/errors'
 import { pickLocaleName } from '../../shared/i18n/localeName'
 import { useAuth } from '../auth/useAuth'
@@ -31,9 +32,18 @@ export function RegisterPage() {
   const { t, i18n } = useTranslation('admissions')
   const { register, isRegistering, registerError } = useAuth()
 
-  const { data, isPending, isError } = useListCurrentlyOpenAdmissionCycles()
+  const [cycleSearch, setCycleSearch] = useState('')
+  const [selectedCycle, setSelectedCycle] =
+    useState<ListCurrentlyOpenAdmissionCycles200DataItem | null>(null)
+  // Availability comes from the unfiltered total, never the current search page.
+  const { data, isPending, isError } = useListCurrentlyOpenAdmissionCycles({ per_page: 100 })
   const openCycles = data?.data ?? []
-  const multipleOpen = openCycles.length > 1
+  const openTotal = data?.meta?.total ?? openCycles.length
+  const multipleOpen = openTotal > 1
+  const choices = useListCurrentlyOpenAdmissionCycles(
+    { q: cycleSearch, per_page: 100 },
+    { query: { enabled: multipleOpen } },
+  )
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -89,7 +99,7 @@ export function RegisterPage() {
     )
   }
 
-  if (openCycles.length === 0) {
+  if (openTotal === 0) {
     return (
       <Container maxWidth="sm">
         <Box sx={{ py: 8 }}>
@@ -164,22 +174,33 @@ export function RegisterPage() {
         />
 
         {multipleOpen && (
-          <TextField
-            select
-            label={t('register.cycle')}
-            helperText={t('register.cycleHelp')}
-            value={cycleId === '' ? '' : String(cycleId)}
-            onChange={(event) => setCycleId(Number(event.target.value))}
-            fullWidth
-            required
-            margin="normal"
-          >
-            {openCycles.map((cycle) => (
-              <MenuItem key={cycle.id} value={String(cycle.id)}>
-                {pickLocaleName(cycle, i18n.language)}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Autocomplete
+            options={choices.data?.data ?? []}
+            value={selectedCycle}
+            inputValue={cycleSearch}
+            onInputChange={(_, value) => setCycleSearch(value)}
+            onChange={(_, cycle) => {
+              setSelectedCycle(cycle)
+              setCycleId(cycle?.id ?? '')
+            }}
+            getOptionLabel={(cycle) => pickLocaleName(cycle, i18n.language)}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            filterOptions={(options) => options}
+            loading={choices.isFetching}
+            loadingText={t('register.loading')}
+            noOptionsText={t('register.noMatchingCycles')}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t('register.cycle')}
+                helperText={choices.isError ? t('register.loadError') : t('register.cycleHelp')}
+                error={choices.isError}
+                fullWidth
+                required
+                margin="normal"
+              />
+            )}
+          />
         )}
 
         <Button

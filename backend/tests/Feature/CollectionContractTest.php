@@ -12,7 +12,9 @@ uses(RefreshDatabase::class);
  */
 it('preserves the shared collection contract inside the actor scope', function (string $endpoint, Closure $fixture) {
     $scenario = $fixture();
-    Sanctum::actingAs(User::query()->findOrFail($scenario['actor']));
+    if ($scenario['actor'] !== null) {
+        Sanctum::actingAs(User::query()->findOrFail($scenario['actor']));
+    }
 
     $this->getJson($endpoint.'?unknown_contract_field=1')->assertUnprocessable();
     $this->getJson($endpoint.'?'.$scenario['outside_filter'])->assertOk()->assertJsonPath('meta.total', 0)->assertJsonCount(0, 'data');

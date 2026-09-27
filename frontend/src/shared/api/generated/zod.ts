@@ -607,6 +607,20 @@ export const AdministrationCardResponse = zod.object({
  * Cycles that are active and whose window contains the current moment.
  * @summary List currently-open Admission Cycles.
  */
+export const ListCurrentlyOpenAdmissionCyclesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual Cycle name search.'),
+  "id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "intake_term": zod.string().optional().describe('Comma-separated intake terms.'),
+  "year": zod.string().optional().describe('Comma-separated intake years.'),
+  "year_min": zod.number().optional().describe('Minimum intake year.'),
+  "year_max": zod.number().optional().describe('Maximum intake year.'),
+  "is_active": zod.string().optional().describe('Active states, true or false.'),
+  "is_open": zod.string().optional().describe('Derived window states, true or false.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ListCurrentlyOpenAdmissionCyclesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -618,7 +632,19 @@ export const ListCurrentlyOpenAdmissionCyclesResponse = zod.object({
   "closes_at": zod.string().optional(),
   "is_active": zod.boolean().optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2054,6 +2080,20 @@ export const StreamADocumentResponse = zod.void()
  * list; the public registration screen uses the open-cycle lookup instead.
  * @summary List Admission Cycles.
  */
+export const ListAdmissionCyclesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual Cycle name search.'),
+  "id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "intake_term": zod.string().optional().describe('Comma-separated intake terms.'),
+  "year": zod.string().optional().describe('Comma-separated intake years.'),
+  "year_min": zod.number().optional().describe('Minimum intake year.'),
+  "year_max": zod.number().optional().describe('Maximum intake year.'),
+  "is_active": zod.string().optional().describe('Active states, true or false.'),
+  "is_open": zod.string().optional().describe('Derived window states, true or false.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ListAdmissionCyclesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2065,7 +2105,19 @@ export const ListAdmissionCyclesResponse = zod.object({
   "closes_at": zod.string().optional(),
   "is_active": zod.boolean().optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2094,6 +2146,27 @@ export const CreateAnAdmissionCycleResponse = zod.object({
   "is_open": zod.boolean().optional()
 }).optional()
 })
+
+
+/**
+ * All matching manager-readable rows, with bilingual names and localized state.
+ * @summary Export Admission Cycles.
+ */
+export const ExportAdmissionCyclesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual Cycle name search.'),
+  "id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "intake_term": zod.string().optional().describe('Comma-separated intake terms.'),
+  "year": zod.string().optional().describe('Comma-separated intake years.'),
+  "year_min": zod.number().optional().describe('Minimum intake year.'),
+  "year_max": zod.number().optional().describe('Maximum intake year.'),
+  "is_active": zod.string().optional().describe('Active states, true or false.'),
+  "is_open": zod.string().optional().describe('Derived window states, true or false.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Ignored by export.'),
+  "per_page": zod.number().optional().describe('Ignored by export.')
+})
+
+export const ExportAdmissionCyclesResponse = zod.unknown()
 
 
 /**

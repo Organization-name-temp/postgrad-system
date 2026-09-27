@@ -20,6 +20,9 @@ const srv = vi.hoisted(() => ({
   openCycles: [] as OpenCycle[],
   registerBody: undefined as unknown,
   authed: false,
+  openTotal: undefined as number | undefined,
+  searchedCycles: undefined as OpenCycle[] | undefined,
+  lookupCalls: [] as AxiosRequestConfig[],
 }))
 
 vi.mock('../../shared/api/http', () => ({
@@ -32,7 +35,13 @@ vi.mock('../../shared/api/http', () => ({
   customInstance: (config: AxiosRequestConfig) => {
     const url = config.url ?? ''
     if (url.endsWith('/admission-cycles/open')) {
-      return Promise.resolve({ data: srv.openCycles })
+      srv.lookupCalls.push(config)
+      const search = config.params?.q
+      const rows = search && srv.searchedCycles ? srv.searchedCycles : srv.openCycles
+      return Promise.resolve({
+        data: rows,
+        meta: { total: search ? rows.length : (srv.openTotal ?? rows.length) },
+      })
     }
     if (url.endsWith('/register')) {
       srv.registerBody = config.data
@@ -78,6 +87,9 @@ describe('RegisterPage', () => {
     srv.openCycles = []
     srv.registerBody = undefined
     srv.authed = false
+    srv.openTotal = undefined
+    srv.searchedCycles = undefined
+    srv.lookupCalls = []
   })
 
   it('shows an admissions-closed state when no cycle is open', async () => {
@@ -103,6 +115,43 @@ describe('RegisterPage', () => {
     renderRegister()
 
     expect(await screen.findByLabelText(/admission cycle/i)).toBeInTheDocument()
+  })
+
+  it('searches beyond the lookup page and submits the selected Cycle without treating search results as availability', async () => {
+    srv.openCycles = [{ id: 7, name_en: 'Fall 2026', name_ar: 'خريف 2026' }]
+    srv.openTotal = 102
+    srv.searchedCycles = [{ id: 207, name_en: 'Late intake', name_ar: 'دورة متأخرة' }]
+    const user = userEvent.setup({ delay: null })
+    renderRegister()
+
+    const picker = await screen.findByRole('combobox', { name: /admission cycle/i })
+    await user.type(picker, 'Late')
+    await user.click(await screen.findByRole('option', { name: 'Late intake' }))
+    expect(
+      srv.lookupCalls.some((call) => call.params?.q === 'Late' && call.params?.per_page === 100),
+    ).toBe(true)
+    await user.type(screen.getByLabelText(/full name/i), 'Sara Applicant')
+    await user.type(screen.getByLabelText(/email/i), 'sara@example.test')
+    await user.type(screen.getByLabelText(/^password/i), 'correct-horse')
+    await user.type(screen.getByLabelText(/confirm password/i), 'correct-horse')
+    await user.click(screen.getByRole('button', { name: /register and start/i }))
+    expect(await screen.findByText('Application wizard')).toBeInTheDocument()
+    expect(srv.registerBody).toMatchObject({ admission_cycle_id: 207 })
+  }, 15000)
+
+  it('keeps registration available when the Cycle search has no matches', async () => {
+    srv.openCycles = [{ id: 7, name_en: 'Fall 2026', name_ar: 'خريف 2026' }]
+    srv.openTotal = 102
+    srv.searchedCycles = []
+    const user = userEvent.setup({ delay: null })
+    renderRegister()
+    await user.type(await screen.findByRole('combobox', { name: /admission cycle/i }), 'No match')
+    expect(
+      await screen.findByText('No open Admission Cycles match this search.'),
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument()
+    expect(screen.queryByText(/admissions are currently closed/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /register and start/i })).toBeDisabled()
   })
 
   it('registers and lands the applicant in their application wizard', async () => {

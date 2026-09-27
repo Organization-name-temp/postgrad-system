@@ -323,3 +323,41 @@ assigned interviews and slot pool, advisor/interviewer/applicant pickers with
 contract/type-ahead adoption, and Dean Faculty criterion. Then the Pipeline Report
 and print prerequisite unlock Phase 7 academic Reports. All seven Phase 7 ticket
 acceptance, full package gates and consolidated review remain outstanding.
+
+### Admissions/Catalog prerequisite (#06), Admission Cycles
+
+- Management and public currently-open lookup now always use the collection
+  envelope, stable multi-sort and normalized bilingual name search. Management
+  defaults to 25, public reference lookup to 100, with the shared hard cap. Year/
+  term/active/window criteria narrow selection; derived `is_open` filtering reuses
+  Admissions' existing `currentlyOpen` scope rather than a stored state.
+- Public lookup applies the current-open base before all criteria. Closed/future
+  Cycle ids and `is_open=false` return empty matches; the public export sibling is
+  absent (404). Both endpoints added to the shared dataset, whose actor fixture now
+  explicitly supports unauthenticated public collection checks.
+- Added authenticated `/admission-cycles/export` before numeric detail. Independent
+  canonical readable projection includes string Cycle ids, both names, ISO window
+  timestamps and localized term/active/open labels. All filtered rows export,
+  regardless of page size, with RTL and audit criteria/count verified in workbook.
+- Red backend tests demonstrated ignored query/paging, missing public metadata and
+  absent export route. Green focused run: **38 passed, 249 assertions, 7.45s**,
+  including original CRUD/authorization/open-window and registration behavior plus
+  all shared contract rows. Pint, PHPStan and deptrac passed.
+- Management UI has URL filters/paging and generated authenticated blob export;
+  red absent-control tests became green. Public registration uses a server-backed
+  type-ahead with a 100-row request. Unfiltered metadata controls availability;
+  filtered matches never silently auto-select a lone result or close admissions.
+- Registration red regression used 102 open Cycles with only one on the lookup page;
+  green tests select a searched Cycle outside that page and submit its opaque id.
+  Empty searches keep the form available with a disabled submit until selection.
+  **8 focused frontend tests passed, 13.04s** across registration and management.
+  Typecheck, lint and full format check passed. OpenAPI/hooks/Zod regenerated.
+- Final serial EN/AR collection + admissions headline browser run, post-commit API
+  drift checks and whole #06 acceptance remain pending; full gates/review reserved.
+
+Cycle serial browser verification: **3 passed, 1.9m** — complete admissions headline
+and EN/AR management bookmark reload, successful authenticated XLSX downloads and
+serious/critical axe checks. No live Cycle windows or named personas modified by
+the new collection checks. Workbook artifacts captured in the local Playwright
+report. The type-ahead's beyond-page and empty-search behavior is proven by focused
+RTL tests; the browser headline exercises the preserved single-open-Cycle path.

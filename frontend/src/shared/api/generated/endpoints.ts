@@ -682,6 +682,53 @@ export type AdministrationCard403 = {
   message?: string;
 };
 
+export type ListCurrentlyOpenAdmissionCyclesParams = {
+/**
+ * Normalized bilingual Cycle name search.
+ */
+q?: string;
+/**
+ * Comma-separated Cycle ids.
+ */
+id?: string;
+/**
+ * Comma-separated intake terms.
+ */
+intake_term?: string;
+/**
+ * Comma-separated intake years.
+ */
+year?: string;
+/**
+ * Minimum intake year.
+ */
+year_min?: number;
+/**
+ * Maximum intake year.
+ */
+year_max?: number;
+/**
+ * Active states, true or false.
+ */
+is_active?: string;
+/**
+ * Derived window states, true or false.
+ */
+is_open?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type ListCurrentlyOpenAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -694,8 +741,26 @@ export type ListCurrentlyOpenAdmissionCycles200DataItem = {
   is_open?: boolean;
 };
 
+export type ListCurrentlyOpenAdmissionCycles200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ListCurrentlyOpenAdmissionCycles200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type ListCurrentlyOpenAdmissionCycles200 = {
   data?: ListCurrentlyOpenAdmissionCycles200DataItem[];
+  links?: ListCurrentlyOpenAdmissionCycles200Links;
+  meta?: ListCurrentlyOpenAdmissionCycles200Meta;
 };
 
 export type RegisterAndStartAnApplicationBody = {
@@ -2500,6 +2565,53 @@ export type StreamADocument403 = {
   message?: string;
 };
 
+export type ListAdmissionCyclesParams = {
+/**
+ * Normalized bilingual Cycle name search.
+ */
+q?: string;
+/**
+ * Comma-separated Cycle ids.
+ */
+id?: string;
+/**
+ * Comma-separated intake terms.
+ */
+intake_term?: string;
+/**
+ * Comma-separated intake years.
+ */
+year?: string;
+/**
+ * Minimum intake year.
+ */
+year_min?: number;
+/**
+ * Maximum intake year.
+ */
+year_max?: number;
+/**
+ * Active states, true or false.
+ */
+is_active?: string;
+/**
+ * Derived window states, true or false.
+ */
+is_open?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type ListAdmissionCycles200DataItem = {
   id?: number;
   intake_term?: string;
@@ -2512,8 +2624,26 @@ export type ListAdmissionCycles200DataItem = {
   is_open?: boolean;
 };
 
+export type ListAdmissionCycles200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ListAdmissionCycles200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type ListAdmissionCycles200 = {
   data?: ListAdmissionCycles200DataItem[];
+  links?: ListAdmissionCycles200Links;
+  meta?: ListAdmissionCycles200Meta;
 };
 
 export type CreateAnAdmissionCycleBody = {
@@ -2554,6 +2684,57 @@ export type CreateAnAdmissionCycle422Errors = {
 export type CreateAnAdmissionCycle422 = {
   message?: string;
   errors?: CreateAnAdmissionCycle422Errors;
+};
+
+export type ExportAdmissionCyclesParams = {
+/**
+ * Normalized bilingual Cycle name search.
+ */
+q?: string;
+/**
+ * Comma-separated Cycle ids.
+ */
+id?: string;
+/**
+ * Comma-separated intake terms.
+ */
+intake_term?: string;
+/**
+ * Comma-separated intake years.
+ */
+year?: string;
+/**
+ * Minimum intake year.
+ */
+year_min?: number;
+/**
+ * Maximum intake year.
+ */
+year_max?: number;
+/**
+ * Active states, true or false.
+ */
+is_active?: string;
+/**
+ * Derived window states, true or false.
+ */
+is_open?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Ignored by export.
+ */
+page?: number;
+/**
+ * Ignored by export.
+ */
+per_page?: number;
+};
+
+export type ExportAdmissionCycles403 = {
+  message?: string;
 };
 
 export type ShowAnAdmissionCycle200Data = {
@@ -15073,13 +15254,14 @@ export function useAdministrationCard<TData = Awaited<ReturnType<typeof administ
  * @summary List currently-open Admission Cycles.
  */
 export const listCurrentlyOpenAdmissionCycles = (
-
+    params?: ListCurrentlyOpenAdmissionCyclesParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<ListCurrentlyOpenAdmissionCycles200>(
-      {url: `/api/v1/admission-cycles/open`, method: 'GET', signal
+      {url: `/api/v1/admission-cycles/open`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -15087,23 +15269,23 @@ export const listCurrentlyOpenAdmissionCycles = (
 
 
 
-export const getListCurrentlyOpenAdmissionCyclesQueryKey = () => {
+export const getListCurrentlyOpenAdmissionCyclesQueryKey = (params?: ListCurrentlyOpenAdmissionCyclesParams,) => {
     return [
-    `/api/v1/admission-cycles/open`
+    `/api/v1/admission-cycles/open`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListCurrentlyOpenAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+export const getListCurrentlyOpenAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(params?: ListCurrentlyOpenAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListCurrentlyOpenAdmissionCyclesQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListCurrentlyOpenAdmissionCyclesQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>> = ({ signal }) => listCurrentlyOpenAdmissionCycles(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>> = ({ signal }) => listCurrentlyOpenAdmissionCycles(params, signal);
 
 
 
@@ -15117,7 +15299,7 @@ export type ListCurrentlyOpenAdmissionCyclesQueryError = unknown
 
 
 export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
+ params: undefined |  ListCurrentlyOpenAdmissionCyclesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>,
           TError,
@@ -15127,7 +15309,7 @@ export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<t
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
+ params?: ListCurrentlyOpenAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>,
           TError,
@@ -15137,7 +15319,7 @@ export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<t
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+ params?: ListCurrentlyOpenAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -15145,11 +15327,11 @@ export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<t
  */
 
 export function useListCurrentlyOpenAdmissionCycles<TData = Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
+ params?: ListCurrentlyOpenAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listCurrentlyOpenAdmissionCycles>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListCurrentlyOpenAdmissionCyclesQueryOptions(options)
+  const queryOptions = getListCurrentlyOpenAdmissionCyclesQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -18738,13 +18920,14 @@ export function useStreamADocument<TData = Awaited<ReturnType<typeof streamADocu
  * @summary List Admission Cycles.
  */
 export const listAdmissionCycles = (
-
+    params?: ListAdmissionCyclesParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<ListAdmissionCycles200>(
-      {url: `/api/v1/admission-cycles`, method: 'GET', signal
+      {url: `/api/v1/admission-cycles`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -18752,23 +18935,23 @@ export const listAdmissionCycles = (
 
 
 
-export const getListAdmissionCyclesQueryKey = () => {
+export const getListAdmissionCyclesQueryKey = (params?: ListAdmissionCyclesParams,) => {
     return [
-    `/api/v1/admission-cycles`
+    `/api/v1/admission-cycles`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+export const getListAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(params?: ListAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListAdmissionCyclesQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getListAdmissionCyclesQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdmissionCycles>>> = ({ signal }) => listAdmissionCycles(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdmissionCycles>>> = ({ signal }) => listAdmissionCycles(params, signal);
 
 
 
@@ -18782,7 +18965,7 @@ export type ListAdmissionCyclesQueryError = unknown
 
 
 export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
+ params: undefined |  ListAdmissionCyclesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listAdmissionCycles>>,
           TError,
@@ -18792,7 +18975,7 @@ export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdm
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
+ params?: ListAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listAdmissionCycles>>,
           TError,
@@ -18802,7 +18985,7 @@ export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdm
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+ params?: ListAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -18810,11 +18993,11 @@ export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdm
  */
 
 export function useListAdmissionCycles<TData = Awaited<ReturnType<typeof listAdmissionCycles>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
+ params?: ListAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listAdmissionCycles>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListAdmissionCyclesQueryOptions(options)
+  const queryOptions = getListAdmissionCyclesQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -18891,6 +19074,102 @@ export const useCreateAnAdmissionCycle = <TError = CreateAnAdmissionCycle422,
       > => {
       return useMutation(getCreateAnAdmissionCycleMutationOptions(options), queryClient);
     }
+
+/**
+ * All matching manager-readable rows, with bilingual names and localized state.
+ * @summary Export Admission Cycles.
+ */
+export const exportAdmissionCycles = (
+    params?: ExportAdmissionCyclesParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/admission-cycles/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportAdmissionCyclesQueryKey = (params?: ExportAdmissionCyclesParams,) => {
+    return [
+    `/api/v1/admission-cycles/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportAdmissionCyclesQueryOptions = <TData = Awaited<ReturnType<typeof exportAdmissionCycles>>, TError = ExportAdmissionCycles403>(params?: ExportAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdmissionCycles>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportAdmissionCyclesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAdmissionCycles>>> = ({ signal }) => exportAdmissionCycles(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportAdmissionCycles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportAdmissionCyclesQueryResult = NonNullable<Awaited<ReturnType<typeof exportAdmissionCycles>>>
+export type ExportAdmissionCyclesQueryError = ExportAdmissionCycles403
+
+
+export function useExportAdmissionCycles<TData = Awaited<ReturnType<typeof exportAdmissionCycles>>, TError = ExportAdmissionCycles403>(
+ params: undefined |  ExportAdmissionCyclesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdmissionCycles>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdmissionCycles<TData = Awaited<ReturnType<typeof exportAdmissionCycles>>, TError = ExportAdmissionCycles403>(
+ params?: ExportAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdmissionCycles>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAdmissionCycles>>,
+          TError,
+          Awaited<ReturnType<typeof exportAdmissionCycles>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAdmissionCycles<TData = Awaited<ReturnType<typeof exportAdmissionCycles>>, TError = ExportAdmissionCycles403>(
+ params?: ExportAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Admission Cycles.
+ */
+
+export function useExportAdmissionCycles<TData = Awaited<ReturnType<typeof exportAdmissionCycles>>, TError = ExportAdmissionCycles403>(
+ params?: ExportAdmissionCyclesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAdmissionCycles>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportAdmissionCyclesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * @summary Show an Admission Cycle.

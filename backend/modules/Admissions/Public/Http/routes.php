@@ -193,6 +193,7 @@ Route::middleware('auth:sanctum')
 
 Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
     Route::get('/admission-cycles', [AdmissionCycleController::class, 'index']);
+    Route::get('/admission-cycles/export', [AdmissionCycleController::class, 'export']);
     Route::post('/admission-cycles', [AdmissionCycleController::class, 'store']);
     Route::get('/admission-cycles/{admission_cycle}', [AdmissionCycleController::class, 'show'])->whereNumber('admission_cycle');
     Route::patch('/admission-cycles/{admission_cycle}', [AdmissionCycleController::class, 'update'])->whereNumber('admission_cycle');

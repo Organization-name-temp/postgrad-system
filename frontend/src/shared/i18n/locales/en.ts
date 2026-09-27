@@ -629,6 +629,7 @@ export const en = {
       },
     },
     register: {
+      noMatchingCycles: 'No open Admission Cycles match this search.',
       title: 'Start your application',
       intro:
         'Create your account to apply to E-JUST. Registering starts your application straight away — there is no separate sign-up.',
@@ -1147,6 +1148,21 @@ export const en = {
       },
     },
     cycles: {
+      filters: {
+        search: 'Search Admission Cycles',
+        minYear: 'Minimum intake year',
+        maxYear: 'Maximum intake year',
+        all: 'All',
+        activeState: 'Active state',
+        active: 'Active',
+        windowState: 'Open window',
+        notOpen: 'Not open',
+        sort: 'Sort by',
+        newest: 'Newest intake first',
+        oldest: 'Oldest intake first',
+        nameEnglish: 'English name',
+        nameArabic: 'Arabic name',
+      },
       title: 'Admission cycles',
       new: 'New cycle',
       edit: 'Edit cycle',

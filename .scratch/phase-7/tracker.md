@@ -1073,3 +1073,28 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   single consolidated review remain pending across all seven tickets.
 - Final regenerated client has unavailable string-array and nullable academic types;
   frontend typecheck passed. Post-commit API drift checks follow this slice.
+
+### Initial owner Academic Standing Report page
+
+- Backend/frontend post-commit API drift checks passed for the Standing List/export
+  slice. The first frontend tracer failed on the absent Report page. AcademicStanding
+  now renders all five owner counts through the shared horizontal Chart and its
+  identical accessible table, within the executable shared ReportDocument.
+- Faculty/Department/Program criteria search their owner collections in bounded
+  pages and resolve bookmarked opaque IDs separately; labels switch language without
+  losing criteria. Degree, lifecycle, Standing and bilingual name/University-ID
+  criteria use the URL. Print criteria describe effective selections, including
+  default Active lifecycle. Only nonzero bands link to a narrower Student List,
+  preventing a zero band excluded by an existing Standing filter from widening it.
+- Focused EN/AR tests **2 passed, 13.06s**, covering named selected references beyond
+  the first reference page, exact chart/table count and URL, language switch,
+  lifecycle selection/Back and actual keyboard Enter. The extended history test
+  initially tried to focus a table link removed during loading; reacquiring the
+  current table after Back corrected the harness. No product behavior was changed
+  to accommodate stale DOM references.
+- Frontend typecheck, lint and full format passed on the page implementation;
+  focused ESLint/Prettier rechecks follow the final history harness edit. This page
+  is not yet composed into the shell: the ordinary Student List and matching
+  protected routes/navigation are next, followed by native browser/second Report
+  print verification. #01 and all subsequent ticket acceptance remain pending.
+- Final focused ESLint/Prettier rechecks passed before the page commit.

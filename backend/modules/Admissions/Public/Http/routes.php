@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicantInterviewController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
+use Modules\Admissions\Internal\Http\Controllers\ApplicationPipelineReportController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
 use Modules\Admissions\Internal\Http\Controllers\DashboardCardController;
 use Modules\Admissions\Internal\Http\Controllers\DeanReviewController;
@@ -144,6 +145,7 @@ Route::middleware('auth:sanctum')
 // Reviewer screening (ticket 07). The Student Affairs queue, application detail, and
 // the screen action, all gated on `application.screen` (SA / Dean).
 Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
+    Route::get('/admissions/reports/application-pipeline', ApplicationPipelineReportController::class);
     Route::get('/applications', [ApplicationScreeningController::class, 'index']);
     Route::get('/applications/export', [ApplicationScreeningController::class, 'export']);
     Route::get('/applications/{application}', [ApplicationScreeningController::class, 'show'])->whereNumber('application');

@@ -7680,11 +7680,211 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/admissions/reports/application-pipeline:
+    get:
+      summary: 'Application Pipeline Report.'
+      operationId: applicationPipelineReport
+      description: "Live actor-scoped counts and measured conversions from Admissions' owner\naggregate. Reads never reconcile or mutate Applications. Counts include\nzero stages; a conversion with no eligible Applications has a null rate.\nRequires application.screen. Paging never limits a Report summary."
+      parameters:
+        -
+          in: query
+          name: admission_cycle_id
+          description: 'Selected Admission Cycle.'
+          example: 1
+          required: true
+          schema:
+            type: integer
+            description: 'Selected Admission Cycle.'
+            example: 1
+        -
+          in: query
+          name: program_id
+          description: 'Optional primary Program.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Optional primary Program.'
+            example: 1
+            nullable: true
+        -
+          in: query
+          name: degree_level
+          description: 'Optional MSc or PhD degree.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'Optional MSc or PhD degree.'
+            example: MSc
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Ignored by the summary.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Ignored by the summary.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Ignored by the summary.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Ignored by the summary.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    total: 2
+                    statuses:
+                      draft: 0
+                      submitted: 0
+                      email_verified: 0
+                      under_sa_review: 1
+                      sa_approved: 0
+                      returned_for_revision: 0
+                      under_dean_review: 1
+                      interview_scheduled: 0
+                      interview_completed: 0
+                      accepted: 0
+                      conditionally_accepted: 0
+                      waitlisted: 0
+                      rejected: 0
+                    conversions:
+                      -
+                        from_status: under_sa_review
+                        to_status: sa_approved
+                        eligible: 2
+                        converted: 1
+                        rate: 50.0
+                  meta:
+                    admission_cycle_id: 1
+                    program_id: null
+                    degree_level: null
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 2
+                      statuses:
+                        type: object
+                        properties:
+                          draft:
+                            type: integer
+                            example: 0
+                          submitted:
+                            type: integer
+                            example: 0
+                          email_verified:
+                            type: integer
+                            example: 0
+                          under_sa_review:
+                            type: integer
+                            example: 1
+                          sa_approved:
+                            type: integer
+                            example: 0
+                          returned_for_revision:
+                            type: integer
+                            example: 0
+                          under_dean_review:
+                            type: integer
+                            example: 1
+                          interview_scheduled:
+                            type: integer
+                            example: 0
+                          interview_completed:
+                            type: integer
+                            example: 0
+                          accepted:
+                            type: integer
+                            example: 0
+                          conditionally_accepted:
+                            type: integer
+                            example: 0
+                          waitlisted:
+                            type: integer
+                            example: 0
+                          rejected:
+                            type: integer
+                            example: 0
+                      conversions:
+                        type: array
+                        example:
+                          - from_status: under_sa_review
+                            to_status: sa_approved
+                            eligible: 2
+                            converted: 1
+                            rate: 50
+                        items:
+                          type: object
+                          properties:
+                            from_status:
+                              type: string
+                              example: under_sa_review
+                            to_status:
+                              type: string
+                              example: sa_approved
+                            eligible:
+                              type: integer
+                              example: 2
+                            converted:
+                              type: integer
+                              example: 1
+                            rate:
+                              type: number
+                              example: 50.0
+                  meta:
+                    type: object
+                    properties:
+                      admission_cycle_id:
+                        type: integer
+                        example: 1
+                      program_id:
+                        type: integer
+                        example: null
+                        nullable: true
+                      degree_level:
+                        type: string
+                        example: null
+                        nullable: true
+                    required:
+                      - program_id
+                      - degree_level
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
   /api/v1/applications:
     get:
       summary: 'Screening queue.'
       operationId: screeningQueue
-      description: "The applications awaiting Student Affairs screening (`under_sa_review`),\noldest-first, each with the applicant's identity, chosen primary Program, and a\n**derived age** — whole days waited since entering review, computed from the\ntimeline, never stored. Gated on `application.screen`."
+      description: "Defaults to Applications awaiting Student Affairs screening (`under_sa_review`).\nAn explicit status selection supports Pipeline drill-through across stages,\nwithin the same actor scope. Oldest-first, each with identity, primary Program, and a\n**derived age** — whole days waited since entering review, computed from the\ntimeline, never stored. Gated on `application.screen`."
       parameters:
         -
           in: query
@@ -7699,13 +7899,13 @@ paths:
         -
           in: query
           name: status
-          description: 'Comma-separated statuses within the queue.'
-          example: under_sa_review
+          description: 'Comma-separated Application statuses; defaults to under_sa_review.'
+          example: accepted
           required: false
           schema:
             type: string
-            description: 'Comma-separated statuses within the queue.'
-            example: under_sa_review
+            description: 'Comma-separated Application statuses; defaults to under_sa_review.'
+            example: accepted
         -
           in: query
           name: program_id

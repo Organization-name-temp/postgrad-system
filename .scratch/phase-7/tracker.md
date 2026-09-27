@@ -857,3 +857,30 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   does not deliver prerequisite #08. Its owner API, exact all-status drill-through,
   Analytics composition and subsequent print work remain required before Phase 7
   Report delivery; all seven ticket acceptance/final gates/review remain pending.
+
+### Pipeline owner HTTP and ordinary stage drill-through
+
+- Catalog parent-reference post-commit backend/frontend API drift checks passed.
+- The Pipeline HTTP tracer first failed with 404. Admissions now exposes its
+  existing owner aggregate through an `application.screen`-gated Report endpoint.
+  Counts include all zero stages and conversion rates retain null denominators.
+  Scope follows live Dean assignments and the Student Affairs union; parameters
+  narrow that scope and do not cap the aggregate by pagination. Unknown criteria
+  are rejected, and the payload contains domain values rather than display copy.
+- The next HTTP tracer exposed accepted-stage drill-through returning zero rows.
+  Explicit status selection now reaches every Application stage in the ordinary
+  actor-scoped list and its canonical export. With no status selection, the
+  default remains Under SA Review. Workbook read-back verifies the exact selected
+  ID. Mixed-stage derived filtering and stable pagination also passed; no sorting
+  implementation change was needed after verification.
+- Focused backend **29 tests / 212 assertions passed, 6.42s**; Pint, PHPStan and
+  deptrac passed. OpenAPI and Orval regenerated. Scribe's inferred GET body was
+  removed by validating query input explicitly and marking that validation with
+  Scribe's query-parameter annotation. The first generated client failed typecheck
+  on its inferred unused body argument; regeneration removed that argument.
+  Final backend focused **7 tests / 80 assertions passed, 3.93s** and PHPStan/Pint
+  rechecks passed. Frontend generated-client typecheck passed.
+- Prerequisite #08 remains incomplete: Analytics composition, the Report parameter
+  bar/chart/table and EN/AR browser drill-through are still required. Print #15,
+  all seven Phase 7 acceptance, full gates and consolidated final review remain
+  pending. No final gate or review has been claimed.

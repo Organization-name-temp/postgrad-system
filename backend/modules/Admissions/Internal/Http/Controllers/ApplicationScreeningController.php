@@ -45,13 +45,14 @@ class ApplicationScreeningController
     /**
      * Screening queue.
      *
-     * The applications awaiting Student Affairs screening (`under_sa_review`),
-     * oldest-first, each with the applicant's identity, chosen primary Program, and a
+     * Defaults to Applications awaiting Student Affairs screening (`under_sa_review`).
+     * An explicit status selection supports Pipeline drill-through across stages,
+     * within the same actor scope. Oldest-first, each with identity, primary Program, and a
      * **derived age** — whole days waited since entering review, computed from the
      * timeline, never stored. Gated on `application.screen`.
      *
      * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
-     * @queryParam status string Comma-separated statuses within the queue. Example: under_sa_review
+     * @queryParam status string Comma-separated Application statuses; defaults to under_sa_review. Example: accepted
      * @queryParam program_id string Program ids. Example: 1,2
      * @queryParam faculty_id string Faculty ids, narrowing the actor scope. Example: 1,2
      * @queryParam admission_cycle_id string Cycle ids. Example: 1
@@ -68,7 +69,7 @@ class ApplicationScreeningController
     #[ResponseField('data.age_days', 'integer', nullable: true)]
     public function index(Request $request, ProgramCatalog $catalog, ApplicationCollection $collection): AnonymousResourceCollection
     {
-        $applications = $collection->page($request, $collection->query($request), [ApplicationStatus::UnderSAReview]);
+        $applications = $collection->page($request, $collection->query($request), $this->selectedStages($request));
 
         // Resolve every queued application's primary Program in one facade read
         // (ADR-0012) and stash it per row, so rendering the queue is a single Catalog
@@ -101,7 +102,13 @@ class ApplicationScreeningController
      */
     public function export(Request $request, ApplicationExport $export): BinaryFileResponse
     {
-        return $export->download($request, [ApplicationStatus::UnderSAReview]);
+        return $export->download($request, $this->selectedStages($request));
+    }
+
+    /** @return list<ApplicationStatus> */
+    private function selectedStages(Request $request): array
+    {
+        return $request->filled('status') ? ApplicationStatus::cases() : [ApplicationStatus::UnderSAReview];
     }
 
     /**

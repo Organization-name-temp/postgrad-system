@@ -1790,15 +1790,65 @@ export const StatusTimelineResponse = zod.object({
 
 
 /**
- * The applications awaiting Student Affairs screening (`under_sa_review`),
- * oldest-first, each with the applicant's identity, chosen primary Program, and a
+ * Live actor-scoped counts and measured conversions from Admissions' owner
+ * aggregate. Reads never reconcile or mutate Applications. Counts include
+ * zero stages; a conversion with no eligible Applications has a null rate.
+ * Requires application.screen. Paging never limits a Report summary.
+ * @summary Application Pipeline Report.
+ */
+export const ApplicationPipelineReportQueryParams = zod.object({
+  "admission_cycle_id": zod.number().describe('Selected Admission Cycle.'),
+  "program_id": zod.number().nullish().describe('Optional primary Program.'),
+  "degree_level": zod.string().nullish().describe('Optional MSc or PhD degree.'),
+  "page": zod.number().optional().describe('Ignored by the summary.'),
+  "per_page": zod.number().optional().describe('Ignored by the summary.')
+})
+
+export const ApplicationPipelineReportResponse = zod.object({
+  "data": zod.object({
+  "total": zod.number().optional(),
+  "statuses": zod.object({
+  "draft": zod.number().optional(),
+  "submitted": zod.number().optional(),
+  "email_verified": zod.number().optional(),
+  "under_sa_review": zod.number().optional(),
+  "sa_approved": zod.number().optional(),
+  "returned_for_revision": zod.number().optional(),
+  "under_dean_review": zod.number().optional(),
+  "interview_scheduled": zod.number().optional(),
+  "interview_completed": zod.number().optional(),
+  "accepted": zod.number().optional(),
+  "conditionally_accepted": zod.number().optional(),
+  "waitlisted": zod.number().optional(),
+  "rejected": zod.number().optional()
+}).optional(),
+  "conversions": zod.array(zod.object({
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "eligible": zod.number().optional(),
+  "converted": zod.number().optional(),
+  "rate": zod.number().optional()
+})).optional()
+}).optional(),
+  "meta": zod.object({
+  "admission_cycle_id": zod.number().optional(),
+  "program_id": zod.number().nullable(),
+  "degree_level": zod.string().nullable()
+}).optional()
+})
+
+
+/**
+ * Defaults to Applications awaiting Student Affairs screening (`under_sa_review`).
+ * An explicit status selection supports Pipeline drill-through across stages,
+ * within the same actor scope. Oldest-first, each with identity, primary Program, and a
  * **derived age** — whole days waited since entering review, computed from the
  * timeline, never stored. Gated on `application.screen`.
  * @summary Screening queue.
  */
 export const ScreeningQueueQueryParams = zod.object({
   "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
-  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "status": zod.string().optional().describe('Comma-separated Application statuses; defaults to under_sa_review.'),
   "program_id": zod.string().optional().describe('Program ids.'),
   "faculty_id": zod.string().optional().describe('Faculty ids, narrowing the actor scope.'),
   "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),

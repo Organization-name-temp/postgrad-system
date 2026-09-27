@@ -2497,13 +2497,85 @@ export type StatusTimeline403 = {
   message?: string;
 };
 
+export type ApplicationPipelineReportParams = {
+/**
+ * Selected Admission Cycle.
+ */
+admission_cycle_id: number;
+/**
+ * Optional primary Program.
+ * @nullable
+ */
+program_id?: number | null;
+/**
+ * Optional MSc or PhD degree.
+ * @nullable
+ */
+degree_level?: string | null;
+/**
+ * Ignored by the summary.
+ */
+page?: number;
+/**
+ * Ignored by the summary.
+ */
+per_page?: number;
+};
+
+export type ApplicationPipelineReport200DataStatuses = {
+  draft?: number;
+  submitted?: number;
+  email_verified?: number;
+  under_sa_review?: number;
+  sa_approved?: number;
+  returned_for_revision?: number;
+  under_dean_review?: number;
+  interview_scheduled?: number;
+  interview_completed?: number;
+  accepted?: number;
+  conditionally_accepted?: number;
+  waitlisted?: number;
+  rejected?: number;
+};
+
+export type ApplicationPipelineReport200DataConversionsItem = {
+  from_status?: string;
+  to_status?: string;
+  eligible?: number;
+  converted?: number;
+  rate?: number;
+};
+
+export type ApplicationPipelineReport200Data = {
+  total?: number;
+  statuses?: ApplicationPipelineReport200DataStatuses;
+  conversions?: ApplicationPipelineReport200DataConversionsItem[];
+};
+
+export type ApplicationPipelineReport200Meta = {
+  admission_cycle_id?: number;
+  /** @nullable */
+  program_id: number | null;
+  /** @nullable */
+  degree_level: string | null;
+};
+
+export type ApplicationPipelineReport200 = {
+  data?: ApplicationPipelineReport200Data;
+  meta?: ApplicationPipelineReport200Meta;
+};
+
+export type ApplicationPipelineReport403 = {
+  message?: string;
+};
+
 export type ScreeningQueueParams = {
 /**
  * Normalized bilingual name or identifier search.
  */
 q?: string;
 /**
- * Comma-separated statuses within the queue.
+ * Comma-separated Application statuses; defaults to under_sa_review.
  */
 status?: string;
 /**
@@ -18724,8 +18796,107 @@ export function useStatusTimeline<TData = Awaited<ReturnType<typeof statusTimeli
 
 
 /**
- * The applications awaiting Student Affairs screening (`under_sa_review`),
- * oldest-first, each with the applicant's identity, chosen primary Program, and a
+ * Live actor-scoped counts and measured conversions from Admissions' owner
+ * aggregate. Reads never reconcile or mutate Applications. Counts include
+ * zero stages; a conversion with no eligible Applications has a null rate.
+ * Requires application.screen. Paging never limits a Report summary.
+ * @summary Application Pipeline Report.
+ */
+export const applicationPipelineReport = (
+    params: ApplicationPipelineReportParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ApplicationPipelineReport200>(
+      {url: `/api/v1/admissions/reports/application-pipeline`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getApplicationPipelineReportQueryKey = (params?: ApplicationPipelineReportParams,) => {
+    return [
+    `/api/v1/admissions/reports/application-pipeline`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getApplicationPipelineReportQueryOptions = <TData = Awaited<ReturnType<typeof applicationPipelineReport>>, TError = ApplicationPipelineReport403>(params: ApplicationPipelineReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationPipelineReport>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getApplicationPipelineReportQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof applicationPipelineReport>>> = ({ signal }) => applicationPipelineReport(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof applicationPipelineReport>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ApplicationPipelineReportQueryResult = NonNullable<Awaited<ReturnType<typeof applicationPipelineReport>>>
+export type ApplicationPipelineReportQueryError = ApplicationPipelineReport403
+
+
+export function useApplicationPipelineReport<TData = Awaited<ReturnType<typeof applicationPipelineReport>>, TError = ApplicationPipelineReport403>(
+ params: ApplicationPipelineReportParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationPipelineReport>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof applicationPipelineReport>>,
+          TError,
+          Awaited<ReturnType<typeof applicationPipelineReport>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useApplicationPipelineReport<TData = Awaited<ReturnType<typeof applicationPipelineReport>>, TError = ApplicationPipelineReport403>(
+ params: ApplicationPipelineReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationPipelineReport>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof applicationPipelineReport>>,
+          TError,
+          Awaited<ReturnType<typeof applicationPipelineReport>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useApplicationPipelineReport<TData = Awaited<ReturnType<typeof applicationPipelineReport>>, TError = ApplicationPipelineReport403>(
+ params: ApplicationPipelineReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationPipelineReport>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Application Pipeline Report.
+ */
+
+export function useApplicationPipelineReport<TData = Awaited<ReturnType<typeof applicationPipelineReport>>, TError = ApplicationPipelineReport403>(
+ params: ApplicationPipelineReportParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationPipelineReport>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getApplicationPipelineReportQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Defaults to Applications awaiting Student Affairs screening (`under_sa_review`).
+ * An explicit status selection supports Pipeline drill-through across stages,
+ * within the same actor scope. Oldest-first, each with identity, primary Program, and a
  * **derived age** — whole days waited since entering review, computed from the
  * timeline, never stored. Gated on `application.screen`.
  * @summary Screening queue.

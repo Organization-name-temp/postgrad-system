@@ -1591,3 +1591,19 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   EN/AR, light/dark, 390/1280px, required-reason feedback, keyboard Cancel and
   no capacity-decision POST passed. This proves UI behavior with a supplied read
   fixture; separate Pest tests prove real scope and workflow transitions.
+- Frontend gate attempt 6: regenerated API, lint, format, typecheck and **121
+  unit files / 676 tests** passed. Its browser step attached to an unrelated
+  service already bound on 5173 (`complaint-frontend`, “Complaint Hub”) through
+  Playwright's reuse-existing-server setting. The first two PRS Standing tests
+  timed out waiting for `/me` on that foreign app; this is an origin collision,
+  not an academic assertion. Stopped (exit 143), so **no complete gate pass**.
+  The unrelated service was not stopped or modified. Log retained as
+  `frontend-gate-attempt6.log`.
+- Test infrastructure now accepts `PLAYWRIGHT_WEB_PORT` as well as the existing
+  API-port override and declines server reuse when either override is explicit.
+  The selected Vite server uses its strict port and shares the API target. With
+  `PLAYWRIGHT_WEB_PORT=5177`, `PLAYWRIGHT_API_PORT=18001` and stateful-cookie
+  domain including `localhost:5177`, all **four Standing role/language browser
+  journeys passed in 1.5m** on independent PRS servers; both ports were free
+  again at completion. Static formatting of the config passed. Next full gate
+  uses this isolated origin from a fresh fixture.

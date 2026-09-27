@@ -10,7 +10,11 @@ Detailed chronological evidence and prerequisite dispositions:
 Start PostgreSQL with `docker compose up -d`. From `backend/`, prepare the fictional
 fixture with `php artisan migrate:fresh --seed --force`; do not reseed during a
 browser suite. Serve Laravel and Vite normally, or let Playwright manage their
-configured ports. All seeded accounts below use password `password`.
+configured ports. If another app owns 5173, run the frontend gate with
+`PLAYWRIGHT_WEB_PORT=5177 PLAYWRIGHT_API_PORT=18001` and a
+`SANCTUM_STATEFUL_DOMAINS` value containing `localhost:5177`. The test config
+requires the selected servers to start on those exact ports, so it cannot reuse
+a foreign app. All seeded accounts below use password `password`.
 
 1. Sign in as Advisor `r03@ejust.test`. Open Analytics → Academic Standing.
    Search `Phase 7 report`; the isolated owner-derived cohort contains three

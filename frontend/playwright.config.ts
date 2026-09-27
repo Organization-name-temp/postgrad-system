@@ -2,9 +2,11 @@ import { defineConfig, devices } from '@playwright/test'
 
 const apiPort = process.env.PLAYWRIGHT_API_PORT ?? '18000'
 const apiUrl = `http://127.0.0.1:${apiPort}`
+const webPort = process.env.PLAYWRIGHT_WEB_PORT ?? '5173'
+const webUrl = `http://localhost:${webPort}`
 
 // The headline smoke needs the whole stack, so Playwright boots BOTH servers:
-// Laravel (an isolated test port) and Vite (5173). The SPA reaches the API through the Vite
+// Laravel (an isolated test port) and Vite (5173 by default). The SPA reaches the API through the Vite
 // proxy, exactly as in real dev. It exercises auth, the catalog browse tree and
 // Course detail, so it needs Postgres up (`docker compose up`) and the dev DB
 // migrated + seeded (`php artisan migrate --seed`) so the CatalogSeeder data exists.
@@ -43,7 +45,7 @@ export default defineConfig({
   // attachments (style smoke) into a report CI uploads for human review.
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: webUrl,
     trace: 'on-first-retry',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
@@ -52,13 +54,13 @@ export default defineConfig({
       command: `php artisan serve --host=127.0.0.1 --port=${apiPort}`,
       cwd: '../backend',
       url: `${apiUrl}/up`,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: !process.env.CI && !process.env.PLAYWRIGHT_API_PORT,
       timeout: 60_000,
     },
     {
-      command: `VITE_API_TARGET=${apiUrl} npm run dev`,
-      url: 'http://localhost:5173',
-      reuseExistingServer: !process.env.CI,
+      command: `VITE_API_TARGET=${apiUrl} VITE_DEV_PORT=${webPort} npm run dev -- --host 127.0.0.1 --port ${webPort} --strictPort`,
+      url: `http://127.0.0.1:${webPort}`,
+      reuseExistingServer: !process.env.CI && !process.env.PLAYWRIGHT_WEB_PORT,
       timeout: 60_000,
     },
   ],

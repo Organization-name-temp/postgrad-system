@@ -119,6 +119,22 @@ function renderRealNav() {
   )
 }
 
+it('reveals Analytics only when an owner Report gate is held', () => {
+  mockedUseAuth.mockReturnValue(
+    authState({ hasPermission: (permission) => permission === 'application.screen' }),
+  )
+  const shown = renderRealNav()
+  expect(screen.getByText('Analytics')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Application Pipeline' })).toHaveAttribute(
+    'href',
+    '/analytics/application-pipeline',
+  )
+  shown.unmount()
+  mockedUseAuth.mockReturnValue(authState({ hasPermission: () => false }))
+  renderRealNav()
+  expect(screen.queryByText('Analytics')).not.toBeInTheDocument()
+})
+
 describe('SideNav — persona gating (ticket 11)', () => {
   beforeEach(() => vi.clearAllMocks())
 

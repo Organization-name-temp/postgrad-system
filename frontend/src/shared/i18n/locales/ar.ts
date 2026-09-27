@@ -215,6 +215,7 @@ export const ar = {
       cycles: 'دورات القبول',
       semesters: 'الفصول الدراسية',
       screening: 'قائمة الفرز',
+      applicationPipeline: 'مسار طلبات القبول',
       deanReview: 'مراجعة العميد',
       deanDecisions: 'قرارات القبول',
       interviewScheduling: 'جدولة المقابلات',
@@ -250,6 +251,7 @@ export const ar = {
       assignments: 'عمداء الكليات',
       departmentHeads: 'رؤساء الأقسام',
       sections: {
+        analytics: 'التحليلات',
         admissions: 'القبول',
         catalog: 'الدليل',
         calendar: 'التقويم',
@@ -554,6 +556,25 @@ export const ar = {
     outcomes: { Approved: 'مقبول', Rejected: 'مرفوض' },
   },
   admissions: {
+    pipeline: {
+      title: 'مسار طلبات القبول',
+      cycle: 'معرّف دورة القبول',
+      program: 'معرّف البرنامج',
+      selectCycle: 'اختر دورة قبول لعرض طلباتها.',
+      loading: 'جارٍ تحميل مسار طلبات القبول',
+      loadError: 'تعذّر تحميل مسار طلبات القبول.',
+      retry: 'إعادة المحاولة',
+      total: '{{count}} طلبات',
+      stage: 'حالة الطلب',
+      applications: 'الطلبات',
+      conversions: 'الانتقالات المقاسة بين الحالات',
+      from: 'من الحالة',
+      to: 'إلى الحالة',
+      eligible: 'الطلبات المؤهلة',
+      converted: 'الطلبات المنتقلة',
+      rate: 'معدل الانتقال',
+      noDenominator: 'لا توجد طلبات مؤهلة',
+    },
     cards: {
       myApplication: {
         title: 'طلبي',

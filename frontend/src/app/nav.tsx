@@ -51,6 +51,13 @@ import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
  */
 export const navItems: NavItem[] = [
   {
+    key: 'applicationPipeline',
+    to: '/analytics/application-pipeline',
+    icon: <DonutLargeIcon />,
+    permission: PERMISSION.screenApplications,
+    section: 'analytics',
+  },
+  {
     key: 'transcript',
     to: '/records',
     icon: <ReceiptLongIcon />,

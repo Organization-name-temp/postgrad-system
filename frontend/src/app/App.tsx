@@ -20,6 +20,7 @@ import { CourseEditPage } from '../features/catalog/courses/CourseEditPage'
 import { CatalogTreePage } from '../features/catalog/tree/CatalogTreePage'
 import { ApplyPage } from '../features/admissions/wizard/ApplyPage'
 import { ScreeningQueuePage } from '../features/admissions/screening/ScreeningQueuePage'
+import { ApplicationPipelineReportPage } from '../features/admissions/reports/ApplicationPipelineReportPage'
 import { ApplicationReviewPage } from '../features/admissions/screening/ApplicationReviewPage'
 import { DeanQueuePage } from '../features/admissions/dean/DeanQueuePage'
 import { DeanReviewPage } from '../features/admissions/dean/DeanReviewPage'
@@ -275,6 +276,12 @@ export function App() {
                     behalf. Gated on courses.register_for_student (nav + API); an Advisor's
                     picker is scoped to their advisees, Student Affairs sees all. */}
                 <Route path="/registration/on-behalf" element={<ComposeForStudentPage />} />
+                <Route element={<RequireAuth permission={PERMISSION.screenApplications} />}>
+                  <Route
+                    path="/analytics/application-pipeline"
+                    element={<ApplicationPipelineReportPage />}
+                  />
+                </Route>
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
                 <Route path="/dean" element={<DeanQueuePage />} />

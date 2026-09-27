@@ -219,6 +219,7 @@ export const en = {
       cycles: 'Admission cycles',
       semesters: 'Semesters',
       screening: 'Screening queue',
+      applicationPipeline: 'Application Pipeline',
       deanReview: 'Dean review',
       deanDecisions: 'Admission decisions',
       interviewScheduling: 'Interview scheduling',
@@ -254,6 +255,7 @@ export const en = {
       assignments: 'Faculty deans',
       departmentHeads: 'Department heads',
       sections: {
+        analytics: 'Analytics',
         admissions: 'Admissions',
         catalog: 'Catalog',
         calendar: 'Calendar',
@@ -580,6 +582,25 @@ export const en = {
     outcomes: { Approved: 'Approved', Rejected: 'Rejected' },
   },
   admissions: {
+    pipeline: {
+      title: 'Application Pipeline',
+      cycle: 'Admission Cycle ID',
+      program: 'Program ID',
+      selectCycle: 'Select an Admission Cycle to inspect its Applications.',
+      loading: 'Loading Application Pipeline',
+      loadError: 'Could not load the Application Pipeline.',
+      retry: 'Retry',
+      total: '{{count}} Applications',
+      stage: 'Application Status',
+      applications: 'Applications',
+      conversions: 'Measured stage conversions',
+      from: 'From status',
+      to: 'To status',
+      eligible: 'Eligible Applications',
+      converted: 'Converted Applications',
+      rate: 'Conversion rate',
+      noDenominator: 'No eligible Applications',
+    },
     // Admissions' Dashboard Cards (phase 4.5, ticket 03). Each Card's copy lives in the namespace
     // of the feature that owns its data, per Card, EN + AR together.
     cards: {

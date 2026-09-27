@@ -29,10 +29,10 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 | 01 Standing | Implemented; final acceptance pending | Owner summary/List/export, protected EN/AR UI and four native journeys verified below; final gates/review pending |
 | 02 Readiness | Implemented; final acceptance pending | Bounded owner parity, scoped summary/List/export, EN/AR UI and four native journeys verified below; final gates/review pending |
 | 03 Termination | Implemented; final acceptance pending | Scoped minimal Case summary/List/export, authorized review links, worked seed evidence, EN/AR UI and four native journeys verified below |
-| 04 Shell/Catalog/Admissions polish | Audit in progress | Session/control labels and Pipeline count wording fixed test-first; narrow Catalog overflow reproduced; four-state audit running |
-| 05 Enrollment/Grading/progress polish | Audit in progress | B05-01 Arabic Waiver download message fixed; page regression passes EN/AR |
-| 06 Records polish | Pending audit | Existing Records print regressions to retain |
-| 07 Acceptance | Pending 01–06 | Human demo review remains required before phase acceptance |
+| 04 Shell/Catalog/Admissions polish | Implemented; final verification pending | Concrete label, count, contrast and responsive defects fixed test-first; core/detail matrices and expanded Admissions journey passed; final gates/review pending |
+| 05 Enrollment/Grading/progress polish | Implemented; final verification pending | Paired Waiver/loading/identifier/count corrections verified; expanded owner journeys and final gate/review pending |
+| 06 Records polish | Implemented; final verification pending | Paired loading corrections, service journey, four-state read/print and invalid public verifier passed; expanded action-state checks and final gate/review pending |
+| 07 Acceptance | Implemented; final verification pending | Exact-population/export headline passed; reproducible demo and audit recorded; complete gates/consolidated review pending, human acceptance required |
 
 ## Commands and results
 

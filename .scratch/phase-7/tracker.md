@@ -14,10 +14,11 @@ actionable findings and rerun affected checks. No push, merge or external runner
 ## Prerequisite frontier
 
 Phase 7 #01 requires Phase 4.6 #08 and #15. The transitive ticket closure is
-#01, #02, #03, #04, #05, #06, #08 and #15. Existing Support parser, Arabic
-normalizer and OpenSpout writer are executable; shared frontend query/filter/export
-controls, chart/table presentation, Analytics composition and Reports are absent.
-Owner batch calculations are absent from Grading and AcademicStanding facades.
+#01, #02, #03, #04, #05, #06, #08 and #15. At the fixed baseline, the Support parser, Arabic
+normalizer and OpenSpout writer were executable; shared frontend query/filter/export
+controls, chart/table presentation, Analytics composition and Reports were absent.
+Owner batch calculations were absent from Grading and AcademicStanding facades.
+The evidence below records the executable capabilities added since that baseline.
 Verify each remaining acceptance criterion before marking a prerequisite satisfied;
 planning merges are not implementation evidence. Other Phase 4.6 tickets are outside scope.
 
@@ -227,3 +228,6 @@ Reserved until all tickets and prerequisite changes are implemented.
   downloads and serious/critical axe checks. Workbook artifacts in the local report.
 - Admissions collections and type-ahead picker adoption remain pending for #06;
   full package gates and the one consolidated final review are still reserved.
+
+Reference collection commit `487964d`: `composer api:check` and
+`npm run api:check` **passed** after commit; generation produces no drift.

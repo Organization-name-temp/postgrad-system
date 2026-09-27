@@ -65,8 +65,10 @@ Fixes preserve business rules and disclosure:
 Focused export/recovery checks passed 6 tests / 58 assertions; focused Records UI checks
 passed 17 tests, including reproduced red/green presentation regressions. Schema changes
 required one legacy Dashboard fixture to represent Identification Type as explicit null.
-Complete affected gate reruns and the expanded real-browser watermark/print assertions
-remain pending; see [verification.md](verification.md) for their final results.
+The backend affected gate rerun passed 1,216 tests / 6,066 assertions and all static/drift
+checks. The complete frontend gate rerun remains pending. Additional A4 print and runner
+contention failures were reproduced and narrowly resolved during verification; see
+[verification.md](verification.md) for the final results.
 
 Summary: Standards 4 findings, worst nullable owner API contract; Spec 2 findings, worst
 requester-language Export contract. All six are implemented and awaiting final gate evidence.

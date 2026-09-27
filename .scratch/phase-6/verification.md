@@ -19,7 +19,8 @@ Branch: `phase-6/records-transcript`. No worktree, branch switch, merge, or push
    tests (17.7 minutes). The full Transcript journey passed in 3.5 minutes.
 3. One consolidated Standards/Spec review of the complete Phase 6 diff found four
    Standards and two Spec gaps. Their fixes have narrow regression evidence; complete
-   gate reruns remain pending. See [review.md](review.md).
+   the backend rerun passed 1,216 tests / 6,066 assertions and all static/drift
+   checks. The frontend rerun remains pending. See [review.md](review.md).
 
 ## Acceptance coverage by ticket
 
@@ -59,3 +60,19 @@ is needed or claimed.
 The one consolidated review is recorded in [review.md](review.md). All six findings
 are implemented, with narrow regression checks. Ticket completion and verified phase
 status await the complete gate reruns after those fixes.
+
+## Re-verification failures and fixes
+
+The first frontend rerun stopped with four unit-test failures: one 20-second interaction
+timeout and three still-loading mocked API views. All four files passed unchanged in an
+isolated one-worker run (20 tests). The installed Vitest default selected seven workers
+on this shared host; limiting the suite to two workers preserved all assertions/timeouts
+and passed all 88 files / 534 tests. This limits runner contention without changing app
+behavior or weakening acceptance.
+
+A stronger portrait-paper print check then reproduced an over-wide CH Summary at A4
+width. Scoped print-only fixed table layout, smaller token-based cell text/padding, and
+wrapping retain every value and column; the real browser regression passed (15.3 seconds).
+The complete print matrix now checks the same A4 width; its full-gate rerun is pending.
+The focused browser also waits for the authenticated heading before reading record data,
+rather than mistaking a cold session loader for a missing document.

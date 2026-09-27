@@ -9,8 +9,18 @@ test('dark theme prints all Transcript text legibly on white paper', async ({ pa
   await expect(page).toHaveURL(/\/$/)
   await page.getByRole('button', { name: 'English', exact: true }).click()
   await page.goto('/records')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15_000 })
   await expect(page.getByText('31000000000004')).toBeVisible()
+  await page.setViewportSize({ width: 794, height: 1123 })
   await page.emulateMedia({ media: 'print' })
+  const fitsPaper = await page
+    .locator('article')
+    .evaluate((article) =>
+      [...article.querySelectorAll('table')].every(
+        (table) => table.getBoundingClientRect().width <= article.getBoundingClientRect().width + 1,
+      ),
+    )
+  expect(fitsPaper, 'Transcript tables fit A4 portrait print width').toBe(true)
   const colors = await page
     .locator('main')
     .evaluate((main) =>

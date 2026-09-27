@@ -117,6 +117,8 @@ async function checkReadAndPrintMatrix(
         await expect(page.getByText('31000000000004')).toBeVisible()
       }
       await accessible(page)
+      const viewport = page.viewportSize()
+      await page.setViewportSize({ width: 794, height: 1123 })
       await page.emulateMedia({ media: 'print' })
       if (!publicView) await expect(page.getByRole('banner')).toBeHidden()
       if (!revokedPublic) await expect(page.locator('article')).toBeVisible()
@@ -153,6 +155,7 @@ async function checkReadAndPrintMatrix(
         contentType: 'image/png',
       })
       await page.emulateMedia({ media: 'screen' })
+      if (viewport) await page.setViewportSize(viewport)
     }
   }
 }

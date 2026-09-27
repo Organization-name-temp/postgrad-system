@@ -7,6 +7,133 @@
 import * as zod from 'zod';
 
 /**
+ * @summary Export every Student in the authorized advisory readiness selection.
+ */
+export const ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "readiness": zod.string().optional().describe('CSV ready, not_ready or unavailable groups.'),
+  "blocker": zod.string().optional().describe('CSV overlapping typed blockers; any selected blocker matches.'),
+  "remaining_ch_min": zod.number().optional().describe('Inclusive remaining-CH lower bound.'),
+  "remaining_ch_max": zod.number().optional().describe('Inclusive remaining-CH upper bound.'),
+  "cgpa_min": zod.number().optional().describe('Inclusive CGPA lower bound; unknown values excluded.'),
+  "cgpa_max": zod.number().optional().describe('Inclusive CGPA upper bound.'),
+  "cgpa_availability": zod.string().optional().describe('CSV available or unavailable CGPA.'),
+  "proximity": zod.string().optional().describe('Remaining 1–5 CH only; not Approaching Graduation.')
+})
+
+export const ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionResponse = zod.unknown()
+
+
+/**
+ * @summary Advisory readiness Student List for the authorized Report selection.
+ */
+export const AdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "readiness": zod.string().optional().describe('CSV ready, not_ready or unavailable groups.'),
+  "blocker": zod.string().optional().describe('CSV overlapping typed blockers; any selected blocker matches.'),
+  "remaining_ch_min": zod.number().optional().describe('Inclusive remaining-CH lower bound.'),
+  "remaining_ch_max": zod.number().optional().describe('Inclusive remaining-CH upper bound.'),
+  "cgpa_min": zod.number().optional().describe('Inclusive CGPA lower bound; unknown values excluded.'),
+  "cgpa_max": zod.number().optional().describe('Inclusive CGPA upper bound.'),
+  "cgpa_availability": zod.string().optional().describe('CSV available or unavailable CGPA.'),
+  "proximity": zod.string().optional().describe('Remaining 1–5 CH only; not Approaching Graduation.')
+})
+
+export const AdvisoryReadinessStudentListForTheAuthorizedReportSelectionResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name_en": zod.string().nullable(),
+  "name_ar": zod.string().nullable(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_id": zod.number().optional(),
+  "faculty_id": zod.number().optional()
+}).nullable(),
+  "lifecycle": zod.string().optional(),
+  "readiness": zod.object({
+  "ready": zod.boolean().optional(),
+  "remaining_credit_hours": zod.number().optional(),
+  "cgpa": zod.number().nullable(),
+  "approaching_graduation": zod.boolean().optional(),
+  "blockers": zod.array(zod.string()).optional()
+}).nullable(),
+  "readiness_group": zod.string().optional(),
+  "unavailable": zod.array(zod.string()).optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * Blocker counts overlap; groups partition the selected Student population.
+ * No proposed schedule or formal graduation approval is supplied.
+ * @summary Advisory Graduation Readiness counts for the authorized full selection.
+ */
+export const AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "readiness": zod.string().optional().describe('CSV ready, not_ready or unavailable groups.'),
+  "blocker": zod.string().optional().describe('CSV overlapping typed blockers; any selected blocker matches.'),
+  "remaining_ch_min": zod.number().optional().describe('Inclusive remaining-CH lower bound.'),
+  "remaining_ch_max": zod.number().optional().describe('Inclusive remaining-CH upper bound.'),
+  "cgpa_min": zod.number().optional().describe('Inclusive CGPA lower bound; unknown values excluded.'),
+  "cgpa_max": zod.number().optional().describe('Inclusive CGPA upper bound.'),
+  "cgpa_availability": zod.string().optional().describe('CSV available or unavailable CGPA.'),
+  "proximity": zod.string().optional().describe('Remaining 1–5 CH only; not Approaching Graduation.')
+})
+
+export const AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionResponse = zod.object({
+  "data": zod.object({
+  "total": zod.number().optional(),
+  "groups": zod.object({
+  "ready": zod.number().optional(),
+  "not_ready": zod.number().optional(),
+  "unavailable": zod.number().optional()
+}).optional(),
+  "blockers": zod.object({
+  "RemainingRequirements": zod.number().optional(),
+  "CgpaUnavailable": zod.number().optional(),
+  "CgpaBelowMinimum": zod.number().optional(),
+  "TerminationPending": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
  * @summary Current Academic Standing counts for the authorized full selection.
  */
 export const CurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryParams = zod.object({

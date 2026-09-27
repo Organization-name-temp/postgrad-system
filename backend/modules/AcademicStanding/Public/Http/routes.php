@@ -3,11 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use Modules\AcademicStanding\Internal\Http\Controllers\CreditHourSummaryController;
 use Modules\AcademicStanding\Internal\Http\Controllers\GraduationReadinessController;
+use Modules\AcademicStanding\Internal\Http\Controllers\GraduationReportController;
 use Modules\AcademicStanding\Internal\Http\Controllers\StandingController;
 use Modules\AcademicStanding\Internal\Http\Controllers\StandingReportController;
 use Modules\AcademicStanding\Internal\Http\Controllers\TerminationCaseController;
 
 Route::middleware(['auth:sanctum', 'can:standing.monitor'])->group(function () {
+    Route::get('/academic-standing/reports/graduation-readiness/students/export', [GraduationReportController::class, 'export']);
+    Route::get('/academic-standing/reports/graduation-readiness/students', [GraduationReportController::class, 'students']);
+    Route::get('/academic-standing/reports/graduation-readiness', [GraduationReportController::class, 'summary']);
     Route::get('/academic-standing/reports/standing', [StandingReportController::class, 'summary']);
     Route::get('/academic-standing/reports/standing/students', [StandingReportController::class, 'students']);
     Route::get('/academic-standing/reports/standing/students/export', [StandingReportController::class, 'export']);

@@ -32,6 +32,13 @@ return [
         'degrees' => ['MSc' => 'MSc', 'PhD' => 'PhD'],
         'unavailable' => ['program' => 'Program unavailable', 'student_name' => 'Student name unavailable'],
     ],
+    'graduation_report' => [
+        'headers' => ['readiness' => 'Advisory readiness', 'remaining_ch' => 'Remaining CH', 'cgpa' => 'CGPA', 'approaching' => 'Approaching Graduation (no proposal)', 'blockers' => 'Blockers (overlapping)', 'advisory' => 'Advisory status', 'unavailable' => 'Unavailable data'],
+        'groups' => ['ready' => 'Academically ready (advisory)', 'not_ready' => 'Not academically ready', 'unavailable' => 'Readiness unavailable'],
+        'boolean' => ['yes' => 'Yes', 'no' => 'No'],
+        'blockers' => ['RemainingRequirements' => 'Remaining curriculum requirements', 'CgpaUnavailable' => 'CGPA unavailable', 'CgpaBelowMinimum' => 'CGPA below minimum', 'TerminationPending' => 'Actionable termination Case pending'],
+        'advisory' => ['Active' => 'Advisory academic facts; not formal graduation approval', 'Terminated' => 'Historical advisory facts; not currently eligible for graduation'],
+    ],
     'exports' => [
         'headers' => [
             'case_id' => 'Case ID',

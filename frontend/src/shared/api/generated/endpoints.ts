@@ -24,6 +24,295 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams = {
+/**
+ * CSV Faculty IDs.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active.
+ */
+lifecycle?: string;
+/**
+ * Bilingual name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV field order.
+ */
+sort?: string;
+/**
+ * Accepted but does not truncate summary.
+ */
+page?: number;
+/**
+ * Accepted but does not truncate summary.
+ */
+per_page?: number;
+/**
+ * CSV ready, not_ready or unavailable groups.
+ */
+readiness?: string;
+/**
+ * CSV overlapping typed blockers; any selected blocker matches.
+ */
+blocker?: string;
+/**
+ * Inclusive remaining-CH lower bound.
+ */
+remaining_ch_min?: number;
+/**
+ * Inclusive remaining-CH upper bound.
+ */
+remaining_ch_max?: number;
+/**
+ * Inclusive CGPA lower bound; unknown values excluded.
+ */
+cgpa_min?: number;
+/**
+ * Inclusive CGPA upper bound.
+ */
+cgpa_max?: number;
+/**
+ * CSV available or unavailable CGPA.
+ */
+cgpa_availability?: string;
+/**
+ * Remaining 1–5 CH only; not Approaching Graduation.
+ */
+proximity?: string;
+};
+
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams = {
+/**
+ * CSV Faculty IDs.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active.
+ */
+lifecycle?: string;
+/**
+ * Bilingual name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV field order.
+ */
+sort?: string;
+/**
+ * Accepted but does not truncate summary.
+ */
+page?: number;
+/**
+ * Accepted but does not truncate summary.
+ */
+per_page?: number;
+/**
+ * CSV ready, not_ready or unavailable groups.
+ */
+readiness?: string;
+/**
+ * CSV overlapping typed blockers; any selected blocker matches.
+ */
+blocker?: string;
+/**
+ * Inclusive remaining-CH lower bound.
+ */
+remaining_ch_min?: number;
+/**
+ * Inclusive remaining-CH upper bound.
+ */
+remaining_ch_max?: number;
+/**
+ * Inclusive CGPA lower bound; unknown values excluded.
+ */
+cgpa_min?: number;
+/**
+ * Inclusive CGPA upper bound.
+ */
+cgpa_max?: number;
+/**
+ * CSV available or unavailable CGPA.
+ */
+cgpa_availability?: string;
+/**
+ * Remaining 1–5 CH only; not Approaching Graduation.
+ */
+proximity?: string;
+};
+
+/**
+ * @nullable
+ */
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelection200DataItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_id?: number;
+  faculty_id?: number;
+} | null;
+
+/**
+ * @nullable
+ */
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelection200DataItemReadiness = {
+  ready?: boolean;
+  remaining_credit_hours?: number;
+  /** @nullable */
+  cgpa: number | null;
+  approaching_graduation?: boolean;
+  blockers?: string[];
+} | null;
+
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelection200DataItem = {
+  student_id?: number;
+  university_id?: string;
+  /** @nullable */
+  name_en: string | null;
+  /** @nullable */
+  name_ar: string | null;
+  /** @nullable */
+  program: AdvisoryReadinessStudentListForTheAuthorizedReportSelection200DataItemProgram;
+  lifecycle?: string;
+  /** @nullable */
+  readiness: AdvisoryReadinessStudentListForTheAuthorizedReportSelection200DataItemReadiness;
+  readiness_group?: string;
+  unavailable?: string[];
+};
+
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelection200Meta = {
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
+
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelection200 = {
+  data?: AdvisoryReadinessStudentListForTheAuthorizedReportSelection200DataItem[];
+  meta?: AdvisoryReadinessStudentListForTheAuthorizedReportSelection200Meta;
+};
+
+export type AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams = {
+/**
+ * CSV Faculty IDs.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active.
+ */
+lifecycle?: string;
+/**
+ * Bilingual name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV field order.
+ */
+sort?: string;
+/**
+ * Accepted but does not truncate summary.
+ */
+page?: number;
+/**
+ * Accepted but does not truncate summary.
+ */
+per_page?: number;
+/**
+ * CSV ready, not_ready or unavailable groups.
+ */
+readiness?: string;
+/**
+ * CSV overlapping typed blockers; any selected blocker matches.
+ */
+blocker?: string;
+/**
+ * Inclusive remaining-CH lower bound.
+ */
+remaining_ch_min?: number;
+/**
+ * Inclusive remaining-CH upper bound.
+ */
+remaining_ch_max?: number;
+/**
+ * Inclusive CGPA lower bound; unknown values excluded.
+ */
+cgpa_min?: number;
+/**
+ * Inclusive CGPA upper bound.
+ */
+cgpa_max?: number;
+/**
+ * CSV available or unavailable CGPA.
+ */
+cgpa_availability?: string;
+/**
+ * Remaining 1–5 CH only; not Approaching Graduation.
+ */
+proximity?: string;
+};
+
+export type AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200DataGroups = {
+  ready?: number;
+  not_ready?: number;
+  unavailable?: number;
+};
+
+export type AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200DataBlockers = {
+  RemainingRequirements?: number;
+  CgpaUnavailable?: number;
+  CgpaBelowMinimum?: number;
+  TerminationPending?: number;
+};
+
+export type AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200Data = {
+  total?: number;
+  groups?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200DataGroups;
+  blockers?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200DataBlockers;
+};
+
+export type AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200 = {
+  data?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200Data;
+};
+
 export type CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams = {
 /**
  * CSV Faculty IDs narrowing permitted Students.
@@ -13942,6 +14231,291 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * @summary Export every Student in the authorized advisory readiness selection.
+ */
+export const exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection = (
+    params?: ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/academic-standing/reports/graduation-readiness/students/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryKey = (params?: ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/graduation-readiness/students/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryOptions = <TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError = unknown>(params?: ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>> = ({ signal }) => exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryResult = NonNullable<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>>
+export type ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryError = unknown
+
+
+export function useExportEveryStudentInTheAuthorizedAdvisoryReadinessSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError = unknown>(
+ params: undefined |  ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>,
+          TError,
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportEveryStudentInTheAuthorizedAdvisoryReadinessSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError = unknown>(
+ params?: ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>,
+          TError,
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportEveryStudentInTheAuthorizedAdvisoryReadinessSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError = unknown>(
+ params?: ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export every Student in the authorized advisory readiness selection.
+ */
+
+export function useExportEveryStudentInTheAuthorizedAdvisoryReadinessSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError = unknown>(
+ params?: ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedAdvisoryReadinessSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Advisory readiness Student List for the authorized Report selection.
+ */
+export const advisoryReadinessStudentListForTheAuthorizedReportSelection = (
+    params?: AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisoryReadinessStudentListForTheAuthorizedReportSelection200>(
+      {url: `/api/v1/academic-standing/reports/graduation-readiness/students`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryKey = (params?: AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/graduation-readiness/students`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryOptions = <TData = Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError = unknown>(params?: AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>> = ({ signal }) => advisoryReadinessStudentListForTheAuthorizedReportSelection(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryResult = NonNullable<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>>
+export type AdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryError = unknown
+
+
+export function useAdvisoryReadinessStudentListForTheAuthorizedReportSelection<TData = Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError = unknown>(
+ params: undefined |  AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>,
+          TError,
+          Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisoryReadinessStudentListForTheAuthorizedReportSelection<TData = Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError = unknown>(
+ params?: AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>,
+          TError,
+          Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisoryReadinessStudentListForTheAuthorizedReportSelection<TData = Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError = unknown>(
+ params?: AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Advisory readiness Student List for the authorized Report selection.
+ */
+
+export function useAdvisoryReadinessStudentListForTheAuthorizedReportSelection<TData = Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError = unknown>(
+ params?: AdvisoryReadinessStudentListForTheAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryReadinessStudentListForTheAuthorizedReportSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Blocker counts overlap; groups partition the selected Student population.
+ * No proposed schedule or formal graduation approval is supplied.
+ * @summary Advisory Graduation Readiness counts for the authorized full selection.
+ */
+export const advisoryGraduationReadinessCountsForTheAuthorizedFullSelection = (
+    params?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection200>(
+      {url: `/api/v1/academic-standing/reports/graduation-readiness`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryKey = (params?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/graduation-readiness`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryOptions = <TData = Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError = unknown>(params?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>> = ({ signal }) => advisoryGraduationReadinessCountsForTheAuthorizedFullSelection(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryResult = NonNullable<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>>
+export type AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryError = unknown
+
+
+export function useAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params: undefined |  AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>,
+          TError,
+          Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>,
+          TError,
+          Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Advisory Graduation Readiness counts for the authorized full selection.
+ */
+
+export function useAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params?: AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof advisoryGraduationReadinessCountsForTheAuthorizedFullSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getAdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * @summary Current Academic Standing counts for the authorized full selection.

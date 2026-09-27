@@ -1151,3 +1151,32 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 - Focused owner/admission/Waiver/underload regressions passed **46 tests / 417
   assertions, 13.18s**. Pint, PHPStan and deptrac passed. These are executable
   prerequisites for #02, not completion of its Report/List/export/UI acceptance.
+
+### Graduation Readiness Report HTTP selection and workbook slice
+
+- The owner Report, ordinary pageable Student List and audited full XLSX export
+  now reuse #01's live academic cohort authorization before owner calculations.
+  Three readiness groups partition the selection; typed blocker counts overlap.
+  Missing admission-bound curricula remain explicit unavailable rows in totals.
+- Readiness/blocker/remaining-CH/nullable-CGPA/proximity criteria compose before
+  derived ordering and pagination. Proximity is explicitly remaining 1–5 CH;
+  no completing schedule is supplied. Unknown numeric academic facts never become
+  zero. Stable Student ID ordering and nullable values last remain deterministic.
+- A real weighted Grade example proves Academic Warning with CGPA 3.25 remains
+  ready when curriculum requirements are satisfied. Current open Cases block;
+  dismissal and trigger clearance are reflected immediately without reconciliation.
+  Historical Terminated academic facts remain readable via explicit lifecycle.
+  Repeat reads preserve Case/Observation/notification facts.
+- Worked scoped counts, matching drill criteria, derived order-before-page,
+  unavailable population and EN/AR workbook read-back passed **9 focused tests /
+  214 assertions, 6.98s** including the owner regressions. The live open-Case
+  fixture initially used a nonexistent abbreviated state; using the canonical
+  AwaitingAdvisor state corrected the fixture without a product workaround.
+- Whole seeded-cohort owner verification passed **1 test / 544 assertions, 28.44s**:
+  all 180 Credit-Hour and readiness results agree with independent single reads,
+  batch query count stays below 200 and no-proposal Approaching Graduation is false.
+- Pint, PHPStan, deptrac and generated-client typecheck passed. OpenAPI/Orval
+  regenerated with truthful nullable readiness/CGPA, blocker arrays and safe data;
+  no generated file hand-edits. UI/browser evidence and remaining worked HTTP
+  acceptance scenarios are still required before #02 completion. Full gates and
+  the consolidated review remain pending.

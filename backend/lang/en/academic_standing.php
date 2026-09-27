@@ -39,6 +39,10 @@ return [
         'blockers' => ['RemainingRequirements' => 'Remaining curriculum requirements', 'CgpaUnavailable' => 'CGPA unavailable', 'CgpaBelowMinimum' => 'CGPA below minimum', 'TerminationPending' => 'Actionable termination Case pending'],
         'advisory' => ['Active' => 'Advisory academic facts; not formal graduation approval', 'Terminated' => 'Historical advisory facts; not currently eligible for graduation'],
     ],
+    'termination_report' => [
+        'headers' => ['state' => 'Workflow stage / outcome', 'created_at' => 'Case created (UTC)', 'advisor_reviewed_at' => 'Advisor assessed (UTC)', 'department_head_reviewed_at' => 'Department Head reviewed (UTC)', 'council_decided_at' => 'Council decided (UTC)', 'closed_at' => 'Case closed (UTC)', 'unavailable' => 'Unavailable data'],
+        'states' => ['AwaitingAdvisor' => 'Flagged: awaiting Advisor assessment', 'AwaitingDepartmentHead' => 'Advisor assessed: awaiting Department Head review', 'AwaitingCouncil' => 'Recommended: awaiting Council decision', 'Dismissed' => 'Dismissed', 'Terminated' => 'Terminated', 'TriggerCleared' => 'Trigger cleared', 'EvidenceChanged' => 'Evidence changed / replaced'],
+    ],
     'exports' => [
         'headers' => [
             'case_id' => 'Case ID',

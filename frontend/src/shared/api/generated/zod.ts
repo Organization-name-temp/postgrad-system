@@ -7,6 +7,125 @@
 import * as zod from 'zod';
 
 /**
+ * AwaitingCouncil means a Department Head recommendation, distinct from initial
+ * flagging and Advisor assessment. GET never reconciles or replaces Cases.
+ * @summary Scoped Termination Case counts and distinct Students.
+ */
+export const ScopedTerminationCaseCountsAndDistinctStudentsQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active and Terminated.'),
+  "state": zod.string().optional().describe('CSV existing Case states.'),
+  "history": zod.string().optional().describe('default includes open Cases and Terminated; include adds all closed outcomes.'),
+  "created_from": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "created_to": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "q": zod.string().optional().describe('Bilingual Student name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV order; stable Case ID breaks ties and unknown timestamps sort last.'),
+  "page": zod.number().optional().describe('Page number; summary\/export retain the full selection.'),
+  "per_page": zod.number().optional().describe('List size capped at 100; summary\/export retain the full selection.')
+})
+
+export const ScopedTerminationCaseCountsAndDistinctStudentsResponse = zod.object({
+  "data": zod.object({
+  "case_count": zod.number().optional(),
+  "student_count": zod.number().optional(),
+  "states": zod.object({
+  "AwaitingAdvisor": zod.number().optional(),
+  "AwaitingDepartmentHead": zod.number().optional(),
+  "AwaitingCouncil": zod.number().optional(),
+  "Dismissed": zod.number().optional(),
+  "Terminated": zod.number().optional(),
+  "TriggerCleared": zod.number().optional(),
+  "EvidenceChanged": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Localized stages preserve recommendation meaning. Identifiers are strings;
+ * the workbook contains minimal oversight facts and no private evidence.
+ * @summary Export the complete scoped Termination Case selection.
+ */
+export const ExportTheCompleteScopedTerminationCaseSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active and Terminated.'),
+  "state": zod.string().optional().describe('CSV existing Case states.'),
+  "history": zod.string().optional().describe('default includes open Cases and Terminated; include adds all closed outcomes.'),
+  "created_from": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "created_to": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "q": zod.string().optional().describe('Bilingual Student name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV order; stable Case ID breaks ties and unknown timestamps sort last.'),
+  "page": zod.number().optional().describe('Page number; summary\/export retain the full selection.'),
+  "per_page": zod.number().optional().describe('List size capped at 100; summary\/export retain the full selection.')
+})
+
+export const ExportTheCompleteScopedTerminationCaseSelectionResponse = zod.unknown()
+
+
+/**
+ * Review URLs require operational permission, persona, stage and live access.
+ * No evidence, fingerprints, private identity or review narratives are exposed.
+ * All available workflow timestamps are UTC; date filters describe Case creation.
+ * @summary Scoped minimal Termination Case List.
+ */
+export const ScopedMinimalTerminationCaseListQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active and Terminated.'),
+  "state": zod.string().optional().describe('CSV existing Case states.'),
+  "history": zod.string().optional().describe('default includes open Cases and Terminated; include adds all closed outcomes.'),
+  "created_from": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "created_to": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "q": zod.string().optional().describe('Bilingual Student name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV order; stable Case ID breaks ties and unknown timestamps sort last.'),
+  "page": zod.number().optional().describe('Page number; summary\/export retain the full selection.'),
+  "per_page": zod.number().optional().describe('List size capped at 100; summary\/export retain the full selection.')
+})
+
+export const ScopedMinimalTerminationCaseListResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name_en": zod.string().nullable(),
+  "name_ar": zod.string().nullable(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_id": zod.number().optional(),
+  "faculty_id": zod.number().optional()
+}).nullable(),
+  "lifecycle": zod.string().optional(),
+  "case_id": zod.number().optional(),
+  "state": zod.string().optional(),
+  "created_at": zod.string().nullable(),
+  "advisor_reviewed_at": zod.string().nullable(),
+  "department_head_reviewed_at": zod.string().nullable(),
+  "council_decided_at": zod.string().nullable(),
+  "closed_at": zod.string().nullable(),
+  "unavailable": zod.array(zod.string()).optional(),
+  "review_url": zod.string().nullable()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
  * @summary Export every Student in the authorized advisory readiness selection.
  */
 export const ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryParams = zod.object({

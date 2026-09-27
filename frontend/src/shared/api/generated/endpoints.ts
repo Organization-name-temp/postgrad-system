@@ -24,6 +24,243 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type ScopedTerminationCaseCountsAndDistinctStudentsParams = {
+/**
+ * CSV Faculty IDs narrowing permitted Students.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active and Terminated.
+ */
+lifecycle?: string;
+/**
+ * CSV existing Case states.
+ */
+state?: string;
+/**
+ * default includes open Cases and Terminated; include adds all closed outcomes.
+ */
+history?: string;
+/**
+ * Inclusive Case-created UTC date, YYYY-MM-DD.
+ */
+created_from?: string;
+/**
+ * Inclusive Case-created UTC date, YYYY-MM-DD.
+ */
+created_to?: string;
+/**
+ * Bilingual Student name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV order; stable Case ID breaks ties and unknown timestamps sort last.
+ */
+sort?: string;
+/**
+ * Page number; summary/export retain the full selection.
+ */
+page?: number;
+/**
+ * List size capped at 100; summary/export retain the full selection.
+ */
+per_page?: number;
+};
+
+export type ScopedTerminationCaseCountsAndDistinctStudents200DataStates = {
+  AwaitingAdvisor?: number;
+  AwaitingDepartmentHead?: number;
+  AwaitingCouncil?: number;
+  Dismissed?: number;
+  Terminated?: number;
+  TriggerCleared?: number;
+  EvidenceChanged?: number;
+};
+
+export type ScopedTerminationCaseCountsAndDistinctStudents200Data = {
+  case_count?: number;
+  student_count?: number;
+  states?: ScopedTerminationCaseCountsAndDistinctStudents200DataStates;
+};
+
+export type ScopedTerminationCaseCountsAndDistinctStudents200 = {
+  data?: ScopedTerminationCaseCountsAndDistinctStudents200Data;
+};
+
+export type ExportTheCompleteScopedTerminationCaseSelectionParams = {
+/**
+ * CSV Faculty IDs narrowing permitted Students.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active and Terminated.
+ */
+lifecycle?: string;
+/**
+ * CSV existing Case states.
+ */
+state?: string;
+/**
+ * default includes open Cases and Terminated; include adds all closed outcomes.
+ */
+history?: string;
+/**
+ * Inclusive Case-created UTC date, YYYY-MM-DD.
+ */
+created_from?: string;
+/**
+ * Inclusive Case-created UTC date, YYYY-MM-DD.
+ */
+created_to?: string;
+/**
+ * Bilingual Student name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV order; stable Case ID breaks ties and unknown timestamps sort last.
+ */
+sort?: string;
+/**
+ * Page number; summary/export retain the full selection.
+ */
+page?: number;
+/**
+ * List size capped at 100; summary/export retain the full selection.
+ */
+per_page?: number;
+};
+
+export type ScopedMinimalTerminationCaseListParams = {
+/**
+ * CSV Faculty IDs narrowing permitted Students.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active and Terminated.
+ */
+lifecycle?: string;
+/**
+ * CSV existing Case states.
+ */
+state?: string;
+/**
+ * default includes open Cases and Terminated; include adds all closed outcomes.
+ */
+history?: string;
+/**
+ * Inclusive Case-created UTC date, YYYY-MM-DD.
+ */
+created_from?: string;
+/**
+ * Inclusive Case-created UTC date, YYYY-MM-DD.
+ */
+created_to?: string;
+/**
+ * Bilingual Student name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV order; stable Case ID breaks ties and unknown timestamps sort last.
+ */
+sort?: string;
+/**
+ * Page number; summary/export retain the full selection.
+ */
+page?: number;
+/**
+ * List size capped at 100; summary/export retain the full selection.
+ */
+per_page?: number;
+};
+
+/**
+ * @nullable
+ */
+export type ScopedMinimalTerminationCaseList200DataItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_id?: number;
+  faculty_id?: number;
+} | null;
+
+export type ScopedMinimalTerminationCaseList200DataItem = {
+  student_id?: number;
+  university_id?: string;
+  /** @nullable */
+  name_en: string | null;
+  /** @nullable */
+  name_ar: string | null;
+  /** @nullable */
+  program: ScopedMinimalTerminationCaseList200DataItemProgram;
+  lifecycle?: string;
+  case_id?: number;
+  state?: string;
+  /** @nullable */
+  created_at: string | null;
+  /** @nullable */
+  advisor_reviewed_at: string | null;
+  /** @nullable */
+  department_head_reviewed_at: string | null;
+  /** @nullable */
+  council_decided_at: string | null;
+  /** @nullable */
+  closed_at: string | null;
+  unavailable?: string[];
+  /** @nullable */
+  review_url: string | null;
+};
+
+export type ScopedMinimalTerminationCaseList200Meta = {
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
+
+export type ScopedMinimalTerminationCaseList200 = {
+  data?: ScopedMinimalTerminationCaseList200DataItem[];
+  meta?: ScopedMinimalTerminationCaseList200Meta;
+};
+
 export type ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionParams = {
 /**
  * CSV Faculty IDs.
@@ -14231,6 +14468,296 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * AwaitingCouncil means a Department Head recommendation, distinct from initial
+ * flagging and Advisor assessment. GET never reconciles or replaces Cases.
+ * @summary Scoped Termination Case counts and distinct Students.
+ */
+export const scopedTerminationCaseCountsAndDistinctStudents = (
+    params?: ScopedTerminationCaseCountsAndDistinctStudentsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScopedTerminationCaseCountsAndDistinctStudents200>(
+      {url: `/api/v1/academic-standing/reports/termination`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getScopedTerminationCaseCountsAndDistinctStudentsQueryKey = (params?: ScopedTerminationCaseCountsAndDistinctStudentsParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/termination`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getScopedTerminationCaseCountsAndDistinctStudentsQueryOptions = <TData = Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError = unknown>(params?: ScopedTerminationCaseCountsAndDistinctStudentsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getScopedTerminationCaseCountsAndDistinctStudentsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>> = ({ signal }) => scopedTerminationCaseCountsAndDistinctStudents(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ScopedTerminationCaseCountsAndDistinctStudentsQueryResult = NonNullable<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>>
+export type ScopedTerminationCaseCountsAndDistinctStudentsQueryError = unknown
+
+
+export function useScopedTerminationCaseCountsAndDistinctStudents<TData = Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError = unknown>(
+ params: undefined |  ScopedTerminationCaseCountsAndDistinctStudentsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>,
+          TError,
+          Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScopedTerminationCaseCountsAndDistinctStudents<TData = Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError = unknown>(
+ params?: ScopedTerminationCaseCountsAndDistinctStudentsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>,
+          TError,
+          Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScopedTerminationCaseCountsAndDistinctStudents<TData = Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError = unknown>(
+ params?: ScopedTerminationCaseCountsAndDistinctStudentsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Scoped Termination Case counts and distinct Students.
+ */
+
+export function useScopedTerminationCaseCountsAndDistinctStudents<TData = Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError = unknown>(
+ params?: ScopedTerminationCaseCountsAndDistinctStudentsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedTerminationCaseCountsAndDistinctStudents>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getScopedTerminationCaseCountsAndDistinctStudentsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Localized stages preserve recommendation meaning. Identifiers are strings;
+ * the workbook contains minimal oversight facts and no private evidence.
+ * @summary Export the complete scoped Termination Case selection.
+ */
+export const exportTheCompleteScopedTerminationCaseSelection = (
+    params?: ExportTheCompleteScopedTerminationCaseSelectionParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/academic-standing/reports/termination/cases/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportTheCompleteScopedTerminationCaseSelectionQueryKey = (params?: ExportTheCompleteScopedTerminationCaseSelectionParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/termination/cases/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportTheCompleteScopedTerminationCaseSelectionQueryOptions = <TData = Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError = unknown>(params?: ExportTheCompleteScopedTerminationCaseSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportTheCompleteScopedTerminationCaseSelectionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>> = ({ signal }) => exportTheCompleteScopedTerminationCaseSelection(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportTheCompleteScopedTerminationCaseSelectionQueryResult = NonNullable<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>>
+export type ExportTheCompleteScopedTerminationCaseSelectionQueryError = unknown
+
+
+export function useExportTheCompleteScopedTerminationCaseSelection<TData = Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError = unknown>(
+ params: undefined |  ExportTheCompleteScopedTerminationCaseSelectionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>,
+          TError,
+          Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportTheCompleteScopedTerminationCaseSelection<TData = Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError = unknown>(
+ params?: ExportTheCompleteScopedTerminationCaseSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>,
+          TError,
+          Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportTheCompleteScopedTerminationCaseSelection<TData = Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError = unknown>(
+ params?: ExportTheCompleteScopedTerminationCaseSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export the complete scoped Termination Case selection.
+ */
+
+export function useExportTheCompleteScopedTerminationCaseSelection<TData = Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError = unknown>(
+ params?: ExportTheCompleteScopedTerminationCaseSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportTheCompleteScopedTerminationCaseSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportTheCompleteScopedTerminationCaseSelectionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Review URLs require operational permission, persona, stage and live access.
+ * No evidence, fingerprints, private identity or review narratives are exposed.
+ * All available workflow timestamps are UTC; date filters describe Case creation.
+ * @summary Scoped minimal Termination Case List.
+ */
+export const scopedMinimalTerminationCaseList = (
+    params?: ScopedMinimalTerminationCaseListParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ScopedMinimalTerminationCaseList200>(
+      {url: `/api/v1/academic-standing/reports/termination/cases`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getScopedMinimalTerminationCaseListQueryKey = (params?: ScopedMinimalTerminationCaseListParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/termination/cases`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getScopedMinimalTerminationCaseListQueryOptions = <TData = Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError = unknown>(params?: ScopedMinimalTerminationCaseListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getScopedMinimalTerminationCaseListQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>> = ({ signal }) => scopedMinimalTerminationCaseList(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ScopedMinimalTerminationCaseListQueryResult = NonNullable<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>>
+export type ScopedMinimalTerminationCaseListQueryError = unknown
+
+
+export function useScopedMinimalTerminationCaseList<TData = Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError = unknown>(
+ params: undefined |  ScopedMinimalTerminationCaseListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>,
+          TError,
+          Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScopedMinimalTerminationCaseList<TData = Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError = unknown>(
+ params?: ScopedMinimalTerminationCaseListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>,
+          TError,
+          Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useScopedMinimalTerminationCaseList<TData = Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError = unknown>(
+ params?: ScopedMinimalTerminationCaseListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Scoped minimal Termination Case List.
+ */
+
+export function useScopedMinimalTerminationCaseList<TData = Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError = unknown>(
+ params?: ScopedMinimalTerminationCaseListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof scopedMinimalTerminationCaseList>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getScopedMinimalTerminationCaseListQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * @summary Export every Student in the authorized advisory readiness selection.

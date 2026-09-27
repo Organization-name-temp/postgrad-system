@@ -41,6 +41,656 @@ tags:
   - name: Waivers
     description: ''
 paths:
+  /api/v1/academic-standing/reports/termination:
+    get:
+      summary: 'Scoped Termination Case counts and distinct Students.'
+      operationId: scopedTerminationCaseCountsAndDistinctStudents
+      description: "AwaitingCouncil means a Department Head recommendation, distinct from initial\nflagging and Advisor assessment. GET never reconciles or replaces Cases."
+      parameters:
+        -
+          in: query
+          name: faculty_id
+          description: 'CSV Faculty IDs narrowing permitted Students.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Faculty IDs narrowing permitted Students.'
+            example: '1'
+        -
+          in: query
+          name: department_id
+          description: 'CSV Department IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Department IDs.'
+            example: '1'
+        -
+          in: query
+          name: program_id
+          description: 'CSV Program IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Program IDs.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'CSV MSc or PhD.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'CSV MSc or PhD.'
+            example: MSc
+        -
+          in: query
+          name: lifecycle
+          description: 'CSV lifecycle; default Active and Terminated.'
+          example: 'Active,Terminated'
+          required: false
+          schema:
+            type: string
+            description: 'CSV lifecycle; default Active and Terminated.'
+            example: 'Active,Terminated'
+        -
+          in: query
+          name: state
+          description: 'CSV existing Case states.'
+          example: AwaitingCouncil
+          required: false
+          schema:
+            type: string
+            description: 'CSV existing Case states.'
+            example: AwaitingCouncil
+        -
+          in: query
+          name: history
+          description: 'default includes open Cases and Terminated; include adds all closed outcomes.'
+          example: include
+          required: false
+          schema:
+            type: string
+            description: 'default includes open Cases and Terminated; include adds all closed outcomes.'
+            example: include
+        -
+          in: query
+          name: created_from
+          description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: created_to
+          description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+          example: '2026-01-31'
+          required: false
+          schema:
+            type: string
+            description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+            example: '2026-01-31'
+        -
+          in: query
+          name: q
+          description: 'Bilingual Student name or University-ID search.'
+          example: Ahmed
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual Student name or University-ID search.'
+            example: Ahmed
+        -
+          in: query
+          name: sort
+          description: 'CSV order; stable Case ID breaks ties and unknown timestamps sort last.'
+          example: '-created_at'
+          required: false
+          schema:
+            type: string
+            description: 'CSV order; stable Case ID breaks ties and unknown timestamps sort last.'
+            example: '-created_at'
+        -
+          in: query
+          name: page
+          description: 'Page number; summary/export retain the full selection.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; summary/export retain the full selection.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'List size capped at 100; summary/export retain the full selection.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'List size capped at 100; summary/export retain the full selection.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    case_count: 4
+                    student_count: 4
+                    states:
+                      AwaitingAdvisor: 1
+                      AwaitingDepartmentHead: 1
+                      AwaitingCouncil: 1
+                      Dismissed: 0
+                      Terminated: 1
+                      TriggerCleared: 0
+                      EvidenceChanged: 0
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      case_count:
+                        type: integer
+                        example: 4
+                      student_count:
+                        type: integer
+                        example: 4
+                      states:
+                        type: object
+                        properties:
+                          AwaitingAdvisor:
+                            type: integer
+                            example: 1
+                          AwaitingDepartmentHead:
+                            type: integer
+                            example: 1
+                          AwaitingCouncil:
+                            type: integer
+                            example: 1
+                          Dismissed:
+                            type: integer
+                            example: 0
+                          Terminated:
+                            type: integer
+                            example: 1
+                          TriggerCleared:
+                            type: integer
+                            example: 0
+                          EvidenceChanged:
+                            type: integer
+                            example: 0
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/academic-standing/reports/termination/cases/export:
+    get:
+      summary: 'Export the complete scoped Termination Case selection.'
+      operationId: exportTheCompleteScopedTerminationCaseSelection
+      description: "Localized stages preserve recommendation meaning. Identifiers are strings;\nthe workbook contains minimal oversight facts and no private evidence."
+      parameters:
+        -
+          in: query
+          name: faculty_id
+          description: 'CSV Faculty IDs narrowing permitted Students.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Faculty IDs narrowing permitted Students.'
+            example: '1'
+        -
+          in: query
+          name: department_id
+          description: 'CSV Department IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Department IDs.'
+            example: '1'
+        -
+          in: query
+          name: program_id
+          description: 'CSV Program IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Program IDs.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'CSV MSc or PhD.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'CSV MSc or PhD.'
+            example: MSc
+        -
+          in: query
+          name: lifecycle
+          description: 'CSV lifecycle; default Active and Terminated.'
+          example: 'Active,Terminated'
+          required: false
+          schema:
+            type: string
+            description: 'CSV lifecycle; default Active and Terminated.'
+            example: 'Active,Terminated'
+        -
+          in: query
+          name: state
+          description: 'CSV existing Case states.'
+          example: AwaitingCouncil
+          required: false
+          schema:
+            type: string
+            description: 'CSV existing Case states.'
+            example: AwaitingCouncil
+        -
+          in: query
+          name: history
+          description: 'default includes open Cases and Terminated; include adds all closed outcomes.'
+          example: include
+          required: false
+          schema:
+            type: string
+            description: 'default includes open Cases and Terminated; include adds all closed outcomes.'
+            example: include
+        -
+          in: query
+          name: created_from
+          description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: created_to
+          description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+          example: '2026-01-31'
+          required: false
+          schema:
+            type: string
+            description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+            example: '2026-01-31'
+        -
+          in: query
+          name: q
+          description: 'Bilingual Student name or University-ID search.'
+          example: Ahmed
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual Student name or University-ID search.'
+            example: Ahmed
+        -
+          in: query
+          name: sort
+          description: 'CSV order; stable Case ID breaks ties and unknown timestamps sort last.'
+          example: '-created_at'
+          required: false
+          schema:
+            type: string
+            description: 'CSV order; stable Case ID breaks ties and unknown timestamps sort last.'
+            example: '-created_at'
+        -
+          in: query
+          name: page
+          description: 'Page number; summary/export retain the full selection.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; summary/export retain the full selection.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'List size capped at 100; summary/export retain the full selection.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'List size capped at 100; summary/export retain the full selection.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - 'Academic Standing'
+      security: []
+  /api/v1/academic-standing/reports/termination/cases:
+    get:
+      summary: 'Scoped minimal Termination Case List.'
+      operationId: scopedMinimalTerminationCaseList
+      description: "Review URLs require operational permission, persona, stage and live access.\nNo evidence, fingerprints, private identity or review narratives are exposed.\nAll available workflow timestamps are UTC; date filters describe Case creation."
+      parameters:
+        -
+          in: query
+          name: faculty_id
+          description: 'CSV Faculty IDs narrowing permitted Students.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Faculty IDs narrowing permitted Students.'
+            example: '1'
+        -
+          in: query
+          name: department_id
+          description: 'CSV Department IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Department IDs.'
+            example: '1'
+        -
+          in: query
+          name: program_id
+          description: 'CSV Program IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Program IDs.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'CSV MSc or PhD.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'CSV MSc or PhD.'
+            example: MSc
+        -
+          in: query
+          name: lifecycle
+          description: 'CSV lifecycle; default Active and Terminated.'
+          example: 'Active,Terminated'
+          required: false
+          schema:
+            type: string
+            description: 'CSV lifecycle; default Active and Terminated.'
+            example: 'Active,Terminated'
+        -
+          in: query
+          name: state
+          description: 'CSV existing Case states.'
+          example: AwaitingCouncil
+          required: false
+          schema:
+            type: string
+            description: 'CSV existing Case states.'
+            example: AwaitingCouncil
+        -
+          in: query
+          name: history
+          description: 'default includes open Cases and Terminated; include adds all closed outcomes.'
+          example: include
+          required: false
+          schema:
+            type: string
+            description: 'default includes open Cases and Terminated; include adds all closed outcomes.'
+            example: include
+        -
+          in: query
+          name: created_from
+          description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: created_to
+          description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+          example: '2026-01-31'
+          required: false
+          schema:
+            type: string
+            description: 'Inclusive Case-created UTC date, YYYY-MM-DD.'
+            example: '2026-01-31'
+        -
+          in: query
+          name: q
+          description: 'Bilingual Student name or University-ID search.'
+          example: Ahmed
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual Student name or University-ID search.'
+            example: Ahmed
+        -
+          in: query
+          name: sort
+          description: 'CSV order; stable Case ID breaks ties and unknown timestamps sort last.'
+          example: '-created_at'
+          required: false
+          schema:
+            type: string
+            description: 'CSV order; stable Case ID breaks ties and unknown timestamps sort last.'
+            example: '-created_at'
+        -
+          in: query
+          name: page
+          description: 'Page number; summary/export retain the full selection.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; summary/export retain the full selection.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'List size capped at 100; summary/export retain the full selection.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'List size capped at 100; summary/export retain the full selection.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      student_id: 1
+                      university_id: 001-STUDENT
+                      name_en: null
+                      name_ar: null
+                      program:
+                        id: 1
+                        code: CSE-MSC
+                        name_en: 'Computer Science'
+                        name_ar: 'علوم الحاسب'
+                        degree_level: MSc
+                        department_id: 1
+                        faculty_id: 1
+                      lifecycle: Active
+                      case_id: 1
+                      state: AwaitingCouncil
+                      created_at: '2026-01-01T00:00:00+00:00'
+                      advisor_reviewed_at: null
+                      department_head_reviewed_at: null
+                      council_decided_at: null
+                      closed_at: null
+                      unavailable:
+                        - student_name
+                      review_url: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 25
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        student_id: 1
+                        university_id: 001-STUDENT
+                        name_en: null
+                        name_ar: null
+                        program:
+                          id: 1
+                          code: CSE-MSC
+                          name_en: 'Computer Science'
+                          name_ar: 'علوم الحاسب'
+                          degree_level: MSc
+                          department_id: 1
+                          faculty_id: 1
+                        lifecycle: Active
+                        case_id: 1
+                        state: AwaitingCouncil
+                        created_at: '2026-01-01T00:00:00+00:00'
+                        advisor_reviewed_at: null
+                        department_head_reviewed_at: null
+                        council_decided_at: null
+                        closed_at: null
+                        unavailable:
+                          - student_name
+                        review_url: null
+                    items:
+                      type: object
+                      properties:
+                        student_id:
+                          type: integer
+                          example: 1
+                        university_id:
+                          type: string
+                          example: 001-STUDENT
+                        name_en:
+                          type: string
+                          example: null
+                          nullable: true
+                        name_ar:
+                          type: string
+                          example: null
+                          nullable: true
+                        program:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            code:
+                              type: string
+                              example: CSE-MSC
+                            name_en:
+                              type: string
+                              example: 'Computer Science'
+                            name_ar:
+                              type: string
+                              example: 'علوم الحاسب'
+                            degree_level:
+                              type: string
+                              example: MSc
+                            department_id:
+                              type: integer
+                              example: 1
+                            faculty_id:
+                              type: integer
+                              example: 1
+                          nullable: true
+                        lifecycle:
+                          type: string
+                          example: Active
+                        case_id:
+                          type: integer
+                          example: 1
+                        state:
+                          type: string
+                          example: AwaitingCouncil
+                        created_at:
+                          type: string
+                          example: '2026-01-01T00:00:00+00:00'
+                          nullable: true
+                        advisor_reviewed_at:
+                          type: string
+                          example: null
+                          nullable: true
+                        department_head_reviewed_at:
+                          type: string
+                          example: null
+                          nullable: true
+                        council_decided_at:
+                          type: string
+                          example: null
+                          nullable: true
+                        closed_at:
+                          type: string
+                          example: null
+                          nullable: true
+                        unavailable:
+                          type: array
+                          example:
+                            - student_name
+                          items:
+                            type: string
+                        review_url:
+                          type: string
+                          example: null
+                          nullable: true
+                      required:
+                        - name_en
+                        - name_ar
+                        - program
+                        - created_at
+                        - advisor_reviewed_at
+                        - department_head_reviewed_at
+                        - council_decided_at
+                        - closed_at
+                        - review_url
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+      tags:
+        - 'Academic Standing'
+      security: []
   /api/v1/academic-standing/reports/graduation-readiness/students/export:
     get:
       summary: 'Export every Student in the authorized advisory readiness selection.'

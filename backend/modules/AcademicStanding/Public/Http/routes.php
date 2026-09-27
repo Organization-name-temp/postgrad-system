@@ -7,8 +7,12 @@ use Modules\AcademicStanding\Internal\Http\Controllers\GraduationReportControlle
 use Modules\AcademicStanding\Internal\Http\Controllers\StandingController;
 use Modules\AcademicStanding\Internal\Http\Controllers\StandingReportController;
 use Modules\AcademicStanding\Internal\Http\Controllers\TerminationCaseController;
+use Modules\AcademicStanding\Internal\Http\Controllers\TerminationReportController;
 
 Route::middleware(['auth:sanctum', 'can:standing.monitor'])->group(function () {
+    Route::get('/academic-standing/reports/termination', [TerminationReportController::class, 'summary']);
+    Route::get('/academic-standing/reports/termination/cases/export', [TerminationReportController::class, 'export']);
+    Route::get('/academic-standing/reports/termination/cases', [TerminationReportController::class, 'cases']);
     Route::get('/academic-standing/reports/graduation-readiness/students/export', [GraduationReportController::class, 'export']);
     Route::get('/academic-standing/reports/graduation-readiness/students', [GraduationReportController::class, 'students']);
     Route::get('/academic-standing/reports/graduation-readiness', [GraduationReportController::class, 'summary']);

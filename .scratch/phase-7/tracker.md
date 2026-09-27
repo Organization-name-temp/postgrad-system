@@ -1214,3 +1214,34 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   ignored test-results. Human presentation acceptance is not claimed. Remaining
   worked HTTP acceptance scenarios, #03–#07, full gates and the consolidated final
   review remain pending; no per-ticket review was run.
+
+### Termination Report HTTP oversight slice
+
+- AcademicStanding now selects a minimal Case projection after #01's live cohort
+  scope. Default lifecycle includes Active and Terminated Students; default Cases
+  include three open stages and final Terminated outcomes. Explicit history adds
+  Dismissed, TriggerCleared and EvidenceChanged replacements. Case counts and
+  distinct Student counts remain separately labelled.
+- Owner-local Case reads select only references, state and workflow timestamps;
+  evidence, fingerprints and review narratives are not fetched or serialized.
+  Inclusive UTC Case-created date boundaries compose with academic/state/history
+  criteria before stable Case-ID ordering and pagination (cap 100).
+- Review URLs require operational permission, explicit persona, relevant open
+  stage, Active lifecycle and live advisee/academic Department access. Oversight
+  alone grants no operational link; existing review routes retain their own gates.
+- EN/AR canonical workbook read-back proves all 30 scoped Cases despite per_page=1,
+  string Case/Student/University IDs, recommendation-stage labels, RTL sheet
+  metadata, private-data exclusion and actor/criteria/Case/Student count audits.
+- Focused new Report plus existing operational regressions passed **15 tests /
+  187 assertions, 6.90s**, including live union/reassignment, inclusive date edges,
+  history counts, repeated GETs without workflow writes, Student/Instructor-only
+  denial, Advisor/Head/Council link access and 105-Case deterministic pagination.
+  The first history fixture attempted several open Cases for one Student; the
+  owner database constraint correctly rejected it. Distinct open Students plus
+  closed replacements now model legal history without disabling the constraint.
+- Pint, PHPStan and deptrac passed. OpenAPI/Orval regenerated with nullable safe
+  names/Program, timestamps/review URL and unavailable string array. Generated
+  client typecheck is pending before commit. Owner UI, browser/demo fixtures,
+  print/a11y, all remaining acceptance gates and the consolidated review remain
+  pending. No per-ticket review was run.
+- Final generated-client typecheck passed. Post-commit API drift checks follow.

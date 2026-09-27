@@ -39,6 +39,10 @@ return [
         'blockers' => ['RemainingRequirements' => 'متطلبات خطة دراسية متبقية', 'CgpaUnavailable' => 'المعدل التراكمي غير متاح', 'CgpaBelowMinimum' => 'المعدل التراكمي أقل من الحد الأدنى', 'TerminationPending' => 'حالة إنهاء قيد تستدعي الإجراء قيد النظر'],
         'advisory' => ['Active' => 'معلومات أكاديمية استرشادية؛ ليست موافقة رسمية على التخرج', 'Terminated' => 'معلومات تاريخية استرشادية؛ الطالب غير مؤهل حاليًا للتخرج'],
     ],
+    'termination_report' => [
+        'headers' => ['state' => 'مرحلة المراجعة / النتيجة', 'created_at' => 'إنشاء الحالة (UTC)', 'advisor_reviewed_at' => 'تقييم المرشد (UTC)', 'department_head_reviewed_at' => 'مراجعة رئيس القسم (UTC)', 'council_decided_at' => 'قرار المجلس (UTC)', 'closed_at' => 'إغلاق الحالة (UTC)', 'unavailable' => 'البيانات غير المتاحة'],
+        'states' => ['AwaitingAdvisor' => 'رصد حالة بانتظار تقييم المرشد', 'AwaitingDepartmentHead' => 'تقييم المرشد بانتظار مراجعة رئيس القسم', 'AwaitingCouncil' => 'توصية بانتظار قرار المجلس', 'Dismissed' => 'مرفوضة', 'Terminated' => 'تم إنهاء القيد', 'TriggerCleared' => 'زوال سبب الإجراء', 'EvidenceChanged' => 'تغيّرت الأدلة / حالة مستبدلة'],
+    ],
     'exports' => [
         'headers' => [
             'case_id' => 'رقم الحالة',

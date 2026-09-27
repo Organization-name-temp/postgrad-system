@@ -61,5 +61,7 @@ class DatabaseSeeder extends Seeder
         // Analytics prerequisite: a deterministic generated layer on top of the
         // named personas, with its own staff so their operational footprints stay intact.
         $this->call(GeneratedCohortSeeder::class);
+
+        $this->call(Phase7AcademicReportSeeder::class);
     }
 }

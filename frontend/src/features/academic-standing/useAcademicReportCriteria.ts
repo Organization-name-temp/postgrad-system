@@ -18,7 +18,7 @@ export const ACADEMIC_STANDINGS = [
 ] as const
 
 /** Shared only by the AcademicStanding owner's Report and ordinary Student List. */
-export function useAcademicReportCriteria(includeStanding = true) {
+export function useAcademicReportCriteria(includeStanding = true, defaultLifecycle = 'Active') {
   const { t, i18n } = useTranslation('academicStanding')
   const collection = useCollectionQuery()
   const [facultySearch, setFacultySearch] = useState<string | null>(null)
@@ -160,7 +160,7 @@ export function useAcademicReportCriteria(includeStanding = true) {
     },
     {
       label: t('report.lifecycle'),
-      value: labelFor('lifecycle', collection.searchParams.get('lifecycle') ?? 'Active'),
+      value: labelFor('lifecycle', collection.searchParams.get('lifecycle') ?? defaultLifecycle),
     },
     {
       label: t('report.standing'),
@@ -173,7 +173,7 @@ export function useAcademicReportCriteria(includeStanding = true) {
     criteria: includeStanding ? criteria : criteria.slice(0, -1),
     values: {
       ...collection.params,
-      lifecycle: collection.searchParams.get('lifecycle') ?? 'Active',
+      lifecycle: collection.searchParams.get('lifecycle') ?? defaultLifecycle,
     },
   }
 }

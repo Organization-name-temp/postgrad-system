@@ -1245,3 +1245,28 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   print/a11y, all remaining acceptance gates and the consolidated review remain
   pending. No per-ticket review was run.
 - Final generated-client typecheck passed. Post-commit API drift checks follow.
+
+### Termination UI and executable demo fixtures
+
+- Protected Report/List routes and navigation now share academic Report roles and
+  monitor permission. UI preserves named academic, state, history and UTC date
+  criteria; separately labels Case and distinct Student populations; exposes only
+  server-authorized, stage/persona/permission-matched operational links.
+- EN/AR Report/List and navigation focused tests passed **28 tests / 3 files,
+  20.71s** after seven navigation assertions failed before composition. Typecheck
+  and lint passed. Generated API drift checks following the backend commit passed.
+- New isolated Phase7AcademicReportSeeder uses existing academic seed helpers,
+  two unused graduate Offerings and owner-derived D/F Grades. Public Termination
+  reconciliation creates three real Cases; reseeding preserves their reviews and
+  evidence. Named operational rosters remain untouched. Test-first missing-seeder
+  RED became **1 passing test / 17 assertions, 18.75s**; Pint/PHPStan passed.
+- Seeded development fixtures successfully. Native EN/AR × oversight persona
+  browser/print/accessibility verification is running; no result claimed yet.
+  All seven-ticket final gates and consolidated review remain pending.
+- Native Termination journeys passed **4 / 4, 1.5m** (Student Affairs light
+  and Dean dark, EN/AR): exact 3 Cases / 3 Students, keyboard state drill,
+  seven-state table with zero-state links absent, privacy-safe List, no oversight
+  review link, canonical downloads, Back navigation, and Report/List axe without
+  serious/critical violations. A4 PDFs preserve direction, black text and table fit;
+  EN/AR each occupy two pages. Actual Arabic page 1 inspected; complete paper
+  inspection and final cross-phase acceptance remain pending.

@@ -13,6 +13,8 @@ import { RegisterPage } from '../features/admissions/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
 import { GraduationReportPage } from '../features/academic-standing/GraduationReportPage'
 import { GraduationStudentListPage } from '../features/academic-standing/GraduationStudentListPage'
+import { TerminationReportPage } from '../features/academic-standing/TerminationReportPage'
+import { TerminationCaseListPage } from '../features/academic-standing/TerminationCaseListPage'
 import { StandingReportPage } from '../features/academic-standing/StandingReportPage'
 import { StandingStudentListPage } from '../features/academic-standing/StandingStudentListPage'
 import { ACADEMIC_REPORT_ROLES } from '../features/academic-standing/academicReportAccess'
@@ -295,6 +297,11 @@ export function App() {
                     />
                   }
                 >
+                  <Route path="/analytics/termination" element={<TerminationReportPage />} />
+                  <Route
+                    path="/analytics/termination/cases"
+                    element={<TerminationCaseListPage />}
+                  />
                   <Route
                     path="/analytics/graduation-readiness"
                     element={<GraduationReportPage />}

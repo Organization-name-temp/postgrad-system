@@ -149,6 +149,10 @@ it.each(['R03', 'R05', 'R06', 'R07', 'R08', 'R09', 'R10'])(
       'href',
       '/analytics/academic-standing',
     )
+    expect(screen.getByRole('link', { name: 'Termination Report' })).toHaveAttribute(
+      'href',
+      '/analytics/termination',
+    )
     expect(screen.getByRole('link', { name: 'Graduation Readiness Report' })).toHaveAttribute(
       'href',
       '/analytics/graduation-readiness',
@@ -167,6 +171,7 @@ it.each(['R02', 'R04'])(
     )
     renderRealNav()
     expect(screen.queryByRole('link', { name: 'Academic Standing Report' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Termination Report' })).not.toBeInTheDocument()
     expect(
       screen.queryByRole('link', { name: 'Graduation Readiness Report' }),
     ).not.toBeInTheDocument()

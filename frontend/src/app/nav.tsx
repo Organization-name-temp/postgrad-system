@@ -52,6 +52,14 @@ import { ACADEMIC_REPORT_ROLES } from '../features/academic-standing/academicRep
  */
 export const navItems: NavItem[] = [
   {
+    key: 'terminationReport',
+    to: '/analytics/termination',
+    icon: <DonutLargeIcon />,
+    permission: PERMISSION.monitorAcademicStanding,
+    roles: ACADEMIC_REPORT_ROLES,
+    section: 'analytics',
+  },
+  {
     key: 'graduationReadinessReport',
     to: '/analytics/graduation-readiness',
     icon: <DonutLargeIcon />,

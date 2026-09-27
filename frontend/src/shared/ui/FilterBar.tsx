@@ -35,6 +35,20 @@ export function FilterBar({
           slotProps={{ inputLabel: field.type === 'date' ? { shrink: true } : undefined }}
           sx={{ flex: '1 1 12rem', minWidth: 0 }}
         >
+          {field.options &&
+            values[field.key] !== undefined &&
+            values[field.key] !== '' &&
+            !field.options.some((option) => option.value === String(values[field.key])) && (
+              <MenuItem value={String(values[field.key])}>
+                {String(values[field.key])
+                  .split(',')
+                  .map((value) => {
+                    const token = value.trim()
+                    return field.options?.find((option) => option.value === token)?.label ?? token
+                  })
+                  .join(', ')}
+              </MenuItem>
+            )}
           {field.options?.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}

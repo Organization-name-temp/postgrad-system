@@ -477,3 +477,28 @@ headline plus awaiting/booked/assigned EN/AR bookmarked criteria, reload, authen
 workbook downloads and serious/critical axe checks. This closes the Interview
 collection slice; slot pool/pickers, Catalog type-ahead, direct Faculty criterion,
 Pipeline/print prerequisites and all seven Phase 7 acceptance items remain pending.
+
+### Shared bookmark display fidelity
+
+- Test-first reproduction proved preset dropdowns rendered valid bookmarked
+  comma-separated filters and compound sorts blank (MUI out-of-range warning),
+  while the backend still applied them. FilterBar now includes the current value
+  when it is outside presets, displaying constituent owner labels without changing
+  the URL or API criteria. Ordinary preset selection/clearing remains unchanged.
+- Focused verification: **4 files / 9 tests passed, 16.87s**, including shared
+  filter/hook and both Interview worklists. EN/AR Interview browser checks were
+  expanded to use multiple confirmation/mode values and compound sorts; pending.
+
+Expanded browser first run failed: the sort assertion still expected the old
+single-field value although the UI correctly retained `-scheduled_at,id`; an
+assigned login also timed out without a rendered error snapshot. Stopped that run,
+corrected the outdated expected value and reran the serial four-test selection.
+Frontend typecheck/lint/full format passed for the shared fix. Final browser result
+is pending; the failed/interrupted run is not counted as passing evidence.
+
+Final expanded serial browser rerun: **4 passed, 1.0m**. Both booked and assigned
+worklists visibly preserve multiple confirmation values and compound sort bookmarks
+in EN/AR, download authenticated workbooks and pass serious/critical axe checks.
+The earlier login timeout did not recur. Shared fix static and focused tests remain
+green. Full Phase 7 gates, print/layout verification and final consolidated review
+are still pending behind the remaining approved implementation frontier.

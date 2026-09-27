@@ -31,3 +31,34 @@ it('submits labelled text and select criteria and lets the owner clear criteria'
   await user.click(screen.getByRole('option', { name: 'All' }))
   expect(change).toHaveBeenCalledWith({ status: '' })
 })
+
+it('shows bookmarked comma-separated selections and compound sorts without silently clearing them', () => {
+  render(
+    <FilterBar
+      fields={[
+        {
+          key: 'status',
+          label: 'Status',
+          options: [
+            { value: '', label: 'All' },
+            { value: 'pending', label: 'Pending' },
+            { value: 'confirmed', label: 'Confirmed' },
+          ],
+        },
+        {
+          key: 'sort',
+          label: 'Sort',
+          options: [
+            { value: '', label: 'Default' },
+            { value: '-age', label: 'Longest wait' },
+            { value: 'name', label: 'Name' },
+          ],
+        },
+      ]}
+      values={{ status: 'pending,confirmed', sort: '-age,name' }}
+      onChange={vi.fn()}
+    />,
+  )
+  expect(screen.getByRole('combobox', { name: 'Status' })).toHaveTextContent('Pending, Confirmed')
+  expect(screen.getByRole('combobox', { name: 'Sort' })).toHaveTextContent('Longest wait, Name')
+})

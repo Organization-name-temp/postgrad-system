@@ -14,7 +14,8 @@ for (const locale of ['en', 'ar'] as const) {
       await page.getByRole('button', { name: 'Sign in' }).click()
       await expect(page).toHaveURL(/\/$/)
       await page.getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English' }).click()
-      const criteria = 'q=NoSuchInterviewApplicant&status=confirmed&mode=virtual&sort=-scheduled_at'
+      const criteria =
+        'q=NoSuchInterviewApplicant&status=confirmed,pending_confirmation&mode=virtual,in_person&sort=-scheduled_at,id'
       await page.goto(
         scope === 'booked'
           ? `/interviews/scheduling?${criteria
@@ -33,8 +34,13 @@ for (const locale of ['en', 'ar'] as const) {
       await expect(search).toHaveValue('NoSuchInterviewApplicant')
       await page.reload()
       await expect(search).toHaveValue('NoSuchInterviewApplicant')
+      await expect(
+        region.getByRole('combobox', { name: locale === 'ar' ? 'التأكيد' : 'Confirmation' }),
+      ).toContainText(
+        locale === 'ar' ? 'مؤكَّدة, بانتظار التأكيد' : 'Confirmed, Awaiting confirmation',
+      )
       await expect(region.getByLabel(locale === 'ar' ? 'الترتيب حسب' : 'Sort by')).toHaveValue(
-        '-scheduled_at',
+        '-scheduled_at,id',
       )
       const pending = page.waitForEvent('download')
       await region

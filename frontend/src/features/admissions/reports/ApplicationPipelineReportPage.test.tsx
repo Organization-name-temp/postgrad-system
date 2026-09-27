@@ -99,6 +99,7 @@ it.each(['en', 'ar'] as const)(
         </QueryClientProvider>
       </ThemeProvider>,
     )
+    if (locale === 'ar') expect(await screen.findByText('عدد الطلبات: 3')).toBeInTheDocument()
     const title = locale === 'en' ? 'Application Pipeline' : 'مسار طلبات القبول'
     expect(await screen.findByRole('img', { name: title })).toBeInTheDocument()
     expect(

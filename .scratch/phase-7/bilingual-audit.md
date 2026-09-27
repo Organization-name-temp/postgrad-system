@@ -38,3 +38,14 @@ remain unchanged.
 
 All remaining items require the final acceptance pass. No broad audit claim is made
 from dictionary parity alone.
+
+## Confirmed shell/Admissions corrections
+
+| ID | Surface | Evidence | Disposition |
+| --- | --- | --- | --- |
+| B04-01 | Authenticated route loading | Arabic interaction regression found English-only `Checking your session` accessible spinner label. | Paired auth dictionary key and actual guard translation; 8 guard tests passed, including Arabic loading. |
+| B04-02 | Built-in selection controls | Themed Autocomplete interaction passed English and failed Arabic clear/open/close labels before change. Existing Admissions selector instances have no local control-label override. | Apply MUI locale defaults with existing locale-derived theme; component overrides remain authoritative. EN/AR control tests preserve selected value. Theme/guard/control focused checks: 16 tests passed. |
+| B04-03 | Pipeline population | Arabic Report rendered `{{count}} طلبات` regardless of count, which is unsuitable for the generated population (e.g. 69). | Use `عدد الطلبات: {{count}}`, a count-neutral label; actual Arabic Report regression captured RED. Final focused verification pending. |
+
+These fixes do not establish complete existing-surface audit coverage. Four-state
+responsive/browser checks and runtime message paths remain on the acceptance frontier.

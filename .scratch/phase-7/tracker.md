@@ -1270,3 +1270,18 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   serious/critical violations. A4 PDFs preserve direction, black text and table fit;
   EN/AR each occupy two pages. Actual Arabic page 1 inspected; complete paper
   inspection and final cross-phase acceptance remain pending.
+
+### Existing-screen polish frontier
+
+- #04 confirmed two concrete defects test-first: untranslated session-loading
+  accessible label and Arabic selection controls inheriting English built-in
+  labels. Paired auth key and locale-derived MUI defaults fix them; **16 focused
+  guard/theme/control tests passed, 9.37s**. Arabic Pipeline population wording
+  regression also captured; count-neutral translation verification is running.
+- Actual Termination paper second pages inspected in English and dark-theme Arabic:
+  all seven state labels/counts fit with correct direction and black-on-white text.
+  Human presentation signoff remains unclaimed.
+- Bilingual audit records retain explicit coverage gaps rather than infer complete
+  screen correctness from dictionary parity. #04–#07, final gates/review pending.
+- Pipeline EN/AR focused Report tests passed **2 / 2, 15.32s**; frontend typecheck
+  and lint passed for this polish slice. Full four-state surface audit remains pending.

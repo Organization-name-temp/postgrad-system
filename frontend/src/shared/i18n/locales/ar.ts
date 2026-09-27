@@ -283,6 +283,7 @@ export const ar = {
     },
   },
   auth: {
+    checkingSession: 'جارٍ التحقق من جلستك',
     login: {
       title: 'تسجيل الدخول',
       submit: 'تسجيل الدخول',
@@ -574,7 +575,7 @@ export const ar = {
       loading: 'جارٍ تحميل مسار طلبات القبول',
       loadError: 'تعذّر تحميل مسار طلبات القبول.',
       retry: 'إعادة المحاولة',
-      total: '{{count}} طلبات',
+      total: 'عدد الطلبات: {{count}}',
       stage: 'حالة الطلب',
       applications: 'الطلبات',
       conversions: 'الانتقالات المقاسة بين الحالات',

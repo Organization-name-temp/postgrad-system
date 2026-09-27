@@ -290,6 +290,7 @@ export const en = {
     },
   },
   auth: {
+    checkingSession: 'Checking your session',
     login: {
       title: 'Sign in',
       submit: 'Sign in',

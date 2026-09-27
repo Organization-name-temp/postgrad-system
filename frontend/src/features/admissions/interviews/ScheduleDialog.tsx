@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import {
   Alert,
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -20,6 +20,7 @@ import {
   useListInterviewSlots,
   useScheduleAnApplicantIntoAnInterviewSlot,
 } from '../../../shared/api/generated/endpoints'
+import type { ListInterviewSlots200DataItem } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { formatSlotWhen, slotWhere } from './slotDisplay'
 
@@ -44,16 +45,21 @@ export function ScheduleDialog({
 }: ScheduleDialogProps) {
   const { t, i18n } = useTranslation('admissions')
   const queryClient = useQueryClient()
+  const [search, setSearch] = useState('')
+  const [inputValue, setInputValue] = useState('')
+  const [selectedSlot, setSelectedSlot] = useState<ListInterviewSlots200DataItem | null>(null)
   const slots = useListInterviewSlots(
-    { is_open: 'true', per_page: 100 },
+    { is_open: 'true', per_page: 100, q: search || undefined },
     { query: { enabled: open } },
   )
   const openSlots = (slots.data?.data ?? []).filter((slot) => slot.is_open)
 
-  const [slotId, setSlotId] = useState('')
+  const slotId = selectedSlot?.id
   useEffect(() => {
     if (open) {
-      setSlotId('')
+      setSelectedSlot(null)
+      setSearch('')
+      setInputValue('')
     }
   }, [open])
 
@@ -61,7 +67,7 @@ export function ScheduleDialog({
   const error = schedule.isError ? apiErrorMessage(schedule.error) : undefined
 
   const handleSubmit = () => {
-    if (applicationId === undefined || slotId === '') {
+    if (applicationId === undefined || slotId === undefined) {
       return
     }
     schedule.mutate(
@@ -85,25 +91,42 @@ export function ScheduleDialog({
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {error && <Alert severity="error">{error}</Alert>}
-          {openSlots.length === 0 ? (
-            <Typography color="text.secondary">{t('interviews.scheduling.noOpenSlots')}</Typography>
-          ) : (
-            <TextField
-              select
-              label={t('interviews.scheduling.slot')}
-              value={slotId}
-              onChange={(event) => setSlotId(event.target.value)}
-              required
-              fullWidth
-            >
-              {openSlots.map((slot) => (
-                <MenuItem key={slot.id} value={String(slot.id)}>
-                  {formatSlotWhen(slot.scheduled_at, i18n.language)} — {slot.interviewer?.name}
-                  {slotWhere(slot) ? ` (${slotWhere(slot)})` : ''}
-                </MenuItem>
-              ))}
-            </TextField>
-          )}
+          {slots.isError && <Alert severity="error">{t('interviews.scheduling.loadError')}</Alert>}
+          {!slots.isPending &&
+            !slots.isError &&
+            !search &&
+            (slots.data?.meta?.total ?? 0) === 0 && (
+              <Typography color="text.secondary">
+                {t('interviews.scheduling.noOpenSlots')}
+              </Typography>
+            )}
+          <Autocomplete
+            options={openSlots}
+            value={selectedSlot}
+            inputValue={inputValue}
+            onChange={(_, value) => setSelectedSlot(value)}
+            onInputChange={(_, value, reason) => {
+              if (reason === 'input' || reason === 'clear') {
+                setInputValue(value)
+                setSearch(value)
+                setSelectedSlot(null)
+              } else if (value) {
+                setInputValue(value)
+              }
+            }}
+            filterOptions={(options) => options}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            getOptionKey={(option) => option.id ?? 0}
+            getOptionLabel={(slot) =>
+              `${formatSlotWhen(slot.scheduled_at, i18n.language)} — ${slot.interviewer?.name ?? ''}${slotWhere(slot) ? ` (${slotWhere(slot)})` : ''}`
+            }
+            loading={slots.isPending}
+            loadingText={t('interviews.scheduling.loading')}
+            noOptionsText={t('interviews.scheduling.noMatchingSlots')}
+            renderInput={(props) => (
+              <TextField {...props} label={t('interviews.scheduling.slot')} required fullWidth />
+            )}
+          />
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -113,7 +136,7 @@ export function ScheduleDialog({
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={schedule.isPending || slotId === ''}
+          disabled={schedule.isPending || slotId === undefined}
         >
           {t('interviews.scheduling.confirm')}
         </Button>

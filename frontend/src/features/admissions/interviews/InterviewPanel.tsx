@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Chip,
   CircularProgress,
   Divider,
-  MenuItem,
   Stack,
   TextField,
   Typography,
@@ -21,6 +21,7 @@ import {
   useOpenSlotsToRescheduleInto,
   useRescheduleMyInterview,
 } from '../../../shared/api/generated/endpoints'
+import type { OpenSlotsToRescheduleInto200DataItem } from '../../../shared/api/generated/endpoints'
 import { apiErrorMessage } from '../../../shared/api/errors'
 import { formatSlotWhen, slotWhere } from './slotDisplay'
 
@@ -39,10 +40,17 @@ export function InterviewPanel() {
   const interviewQuery = useMyInterview({ query: { retry: false } })
   const confirm = useConfirmMyInterview()
   const reschedule = useRescheduleMyInterview()
-  const openSlots = useOpenSlotsToRescheduleInto(undefined, { query: { enabled: false } })
-
   const [rescheduling, setRescheduling] = useState(false)
-  const [slotId, setSlotId] = useState('')
+  const [search, setSearch] = useState('')
+  const [inputValue, setInputValue] = useState('')
+  const [selectedSlot, setSelectedSlot] = useState<OpenSlotsToRescheduleInto200DataItem | null>(
+    null,
+  )
+  const openSlots = useOpenSlotsToRescheduleInto(
+    { q: search || undefined, per_page: 100 },
+    { query: { enabled: rescheduling } },
+  )
+  const slotId = selectedSlot?.id
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: getMyInterviewQueryKey() })
 
@@ -76,12 +84,13 @@ export function InterviewPanel() {
 
   const startReschedule = () => {
     setRescheduling(true)
-    setSlotId('')
-    void openSlots.refetch()
+    setSelectedSlot(null)
+    setSearch('')
+    setInputValue('')
   }
 
   const submitReschedule = () => {
-    if (slotId === '') {
+    if (slotId === undefined) {
       return
     }
     reschedule.mutate(
@@ -134,29 +143,53 @@ export function InterviewPanel() {
 
       {rescheduling ? (
         <Stack spacing={2}>
-          <TextField
-            select
-            label={t('interviews.applicant.newSlot')}
-            value={slotId}
-            onChange={(event) => setSlotId(event.target.value)}
-            fullWidth
-            helperText={
-              (openSlots.data?.data ?? []).length === 0
-                ? t('interviews.applicant.noOpenSlots')
-                : undefined
+          {openSlots.isError && (
+            <Alert severity="error">{t('interviews.applicant.loadError')}</Alert>
+          )}
+          <Autocomplete
+            options={openSlots.data?.data ?? []}
+            value={selectedSlot}
+            inputValue={inputValue}
+            onChange={(_, value) => setSelectedSlot(value)}
+            onInputChange={(_, value, reason) => {
+              if (reason === 'input' || reason === 'clear') {
+                setInputValue(value)
+                setSearch(value)
+                setSelectedSlot(null)
+              } else if (value) {
+                setInputValue(value)
+              }
+            }}
+            filterOptions={(options) => options}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            getOptionKey={(option) => option.id ?? 0}
+            getOptionLabel={(option) =>
+              `${formatSlotWhen(option.scheduled_at, i18n.language)}${slotWhere(option) ? ` (${slotWhere(option)})` : ''}`
             }
-          >
-            {(openSlots.data?.data ?? []).map((option) => (
-              <MenuItem key={option.id} value={String(option.id)}>
-                {formatSlotWhen(option.scheduled_at, i18n.language)}
-              </MenuItem>
-            ))}
-          </TextField>
+            loading={openSlots.isPending}
+            loadingText={t('interviews.scheduling.loading')}
+            noOptionsText={t('interviews.scheduling.noMatchingSlots')}
+            renderInput={(props) => (
+              <TextField
+                {...props}
+                label={t('interviews.applicant.newSlot')}
+                fullWidth
+                helperText={
+                  !openSlots.isPending &&
+                  !openSlots.isError &&
+                  !search &&
+                  openSlots.data?.meta?.total === 0
+                    ? t('interviews.applicant.noOpenSlots')
+                    : undefined
+                }
+              />
+            )}
+          />
           <Stack direction="row" spacing={2}>
             <Button
               variant="contained"
               onClick={submitReschedule}
-              disabled={reschedule.isPending || slotId === ''}
+              disabled={reschedule.isPending || slotId === undefined}
             >
               {t('interviews.applicant.confirmReschedule')}
             </Button>

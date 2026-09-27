@@ -839,6 +839,7 @@ export const ar = {
         },
       },
       scheduling: {
+        noMatchingSlots: 'لا توجد مواعيد متاحة تطابق البحث عن المكان.',
         title: 'جدولة المقابلات',
         awaiting: 'بانتظار الجدولة',
         awaitingEmpty: 'لا يوجد متقدمون مقبولون بانتظار الجدولة.',

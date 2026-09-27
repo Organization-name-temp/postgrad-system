@@ -225,6 +225,16 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await slotForm.getByLabel('Location').fill(slotLocation)
   await slotForm.getByRole('button', { name: 'Save', exact: true }).click()
   await expect(slotForm).not.toBeVisible()
+  const replacementLocation = `Smoke replacement ${UNIQUE}`
+  await page.getByRole('button', { name: 'New slot' }).click()
+  await slotForm
+    .getByLabel('Date & time')
+    .fill(new Date(Date.now() + 4 * 86400000).toISOString().slice(0, 16))
+  await slotForm.getByRole('combobox', { name: 'Interviewer' }).click()
+  await page.getByRole('option', { name: 'Dr. Hoda Mansour', exact: true }).click()
+  await slotForm.getByLabel('Location').fill(replacementLocation)
+  await slotForm.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(slotForm).not.toBeVisible()
   await page.getByRole('link', { name: 'Interview scheduling' }).first().click()
   await expect(page).toHaveURL(/\/interviews\/scheduling$/)
   await page
@@ -236,10 +246,25 @@ test('headline: a stranger applies and is admitted as a Student across every rol
     .getByRole('button', { name: 'Schedule' })
     .click()
   // Book the slot created for this run, assigned to the named interviewer below.
-  await page.getByRole('combobox', { name: 'Interview slot' }).click()
+  await page.getByRole('combobox', { name: 'Interview slot' }).fill(slotLocation)
   await page.getByRole('option', { name: new RegExp(slotLocation) }).click()
   await page.getByRole('button', { name: 'Schedule interview' }).click()
   await capture(page, testInfo, '4-sa-scheduled')
+  await logout(page)
+
+  // The applicant searches their permitted open-slot lookup, uses the one
+  // reschedule, then confirms attendance. Each run owns both slots and applicant.
+  await login(page, APPLICANT.email)
+  await page.goto('/apply')
+  await page.getByRole('button', { name: 'Reschedule', exact: true }).click()
+  await page.getByRole('combobox', { name: 'New slot' }).fill(replacementLocation)
+  await page.getByRole('option', { name: new RegExp(replacementLocation) }).click()
+  await page.getByRole('button', { name: 'Move to this slot' }).click()
+  await expect(page.getByRole('button', { name: 'Reschedule', exact: true })).not.toBeVisible()
+  await page.getByRole('button', { name: 'Confirm attendance' }).click()
+  await expect(page.getByText('Confirmed', { exact: true })).toBeVisible()
+  await expectNoSeriousA11y(page)
+  await capture(page, testInfo, '4b-applicant-rescheduled')
   await logout(page)
 
   // ── 6. The assigned interviewer records an evaluation ────────────────────────────

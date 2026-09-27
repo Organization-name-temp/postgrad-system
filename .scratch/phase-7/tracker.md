@@ -566,3 +566,44 @@ Slot-pool serial browser verification **3 passed, 2.2m**: full admissions headli
 plus EN/AR bookmarked multi-value filters and compound sort, numeric duration
 criterion reload, authenticated workbook downloads and serious/critical axe scans.
 No final package gate or manual print/layout acceptance is claimed by this result.
+
+### Scheduling and Applicant slot type-aheads
+
+- Red HTTP-boundary tests reproduced the non-searchable selects in both staff
+  scheduling and Applicant rescheduling. Both now use owner-server Autocomplete
+  queries with a 100-row reference page, retain an explicitly selected slot DTO,
+  and disable local filtering so Arabic owner-normalized matches remain available.
+  Scheduling always requests open-only slots; Applicant lookup retains its existing
+  server base constraint. Selecting does not auto-select the first result.
+- Selection beyond the first page is covered by a 101-row metadata scenario where
+  Arabic lookup returns slot 207; both actions submit that owner ID. Both EN and AR
+  cases pass. Clearing restores the baseline query; stable slot IDs key options.
+  Search/load/error and no-matching messages remain distinct from no available slots.
+  Added the shared Admissions no-matching message in English and Arabic together.
+- Focused frontend regression **4 files / 10 tests passed, 24.39s**, including both
+  type-aheads, independent scheduling collections and slot-pool URL/export controls.
+  Frontend typecheck/lint/format passed; affected test typecheck/format rerun active
+  after adding bilingual test cases. No backend or generated API change in this slice.
+- Headline now owns two capacity-one slots, searches the scheduling reference by its
+  unique location, and the new Applicant searches/reschedules into the second slot,
+  exhausts their reschedule budget and confirms attendance before the existing
+  evaluation/completion/acceptance journey. Serial browser verification active.
+- Staff directory pickers, Catalog type-aheads and direct Faculty filter remain #06
+  frontier; Pipeline/print prerequisites and all seven Phase 7 acceptance/final gates
+  and the one consolidated final review remain pending.
+
+Type-ahead follow-up TDD: choosing a slot and then typing a new search left the old
+choice submit-enabled. EN/AR tests reproduced this in both pickers. Separate visible
+input state now retains typed search while invalidating the previous choice; actions
+remain disabled until a new owner result is explicitly selected. The selected DTO
+still survives ordinary query refreshes. Focused rerun **4 files / 10 tests passed,
+19.31s**. Affected static and serial browser checks rerun after this fix; the earlier
+expanded headline/browser run passed **3 tests, 2.4m**, before this final adjustment.
+
+Final slot type-ahead verification after the stale-selection fix: frontend
+**typecheck/lint/full format passed**. Serial expanded admissions headline plus
+EN/AR slot-pool bookmarks/downloads/axe **3 passed, 2.3m**. Applicant search,
+reschedule-budget exhaustion, confirmation and subsequent staff completion/acceptance
+remain executable. #06 still needs staff/Catalog type-aheads and direct Faculty
+criteria; all seven Phase 7 Report/polish acceptance and final gates/review remain
+pending. No API artifacts changed in this UI-only slice.

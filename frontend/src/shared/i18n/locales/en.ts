@@ -881,6 +881,7 @@ export const en = {
         },
       },
       scheduling: {
+        noMatchingSlots: 'No open slots match this location search.',
         title: 'Interview scheduling',
         awaiting: 'Awaiting scheduling',
         awaitingEmpty: 'No approved applicants are awaiting scheduling.',

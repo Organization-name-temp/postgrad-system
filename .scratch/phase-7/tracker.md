@@ -1564,3 +1564,10 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   code, owner workflows and assertions remain unchanged. Focused five-test serial
   grading-headline/Readiness run is active against the retained failing preference
   state; next full gate will receive a new fresh fixture after it ends.
+- Saved-preference race focused verification **PASSED: 5 tests / 2.9m** against
+  the retained failing Arabic account state: grading headline 37.4s, all four
+  Readiness Report/List/export/paper journeys 28.0s / 37.5s / 33.5s / 35.5s.
+  Extended the same authenticated persistence wait to Records/Waiver switches;
+  anonymous recipient/public language choices retain their local-only behavior.
+  Browser discovery and formatting checked before the next complete gate. Failed
+  recovery log retained as `frontend-gate-attempt4.log` under durable log storage.

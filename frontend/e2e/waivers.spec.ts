@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -30,12 +34,8 @@ const SURFACES = [
 ] as const
 
 async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/, { timeout: 20_000 })
-  await page.getByRole('button', { name: 'English' }).click()
+  await loginWithSavedPreference(page, email)
+  await selectAuthenticatedLanguage(page, 'en')
 }
 
 test.describe('Waiver persona surfaces are bilingual, RTL-safe, and accessible', () => {
@@ -44,7 +44,7 @@ test.describe('Waiver persona surfaces are bilingual, RTL-safe, and accessible',
       test(`${surface.role} Waiver surface in ${language}`, async ({ page }) => {
         await login(page, surface.email)
         await page.goto(surface.path)
-        await page.getByRole('button', { name: language === 'ar' ? 'العربية' : 'English' }).click()
+        await selectAuthenticatedLanguage(page, language)
 
         await expect(
           page.getByRole('heading', { level: 1, name: surface.heading[language] }),

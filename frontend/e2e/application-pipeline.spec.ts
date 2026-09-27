@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -10,12 +14,8 @@ for (const account of ['r05', 'r07']) {
         (mode) => localStorage.setItem('mui-mode', mode),
         account === 'r07' ? 'dark' : 'light',
       )
-      await page.goto('/login')
-      await page.getByLabel('Email').fill(`${account}@ejust.test`)
-      await page.getByLabel('Password').fill('password')
-      await page.getByRole('button', { name: 'Sign in' }).click()
-      await expect(page).toHaveURL(/\/$/)
-      await page.getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English' }).click()
+      await loginWithSavedPreference(page, `${account}@ejust.test`)
+      await selectAuthenticatedLanguage(page, locale)
       await expect(
         page.getByRole('link', {
           name: locale === 'ar' ? 'مسار طلبات القبول' : 'Application Pipeline',
@@ -189,7 +189,7 @@ for (const account of ['r05', 'r07']) {
       await page.getByRole('img', { name: title }).locator('.MuiBarChart-element').nth(3).click()
       expect((await (await clickList).json()).meta.total).toBe(expectedCount)
       await expect(page).toHaveURL(/status=under_sa_review/)
-      await page.getByRole('button', { name: 'English' }).click()
+      await selectAuthenticatedLanguage(page, 'en')
     })
   }
 }

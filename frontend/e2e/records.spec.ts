@@ -1,4 +1,4 @@
-import { loginInEnglish as login } from './authenticatedLanguage'
+import { loginInEnglish as login, selectAuthenticatedLanguage } from './authenticatedLanguage'
 import { auditPresentation } from './presentationAudit'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page, type TestInfo } from '@playwright/test'
@@ -92,9 +92,7 @@ async function checkReadAndPrintMatrix(
             .click()
         }
       } else {
-        await page
-          .getByRole('button', { name: language === 'ar' ? 'العربية' : 'English', exact: true })
-          .click()
+        await selectAuthenticatedLanguage(page, language)
       }
       await expect(page.locator('html')).toHaveAttribute('dir', language === 'ar' ? 'rtl' : 'ltr')
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
@@ -225,9 +223,9 @@ test('Phase 6 serial journey: payment correction, bilingual certification/QR, re
     await recipient.getByRole('button', { name: 'English', exact: true }).click()
     await student.goto('/records')
     await checkReadAndPrintMatrix(student, 'current', false, testInfo)
-    await student.getByRole('button', { name: 'English', exact: true }).click()
+    await selectAuthenticatedLanguage(student, 'en')
     await checkReadAndPrintMatrix(staff, 'official', false, testInfo)
-    await staff.getByRole('button', { name: 'English', exact: true }).click()
+    await selectAuthenticatedLanguage(staff, 'en')
     await staff.getByLabel('Revocation reason').fill('Fictional learning revocation')
     await staff.getByRole('button', { name: 'Revoke validity' }).click()
     await expect(staff.getByText('Revoked official copy')).toBeVisible()
@@ -240,7 +238,7 @@ test('Phase 6 serial journey: payment correction, bilingual certification/QR, re
     await accessible(recipient)
     await checkReadAndPrintMatrix(recipient, 'public-revoked', true, testInfo, true)
     await checkReadAndPrintMatrix(staff, 'official-revoked', false, testInfo)
-    await staff.getByRole('button', { name: 'English', exact: true }).click()
+    await selectAuthenticatedLanguage(staff, 'en')
 
     const refund = await submitRequest(student, 'digital')
     await approveAndPay(student, staff, refund)

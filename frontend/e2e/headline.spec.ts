@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
@@ -7,10 +11,7 @@ import AxeBuilder from '@axe-core/playwright'
 // detail, tied together in the app shell.
 
 async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
+  await loginWithSavedPreference(page, email)
 }
 
 // WCAG AA gate (design-system.md §12): axe on the real screens, no serious/critical.
@@ -39,7 +40,7 @@ test('headline: sign in, browse the catalog tree, open a course, flip to RTL, si
 
   // Land on the guarded dashboard. Force a deterministic start language
   // (self-heals if a prior run left this seeded user in Arabic).
-  await page.getByRole('button', { name: 'English' }).click()
+  await selectAuthenticatedLanguage(page, 'en')
   await expect(page).toHaveURL(/\/$/)
 
   // The Dashboard's identity header: who is signed in, and the roles they hold. The Phase-0
@@ -81,12 +82,12 @@ test('headline: sign in, browse the catalog tree, open a course, flip to RTL, si
 
   // Toggle EN → AR: the layout flips to RTL and the Course name shows in Arabic,
   // with no reload.
-  await page.getByRole('button', { name: 'العربية' }).click()
+  await selectAuthenticatedLanguage(page, 'ar')
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
   await expect(page.getByRole('heading', { name: 'خوارزميات متقدمة' })).toBeVisible()
 
   // Reset to English (leave the seeded user clean), then sign out.
-  await page.getByRole('button', { name: 'English' }).click()
+  await selectAuthenticatedLanguage(page, 'en')
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
 
   await page.getByRole('button', { name: 'Account menu' }).click()

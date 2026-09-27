@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -82,12 +86,8 @@ for (const surface of surfaces) {
       test(`audit ${surface.name} ${scheme} ${locale}`, async ({ page }, testInfo) => {
         test.setTimeout(180_000)
         await page.addInitScript((mode) => localStorage.setItem('mui-mode', mode), scheme)
-        await page.goto('/login')
-        await page.getByLabel('Email').fill(surface.email)
-        await page.getByLabel('Password').fill('password')
-        await page.getByRole('button', { name: 'Sign in' }).click()
-        await expect(page).toHaveURL(/\/$/)
-        await page.getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English' }).click()
+        await loginWithSavedPreference(page, surface.email)
+        await selectAuthenticatedLanguage(page, locale)
         const coverage: unknown[] = []
         for (const path of surface.paths) {
           await page.goto(path)
@@ -130,7 +130,7 @@ for (const surface of surfaces) {
           body: JSON.stringify(coverage, null, 2),
           contentType: 'application/json',
         })
-        await page.getByRole('button', { name: 'English' }).click()
+        await selectAuthenticatedLanguage(page, 'en')
       })
     }
   }

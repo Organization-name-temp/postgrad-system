@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -5,15 +9,11 @@ for (const locale of ['en', 'ar'] as const) {
   test(`Course filters and authenticated export retain their URL in ${locale}`, async ({
     page,
   }, testInfo) => {
-    await page.goto('/login')
-    await page.getByLabel('Email').fill('r07@ejust.test')
-    await page.getByLabel('Password').fill('password')
-    await page.getByRole('button', { name: 'Sign in' }).click()
-    await expect(page).toHaveURL(/\/$/)
-    await page.getByRole('button', { name: 'English' }).click()
+    await loginWithSavedPreference(page, 'r07@ejust.test')
+    await selectAuthenticatedLanguage(page, 'en')
     await page.goto('/catalog/courses?q=CSE5&level=500')
     await expect(page.getByText('CSE511', { exact: true })).toBeVisible()
-    if (locale === 'ar') await page.getByRole('button', { name: 'العربية' }).click()
+    if (locale === 'ar') await selectAuthenticatedLanguage(page, 'ar')
     await expect(page.locator('html')).toHaveAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr')
     const search = page.getByLabel(
       locale === 'ar' ? 'البحث بالرمز أو الاسم' : 'Search by code or name',
@@ -71,6 +71,6 @@ for (const locale of ['en', 'ar'] as const) {
     expect(
       detailScan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
     ).toEqual([])
-    await page.getByRole('button', { name: 'English' }).click()
+    await selectAuthenticatedLanguage(page, 'en')
   })
 }

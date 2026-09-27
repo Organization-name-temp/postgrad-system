@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { execSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -69,11 +73,7 @@ const COPY = {
 } as const
 
 async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
+  await loginWithSavedPreference(page, email)
 }
 
 /**
@@ -84,7 +84,7 @@ async function login(page: Page, email: string) {
  */
 async function loginInEnglish(page: Page, email: string) {
   await login(page, email)
-  await page.getByRole('button', { name: 'English' }).click()
+  await selectAuthenticatedLanguage(page, 'en')
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
 }
 
@@ -148,7 +148,7 @@ test.describe('grading screens', () => {
       // Pre-set the colour scheme (the pre-paint script reads it) before the first paint.
       await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
       await login(page, INSTRUCTOR)
-      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await selectAuthenticatedLanguage(page, lang)
       await expect(page.locator('html')).toHaveAttribute('dir', dir)
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
 
@@ -212,7 +212,7 @@ test.describe('outstanding incompletes (ticket 05)', () => {
       // scanning r04's list would race it. The seeder's deferring Instructor holds two,
       // finalized and stable — including one the conversion command never touches.
       await login(page, DEFERRING_INSTRUCTOR)
-      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await selectAuthenticatedLanguage(page, lang)
       await expect(page.locator('html')).toHaveAttribute('dir', dir)
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
 
@@ -247,7 +247,7 @@ test.describe('central grade entry (ticket 09)', () => {
 
       await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
       await login(page, STUDENT_AFFAIRS)
-      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await selectAuthenticatedLanguage(page, lang)
       await expect(page.locator('html')).toHaveAttribute('dir', dir)
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
 
@@ -279,7 +279,7 @@ test.describe('my grades screen (ticket 04)', () => {
 
       await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
       await login(page, STUDENT)
-      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await selectAuthenticatedLanguage(page, lang)
       await expect(page.locator('html')).toHaveAttribute('dir', dir)
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
 

@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { expect, test } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -8,12 +12,8 @@ for (const scheme of ['light', 'dark'] as const) {
     }) => {
       test.setTimeout(120_000)
       await page.addInitScript((mode) => localStorage.setItem('mui-mode', mode), scheme)
-      await page.goto('/login')
-      await page.getByLabel('Email').fill('r09@ejust.test')
-      await page.getByLabel('Password').fill('password')
-      await page.getByRole('button', { name: 'Sign in' }).click()
-      await expect(page).toHaveURL(/\/$/)
-      await page.getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English' }).click()
+      await loginWithSavedPreference(page, 'r09@ejust.test')
+      await selectAuthenticatedLanguage(page, locale)
       for (const [collection, code] of [
         ['programs', 'MSC-CE'],
         ['courses', 'CSE511'],
@@ -86,7 +86,7 @@ for (const scheme of ['light', 'dark'] as const) {
           .click()
         await expect(dialog).toBeHidden()
       }
-      await page.getByRole('button', { name: 'English' }).click()
+      await selectAuthenticatedLanguage(page, 'en')
     })
   }
 }

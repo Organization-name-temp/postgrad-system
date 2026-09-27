@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
@@ -30,11 +34,7 @@ const surfaces = [
 ] as const
 
 async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/, { timeout: 20_000 })
+  await loginWithSavedPreference(page, email)
 }
 
 test.describe('Transfer workflow role surfaces', () => {
@@ -46,7 +46,7 @@ test.describe('Transfer workflow role surfaces', () => {
       await expect(page.locator('.MuiSkeleton-root')).toHaveCount(0)
       await expect(page.getByRole('alert')).toHaveCount(0)
 
-      await page.getByRole('button', { name: 'العربية' }).click()
+      await selectAuthenticatedLanguage(page, 'ar')
       await expect(page.getByRole('heading', { level: 1, name: surface.ar })).toBeVisible()
       await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
       await expect(page.locator('html')).toHaveAttribute('lang', 'ar')

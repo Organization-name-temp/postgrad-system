@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -5,12 +9,8 @@ for (const locale of ['en', 'ar'] as const) {
   test(`Awaiting interview criteria and authenticated workbook work in ${locale}`, async ({
     page,
   }, testInfo) => {
-    await page.goto('/login')
-    await page.getByLabel('Email').fill('r05@ejust.test')
-    await page.getByLabel('Password').fill('password')
-    await page.getByRole('button', { name: 'Sign in' }).click()
-    await expect(page).toHaveURL(/\/$/)
-    await page.getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English' }).click()
+    await loginWithSavedPreference(page, 'r05@ejust.test')
+    await selectAuthenticatedLanguage(page, locale)
     await page.goto(
       '/interviews/scheduling?awaiting_q=NoSuchSchedulingApplicant&awaiting_sort=-age_days&booked_q=Other',
     )
@@ -35,6 +35,6 @@ for (const locale of ['en', 'ar'] as const) {
     expect(
       scan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
     ).toEqual([])
-    await page.getByRole('button', { name: 'English' }).click()
+    await selectAuthenticatedLanguage(page, 'en')
   })
 }

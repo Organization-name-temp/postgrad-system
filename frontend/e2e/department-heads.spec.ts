@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { test, expect } from '@playwright/test'
 import type { Locator, Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
@@ -26,15 +30,11 @@ const COMBOS = [
 ] as const
 
 async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
+  await loginWithSavedPreference(page, email)
   // Pin English. The locale is persisted per user (`preferred_locale` on /me), and the bilingual
   // axe specs sign in as these same seeded accounts and leave Arabic behind — so a flow that
   // asserts English copy must state that rather than inherit whatever ran before it.
-  await page.getByRole('button', { name: 'English' }).click()
+  await selectAuthenticatedLanguage(page, 'en')
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
 }
 
@@ -91,7 +91,7 @@ test.describe('department head assignments', () => {
       // Pre-set the colour scheme (the pre-paint script reads it) before the first paint.
       await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
       await login(page, ADMIN)
-      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await selectAuthenticatedLanguage(page, lang)
       await expect(page.locator('html')).toHaveAttribute('dir', dir)
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
 

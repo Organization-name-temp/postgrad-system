@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
@@ -6,14 +10,11 @@ for (const locale of ['en', 'ar'] as const) {
     test(`${scope} Interview collection preserves criteria and downloads in ${locale}`, async ({
       page,
     }, testInfo) => {
-      await page.goto('/login')
-      await page
-        .getByLabel('Email')
-        .fill(scope === 'booked' ? 'r05@ejust.test' : 'interviewer.hoda@ejust.test')
-      await page.getByLabel('Password').fill('password')
-      await page.getByRole('button', { name: 'Sign in' }).click()
-      await expect(page).toHaveURL(/\/$/)
-      await page.getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English' }).click()
+      await loginWithSavedPreference(
+        page,
+        scope === 'booked' ? 'r05@ejust.test' : 'interviewer.hoda@ejust.test',
+      )
+      await selectAuthenticatedLanguage(page, locale)
       const criteria =
         'q=NoSuchInterviewApplicant&status=confirmed,pending_confirmation&mode=virtual,in_person&sort=-scheduled_at,id'
       await page.goto(
@@ -60,7 +61,7 @@ for (const locale of ['en', 'ar'] as const) {
           (value) => value.impact === 'serious' || value.impact === 'critical',
         ),
       ).toEqual([])
-      await page.getByRole('button', { name: 'English' }).click()
+      await selectAuthenticatedLanguage(page, 'en')
     })
   }
 }

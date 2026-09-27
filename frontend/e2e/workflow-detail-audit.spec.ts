@@ -1,3 +1,7 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
@@ -40,14 +44,8 @@ for (const role of roles) {
       test(`existing ${role.name} in ${scheme} ${locale}`, async ({ page }) => {
         test.setTimeout(120_000)
         await page.addInitScript((mode) => localStorage.setItem('mui-mode', mode), scheme)
-        await page.goto('/login')
-        await page.getByLabel('Email').fill(role.email)
-        await page.getByLabel('Password').fill('password')
-        await page.getByRole('button', { name: 'Sign in' }).click()
-        await expect(page).toHaveURL(/\/$/)
-        await page
-          .getByRole('button', { name: locale === 'ar' ? 'العربية' : 'English', exact: true })
-          .click()
+        await loginWithSavedPreference(page, role.email)
+        await selectAuthenticatedLanguage(page, locale)
         await page.goto(role.path)
         await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
         await audit(page)
@@ -66,13 +64,11 @@ for (const role of roles) {
         if (role.name === 'Applicant form') {
           const input = page.locator('input[name="name_en"]')
           await input.fill('Phase 7 unsaved applicant')
-          await page
-            .getByRole('button', { name: locale === 'ar' ? 'English' : 'العربية', exact: true })
-            .click()
+          await selectAuthenticatedLanguage(page, locale === 'ar' ? 'en' : 'ar')
           await expect(input).toHaveValue('Phase 7 unsaved applicant')
           await audit(page)
         }
-        await page.getByRole('button', { name: 'English', exact: true }).click()
+        await selectAuthenticatedLanguage(page, 'en')
       })
     }
   }

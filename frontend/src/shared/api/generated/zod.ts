@@ -1005,6 +1005,21 @@ export const ResubmitAfterRevisionResponse = zod.object({
  * one reschedule. Same shape as the Student Affairs slot list.
  * @summary Open slots to reschedule into.
  */
+export const OpenSlotsToRescheduleIntoQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual location search.'),
+  "id": zod.string().optional().describe('Comma-separated slot ids.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids.'),
+  "mode": zod.string().optional().describe('Comma-separated modes.'),
+  "is_open": zod.string().optional().describe('Derived availability, true or false.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "duration_minutes_min": zod.number().optional().describe('Minimum duration in minutes.'),
+  "duration_minutes_max": zod.number().optional().describe('Maximum duration in minutes.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
 export const OpenSlotsToRescheduleIntoResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1020,7 +1035,19 @@ export const OpenSlotsToRescheduleIntoResponse = zod.object({
   "email": zod.string().optional()
 }).optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -1392,10 +1419,47 @@ export const ListAssignableInterviewersResponse = zod.object({
 
 
 /**
- * The whole slot pool, soonest-first, each with its resolved interviewer and
+ * Every matching manager-readable slot, independent of pagination.
+ * @summary Export interview slots.
+ */
+export const ExportInterviewSlotsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual location search.'),
+  "id": zod.string().optional().describe('Comma-separated slot ids.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids.'),
+  "mode": zod.string().optional().describe('Comma-separated modes.'),
+  "is_open": zod.string().optional().describe('Derived availability, true or false.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "duration_minutes_min": zod.number().optional().describe('Minimum duration in minutes.'),
+  "duration_minutes_max": zod.number().optional().describe('Maximum duration in minutes.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
+export const ExportInterviewSlotsResponse = zod.unknown()
+
+
+/**
+ * The paginated slot pool, soonest-first, each with its resolved interviewer and
  * whether it is still open. Gated on `interview.schedule`.
  * @summary List interview slots.
  */
+export const ListInterviewSlotsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual location search.'),
+  "id": zod.string().optional().describe('Comma-separated slot ids.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids.'),
+  "mode": zod.string().optional().describe('Comma-separated modes.'),
+  "is_open": zod.string().optional().describe('Derived availability, true or false.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "duration_minutes_min": zod.number().optional().describe('Minimum duration in minutes.'),
+  "duration_minutes_max": zod.number().optional().describe('Maximum duration in minutes.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
 export const ListInterviewSlotsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1411,7 +1475,19 @@ export const ListInterviewSlotsResponse = zod.object({
   "email": zod.string().optional()
 }).optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 

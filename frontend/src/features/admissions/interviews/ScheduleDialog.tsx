@@ -44,7 +44,10 @@ export function ScheduleDialog({
 }: ScheduleDialogProps) {
   const { t, i18n } = useTranslation('admissions')
   const queryClient = useQueryClient()
-  const slots = useListInterviewSlots({ query: { enabled: open } })
+  const slots = useListInterviewSlots(
+    { is_open: 'true', per_page: 100 },
+    { query: { enabled: open } },
+  )
   const openSlots = (slots.data?.data ?? []).filter((slot) => slot.is_open)
 
   const [slotId, setSlotId] = useState('')

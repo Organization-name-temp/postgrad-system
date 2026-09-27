@@ -39,7 +39,7 @@ export function InterviewPanel() {
   const interviewQuery = useMyInterview({ query: { retry: false } })
   const confirm = useConfirmMyInterview()
   const reschedule = useRescheduleMyInterview()
-  const openSlots = useOpenSlotsToRescheduleInto({ query: { enabled: false } })
+  const openSlots = useOpenSlotsToRescheduleInto(undefined, { query: { enabled: false } })
 
   const [rescheduling, setRescheduling] = useState(false)
   const [slotId, setSlotId] = useState('')

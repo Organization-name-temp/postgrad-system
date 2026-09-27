@@ -9,9 +9,12 @@ use Illuminate\Validation\Rule;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesInterviewers;
 use Modules\Admissions\Internal\Http\Resources\InterviewSlotResource;
 use Modules\Admissions\Internal\Models\InterviewSlot;
+use Modules\Admissions\Internal\Support\InterviewSlotCollection;
+use Modules\Admissions\Internal\Support\InterviewSlotExport;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Identity\Public\UserSummary;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -46,23 +49,57 @@ class InterviewSlotController
     /**
      * List interview slots.
      *
-     * The whole slot pool, soonest-first, each with its resolved interviewer and
+     * The paginated slot pool, soonest-first, each with its resolved interviewer and
      * whether it is still open. Gated on `interview.schedule`.
      *
-     * @response 200 {"data": [{"id": 1, "scheduled_at": "2026-07-20T10:00:00+00:00", "duration_minutes": 30, "mode": "in_person", "location": "Building C, Room 204", "meeting_link": null, "interviewer_id": 4, "interviewer": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "is_open": true}]}
+     * @queryParam q string Normalized bilingual location search. Example: Building
+     * @queryParam id string Comma-separated slot ids. Example: 1,2
+     * @queryParam interviewer_id string Comma-separated interviewer ids. Example: 4
+     * @queryParam mode string Comma-separated modes. Example: in_person
+     * @queryParam is_open string Derived availability, true or false. Example: true
+     * @queryParam scheduled_at_min string Earliest scheduled timestamp. Example: 2026-01-01
+     * @queryParam scheduled_at_max string Latest scheduled timestamp. Example: 2027-01-01
+     * @queryParam duration_minutes_min integer Minimum duration in minutes. Example: 15
+     * @queryParam duration_minutes_max integer Maximum duration in minutes. Example: 240
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: scheduled_at,-id
+     * @queryParam page integer Page number; ignored by export. Example: 1
+     * @queryParam per_page integer Page size, capped at 100; ignored by export. Example: 25
+     *
+     * @response 200 {"data": [{"id": 1, "scheduled_at": "2026-07-20T10:00:00+00:00", "duration_minutes": 30, "mode": "in_person", "location": "Building C, Room 204", "meeting_link": null, "interviewer_id": 4, "interviewer": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "is_open": true}], "links": {"first": "http://localhost/api/v1/interview-slots?page=1", "last": "http://localhost/api/v1/interview-slots?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 25, "total": 1, "last_page": 1}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function index(Directory $directory): AnonymousResourceCollection
+    public function index(Request $request, Directory $directory, InterviewSlotCollection $collection): AnonymousResourceCollection
     {
-        $slots = InterviewSlot::query()
-            ->with('interview')
-            ->orderBy('scheduled_at')
-            ->orderBy('id')
-            ->get();
-
-        $this->attachInterviewers($slots, $directory);
+        $query = $collection->query($request);
+        $slots = $collection->selection($query)->paginate($query->perPage, ['*'], 'page', $query->page)->withQueryString();
+        $this->attachInterviewers($slots->getCollection(), $directory);
 
         return InterviewSlotResource::collection($slots);
+    }
+
+    /**
+     * Export interview slots.
+     *
+     * Every matching manager-readable slot, independent of pagination.
+     *
+     * @queryParam q string Normalized bilingual location search. Example: Building
+     * @queryParam id string Comma-separated slot ids. Example: 1,2
+     * @queryParam interviewer_id string Comma-separated interviewer ids. Example: 4
+     * @queryParam mode string Comma-separated modes. Example: in_person
+     * @queryParam is_open string Derived availability, true or false. Example: true
+     * @queryParam scheduled_at_min string Earliest scheduled timestamp. Example: 2026-01-01
+     * @queryParam scheduled_at_max string Latest scheduled timestamp. Example: 2027-01-01
+     * @queryParam duration_minutes_min integer Minimum duration in minutes. Example: 15
+     * @queryParam duration_minutes_max integer Maximum duration in minutes. Example: 240
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: scheduled_at,-id
+     * @queryParam page integer Page number; ignored by export. Example: 1
+     * @queryParam per_page integer Page size, capped at 100; ignored by export. Example: 25
+     *
+     * @response 200 scenario="XLSX" <<binary>>
+     */
+    public function export(Request $request, InterviewSlotExport $export): BinaryFileResponse
+    {
+        return $export->download($request);
     }
 
     /**

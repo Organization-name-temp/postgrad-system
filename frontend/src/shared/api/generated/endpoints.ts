@@ -1221,6 +1221,57 @@ export type ResubmitAfterRevision422 = {
   errors?: ResubmitAfterRevision422Errors;
 };
 
+export type OpenSlotsToRescheduleIntoParams = {
+/**
+ * Normalized bilingual location search.
+ */
+q?: string;
+/**
+ * Comma-separated slot ids.
+ */
+id?: string;
+/**
+ * Comma-separated interviewer ids.
+ */
+interviewer_id?: string;
+/**
+ * Comma-separated modes.
+ */
+mode?: string;
+/**
+ * Derived availability, true or false.
+ */
+is_open?: string;
+/**
+ * Earliest scheduled timestamp.
+ */
+scheduled_at_min?: string;
+/**
+ * Latest scheduled timestamp.
+ */
+scheduled_at_max?: string;
+/**
+ * Minimum duration in minutes.
+ */
+duration_minutes_min?: number;
+/**
+ * Maximum duration in minutes.
+ */
+duration_minutes_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number; ignored by export.
+ */
+page?: number;
+/**
+ * Page size, capped at 100; ignored by export.
+ */
+per_page?: number;
+};
+
 export type OpenSlotsToRescheduleInto200DataItemInterviewer = {
   id?: number;
   name?: string;
@@ -1240,8 +1291,26 @@ export type OpenSlotsToRescheduleInto200DataItem = {
   is_open?: boolean;
 };
 
+export type OpenSlotsToRescheduleInto200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type OpenSlotsToRescheduleInto200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type OpenSlotsToRescheduleInto200 = {
   data?: OpenSlotsToRescheduleInto200DataItem[];
+  links?: OpenSlotsToRescheduleInto200Links;
+  meta?: OpenSlotsToRescheduleInto200Meta;
 };
 
 export type MyInterview200DataSlotInterviewer = {
@@ -1819,6 +1888,108 @@ export type ListAssignableInterviewers403 = {
   message?: string;
 };
 
+export type ExportInterviewSlotsParams = {
+/**
+ * Normalized bilingual location search.
+ */
+q?: string;
+/**
+ * Comma-separated slot ids.
+ */
+id?: string;
+/**
+ * Comma-separated interviewer ids.
+ */
+interviewer_id?: string;
+/**
+ * Comma-separated modes.
+ */
+mode?: string;
+/**
+ * Derived availability, true or false.
+ */
+is_open?: string;
+/**
+ * Earliest scheduled timestamp.
+ */
+scheduled_at_min?: string;
+/**
+ * Latest scheduled timestamp.
+ */
+scheduled_at_max?: string;
+/**
+ * Minimum duration in minutes.
+ */
+duration_minutes_min?: number;
+/**
+ * Maximum duration in minutes.
+ */
+duration_minutes_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number; ignored by export.
+ */
+page?: number;
+/**
+ * Page size, capped at 100; ignored by export.
+ */
+per_page?: number;
+};
+
+export type ListInterviewSlotsParams = {
+/**
+ * Normalized bilingual location search.
+ */
+q?: string;
+/**
+ * Comma-separated slot ids.
+ */
+id?: string;
+/**
+ * Comma-separated interviewer ids.
+ */
+interviewer_id?: string;
+/**
+ * Comma-separated modes.
+ */
+mode?: string;
+/**
+ * Derived availability, true or false.
+ */
+is_open?: string;
+/**
+ * Earliest scheduled timestamp.
+ */
+scheduled_at_min?: string;
+/**
+ * Latest scheduled timestamp.
+ */
+scheduled_at_max?: string;
+/**
+ * Minimum duration in minutes.
+ */
+duration_minutes_min?: number;
+/**
+ * Maximum duration in minutes.
+ */
+duration_minutes_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number; ignored by export.
+ */
+page?: number;
+/**
+ * Page size, capped at 100; ignored by export.
+ */
+per_page?: number;
+};
+
 export type ListInterviewSlots200DataItemInterviewer = {
   id?: number;
   name?: string;
@@ -1838,8 +2009,26 @@ export type ListInterviewSlots200DataItem = {
   is_open?: boolean;
 };
 
+export type ListInterviewSlots200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ListInterviewSlots200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type ListInterviewSlots200 = {
   data?: ListInterviewSlots200DataItem[];
+  links?: ListInterviewSlots200Links;
+  meta?: ListInterviewSlots200Meta;
 };
 
 export type ListInterviewSlots403 = {
@@ -16588,13 +16777,14 @@ export const useResubmitAfterRevision = <TError = ResubmitAfterRevision401 | Res
  * @summary Open slots to reschedule into.
  */
 export const openSlotsToRescheduleInto = (
-
+    params?: OpenSlotsToRescheduleIntoParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<OpenSlotsToRescheduleInto200>(
-      {url: `/api/v1/application/interview/slots`, method: 'GET', signal
+      {url: `/api/v1/application/interview/slots`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -16602,23 +16792,23 @@ export const openSlotsToRescheduleInto = (
 
 
 
-export const getOpenSlotsToRescheduleIntoQueryKey = () => {
+export const getOpenSlotsToRescheduleIntoQueryKey = (params?: OpenSlotsToRescheduleIntoParams,) => {
     return [
-    `/api/v1/application/interview/slots`
+    `/api/v1/application/interview/slots`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getOpenSlotsToRescheduleIntoQueryOptions = <TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+export const getOpenSlotsToRescheduleIntoQueryOptions = <TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(params?: OpenSlotsToRescheduleIntoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getOpenSlotsToRescheduleIntoQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getOpenSlotsToRescheduleIntoQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>> = ({ signal }) => openSlotsToRescheduleInto(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>> = ({ signal }) => openSlotsToRescheduleInto(params, signal);
 
 
 
@@ -16632,7 +16822,7 @@ export type OpenSlotsToRescheduleIntoQueryError = unknown
 
 
 export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
+ params: undefined |  OpenSlotsToRescheduleIntoParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof openSlotsToRescheduleInto>>,
           TError,
@@ -16642,7 +16832,7 @@ export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof o
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
+ params?: OpenSlotsToRescheduleIntoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof openSlotsToRescheduleInto>>,
           TError,
@@ -16652,7 +16842,7 @@ export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof o
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+ params?: OpenSlotsToRescheduleIntoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -16660,11 +16850,11 @@ export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof o
  */
 
 export function useOpenSlotsToRescheduleInto<TData = Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
+ params?: OpenSlotsToRescheduleIntoParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof openSlotsToRescheduleInto>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getOpenSlotsToRescheduleIntoQueryOptions(options)
+  const queryOptions = getOpenSlotsToRescheduleIntoQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -17577,18 +17767,19 @@ export function useListAssignableInterviewers<TData = Awaited<ReturnType<typeof 
 
 
 /**
- * The whole slot pool, soonest-first, each with its resolved interviewer and
- * whether it is still open. Gated on `interview.schedule`.
- * @summary List interview slots.
+ * Every matching manager-readable slot, independent of pagination.
+ * @summary Export interview slots.
  */
-export const listInterviewSlots = (
-
+export const exportInterviewSlots = (
+    params?: ExportInterviewSlotsParams,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<ListInterviewSlots200>(
-      {url: `/api/v1/interview-slots`, method: 'GET', signal
+      return customInstance<Blob>(
+      {url: `/api/v1/interview-slots/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
     },
       );
     }
@@ -17596,23 +17787,119 @@ export const listInterviewSlots = (
 
 
 
-export const getListInterviewSlotsQueryKey = () => {
+export const getExportInterviewSlotsQueryKey = (params?: ExportInterviewSlotsParams,) => {
     return [
-    `/api/v1/interview-slots`
+    `/api/v1/interview-slots/export`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getListInterviewSlotsQueryOptions = <TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+export const getExportInterviewSlotsQueryOptions = <TData = Awaited<ReturnType<typeof exportInterviewSlots>>, TError = unknown>(params?: ExportInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportInterviewSlots>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getListInterviewSlotsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getExportInterviewSlotsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterviewSlots>>> = ({ signal }) => listInterviewSlots(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportInterviewSlots>>> = ({ signal }) => exportInterviewSlots(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportInterviewSlots>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportInterviewSlotsQueryResult = NonNullable<Awaited<ReturnType<typeof exportInterviewSlots>>>
+export type ExportInterviewSlotsQueryError = unknown
+
+
+export function useExportInterviewSlots<TData = Awaited<ReturnType<typeof exportInterviewSlots>>, TError = unknown>(
+ params: undefined |  ExportInterviewSlotsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportInterviewSlots>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportInterviewSlots>>,
+          TError,
+          Awaited<ReturnType<typeof exportInterviewSlots>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportInterviewSlots<TData = Awaited<ReturnType<typeof exportInterviewSlots>>, TError = unknown>(
+ params?: ExportInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportInterviewSlots>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportInterviewSlots>>,
+          TError,
+          Awaited<ReturnType<typeof exportInterviewSlots>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportInterviewSlots<TData = Awaited<ReturnType<typeof exportInterviewSlots>>, TError = unknown>(
+ params?: ExportInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportInterviewSlots>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export interview slots.
+ */
+
+export function useExportInterviewSlots<TData = Awaited<ReturnType<typeof exportInterviewSlots>>, TError = unknown>(
+ params?: ExportInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportInterviewSlots>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportInterviewSlotsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * The paginated slot pool, soonest-first, each with its resolved interviewer and
+ * whether it is still open. Gated on `interview.schedule`.
+ * @summary List interview slots.
+ */
+export const listInterviewSlots = (
+    params?: ListInterviewSlotsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<ListInterviewSlots200>(
+      {url: `/api/v1/interview-slots`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getListInterviewSlotsQueryKey = (params?: ListInterviewSlotsParams,) => {
+    return [
+    `/api/v1/interview-slots`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListInterviewSlotsQueryOptions = <TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(params?: ListInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListInterviewSlotsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listInterviewSlots>>> = ({ signal }) => listInterviewSlots(params, signal);
 
 
 
@@ -17626,7 +17913,7 @@ export type ListInterviewSlotsQueryError = ListInterviewSlots403
 
 
 export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
+ params: undefined |  ListInterviewSlotsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof listInterviewSlots>>,
           TError,
@@ -17636,7 +17923,7 @@ export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInte
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
+ params?: ListInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof listInterviewSlots>>,
           TError,
@@ -17646,7 +17933,7 @@ export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInte
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+ params?: ListInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -17654,11 +17941,11 @@ export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInte
  */
 
 export function useListInterviewSlots<TData = Awaited<ReturnType<typeof listInterviewSlots>>, TError = ListInterviewSlots403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
+ params?: ListInterviewSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listInterviewSlots>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getListInterviewSlotsQueryOptions(options)
+  const queryOptions = getListInterviewSlotsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -6,6 +6,7 @@
 // messages live in lang/{locale}/validation.php; this file holds only the custom
 // domain messages the Admissions controllers raise directly.
 return [
+    'slot_export' => ['columns' => ['id' => 'Slot ID', 'scheduled_at' => 'Scheduled at', 'duration_minutes' => 'Duration (minutes)', 'mode' => 'Mode', 'location' => 'Location', 'interviewer_id' => 'Interviewer ID', 'interviewer_name' => 'Interviewer', 'is_open' => 'Availability'], 'values' => ['open' => 'Open', 'booked' => 'Booked']],
     'interview_export_columns' => ['id' => 'Interview ID', 'application_id' => 'Application reference', 'name_en' => 'English name', 'name_ar' => 'Arabic name', 'national_id' => 'National ID / passport', 'degree' => 'Degree', 'status' => 'Confirmation state', 'scheduled_at' => 'Scheduled at', 'duration_minutes' => 'Duration (minutes)', 'mode' => 'Mode', 'location' => 'Location', 'interviewer_id' => 'Interviewer ID', 'interviewer_name' => 'Interviewer', 'evaluation_score' => 'Evaluation score', 'evaluation_notes' => 'Evaluation notes', 'completed_at' => 'Completed at'],
     'interview_states' => ['pending_confirmation' => 'Pending confirmation', 'confirmed' => 'Confirmed'],
     'interview_modes' => ['in_person' => 'In person', 'virtual' => 'Virtual'],

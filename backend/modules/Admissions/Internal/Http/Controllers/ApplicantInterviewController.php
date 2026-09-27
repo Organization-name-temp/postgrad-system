@@ -11,6 +11,7 @@ use Modules\Admissions\Internal\Http\Resources\InterviewResource;
 use Modules\Admissions\Internal\Http\Resources\InterviewSlotResource;
 use Modules\Admissions\Internal\Models\Interview;
 use Modules\Admissions\Internal\Models\InterviewSlot;
+use Modules\Admissions\Internal\Support\InterviewSlotCollection;
 use Modules\Identity\Public\Contracts\Directory;
 
 /**
@@ -49,18 +50,26 @@ class ApplicantInterviewController
      * The interview slots still open, soonest-first — the applicant's picker for their
      * one reschedule. Same shape as the Student Affairs slot list.
      *
-     * @response 200 {"data": [{"id": 2, "scheduled_at": "2026-07-22T13:00:00+00:00", "duration_minutes": 30, "mode": "virtual", "location": null, "meeting_link": "https://meet.ejust.edu.eg/abc", "interviewer_id": 5, "interviewer": {"id": 5, "name": "Dr. Second Instructor", "email": "instructor2@ejust.test"}, "is_open": true}]}
+     * @queryParam q string Normalized bilingual location search. Example: Building
+     * @queryParam id string Comma-separated slot ids. Example: 1,2
+     * @queryParam interviewer_id string Comma-separated interviewer ids. Example: 4
+     * @queryParam mode string Comma-separated modes. Example: in_person
+     * @queryParam is_open string Derived availability, true or false. Example: true
+     * @queryParam scheduled_at_min string Earliest scheduled timestamp. Example: 2026-01-01
+     * @queryParam scheduled_at_max string Latest scheduled timestamp. Example: 2027-01-01
+     * @queryParam duration_minutes_min integer Minimum duration in minutes. Example: 15
+     * @queryParam duration_minutes_max integer Maximum duration in minutes. Example: 240
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: scheduled_at,-id
+     * @queryParam page integer Page number; ignored by export. Example: 1
+     * @queryParam per_page integer Page size, capped at 100; ignored by export. Example: 100
+     *
+     * @response 200 {"data": [{"id": 2, "scheduled_at": "2026-07-22T13:00:00+00:00", "duration_minutes": 30, "mode": "virtual", "location": null, "meeting_link": "https://meet.ejust.edu.eg/abc", "interviewer_id": 5, "interviewer": {"id": 5, "name": "Dr. Second Instructor", "email": "instructor2@ejust.test"}, "is_open": true}], "links": {"first": "http://localhost/api/v1/application/interview/slots?page=1", "last": "http://localhost/api/v1/application/interview/slots?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 100, "total": 1, "last_page": 1}}
      */
-    public function openSlots(Directory $directory): AnonymousResourceCollection
+    public function openSlots(Request $request, Directory $directory, InterviewSlotCollection $collection): AnonymousResourceCollection
     {
-        $slots = InterviewSlot::query()
-            ->open()
-            ->with('interview')
-            ->orderBy('scheduled_at')
-            ->orderBy('id')
-            ->get();
-
-        $this->attachInterviewers($slots, $directory);
+        $query = $collection->query($request, defaultPerPage: 100);
+        $slots = $collection->selection($query, onlyOpen: true)->paginate($query->perPage, ['*'], 'page', $query->page)->withQueryString();
+        $this->attachInterviewers($slots->getCollection(), $directory);
 
         return InterviewSlotResource::collection($slots);
     }

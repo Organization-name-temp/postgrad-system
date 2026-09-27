@@ -121,6 +121,7 @@ Route::middleware(['auth:sanctum', 'can:interview.schedule'])->group(function ()
     Route::get('/applications/awaiting-interview/export', [InterviewSchedulingController::class, 'exportAwaiting']);
 
     Route::get('/interview-slots/interviewers', [InterviewSlotController::class, 'interviewers']);
+    Route::get('/interview-slots/export', [InterviewSlotController::class, 'export']);
     Route::get('/interview-slots', [InterviewSlotController::class, 'index']);
     Route::post('/interview-slots', [InterviewSlotController::class, 'store']);
     Route::patch('/interview-slots/{interview_slot}', [InterviewSlotController::class, 'update'])->whereNumber('interview_slot');

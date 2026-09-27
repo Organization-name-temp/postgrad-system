@@ -502,3 +502,38 @@ in EN/AR, download authenticated workbooks and pass serious/critical axe checks.
 The earlier login timeout did not recur. Shared fix static and focused tests remain
 green. Full Phase 7 gates, print/layout verification and final consolidated review
 are still pending behind the remaining approved implementation frontier.
+
+### Interview slot pool / personal picker backend query contract
+
+- Continued executable prerequisite #06. Red HTTP tests proved the pool ignored
+  search/availability/page criteria, personal picker had no page metadata, and
+  manager export was absent. Both collections now use Admissions-owned selection,
+  normalized bilingual location search, opaque IDs, mode, scheduled/duration bounds,
+  derived availability filtering and stable SQL pagination. Availability reuses the
+  existing owner `open` scope and current booking relation; no stored capacity flag.
+- Pool defaults to 25; personal lookup defaults to 100 and always retains its base
+  open-only constraint, so `is_open=false` or a booked slot ID gives an empty page.
+  Applicant export remains 404. Manager export independently enforces scheduling
+  permission, mirrors full selection across pages, resolves staff through bounded
+  Public Directory DTOs, localizes canonical labels/availability and RTL, keeps IDs
+  strings and records effective criteria/count audit evidence. Meeting links are not
+  export columns or search fields.
+- Shared collection dataset now includes both slot endpoints, covering unknown-key
+  rejection, private link search exclusion, outside filters and truthful pagination.
+  Focused backend **36 passed, 237 assertions, 6.58s**, including existing pool
+  mutations and Applicant confirmation/rescheduling. Pint/PHPStan/deptrac passed
+  after correcting a redundant null-safe call in the authorized export audit path.
+- Controllers document all parameters and paginated shapes; OpenAPI/client/Zod
+  regenerated. A red ScheduleDialog HTTP test caught the old generated-hook options
+  being sent as query criteria. Scheduling now explicitly requests 100 open slots;
+  personal picker options moved to the new argument position. Focused frontend
+  **3 files / 6 tests passed, 17.21s**. Static and serial headline verification active.
+- Slot-pool URL controls/export UI and both slot-picker type-aheads are still pending,
+  together with staff/Catalog pickers and direct Faculty criterion. This checkpoint
+  does not complete #06 or any full Phase 7 acceptance/gate/review item.
+
+Slot API checkpoint frontend typecheck/lint/full format **passed**. Serial complete
+admissions headline **1 passed, 1.5m**, retaining slot creation, open-only scheduling,
+interviewer evaluation, completion and acceptance. Slot-pool EN/AR controls/export
+browser evidence will be gathered when that UI slice is implemented. Full Phase 7
+completion/gates/print audit/consolidated review remain pending.

@@ -4062,7 +4062,127 @@ paths:
       summary: 'Open slots to reschedule into.'
       operationId: openSlotsToRescheduleInto
       description: "The interview slots still open, soonest-first — the applicant's picker for their\none reschedule. Same shape as the Student Affairs slot list."
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual location search.'
+          example: Building
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual location search.'
+            example: Building
+        -
+          in: query
+          name: id
+          description: 'Comma-separated slot ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated slot ids.'
+            example: '1,2'
+        -
+          in: query
+          name: interviewer_id
+          description: 'Comma-separated interviewer ids.'
+          example: '4'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interviewer ids.'
+            example: '4'
+        -
+          in: query
+          name: mode
+          description: 'Comma-separated modes.'
+          example: in_person
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated modes.'
+            example: in_person
+        -
+          in: query
+          name: is_open
+          description: 'Derived availability, true or false.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Derived availability, true or false.'
+            example: 'true'
+        -
+          in: query
+          name: scheduled_at_min
+          description: 'Earliest scheduled timestamp.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Earliest scheduled timestamp.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: scheduled_at_max
+          description: 'Latest scheduled timestamp.'
+          example: '2027-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Latest scheduled timestamp.'
+            example: '2027-01-01'
+        -
+          in: query
+          name: duration_minutes_min
+          description: 'Minimum duration in minutes.'
+          example: 15
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum duration in minutes.'
+            example: 15
+        -
+          in: query
+          name: duration_minutes_max
+          description: 'Maximum duration in minutes.'
+          example: 240
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum duration in minutes.'
+            example: 240
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: 'scheduled_at,-id'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: 'scheduled_at,-id'
+        -
+          in: query
+          name: page
+          description: 'Page number; ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100; ignored by export.'
+          example: 100
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100; ignored by export.'
+            example: 100
       responses:
         200:
           description: ''
@@ -4085,6 +4205,16 @@ paths:
                         name: 'Dr. Second Instructor'
                         email: instructor2@ejust.test
                       is_open: true
+                  links:
+                    first: 'http://localhost/api/v1/application/interview/slots?page=1'
+                    last: 'http://localhost/api/v1/application/interview/slots?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 100
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -4142,6 +4272,38 @@ paths:
                         is_open:
                           type: boolean
                           example: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/application/interview/slots?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/application/interview/slots?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 100
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
       tags:
         - Admissions
       security: []
@@ -5758,12 +5920,269 @@ paths:
       tags:
         - Admissions
       security: []
+  /api/v1/interview-slots/export:
+    get:
+      summary: 'Export interview slots.'
+      operationId: exportInterviewSlots
+      description: 'Every matching manager-readable slot, independent of pagination.'
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual location search.'
+          example: Building
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual location search.'
+            example: Building
+        -
+          in: query
+          name: id
+          description: 'Comma-separated slot ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated slot ids.'
+            example: '1,2'
+        -
+          in: query
+          name: interviewer_id
+          description: 'Comma-separated interviewer ids.'
+          example: '4'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interviewer ids.'
+            example: '4'
+        -
+          in: query
+          name: mode
+          description: 'Comma-separated modes.'
+          example: in_person
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated modes.'
+            example: in_person
+        -
+          in: query
+          name: is_open
+          description: 'Derived availability, true or false.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Derived availability, true or false.'
+            example: 'true'
+        -
+          in: query
+          name: scheduled_at_min
+          description: 'Earliest scheduled timestamp.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Earliest scheduled timestamp.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: scheduled_at_max
+          description: 'Latest scheduled timestamp.'
+          example: '2027-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Latest scheduled timestamp.'
+            example: '2027-01-01'
+        -
+          in: query
+          name: duration_minutes_min
+          description: 'Minimum duration in minutes.'
+          example: 15
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum duration in minutes.'
+            example: 15
+        -
+          in: query
+          name: duration_minutes_max
+          description: 'Maximum duration in minutes.'
+          example: 240
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum duration in minutes.'
+            example: 240
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: 'scheduled_at,-id'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: 'scheduled_at,-id'
+        -
+          in: query
+          name: page
+          description: 'Page number; ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100; ignored by export.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100; ignored by export.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - Admissions
+      security: []
   /api/v1/interview-slots:
     get:
       summary: 'List interview slots.'
       operationId: listInterviewSlots
-      description: "The whole slot pool, soonest-first, each with its resolved interviewer and\nwhether it is still open. Gated on `interview.schedule`."
-      parameters: []
+      description: "The paginated slot pool, soonest-first, each with its resolved interviewer and\nwhether it is still open. Gated on `interview.schedule`."
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual location search.'
+          example: Building
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual location search.'
+            example: Building
+        -
+          in: query
+          name: id
+          description: 'Comma-separated slot ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated slot ids.'
+            example: '1,2'
+        -
+          in: query
+          name: interviewer_id
+          description: 'Comma-separated interviewer ids.'
+          example: '4'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interviewer ids.'
+            example: '4'
+        -
+          in: query
+          name: mode
+          description: 'Comma-separated modes.'
+          example: in_person
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated modes.'
+            example: in_person
+        -
+          in: query
+          name: is_open
+          description: 'Derived availability, true or false.'
+          example: 'true'
+          required: false
+          schema:
+            type: string
+            description: 'Derived availability, true or false.'
+            example: 'true'
+        -
+          in: query
+          name: scheduled_at_min
+          description: 'Earliest scheduled timestamp.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Earliest scheduled timestamp.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: scheduled_at_max
+          description: 'Latest scheduled timestamp.'
+          example: '2027-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Latest scheduled timestamp.'
+            example: '2027-01-01'
+        -
+          in: query
+          name: duration_minutes_min
+          description: 'Minimum duration in minutes.'
+          example: 15
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum duration in minutes.'
+            example: 15
+        -
+          in: query
+          name: duration_minutes_max
+          description: 'Maximum duration in minutes.'
+          example: 240
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum duration in minutes.'
+            example: 240
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: 'scheduled_at,-id'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: 'scheduled_at,-id'
+        -
+          in: query
+          name: page
+          description: 'Page number; ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100; ignored by export.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100; ignored by export.'
+            example: 25
       responses:
         200:
           description: ''
@@ -5786,6 +6205,16 @@ paths:
                         name: 'Dr. Instructor'
                         email: instructor@ejust.test
                       is_open: true
+                  links:
+                    first: 'http://localhost/api/v1/interview-slots?page=1'
+                    last: 'http://localhost/api/v1/interview-slots?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 25
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -5843,6 +6272,38 @@ paths:
                         is_open:
                           type: boolean
                           example: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/interview-slots?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/interview-slots?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
         403:
           description: ''
           content:

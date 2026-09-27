@@ -139,6 +139,26 @@ foreach (['programs' => Program::class, 'departments' => Department::class, 'fac
 }
 
 dataset('collection contracts', [
+    'Interview slot pool' => ['/api/v1/interview-slots', function (): array {
+        $first = InterviewSlot::factory()->create(['scheduled_at' => now()->addDay()->startOfDay(), 'meeting_link' => 'https://meet.test/private-slot-probe']);
+        InterviewSlot::factory()->create(['scheduled_at' => $first->scheduled_at]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id=999999', 'private_probe' => 'q=private-slot-probe'];
+    }],
+    'Applicant open slot picker' => ['/api/v1/application/interview/slots', function (): array {
+        $first = InterviewSlot::factory()->create(['scheduled_at' => now()->addDay()->startOfDay(), 'meeting_link' => 'https://meet.test/private-slot-probe']);
+        InterviewSlot::factory()->create(['scheduled_at' => $first->scheduled_at]);
+        $booked = InterviewSlot::factory()->create();
+        Interview::factory()->create(['interview_slot_id' => $booked->id]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Applicant);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$booked->id, 'private_probe' => 'q=private-slot-probe'];
+    }],
     'Booked interviews' => ['/api/v1/interviews', function (): array {
         $actor = User::factory()->create();
         $actor->assignRole(Role::StudentAffairs);

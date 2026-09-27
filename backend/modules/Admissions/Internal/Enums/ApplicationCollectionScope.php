@@ -6,4 +6,5 @@ enum ApplicationCollectionScope
 {
     case Screening;
     case DeanFaculty;
+    case AwaitingInterview;
 }

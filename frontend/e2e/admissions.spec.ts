@@ -228,6 +228,10 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await page.getByRole('link', { name: 'Interview scheduling' }).first().click()
   await expect(page).toHaveURL(/\/interviews\/scheduling$/)
   await page
+    .getByRole('region', { name: 'Awaiting scheduling' })
+    .getByLabel('Search applicants')
+    .fill(APPLICANT.name)
+  await page
     .getByRole('row', { name: new RegExp(APPLICANT.name) })
     .getByRole('button', { name: 'Schedule' })
     .click()

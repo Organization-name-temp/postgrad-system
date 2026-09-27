@@ -41,6 +41,14 @@ final readonly class ApplicationCollection
     private function scoped(int $actor, array $statuses, ApplicationCollectionScope $scope): Builder
     {
         $builder = Application::query()->with('statusTransitions')->whereIn('status', $statuses);
+        if ($scope === ApplicationCollectionScope::AwaitingInterview) {
+            $builder->whereDoesntHave('interview');
+            if ($this->directory->isAdministrator($actor) || $this->directory->hasRole($actor, Role::StudentAffairs) || $this->directory->hasRole($actor, Role::Dean)) {
+                return $builder;
+            }
+
+            return $builder->whereRaw('1 = 0');
+        }
         if ($this->directory->isAdministrator($actor) || ($scope === ApplicationCollectionScope::Screening && $this->directory->hasRole($actor, Role::StudentAffairs))) {
             return $builder;
         }

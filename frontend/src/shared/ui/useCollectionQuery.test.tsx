@@ -17,6 +17,44 @@ function Investigation() {
   )
 }
 
+function TwoInvestigations() {
+  const awaiting = useCollectionQuery(25, 'awaiting')
+  const booked = useCollectionQuery(25, 'booked')
+  const navigate = useNavigate()
+  return (
+    <>
+      <output aria-label="awaiting criteria">{JSON.stringify(awaiting.params)}</output>
+      <output aria-label="booked criteria">{JSON.stringify(booked.params)}</output>
+      <button onClick={() => awaiting.setCriteria({ q: 'Ahmed' })}>Filter awaiting</button>
+      <button onClick={() => booked.setPage(4)}>Page booked</button>
+      <button onClick={() => navigate(-1)}>Back</button>
+    </>
+  )
+}
+
+it('keeps two collections independent in one bookmarked URL and restores both with Back', async () => {
+  const user = userEvent.setup()
+  render(
+    <MemoryRouter initialEntries={['/?awaiting_q=Ali&awaiting_page=2&booked_q=Sara&booked_page=3']}>
+      <TwoInvestigations />
+    </MemoryRouter>,
+  )
+  const awaiting = () => JSON.parse(screen.getByLabelText('awaiting criteria').textContent ?? '{}')
+  const booked = () => JSON.parse(screen.getByLabelText('booked criteria').textContent ?? '{}')
+  expect(awaiting()).toEqual({ q: 'Ali', page: 2, per_page: 25 })
+  expect(booked()).toEqual({ q: 'Sara', page: 3, per_page: 25 })
+  await user.click(screen.getByText('Filter awaiting'))
+  expect(awaiting()).toEqual({ q: 'Ahmed', page: 1, per_page: 25 })
+  expect(booked()).toEqual({ q: 'Sara', page: 3, per_page: 25 })
+  await user.click(screen.getByText('Page booked'))
+  expect(awaiting().q).toBe('Ahmed')
+  expect(booked().page).toBe(4)
+  await user.click(screen.getByText('Back'))
+  expect(booked().page).toBe(3)
+  await user.click(screen.getByText('Back'))
+  expect(awaiting()).toEqual({ q: 'Ali', page: 2, per_page: 25 })
+})
+
 it('restores bookmarked criteria and browser history while resetting pages on filter changes', async () => {
   const user = userEvent.setup()
   render(

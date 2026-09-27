@@ -1521,6 +1521,49 @@ export type RecordMyEvaluation422 = {
   errors?: RecordMyEvaluation422Errors;
 };
 
+export type ApplicationsAwaitingInterviewSchedulingParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses within the queue.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type ApplicationsAwaitingInterviewScheduling200DataItem = {
   id?: number;
   status?: string;
@@ -1532,14 +1575,80 @@ export type ApplicationsAwaitingInterviewScheduling200DataItem = {
   primary_program?: string | null;
   finalized_at?: string;
   review_entered_at?: string;
-  age_days?: number;
+  /** @nullable */
+  age_days: number | null;
+};
+
+export type ApplicationsAwaitingInterviewScheduling200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type ApplicationsAwaitingInterviewScheduling200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
 };
 
 export type ApplicationsAwaitingInterviewScheduling200 = {
   data?: ApplicationsAwaitingInterviewScheduling200DataItem[];
+  links?: ApplicationsAwaitingInterviewScheduling200Links;
+  meta?: ApplicationsAwaitingInterviewScheduling200Meta;
 };
 
 export type ApplicationsAwaitingInterviewScheduling403 = {
+  message?: string;
+};
+
+export type ExportApplicationsAwaitingInterviewSchedulingParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses within the queue.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Ignored by export.
+ */
+page?: number;
+/**
+ * Ignored by export.
+ */
+per_page?: number;
+};
+
+export type ExportApplicationsAwaitingInterviewScheduling403 = {
   message?: string;
 };
 
@@ -16781,13 +16890,14 @@ export const useRecordMyEvaluation = <TError = RecordMyEvaluation403 | RecordMyE
  * @summary Applications awaiting interview scheduling.
  */
 export const applicationsAwaitingInterviewScheduling = (
-
+    params?: ApplicationsAwaitingInterviewSchedulingParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<ApplicationsAwaitingInterviewScheduling200>(
-      {url: `/api/v1/applications/awaiting-interview`, method: 'GET', signal
+      {url: `/api/v1/applications/awaiting-interview`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -16795,23 +16905,23 @@ export const applicationsAwaitingInterviewScheduling = (
 
 
 
-export const getApplicationsAwaitingInterviewSchedulingQueryKey = () => {
+export const getApplicationsAwaitingInterviewSchedulingQueryKey = (params?: ApplicationsAwaitingInterviewSchedulingParams,) => {
     return [
-    `/api/v1/applications/awaiting-interview`
+    `/api/v1/applications/awaiting-interview`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getApplicationsAwaitingInterviewSchedulingQueryOptions = <TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+export const getApplicationsAwaitingInterviewSchedulingQueryOptions = <TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(params?: ApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getApplicationsAwaitingInterviewSchedulingQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getApplicationsAwaitingInterviewSchedulingQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>> = ({ signal }) => applicationsAwaitingInterviewScheduling(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>> = ({ signal }) => applicationsAwaitingInterviewScheduling(params, signal);
 
 
 
@@ -16825,7 +16935,7 @@ export type ApplicationsAwaitingInterviewSchedulingQueryError = ApplicationsAwai
 
 
 export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+ params: undefined |  ApplicationsAwaitingInterviewSchedulingParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>,
           TError,
@@ -16835,7 +16945,7 @@ export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<Retur
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+ params?: ApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>,
           TError,
@@ -16845,7 +16955,7 @@ export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<Retur
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ params?: ApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -16853,11 +16963,107 @@ export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<Retur
  */
 
 export function useApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError = ApplicationsAwaitingInterviewScheduling403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ params?: ApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof applicationsAwaitingInterviewScheduling>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getApplicationsAwaitingInterviewSchedulingQueryOptions(options)
+  const queryOptions = getApplicationsAwaitingInterviewSchedulingQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every matching unbooked applicant for the privileged scheduling actor.
+ * @summary Export applications awaiting interview scheduling.
+ */
+export const exportApplicationsAwaitingInterviewScheduling = (
+    params?: ExportApplicationsAwaitingInterviewSchedulingParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/applications/awaiting-interview/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportApplicationsAwaitingInterviewSchedulingQueryKey = (params?: ExportApplicationsAwaitingInterviewSchedulingParams,) => {
+    return [
+    `/api/v1/applications/awaiting-interview/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportApplicationsAwaitingInterviewSchedulingQueryOptions = <TData = Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError = ExportApplicationsAwaitingInterviewScheduling403>(params?: ExportApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportApplicationsAwaitingInterviewSchedulingQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>> = ({ signal }) => exportApplicationsAwaitingInterviewScheduling(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportApplicationsAwaitingInterviewSchedulingQueryResult = NonNullable<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>>
+export type ExportApplicationsAwaitingInterviewSchedulingQueryError = ExportApplicationsAwaitingInterviewScheduling403
+
+
+export function useExportApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError = ExportApplicationsAwaitingInterviewScheduling403>(
+ params: undefined |  ExportApplicationsAwaitingInterviewSchedulingParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>,
+          TError,
+          Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError = ExportApplicationsAwaitingInterviewScheduling403>(
+ params?: ExportApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>,
+          TError,
+          Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError = ExportApplicationsAwaitingInterviewScheduling403>(
+ params?: ExportApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export applications awaiting interview scheduling.
+ */
+
+export function useExportApplicationsAwaitingInterviewScheduling<TData = Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError = ExportApplicationsAwaitingInterviewScheduling403>(
+ params?: ExportApplicationsAwaitingInterviewSchedulingParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportApplicationsAwaitingInterviewScheduling>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportApplicationsAwaitingInterviewSchedulingQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

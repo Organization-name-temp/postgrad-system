@@ -117,6 +117,7 @@ Route::middleware(['auth:sanctum', 'can:interview.schedule'])->group(function ()
     // Declared before the model-bound `/applications/{application}` reviewer routes;
     // the literal segment cannot be read as an integer id (they are whereNumber-bound).
     Route::get('/applications/awaiting-interview', [InterviewSchedulingController::class, 'index']);
+    Route::get('/applications/awaiting-interview/export', [InterviewSchedulingController::class, 'exportAwaiting']);
 
     Route::get('/interview-slots/interviewers', [InterviewSlotController::class, 'interviewers']);
     Route::get('/interview-slots', [InterviewSlotController::class, 'index']);

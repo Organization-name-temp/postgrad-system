@@ -368,3 +368,39 @@ worklists/slot pool and staff/applicant pickers, Catalog picker adoption and dir
 Dean Faculty criterion. Existing interview scheduling is university-wide for its
 privileged actors; migration must preserve that operational scope independently
 of the faculty-scoped Dean review/decision queues.
+
+### Admissions/Catalog prerequisite (#06), awaiting-interview worklist
+
+- The unbooked Dean-approved population now shares Application collection parsing,
+  stored/derived selection and pagination. Its explicit Awaiting-Interview scope
+  retains university-wide scheduling for SA, Deans and administrators, independent
+  of the faculty-scoped Dean review/decision workflows. Existing booked applicants
+  remain excluded before any filter, sort, count, page or export.
+- Red HTTP tests demonstrated ignored query/page criteria and absent export route.
+  New `/applications/awaiting-interview/export` uses full scoped selection and
+  existing canonical bilingual projection, bounded Program reads and audit resource
+  `applications/awaiting-interview`. Workbook readback proves page-independent
+  selection, booked exclusion and counts; unauthorized Applicants are denied.
+- Focused backend regression run **59 passed, 337 assertions, 10.38s**, including
+  original scheduling/mutations, screening, both Dean queues, Pipeline owner scope
+  and the shared dataset extended with this worklist. Pint/PHPStan/deptrac passed.
+- Scheduling retains both existing worklists. Shared URL hook now supports an
+  optional collection namespace: browser keys such as `awaiting_q` are stripped to
+  ordinary flat `q` for the API, and changing one worklist preserves the other's
+  criteria/page. Single-collection callers retain existing behavior. Red shared
+  hook regression proved absent isolation; green tests cover both contexts and Back.
+- Awaiting section is a named accessible region with URL controls, paging and
+  authenticated blob export. Focused frontend red absent-control tests became
+  green. **6 files / 12 tests passed, 23.67s**, including the hook and previous
+  single-collection pages. Existing bilingual labels and numeric direction reused.
+- OpenAPI/client/Zod regenerated from documented controller parameters and the
+  always-paginated nullable-age response. Frontend typecheck/lint/full format passed.
+- Final EN/AR collection and complete admissions headline browser run is active;
+  headline now searches its own Applicant inside the paginated awaiting region.
+  Booked/assigned interviews, slots/pickers and remaining #06 acceptance are pending;
+  this slice does not claim full prerequisite or Phase 7 ticket completion.
+
+Awaiting-interview serial browser verification: **3 passed, 2.0m** — full admissions
+headline with Applicant search in the paginated worklist, plus EN/AR bookmarked
+criteria reload, authenticated workbook downloads and serious/critical axe checks.
+The existing slot creation/evaluation/completion/acceptance journey remains intact.

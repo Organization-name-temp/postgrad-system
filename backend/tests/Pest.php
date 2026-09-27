@@ -4,6 +4,7 @@ use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Internal\Models\Interview;
 use Modules\Catalog\Internal\Models\Course;
 use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
@@ -138,6 +139,17 @@ foreach (['programs' => Program::class, 'departments' => Department::class, 'fac
 
 dataset('collection contracts', [
     ...$catalogReferenceContracts,
+    'Awaiting interview scheduling' => ['/api/v1/applications/awaiting-interview', function (): array {
+        $first = Application::factory()->interviewScheduled()->create(['phone' => '+201088888888', 'finalized_at' => now()->subDays(2)]);
+        Application::factory()->interviewScheduled()->create(['phone' => '+201088888888', 'finalized_at' => $first->finalized_at]);
+        $booked = Application::factory()->interviewScheduled()->create();
+        Interview::factory()->create(['application_id' => $booked->id]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Dean);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'status=under_sa_review', 'private_probe' => 'q=1088888888'];
+    }],
     'Admission Cycle management' => ['/api/v1/admission-cycles', function (): array {
         $first = AdmissionCycle::factory()->open()->create(['year' => 2026]);
         AdmissionCycle::factory()->closed()->create(['year' => 2025]);

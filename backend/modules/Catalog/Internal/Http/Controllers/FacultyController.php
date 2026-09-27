@@ -26,6 +26,7 @@ class FacultyController
      * List Faculties.
      *
      * @queryParam q string Bilingual name or code fragment. Example: A
+     * @queryParam id string Comma-separated reference ids. Example: 1,2
      * @queryParam code string Exact codes. Example: A001
      * @queryParam is_active string Active states. Example: true
      * @queryParam sort string Comma-separated readable fields; minus descends. Example: code,-name_en
@@ -47,6 +48,7 @@ class FacultyController
      * All matching authorized rows with canonical localized columns; paging is ignored.
      *
      * @queryParam q string Bilingual name or code fragment. Example: A
+     * @queryParam id string Comma-separated reference ids. Example: 1,2
      * @queryParam code string Exact codes. Example: A001
      * @queryParam is_active string Active states. Example: true
      * @queryParam sort string Comma-separated readable fields; minus descends. Example: code,-name_en

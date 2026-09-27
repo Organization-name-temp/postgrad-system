@@ -25,15 +25,15 @@ final class ReferenceCollection
     public function query(Request $request, string $resource): CollectionQuery
     {
         $request->validate(['is_active' => ['sometimes', 'regex:/^\s*(true|false|1|0)(\s*,\s*(true|false|1|0))*\s*$/']]);
-        $filters = ['code', 'is_active', ...$this->fields($resource)];
-        $sortable = ['id', 'code', 'name_en', 'name_ar', ...array_diff($filters, ['code', 'faculty_id'])];
+        $filters = ['id', 'code', 'is_active', ...$this->fields($resource)];
+        $sortable = ['id', 'code', 'name_en', 'name_ar', ...array_diff($filters, ['id', 'code', 'faculty_id'])];
         if ($resource === 'departments') {
             $sortable[] = 'faculty_id';
         }
         $input = $request->query();
         $input['sort'] ??= 'code';
 
-        return CollectionQuery::from($input, $filters, $filters, $sortable, defaultPerPage: 100, integerFilters: array_values(array_intersect($filters, ['department_id', 'faculty_id'])));
+        return CollectionQuery::from($input, $filters, $filters, $sortable, defaultPerPage: 100, integerFilters: array_values(array_intersect($filters, ['id', 'department_id', 'faculty_id'])));
     }
 
     /**

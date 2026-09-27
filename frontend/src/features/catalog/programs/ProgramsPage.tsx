@@ -45,7 +45,24 @@ export function ProgramsPage() {
   const { data, isPending, isError } = useListPrograms(collection.params)
   const programs = data?.data ?? []
   const { data: departmentsData } = useListDepartments()
-  const departments = departmentsData?.data ?? []
+  const initialParents = departmentsData?.data ?? []
+  const missingParentIds = [
+    ...new Set(
+      programs
+        .map((row) => row.department_id)
+        .filter(
+          (id): id is number => id != null && !initialParents.some((parent) => parent.id === id),
+        ),
+    ),
+  ].join(',')
+  const missingParents = useListDepartments(
+    { id: missingParentIds || undefined, per_page: 100 },
+    { query: { enabled: missingParentIds !== '' } },
+  )
+  const departments = [
+    ...initialParents,
+    ...(missingParentIds ? (missingParents.data?.data ?? []) : []),
+  ]
 
   const departmentName = (id?: number): string => {
     const department = departments.find((item) => item.id === id)

@@ -33,6 +33,7 @@ class ProgramController
      * List Programs.
      *
      * @queryParam q string Bilingual name or code fragment. Example: A
+     * @queryParam id string Comma-separated reference ids. Example: 1,2
      * @queryParam code string Exact codes. Example: A001
      * @queryParam is_active string Active states. Example: true
      * @queryParam department_id string Department ids. Example: 1
@@ -57,6 +58,7 @@ class ProgramController
      * All matching authorized rows with canonical localized columns; paging is ignored.
      *
      * @queryParam q string Bilingual name or code fragment. Example: A
+     * @queryParam id string Comma-separated reference ids. Example: 1,2
      * @queryParam code string Exact codes. Example: A001
      * @queryParam is_active string Active states. Example: true
      * @queryParam department_id string Department ids. Example: 1

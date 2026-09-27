@@ -10,6 +10,35 @@ use OpenSpout\Reader\XLSX\Reader;
 
 uses(RefreshDatabase::class);
 
+it('resolves exact reference IDs without depending on the first reference page', function (string $resource, string $model) {
+    $model::factory()->create(['code' => 'A001']);
+    $wanted = $model::factory()->create(['code' => 'Z999']);
+    actingAsRole(Role::Student);
+    $this->getJson('/api/v1/'.$resource.'?id='.$wanted->id.'&per_page=100')
+        ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $wanted->id)->assertJsonPath('meta.total', 1);
+    $this->getJson('/api/v1/'.$resource.'?id=999999')->assertOk()->assertJsonPath('meta.total', 0);
+    $this->getJson('/api/v1/'.$resource.'?id=0')->assertUnprocessable();
+    $response = $this->get('/api/v1/'.$resource.'/export?id='.$wanted->id.'&per_page=1')->assertOk();
+    $reader = new Reader;
+    $reader->open($response->baseResponse->getFile()->getPathname());
+    $rows = [];
+    foreach ($reader->getSheetIterator() as $sheet) {
+        foreach ($sheet->getRowIterator() as $row) {
+            $rows[] = $row->toArray();
+        }
+    }
+    $reader->close();
+    expect($rows)->toHaveCount(2)->and($rows[1][0])->toBe((string) $wanted->id);
+    $audit = AuditLog::query()->where('action', 'catalog.'.$resource.'_exported')->sole();
+    expect($audit->metadata['criteria']['id'])->toBe([(string) $wanted->id])->and($audit->metadata['row_count'])->toBe(1);
+    actingAsRole(Role::Applicant);
+    $this->getJson('/api/v1/'.$resource.'?id='.$wanted->id)->assertOk()->assertJsonPath('meta.total', 1);
+})->with([
+    'Programs' => ['programs', Program::class],
+    'Departments' => ['departments', Department::class],
+    'Faculties' => ['faculties', Faculty::class],
+]);
+
 it('filters and pages a bilingual reference collection with stable ties', function (string $resource, string $model, ?string $parent) {
     $first = $model::factory()->create(['code' => 'A001', 'name_en' => 'Same name', 'name_ar' => 'أَحْمَد', 'is_active' => true]);
     $attributes = ['code' => 'A002', 'name_en' => 'Same name', 'name_ar' => 'أحمد', 'is_active' => true];

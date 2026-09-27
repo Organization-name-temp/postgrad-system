@@ -11591,6 +11591,16 @@ paths:
             example: A
         -
           in: query
+          name: id
+          description: 'Comma-separated reference ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated reference ids.'
+            example: '1,2'
+        -
+          in: query
           name: code
           description: 'Exact codes.'
           example: A001
@@ -11678,6 +11688,16 @@ paths:
             type: string
             description: 'Bilingual name or code fragment.'
             example: A
+        -
+          in: query
+          name: id
+          description: 'Comma-separated reference ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated reference ids.'
+            example: '1,2'
         -
           in: query
           name: code
@@ -12138,6 +12158,16 @@ paths:
             example: A
         -
           in: query
+          name: id
+          description: 'Comma-separated reference ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated reference ids.'
+            example: '1,2'
+        -
+          in: query
           name: code
           description: 'Exact codes.'
           example: A001
@@ -12235,6 +12265,16 @@ paths:
             type: string
             description: 'Bilingual name or code fragment.'
             example: A
+        -
+          in: query
+          name: id
+          description: 'Comma-separated reference ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated reference ids.'
+            example: '1,2'
         -
           in: query
           name: code
@@ -12740,6 +12780,16 @@ paths:
             example: A
         -
           in: query
+          name: id
+          description: 'Comma-separated reference ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated reference ids.'
+            example: '1,2'
+        -
+          in: query
           name: code
           description: 'Exact codes.'
           example: A001
@@ -12857,6 +12907,16 @@ paths:
             type: string
             description: 'Bilingual name or code fragment.'
             example: A
+        -
+          in: query
+          name: id
+          description: 'Comma-separated reference ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated reference ids.'
+            example: '1,2'
         -
           in: query
           name: code

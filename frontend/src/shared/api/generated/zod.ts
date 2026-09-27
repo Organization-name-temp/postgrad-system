@@ -2791,6 +2791,7 @@ export const CatalogSummaryCardResponse = zod.object({
  */
 export const ExportFacultiesQueryParams = zod.object({
   "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
   "code": zod.string().optional().describe('Exact codes.'),
   "is_active": zod.string().optional().describe('Active states.'),
   "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
@@ -2806,6 +2807,7 @@ export const ExportFacultiesResponse = zod.unknown()
  */
 export const ListFacultiesQueryParams = zod.object({
   "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
   "code": zod.string().optional().describe('Exact codes.'),
   "is_active": zod.string().optional().describe('Active states.'),
   "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
@@ -2942,6 +2944,7 @@ export const DeactivateAFacultyResponse = zod.object({
  */
 export const ExportDepartmentsQueryParams = zod.object({
   "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
   "code": zod.string().optional().describe('Exact codes.'),
   "is_active": zod.string().optional().describe('Active states.'),
   "faculty_id": zod.string().optional().describe('Faculty ids.'),
@@ -2958,6 +2961,7 @@ export const ExportDepartmentsResponse = zod.unknown()
  */
 export const ListDepartmentsQueryParams = zod.object({
   "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
   "code": zod.string().optional().describe('Exact codes.'),
   "is_active": zod.string().optional().describe('Active states.'),
   "faculty_id": zod.string().optional().describe('Faculty ids.'),
@@ -3103,6 +3107,7 @@ export const DeactivateADepartmentResponse = zod.object({
  */
 export const ExportProgramsQueryParams = zod.object({
   "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
   "code": zod.string().optional().describe('Exact codes.'),
   "is_active": zod.string().optional().describe('Active states.'),
   "department_id": zod.string().optional().describe('Department ids.'),
@@ -3121,6 +3126,7 @@ export const ExportProgramsResponse = zod.unknown()
  */
 export const ListProgramsQueryParams = zod.object({
   "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
   "code": zod.string().optional().describe('Exact codes.'),
   "is_active": zod.string().optional().describe('Active states.'),
   "department_id": zod.string().optional().describe('Department ids.'),

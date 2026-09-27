@@ -3784,6 +3784,10 @@ export type ExportFacultiesParams = {
  */
 q?: string;
 /**
+ * Comma-separated reference ids.
+ */
+id?: string;
+/**
  * Exact codes.
  */
 code?: string;
@@ -3814,6 +3818,10 @@ export type ListFacultiesParams = {
  * Bilingual name or code fragment.
  */
 q?: string;
+/**
+ * Comma-separated reference ids.
+ */
+id?: string;
 /**
  * Exact codes.
  */
@@ -3959,6 +3967,10 @@ export type ExportDepartmentsParams = {
  */
 q?: string;
 /**
+ * Comma-separated reference ids.
+ */
+id?: string;
+/**
  * Exact codes.
  */
 code?: string;
@@ -3993,6 +4005,10 @@ export type ListDepartmentsParams = {
  * Bilingual name or code fragment.
  */
 q?: string;
+/**
+ * Comma-separated reference ids.
+ */
+id?: string;
 /**
  * Exact codes.
  */
@@ -4152,6 +4168,10 @@ export type ExportProgramsParams = {
  */
 q?: string;
 /**
+ * Comma-separated reference ids.
+ */
+id?: string;
+/**
  * Exact codes.
  */
 code?: string;
@@ -4194,6 +4214,10 @@ export type ListProgramsParams = {
  * Bilingual name or code fragment.
  */
 q?: string;
+/**
+ * Comma-separated reference ids.
+ */
+id?: string;
 /**
  * Exact codes.
  */

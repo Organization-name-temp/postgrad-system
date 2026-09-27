@@ -833,3 +833,27 @@ Course detail final browser verification: EN/AR live owner headers, Course dialo
 reference choices, retained query criteria, downloads and serious/critical axe scans
 **2 tests passed, 55.8s**. No API artifacts changed. Parent labels on paginated
 Catalog grids remain the next prerequisite follow-up; no final gate/review claim.
+
+### Catalog grid parent references
+
+- Exact-ID HTTP tests first reproduced unsupported reference IDs (422). Catalog's
+  own Faculty/Department/Program collections now accept validated positive ID CSV
+  filters; their common stored selection, totals and export share that criterion.
+  Existing `catalog.view` authorization stays intact, including Applicants under
+  the established Permission matrix. No cross-owner tables or joins were added.
+- Six EN/AR page tests first reproduced missing grid parent names beyond page one.
+  The grids keep the initial reference choices and fetch only missing parent IDs
+  from their visible rows in a bounded 100-row request. Ordinary pages whose
+  parents are already present need no extra request. Filter choices are preserved.
+- Backend **44 tests / 241 assertions passed, 7.84s**, including reference-ID
+  validation, empty unknown IDs, read roles, workbook read-back and effective ID
+  audit criteria. Backend Pint/PHPStan/deptrac passed. Frontend focused **3 files /
+  10 tests passed, 15.85s**; typecheck/lint/full format passed.
+- Controllers document the ID criterion; OpenAPI and Orval regenerated. Serial
+  Course/Catalog EN/AR dialogs, lookup choices, criteria/downloads, owner headers,
+  curriculum reference selection and serious/critical axe checks **4 passed, 2.2m**.
+  Post-commit API drift checks remain next. Final package gates/review are pending.
+- Pipeline Report HTTP tracer now fails with 404, proving the aggregate facade alone
+  does not deliver prerequisite #08. Its owner API, exact all-status drill-through,
+  Analytics composition and subsequent print work remain required before Phase 7
+  Report delivery; all seven ticket acceptance/final gates/review remain pending.

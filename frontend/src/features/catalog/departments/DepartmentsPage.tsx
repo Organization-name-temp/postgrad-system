@@ -46,7 +46,24 @@ export function DepartmentsPage() {
   const { data, isPending, isError } = useListDepartments(collection.params)
   const departments = data?.data ?? []
   const { data: facultiesData } = useListFaculties()
-  const faculties = facultiesData?.data ?? []
+  const initialParents = facultiesData?.data ?? []
+  const missingParentIds = [
+    ...new Set(
+      departments
+        .map((row) => row.faculty_id)
+        .filter(
+          (id): id is number => id != null && !initialParents.some((parent) => parent.id === id),
+        ),
+    ),
+  ].join(',')
+  const missingParents = useListFaculties(
+    { id: missingParentIds || undefined, per_page: 100 },
+    { query: { enabled: missingParentIds !== '' } },
+  )
+  const faculties = [
+    ...initialParents,
+    ...(missingParentIds ? (missingParents.data?.data ?? []) : []),
+  ]
 
   const facultyName = (id?: number): string => {
     const faculty = faculties.find((item) => item.id === id)

@@ -1571,3 +1571,17 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   anonymous recipient/public language choices retain their local-only behavior.
   Browser discovery and formatting checked before the next complete gate. Failed
   recovery log retained as `frontend-gate-attempt4.log` under durable log storage.
+- Frontend gate attempt 5 stopped during its unit stage (exit 143), before a
+  terminal unit/browser result, after auditing the empty seeded capacity queue.
+  This was a deliberate verification-scope change, not a product-gate pass or a
+  test failure; the prior log is retained as `frontend-gate-attempt5.log`.
+- B05-05: the populated capacity Card used a level-six heading immediately
+  beneath the page h1. Its owner interaction test fixture was expanded to assert
+  level two in EN/AR and went **3 RED**. Rendering that dense heading as h2
+  preserved the design typography; the same **3 tests passed in 8.01s**.
+  A new four-state native audit supplies the existing typed capacity response
+  fixture after a real scoped GET, then checks required-reason validation, the
+  denial dialog, keyboard Cancel, no decision write, 390/1280px page fit and
+  serious/critical axe. It is running; fixture injection tests rendering only,
+  not backend scope or decision authority (which the existing Pest owner tests
+  cover).

@@ -272,3 +272,40 @@ final-decision regression run **38 passed, 165 assertions, 9.04s**; subsequent f
 queue/export run **6 passed, 24 assertions, 3.41s**. Controller query/response docs,
 generated API artifacts, UI controls, dataset registration and static/browser
 verification for this next slice remain pending.
+
+### Admissions/Catalog prerequisite (#06), Dean decision worklist
+
+- Decision-state/degree/search/age criteria now narrow the operational Dean-Faculty
+  base before stable paging. Student Affairs on the same actor never widens that
+  Dean worklist. The unparameterized Dashboard Card retains complete counts and
+  shares the same awaiting-decision statuses with the pageable controller.
+- `/dean/decisions/export` reuses the complete scoped selection, canonical readable
+  projection and bilingual XLSX behavior. Workbook assertions prove filtering to
+  Waitlisted, exclusion of other Faculties, page-independent rows and resource/count
+  audit metadata. No change to decision actions or acceptance mint.
+- Red queue/export regressions confirmed missing paging/filtering and missing route;
+  red frontend tests confirmed absent controls/export. Final focused backend run:
+  **70 passed, 317 assertions, 15.21s**, including original decisions, Cards,
+  administrative overrides and the shared dataset extended with decision worklist.
+- **4 focused Vitest/RTL tests passed, 9.20s** across both Dean queue pages. Decision
+  tests verify named state control, bookmark/API criteria, reset, Back and blob
+  export. A failed named-label assertion found new dictionary keys in the wrong
+  namespace; corrected both EN/AR placement and reran successfully.
+- Documented all query parameters and paginated/null-age response; regenerated
+  OpenAPI/client/Zod. Pint, PHPStan, deptrac, frontend typecheck, lint and full format
+  check passed. Final serial browser run and post-commit drift checks pending below.
+- Remaining Admissions collections/pickers and direct Faculty criterion adoption
+  still pending for #06. No whole-ticket/full-package gate or final review claimed.
+
+Decision browser run: both EN/AR collection journeys **passed** (17.3s/22.3s),
+each traversing review and decisions with bookmark reload, workbook downloads and
+serious/critical axe checks. The shared admissions headline **failed** before final
+decisions: repeated earlier runs had exhausted all seeded capacity-one interview
+slots, and the scheduling dialog correctly displayed no open slots. The headline
+now creates and selects a unique slot assigned to its named interviewer through the
+normal authorized UI, preserving demo slots and repeatability. Its rerun is active;
+no passing headline or full frontend gate claimed for this slice yet.
+The first isolated-slot headline rerun failed on the test's exact `Location` label
+locator because the required-field marker is part of that label. The rendered form
+had the correct date and named interviewer. Corrected the locator to the scoped
+label match used by the other required inputs; the next headline rerun is active.

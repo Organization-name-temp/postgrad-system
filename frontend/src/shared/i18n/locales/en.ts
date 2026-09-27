@@ -780,6 +780,7 @@ export const en = {
     // Dean final decision (ticket 12): the post-interview decisions queue + the
     // accept/conditional/waitlist/reject form with the pre-filled advisor.
     decisions: {
+      filters: { state: 'Decision state', allStates: 'All decision states' },
       title: 'Admission decisions',
       intro: 'Applications awaiting your final decision after interview, oldest first.',
       empty: 'No applications are awaiting a decision.',

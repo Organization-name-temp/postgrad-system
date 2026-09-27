@@ -7385,7 +7385,107 @@ paths:
       summary: 'Dean decisions queue.'
       operationId: deanDecisionsQueue
       description: "The applications awaiting the signed-in Dean's final decision — those resting at\n`interview_completed` (a first decision is due) and those held at\n`conditionally_accepted` / `waitlisted` (a resolution is due) — whose primary\nProgram's Faculty is among the Dean's assigned Faculties, oldest-first (by when\nthey were finalized), each with the applicant's identity, resolved primary\nProgram, and days waited in the current status. Same faculty-scoping as the Dean\nreview queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.\nGated on `applicant.decide` (Dean only)."
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual name or identifier search.'
+          example: Ahmed
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual name or identifier search.'
+            example: Ahmed
+        -
+          in: query
+          name: status
+          description: 'Comma-separated statuses within the queue.'
+          example: 'interview_completed,waitlisted'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated statuses within the queue.'
+            example: 'interview_completed,waitlisted'
+        -
+          in: query
+          name: program_id
+          description: 'Program ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Program ids.'
+            example: '1,2'
+        -
+          in: query
+          name: admission_cycle_id
+          description: 'Cycle ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Cycle ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Degree levels.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'Degree levels.'
+            example: MSc
+        -
+          in: query
+          name: age_days_min
+          description: 'Minimum whole days in current review.'
+          example: 7
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum whole days in current review.'
+            example: 7
+        -
+          in: query
+          name: age_days_max
+          description: 'Maximum whole days in current review.'
+          example: 30
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum whole days in current review.'
+            example: 30
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: '-age_days,name_en'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: '-age_days,name_en'
+        -
+          in: query
+          name: page
+          description: 'Page number.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100.'
+            example: 25
       responses:
         200:
           description: ''
@@ -7415,6 +7515,16 @@ paths:
                       finalized_at: '2026-07-10T10:00:00+00:00'
                       review_entered_at: '2026-07-12T10:00:00+00:00'
                       age_days: 3
+                  links:
+                    first: 'http://localhost/api/v1/dean/decisions?page=1'
+                    last: 'http://localhost/api/v1/dean/decisions?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 25
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -7499,6 +7609,170 @@ paths:
                         age_days:
                           type: integer
                           example: 3
+                          nullable: true
+                      required:
+                        - age_days
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/dean/decisions?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/dean/decisions?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'This action is unauthorized.'
+                properties:
+                  message:
+                    type: string
+                    example: 'This action is unauthorized.'
+      tags:
+        - Admissions
+      security: []
+  /api/v1/dean/decisions/export:
+    get:
+      summary: 'Export Dean decision worklist.'
+      operationId: exportDeanDecisionWorklist
+      description: 'Canonical readable columns for every matching row inside the Dean faculty scope.'
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual name or identifier search.'
+          example: Ahmed
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual name or identifier search.'
+            example: Ahmed
+        -
+          in: query
+          name: status
+          description: 'Comma-separated statuses within the queue.'
+          example: 'interview_completed,waitlisted'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated statuses within the queue.'
+            example: 'interview_completed,waitlisted'
+        -
+          in: query
+          name: program_id
+          description: 'Program ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Program ids.'
+            example: '1,2'
+        -
+          in: query
+          name: admission_cycle_id
+          description: 'Cycle ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Cycle ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Degree levels.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'Degree levels.'
+            example: MSc
+        -
+          in: query
+          name: age_days_min
+          description: 'Minimum whole days in current review.'
+          example: 7
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum whole days in current review.'
+            example: 7
+        -
+          in: query
+          name: age_days_max
+          description: 'Maximum whole days in current review.'
+          example: 30
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum whole days in current review.'
+            example: 30
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: '-age_days,name_en'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: '-age_days,name_en'
+        -
+          in: query
+          name: page
+          description: 'Ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Ignored by export.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Ignored by export.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
         403:
           description: ''
           content:

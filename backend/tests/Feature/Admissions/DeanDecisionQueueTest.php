@@ -8,9 +8,11 @@ use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Identity\Internal\Models\AuditLog;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
+use OpenSpout\Reader\XLSX\Reader;
 
 uses(RefreshDatabase::class);
 
@@ -83,6 +85,25 @@ it('excludes applications outside the Dean’s faculties', function () {
         ->assertJsonPath('data.0.id', $ours->id);
 });
 
+it('filters decision state before stable pages without widening a multirole Dean scope', function () {
+    $faculty = Faculty::factory()->create();
+    $first = decisionQueueApplication($faculty, ApplicationStatus::Waitlisted);
+    $second = decisionQueueApplication($faculty, ApplicationStatus::Waitlisted);
+    decisionQueueApplication($faculty, ApplicationStatus::InterviewCompleted);
+    $outside = decisionQueueApplication(Faculty::factory()->create(), ApplicationStatus::Waitlisted);
+    $dean = decisionQueueDean($faculty);
+    $dean->assignRole(Role::StudentAffairs);
+    Sanctum::actingAs($dean);
+
+    $this->getJson('/api/v1/dean/decisions?status=waitlisted&sort=id&per_page=1&page=2')
+        ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $second->id)
+        ->assertJsonPath('meta.total', 2);
+    $this->getJson('/api/v1/dean/decisions?status=waitlisted&sort=id&per_page=1')
+        ->assertOk()->assertJsonPath('data.0.id', $first->id);
+    $this->getJson('/api/v1/dean/decisions?program_id='.$outside->primary_program_id)
+        ->assertOk()->assertJsonPath('meta.total', 0)->assertJsonCount(0, 'data');
+});
+
 it('is empty for a Dean with no faculty assignment', function () {
     $faculty = Faculty::factory()->create();
     decisionQueueApplication($faculty, ApplicationStatus::InterviewCompleted);
@@ -94,6 +115,30 @@ it('is empty for a Dean with no faculty assignment', function () {
     $this->getJson('/api/v1/dean/decisions')
         ->assertOk()
         ->assertJsonCount(0, 'data');
+});
+
+it('exports the filtered decision state for every in-scope row and audits the decision resource', function () {
+    $faculty = Faculty::factory()->create();
+    $first = decisionQueueApplication($faculty, ApplicationStatus::Waitlisted);
+    $second = decisionQueueApplication($faculty, ApplicationStatus::Waitlisted);
+    decisionQueueApplication($faculty, ApplicationStatus::InterviewCompleted);
+    decisionQueueApplication(Faculty::factory()->create(), ApplicationStatus::Waitlisted);
+    $dean = decisionQueueDean($faculty);
+    $dean->assignRole(Role::StudentAffairs);
+    Sanctum::actingAs($dean);
+    $response = $this->get('/api/v1/dean/decisions/export?status=waitlisted&sort=id&per_page=1')->assertOk();
+    $reader = new Reader;
+    $reader->open($response->baseResponse->getFile()->getPathname());
+    $rows = [];
+    foreach ($reader->getSheetIterator() as $sheet) {
+        foreach ($sheet->getRowIterator() as $row) {
+            $rows[] = $row->toArray();
+        }
+    }
+    $reader->close();
+    expect($rows)->toHaveCount(3)->and($rows[1][0])->toBe((string) $first->id)->and($rows[2][0])->toBe((string) $second->id);
+    $audit = AuditLog::query()->where('action', 'admissions.applications_exported')->sole();
+    expect($audit->metadata['resource'])->toBe('dean/decisions')->and($audit->metadata['row_count'])->toBe(2);
 });
 
 it('refuses the decisions queue to a user without applicant.decide (403)', function () {

@@ -2247,6 +2247,49 @@ export type DeanDecisionOnAnApplication422 = {
   errors?: DeanDecisionOnAnApplication422Errors;
 };
 
+export type DeanDecisionsQueueParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses within the queue.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type DeanDecisionsQueue200DataItemPrimaryProgram = {
   id?: number;
   code?: string;
@@ -2269,14 +2312,80 @@ export type DeanDecisionsQueue200DataItem = {
   primary_program?: DeanDecisionsQueue200DataItemPrimaryProgram;
   finalized_at?: string;
   review_entered_at?: string;
-  age_days?: number;
+  /** @nullable */
+  age_days: number | null;
+};
+
+export type DeanDecisionsQueue200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type DeanDecisionsQueue200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
 };
 
 export type DeanDecisionsQueue200 = {
   data?: DeanDecisionsQueue200DataItem[];
+  links?: DeanDecisionsQueue200Links;
+  meta?: DeanDecisionsQueue200Meta;
 };
 
 export type DeanDecisionsQueue403 = {
+  message?: string;
+};
+
+export type ExportDeanDecisionWorklistParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses within the queue.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Ignored by export.
+ */
+page?: number;
+/**
+ * Ignored by export.
+ */
+per_page?: number;
+};
+
+export type ExportDeanDecisionWorklist403 = {
   message?: string;
 };
 
@@ -18058,13 +18167,14 @@ export const useDeanDecisionOnAnApplication = <TError = DeanDecisionOnAnApplicat
  * @summary Dean decisions queue.
  */
 export const deanDecisionsQueue = (
-
+    params?: DeanDecisionsQueueParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<DeanDecisionsQueue200>(
-      {url: `/api/v1/dean/decisions`, method: 'GET', signal
+      {url: `/api/v1/dean/decisions`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -18072,23 +18182,23 @@ export const deanDecisionsQueue = (
 
 
 
-export const getDeanDecisionsQueueQueryKey = () => {
+export const getDeanDecisionsQueueQueryKey = (params?: DeanDecisionsQueueParams,) => {
     return [
-    `/api/v1/dean/decisions`
+    `/api/v1/dean/decisions`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getDeanDecisionsQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+export const getDeanDecisionsQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(params?: DeanDecisionsQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDeanDecisionsQueueQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getDeanDecisionsQueueQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanDecisionsQueue>>> = ({ signal }) => deanDecisionsQueue(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanDecisionsQueue>>> = ({ signal }) => deanDecisionsQueue(params, signal);
 
 
 
@@ -18102,7 +18212,7 @@ export type DeanDecisionsQueueQueryError = DeanDecisionsQueue403
 
 
 export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
+ params: undefined |  DeanDecisionsQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof deanDecisionsQueue>>,
           TError,
@@ -18112,7 +18222,7 @@ export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDeci
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
+ params?: DeanDecisionsQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof deanDecisionsQueue>>,
           TError,
@@ -18122,7 +18232,7 @@ export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDeci
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+ params?: DeanDecisionsQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -18130,11 +18240,107 @@ export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDeci
  */
 
 export function useDeanDecisionsQueue<TData = Awaited<ReturnType<typeof deanDecisionsQueue>>, TError = DeanDecisionsQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
+ params?: DeanDecisionsQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanDecisionsQueue>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getDeanDecisionsQueueQueryOptions(options)
+  const queryOptions = getDeanDecisionsQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Canonical readable columns for every matching row inside the Dean faculty scope.
+ * @summary Export Dean decision worklist.
+ */
+export const exportDeanDecisionWorklist = (
+    params?: ExportDeanDecisionWorklistParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/dean/decisions/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportDeanDecisionWorklistQueryKey = (params?: ExportDeanDecisionWorklistParams,) => {
+    return [
+    `/api/v1/dean/decisions/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportDeanDecisionWorklistQueryOptions = <TData = Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError = ExportDeanDecisionWorklist403>(params?: ExportDeanDecisionWorklistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportDeanDecisionWorklistQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>> = ({ signal }) => exportDeanDecisionWorklist(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportDeanDecisionWorklistQueryResult = NonNullable<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>>
+export type ExportDeanDecisionWorklistQueryError = ExportDeanDecisionWorklist403
+
+
+export function useExportDeanDecisionWorklist<TData = Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError = ExportDeanDecisionWorklist403>(
+ params: undefined |  ExportDeanDecisionWorklistParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDeanDecisionWorklist>>,
+          TError,
+          Awaited<ReturnType<typeof exportDeanDecisionWorklist>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDeanDecisionWorklist<TData = Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError = ExportDeanDecisionWorklist403>(
+ params?: ExportDeanDecisionWorklistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDeanDecisionWorklist>>,
+          TError,
+          Awaited<ReturnType<typeof exportDeanDecisionWorklist>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDeanDecisionWorklist<TData = Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError = ExportDeanDecisionWorklist403>(
+ params?: ExportDeanDecisionWorklistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Dean decision worklist.
+ */
+
+export function useExportDeanDecisionWorklist<TData = Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError = ExportDeanDecisionWorklist403>(
+ params?: ExportDeanDecisionWorklistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanDecisionWorklist>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportDeanDecisionWorklistQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

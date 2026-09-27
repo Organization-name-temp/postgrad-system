@@ -74,11 +74,17 @@ trait ResolvesQueuePrograms
         ProgramCatalog $catalog,
         Directory $directory,
     ): Collection {
-        return $this->deanOrAdminQueue($request, [
+        return $this->deanOrAdminQueue($request, $this->awaitingDecisionStatuses(), $assignments, $catalog, $directory);
+    }
+
+    /** @return list<ApplicationStatus> */
+    protected function awaitingDecisionStatuses(): array
+    {
+        return [
             ApplicationStatus::InterviewCompleted,
             ApplicationStatus::ConditionallyAccepted,
             ApplicationStatus::Waitlisted,
-        ], $assignments, $catalog, $directory);
+        ];
     }
 
     /**

@@ -76,7 +76,7 @@ async function capture(page: Page, testInfo: TestInfo, name: string) {
 
 // Open the queue row for our applicant (queues also hold seeded rows) and follow it.
 async function openApplicantRow(page: Page) {
-  if (['/screening', '/dean'].includes(new URL(page.url()).pathname)) {
+  if (['/screening', '/dean', '/dean/decisions'].includes(new URL(page.url()).pathname)) {
     await page.getByLabel('Search applicants').fill(APPLICANT.name)
   }
   const row = page.getByRole('row', { name: new RegExp(APPLICANT.name) })
@@ -211,15 +211,29 @@ test('headline: a stranger applies and is admitted as a Student across every rol
 
   // ── 5. Student Affairs schedules an interview slot ───────────────────────────────
   await login(page, 'r05@ejust.test')
+  // Each run creates its own capacity-one slot; repeated runs must not exhaust
+  // the named demo slots or depend on which of them was booked previously.
+  await page.getByRole('link', { name: 'Interview slots', exact: true }).click()
+  await page.getByRole('button', { name: 'New slot' }).click()
+  const slotForm = page.getByRole('dialog', { name: 'New slot' })
+  await slotForm
+    .getByLabel('Date & time')
+    .fill(new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 16))
+  await slotForm.getByRole('combobox', { name: 'Interviewer' }).click()
+  await page.getByRole('option', { name: 'Dr. Hoda Mansour', exact: true }).click()
+  const slotLocation = `Smoke room ${UNIQUE}`
+  await slotForm.getByLabel('Location').fill(slotLocation)
+  await slotForm.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(slotForm).not.toBeVisible()
   await page.getByRole('link', { name: 'Interview scheduling' }).first().click()
   await expect(page).toHaveURL(/\/interviews\/scheduling$/)
   await page
     .getByRole('row', { name: new RegExp(APPLICANT.name) })
     .getByRole('button', { name: 'Schedule' })
     .click()
-  // Pick the first open slot and book it.
+  // Book the slot created for this run, assigned to the named interviewer below.
   await page.getByRole('combobox', { name: 'Interview slot' }).click()
-  await page.getByRole('option').first().click()
+  await page.getByRole('option', { name: new RegExp(slotLocation) }).click()
   await page.getByRole('button', { name: 'Schedule interview' }).click()
   await capture(page, testInfo, '4-sa-scheduled')
   await logout(page)

@@ -138,6 +138,21 @@ foreach (['programs' => Program::class, 'departments' => Department::class, 'fac
 
 dataset('collection contracts', [
     ...$catalogReferenceContracts,
+    'Dean decision worklist' => ['/api/v1/dean/decisions', function (): array {
+        $program = Program::factory()->create();
+        $outside = Program::factory()->create();
+        $first = Application::factory()->interviewScheduled()->create(['status' => ApplicationStatus::Waitlisted,
+            'primary_program_id' => $program->id, 'phone' => '+201088888888']);
+        Application::factory()->interviewScheduled()->create(['status' => ApplicationStatus::InterviewCompleted,
+            'primary_program_id' => $program->id, 'phone' => '+201088888888']);
+        Application::factory()->interviewScheduled()->create(['status' => ApplicationStatus::Waitlisted, 'primary_program_id' => $outside->id]);
+        $dean = User::factory()->create();
+        $dean->assignRole(Role::Dean);
+        FacultyDeanAssignment::create(['user_id' => $dean->id, 'faculty_id' => $program->department->faculty_id]);
+
+        return ['actor' => $dean->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'program_id='.$outside->id, 'private_probe' => 'q=1088888888'];
+    }],
     'Dean review queue' => ['/api/v1/dean/applications', function (): array {
         $program = Program::factory()->create();
         $outside = Program::factory()->create();

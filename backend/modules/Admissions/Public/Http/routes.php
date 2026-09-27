@@ -172,6 +172,7 @@ Route::middleware(['auth:sanctum', 'can:applicant.decide'])->group(function () {
     // conditional/waitlist offer. Literal segment, declared before the id-bound decide
     // route in the same permission group.
     Route::get('/dean/decisions', [FinalDecisionController::class, 'index']);
+    Route::get('/dean/decisions/export', [FinalDecisionController::class, 'export']);
     Route::get('/dean/advisors', [FinalDecisionController::class, 'advisors']);
     Route::post('/dean/applications/{application}/decide', [FinalDecisionController::class, 'decide'])->whereNumber('application');
 

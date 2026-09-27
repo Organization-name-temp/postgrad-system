@@ -1504,3 +1504,12 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   switch using persisted authenticated locale. No grade workflow write or fixture
   change was needed. Remaining seven checks rerunning serially; unrun checks on
   the stopped attempt are not claimed as passing.
+- Complete backend gate attempt 4 **PASSED (exit 0)**:
+  `COMPOSER_PROCESS_TIMEOUT=0 composer gate` from `backend/`. Pint, PHPStan,
+  deptrac, **1,329 tests / 8,421 assertions (740.02s)** and OpenAPI drift all
+  passed. Exact log: `/tmp/phase7-backend-gate.log`. Prior failed attempts remain
+  documented with fixes; this is the first complete green backend gate.
+- Correction-dialog native audit passed all four language/theme combinations
+  (13.3s / 19.7s / 12.8s / 19.2s), including validation, keyboard selection and
+  narrow/wide axe. Expanded Enrollment passed **4.2m**; Phase 7 exact-population/
+  workbook/language/investigation headline passed **59.9s**. Records remains active.

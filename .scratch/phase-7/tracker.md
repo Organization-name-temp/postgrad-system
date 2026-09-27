@@ -404,3 +404,10 @@ Awaiting-interview serial browser verification: **3 passed, 2.0m** — full admi
 headline with Applicant search in the paginated worklist, plus EN/AR bookmarked
 criteria reload, authenticated workbook downloads and serious/critical axe checks.
 The existing slot creation/evaluation/completion/acceptance journey remains intact.
+
+Awaiting-interview commit `1dea732`: `composer api:check` followed by
+`npm run api:check` **passed**, with no generated drift. Next #06 frontier:
+booked and assigned Interview collections (preserving the assigned-interviewer/
+administrator scope), slot pool and applicant reschedule lookup, staff pickers,
+Catalog type-ahead adoption and direct Dean Faculty criterion. Pipeline/print
+prerequisites and all seven Phase 7 acceptance/gates/final review remain pending.

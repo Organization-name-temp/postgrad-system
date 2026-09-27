@@ -930,3 +930,30 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 - The chart's axis skips some long stage labels at desktop density. A focused
   layout follow-up is next before print. Prerequisite #08 full gates and #15 second
   Report print verification remain pending alongside actual Phase 7 acceptance.
+
+### Pipeline horizontal layout and executable Report printing
+
+- Native browser checks first reproduced an omitted long status label and clipped
+  Arabic numeric-axis zero. Horizontal bars now retain all 13 stage labels and
+  reserve enough numeric-axis height in RTL. Chart/table data and drill URLs remain
+  identical; both keyboard table links and actual mouse bars reach the scoped queue.
+- Shared ReportDocument prints title and effective named criteria, chart and table
+  with A4 margins, readable monochrome tokens and sensible block breaks. Printed
+  criteria use selected owner IDs, never unfinished lookup text. Tests reproduced
+  SVG screen-color leakage and dark paper margins; print-specific SVG colors and
+  the document light color scheme resolve both without changing screen themes.
+- Focused frontend **4 files / 10 tests passed, 21.60s**. Typecheck, lint and full
+  format passed after the component type correction; subsequent print-only CSS
+  refinements passed focused ESLint and Prettier. Latest serial native Pipeline
+  journeys **4 passed, 1.5m**, covering Student Affairs/Dean, EN/AR, light/dark,
+  exact scoped drill/list/export, serious/critical axe and print assertions.
+- Generated actual A4 PDFs were inspected with native Codex image tools: title and
+  complete chart on page 1, complete stage table on page 2, conversions on page 3.
+  Final dark Arabic paper is white with legible RTL text and isolated numeric values.
+  These are automated/Codex inspections, not human signoff. Artifacts regenerate
+  under ignored Playwright test-results; no product PDF dependency was introduced.
+- Prerequisite #08 executable journey is verified; final package gates remain for
+  verification pass 2. Prerequisite #15 has executable shared printing verified on
+  Pipeline; its required second Report verification will accompany the first
+  Academic Standing Report. No planning merge is being counted as implementation.
+  All seven Phase 7 acceptance, full gates and consolidated review remain pending.

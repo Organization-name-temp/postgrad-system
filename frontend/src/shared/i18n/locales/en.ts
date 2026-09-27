@@ -156,6 +156,7 @@ export const en = {
   },
   common: {
     collection: {
+      criteria: 'Report criteria',
       total: '{{count}} matching rows',
       total_one: '{{count}} matching row',
       total_other: '{{count}} matching rows',
@@ -586,6 +587,7 @@ export const en = {
       title: 'Application Pipeline',
       cycle: 'Admission Cycle',
       program: 'Program',
+      allPrograms: 'All permitted Programs',
       referenceLoading: 'Loading choices',
       noMatches: 'No matching choices',
       clear: 'Clear selection',

@@ -152,6 +152,7 @@ export const ar = {
   },
   common: {
     collection: {
+      criteria: 'معايير التقرير',
       total: '{{count}} صفوف مطابقة',
       total_one: '{{count}} صف مطابق',
       total_other: '{{count}} صفوف مطابقة',
@@ -560,6 +561,7 @@ export const ar = {
       title: 'مسار طلبات القبول',
       cycle: 'دورة القبول',
       program: 'البرنامج',
+      allPrograms: 'كل البرامج المسموح بها',
       referenceLoading: 'جارٍ تحميل الخيارات',
       noMatches: 'لا توجد خيارات مطابقة',
       clear: 'مسح الاختيار',

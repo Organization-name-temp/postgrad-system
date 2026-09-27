@@ -6,6 +6,10 @@ for (const account of ['r05', 'r07']) {
     test(`Pipeline exact stage drill and export work for ${account} in ${locale}`, async ({
       page,
     }, testInfo) => {
+      await page.addInitScript(
+        (mode) => localStorage.setItem('mui-mode', mode),
+        account === 'r07' ? 'dark' : 'light',
+      )
       await page.goto('/login')
       await page.getByLabel('Email').fill(`${account}@ejust.test`)
       await page.getByLabel('Password').fill('password')
@@ -53,11 +57,74 @@ for (const account of ['r05', 'r07']) {
       const title = locale === 'ar' ? 'مسار طلبات القبول' : 'Application Pipeline'
       await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
       await expect(
+        page
+          .getByRole('img', { name: title })
+          .getByText(locale === 'ar' ? 'مقبول بشروط' : 'Conditionally accepted', { exact: true }),
+      ).toBeVisible()
+      await expect(
+        page
+          .getByRole('img', { name: title })
+          .locator('.MuiChartsAxis-directionX')
+          .getByText('0', { exact: true }),
+      ).toBeVisible()
+      await expect(
         page.getByRole('combobox', {
           name: locale === 'ar' ? 'دورة القبول' : 'Admission Cycle',
           exact: true,
         }),
       ).toHaveValue(locale === 'ar' ? selected.name_ar : selected.name_en)
+      await page.setViewportSize({ width: 794, height: 1123 })
+      await page.emulateMedia({ media: 'print' })
+      const printedCriteria = page.getByRole('region', {
+        name: locale === 'ar' ? 'معايير التقرير' : 'Report criteria',
+      })
+      await expect(printedCriteria).toBeVisible()
+      await expect(printedCriteria).toContainText(
+        locale === 'ar' ? selected.name_ar : selected.name_en,
+      )
+      expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(
+        'rgb(255, 255, 255)',
+      )
+      expect(
+        await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme),
+      ).toBe('light')
+      await expect(page.getByRole('table', { name: title, exact: true })).toBeVisible()
+      await expect(page.getByRole('banner', { includeHidden: true })).toBeHidden()
+      await expect(
+        page.getByRole('combobox', {
+          name: locale === 'ar' ? 'دورة القبول' : 'Admission Cycle',
+          exact: true,
+          includeHidden: true,
+        }),
+      ).toBeHidden()
+      const printText = await page.getByRole('article', { name: title }).evaluate((article) => ({
+        colors: [...article.querySelectorAll('p,h1,td,th,dt,dd')].map(
+          (element) => getComputedStyle(element).color,
+        ),
+        axisColors: [...article.querySelectorAll('svg text')].map(
+          (element) => getComputedStyle(element).fill,
+        ),
+        fits: [...article.querySelectorAll('table')].every(
+          (table) =>
+            table.getBoundingClientRect().width <= article.getBoundingClientRect().width + 1,
+        ),
+        direction: getComputedStyle(article).direction,
+      }))
+      expect(printText.colors.every((color) => color === 'rgb(0, 0, 0)')).toBe(true)
+      expect(printText.axisColors.every((color) => color === 'rgb(0, 0, 0)')).toBe(true)
+      expect(printText.fits).toBe(true)
+      expect(printText.direction).toBe(locale === 'ar' ? 'rtl' : 'ltr')
+      await page.screenshot({
+        path: testInfo.outputPath(`pipeline-print-${account}-${locale}.png`),
+        fullPage: true,
+      })
+      await page.pdf({
+        path: testInfo.outputPath(`pipeline-print-${account}-${locale}.pdf`),
+        printBackground: true,
+        preferCSSPageSize: true,
+      })
+      await page.emulateMedia({ media: 'screen' })
+      await page.setViewportSize({ width: 1280, height: 720 })
       await page
         .getByRole('button', { name: locale === 'ar' ? 'عرض كجدول' : 'View as table' })
         .click()
@@ -80,6 +147,10 @@ for (const account of ['r05', 'r07']) {
           (violation) => violation.impact === 'serious' || violation.impact === 'critical',
         ),
       ).toEqual([])
+      await page.evaluate(() => {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+        window.scrollTo(0, 0)
+      })
       await page.screenshot({
         path: testInfo.outputPath(`pipeline-${account}-${locale}.png`),
         fullPage: true,
@@ -111,6 +182,13 @@ for (const account of ['r05', 'r07']) {
         new RegExp(`application-pipeline\\?admission_cycle_id=${selected.id}`),
       )
       await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
+      const clickList = page.waitForResponse(
+        (response) =>
+          response.url().includes('/api/v1/applications?') && response.request().method() === 'GET',
+      )
+      await page.getByRole('img', { name: title }).locator('.MuiBarChart-element').nth(3).click()
+      expect((await (await clickList).json()).meta.total).toBe(expectedCount)
+      await expect(page).toHaveURL(/status=under_sa_review/)
       await page.getByRole('button', { name: 'English' }).click()
     })
   }

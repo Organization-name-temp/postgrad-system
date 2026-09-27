@@ -10,8 +10,9 @@ import { ChartDataTable, type ChartDataProps } from './ChartDataTable'
 /** One series feeds the graphic, accessible drill-through and printable table. */
 export function Chart({
   kind = 'bar',
+  layout = 'vertical',
   ...props
-}: ChartDataProps & { kind?: 'bar' | 'line' | 'pie' }) {
+}: ChartDataProps & { kind?: 'bar' | 'line' | 'pie'; layout?: 'vertical' | 'horizontal' }) {
   const theme = useTheme()
   const { t } = useTranslation('common')
   const navigate = useNavigate()
@@ -24,14 +25,42 @@ export function Chart({
     const href = props.data[index]?.href
     if (href) void navigate(href)
   }
-  const common = { height: 320, colors, skipAnimation: true }
+  const common = {
+    height:
+      kind === 'bar' && layout === 'horizontal' ? Math.max(320, labels.length * 36 + 80) : 320,
+    colors,
+    skipAnimation: true,
+  }
   return (
-    <Stack component="section" aria-label={props.label} spacing={1} sx={{ breakInside: 'avoid' }}>
-      <Box role="img" aria-label={props.label}>
+    <Stack
+      component="section"
+      aria-label={props.label}
+      spacing={1}
+      sx={{ breakInside: 'avoid', '@media print': { breakInside: 'auto' } }}
+    >
+      <Box role="img" aria-label={props.label} sx={{ breakInside: 'avoid' }}>
         {kind === 'bar' && (
           <BarChart
             {...common}
-            xAxis={[{ scaleType: 'band', data: labels }]}
+            layout={layout}
+            xAxis={
+              layout === 'vertical'
+                ? [{ scaleType: 'band', data: labels }]
+                : [{ tickNumber: 6, height: 48 }]
+            }
+            yAxis={
+              layout === 'horizontal'
+                ? [
+                    {
+                      scaleType: 'band',
+                      data: labels,
+                      width: 'auto',
+                      position: theme.direction === 'rtl' ? 'right' : 'left',
+                      tickLabelInterval: () => true,
+                    },
+                  ]
+                : undefined
+            }
             series={[{ data: values, label: props.valueLabel }]}
             onItemClick={(_, item) => drill(item.dataIndex)}
           />
@@ -70,7 +99,10 @@ export function Chart({
       </Button>
       <Box
         id={tableId}
-        sx={{ display: expanded ? 'block' : 'none', '@media print': { display: 'block' } }}
+        sx={{
+          display: expanded ? 'block' : 'none',
+          '@media print': { display: 'block', breakInside: 'avoid' },
+        }}
       >
         <ChartDataTable {...props} />
       </Box>

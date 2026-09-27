@@ -2,7 +2,6 @@ import {
   Alert,
   Button,
   CircularProgress,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -20,6 +19,7 @@ import {
 import { pickLocaleName } from '../../../shared/i18n/localeName'
 import { Chart } from '../../../shared/ui/Chart'
 import { FilterBar } from '../../../shared/ui/FilterBar'
+import { ReportDocument } from '../../../shared/ui/ReportDocument'
 import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
 
 export function ApplicationPipelineReportPage() {
@@ -52,6 +52,19 @@ export function ApplicationPipelineReportPage() {
     value: String(row.id),
     label: pickLocaleName(row, i18n.language, row.code ?? String(row.id)),
   })
+  const cycleRow = selectedCycle.data?.data?.find((row) => String(row.id) === cycle)
+  const programRow = selectedProgram.data?.data?.find((row) => String(row.id) === program)
+  const currentCycle = cycleRow
+    ? cycleOption(cycleRow)
+    : cycle
+      ? { value: cycle, label: cycle }
+      : undefined
+  const currentProgram = programRow
+    ? programOption(programRow)
+    : program
+      ? { value: program, label: program }
+      : undefined
+  const degree = collection.searchParams.get('degree_level')
   const referenceCopy = {
     loadingText: t('pipeline.referenceLoading'),
     noOptionsText: t('pipeline.noMatches'),
@@ -78,10 +91,22 @@ export function ApplicationPipelineReportPage() {
     return `/screening?${criteria.toString()}`
   }
   return (
-    <Stack spacing={2}>
-      <Typography component="h1" variant="h4">
-        {t('pipeline.title')}
-      </Typography>
+    <ReportDocument
+      title={t('pipeline.title')}
+      criteria={[
+        { label: t('pipeline.cycle'), value: currentCycle?.label ?? t('pipeline.selectCycle') },
+        { label: t('pipeline.program'), value: currentProgram?.label ?? t('pipeline.allPrograms') },
+        {
+          label: t('screening.columns.degree'),
+          value:
+            degree === 'MSc'
+              ? t('screening.filters.msc')
+              : degree === 'PhD'
+                ? t('screening.filters.phd')
+                : (degree ?? t('screening.filters.all')),
+        },
+      ]}
+    >
       <FilterBar
         values={collection.params}
         onChange={collection.setCriteria}
@@ -92,11 +117,7 @@ export function ApplicationPipelineReportPage() {
             reference: {
               ...referenceCopy,
               options: (cycles.data?.data ?? []).map(cycleOption),
-              selected: selectedCycle.data?.data?.find((row) => String(row.id) === cycle)
-                ? cycleOption(selectedCycle.data.data.find((row) => String(row.id) === cycle)!)
-                : cycle
-                  ? { value: cycle, label: cycle }
-                  : undefined,
+              selected: currentCycle,
               query: cycleSearch,
               onSearch: setCycleSearch,
               loading: cycles.isPending,
@@ -108,13 +129,7 @@ export function ApplicationPipelineReportPage() {
             reference: {
               ...referenceCopy,
               options: (programs.data?.data ?? []).map(programOption),
-              selected: selectedProgram.data?.data?.find((row) => String(row.id) === program)
-                ? programOption(
-                    selectedProgram.data.data.find((row) => String(row.id) === program)!,
-                  )
-                : program
-                  ? { value: program, label: program }
-                  : undefined,
+              selected: currentProgram,
               query: programSearch,
               onSearch: setProgramSearch,
               loading: programs.isPending,
@@ -145,6 +160,7 @@ export function ApplicationPipelineReportPage() {
         <>
           <Typography>{t('pipeline.total', { count: summary.total ?? 0 })}</Typography>
           <Chart
+            layout="horizontal"
             label={t('pipeline.title')}
             categoryLabel={t('pipeline.stage')}
             valueLabel={t('pipeline.applications')}
@@ -190,6 +206,6 @@ export function ApplicationPipelineReportPage() {
           </Table>
         </>
       )}
-    </Stack>
+    </ReportDocument>
   )
 }

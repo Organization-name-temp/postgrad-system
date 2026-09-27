@@ -449,3 +449,7 @@ Final regenerated collection score types are `number | null`; affected frontend
 typecheck and formatting passed. Backend PHPStan rerun passed after response
 annotations. The next slice is booked worklist URL controls plus serial headline
 and EN/AR collection verification; this checkpoint remains partial #06 progress.
+
+Checkpoint `fc4b154`: sequential `composer api:check` and `npm run api:check`
+passed after commit, with no generated drift. Working tree was clean. This is
+implementation progress on #06, not completion of #06 or any full Phase 7 ticket.

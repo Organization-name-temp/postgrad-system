@@ -155,6 +155,12 @@ async function checkReadAndPrintMatrix(
         colors.every((color) => color === 'rgb(0, 0, 0)'),
         'Dark theme must not print faint or white Transcript text',
       ).toBe(true)
+      await page.pdf({
+        path: testInfo.outputPath(`${name}-print-${scheme}-${language}.pdf`),
+        format: 'A4',
+        printBackground: true,
+        preferCSSPageSize: true,
+      })
       await testInfo.attach(`${name}-print-${scheme}-${language}`, {
         body: await page.screenshot({ fullPage: true }),
         contentType: 'image/png',

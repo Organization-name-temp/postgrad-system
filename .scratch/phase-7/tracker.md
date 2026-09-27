@@ -1378,3 +1378,20 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   covering EN/AR, light/dark, 390/1280px, keyboard dialog focus and loaded axe
   checks. Named reference and Catalog fixes are committed with this evidence;
   headline, invalid-public verifier and Records paper journey remain unrun.
+- Serial acceptance slice: `npx playwright test e2e/phase7-headline.spec.ts
+  e2e/records-invalid-audit.spec.ts e2e/records.spec.ts --workers=1 --max-failures=1`
+  passed **6 tests, 5.0m**. Advisor headline verifies matching three-Student
+  membership across all Reports, canonical downloaded workbook contents, keyboard
+  drill-through, EN/AR criterion continuity, scoped Grade detail and authorized
+  Advisor review. Invalid verifier passed all four states with no private snapshot.
+- Records service journey passed payment correction, certification, bearer QR,
+  revocation, full refund and collection. Actual PDFs generated for current,
+  official, public valid, private revoked and public revoked in all four states:
+  current/revoked public **one A4 page**, official/full snapshot **two A4 pages**.
+  Inspected EN official and dark AR current/official/public valid/revoked rendered
+  pages, including continuation table headings, watermark, seal and unmirrored QR.
+  No snapshot mutation or disclosure expansion. Human paper acceptance remains
+  required; this is native verification, not human signoff.
+- Additional read-only detail audit is running for Applicant draft/populated
+  language switching, Screening/Dean/Advisor details, attendance register and
+  Interviewer in all four states, narrow/wide. Full package gates still pending.

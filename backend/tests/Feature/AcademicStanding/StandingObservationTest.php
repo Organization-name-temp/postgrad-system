@@ -23,6 +23,11 @@ final class MutableStandingGrading implements GradingRecords
         return $this->attempts;
     }
 
+    public function effectiveAttemptsForStudents(array $studentIds): array
+    {
+        return array_fill_keys($studentIds, $this->attempts);
+    }
+
     public function cgpaFor(int $studentId): ?float
     {
         return $this->cgpa;

@@ -47,7 +47,22 @@ final readonly class EloquentGradingRecords implements GradingRecords
 
     public function effectiveAttemptsForStudent(int $studentId): array
     {
-        $record = $this->tally->recordFor($studentId);
+        return $this->effectiveAttemptsForStudents([$studentId])[$studentId];
+    }
+
+    public function effectiveAttemptsForStudents(array $studentIds): array
+    {
+        $values = [];
+        foreach ($this->tally->recordsFor($studentIds) as $studentId => $record) {
+            $values[$studentId] = $this->effectiveAttempts($record);
+        }
+
+        return $values;
+    }
+
+    /** @return list<EffectiveAttemptSummary> */
+    private function effectiveAttempts(StudentGpaRecord $record): array
+    {
         $enrollments = collect($record->enrollments)->keyBy(fn ($enrollment): int => $enrollment->id);
 
         return array_map(function (GpaAttempt $attempt) use ($record, $enrollments): EffectiveAttemptSummary {

@@ -15,9 +15,12 @@ it('batch CGPA seeded cohort parity gate agrees for every generated Student acro
     expect($ids)->toHaveCount(180);
     $records = app(GradingRecords::class);
     $values = $records->cgpaForStudents($ids);
+    $attempts = $records->effectiveAttemptsForStudents($ids);
     expect(array_keys($values))->toBe($ids);
+    expect(array_keys($attempts))->toBe($ids);
     foreach ($ids as $id) {
         expect($values[$id])->toBe($records->cgpaFor($id));
+        expect($attempts[$id])->toEqual($records->effectiveAttemptsForStudent($id));
     }
     expect($values)->toContain(null);
 });

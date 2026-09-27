@@ -187,3 +187,26 @@ it('distributes batch CGPA values without conflating an ungraded record with zer
     expect(gradingRecords()->cgpaDistributionForStudents([$zero->id, $good->id, $empty->id]))
         ->toBe(['0.00' => 1, '3.00' => 1, 'ungraded' => 1]);
 });
+
+it('batch effective Attempts retain the latest finalized Retake and every empty Student', function () {
+    $student = grStudent();
+    $empty = grStudent();
+    $course = Course::factory()->create();
+    $fall = Semester::factory()->create(['starts_at' => '2025-09-01']);
+    $spring = Semester::factory()->create(['starts_at' => '2026-02-01']);
+    grGrade(grEnroll(grOffering($fall, $course), $student), 95);
+    $latest = grEnroll(grOffering($spring, $course), $student, CourseStatus::Retake);
+    grGrade($latest, 62);
+    grGrade(grEnroll(grOffering(), $student), 91, GradeSheetStatus::Draft);
+
+    $records = gradingRecords();
+    $batch = $records->effectiveAttemptsForStudents([$student->id, $empty->id, $student->id]);
+    expect(array_keys($batch))->toBe([$student->id, $empty->id])
+        ->and($batch[$empty->id])->toBe([])
+        ->and($batch[$student->id])->toHaveCount(1)
+        ->and($batch[$student->id][0]->enrollmentId)->toBe($latest->id)
+        ->and($batch[$student->id][0]->letterGrade)->toBe('D')
+        ->and($batch[$student->id][0]->earned)->toBeFalse()
+        ->and($batch[$student->id])->toEqual($records->effectiveAttemptsForStudent($student->id))
+        ->and($records->effectiveAttemptsForStudents([]))->toBe([]);
+});

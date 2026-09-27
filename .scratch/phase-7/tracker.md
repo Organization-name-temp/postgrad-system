@@ -969,3 +969,15 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   Pint, PHPStan and deptrac passed. No API shape changed.
 - This is supporting access behavior, not completion of #01: cohort APIs, bounded
   owner Standing batches, UI/export and second Report printing remain next.
+
+### Owner effective-Attempt batches for current Standing
+
+- The public Grading tracer first failed on the missing batch method. Grading now
+  exposes effectiveAttemptsForStudents through its existing bounded StudentGpaTally;
+  single reads delegate to the same selection. AcademicStanding will consume DTOs,
+  not reinterpret Grade supersession or earned-credit rules.
+- Worked Retake/draft/empty/duplicate-ID checks passed with existing Standing tests:
+  **15 tests / 48 assertions, 4.19s**. Seeded 180-Student CGPA and effective-Attempt
+  batch/single parity **1 test / 364 assertions, 18.57s**. Pint, PHPStan and deptrac
+  passed. This is an internal Public contract addition, with no HTTP API change.
+- Current Standing batch implementation is next; #01 cohort delivery remains pending.

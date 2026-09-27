@@ -1414,6 +1414,140 @@ export type MyApplicationCard200 = {
   meta: MyApplicationCard200Meta;
 };
 
+export type ExportAssignedInterviewsParams = {
+/**
+ * Normalized bilingual applicant name or National ID search.
+ */
+q?: string;
+/**
+ * Comma-separated Interview ids.
+ */
+id?: string;
+/**
+ * Comma-separated Application ids.
+ */
+application_id?: string;
+/**
+ * Comma-separated confirmation states.
+ */
+status?: string;
+/**
+ * Comma-separated interviewer ids, within actor scope.
+ */
+interviewer_id?: string;
+/**
+ * Comma-separated primary Program ids.
+ */
+program_id?: string;
+/**
+ * Comma-separated Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Comma-separated applying degrees.
+ */
+degree_level?: string;
+/**
+ * Comma-separated interview modes.
+ */
+mode?: string;
+/**
+ * Minimum recorded score, 1–10.
+ */
+evaluation_score_min?: number;
+/**
+ * Maximum recorded score, 1–10.
+ */
+evaluation_score_max?: number;
+/**
+ * Earliest scheduled timestamp.
+ */
+scheduled_at_min?: string;
+/**
+ * Latest scheduled timestamp.
+ */
+scheduled_at_max?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number; ignored by export.
+ */
+page?: number;
+/**
+ * Page size, capped at 100; ignored by export.
+ */
+per_page?: number;
+};
+
+export type InterviewsAssignedToMeParams = {
+/**
+ * Normalized bilingual applicant name or National ID search.
+ */
+q?: string;
+/**
+ * Comma-separated Interview ids.
+ */
+id?: string;
+/**
+ * Comma-separated Application ids.
+ */
+application_id?: string;
+/**
+ * Comma-separated confirmation states.
+ */
+status?: string;
+/**
+ * Comma-separated interviewer ids, within actor scope.
+ */
+interviewer_id?: string;
+/**
+ * Comma-separated primary Program ids.
+ */
+program_id?: string;
+/**
+ * Comma-separated Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Comma-separated applying degrees.
+ */
+degree_level?: string;
+/**
+ * Comma-separated interview modes.
+ */
+mode?: string;
+/**
+ * Minimum recorded score, 1–10.
+ */
+evaluation_score_min?: number;
+/**
+ * Maximum recorded score, 1–10.
+ */
+evaluation_score_max?: number;
+/**
+ * Earliest scheduled timestamp.
+ */
+scheduled_at_min?: string;
+/**
+ * Latest scheduled timestamp.
+ */
+scheduled_at_max?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number; ignored by export.
+ */
+page?: number;
+/**
+ * Page size, capped at 100; ignored by export.
+ */
+per_page?: number;
+};
+
 export type InterviewsAssignedToMe200DataItemSlotInterviewer = {
   id?: number;
   name?: string;
@@ -1425,9 +1559,10 @@ export type InterviewsAssignedToMe200DataItemSlot = {
   scheduled_at?: string;
   duration_minutes?: number;
   mode?: string;
-  location?: string;
   /** @nullable */
-  meeting_link?: string | null;
+  location: string | null;
+  /** @nullable */
+  meeting_link: string | null;
   interviewer_id?: number;
   interviewer?: InterviewsAssignedToMe200DataItemSlotInterviewer;
   is_open?: boolean;
@@ -1448,17 +1583,35 @@ export type InterviewsAssignedToMe200DataItem = {
   reschedule_count?: number;
   can_reschedule?: boolean;
   /** @nullable */
-  evaluation_score?: string | null;
+  evaluation_score: number | null;
   /** @nullable */
-  evaluation_notes?: string | null;
+  evaluation_notes: string | null;
   /** @nullable */
   completed_at?: string | null;
   slot?: InterviewsAssignedToMe200DataItemSlot;
   applicant?: InterviewsAssignedToMe200DataItemApplicant;
 };
 
+export type InterviewsAssignedToMe200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type InterviewsAssignedToMe200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type InterviewsAssignedToMe200 = {
   data?: InterviewsAssignedToMe200DataItem[];
+  links?: InterviewsAssignedToMe200Links;
+  meta?: InterviewsAssignedToMe200Meta;
 };
 
 export type RecordMyEvaluationBody = {
@@ -1800,6 +1953,140 @@ export type DeleteAnInterviewSlot409 = {
   message?: string;
 };
 
+export type ExportBookedInterviewsParams = {
+/**
+ * Normalized bilingual applicant name or National ID search.
+ */
+q?: string;
+/**
+ * Comma-separated Interview ids.
+ */
+id?: string;
+/**
+ * Comma-separated Application ids.
+ */
+application_id?: string;
+/**
+ * Comma-separated confirmation states.
+ */
+status?: string;
+/**
+ * Comma-separated interviewer ids, within actor scope.
+ */
+interviewer_id?: string;
+/**
+ * Comma-separated primary Program ids.
+ */
+program_id?: string;
+/**
+ * Comma-separated Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Comma-separated applying degrees.
+ */
+degree_level?: string;
+/**
+ * Comma-separated interview modes.
+ */
+mode?: string;
+/**
+ * Minimum recorded score, 1–10.
+ */
+evaluation_score_min?: number;
+/**
+ * Maximum recorded score, 1–10.
+ */
+evaluation_score_max?: number;
+/**
+ * Earliest scheduled timestamp.
+ */
+scheduled_at_min?: string;
+/**
+ * Latest scheduled timestamp.
+ */
+scheduled_at_max?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number; ignored by export.
+ */
+page?: number;
+/**
+ * Page size, capped at 100; ignored by export.
+ */
+per_page?: number;
+};
+
+export type BookedInterviewsParams = {
+/**
+ * Normalized bilingual applicant name or National ID search.
+ */
+q?: string;
+/**
+ * Comma-separated Interview ids.
+ */
+id?: string;
+/**
+ * Comma-separated Application ids.
+ */
+application_id?: string;
+/**
+ * Comma-separated confirmation states.
+ */
+status?: string;
+/**
+ * Comma-separated interviewer ids, within actor scope.
+ */
+interviewer_id?: string;
+/**
+ * Comma-separated primary Program ids.
+ */
+program_id?: string;
+/**
+ * Comma-separated Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Comma-separated applying degrees.
+ */
+degree_level?: string;
+/**
+ * Comma-separated interview modes.
+ */
+mode?: string;
+/**
+ * Minimum recorded score, 1–10.
+ */
+evaluation_score_min?: number;
+/**
+ * Maximum recorded score, 1–10.
+ */
+evaluation_score_max?: number;
+/**
+ * Earliest scheduled timestamp.
+ */
+scheduled_at_min?: string;
+/**
+ * Latest scheduled timestamp.
+ */
+scheduled_at_max?: string;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number; ignored by export.
+ */
+page?: number;
+/**
+ * Page size, capped at 100; ignored by export.
+ */
+per_page?: number;
+};
+
 export type BookedInterviews200DataItemSlotInterviewer = {
   id?: number;
   name?: string;
@@ -1811,9 +2098,10 @@ export type BookedInterviews200DataItemSlot = {
   scheduled_at?: string;
   duration_minutes?: number;
   mode?: string;
-  location?: string;
   /** @nullable */
-  meeting_link?: string | null;
+  location: string | null;
+  /** @nullable */
+  meeting_link: string | null;
   interviewer_id?: number;
   interviewer?: BookedInterviews200DataItemSlotInterviewer;
   is_open?: boolean;
@@ -1833,16 +2121,36 @@ export type BookedInterviews200DataItem = {
   status?: string;
   reschedule_count?: number;
   can_reschedule?: boolean;
-  evaluation_score?: number;
-  evaluation_notes?: string;
+  /** @nullable */
+  evaluation_score: number | null;
+  /** @nullable */
+  evaluation_notes: string | null;
   /** @nullable */
   completed_at?: string | null;
   slot?: BookedInterviews200DataItemSlot;
   applicant?: BookedInterviews200DataItemApplicant;
 };
 
+export type BookedInterviews200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type BookedInterviews200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
+};
+
 export type BookedInterviews200 = {
   data?: BookedInterviews200DataItem[];
+  links?: BookedInterviews200Links;
+  meta?: BookedInterviews200Meta;
 };
 
 export type BookedInterviews403 = {
@@ -16714,6 +17022,102 @@ export function useMyApplicationCard<TData = Awaited<ReturnType<typeof myApplica
 
 
 /**
+ * Downloads every matching authorized row with the list's live scope.
+ * @summary Export assigned interviews.
+ */
+export const exportAssignedInterviews = (
+    params?: ExportAssignedInterviewsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/interviews/assigned/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportAssignedInterviewsQueryKey = (params?: ExportAssignedInterviewsParams,) => {
+    return [
+    `/api/v1/interviews/assigned/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportAssignedInterviewsQueryOptions = <TData = Awaited<ReturnType<typeof exportAssignedInterviews>>, TError = unknown>(params?: ExportAssignedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAssignedInterviews>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportAssignedInterviewsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportAssignedInterviews>>> = ({ signal }) => exportAssignedInterviews(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportAssignedInterviews>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportAssignedInterviewsQueryResult = NonNullable<Awaited<ReturnType<typeof exportAssignedInterviews>>>
+export type ExportAssignedInterviewsQueryError = unknown
+
+
+export function useExportAssignedInterviews<TData = Awaited<ReturnType<typeof exportAssignedInterviews>>, TError = unknown>(
+ params: undefined |  ExportAssignedInterviewsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAssignedInterviews>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAssignedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof exportAssignedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAssignedInterviews<TData = Awaited<ReturnType<typeof exportAssignedInterviews>>, TError = unknown>(
+ params?: ExportAssignedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAssignedInterviews>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportAssignedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof exportAssignedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportAssignedInterviews<TData = Awaited<ReturnType<typeof exportAssignedInterviews>>, TError = unknown>(
+ params?: ExportAssignedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAssignedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export assigned interviews.
+ */
+
+export function useExportAssignedInterviews<TData = Awaited<ReturnType<typeof exportAssignedInterviews>>, TError = unknown>(
+ params?: ExportAssignedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportAssignedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportAssignedInterviewsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
  * The interviews booked into the signed-in user's own slots, soonest-first, each
  * with the applicant's identity and the slot details — the interviewer's queue.
  * Empty for a user who is not the assigned interviewer on any slot. An administrator
@@ -16722,13 +17126,14 @@ export function useMyApplicationCard<TData = Awaited<ReturnType<typeof myApplica
  * @summary Interviews assigned to me.
  */
 export const interviewsAssignedToMe = (
-
+    params?: InterviewsAssignedToMeParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<InterviewsAssignedToMe200>(
-      {url: `/api/v1/interviews/assigned`, method: 'GET', signal
+      {url: `/api/v1/interviews/assigned`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -16736,23 +17141,23 @@ export const interviewsAssignedToMe = (
 
 
 
-export const getInterviewsAssignedToMeQueryKey = () => {
+export const getInterviewsAssignedToMeQueryKey = (params?: InterviewsAssignedToMeParams,) => {
     return [
-    `/api/v1/interviews/assigned`
+    `/api/v1/interviews/assigned`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getInterviewsAssignedToMeQueryOptions = <TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+export const getInterviewsAssignedToMeQueryOptions = <TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(params?: InterviewsAssignedToMeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getInterviewsAssignedToMeQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getInterviewsAssignedToMeQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof interviewsAssignedToMe>>> = ({ signal }) => interviewsAssignedToMe(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof interviewsAssignedToMe>>> = ({ signal }) => interviewsAssignedToMe(params, signal);
 
 
 
@@ -16766,7 +17171,7 @@ export type InterviewsAssignedToMeQueryError = unknown
 
 
 export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
+ params: undefined |  InterviewsAssignedToMeParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof interviewsAssignedToMe>>,
           TError,
@@ -16776,7 +17181,7 @@ export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof inte
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
+ params?: InterviewsAssignedToMeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof interviewsAssignedToMe>>,
           TError,
@@ -16786,7 +17191,7 @@ export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof inte
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+ params?: InterviewsAssignedToMeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -16794,11 +17199,11 @@ export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof inte
  */
 
 export function useInterviewsAssignedToMe<TData = Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
+ params?: InterviewsAssignedToMeParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof interviewsAssignedToMe>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getInterviewsAssignedToMeQueryOptions(options)
+  const queryOptions = getInterviewsAssignedToMeQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -17469,20 +17874,19 @@ export const useDeleteAnInterviewSlot = <TError = DeleteAnInterviewSlot403 | Del
     }
 
 /**
- * Every interview that has been booked, most-recent-first, each with the applicant
- * being interviewed, the slot details, its confirmation status, and any recorded
- * evaluation — Student Affairs' view for tracking interviews and marking them
- * complete. Gated on `interview.schedule`.
- * @summary Booked interviews.
+ * Downloads every matching authorized row with the list's live scope.
+ * @summary Export booked interviews.
  */
-export const bookedInterviews = (
-
+export const exportBookedInterviews = (
+    params?: ExportBookedInterviewsParams,
  signal?: AbortSignal
 ) => {
 
 
-      return customInstance<BookedInterviews200>(
-      {url: `/api/v1/interviews`, method: 'GET', signal
+      return customInstance<Blob>(
+      {url: `/api/v1/interviews/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
     },
       );
     }
@@ -17490,23 +17894,121 @@ export const bookedInterviews = (
 
 
 
-export const getBookedInterviewsQueryKey = () => {
+export const getExportBookedInterviewsQueryKey = (params?: ExportBookedInterviewsParams,) => {
     return [
-    `/api/v1/interviews`
+    `/api/v1/interviews/export`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getBookedInterviewsQueryOptions = <TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+export const getExportBookedInterviewsQueryOptions = <TData = Awaited<ReturnType<typeof exportBookedInterviews>>, TError = unknown>(params?: ExportBookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportBookedInterviews>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getBookedInterviewsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getExportBookedInterviewsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof bookedInterviews>>> = ({ signal }) => bookedInterviews(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportBookedInterviews>>> = ({ signal }) => exportBookedInterviews(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportBookedInterviews>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportBookedInterviewsQueryResult = NonNullable<Awaited<ReturnType<typeof exportBookedInterviews>>>
+export type ExportBookedInterviewsQueryError = unknown
+
+
+export function useExportBookedInterviews<TData = Awaited<ReturnType<typeof exportBookedInterviews>>, TError = unknown>(
+ params: undefined |  ExportBookedInterviewsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportBookedInterviews>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportBookedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof exportBookedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportBookedInterviews<TData = Awaited<ReturnType<typeof exportBookedInterviews>>, TError = unknown>(
+ params?: ExportBookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportBookedInterviews>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportBookedInterviews>>,
+          TError,
+          Awaited<ReturnType<typeof exportBookedInterviews>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportBookedInterviews<TData = Awaited<ReturnType<typeof exportBookedInterviews>>, TError = unknown>(
+ params?: ExportBookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportBookedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export booked interviews.
+ */
+
+export function useExportBookedInterviews<TData = Awaited<ReturnType<typeof exportBookedInterviews>>, TError = unknown>(
+ params?: ExportBookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportBookedInterviews>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportBookedInterviewsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Every interview that has been booked, most-recent-first, each with the applicant
+ * being interviewed, the slot details, its confirmation status, and any recorded
+ * evaluation — Student Affairs' view for tracking interviews and marking them
+ * complete. Gated on `interview.schedule`.
+ * @summary Booked interviews.
+ */
+export const bookedInterviews = (
+    params?: BookedInterviewsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<BookedInterviews200>(
+      {url: `/api/v1/interviews`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getBookedInterviewsQueryKey = (params?: BookedInterviewsParams,) => {
+    return [
+    `/api/v1/interviews`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getBookedInterviewsQueryOptions = <TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(params?: BookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getBookedInterviewsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof bookedInterviews>>> = ({ signal }) => bookedInterviews(params, signal);
 
 
 
@@ -17520,7 +18022,7 @@ export type BookedInterviewsQueryError = BookedInterviews403
 
 
 export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
+ params: undefined |  BookedInterviewsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof bookedInterviews>>,
           TError,
@@ -17530,7 +18032,7 @@ export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInte
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
+ params?: BookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof bookedInterviews>>,
           TError,
@@ -17540,7 +18042,7 @@ export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInte
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+ params?: BookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -17548,11 +18050,11 @@ export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInte
  */
 
 export function useBookedInterviews<TData = Awaited<ReturnType<typeof bookedInterviews>>, TError = BookedInterviews403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
+ params?: BookedInterviewsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof bookedInterviews>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getBookedInterviewsQueryOptions(options)
+  const queryOptions = getBookedInterviewsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

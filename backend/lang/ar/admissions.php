@@ -2,6 +2,9 @@
 
 // Arabic Admissions domain lines, selected when the request negotiates `ar`.
 return [
+    'interview_export_columns' => ['id' => 'معرّف المقابلة', 'application_id' => 'مرجع الطلب', 'name_en' => 'الاسم بالإنجليزية', 'name_ar' => 'الاسم بالعربية', 'national_id' => 'الرقم القومي / جواز السفر', 'degree' => 'الدرجة', 'status' => 'حالة التأكيد', 'scheduled_at' => 'موعد المقابلة', 'duration_minutes' => 'المدة بالدقائق', 'mode' => 'النمط', 'location' => 'المكان', 'interviewer_id' => 'معرّف المحاور', 'interviewer_name' => 'المحاور', 'evaluation_score' => 'درجة التقييم', 'evaluation_notes' => 'ملاحظات التقييم', 'completed_at' => 'وقت الإتمام'],
+    'interview_states' => ['pending_confirmation' => 'بانتظار التأكيد', 'confirmed' => 'مؤكد'],
+    'interview_modes' => ['in_person' => 'حضوري', 'virtual' => 'عن بُعد'],
     'cycle_export' => [
         'columns' => [
             'id' => 'معرّف دورة القبول',

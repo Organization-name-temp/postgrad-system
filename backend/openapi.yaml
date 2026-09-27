@@ -4613,12 +4613,349 @@ paths:
       tags:
         - Admissions
       security: []
+  /api/v1/interviews/assigned/export:
+    get:
+      summary: 'Export assigned interviews.'
+      operationId: exportAssignedInterviews
+      description: "Downloads every matching authorized row with the list's live scope."
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual applicant name or National ID search.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual applicant name or National ID search.'
+            example: Sara
+        -
+          in: query
+          name: id
+          description: 'Comma-separated Interview ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Interview ids.'
+            example: '1,2'
+        -
+          in: query
+          name: application_id
+          description: 'Comma-separated Application ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Application ids.'
+            example: '1'
+        -
+          in: query
+          name: status
+          description: 'Comma-separated confirmation states.'
+          example: confirmed
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated confirmation states.'
+            example: confirmed
+        -
+          in: query
+          name: interviewer_id
+          description: 'Comma-separated interviewer ids, within actor scope.'
+          example: '4'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interviewer ids, within actor scope.'
+            example: '4'
+        -
+          in: query
+          name: program_id
+          description: 'Comma-separated primary Program ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated primary Program ids.'
+            example: '1'
+        -
+          in: query
+          name: admission_cycle_id
+          description: 'Comma-separated Cycle ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Cycle ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Comma-separated applying degrees.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated applying degrees.'
+            example: MSc
+        -
+          in: query
+          name: mode
+          description: 'Comma-separated interview modes.'
+          example: in_person
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interview modes.'
+            example: in_person
+        -
+          in: query
+          name: evaluation_score_min
+          description: 'Minimum recorded score, 1–10.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum recorded score, 1–10.'
+            example: 1
+        -
+          in: query
+          name: evaluation_score_max
+          description: 'Maximum recorded score, 1–10.'
+          example: 10
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum recorded score, 1–10.'
+            example: 10
+        -
+          in: query
+          name: scheduled_at_min
+          description: 'Earliest scheduled timestamp.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Earliest scheduled timestamp.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: scheduled_at_max
+          description: 'Latest scheduled timestamp.'
+          example: '2027-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Latest scheduled timestamp.'
+            example: '2027-01-01'
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: 'scheduled_at,-id'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: 'scheduled_at,-id'
+        -
+          in: query
+          name: page
+          description: 'Page number; ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100; ignored by export.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100; ignored by export.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - Admissions
+      security: []
   /api/v1/interviews/assigned:
     get:
       summary: 'Interviews assigned to me.'
       operationId: interviewsAssignedToMe
       description: "The interviews booked into the signed-in user's own slots, soonest-first, each\nwith the applicant's identity and the slot details — the interviewer's queue.\nEmpty for a user who is not the assigned interviewer on any slot. An administrator\nsees **every** interview instead (ADR-0015), so they can reach the evaluation\nwrite-path through this same screen."
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual applicant name or National ID search.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual applicant name or National ID search.'
+            example: Sara
+        -
+          in: query
+          name: id
+          description: 'Comma-separated Interview ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Interview ids.'
+            example: '1,2'
+        -
+          in: query
+          name: application_id
+          description: 'Comma-separated Application ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Application ids.'
+            example: '1'
+        -
+          in: query
+          name: status
+          description: 'Comma-separated confirmation states.'
+          example: confirmed
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated confirmation states.'
+            example: confirmed
+        -
+          in: query
+          name: interviewer_id
+          description: 'Comma-separated interviewer ids, within actor scope.'
+          example: '4'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interviewer ids, within actor scope.'
+            example: '4'
+        -
+          in: query
+          name: program_id
+          description: 'Comma-separated primary Program ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated primary Program ids.'
+            example: '1'
+        -
+          in: query
+          name: admission_cycle_id
+          description: 'Comma-separated Cycle ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Cycle ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Comma-separated applying degrees.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated applying degrees.'
+            example: MSc
+        -
+          in: query
+          name: mode
+          description: 'Comma-separated interview modes.'
+          example: in_person
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interview modes.'
+            example: in_person
+        -
+          in: query
+          name: evaluation_score_min
+          description: 'Minimum recorded score, 1–10.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum recorded score, 1–10.'
+            example: 1
+        -
+          in: query
+          name: evaluation_score_max
+          description: 'Maximum recorded score, 1–10.'
+          example: 10
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum recorded score, 1–10.'
+            example: 10
+        -
+          in: query
+          name: scheduled_at_min
+          description: 'Earliest scheduled timestamp.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Earliest scheduled timestamp.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: scheduled_at_max
+          description: 'Latest scheduled timestamp.'
+          example: '2027-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Latest scheduled timestamp.'
+            example: '2027-01-01'
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: 'scheduled_at,-id'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: 'scheduled_at,-id'
+        -
+          in: query
+          name: page
+          description: 'Page number; ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100; ignored by export.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100; ignored by export.'
+            example: 25
       responses:
         200:
           description: ''
@@ -4656,6 +4993,16 @@ paths:
                         national_id: '29001010101010'
                         applying_for_degree: MSc
                         status: interview_scheduled
+                  links:
+                    first: 'http://localhost/api/v1/interviews/assigned?page=1'
+                    last: 'http://localhost/api/v1/interviews/assigned?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 25
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -4707,7 +5054,7 @@ paths:
                           type: boolean
                           example: true
                         evaluation_score:
-                          type: string
+                          type: integer
                           example: null
                           nullable: true
                         evaluation_notes:
@@ -4736,6 +5083,7 @@ paths:
                             location:
                               type: string
                               example: 'Building C, Room 204'
+                              nullable: true
                             meeting_link:
                               type: string
                               example: null
@@ -4758,6 +5106,9 @@ paths:
                             is_open:
                               type: boolean
                               example: false
+                          required:
+                            - location
+                            - meeting_link
                         applicant:
                           type: object
                           properties:
@@ -4776,6 +5127,41 @@ paths:
                             status:
                               type: string
                               example: interview_scheduled
+                      required:
+                        - evaluation_score
+                        - evaluation_notes
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/interviews/assigned?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/interviews/assigned?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
       tags:
         - Admissions
       security: []
@@ -5795,12 +6181,349 @@ paths:
         required: true
         schema:
           type: integer
+  /api/v1/interviews/export:
+    get:
+      summary: 'Export booked interviews.'
+      operationId: exportBookedInterviews
+      description: "Downloads every matching authorized row with the list's live scope."
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual applicant name or National ID search.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual applicant name or National ID search.'
+            example: Sara
+        -
+          in: query
+          name: id
+          description: 'Comma-separated Interview ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Interview ids.'
+            example: '1,2'
+        -
+          in: query
+          name: application_id
+          description: 'Comma-separated Application ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Application ids.'
+            example: '1'
+        -
+          in: query
+          name: status
+          description: 'Comma-separated confirmation states.'
+          example: confirmed
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated confirmation states.'
+            example: confirmed
+        -
+          in: query
+          name: interviewer_id
+          description: 'Comma-separated interviewer ids, within actor scope.'
+          example: '4'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interviewer ids, within actor scope.'
+            example: '4'
+        -
+          in: query
+          name: program_id
+          description: 'Comma-separated primary Program ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated primary Program ids.'
+            example: '1'
+        -
+          in: query
+          name: admission_cycle_id
+          description: 'Comma-separated Cycle ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Cycle ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Comma-separated applying degrees.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated applying degrees.'
+            example: MSc
+        -
+          in: query
+          name: mode
+          description: 'Comma-separated interview modes.'
+          example: in_person
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interview modes.'
+            example: in_person
+        -
+          in: query
+          name: evaluation_score_min
+          description: 'Minimum recorded score, 1–10.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum recorded score, 1–10.'
+            example: 1
+        -
+          in: query
+          name: evaluation_score_max
+          description: 'Maximum recorded score, 1–10.'
+          example: 10
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum recorded score, 1–10.'
+            example: 10
+        -
+          in: query
+          name: scheduled_at_min
+          description: 'Earliest scheduled timestamp.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Earliest scheduled timestamp.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: scheduled_at_max
+          description: 'Latest scheduled timestamp.'
+          example: '2027-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Latest scheduled timestamp.'
+            example: '2027-01-01'
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: 'scheduled_at,-id'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: 'scheduled_at,-id'
+        -
+          in: query
+          name: page
+          description: 'Page number; ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100; ignored by export.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100; ignored by export.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      tags:
+        - Admissions
+      security: []
   /api/v1/interviews:
     get:
       summary: 'Booked interviews.'
       operationId: bookedInterviews
       description: "Every interview that has been booked, most-recent-first, each with the applicant\nbeing interviewed, the slot details, its confirmation status, and any recorded\nevaluation — Student Affairs' view for tracking interviews and marking them\ncomplete. Gated on `interview.schedule`."
-      parameters: []
+      parameters:
+        -
+          in: query
+          name: q
+          description: 'Normalized bilingual applicant name or National ID search.'
+          example: Sara
+          required: false
+          schema:
+            type: string
+            description: 'Normalized bilingual applicant name or National ID search.'
+            example: Sara
+        -
+          in: query
+          name: id
+          description: 'Comma-separated Interview ids.'
+          example: '1,2'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Interview ids.'
+            example: '1,2'
+        -
+          in: query
+          name: application_id
+          description: 'Comma-separated Application ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Application ids.'
+            example: '1'
+        -
+          in: query
+          name: status
+          description: 'Comma-separated confirmation states.'
+          example: confirmed
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated confirmation states.'
+            example: confirmed
+        -
+          in: query
+          name: interviewer_id
+          description: 'Comma-separated interviewer ids, within actor scope.'
+          example: '4'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interviewer ids, within actor scope.'
+            example: '4'
+        -
+          in: query
+          name: program_id
+          description: 'Comma-separated primary Program ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated primary Program ids.'
+            example: '1'
+        -
+          in: query
+          name: admission_cycle_id
+          description: 'Comma-separated Cycle ids.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated Cycle ids.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'Comma-separated applying degrees.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated applying degrees.'
+            example: MSc
+        -
+          in: query
+          name: mode
+          description: 'Comma-separated interview modes.'
+          example: in_person
+          required: false
+          schema:
+            type: string
+            description: 'Comma-separated interview modes.'
+            example: in_person
+        -
+          in: query
+          name: evaluation_score_min
+          description: 'Minimum recorded score, 1–10.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Minimum recorded score, 1–10.'
+            example: 1
+        -
+          in: query
+          name: evaluation_score_max
+          description: 'Maximum recorded score, 1–10.'
+          example: 10
+          required: false
+          schema:
+            type: integer
+            description: 'Maximum recorded score, 1–10.'
+            example: 10
+        -
+          in: query
+          name: scheduled_at_min
+          description: 'Earliest scheduled timestamp.'
+          example: '2026-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Earliest scheduled timestamp.'
+            example: '2026-01-01'
+        -
+          in: query
+          name: scheduled_at_max
+          description: 'Latest scheduled timestamp.'
+          example: '2027-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Latest scheduled timestamp.'
+            example: '2027-01-01'
+        -
+          in: query
+          name: sort
+          description: "Comma-separated readable fields; '-' descends."
+          example: 'scheduled_at,-id'
+          required: false
+          schema:
+            type: string
+            description: "Comma-separated readable fields; '-' descends."
+            example: 'scheduled_at,-id'
+        -
+          in: query
+          name: page
+          description: 'Page number; ignored by export.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Page number; ignored by export.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Page size, capped at 100; ignored by export.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Page size, capped at 100; ignored by export.'
+            example: 25
       responses:
         200:
           description: ''
@@ -5838,6 +6561,16 @@ paths:
                         national_id: '29001010101010'
                         applying_for_degree: MSc
                         status: interview_scheduled
+                  links:
+                    first: 'http://localhost/api/v1/interviews?page=1'
+                    last: 'http://localhost/api/v1/interviews?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    per_page: 25
+                    total: 1
+                    last_page: 1
                 properties:
                   data:
                     type: array
@@ -5891,9 +6624,11 @@ paths:
                         evaluation_score:
                           type: integer
                           example: 8
+                          nullable: true
                         evaluation_notes:
                           type: string
                           example: 'Strong candidate.'
+                          nullable: true
                         completed_at:
                           type: string
                           example: null
@@ -5916,6 +6651,7 @@ paths:
                             location:
                               type: string
                               example: 'Building C, Room 204'
+                              nullable: true
                             meeting_link:
                               type: string
                               example: null
@@ -5938,6 +6674,9 @@ paths:
                             is_open:
                               type: boolean
                               example: false
+                          required:
+                            - location
+                            - meeting_link
                         applicant:
                           type: object
                           properties:
@@ -5956,6 +6695,41 @@ paths:
                             status:
                               type: string
                               example: interview_scheduled
+                      required:
+                        - evaluation_score
+                        - evaluation_notes
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'http://localhost/api/v1/interviews?page=1'
+                      last:
+                        type: string
+                        example: 'http://localhost/api/v1/interviews?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 25
+                      total:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
         403:
           description: ''
           content:

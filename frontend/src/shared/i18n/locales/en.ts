@@ -819,6 +819,15 @@ export const en = {
     // Interview slots + scheduling + evaluation (ticket 09). Shared across the Student
     // Affairs, interviewer, and applicant interview screens.
     interviews: {
+      filters: {
+        allStates: 'All confirmation states',
+        mode: 'Mode',
+        allModes: 'All modes',
+        from: 'Scheduled from',
+        to: 'Scheduled until',
+        minScore: 'Minimum score',
+        maxScore: 'Maximum score',
+      },
       save: 'Save',
       cancel: 'Cancel',
       completed: 'Completed',

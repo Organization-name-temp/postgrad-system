@@ -777,6 +777,15 @@ export const ar = {
     },
     // مواعيد المقابلات والجدولة والتقييم (التذكرة 09).
     interviews: {
+      filters: {
+        allStates: 'جميع حالات التأكيد',
+        mode: 'النمط',
+        allModes: 'جميع الأنماط',
+        from: 'الموعد من',
+        to: 'الموعد حتى',
+        minScore: 'أدنى درجة',
+        maxScore: 'أقصى درجة',
+      },
       save: 'حفظ',
       cancel: 'إلغاء',
       completed: 'اكتملت',

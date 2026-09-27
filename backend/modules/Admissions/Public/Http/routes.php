@@ -102,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // controller allows an action only for the interviewer the slot is assigned to
 // (anyone else → 403). `assigned` is declared before the id-bound evaluation route.
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/interviews/assigned/export', [InterviewEvaluationController::class, 'export']);
     Route::get('/interviews/assigned', [InterviewEvaluationController::class, 'index']);
     Route::post('/interviews/{interview}/evaluation', [InterviewEvaluationController::class, 'store'])
         ->whereNumber('interview');
@@ -125,6 +126,7 @@ Route::middleware(['auth:sanctum', 'can:interview.schedule'])->group(function ()
     Route::patch('/interview-slots/{interview_slot}', [InterviewSlotController::class, 'update'])->whereNumber('interview_slot');
     Route::delete('/interview-slots/{interview_slot}', [InterviewSlotController::class, 'destroy'])->whereNumber('interview_slot');
 
+    Route::get('/interviews/export', [InterviewSchedulingController::class, 'exportBooked']);
     Route::get('/interviews', [InterviewSchedulingController::class, 'booked']);
     Route::post('/applications/{application}/interview', [InterviewSchedulingController::class, 'store'])->whereNumber('application');
     Route::post('/interviews/{interview}/complete', [InterviewSchedulingController::class, 'complete'])->whereNumber('interview');

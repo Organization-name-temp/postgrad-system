@@ -13,9 +13,16 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
-import { useInterviewsAssignedToMe } from '../../../shared/api/generated/endpoints'
+import {
+  exportAssignedInterviews,
+  useInterviewsAssignedToMe,
+} from '../../../shared/api/generated/endpoints'
 import type { InterviewsAssignedToMe200DataItem } from '../../../shared/api/generated/endpoints'
 import { pickLocaleName } from '../../../shared/i18n/localeName'
+import { FilterBar } from '../../../shared/ui/FilterBar'
+import { DataToolbar } from '../../../shared/ui/DataToolbar'
+import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
+import { downloadBlob } from '../../../shared/downloadBlob'
 import { EvaluationDialog } from './EvaluationDialog'
 import { formatSlotWhen, slotWhere } from './slotDisplay'
 
@@ -28,7 +35,17 @@ import { formatSlotWhen, slotWhere } from './slotDisplay'
  */
 export function InterviewerPage() {
   const { t, i18n } = useTranslation('admissions')
-  const { data, isPending, isError } = useInterviewsAssignedToMe()
+  const collection = useCollectionQuery()
+  const params = {
+    ...collection.params,
+    evaluation_score_min: collection.searchParams.has('evaluation_score_min')
+      ? Number(collection.searchParams.get('evaluation_score_min'))
+      : undefined,
+    evaluation_score_max: collection.searchParams.has('evaluation_score_max')
+      ? Number(collection.searchParams.get('evaluation_score_max'))
+      : undefined,
+  }
+  const { data, isPending, isError } = useInterviewsAssignedToMe(params)
   const interviews = data?.data ?? []
 
   const [target, setTarget] = useState<InterviewsAssignedToMe200DataItem | undefined>(undefined)
@@ -41,6 +58,48 @@ export function InterviewerPage() {
       <Typography variant="body2" color="text.secondary" gutterBottom>
         {t('interviews.mine.intro')}
       </Typography>
+
+      <FilterBar
+        values={collection.params}
+        onChange={collection.setCriteria}
+        fields={[
+          { key: 'q', label: t('screening.filters.search') },
+          {
+            key: 'status',
+            label: t('interviews.columns.confirmation'),
+            options: [
+              { value: '', label: t('interviews.filters.allStates') },
+              { value: 'pending_confirmation', label: t('interviews.status.pending_confirmation') },
+              { value: 'confirmed', label: t('interviews.status.confirmed') },
+            ],
+          },
+          {
+            key: 'mode',
+            label: t('interviews.filters.mode'),
+            options: [
+              { value: '', label: t('interviews.filters.allModes') },
+              { value: 'in_person', label: t('interviews.modes.in_person') },
+              { value: 'virtual', label: t('interviews.modes.virtual') },
+            ],
+          },
+          { key: 'scheduled_at_min', label: t('interviews.filters.from'), type: 'date' },
+          { key: 'scheduled_at_max', label: t('interviews.filters.to'), type: 'date' },
+          { key: 'evaluation_score_min', label: t('interviews.filters.minScore'), type: 'number' },
+          { key: 'evaluation_score_max', label: t('interviews.filters.maxScore'), type: 'number' },
+          { key: 'sort', label: t('screening.filters.sort') },
+        ]}
+      />
+      {data?.meta && (
+        <DataToolbar
+          total={data.meta.total ?? 0}
+          page={data.meta.current_page ?? params.page}
+          lastPage={data.meta.last_page ?? 1}
+          onPageChange={collection.setPage}
+          onExport={async () =>
+            downloadBlob(await exportAssignedInterviews(params), 'assigned-interviews.xlsx')
+          }
+        />
+      )}
 
       {isPending && <CircularProgress aria-label={t('interviews.mine.loading')} sx={{ mt: 2 }} />}
       {isError && (

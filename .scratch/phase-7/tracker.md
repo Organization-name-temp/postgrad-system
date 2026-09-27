@@ -411,3 +411,41 @@ booked and assigned Interview collections (preserving the assigned-interviewer/
 administrator scope), slot pool and applicant reschedule lookup, staff pickers,
 Catalog type-ahead adoption and direct Dean Faculty criterion. Pipeline/print
 prerequisites and all seven Phase 7 acceptance/gates/final review remain pending.
+
+### Booked and assigned Interview collections — backend and assigned UI in progress
+
+- Continued the executable #06 dependency closure on the fixed Phase 7 branch.
+  Booked list remains gated by `interview.schedule`; assigned list remains scoped
+  to the live slot interviewer, with the existing administrator exception.
+- Red HTTP tests demonstrated ignored pagination and missing sibling exports.
+  Added one Admissions-owned selector joining only Admissions tables, normalized
+  bilingual applicant search, confirmation/mode/opaque references, scheduled and
+  score bounds, stable sorting and SQL pagination. Foreign staff resolution uses
+  Identity Public Directory DTOs in bounded batches.
+- Canonical exports mirror the complete filtered row scope across pages, use text
+  identifiers and bilingual RTL workbooks, and record criteria/count audit evidence.
+  Tests cover live reassignment, outside interviewer criteria, unauthorized booked
+  reads/exports, and empty assigned scope for an Applicant.
+- Focused backend regression: **48 passed, 177 assertions, 10.56s** including
+  scheduling, evaluation and Admissions/Enrollment administrator overrides.
+  Pint, PHPStan and deptrac passed. No full package gate claimed.
+- Assigned Interview page HTTP-boundary tests were red for missing URL controls and
+  export. URL filters/pagination/authenticated export now implemented. A subsequent
+  red assertion caught a generated text response; controller binary annotations
+  were corrected and backend OpenAPI/client/Zod regenerated. Verification is still
+  in progress; booked UI migration and serial EN/AR/browser evidence remain pending.
+- All seven Phase 7 acceptance items, remaining prerequisite closure, final package
+  gates, print/layout audit and consolidated code review remain pending.
+
+Assigned UI focused verification: **2 files / 4 tests passed, 12.02s**, including
+awaiting regressions. Frontend typecheck, lint and full formatting passed after the
+binary response correction. Subsequent generated-contract inspection identified
+an inferred string score from the assigned example's null value; explicit integer/
+nullable response annotations were added on both collection endpoints, and the
+assigned pagination example now uses its actual sibling route. Final client
+regeneration and affected typecheck follow. No browser or final gate claimed.
+
+Final regenerated collection score types are `number | null`; affected frontend
+typecheck and formatting passed. Backend PHPStan rerun passed after response
+annotations. The next slice is booked worklist URL controls plus serial headline
+and EN/AR collection verification; this checkpoint remains partial #06 progress.

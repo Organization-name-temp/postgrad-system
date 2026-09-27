@@ -5,6 +5,7 @@ namespace Modules\Admissions\Internal\Support;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Modules\Admissions\Internal\Enums\ApplicationCollectionScope;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Catalog\Public\ProgramCatalog;
@@ -37,10 +38,10 @@ final readonly class ApplicationCollection
      * @param  list<ApplicationStatus>  $statuses
      * @return Builder<Application>
      */
-    private function scoped(int $actor, array $statuses): Builder
+    private function scoped(int $actor, array $statuses, ApplicationCollectionScope $scope): Builder
     {
         $builder = Application::query()->with('statusTransitions')->whereIn('status', $statuses);
-        if ($this->directory->isAdministrator($actor) || $this->directory->hasRole($actor, Role::StudentAffairs)) {
+        if ($this->directory->isAdministrator($actor) || ($scope === ApplicationCollectionScope::Screening && $this->directory->hasRole($actor, Role::StudentAffairs))) {
             return $builder;
         }
         $faculties = $this->directory->hasRole($actor, Role::Dean) ? $this->deans->facultiesForDean($actor) : [];
@@ -61,9 +62,9 @@ final readonly class ApplicationCollection
      * @param  list<ApplicationStatus>  $statuses
      * @return LengthAwarePaginator<int, Application>
      */
-    public function page(Request $request, CollectionQuery $query, array $statuses): LengthAwarePaginator
+    public function page(Request $request, CollectionQuery $query, array $statuses, ApplicationCollectionScope $scope = ApplicationCollectionScope::Screening): LengthAwarePaginator
     {
-        $builder = $this->selection((int) $request->user()?->getAuthIdentifier(), $query, $statuses);
+        $builder = $this->selection((int) $request->user()?->getAuthIdentifier(), $query, $statuses, $scope);
         if (! $this->derived($query)) {
             return $builder->paginate($query->perPage, ['*'], 'page', $query->page)->withQueryString();
         }
@@ -80,9 +81,9 @@ final readonly class ApplicationCollection
      * @param  list<ApplicationStatus>  $statuses
      * @return \Generator<int, Application>
      */
-    public function rows(int $actor, CollectionQuery $query, array $statuses): \Generator
+    public function rows(int $actor, CollectionQuery $query, array $statuses, ApplicationCollectionScope $scope = ApplicationCollectionScope::Screening): \Generator
     {
-        $builder = $this->selection($actor, $query, $statuses);
+        $builder = $this->selection($actor, $query, $statuses, $scope);
         if ($this->derived($query)) {
             yield from $this->derivedRows($builder, $query);
         } else {
@@ -94,9 +95,9 @@ final readonly class ApplicationCollection
      * @param  list<ApplicationStatus>  $statuses
      * @return Builder<Application>
      */
-    private function selection(int $actor, CollectionQuery $query, array $statuses): Builder
+    private function selection(int $actor, CollectionQuery $query, array $statuses, ApplicationCollectionScope $scope): Builder
     {
-        return SqlCollectionQuery::apply($this->scoped($actor, $statuses), $query, self::COLUMNS, ['name_en', 'name_ar', 'national_id'], ! $this->derived($query));
+        return SqlCollectionQuery::apply($this->scoped($actor, $statuses, $scope), $query, self::COLUMNS, ['name_en', 'name_ar', 'national_id'], ! $this->derived($query));
     }
 
     private function derived(CollectionQuery $query): bool

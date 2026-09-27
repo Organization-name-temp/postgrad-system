@@ -231,3 +231,31 @@ Reserved until all tickets and prerequisite changes are implemented.
 
 Reference collection commit `487964d`: `composer api:check` and
 `npm run api:check` **passed** after commit; generation produces no drift.
+
+### Admissions/Catalog prerequisite (#06), Dean review collection
+
+- Dean review now uses the collection envelope, scoped query and all-row XLSX
+  selection. Its new explicit Dean-Faculty scope preserves the operational rule:
+  administrators oversee all Faculties, while a Dean who also holds Student Affairs
+  still sees only assigned Faculties. Screening and Pipeline keep their existing
+  Student Affairs oversight semantics. The query never widens this base scope.
+- Red HTTP regression demonstrated ignored paging; export regression demonstrated
+  the absent route. Green focused backend run: **38 passed, 239 assertions, 9.55s**
+  including original review decisions/authorization, screening/export/Pipeline tests
+  and the shared collection contract dataset extended with Dean review.
+- Canonical export uses the full filtered selection independent of pagination,
+  bounded Program resolution, existing bilingual labels/RTL and audited resource
+  `dean/applications`, criteria and count. Multirole cross-Faculty exclusion is
+  verified by reading the workbook back.
+- Frontend red showed absent URL controls and export. **2 focused RTL tests passed**:
+  bookmark restoration, search reset, browser Back and authenticated blob criteria.
+  Reuses bilingual filters/toolbar and isolates National ID direction in RTL.
+- Pint, PHPStan, deptrac, typecheck, lint and full frontend format check passed.
+  OpenAPI/client/Zod regenerated from controller docs, including nullable derived age.
+- Serial browser run: **3 passed, 1.9m** — complete admissions headline and EN/AR Dean
+  bookmark reload, downloads and serious/critical axe checks. The headline helper
+  subsequently gained Dean search to keep its new Applicant visible beyond page 1;
+  rerun of that final helper is pending below.
+- Decision worklist, other Admissions collections, type-ahead pickers, full package
+  gates and the consolidated final review remain pending. This is a prerequisite
+  slice, not completion of #06 or any Phase 7 Report ticket.

@@ -8,9 +8,11 @@ use Modules\Catalog\Internal\Models\Department;
 use Modules\Catalog\Internal\Models\Faculty;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Catalog\Public\Enums\DegreeLevel;
+use Modules\Identity\Internal\Models\AuditLog;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
+use OpenSpout\Reader\XLSX\Reader;
 
 uses(RefreshDatabase::class);
 
@@ -72,6 +74,25 @@ it('lists only the Dean’s own faculty applications', function () {
         ->assertJsonPath('data.0.status', 'under_dean_review');
 });
 
+it('filters and pages inside the Dean faculty scope even when the Dean also holds Student Affairs', function () {
+    $faculty = Faculty::factory()->create();
+    $otherFaculty = Faculty::factory()->create();
+    [$first] = underDeanReviewApplication($faculty->id, ['name_en' => 'Queue Candidate A']);
+    [$second] = underDeanReviewApplication($faculty->id, ['name_en' => 'Queue Candidate B']);
+    [$outside] = underDeanReviewApplication($otherFaculty->id, ['name_en' => 'Queue Candidate C']);
+    $dean = deanAssignedTo($faculty->id);
+    $dean->assignRole(Role::StudentAffairs);
+    Sanctum::actingAs($dean);
+
+    $this->getJson('/api/v1/dean/applications?q=Candidate&degree_level=MSc&sort=name_en&per_page=1&page=2')
+        ->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $second->id)
+        ->assertJsonPath('meta.total', 2)->assertJsonPath('meta.current_page', 2);
+    $this->getJson('/api/v1/dean/applications?program_id='.$outside->primary_program_id)
+        ->assertOk()->assertJsonCount(0, 'data')->assertJsonPath('meta.total', 0);
+    $this->getJson('/api/v1/dean/applications?q=Candidate&sort=name_en&per_page=1')
+        ->assertOk()->assertJsonPath('data.0.id', $first->id);
+});
+
 it('shows an empty queue to a Dean with no assigned faculty', function () {
     $faculty = Faculty::factory()->create();
     underDeanReviewApplication($faculty->id);
@@ -83,6 +104,29 @@ it('shows an empty queue to a Dean with no assigned faculty', function () {
     $this->getJson('/api/v1/dean/applications')
         ->assertOk()
         ->assertJsonCount(0, 'data');
+});
+
+it('exports every matching Dean review row without disclosing another faculty to a multirole Dean', function () {
+    $faculty = Faculty::factory()->create();
+    [$first] = underDeanReviewApplication($faculty->id, ['name_en' => 'Export A']);
+    [$second] = underDeanReviewApplication($faculty->id, ['name_en' => 'Export B']);
+    underDeanReviewApplication(Faculty::factory()->create()->id, ['name_en' => 'Export C']);
+    $dean = deanAssignedTo($faculty->id);
+    $dean->assignRole(Role::StudentAffairs);
+    Sanctum::actingAs($dean);
+    $response = $this->get('/api/v1/dean/applications/export?q=Export&sort=name_en&per_page=1')->assertOk();
+    $reader = new Reader;
+    $reader->open($response->baseResponse->getFile()->getPathname());
+    $rows = [];
+    foreach ($reader->getSheetIterator() as $sheet) {
+        foreach ($sheet->getRowIterator() as $row) {
+            $rows[] = $row->toArray();
+        }
+    }
+    $reader->close();
+    expect($rows)->toHaveCount(3)->and($rows[1][0])->toBe((string) $first->id)->and($rows[2][0])->toBe((string) $second->id);
+    $audit = AuditLog::query()->where('action', 'admissions.applications_exported')->sole();
+    expect($audit->metadata['resource'])->toBe('dean/applications')->and($audit->metadata['row_count'])->toBe(2);
 });
 
 it('approves an application for interview and notifies the applicant', function () {

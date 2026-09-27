@@ -4,6 +4,7 @@ namespace Modules\Admissions\Internal\Support;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\LazyCollection;
+use Modules\Admissions\Internal\Enums\ApplicationCollectionScope;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Catalog\Public\ProgramCatalog;
@@ -28,14 +29,14 @@ final readonly class ApplicationExport
     }
 
     /** @param list<ApplicationStatus> $statuses */
-    public function download(Request $request, array $statuses): BinaryFileResponse
+    public function download(Request $request, array $statuses, ApplicationCollectionScope $scope = ApplicationCollectionScope::Screening, string $resource = 'applications'): BinaryFileResponse
     {
         $actor = (int) $request->user()?->getAuthIdentifier();
         $columns = $this->columns($actor);
         $query = $this->collection->query($request);
         $count = 0;
-        $rows = function () use ($actor, $query, $statuses, $request, &$count): \Generator {
-            $selection = LazyCollection::make(fn () => $this->collection->rows($actor, $query, $statuses));
+        $rows = function () use ($actor, $query, $statuses, $scope, $request, &$count): \Generator {
+            $selection = LazyCollection::make(fn () => $this->collection->rows($actor, $query, $statuses, $scope));
             foreach ($selection->chunk(100) as $batch) {
                 $ids = $batch->pluck('primary_program_id')->filter()->unique()->values()->all();
                 $programs = $this->programs->findMany($ids);
@@ -54,7 +55,7 @@ final readonly class ApplicationExport
         };
         $response = $this->xlsx->download('applications.xlsx', array_map(fn (string $column): string => __('admissions.export_columns.'.$column), $columns), $rows(), app()->getLocale() === 'ar');
         $this->audit->record(action: 'admissions.applications_exported', actorUserId: $actor,
-            metadata: ['resource' => 'applications', 'criteria' => $query->auditCriteria(), 'row_count' => $count]);
+            metadata: ['resource' => $resource, 'criteria' => $query->auditCriteria(), 'row_count' => $count]);
 
         return $response;
     }

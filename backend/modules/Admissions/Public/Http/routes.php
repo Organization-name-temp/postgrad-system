@@ -157,6 +157,7 @@ Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function ()
 // enforced inside the controller via the Dean↔Faculty assignment mapping.
 Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
     Route::get('/dean/applications', [DeanReviewController::class, 'index']);
+    Route::get('/dean/applications/export', [DeanReviewController::class, 'export']);
     Route::post('/dean/applications/{application}/review', [DeanReviewController::class, 'review'])->whereNumber('application');
 });
 

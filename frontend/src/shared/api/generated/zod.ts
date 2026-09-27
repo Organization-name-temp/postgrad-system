@@ -1750,6 +1750,19 @@ export const ScreeningQueueCardResponse = zod.object({
  * A Dean with no assigned Faculty (or a non-Dean reviewer) sees an empty queue.
  * @summary Dean review queue.
  */
+export const DeanReviewQueueQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const DeanReviewQueueResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1771,9 +1784,41 @@ export const DeanReviewQueueResponse = zod.object({
 }).optional(),
   "finalized_at": zod.string().optional(),
   "review_entered_at": zod.string().optional(),
-  "age_days": zod.number().optional()
-})).optional()
+  "age_days": zod.number().nullable()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
+
+
+/**
+ * Canonical readable columns for every filtered row inside the Dean faculty scope.
+ * @summary Export Dean review queue.
+ */
+export const ExportDeanReviewQueueQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Ignored by export.'),
+  "per_page": zod.number().optional().describe('Ignored by export.')
+})
+
+export const ExportDeanReviewQueueResponse = zod.unknown()
 
 
 /**

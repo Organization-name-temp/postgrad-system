@@ -2071,6 +2071,49 @@ export type ScreeningQueueCard403 = {
   message?: string;
 };
 
+export type DeanReviewQueueParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses within the queue.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size, capped at 100.
+ */
+per_page?: number;
+};
+
 export type DeanReviewQueue200DataItemPrimaryProgram = {
   id?: number;
   code?: string;
@@ -2093,14 +2136,80 @@ export type DeanReviewQueue200DataItem = {
   primary_program?: DeanReviewQueue200DataItemPrimaryProgram;
   finalized_at?: string;
   review_entered_at?: string;
-  age_days?: number;
+  /** @nullable */
+  age_days: number | null;
+};
+
+export type DeanReviewQueue200Links = {
+  first?: string;
+  last?: string;
+  /** @nullable */
+  prev?: string | null;
+  /** @nullable */
+  next?: string | null;
+};
+
+export type DeanReviewQueue200Meta = {
+  current_page?: number;
+  per_page?: number;
+  total?: number;
+  last_page?: number;
 };
 
 export type DeanReviewQueue200 = {
   data?: DeanReviewQueue200DataItem[];
+  links?: DeanReviewQueue200Links;
+  meta?: DeanReviewQueue200Meta;
 };
 
 export type DeanReviewQueue403 = {
+  message?: string;
+};
+
+export type ExportDeanReviewQueueParams = {
+/**
+ * Normalized bilingual name or identifier search.
+ */
+q?: string;
+/**
+ * Comma-separated statuses within the queue.
+ */
+status?: string;
+/**
+ * Program ids.
+ */
+program_id?: string;
+/**
+ * Cycle ids.
+ */
+admission_cycle_id?: string;
+/**
+ * Degree levels.
+ */
+degree_level?: string;
+/**
+ * Minimum whole days in current review.
+ */
+age_days_min?: number;
+/**
+ * Maximum whole days in current review.
+ */
+age_days_max?: number;
+/**
+ * Comma-separated readable fields; '-' descends.
+ */
+sort?: string;
+/**
+ * Ignored by export.
+ */
+page?: number;
+/**
+ * Ignored by export.
+ */
+per_page?: number;
+};
+
+export type ExportDeanReviewQueue403 = {
   message?: string;
 };
 
@@ -17679,13 +17788,14 @@ export function useScreeningQueueCard<TData = Awaited<ReturnType<typeof screenin
  * @summary Dean review queue.
  */
 export const deanReviewQueue = (
-
+    params?: DeanReviewQueueParams,
  signal?: AbortSignal
 ) => {
 
 
       return customInstance<DeanReviewQueue200>(
-      {url: `/api/v1/dean/applications`, method: 'GET', signal
+      {url: `/api/v1/dean/applications`, method: 'GET',
+        params, signal
     },
       );
     }
@@ -17693,23 +17803,23 @@ export const deanReviewQueue = (
 
 
 
-export const getDeanReviewQueueQueryKey = () => {
+export const getDeanReviewQueueQueryKey = (params?: DeanReviewQueueParams,) => {
     return [
-    `/api/v1/dean/applications`
+    `/api/v1/dean/applications`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getDeanReviewQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+export const getDeanReviewQueueQueryOptions = <TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(params?: DeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
 ) => {
 
 const {query: queryOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getDeanReviewQueueQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getDeanReviewQueueQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanReviewQueue>>> = ({ signal }) => deanReviewQueue(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof deanReviewQueue>>> = ({ signal }) => deanReviewQueue(params, signal);
 
 
 
@@ -17723,7 +17833,7 @@ export type DeanReviewQueueQueryError = DeanReviewQueue403
 
 
 export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
+ params: undefined |  DeanReviewQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof deanReviewQueue>>,
           TError,
@@ -17733,7 +17843,7 @@ export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQ
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
+ params?: DeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof deanReviewQueue>>,
           TError,
@@ -17743,7 +17853,7 @@ export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQ
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+ params?: DeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -17751,11 +17861,107 @@ export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQ
  */
 
 export function useDeanReviewQueue<TData = Awaited<ReturnType<typeof deanReviewQueue>>, TError = DeanReviewQueue403>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
+ params?: DeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof deanReviewQueue>>, TError, TData>>, }
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getDeanReviewQueueQueryOptions(options)
+  const queryOptions = getDeanReviewQueueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Canonical readable columns for every filtered row inside the Dean faculty scope.
+ * @summary Export Dean review queue.
+ */
+export const exportDeanReviewQueue = (
+    params?: ExportDeanReviewQueueParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/dean/applications/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportDeanReviewQueueQueryKey = (params?: ExportDeanReviewQueueParams,) => {
+    return [
+    `/api/v1/dean/applications/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportDeanReviewQueueQueryOptions = <TData = Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError = ExportDeanReviewQueue403>(params?: ExportDeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportDeanReviewQueueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportDeanReviewQueue>>> = ({ signal }) => exportDeanReviewQueue(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportDeanReviewQueueQueryResult = NonNullable<Awaited<ReturnType<typeof exportDeanReviewQueue>>>
+export type ExportDeanReviewQueueQueryError = ExportDeanReviewQueue403
+
+
+export function useExportDeanReviewQueue<TData = Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError = ExportDeanReviewQueue403>(
+ params: undefined |  ExportDeanReviewQueueParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDeanReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDeanReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDeanReviewQueue<TData = Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError = ExportDeanReviewQueue403>(
+ params?: ExportDeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportDeanReviewQueue>>,
+          TError,
+          Awaited<ReturnType<typeof exportDeanReviewQueue>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportDeanReviewQueue<TData = Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError = ExportDeanReviewQueue403>(
+ params?: ExportDeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export Dean review queue.
+ */
+
+export function useExportDeanReviewQueue<TData = Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError = ExportDeanReviewQueue403>(
+ params?: ExportDeanReviewQueueParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportDeanReviewQueue>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportDeanReviewQueueQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

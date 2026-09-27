@@ -76,7 +76,7 @@ async function capture(page: Page, testInfo: TestInfo, name: string) {
 
 // Open the queue row for our applicant (queues also hold seeded rows) and follow it.
 async function openApplicantRow(page: Page) {
-  if (new URL(page.url()).pathname === '/screening') {
+  if (['/screening', '/dean'].includes(new URL(page.url()).pathname)) {
     await page.getByLabel('Search applicants').fill(APPLICANT.name)
   }
   const row = page.getByRole('row', { name: new RegExp(APPLICANT.name) })

@@ -84,7 +84,19 @@ async function checkReadAndPrintMatrix(
   for (const scheme of ['light', 'dark'] as const) {
     for (const language of ['en', 'ar'] as const) {
       await page.evaluate((mode) => localStorage.setItem('mui-mode', mode), scheme)
+      const currentUser = publicView
+        ? undefined
+        : page.waitForResponse(
+            (response) =>
+              new URL(response.url()).pathname === '/api/v1/me' &&
+              response.request().method() === 'GET' &&
+              response.status() === 200,
+          )
       await page.reload()
+      if (currentUser) {
+        const user = (await (await currentUser).json()).data
+        await expect(page.locator('html')).toHaveAttribute('lang', user.preferred_locale)
+      }
       if (publicView) {
         if ((await page.locator('html').getAttribute('lang')) !== language) {
           await page

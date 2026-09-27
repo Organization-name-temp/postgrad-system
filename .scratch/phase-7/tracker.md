@@ -1614,3 +1614,21 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   Pipeline, public auth and early core bilingual states passed so far. Exit
   marker and exact log are in `backend/storage/logs/phase7-verification/`;
   complete gate success remains pending its terminal exit.
+
+- Isolated gate continuation: **130/179 browser checks passed**, including the
+  Phase 7 headline with workbook readback (53.4s), all four Readiness states,
+  interview collections, invalid verifier privacy and the dark Transcript print
+  regression. The serial Records service journey is active; no terminal gate
+  success is claimed. Native inspection of newly generated A4 paper confirms
+  Standing EN/AR fits one page, with criteria and chart/table counts matching;
+  Arabic Readiness uses two readable pages, retaining the overlapping-blocker
+  explanation and unsplit table rows. This is native inspection, not human
+  acceptance. Inspection PNGs remain in ignored durable verification storage.
+
+- Attempt 7 Records print matrix failed at check 131: its English watermark
+  assertion received the Arabic SVG after reloading an authenticated page. The
+  harness selected English before the new `/me` saved preference restored Arabic.
+  This is a failing existing integration assertion, not a weakened product check.
+  The matrix now starts its `/me` response wait before reload and waits for the
+  returned preference on the document before choosing its target print language.
+  Remaining browser checks continue serially; this run is not a green gate.

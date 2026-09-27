@@ -29,13 +29,13 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 | 02 Readiness | Pending 01 | No report implementation yet |
 | 03 Termination | Pending 01 | Existing operational queues are not Reports |
 | 04 Shell/Catalog/Admissions polish | Pending audit | |
-| 05 Enrollment/Grading/progress polish | Pending audit | |
+| 05 Enrollment/Grading/progress polish | Audit in progress | B05-01 Arabic Waiver download message fixed; page regression passes EN/AR |
 | 06 Records polish | Pending audit | Existing Records print regressions to retain |
 | 07 Acceptance | Pending 01–06 | Human demo review remains required before phase acceptance |
 
 ## Commands and results
 
-No implementation gates have run yet. Starting commit and clean worktree verified.
+Full package gates remain pending. Starting commit and initial clean worktree verified.
 
 ### Shared frontend prerequisites (#02/#03/#05 slices)
 
@@ -61,10 +61,43 @@ No implementation gates have run yet. Starting commit and clean worktree verifie
 ### Cohort prerequisite (#01)
 
 In progress: added a test-first generated cohort layer with isolated staff and
-natural keys. Red test confirmed missing seeder. The first implementation run
+natural keys, then connected it to `DatabaseSeeder`. Red tests confirmed the
+missing seeder and zero generated screening rows. The first implementation run
 revealed the shipped Catalog has five Programs; corrected the test's invented
-six-Program expectation to require all five. Focused parity/idempotence and named
-persona preservation test is running; full assertion audit is still pending.
+six-Program expectation to require all five.
+
+- Focused tests before main-seeder integration: **2 passed, 15 assertions, 39.62s**.
+  Covers 180 Students, five Programs/terms, CGPA diversity/nulls, stable Student
+  identifiers and named `r02` facts, plus 40 idempotent screening Applications.
+- Uses fixed Faker seed 4607; reuses academic seed helpers and owner GPA/outcome
+  calculations. Isolated Advisor/Instructor/Head accounts keep named rosters intact.
+  Evidence is fictional private seed content, with a valid PNG Photo.
+- `php artisan migrate:fresh --seed --force`: **passed, 65.36s total**; generated
+  layer **15.482s** in this run. All five Semester windows remain the existing
+  relative-date fixture. No browser journey ran during migration/seeding.
+- Pint for affected seed/test files, PHPStan and deptrac: **passed**.
+- `php artisan test --filter='GeneratedCohortSeederTest|RoleAccountSeederTest|GradingSeederTest'`:
+  **21 passed, 131 assertions, 396.48s** after main-seeder integration. Existing
+  named-persona Card/CGPA/roster and historical seeder assertions remain green.
+- `npm run e2e -- e2e/dashboard.spec.ts`: **11 passed, 1.4m** against the fresh
+  fixture, including presence/absence of Cards for seven accounts and axe across
+  all four combinations. No absolute-count assertion needed a change in these
+  audited files. Admissions/Grading headline navigation must still be checked
+  when paginated APIs arrive; they presently identify their own named rows.
+- Full package gates remain pending the phase implementation; #01 is not marked
+  complete until the complete required gates and collection assertion audit pass.
+
+### Bilingual defect B05-01
+
+See `bilingual-audit.md`. The actual Waiver download-error page test failed in
+Arabic with English fallback, then passed after moving the misplaced Arabic key:
+**5 tests passed, 10.19s**. Compared backend EN/AR message key sets: no missing
+counterpart keys. This is source coverage, not a runtime/layout acceptance claim.
+
+One frontend static-check rerun hit an ESLint filesystem race while Playwright
+was recreating `test-results`. After the browser suite finished, reran sequentially:
+`npm run lint && npm run typecheck && npm run format` **passed**. No configuration
+workaround was introduced. The interrupted run itself is not counted as a pass.
 
 ## Consolidated review
 

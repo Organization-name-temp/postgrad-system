@@ -57,5 +57,9 @@ class DatabaseSeeder extends Seeder
         // the Dashboard's composition rule. Runs last: it adds to the four worlds above and
         // disturbs none of them.
         $this->call(RoleAccountSeeder::class);
+
+        // Analytics prerequisite: a deterministic generated layer on top of the
+        // named personas, with its own staff so their operational footprints stay intact.
+        $this->call(GeneratedCohortSeeder::class);
     }
 }

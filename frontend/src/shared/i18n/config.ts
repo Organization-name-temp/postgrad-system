@@ -23,6 +23,7 @@ void i18n.use(initReactI18next).init({
     'enrollment',
     'grading',
     'academicStanding',
+    'records',
   ],
   defaultNS: 'common',
   interpolation: { escapeValue: false }, // React already escapes.

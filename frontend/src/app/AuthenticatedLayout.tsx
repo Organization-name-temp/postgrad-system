@@ -52,7 +52,7 @@ export function AuthenticatedLayout() {
   const nav = <SideNav items={navItems} onNavigate={() => setMobileOpen(false)} />
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', '@media print': { display: 'block' } }}>
       {/* Keyboard skip link (WCAG 2.1, §12): hidden until focused, jumps past the
           nav to the content. Slides in from the top so it's direction-agnostic. */}
       <Link
@@ -71,6 +71,7 @@ export function AuthenticatedLayout() {
           transform: 'translateY(-200%)',
           transition: 'transform 120ms',
           '&:focus': { transform: 'translateY(0)' },
+          '@media print': { display: 'none' },
         })}
       >
         {t('nav.skipToContent')}
@@ -84,6 +85,7 @@ export function AuthenticatedLayout() {
           color: 'text.primary',
           borderBottom: '1px solid',
           borderColor: 'divider',
+          '@media print': { display: 'none' },
         })}
       >
         <Toolbar sx={{ gap: 1 }}>
@@ -110,7 +112,13 @@ export function AuthenticatedLayout() {
         </Toolbar>
       </AppBar>
 
-      <Box sx={{ width: { lg: DRAWER_WIDTH }, flexShrink: { lg: 0 } }}>
+      <Box
+        sx={{
+          width: { lg: DRAWER_WIDTH },
+          flexShrink: { lg: 0 },
+          '@media print': { display: 'none' },
+        }}
+      >
         {/* Below lg: a temporary drawer opened by the app-bar menu button.
             The nav landmark lives on the SideNav list so it travels with the
             list into this drawer's portal (only one copy is ever in the a11y
@@ -151,10 +159,15 @@ export function AuthenticatedLayout() {
         component="main"
         id="main-content"
         tabIndex={-1}
-        sx={{ flexGrow: 1, width: { lg: `calc(100% - ${DRAWER_WIDTH}px)` }, outline: 'none' }}
+        sx={{
+          flexGrow: 1,
+          width: { lg: `calc(100% - ${DRAWER_WIDTH}px)` },
+          outline: 'none',
+          '@media print': { width: '100%' },
+        }}
       >
-        <Toolbar />
-        <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Toolbar sx={{ '@media print': { display: 'none' } }} />
+        <Container maxWidth="lg" sx={{ py: 4, '@media print': { p: 0, maxWidth: 'none' } }}>
           <Outlet />
         </Container>
       </Box>

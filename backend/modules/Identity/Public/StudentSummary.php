@@ -33,13 +33,14 @@ final readonly class StudentSummary
         public Carbon $admittedAt,
         public StudentLifecycleStatus $lifecycleStatus = StudentLifecycleStatus::Active,
         public ?AdmissionEvidenceSnapshot $admissionEvidence = null,
+        public ?StudentIdentity $identity = null,
     ) {}
 
     /**
      * The public array shape for the `/me` payload — the single home for how a
      * Student anchor is exposed to the SPA.
      *
-     * @return array{university_id: string, program_id: int, curriculum_version_id: int, curriculum_version_binding_source: string, enrollment_term: string, admission_cycle_id: int, advisor_id: int, admitted_at: string, lifecycle_status: string}
+     * @return array{university_id: string, program_id: int, curriculum_version_id: int, curriculum_version_binding_source: string, enrollment_term: string, admission_cycle_id: int, advisor_id: int, admitted_at: string, lifecycle_status: string, identity: array{name_en: string, name_ar: string, identification_number: string, identification_type: string|null, ready: bool}|null}
      */
     public function toArray(): array
     {
@@ -53,6 +54,7 @@ final readonly class StudentSummary
             'advisor_id' => $this->advisorId,
             'admitted_at' => $this->admittedAt->toIso8601String(),
             'lifecycle_status' => $this->lifecycleStatus->value,
+            'identity' => $this->identity?->toArray(),
         ];
     }
 }

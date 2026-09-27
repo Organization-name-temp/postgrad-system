@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Admissions\Internal\Console\Commands\FlagOverdueApplications;
 use Modules\Admissions\Internal\Console\Commands\SendInterviewReminders;
+use Modules\Admissions\Internal\Enrollment\EloquentAcceptedStudentIdentifications;
 use Modules\Admissions\Internal\Enrollment\EloquentAdmissionDocuments;
 use Modules\Admissions\Internal\Listeners\SendAcceptanceNotification;
+use Modules\Admissions\Public\AcceptedStudentIdentifications;
 use Modules\Admissions\Public\AdmissionDocuments;
 use Modules\Admissions\Public\Events\AdmissionAccepted;
 
@@ -19,6 +21,7 @@ class AdmissionsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(AcceptedStudentIdentifications::class, EloquentAcceptedStudentIdentifications::class);
         $this->app->bind(AdmissionDocuments::class, EloquentAdmissionDocuments::class);
     }
 

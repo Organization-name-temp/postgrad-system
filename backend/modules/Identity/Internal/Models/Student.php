@@ -33,6 +33,7 @@ use Modules\Identity\Public\StudentSummary;
  * @property StudentLifecycleStatus $lifecycle_status
  * @property string $name_en
  * @property string $name_ar
+ * @property string|null $identification_type
  * @property string $national_id
  * @property Carbon $date_of_birth
  * @property string $nationality
@@ -61,6 +62,7 @@ class Student extends Model
         'name_en',
         'name_ar',
         'national_id',
+        'identification_type',
         'date_of_birth',
         'nationality',
         'gender',

@@ -26,6 +26,9 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       globals: true,
       setupFiles: './src/test/setup.ts',
+      // Bound MUI/jsdom worker memory and event-loop contention on shared hosts.
+      // Unbounded CPU-based forks can miss real async UI responses before assertions.
+      maxWorkers: 2,
       // MUI interaction tests can exceed Vitest's 5s default when the full
       // 80-file suite transforms and renders in parallel on CI-sized hosts.
       testTimeout: 20_000,

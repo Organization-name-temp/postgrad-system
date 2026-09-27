@@ -23,6 +23,7 @@ use Modules\Enrollment\Internal\Support\EloquentMustRetakeObligations;
 use Modules\Enrollment\Internal\Support\EloquentRegistrationPolicyWriter;
 use Modules\Enrollment\Internal\Support\EloquentTransferDecisions;
 use Modules\Enrollment\Internal\Support\EloquentWaiverDecisions;
+use Modules\Enrollment\Internal\Support\PostgresTranscriptReadGuard;
 use Modules\Enrollment\Internal\Support\RemediationReconciler;
 use Modules\Enrollment\Public\AcademicRequestCloseout;
 use Modules\Enrollment\Public\EnrollmentRecords;
@@ -31,6 +32,7 @@ use Modules\Enrollment\Public\ExemptionDecisions;
 use Modules\Enrollment\Public\MustRetakeObligations;
 use Modules\Enrollment\Public\RegistrationPolicyWriter;
 use Modules\Enrollment\Public\RemediationObligations;
+use Modules\Enrollment\Public\TranscriptReadGuard;
 use Modules\Enrollment\Public\TransferDecisions;
 use Modules\Enrollment\Public\WaiverDecisions;
 
@@ -51,6 +53,7 @@ class EnrollmentServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(TranscriptReadGuard::class, PostgresTranscriptReadGuard::class);
         // The cross-module read facade (ADR-0012/0017): consumers depend on the
         // Enrollment\Public contract; the Eloquent reader lives in Enrollment\Internal.
         $this->app->bind(EnrollmentRecords::class, EloquentEnrollmentRecords::class);

@@ -726,3 +726,21 @@ it('validates the detail each held/rejected decision requires', function () {
     $this->postJson("/api/v1/dean/applications/{$rejected->id}/decide", ['action' => 'reject'])
         ->assertStatus(422)->assertJsonValidationErrors('note');
 });
+
+it('preserves the admission identification type and personal identity through Public and owner HTTP reads', function (string $type, string $number) {
+    $faculty = Faculty::factory()->create();
+    [$application, $applicant] = decidableApplication($faculty, ['id_type' => $type, 'national_id' => $number]);
+    decisionAdvisor();
+    Sanctum::actingAs(decidingDean($faculty));
+    $this->postJson("/api/v1/dean/applications/{$application->id}/decide", ['action' => 'accept'])->assertOk();
+    $summary = app(StudentDirectory::class)->find((int) $applicant->id);
+    expect($summary?->identity?->identificationType)->toBe($type)
+        ->and($summary?->identity?->nationalId)->toBe($number);
+    $application->update(['name_en' => 'Archived edit', 'id_type' => $type === 'passport' ? 'national_id' : 'passport']);
+    Sanctum::actingAs($applicant->fresh());
+    $this->getJson('/api/v1/me')->assertOk()
+        ->assertJsonPath('data.student.identity.identification_type', $type)
+        ->assertJsonPath('data.student.identity.identification_number', $number)
+        ->assertJsonPath('data.student.identity.name_en', $summary->identity->nameEn)
+        ->assertJsonPath('data.student.identity.ready', true);
+})->with([['national_id', '29001010101010'], ['passport', 'AB123456']]);

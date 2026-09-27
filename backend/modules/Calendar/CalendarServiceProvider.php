@@ -5,7 +5,9 @@ namespace Modules\Calendar;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Modules\Calendar\Internal\Support\EloquentAcademicCalendar;
+use Modules\Calendar\Internal\Support\PostgresTranscriptReadGuard;
 use Modules\Calendar\Public\AcademicCalendar;
+use Modules\Calendar\Public\TranscriptReadGuard;
 
 /**
  * The supporting Calendar module (ADR-0018): the single authority for the Semester
@@ -17,6 +19,7 @@ class CalendarServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(TranscriptReadGuard::class, PostgresTranscriptReadGuard::class);
         // The cross-module read facade (ADR-0012): consumers depend on the
         // Calendar\Public contract; the Eloquent reader lives in Calendar\Internal.
         $this->app->bind(AcademicCalendar::class, EloquentAcademicCalendar::class);

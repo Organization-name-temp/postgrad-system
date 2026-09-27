@@ -139,6 +139,7 @@ trait SeedsAcademicWorld
                 dateOfBirth: '1997-03-15',
                 nationality: 'EG',
                 gender: $gender,
+                identificationType: 'national_id', // Explicit kind of this fictional seed identity.
             ),
         ));
 

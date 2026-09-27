@@ -22,6 +22,8 @@ use Modules\Notifications\Public\Contracts\Notifier;
  */
 enum NotificationType: string
 {
+    case RecordsRequestChanged = 'records.request_changed';
+
     /** An application was returned for revision. Payload: reviewer `note`. */
     case ApplicationReturned = 'application.returned';
 

@@ -46,6 +46,7 @@ class EloquentStudentEnrollment implements StudentEnrollment
             'name_en' => $command->identity->nameEn,
             'name_ar' => $command->identity->nameAr,
             'national_id' => $command->identity->nationalId,
+            'identification_type' => $command->identity->identificationType,
             'date_of_birth' => $command->identity->dateOfBirth,
             'nationality' => $command->identity->nationality,
             'gender' => $command->identity->gender,

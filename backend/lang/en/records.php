@@ -1,0 +1,52 @@
+<?php
+
+return [
+    'columns' => [
+        'student_id' => 'Student ID',
+        'university_id' => 'University ID',
+        'name_en' => 'Name EN',
+        'name_ar' => 'Name AR',
+        'lifecycle' => 'Lifecycle Status',
+        'request_id' => 'Request ID',
+        'delivery' => 'Delivery',
+        'fee' => 'Fee',
+        'currency' => 'Currency',
+        'status' => 'Status',
+        'issuance_id' => 'Issuance ID',
+        'reference' => 'Reference',
+        'issuer' => 'Issuer',
+        'issued_at' => 'Issued at',
+    ],
+    'statuses' => [
+        'Submitted' => 'Submitted',
+        'AwaitingPayment' => 'Awaiting payment',
+        'PaymentUnderReview' => 'Payment under review',
+        'PaymentCorrectionRequired' => 'Payment correction required',
+        'ReadyForIssuance' => 'Ready for issuance',
+        'CancellationPending' => 'Cancellation pending',
+        'RefundPending' => 'Refund pending',
+        'ReadyForCollection' => 'Ready for collection',
+        'Completed' => 'Completed',
+        'Rejected' => 'Rejected',
+        'Cancelled' => 'Cancelled',
+        'Valid' => 'Valid',
+        'Revoked' => 'Revoked',
+    ],
+    'lifecycle' => [
+        'Active' => 'Active',
+        'Terminated' => 'Terminated',
+    ],
+    'delivery' => [
+        'digital' => 'Digital access',
+        'collection' => 'Collection from Student Affairs',
+    ],
+    'identity_unresolved' => 'Admission Identification Type or bilingual identity is unresolved. Ask Student Affairs to recover the admission identity before official issuance.',
+    'review_changed' => 'The Transcript content has changed or has not been reviewed. Refresh and review the complete preview before issuing.',
+    'full_refund' => 'Record one full refund for exactly the verified EGP payment; partial refunds and deductions are unavailable.',
+    'receipt_required' => 'Upload a private payment receipt.',
+    'exact_payment' => 'Verify one EGP payment for exactly the captured fee.',
+
+    'wrong_state' => 'This action is not available at the current request stage.',
+    'setup_required' => 'Student Affairs must configure the fee and bilingual payment instructions first.',
+    'open_request' => 'Complete the existing open Transcript Request before submitting another.',
+    'positive_fee' => 'The Transcript fee must be a positive EGP amount.', 'content_unavailable' => 'Required academic content is unavailable. Contact Student Affairs.'];

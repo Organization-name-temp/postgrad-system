@@ -23,5 +23,24 @@ final readonly class StudentIdentity
         public string $dateOfBirth,
         public string $nationality,
         public string $gender,
+        public ?string $identificationType = null,
     ) {}
+
+    public function ready(): bool
+    {
+        return in_array($this->identificationType, ['national_id', 'passport'], true)
+            && trim($this->nameEn) !== '' && trim($this->nameAr) !== '' && trim($this->nationalId) !== '';
+    }
+
+    /** @return array{name_en: string, name_ar: string, identification_number: string, identification_type: string|null, ready: bool} */
+    public function toArray(): array
+    {
+        return [
+            'name_en' => $this->nameEn,
+            'name_ar' => $this->nameAr,
+            'identification_number' => $this->nationalId,
+            'identification_type' => $this->identificationType,
+            'ready' => $this->ready(),
+        ];
+    }
 }

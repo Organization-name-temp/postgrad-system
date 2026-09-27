@@ -591,7 +591,55 @@ if termination takes effect first, later academic mutation is blocked.
 **Transcript**:
 The official or unofficial record of a Student's Enrollments, Grades, and Credit-Hour
 Summary. Official transcripts are issued only by Student Affairs with seal, watermark,
-digital signature, and verification QR code.
+and verification QR code; cryptographic digital signing is deferred in the localhost build.
+
+**Unofficial Transcript**:
+The view of a Student's current academic record, reflecting later Grade corrections and
+other academic changes.
+
+**Official Transcript Issuance**:
+One immutable, dated snapshot of a Student's academic record certified by an identified
+Student Affairs staff member. Later academic changes require a new issuance rather than
+changing what was certified.
+
+**Transcript Verification Link**:
+The shareable link encoded in an official Transcript's QR code, allowing anyone holding
+it to view the full issued academic snapshot without a PRS account while the issuance is
+valid. A revoked issuance's link shows only its reference and revoked status.
+
+**Transcript Revocation**:
+Student Affairs' explicit, reasoned withdrawal of an official Transcript issuance's
+validity. It preserves the certified snapshot internally; issuing a new Transcript does
+not itself revoke an earlier one.
+
+**Official Transcript Request**:
+A Student's request for an official Transcript, approved or rejected with a reason by
+Student Affairs. Approval authorizes processing; issuance is a separate action after
+the fee requirement is satisfied.
+
+**Transcript Request Status**:
+Where an Official Transcript Request sits in its workflow: Submitted, Awaiting Payment,
+Payment Under Review, Payment Correction Required, Ready for Issuance, Ready for
+Collection, Completed, Rejected, Cancellation Pending, Refund Pending, or Cancelled.
+
+**Transcript Payment Verification**:
+Student Affairs' confirmation of payment for an Official Transcript Request, supported
+by the Student's payment reference and receipt and attributed to a verifier and time.
+Submitting payment evidence alone does not satisfy the fee requirement.
+
+**Transcript Delivery Method**:
+The Student's choice on an Official Transcript Request: digital access in PRS or
+collection from Student Affairs. Digital delivery completes when the issued copy becomes
+available; collection completes when Student Affairs records the handover.
+
+**Transcript Cancellation Request**:
+A Student's request to stop an Official Transcript Request before issuance, including
+after verified payment. Student Affairs approves or rejects it with a reason.
+
+**Transcript Refund Obligation**:
+The obligation to return a verified payment when Student Affairs approves a pre-issuance
+Transcript Cancellation Request. Student Affairs records the manual refund's amount,
+reference, receipt, and completion time.
 
 ## Presentation
 

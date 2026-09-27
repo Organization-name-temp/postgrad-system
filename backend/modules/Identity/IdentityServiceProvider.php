@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Identity\Internal\Assignments\EloquentDeanAssignments;
 use Modules\Identity\Internal\Assignments\EloquentDepartmentHeadAssignments;
 use Modules\Identity\Internal\Audit\EloquentAuditLogger;
+use Modules\Identity\Internal\Console\Commands\RecoverStudentIdentification;
 use Modules\Identity\Internal\Directory\EloquentDirectory;
 use Modules\Identity\Internal\Enrollment\EloquentStudentCurriculumBindings;
 use Modules\Identity\Internal\Enrollment\EloquentStudentDirectory;
@@ -20,6 +21,7 @@ use Modules\Identity\Internal\Http\Middleware\EnsureRole;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Internal\Registration\EloquentApplicantRegistrar;
 use Modules\Identity\Internal\Registration\EloquentEmailVerifier;
+use Modules\Identity\Internal\Support\PostgresTranscriptReadGuard;
 use Modules\Identity\Public\Contracts\ApplicantRegistrar;
 use Modules\Identity\Public\Contracts\AuditLogger;
 use Modules\Identity\Public\Contracts\DeanAssignments;
@@ -32,11 +34,13 @@ use Modules\Identity\Public\Contracts\StudentEnrollment;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Identity\Public\Contracts\StudentLifecycleWriter;
 use Modules\Identity\Public\Enums\Permission;
+use Modules\Identity\Public\TranscriptReadGuard;
 
 class IdentityServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(TranscriptReadGuard::class, PostgresTranscriptReadGuard::class);
         $this->app->bind(AuditLogger::class, EloquentAuditLogger::class);
         $this->app->bind(ApplicantRegistrar::class, EloquentApplicantRegistrar::class);
         $this->app->bind(EmailVerifier::class, EloquentEmailVerifier::class);
@@ -52,6 +56,10 @@ class IdentityServiceProvider extends ServiceProvider
 
     public function boot(Router $router): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->commands([RecoverStudentIdentification::class]);
+        }
+
         $this->loadMigrationsFrom(__DIR__.'/Internal/Database/Migrations');
 
         $this->registerPermissionGates();

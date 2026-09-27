@@ -845,6 +845,13 @@ export const en = {
         score: 'Score',
       },
       slots: {
+        filters: {
+          search: 'Search slot locations',
+          interviewer: 'Interviewer IDs',
+          allAvailability: 'All availability',
+          minDuration: 'Minimum duration (minutes)',
+          maxDuration: 'Maximum duration (minutes)',
+        },
         title: 'Interview slots',
         intro: 'The pool of appointments approved applicants can be scheduled into.',
         new: 'New slot',

@@ -22,11 +22,16 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   getListInterviewSlotsQueryKey,
+  exportInterviewSlots,
   useDeleteAnInterviewSlot,
   useListInterviewSlots,
 } from '../../../shared/api/generated/endpoints'
 import type { ListInterviewSlots200DataItem } from '../../../shared/api/generated/endpoints'
 import { formatSlotWhen, slotWhere } from './slotDisplay'
+import { FilterBar } from '../../../shared/ui/FilterBar'
+import { DataToolbar } from '../../../shared/ui/DataToolbar'
+import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
+import { downloadBlob } from '../../../shared/downloadBlob'
 import { SlotFormDialog } from './SlotFormDialog'
 
 /**
@@ -39,7 +44,17 @@ import { SlotFormDialog } from './SlotFormDialog'
 export function SlotsPage() {
   const { t, i18n } = useTranslation('admissions')
   const queryClient = useQueryClient()
-  const { data, isPending, isError } = useListInterviewSlots()
+  const collection = useCollectionQuery()
+  const params = {
+    ...collection.params,
+    duration_minutes_min: collection.searchParams.has('duration_minutes_min')
+      ? Number(collection.searchParams.get('duration_minutes_min'))
+      : undefined,
+    duration_minutes_max: collection.searchParams.has('duration_minutes_max')
+      ? Number(collection.searchParams.get('duration_minutes_max'))
+      : undefined,
+  }
+  const { data, isPending, isError } = useListInterviewSlots(params)
   const slots = data?.data ?? []
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -84,6 +99,57 @@ export function SlotsPage() {
       <Typography variant="body2" color="text.secondary" gutterBottom>
         {t('interviews.slots.intro')}
       </Typography>
+
+      <FilterBar
+        values={collection.params}
+        onChange={collection.setCriteria}
+        fields={[
+          { key: 'q', label: t('interviews.slots.filters.search') },
+          { key: 'interviewer_id', label: t('interviews.slots.filters.interviewer') },
+          {
+            key: 'mode',
+            label: t('interviews.slots.mode'),
+            options: [
+              { value: '', label: t('interviews.filters.allModes') },
+              { value: 'in_person', label: t('interviews.modes.in_person') },
+              { value: 'virtual', label: t('interviews.modes.virtual') },
+            ],
+          },
+          {
+            key: 'is_open',
+            label: t('interviews.slots.columns.state'),
+            options: [
+              { value: '', label: t('interviews.slots.filters.allAvailability') },
+              { value: 'true', label: t('interviews.slots.open') },
+              { value: 'false', label: t('interviews.slots.taken') },
+            ],
+          },
+          { key: 'scheduled_at_min', label: t('interviews.filters.from'), type: 'date' },
+          { key: 'scheduled_at_max', label: t('interviews.filters.to'), type: 'date' },
+          {
+            key: 'duration_minutes_min',
+            label: t('interviews.slots.filters.minDuration'),
+            type: 'number',
+          },
+          {
+            key: 'duration_minutes_max',
+            label: t('interviews.slots.filters.maxDuration'),
+            type: 'number',
+          },
+          { key: 'sort', label: t('screening.filters.sort') },
+        ]}
+      />
+      {data?.meta && (
+        <DataToolbar
+          total={data.meta.total ?? 0}
+          page={data.meta.current_page ?? params.page}
+          lastPage={data.meta.last_page ?? 1}
+          onPageChange={collection.setPage}
+          onExport={async () =>
+            downloadBlob(await exportInterviewSlots(params), 'interview-slots.xlsx')
+          }
+        />
+      )}
 
       {isPending && <CircularProgress aria-label={t('interviews.slots.loading')} sx={{ mt: 2 }} />}
       {isError && (

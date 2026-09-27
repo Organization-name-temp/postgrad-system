@@ -542,3 +542,27 @@ Commit `8a2e0bf`: sequential `composer api:check` and `npm run api:check`
 **passed**, with no generated drift. Next frontier remains slot-pool URL controls,
 slot-pickers type-ahead (including selections beyond the first 100), staff/Catalog
 pickers and direct Dean Faculty criteria; then Pipeline/print and Phase 7 Reports.
+
+### Slot-pool URL controls and authenticated export UI
+
+- Red HTTP-boundary UI tests demonstrated absent slot search and export controls.
+  Slot pool now consumes owner-generated hooks with URL location search, opaque
+  interviewer IDs, mode, derived availability, scheduled/duration bounds, compound
+  sorting and truthful pagination. Numeric bounds are sent as numbers, including
+  export criteria. Changing filters resets page; browser Back restores criteria.
+- Added owner EN/AR labels together and reused shared controls/design tokens. Export
+  fetches a Blob through the authenticated generated client and names the workbook
+  `interview-slots.xlsx`. Existing create/edit/delete actions retain their API guards.
+- Focused frontend regression: **4 files / 8 tests passed, 25.12s**, covering slot
+  pool, scheduling picker, independent worklists and compound bookmarks. Typecheck,
+  lint and full frontend formatting passed. No backend or generated contract change
+  in this slice; previous slot API verification remains recorded above.
+- Serial headline plus EN/AR slot bookmark/reload/download/axe verification active.
+  Slot type-aheads and staff/Catalog picker adoption/direct Faculty criterion remain
+  pending prerequisites. Full seven-ticket Phase 7 implementation/gates/print audit
+  and the single consolidated final code review remain pending.
+
+Slot-pool serial browser verification **3 passed, 2.2m**: full admissions headline
+plus EN/AR bookmarked multi-value filters and compound sort, numeric duration
+criterion reload, authenticated workbook downloads and serious/critical axe scans.
+No final package gate or manual print/layout acceptance is claimed by this result.

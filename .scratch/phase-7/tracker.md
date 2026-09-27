@@ -1538,3 +1538,10 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   grouped runs are now supplemented by the complete core matrix within the full
   gate. Standing/Pipeline four-state Reports, Admissions headline, public auth and
   interview collections also passed. Remaining serial suite is active.
+- Interruption recovery: the prior frontend gate handle is missing, no gate/browser
+  process is alive, and temporary logs were cleared. Retained browser artifacts
+  reach the Exemptions checks, but there is no terminal full-gate result. Prior
+  observed passes remain documented; full frontend success is not inferred.
+  Archived interrupted artifacts under ignored backend private storage. Repeating
+  the full gate from a fresh seed with durable workspace logs under
+  `backend/storage/logs/phase7-verification/`, without any competing browser.

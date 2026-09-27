@@ -134,3 +134,8 @@ Final source dictionary audit: **2,104 leaves in each frontend locale**, no miss
 or extra keys; **10 backend EN/AR dictionary pairs** have matching keys. Interpolation
 inspection found the singular fallback defect above rather than treating matching
 keys as proof of correct runtime counts.
+
+After B04-11/B05-04: repeated frontend source audit reports **2,104 keys per
+language, zero missing/extra keys and zero interpolation mismatches**. Counts remain
+provided by the owners; the fix affects their Arabic wording only. Focused affected
+Card verification passed **58 / 7 files**. Both final gates are running.

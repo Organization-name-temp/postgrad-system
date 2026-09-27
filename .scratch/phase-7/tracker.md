@@ -1457,3 +1457,7 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   sixteen RED regressions. Full frontend gate restarted against the same untouched
   freshly seeded fixture; its static stages rerun rather than reusing the aborted
   attempt. No browser reseed occurred during a suite.
+- Post-fix frontend dictionary audit: **2,104 keys per language; zero missing/extra
+  keys and zero interpolation mismatches**. Backend source audit: **10 paired
+  dictionaries**, no key differences. These supplement actual rendering tests and
+  browser checks; they do not substitute for translation quality/human acceptance.

@@ -120,6 +120,12 @@ async function checkReadAndPrintMatrix(
       await page.emulateMedia({ media: 'print' })
       if (!publicView) await expect(page.getByRole('banner')).toBeHidden()
       if (!revokedPublic) await expect(page.locator('article')).toBeVisible()
+      const watermark = page.getByText(
+        language === 'ar' ? 'سجل أكاديمي رسمي' : 'OFFICIAL TRANSCRIPT',
+        { exact: true },
+      )
+      if (name === 'current' || revokedPublic) await expect(watermark).toHaveCount(0)
+      else await expect(watermark).toBeVisible()
       const fits =
         revokedPublic ||
         (await page

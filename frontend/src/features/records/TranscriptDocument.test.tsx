@@ -40,6 +40,7 @@ it('shows null GPAs as dashes, preserves CH and Attempts, and switches academic 
         credit_decisions: [
           {
             type: 'Exemption',
+            approved_at: '2026-09-01T00:00:00Z',
             target_course_code: 'PRE501',
             reason_codes: ['english_proficiency'],
           },
@@ -58,4 +59,36 @@ it('shows null GPAs as dashes, preserves CH and Attempts, and switches academic 
   expect(screen.getByText(/الخريف 2026/)).toBeInTheDocument()
   expect(screen.queryByText('english_proficiency')).not.toBeInTheDocument()
   expect(screen.queryByText('Algorithms')).not.toBeInTheDocument()
+})
+
+it('isolates external identifiers, credit hours, grades and approval dates in an Arabic record', () => {
+  render(
+    <TranscriptDocument
+      language="ar"
+      record={{
+        cgpa: null,
+        credit_decisions: [
+          {
+            type: 'Transfer',
+            target_course_code: 'CE501',
+            credit_hours: 3,
+            approved_at: '2026-09-01T00:00:00Z',
+            source_course_code: 'EXT501',
+            original_grade: 'Distinction',
+            normalized_grade: 'B',
+          },
+          {
+            type: 'Waiver',
+            target_course_code: 'CE502',
+            prior_course_code: 'OLD502',
+            prior_grade: 'A',
+          },
+        ],
+      }}
+    />,
+  )
+  for (const value of ['EXT501', 'Distinction', 'B', 'OLD502', 'A', '3']) {
+    expect(screen.getByText(value)).toHaveAttribute('dir', 'ltr')
+  }
+  expect(screen.getByText(/2026/).closest('[dir="ltr"]')).not.toBeNull()
 })

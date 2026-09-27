@@ -15,7 +15,8 @@ integration/concurrency/print coverage. ADR-0050 documents the transactional own
 Pass 1 is complete. Pass 2 backend gate is green (1,214 tests / 6,041 assertions plus
 Pint, PHPStan, deptrac, OpenAPI drift). Frontend static/generated checks and Vitest are
 green (86 files / 528 tests); its serial full-browser gate passed all 66 tests. Pass 3, one
-consolidated complete-diff Standards/Spec review, has not begun. Ticket completion and
+consolidated complete-diff Standards/Spec review, found four Standards and two Spec gaps.
+All six fixes have narrow verification; complete affected gate reruns are pending. Ticket completion and
 ROADMAP verified status remain pending those final results.
 
 See [verification.md](verification.md) for acceptance evidence and commands. PostgreSQL

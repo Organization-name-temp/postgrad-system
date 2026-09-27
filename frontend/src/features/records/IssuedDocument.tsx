@@ -1,7 +1,8 @@
 import { transcriptPrintSx } from './transcriptPrint'
 import { Alert, Box, Link, Stack, Typography, useTheme } from '@mui/material'
 import { QRCodeSVG } from 'qrcode.react'
-import { useTranslation } from 'react-i18next'
+import { formatRecordTime, LtrValue } from './RecordValue'
+import { Trans, useTranslation } from 'react-i18next'
 import { TranscriptDocument, type TranscriptDocumentRecord } from './TranscriptDocument'
 
 interface IssuanceDisplay {
@@ -36,7 +37,15 @@ export function IssuedDocument({
       {(!revoked || !publicView) && (
         <>
           <Typography>
-            {t('service.issuer', { name: issuance.issuer_name, date: issuance.issued_at })}
+            <Trans
+              ns="records"
+              i18nKey="service.issuer"
+              values={{
+                name: issuance.issuer_name,
+                date: formatRecordTime(issuance.issued_at, i18n.language),
+              }}
+              components={{ date: <LtrValue /> }}
+            />
           </Typography>
           {issuance.snapshot && <TranscriptDocument record={issuance.snapshot} official />}
           <Box

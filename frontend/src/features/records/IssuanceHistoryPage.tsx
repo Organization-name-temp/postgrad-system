@@ -1,6 +1,18 @@
+import InboxOutlined from '@mui/icons-material/InboxOutlined'
+import { RecordTime } from './RecordValue'
+import { RecordStatus } from './RecordStatus'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Alert, Button, MenuItem, Pagination, Stack, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Button,
+  MenuItem,
+  Pagination,
+  Skeleton,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import {
   useScopedOfficialIssuanceHistory,
@@ -57,11 +69,10 @@ export function IssuanceHistoryPage() {
       {query.data?.data?.map((issuance) => (
         <Stack key={issuance.id}>
           <Typography dir="ltr">
-            {issuance.reference} · {issuance.issued_at}
+            {issuance.reference} · <RecordTime value={issuance.issued_at} />
           </Typography>
-          <Typography>
-            {t(`service.statuses.${issuance.status}`)} · {issuance.issuer_name}
-          </Typography>
+          <Typography>{issuance.issuer_name}</Typography>
+          <RecordStatus status={issuance.status} />
           <Button component={Link} to={`/records/issuances/${issuance.id}`}>
             {t('service.official')}
           </Button>
@@ -72,8 +83,29 @@ export function IssuanceHistoryPage() {
         page={page}
         onChange={(_, value) => setPage(value)}
       />
-      {query.isPending && <Typography>{t('loading')}</Typography>}
-      {(error || query.isError) && <Alert severity="error">{t('loadError')}</Alert>}
+      {query.isPending && <Skeleton variant="rectangular" height={96} aria-label={t('loading')} />}
+      {!query.isPending && !query.isError && query.data?.data?.length === 0 && (
+        <Alert severity="info" icon={<InboxOutlined />}>
+          {t('service.noCopies')}
+        </Alert>
+      )}
+      {(error || query.isError) && (
+        <Alert
+          severity="error"
+          action={
+            <Button
+              onClick={() => {
+                setError(false)
+                void query.refetch()
+              }}
+            >
+              {t('retry')}
+            </Button>
+          }
+        >
+          {t('loadError')}
+        </Alert>
+      )}
     </Stack>
   )
 }

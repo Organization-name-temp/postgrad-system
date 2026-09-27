@@ -8,6 +8,7 @@ use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Contracts\StudentDirectory;
 use Modules\Identity\Public\Enums\Role;
+use Symfony\Component\Yaml\Yaml;
 
 uses(RefreshDatabase::class);
 
@@ -46,3 +47,13 @@ it('reports missing or mismatched accepted evidence as unresolved without number
     Sanctum::actingAs(User::factory()->create());
     $this->getJson('/api/v1/me')->assertOk()->assertJsonPath('data.student', null);
 })->with([[false, '29001010101010'], [true, '29001010101011']]);
+
+it('documents the unresolved owner identification type as nullable in the generated API contract', function () {
+    $student = Student::factory()->create(['identification_type' => null]);
+    $student->user->assignRole(Role::Student);
+    Sanctum::actingAs($student->user);
+    $this->getJson('/api/v1/me')->assertOk()->assertJsonPath('data.student.identity.identification_type', null);
+    $specification = Yaml::parseFile(base_path('openapi.yaml'));
+    $identity = $specification['paths']['/api/v1/me']['get']['responses'][200]['content']['application/json']['schema']['properties']['data']['properties']['student']['properties']['identity'];
+    expect($identity['properties']['identification_type']['nullable'] ?? false)->toBeTrue();
+});

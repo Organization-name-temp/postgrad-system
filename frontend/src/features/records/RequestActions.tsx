@@ -1,6 +1,7 @@
+import { LtrValue } from './RecordValue'
 import { useState } from 'react'
 import { Alert, Button, Stack, TextField } from '@mui/material'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { apiErrorMessage } from '../../shared/api/errors'
 import type { OfficialTranscriptRequestDetails200Data } from '../../shared/api/generated/endpoints'
 
@@ -118,7 +119,14 @@ export function RequestActions({
           onChange={(event) => setAmount(event.target.value)}
           disabled={busy}
           slotProps={{ htmlInput: { inputMode: 'decimal', dir: 'ltr' } }}
-          helperText={t('service.exactAmount', { amount: request.refund?.amount ?? request.fee })}
+          helperText={
+            <Trans
+              ns="records"
+              i18nKey="service.exactAmount"
+              values={{ amount: request.refund?.amount ?? request.fee }}
+              components={{ amount: <LtrValue /> }}
+            />
+          }
         />
       )}
       {requiresReceipt && (

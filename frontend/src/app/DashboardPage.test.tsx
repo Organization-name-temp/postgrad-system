@@ -192,6 +192,7 @@ describe('DashboardPage — the identity header', () => {
             university_id: '2026CE0001',
             identity: {
               identification_number: '29001010101010',
+              identification_type: null,
               ready: false,
             },
           },

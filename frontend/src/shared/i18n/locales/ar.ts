@@ -1,6 +1,7 @@
 // Arabic resources (RTL). Mirrors the English namespace structure.
 export const ar = {
   records: {
+    retry: 'إعادة المحاولة',
     terms: { Fall: 'الخريف', Spring: 'الربيع', Summer: 'الصيف' },
     service: {
       title: 'طلبات السجل الأكاديمي',
@@ -17,7 +18,7 @@ export const ar = {
       reference: 'مرجع الدفع أو الاسترداد',
       receipt: 'الإيصال (PDF أو JPEG أو PNG؛ حتى ١٠ ميغابايت)',
       amount: 'الدفع المعتمد أو الاسترداد الكامل (جنيه مصري)',
-      exactAmount: 'المطلوب {{amount}} جنيه مصري بالضبط.',
+      exactAmount: 'المطلوب <amount>{{amount}}</amount> جنيه مصري بالضبط.',
       required: 'أكمل السبب والمبلغ والمرجع والإيصال المطلوبة لهذا الإجراء.',
       receiptInvalid: 'استخدم إيصال PDF أو JPEG أو PNG بحجم لا يتجاوز ١٠ ميغابايت.',
       actionError: 'تعذر إكمال الإجراء. تم الاحتفاظ بمدخلاتك.',
@@ -26,7 +27,7 @@ export const ar = {
       transitions: 'سجل الطلب',
       refund: 'التزام الاسترداد الكامل',
       verified: 'الدفع المعتمد',
-      actor: 'الموظف/المستخدم رقم {{id}}',
+      actor: 'الموظف/المستخدم رقم <id>{{id}}</id>',
       refresh: 'تحديث',
       preview: 'مراجعة المعاينة الرسمية الكاملة',
       issue: 'اعتماد النسخة المراجعة',
@@ -38,9 +39,13 @@ export const ar = {
       valid: 'نسخة رسمية سارية',
       revoked: 'نسخة رسمية ملغاة الصلاحية',
       referenceLabel: 'مرجع الإصدار',
-      issuer: 'أصدرها {{name}} بتاريخ {{date}}',
+      issuer: 'أصدرها {{name}} بتاريخ <date>{{date}}</date>',
       attribution: 'إسناد الإصدار للموظف؛ لا يوجد توقيع رقمي مشفر.',
       seal: 'الجامعة المصرية اليابانية • سجل رسمي',
+      watermark: 'سجل أكاديمي رسمي',
+      noRequests: 'لا توجد طلبات سجل أكاديمي مطابقة لهذه المرشحات.',
+      noCopies: 'لا توجد نسخ رسمية مطابقة لهذه المرشحات.',
+      noStudents: 'لا يوجد طلاب متاحون يطابقون هذا البحث.',
       verify: 'التحقق من النسخة الرسمية',
       qr: 'رابط التحقق برمز QR',
       revoke: 'إلغاء الصلاحية',

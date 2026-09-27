@@ -2,6 +2,7 @@
 // (the auth feature's strings). Later features add their own namespaces.
 export const en = {
   records: {
+    retry: 'Retry',
     terms: { Fall: 'Fall', Spring: 'Spring', Summer: 'Summer' },
     service: {
       title: 'Transcript Requests',
@@ -18,7 +19,7 @@ export const en = {
       reference: 'Payment or refund reference',
       receipt: 'Receipt (PDF, JPEG or PNG; up to 10 MB)',
       amount: 'Verified payment or full refund (EGP)',
-      exactAmount: 'Exactly {{amount}} EGP is required.',
+      exactAmount: 'Exactly <amount>{{amount}}</amount> EGP is required.',
       required: 'Complete the required reason, amount, reference and receipt for this action.',
       receiptInvalid: 'Use a PDF, JPEG or PNG receipt up to 10 MB.',
       actionError: 'The action could not be completed. Your input has been retained.',
@@ -27,7 +28,7 @@ export const en = {
       transitions: 'Request history',
       refund: 'Full refund obligation',
       verified: 'Verified payment',
-      actor: 'Staff/User #{{id}}',
+      actor: 'Staff/User #<id>{{id}}</id>',
       refresh: 'Refresh',
       preview: 'Review complete official preview',
       issue: 'Certify this reviewed copy',
@@ -41,9 +42,13 @@ export const en = {
       valid: 'Valid official copy',
       revoked: 'Revoked official copy',
       referenceLabel: 'Issuance reference',
-      issuer: 'Issued by {{name}} on {{date}}',
+      issuer: 'Issued by {{name}} on <date>{{date}}</date>',
       attribution: 'Issuer attribution; no cryptographic digital signature.',
       seal: 'E-JUST • Official Transcript',
+      watermark: 'OFFICIAL TRANSCRIPT',
+      noRequests: 'No Transcript requests match these filters.',
+      noCopies: 'No official copies match these filters.',
+      noStudents: 'No accessible Students match this search.',
       verify: 'Verify this official copy',
       qr: 'QR verification link',
       revoke: 'Revoke validity',

@@ -1,3 +1,5 @@
+import InboxOutlined from '@mui/icons-material/InboxOutlined'
+import { LtrValue } from './RecordValue'
 import { transcriptPrintSx } from './transcriptPrint'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
@@ -57,10 +59,16 @@ export function TranscriptPage() {
         >
           {(picker.data?.data ?? []).map((student) => (
             <MenuItem key={student.id} value={student.id}>
-              {student.university_id} · {i18n.language === 'ar' ? student.name_ar : student.name_en}
+              <LtrValue>{student.university_id}</LtrValue> ·{' '}
+              {i18n.language === 'ar' ? student.name_ar : student.name_en}
             </MenuItem>
           ))}
         </TextField>
+        {!picker.isPending && !picker.isError && picker.data?.data?.length === 0 && (
+          <Alert severity="info" icon={<InboxOutlined />}>
+            {t('service.noStudents')}
+          </Alert>
+        )}
         <Pagination
           count={picker.data?.meta?.last_page ?? 1}
           page={page}

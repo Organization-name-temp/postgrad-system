@@ -1,3 +1,4 @@
+import { ThemeProvider, createTheme } from '@mui/material'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -36,11 +37,13 @@ beforeEach(() => {
 })
 function renderPage() {
   render(
-    <MemoryRouter initialEntries={['/records/requests/1']}>
-      <Routes>
-        <Route path="/records/requests/:requestId" element={<RequestPage />} />
-      </Routes>
-    </MemoryRouter>,
+    <ThemeProvider theme={createTheme({ cssVariables: true })}>
+      <MemoryRouter initialEntries={['/records/requests/1']}>
+        <Routes>
+          <Route path="/records/requests/:requestId" element={<RequestPage />} />
+        </Routes>
+      </MemoryRouter>
+    </ThemeProvider>,
   )
 }
 

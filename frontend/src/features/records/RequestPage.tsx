@@ -1,3 +1,5 @@
+import { LtrValue, RecordActor, RecordTime } from './RecordValue'
+import { RecordStatus } from './RecordStatus'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Alert, Button, Checkbox, FormControlLabel, Stack, Typography } from '@mui/material'
@@ -87,11 +89,11 @@ export function RequestPage() {
   return (
     <Stack spacing={2}>
       <Typography variant="h4" component="h1">
-        {t('service.title')} #{request.id}
+        {t('service.title')} <LtrValue>#{request.id}</LtrValue>
       </Typography>
+      <RecordStatus status={request.status} />
       <Typography>
-        {t(`service.statuses.${request.status}`)} · {request.fee} EGP ·{' '}
-        {t(`service.${request.delivery_method}`)}
+        <LtrValue>{request.fee} EGP</LtrValue> · {t(`service.${request.delivery_method}`)}
       </Typography>
       {request.cancellation_prior_status && (
         <Alert severity="info">
@@ -119,12 +121,13 @@ export function RequestPage() {
       {request.payments?.map((payment) => (
         <Stack key={payment.id}>
           <Typography dir="ltr">
-            {payment.reference} · {payment.submitted_at}
+            {payment.reference} · <RecordTime value={payment.submitted_at} />
           </Typography>
           {payment.decision && (
             <Typography>
               {t(`service.actions.${payment.decision.decision}`)} · {payment.decision.reason} ·{' '}
-              {t('service.actor', { id: payment.decision.actor_user_id })} · {payment.decision.at}
+              <RecordActor id={payment.decision.actor_user_id} /> ·{' '}
+              <RecordTime value={payment.decision.at} />
             </Typography>
           )}
           <Button
@@ -141,16 +144,17 @@ export function RequestPage() {
       ))}
       {request.verified_payment && (
         <Typography>
-          {t('service.verified')}: {request.verified_payment.amount} EGP ·{' '}
-          {t('service.actor', { id: request.verified_payment.verified_by })} ·{' '}
-          {request.verified_payment.verified_at}
+          {t('service.verified')}: <LtrValue>{request.verified_payment.amount} EGP</LtrValue> ·{' '}
+          <RecordActor id={request.verified_payment.verified_by} /> ·{' '}
+          <RecordTime value={request.verified_payment.verified_at} />
         </Typography>
       )}
       {request.refund && (
         <Stack>
           <Typography>
-            {t('service.refund')}: {request.refund.amount} EGP · {request.refund.reference} ·{' '}
-            {request.refund.completed_at}
+            {t('service.refund')}: <LtrValue>{request.refund.amount} EGP</LtrValue> ·{' '}
+            <LtrValue>{request.refund.reference}</LtrValue> ·{' '}
+            <RecordTime value={request.refund.completed_at} />
           </Typography>
           {request.refund.completed_at && (
             <Button
@@ -173,10 +177,18 @@ export function RequestPage() {
       )}
       <Typography variant="h6">{t('service.transitions')}</Typography>
       {request.transitions?.map((transition) => (
-        <Typography key={transition.id}>
-          {t(`service.statuses.${transition.to_status}`)} · {transition.reason} ·{' '}
-          {t('service.actor', { id: transition.actor_user_id })} · {transition.at}
-        </Typography>
+        <Stack
+          key={transition.id}
+          direction="row"
+          spacing={1}
+          sx={{ flexWrap: 'wrap', alignItems: 'center' }}
+        >
+          <RecordStatus status={transition.to_status} />
+          <Typography>
+            {transition.reason} · <RecordActor id={transition.actor_user_id} /> ·{' '}
+            <RecordTime value={transition.at} />
+          </Typography>
+        </Stack>
       ))}
       {staff && request.status === 'ReadyForIssuance' && (
         <Stack spacing={2}>

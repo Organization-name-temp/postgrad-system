@@ -1,6 +1,18 @@
+import InboxOutlined from '@mui/icons-material/InboxOutlined'
+import { LtrValue } from './RecordValue'
+import { RecordStatus } from './RecordStatus'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Alert, Button, MenuItem, Pagination, Stack, TextField, Typography } from '@mui/material'
+import {
+  Alert,
+  Button,
+  MenuItem,
+  Pagination,
+  Skeleton,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { usePermissions } from '../../shared/access/usePermissions'
 import {
@@ -127,9 +139,10 @@ export function RequestsPage() {
           {queue.data?.data?.map((request) => (
             <Stack key={request.id} direction="row" spacing={2} sx={{ alignItems: 'center' }}>
               <Typography>
-                {request.id} · {t(`service.statuses.${request.status}`)} · {request.fee} EGP ·{' '}
+                <LtrValue>{request.id}</LtrValue> · <LtrValue>{request.fee} EGP</LtrValue> ·{' '}
                 {t(`service.${request.delivery_method}`)}
               </Typography>
+              <RecordStatus status={request.status} />
               <Button component={Link} to={`/records/requests/${request.id}`}>
                 {t('service.open')}
               </Button>
@@ -140,8 +153,22 @@ export function RequestsPage() {
             page={page}
             onChange={(_, value) => setPage(value)}
           />
-          {queue.isPending && <Typography>{t('loading')}</Typography>}
-          {queue.isError && <Alert severity="error">{t('loadError')}</Alert>}
+          {queue.isPending && (
+            <Skeleton variant="rectangular" height={96} aria-label={t('loading')} />
+          )}
+          {!queue.isPending && !queue.isError && queue.data?.data?.length === 0 && (
+            <Alert severity="info" icon={<InboxOutlined />}>
+              {t('service.noRequests')}
+            </Alert>
+          )}
+          {queue.isError && (
+            <Alert
+              severity="error"
+              action={<Button onClick={() => void queue.refetch()}>{t('retry')}</Button>}
+            >
+              {t('loadError')}
+            </Alert>
+          )}
         </>
       )}
       {error && <Alert severity="error">{error}</Alert>}

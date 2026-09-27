@@ -17,7 +17,9 @@ Branch: `phase-6/records-transcript`. No worktree, branch switch, merge, or push
    that process timeout. `npm run gate` passed: generated-client drift, ESLint,
    Prettier, TypeScript, all 86 Vitest files / 528 tests, and all 66 serial Playwright
    tests (17.7 minutes). The full Transcript journey passed in 3.5 minutes.
-3. One consolidated Standards/Spec review of the complete Phase 6 diff remains pending.
+3. One consolidated Standards/Spec review of the complete Phase 6 diff found four
+   Standards and two Spec gaps. Their fixes have narrow regression evidence; complete
+   gate reruns remain pending. See [review.md](review.md).
 
 ## Acceptance coverage by ticket
 
@@ -54,5 +56,6 @@ is needed or claimed.
 
 ## Consolidated review
 
-Pending. Ticket completion and verified phase status must wait for the remaining gate and
-review, including resolution and affected re-verification of any findings.
+The one consolidated review is recorded in [review.md](review.md). All six findings
+are implemented, with narrow regression checks. Ticket completion and verified phase
+status await the complete gate reruns after those fixes.

@@ -3427,7 +3427,8 @@ export type CurrentUser200DataStudentIdentity = {
   name_en?: string;
   name_ar?: string;
   identification_number?: string;
-  identification_type?: string;
+  /** @nullable */
+  identification_type: string | null;
   ready?: boolean;
 };
 

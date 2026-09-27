@@ -11836,9 +11836,12 @@ paths:
                               identification_type:
                                 type: string
                                 example: national_id
+                                nullable: true
                               ready:
                                 type: boolean
                                 example: true
+                            required:
+                              - identification_type
         401:
           description: ''
           content:

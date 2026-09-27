@@ -1,3 +1,4 @@
+import { ThemeProvider, createTheme } from '@mui/material'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { expect, it, vi } from 'vitest'
@@ -13,10 +14,28 @@ it('omits unused filters and shows readable historical status', () => {
     data: { data: [{ id: 1, status: 'Revoked', reference: 'REF-ONE' }], meta: { last_page: 1 } },
   })
   render(
-    <MemoryRouter>
-      <IssuanceHistoryPage />
-    </MemoryRouter>,
+    <ThemeProvider theme={createTheme({ cssVariables: true })}>
+      <MemoryRouter>
+        <IssuanceHistoryPage />
+      </MemoryRouter>
+    </ThemeProvider>,
   )
   expect(history).toHaveBeenCalledWith({ q: undefined, status: undefined, page: 1, per_page: 25 })
-  expect(screen.getByText(/Revoked/)).toBeInTheDocument()
+  expect(screen.getByText(/Revoked/).closest('[data-tone]')).toHaveAttribute('data-tone', 'error')
+})
+
+it('explains successful empty history without confusing it with loading or failure', () => {
+  history.mockReturnValue({
+    data: { data: [], meta: { last_page: 1 } },
+    isPending: false,
+    isError: false,
+  })
+  render(
+    <ThemeProvider theme={createTheme({ cssVariables: true })}>
+      <MemoryRouter>
+        <IssuanceHistoryPage />
+      </MemoryRouter>
+    </ThemeProvider>,
+  )
+  expect(screen.getByText('No official copies match these filters.')).toBeInTheDocument()
 })

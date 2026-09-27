@@ -1,3 +1,4 @@
+import { LtrValue, RecordTime } from './RecordValue'
 import { transcriptPrintSx } from './transcriptPrint'
 import {
   Box,
@@ -59,10 +60,37 @@ export function TranscriptDocument({
       component="article"
       dir={arabic ? 'rtl' : 'ltr'}
       sx={[
-        { bgcolor: 'background.paper', color: 'text.primary', p: 2, '@media print': { p: 0 } },
+        {
+          position: 'relative',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
+          p: 2,
+          '@media print': { p: 0 },
+        },
         transcriptPrintSx,
       ]}
     >
+      {official && (
+        <Box
+          component="span"
+          aria-hidden="true"
+          sx={{
+            position: 'absolute',
+            insetInline: 0,
+            top: '40%',
+            textAlign: 'center',
+            transform: 'rotate(-25deg)',
+            fontSize: (theme) => theme.typography.h2.fontSize,
+            fontWeight: 'bold',
+            color: 'text.primary',
+            opacity: 0.08,
+            pointerEvents: 'none',
+            userSelect: 'none',
+          }}
+        >
+          {t('service.watermark')}
+        </Box>
+      )}
       <Box
         component="img"
         src="/name.png"
@@ -84,7 +112,7 @@ export function TranscriptDocument({
       </Typography>
       {!record.identity?.ready && <Typography>{t('identityUnresolved')}</Typography>}
       <Typography>
-        {name(program)} · {program?.degree_level}
+        {name(program)} · <LtrValue>{program?.degree_level}</LtrValue>
       </Typography>
       <Typography>
         {arabic ? program?.department_name_ar : program?.department_name_en} ·{' '}
@@ -94,10 +122,7 @@ export function TranscriptDocument({
         {admissionTerm} · {t(`lifecycle.${record.lifecycle_status}`)}
       </Typography>
       <Typography>
-        {t('cgpa')}:{' '}
-        <Box component="span" dir="ltr">
-          {number(record.cgpa)}
-        </Box>
+        {t('cgpa')}: <LtrValue>{number(record.cgpa)}</LtrValue>
       </Typography>
       {(record.semesters ?? []).map((semester) => (
         <Box key={semester.semester?.id} sx={{ mt: 3 }}>
@@ -105,10 +130,7 @@ export function TranscriptDocument({
             {name(semester.semester)}
           </Typography>
           <Typography>
-            {t('semesterGpa')}:{' '}
-            <Box component="span" dir="ltr">
-              {number(semester.gpa)}
-            </Box>
+            {t('semesterGpa')}: <LtrValue>{number(semester.gpa)}</LtrValue>
           </Typography>
           <TableContainer>
             <Table size="small" aria-label={name(semester.semester)}>
@@ -130,15 +152,15 @@ export function TranscriptDocument({
                       </Box>{' '}
                       · <Box component="span">{name(course.course)}</Box>
                     </TableCell>
-                    <TableCell>{course.credit_hours}</TableCell>
+                    <TableCell>
+                      <LtrValue>{course.credit_hours}</LtrValue>
+                    </TableCell>
                     <TableCell>{t(`classifications.${course.classification}`)}</TableCell>
                     <TableCell>
                       {course.result === 'InProgress' ? (
                         t('inProgress')
                       ) : (
-                        <Box component="span" dir="ltr">
-                          {course.result}
-                        </Box>
+                        <LtrValue>{course.result}</LtrValue>
                       )}
                     </TableCell>
                     <TableCell>
@@ -157,22 +179,21 @@ export function TranscriptDocument({
       {(record.credit_decisions ?? []).map((decision, index) => (
         <Box key={index} sx={{ my: 1, breakInside: 'avoid' }}>
           <Typography>
-            {t(`decisions.${decision.type}`)} ·{' '}
-            <Box component="span" dir="ltr">
-              {decision.target_course_code}
-            </Box>{' '}
-            · {decision.credit_hours} {t('creditHours')} · {decision.approved_at}
+            {t(`decisions.${decision.type}`)} · <LtrValue>{decision.target_course_code}</LtrValue> ·{' '}
+            <LtrValue>{decision.credit_hours}</LtrValue> {t('creditHours')} ·{' '}
+            <RecordTime value={decision.approved_at} dateOnly language={language} />
           </Typography>
           {decision.type === 'Transfer' && (
             <Typography>
-              {decision.source_institution} · {decision.source_course_code} ·{' '}
-              {decision.source_course_name} · {decision.original_grade} ·{' '}
-              {decision.normalized_grade}
+              {decision.source_institution} · <LtrValue>{decision.source_course_code}</LtrValue> ·{' '}
+              {decision.source_course_name} · <LtrValue>{decision.original_grade}</LtrValue> ·{' '}
+              <LtrValue>{decision.normalized_grade}</LtrValue>
             </Typography>
           )}
           {decision.type === 'Waiver' && (
             <Typography>
-              {decision.prior_course_code} · {decision.prior_grade}
+              <LtrValue>{decision.prior_course_code}</LtrValue> ·{' '}
+              <LtrValue>{decision.prior_grade}</LtrValue>
             </Typography>
           )}
           {decision.type === 'Exemption' && (
@@ -209,7 +230,9 @@ export function TranscriptDocument({
                   <TableRow key={row.category}>
                     <TableCell>{t(`categories.${row.category}`)}</TableCell>
                     {metrics.map((metric) => (
-                      <TableCell key={metric}>{row[metric] ?? '—'}</TableCell>
+                      <TableCell key={metric}>
+                        <LtrValue>{row[metric] ?? '—'}</LtrValue>
+                      </TableCell>
                     ))}
                   </TableRow>
                 ))}

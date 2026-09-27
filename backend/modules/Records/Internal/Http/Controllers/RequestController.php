@@ -140,9 +140,9 @@ final class RequestController
     {
         [$query, $collection] = $this->collection($http, $access, $directory, $students);
         $audit->record(action: 'records.requests_exported', actorUserId: (int) $http->user()?->getAuthIdentifier(), metadata: ['criteria' => $collection->auditCriteria()]);
-        $rows = $query->lazy()->map(fn (TranscriptRequest $r): array => [(string) $r->id, (string) $r->student_id, $r->delivery_method, TranscriptFee::format($r->fee_minor), 'EGP', $r->status]);
+        $rows = $query->lazy()->map(fn (TranscriptRequest $r): array => [(string) $r->id, (string) $r->student_id, __('records.delivery.'.$r->delivery_method), TranscriptFee::format($r->fee_minor), 'EGP', __('records.statuses.'.$r->status)]);
 
-        return $xlsx->download('transcript-requests.xlsx', ['Request ID', 'Student ID', 'Delivery', 'Fee', 'Currency', 'Status'], $rows, app()->getLocale() === 'ar');
+        return $xlsx->download('transcript-requests.xlsx', array_map(fn (string $key): string => __('records.columns.'.$key), ['request_id', 'student_id', 'delivery', 'fee', 'currency', 'status']), $rows, app()->getLocale() === 'ar');
     }
 
     /** @return array{Builder<TranscriptRequest>, CollectionQuery} */

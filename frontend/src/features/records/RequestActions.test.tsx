@@ -75,7 +75,8 @@ it('requires exact full-refund inputs and retains uploaded evidence on refusal',
     />,
   )
   const user = userEvent.setup()
-  expect(screen.getByText('Exactly 125.50 EGP is required.')).toBeInTheDocument()
+  expect(screen.getByText(/Exactly/)).toHaveTextContent('Exactly 125.50 EGP is required.')
+  expect(screen.getByText('125.50')).toHaveAttribute('dir', 'ltr')
   await user.click(screen.getByRole('button', { name: 'Record full refund' }))
   expect(action).not.toHaveBeenCalled()
   await user.type(screen.getByLabelText('Verified payment or full refund (EGP)'), '125.50')

@@ -3261,7 +3261,7 @@ export const CurrentUserResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "identification_number": zod.string().optional(),
-  "identification_type": zod.string().optional(),
+  "identification_type": zod.string().nullable(),
   "ready": zod.boolean().optional()
 }).optional()
 }).optional()

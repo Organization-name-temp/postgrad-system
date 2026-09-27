@@ -3,6 +3,7 @@
 namespace Modules\Identity\Internal\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Knuckles\Scribe\Attributes\ResponseField;
 use Modules\Identity\Internal\Http\Resources\AuthUserResource;
 use Modules\Identity\Internal\Models\User;
 
@@ -21,6 +22,7 @@ class MeController
      * @response 200 {"data": {"id": 2, "name": "Sara Applicant", "email": "sara@example.com", "preferred_locale": "en", "roles": [{"code": "R02", "name": "Student"}], "permissions": ["courses.register_self", "exemption.submit", "transfer_waiver.submit", "grades.view_own", "transcript.view_unofficial", "transcript.export", "standing.monitor", "catalog.view"], "student": {"university_id": "2026-MSC-CE-0001", "program_id": 1, "curriculum_version_id": 12, "curriculum_version_binding_source": "admission_time", "enrollment_term": "Fall 2026", "admission_cycle_id": 1, "advisor_id": 3, "admitted_at": "2026-07-15T10:00:00+00:00", "lifecycle_status": "Active", "identity": {"name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "identification_number": "29001010101010", "identification_type": "national_id", "ready": true}}}}
      * @response 401 {"message": "Unauthenticated."}
      */
+    #[ResponseField('data.student.identity.identification_type', 'string', nullable: true)]
     public function __invoke(Request $request): AuthUserResource
     {
         /** @var User $user */

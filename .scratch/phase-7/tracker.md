@@ -789,3 +789,28 @@ Department server search and explicit University-wide selection with serious/
 critical axe checks; existing Faculty/Program choices, bookmarks and authenticated
 downloads remain executable. Curriculum reference migration is next. No API or
 final gate/review completion is claimed.
+
+### Curriculum Course type-ahead
+
+- EN/AR generated-HTTP tests first reproduced Course search being confined to the
+  first collection page. Each Category now owns independent URL-free reference
+  search state with a 100-row owner query, preserving whole Curriculum reads and
+  existing Preparatory Role/duplicate-exclusion semantics. No aggregate export or
+  duplicate curriculum business rule was introduced.
+- Selected DTOs remain explicit; typing invalidates the previous Course and
+  disables Add. Server Arabic normalization is preserved by disabling client
+  filtering. Paired Catalog loading/error/no-match/accessibility messages apply.
+- Focused existing curriculum, new reference and Catalog form regression
+  **4 files / 16 tests passed, 26.33s**. Frontend **typecheck/lint/full format passed**.
+- Expanded browser initially failed on a mistaken code-link locator before it
+  reached the curriculum. The existing row-level Edit link is now used; EN/AR
+  browser rerun is pending. No browser pass is claimed for curriculum yet.
+- Remaining reference name resolution, Pipeline/print and Phase 7 acceptance/final
+  gates/consolidated review remain required.
+
+Curriculum final browser rerun after correcting the existing Edit-link locator:
+**2 EN/AR tests passed, 1.2m**. Owner Course lookup and selection enable Add; a
+new search invalidates the choice and disables Add. Criteria/downloads and
+serious/critical axe scans remain green. A test-first follow-up now reproduces
+Course detail silently losing its owning Department name beyond the first page;
+that read-only lookup migration is next. No API contract changed in this slice.

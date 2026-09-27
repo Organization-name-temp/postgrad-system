@@ -74,6 +74,32 @@ for (const locale of ['en', 'ar'] as const) {
           formScan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
         ).toEqual([])
         await form.getByRole('button', { name: locale === 'ar' ? 'إلغاء' : 'Cancel' }).click()
+        await page
+          .getByRole('row')
+          .filter({ has: page.getByRole('cell', { name: 'MSC-CE', exact: true }) })
+          .getByRole('link', { name: locale === 'ar' ? 'تعديل' : 'Edit', exact: true })
+          .click()
+        const elective = page.getByTestId('curriculum-section-ResearchElective')
+        const course = elective.getByRole('combobox', {
+          name: locale === 'ar' ? 'إضافة مقرر' : 'Add a course',
+        })
+        await course.fill('CSE5')
+        await page.getByRole('option', { name: /CSE511/ }).click()
+        await expect(course).toHaveValue(/CSE511/)
+        const add = elective.getByRole('button', {
+          name: locale === 'ar' ? 'إضافة' : 'Add',
+          exact: true,
+        })
+        await expect(add).toBeEnabled()
+        await course.fill('NoSuchPhase7Course')
+        await expect(course).toHaveValue('NoSuchPhase7Course')
+        await expect(add).toBeDisabled()
+        const curriculumScan = await new AxeBuilder({ page }).analyze()
+        expect(
+          curriculumScan.violations.filter(
+            (v) => v.impact === 'serious' || v.impact === 'critical',
+          ),
+        ).toEqual([])
       }
     }
     await page.getByRole('button', { name: 'English' }).click()

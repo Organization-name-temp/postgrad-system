@@ -65,9 +65,6 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
   const missingRoles = (data?.meta?.missing_preparatory_requirement_roles ?? []).filter(
     isPreparatoryRequirementRole,
   )
-  const { data: coursesData } = useListCourses()
-  const courses = coursesData?.data ?? []
-
   const add = useAddACourseToAProgramsCurriculum()
   const assignRole = useAssignAPreparatoryRequirementRole()
   const remove = useRemoveACurriculumEntryFromAProgram()
@@ -145,7 +142,6 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
             key={category}
             category={category}
             entries={entries.filter((entry) => entry.category === category)}
-            courses={courses}
             canManage={canManage}
             busy={busy}
             onAdd={addCourse}
@@ -160,7 +156,6 @@ export function CurriculumPanel({ programId, canManage }: CurriculumPanelProps) 
 interface CategorySectionProps {
   category: CourseCategory
   entries: ListAProgramsCurriculum200DataItem[]
-  courses: ListCourses200DataItem[]
   canManage: boolean
   busy: boolean
   onAdd: (
@@ -179,7 +174,6 @@ interface CategorySectionProps {
 function CategorySection({
   category,
   entries,
-  courses,
   canManage,
   busy,
   onAdd,
@@ -188,6 +182,13 @@ function CategorySection({
 }: CategorySectionProps) {
   const { t, i18n } = useTranslation('catalog')
   const [selected, setSelected] = useState<ListCourses200DataItem | null>(null)
+  const [search, setSearch] = useState('')
+  const [input, setInput] = useState('')
+  const lookup = useListCourses(
+    { q: search || undefined, per_page: 100 },
+    { query: { enabled: canManage } },
+  )
+  const courses = lookup.data?.data ?? []
   const [selectedRole, setSelectedRole] = useState<PreparatoryRequirementRole | ''>('')
 
   const courseLabel = (course: ListCourses200DataItem) =>
@@ -206,6 +207,8 @@ function CategorySection({
         category === 'Preparatory' && selectedRole ? selectedRole : undefined,
       )
       setSelected(null)
+      setInput('')
+      setSearch('')
       setSelectedRole('')
     }
   }
@@ -289,13 +292,35 @@ function CategorySection({
         <Stack direction="row" spacing={1} sx={{ mt: 1, alignItems: 'center' }}>
           <Autocomplete
             value={selected}
+            inputValue={selected ? courseLabel(selected) : input}
             onChange={(_event, next) => setSelected(next)}
+            onInputChange={(_event, text, reason) => {
+              if (reason === 'input' || reason === 'clear') {
+                setInput(text)
+                setSearch(text)
+                setSelected(null)
+              }
+            }}
             options={available}
+            filterOptions={(rows) => rows}
+            getOptionKey={(course) => course.id ?? ''}
+            loading={lookup.isFetching}
+            loadingText={t('references.loading')}
+            noOptionsText={lookup.isError ? t('references.error') : t('references.noMatch')}
+            clearText={t('references.clear')}
+            openText={t('references.open')}
+            closeText={t('references.close')}
             getOptionLabel={courseLabel}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             sx={{ minWidth: 280 }}
             renderInput={(params) => (
-              <TextField {...params} label={t('curriculum.addCourse')} size="small" />
+              <TextField
+                {...params}
+                label={t('curriculum.addCourse')}
+                size="small"
+                error={lookup.isError}
+                helperText={lookup.isError ? t('references.error') : undefined}
+              />
             )}
           />
           {category === 'Preparatory' && (

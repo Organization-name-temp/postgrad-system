@@ -76,3 +76,10 @@ wrapping retain every value and column; the real browser regression passed (15.3
 The complete print matrix now checks the same A4 width; its full-gate rerun is pending.
 The focused browser also waits for the authenticated heading before reading record data,
 rather than mistaking a cold session loader for a missing document.
+
+The next serial browser rerun exposed three five-second assertion deadlines while
+session/data loading remained visible (Dashboard, Department Heads, enrollment).
+Functional polling now permits 20 seconds; Dashboard setup waits for authenticated
+content and its locale save before context closure. All content/access/a11y assertions
+remain. The three originally failing tests passed together (4.4 minutes), including
+the full four-user enrollment loop. The complete gate rerun follows a fresh seed.

@@ -81,6 +81,7 @@ async function login(page: Page, email: string) {
   await page.getByLabel('Password').fill('password')
   await page.getByRole('button', { name: 'Sign in' }).click()
   await expect(page).toHaveURL(/\/$/, { timeout: 20_000 })
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 }
 
 /**
@@ -91,8 +92,23 @@ async function login(page: Page, email: string) {
  */
 async function loginInEnglish(page: Page, email: string) {
   await login(page, email)
-  await page.getByRole('button', { name: 'English' }).click()
-  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
+  await selectLanguage(page, 'en')
+}
+
+// Language is persisted user state. Await its save before reloading or ending a
+// context, rather than treating the immediate optimistic DOM change as completion.
+async function selectLanguage(page: Page, language: 'en' | 'ar') {
+  const button = page.getByRole('button', { name: language === 'ar' ? 'العربية' : 'English' })
+  if ((await button.getAttribute('aria-pressed')) !== 'true') {
+    const saved = page.waitForResponse(
+      (response) =>
+        response.url().endsWith('/api/v1/me') && response.request().method() === 'PATCH',
+    )
+    await button.click()
+    expect((await saved).ok()).toBe(true)
+  }
+  await expect(page.locator('html')).toHaveAttribute('lang', language)
+  await expect(page.locator('html')).toHaveAttribute('dir', language === 'ar' ? 'rtl' : 'ltr')
 }
 
 /**
@@ -298,7 +314,7 @@ test.describe('the Dashboard holds WCAG AA', () => {
       await page.addInitScript((s) => localStorage.setItem('mui-mode', s), scheme)
 
       await login(page, MULTI)
-      await page.getByRole('button', { name: lang === 'ar' ? 'العربية' : 'English' }).click()
+      await selectLanguage(page, lang)
 
       await expect(page.locator('html')).toHaveAttribute('dir', dir)
       await expect(page.locator('html')).toHaveAttribute('lang', lang)
@@ -318,8 +334,7 @@ test.describe('the Dashboard holds WCAG AA', () => {
       // Leave the seeded account in English (headline.spec.ts's "leave the seeded user clean"):
       // `preferred_locale` is server state, and an Arabic account left behind is exactly the
       // cross-spec trap playwright.config.ts documents.
-      await page.getByRole('button', { name: 'English' }).click()
-      await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
+      await selectLanguage(page, 'en')
     })
   }
 })

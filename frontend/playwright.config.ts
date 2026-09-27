@@ -36,6 +36,9 @@ export default defineConfig({
   // past the 30s default, so give every test a roomier ceiling; the multi-role headline smokes
   // raise their own further still.
   timeout: 60_000,
+  // These are functional checks against a cold, serial API on a shared host.
+  // Wait for the asserted state; five seconds can expire during session/data loading.
+  expect: { timeout: 20_000 },
   // `list` for console output; `html` bundles the per-combo screenshot
   // attachments (style smoke) into a report CI uploads for human review.
   reporter: [['list'], ['html', { open: 'never' }]],

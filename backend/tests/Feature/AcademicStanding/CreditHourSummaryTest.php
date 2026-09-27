@@ -1,7 +1,12 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use Modules\AcademicStanding\Public\CreditHourCategory;
+use Modules\AcademicStanding\Public\CreditHourSummaries;
+use Modules\AcademicStanding\Public\GraduationBlocker;
+use Modules\AcademicStanding\Public\GraduationProgress;
 use Modules\Catalog\Internal\Enums\VersionSubject;
 use Modules\Catalog\Internal\Models\CatalogVersion;
 use Modules\Catalog\Internal\Models\Program;
@@ -76,4 +81,46 @@ it('allows only the current Advisor or authorized oversight to read another Stud
     $studentAffairs->assignRole(Role::StudentAffairs);
     Sanctum::actingAs($studentAffairs);
     $this->getJson("/api/v1/academic-standing/students/{$student->id}/credit-hours")->assertOk();
+});
+
+it('reads credit summaries in bounded owner batches with single-Student parity', function () {
+    $first = creditSummaryStudent();
+    $others = Student::factory()->count(104)->create([
+        'program_id' => $first->program_id,
+        'curriculum_version_id' => $first->curriculum_version_id,
+        'advisor_id' => $first->advisor_id,
+    ]);
+    $ids = [$first->id, ...$others->modelKeys()];
+    $reader = app(CreditHourSummaries::class);
+    DB::enableQueryLog();
+    DB::flushQueryLog();
+    $batch = $reader->forStudents([...$ids, $first->id, 999999]);
+    $queries = count(DB::getQueryLog());
+    DB::disableQueryLog();
+    expect($batch)->toHaveCount(105)
+        ->and($batch[$first->id]->rows[CreditHourCategory::Total->value]->remainingCh)->toBe(21)
+        ->and($queries)->toBeLessThan(100);
+    foreach ($ids as $id) {
+        expect($batch[$id])->toEqual($reader->forStudent($id));
+    }
+});
+
+it('bulk derives advisory readiness without supplying a hypothetical completing schedule', function () {
+    $student = creditSummaryStudent();
+    $version = CatalogVersion::query()->findOrFail($student->curriculum_version_id);
+    $version->update(['snapshot' => ['prep_required_ch' => 0, 'core_required_ch' => 3, 'elective_required_ch' => 0, 'curriculum' => []]]);
+    $missing = Student::factory()->create(['curriculum_version_id' => 999999]);
+    $reader = app(GraduationProgress::class);
+    $batch = $reader->readinessForStudents([$student->id, $student->id, $missing->id]);
+    expect($batch)->toHaveCount(1)
+        ->and($batch[$student->id]->remainingCreditHours)->toBe(3)
+        ->and($batch[$student->id]->cgpa)->toBeNull()
+        ->and($batch[$student->id]->ready)->toBeFalse()
+        ->and($batch[$student->id]->approachingGraduation)->toBeFalse()
+        ->and($batch[$student->id]->blockers)->toBe([
+            GraduationBlocker::RemainingRequirements,
+            GraduationBlocker::CgpaUnavailable,
+        ])
+        ->and($batch[$student->id])->toEqual($reader->readinessForStudent($student->id))
+        ->and($reader->readinessForStudents([]))->toBe([]);
 });

@@ -1123,3 +1123,31 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   two-Report EN/AR proof for prerequisite #15. Human paper/design acceptance is not
   claimed. Full package gates, remaining Phase 7 tickets and the single consolidated
   baseline review remain pending.
+
+### Graduation Readiness dependency frontier: bounded owner calculations
+
+- Verified existing capabilities before extending them: Enrollment already bulk
+  reads effective Exemptions/Transfers and rosters; CreditHourSummaries.forStudents
+  instead performed one complete single-Student read per ID. A public-seam
+  regression measured **841 queries for 105 Students**, failing the bounded-read
+  criterion before implementation.
+- Catalog now bulk reads immutable bound Curriculum requirements/entries in chunks
+  of 100, using the same DTO projection as single-version reads. A worked snapshot
+  test proves a newer current Curriculum does not replace the admission-bound one.
+  The admission recovery test double forwards the new Public methods.
+- Enrollment now bulk reads effective Waivers in chunks of 100 through its existing
+  Public facade. The established Advisor/Head/Council workflow proves worked 3-CH
+  results, duplicate/absent-ID behavior and single/batch parity.
+- Credit-Hour Summary composes bounded Student, Curriculum, roster, effective Grade
+  and credit-decision DTOs through Public seams and its unchanged allocation
+  calculator. All 105 worked summaries agree with independent single reads; the
+  batch query count is below 100.
+- GraduationProgress now exposes bounded advisory readiness with no proposed
+  schedule. Its tracer exposed an existing empty-proposal edge case: remaining CH
+  with no exact targets could report Approaching Graduation. The owner now requires
+  a nonempty for-credit proposal, implementing #02's approved condition without
+  changing registration exception rules. Missing curricula remain omitted/unavailable;
+  null CGPA and all overlapping typed blockers are retained.
+- Focused owner/admission/Waiver/underload regressions passed **46 tests / 417
+  assertions, 13.18s**. Pint, PHPStan and deptrac passed. These are executable
+  prerequisites for #02, not completion of its Report/List/export/UI acceptance.

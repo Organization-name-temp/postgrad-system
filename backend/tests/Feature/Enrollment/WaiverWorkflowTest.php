@@ -175,6 +175,11 @@ it('takes a qualifying prior E-JUST result through Advisor Head and Council to a
         ->and(app(WaiverDecisions::class)->effectiveForStudent((int) $student->id)[0]->creditHours)
         ->toBe(3);
 
+    $batch = app(WaiverDecisions::class)->effectiveForStudents([(int) $student->id, (int) $student->id, 999999]);
+    expect($batch[(int) $student->id])->toEqual(app(WaiverDecisions::class)->effectiveForStudent((int) $student->id))
+        ->and($batch)->not->toHaveKey(999999)
+        ->and(app(WaiverDecisions::class)->effectiveForStudents([]))->toBe([]);
+
     expect(fn () => WaiverDecision::query()->where('waiver_request_id', $id)->firstOrFail()->update(['credit_hours' => 4]))
         ->toThrow(LogicException::class, 'Effective Waiver decisions are immutable.')
         ->and(fn () => WaiverDecision::query()->where('waiver_request_id', $id)->firstOrFail()->delete())

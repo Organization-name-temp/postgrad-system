@@ -222,6 +222,16 @@ it('keeps acceptance committed when post-commit exemption evaluation fails and r
             return $this->real->requirementsForVersion($curriculumVersionId);
         }
 
+        public function requirementsForVersions(array $curriculumVersionIds): array
+        {
+            return $this->real->requirementsForVersions($curriculumVersionIds);
+        }
+
+        public function entriesForVersions(array $curriculumVersionIds): array
+        {
+            return $this->real->entriesForVersions($curriculumVersionIds);
+        }
+
         /** @return array<int, CurriculumEntrySummary> */
         public function entriesForProgram(int $programId): array
         {

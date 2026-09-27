@@ -25,6 +25,16 @@ interface CurriculumCatalog
     /** The category requirements frozen into a Program Curriculum Version. */
     public function requirementsForVersion(int $curriculumVersionId): ?CurriculumRequirementsSummary;
 
+    /** @param list<int> $curriculumVersionIds
+     * @return array<int, CurriculumRequirementsSummary>
+     */
+    public function requirementsForVersions(array $curriculumVersionIds): array;
+
+    /** @param list<int> $curriculumVersionIds
+     * @return array<int, list<BoundCurriculumEntrySummary>>
+     */
+    public function entriesForVersions(array $curriculumVersionIds): array;
+
     /**
      * The Curriculum Entries of the given Program, keyed by Course id — a Course's
      * placement (Category + ordinal) within that Program. Empty when the Program has no

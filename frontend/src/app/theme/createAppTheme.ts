@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles'
 import type { PaletteOptions, Shadows, Theme } from '@mui/material/styles'
 import { directionFor, isRtlLocale } from '../../shared/i18n/direction'
-import { fontFamily, motion, radius, semantic, shadow, space, typeScale } from './tokens'
+import { chart, fontFamily, motion, radius, semantic, shadow, space, typeScale } from './tokens'
 
 declare module '@mui/material/styles' {
   // Tell MUI's types that CSS theme variables are enabled, so `theme.vars` and
@@ -12,9 +12,11 @@ declare module '@mui/material/styles' {
   // Custom semantic token not in MUI's palette: the keyboard focus ring. Emitted
   // as `--mui-palette-focusRing` and flipped per colour scheme like any other.
   interface Palette {
+    chart: { categorical: readonly string[] }
     focusRing: string
   }
   interface PaletteOptions {
+    chart?: { categorical: readonly string[] }
     focusRing?: string
   }
   interface Shape {
@@ -38,6 +40,7 @@ function toPalette(
   s: typeof semantic.light | typeof semantic.dark,
 ): PaletteOptions {
   return {
+    chart,
     mode,
     // Pick contrast text at the WCAG AA text bar (4.5), not MUI's default 3 — so
     // filled chips/buttons on mid-tone status colours (success/warning) get

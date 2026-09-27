@@ -155,6 +155,15 @@ export const en = {
     },
   },
   common: {
+    collection: {
+      total: '{{count}} matching rows',
+      total_one: '{{count}} matching row',
+      total_other: '{{count}} matching rows',
+      viewTable: 'View as table',
+      hideTable: 'Hide table',
+      export: 'Export all filtered rows',
+      exportError: 'Export failed. Try again.',
+    },
     appName: 'Postgraduate Registration System',
     logOut: 'Log out',
     loading: 'Loading…',

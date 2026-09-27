@@ -151,6 +151,15 @@ export const ar = {
     },
   },
   common: {
+    collection: {
+      total: '{{count}} صفوف مطابقة',
+      total_one: '{{count}} صف مطابق',
+      total_other: '{{count}} صفوف مطابقة',
+      viewTable: 'عرض كجدول',
+      hideTable: 'إخفاء الجدول',
+      export: 'تصدير جميع الصفوف المطابقة',
+      exportError: 'تعذر التصدير. حاول مجددًا.',
+    },
     appName: 'نظام تسجيل الدراسات العليا',
     logOut: 'تسجيل الخروج',
     loading: 'جارٍ التحميل…',

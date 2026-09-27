@@ -59,6 +59,18 @@ for (const locale of ['en', 'ar'] as const) {
       formScan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
     ).toEqual([])
     await form.getByRole('button', { name: locale === 'ar' ? 'إلغاء' : 'Cancel' }).click()
+    await page
+      .getByRole('row')
+      .filter({ has: page.getByRole('cell', { name: 'CSE511', exact: true }) })
+      .getByRole('link', { name: locale === 'ar' ? 'تعديل' : 'Edit', exact: true })
+      .click()
+    await expect(
+      page.getByText(locale === 'ar' ? /CSE511.*هندسة الحاسوب/ : /CSE511.*Computer Engineering/),
+    ).toBeVisible()
+    const detailScan = await new AxeBuilder({ page }).analyze()
+    expect(
+      detailScan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+    ).toEqual([])
     await page.getByRole('button', { name: 'English' }).click()
   })
 }

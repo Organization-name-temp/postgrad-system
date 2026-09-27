@@ -814,3 +814,22 @@ new search invalidates the choice and disables Add. Criteria/downloads and
 serious/critical axe scans remain green. A test-first follow-up now reproduces
 Course detail silently losing its owning Department name beyond the first page;
 that read-only lookup migration is next. No API contract changed in this slice.
+
+### Course detail owner lookup
+
+- EN/AR HTTP tests first reproduced the owning Department name being omitted when
+  it lies beyond the first reference page. Course detail now fetches its exact
+  opaque owner ID through the existing authorized Department detail hook; nullable
+  University-wide ownership keeps its existing meaning. It no longer scans an
+  unrelated reference page for the header label.
+- Course detail/form and curriculum regression **4 files / 16 tests passed,
+  25.38s**. Frontend **typecheck/lint/full format passed**. No API changes.
+- EN Course browser passed, including live owner header and serious/critical axe
+  checks; full EN/AR browser rerun pending. Paginated grid parent-name resolution
+  remains a separate follow-up before prerequisite #06 is treated as complete.
+  Pipeline/print, Phase 7 ticket acceptance and final gates/review remain pending.
+
+Course detail final browser verification: EN/AR live owner headers, Course dialog
+reference choices, retained query criteria, downloads and serious/critical axe scans
+**2 tests passed, 55.8s**. No API artifacts changed. Parent labels on paginated
+Catalog grids remain the next prerequisite follow-up; no final gate/review claim.

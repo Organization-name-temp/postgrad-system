@@ -37,6 +37,71 @@ export const CurrentAcademicStandingCountsForTheAuthorizedFullSelectionResponse 
 
 
 /**
+ * @summary Current Standing Student List for the same authorized Report selection.
+ */
+export const CurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "standing": zod.string().optional().describe('CSV Standing values.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order; nullable values sort last.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const CurrentStandingStudentListForTheSameAuthorizedReportSelectionResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name_en": zod.string().nullable(),
+  "name_ar": zod.string().nullable(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_id": zod.number().optional(),
+  "faculty_id": zod.number().optional()
+}).nullable(),
+  "lifecycle": zod.string().optional(),
+  "cgpa": zod.number().nullable(),
+  "standing": zod.string().optional(),
+  "explanation": zod.string().optional(),
+  "unavailable": zod.array(zod.string()).optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export every Student in the authorized Standing Report selection.
+ */
+export const ExportEveryStudentInTheAuthorizedStandingReportSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "standing": zod.string().optional().describe('CSV Standing values.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate export.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate export.')
+})
+
+export const ExportEveryStudentInTheAuthorizedStandingReportSelectionResponse = zod.unknown()
+
+
+/**
  * @summary My target-aware Credit-Hour Summary.
  */
 export const MyTargetAwareCreditHourSummaryResponse = zod.object({

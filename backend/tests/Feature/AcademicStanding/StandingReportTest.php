@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use Laravel\Sanctum\Sanctum;
 use Modules\Catalog\Internal\Models\Program;
 use Modules\Identity\Internal\Models\DepartmentHeadAssignment;
@@ -42,6 +43,7 @@ it('summarizes only the live union of permitted active Students and narrows it w
 it('denies Student-only and Instructor-only cohort access even with standing.monitor', function (Role $role) {
     $actor = User::factory()->create();
     $actor->assignRole($role);
+    Gate::before(fn (User $user, string $ability): ?bool => $ability === 'standing.monitor' ? true : null);
     Sanctum::actingAs($actor);
     $this->getJson('/api/v1/academic-standing/reports/standing')->assertForbidden();
 })->with([Role::Student, Role::Instructor]);

@@ -39,7 +39,11 @@ final readonly class AcademicCohort
             $students = $this->students->findManyByStudentId($batch);
             $programIds = array_values(array_unique(array_map(fn ($student): int => $student->programId, $students)));
             $programs += $this->programs->findMany($programIds);
-            foreach ($students as $studentId => $student) {
+            foreach ($batch as $studentId) {
+                $student = $students[$studentId] ?? null;
+                if ($student === null) {
+                    continue;
+                }
                 $program = $programs[$student->programId] ?? null;
                 $permitted = $global || isset($advisees[$studentId])
                     || ($program !== null && (in_array($program->facultyId, $faculties, true)

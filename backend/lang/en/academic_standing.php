@@ -8,6 +8,30 @@ return [
     'student_required' => 'You do not have a Student record.',
     'student_missing' => 'No such Student.',
     'curriculum_unavailable' => 'The bound Curriculum Version is unavailable.',
+    'report' => [
+        'headers' => [
+            'student_id' => 'Student ID', 'university_id' => 'University ID',
+            'name_en' => 'Student name (English)', 'name_ar' => 'Student name (Arabic)',
+            'program_code' => 'Program code', 'program' => 'Program', 'degree_level' => 'Degree',
+            'lifecycle' => 'Lifecycle', 'cgpa' => 'CGPA', 'standing' => 'Academic Standing',
+            'explanation' => 'Explanation', 'unavailable' => 'Unavailable data',
+        ],
+        'standings' => [
+            'TerminationPending' => 'Termination pending', 'NotYetAssessed' => 'Not yet assessed',
+            'AcademicProbation' => 'Academic Probation', 'AcademicWarning' => 'Academic Warning',
+            'GoodStanding' => 'Good Standing',
+        ],
+        'explanations' => [
+            'termination_pending' => 'An actionable termination Case is open.',
+            'no_finalized_cgpa_grade' => 'No finalized CGPA-counting Grade yet.',
+            'cgpa_below_minimum' => 'CGPA is below the minimum.',
+            'effective_grade_below_c_plus' => 'An effective Grade is below C+.',
+            'requirements_met' => 'Current Standing requirements are met.',
+        ],
+        'lifecycle' => ['Active' => 'Active', 'Terminated' => 'Terminated'],
+        'degrees' => ['MSc' => 'MSc', 'PhD' => 'PhD'],
+        'unavailable' => ['program' => 'Program unavailable', 'student_name' => 'Student name unavailable'],
+    ],
     'exports' => [
         'headers' => [
             'case_id' => 'Case ID',

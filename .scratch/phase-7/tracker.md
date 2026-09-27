@@ -1039,3 +1039,37 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   remain next; this summary slice does not complete #01.
 - Frontend generated-client typecheck passed. Student List HTTP tracer is written
   separately; it will be implemented in the next vertical slice.
+
+### Current Standing Student List and canonical workbook
+
+- List and export HTTP tracers first failed with 404. Summary, pageable List and
+  full-selection export now share one AcademicStanding-owned selection. Derived
+  Standing filtering and CGPA/severity ordering precede slicing; nullable values
+  remain last in either direction and stable Student IDs break ties. Stored-only
+  ordering remains Identity SQL order through bounded DTO resolution.
+- Safe rows contain names, University ID, Program, lifecycle, nullable CGPA,
+  authoritative Standing/explanation and explicit missing-owner reference codes.
+  They never serialize the private Student identity/admission snapshot. Worked
+  owner Grades prove derived pagination and stale Observation protection; a
+  120-Student HTTP fixture verifies complete totals, the 100-row cap and stable
+  page boundaries. Repeated reads preserve an overdue Incomplete and create no
+  Grade conversions, Cases, Observations, notifications or lifecycle changes.
+- EN/AR workbook read-back proves all filtered authorized rows despite per_page=1,
+  localized headings/Standing, string Student/University IDs, hidden National IDs,
+  and Arabic sheet direction. Export audit records actor, effective criteria
+  including default Active lifecycle, and row count. The initial XML assertion
+  expected boolean spelling 1; inspecting the workbook showed valid true, so the
+  test now checks either legal XML boolean representation.
+- Permission tests explicitly allow standing.monitor at the permission seam for
+  Student/Instructor-only personas and still obtain 403 from the cohort Role guard.
+  Focused HTTP **12 tests / 122 assertions passed, 5.81s**; Pint, PHPStan and deptrac
+  passed. Generated API regeneration exposed the local documentation type override
+  treating array annotations as scalar strings. A truthful missing-name example
+  now lets Scribe infer the unavailable string array; nullable names, Program and
+  CGPA remain explicitly documented. No generated file was hand-edited.
+- OpenAPI and Orval regenerated; final generated-client typecheck is pending before
+  commit. Owner UI, named academic filters, chart/table drill-through, browser and
+  second Report print verification remain required for #01. Final gates and the
+  single consolidated review remain pending across all seven tickets.
+- Final regenerated client has unavailable string-array and nullable academic types;
+  frontend typecheck passed. Post-commit API drift checks follow this slice.

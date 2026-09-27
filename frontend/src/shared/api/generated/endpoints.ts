@@ -84,6 +84,134 @@ export type CurrentAcademicStandingCountsForTheAuthorizedFullSelection200 = {
   data?: CurrentAcademicStandingCountsForTheAuthorizedFullSelection200Data;
 };
 
+export type CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams = {
+/**
+ * CSV Faculty IDs.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active.
+ */
+lifecycle?: string;
+/**
+ * CSV Standing values.
+ */
+standing?: string;
+/**
+ * Bilingual name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV field order; nullable values sort last.
+ */
+sort?: string;
+/**
+ * Page number.
+ */
+page?: number;
+/**
+ * Page size capped at 100.
+ */
+per_page?: number;
+};
+
+/**
+ * @nullable
+ */
+export type CurrentStandingStudentListForTheSameAuthorizedReportSelection200DataItemProgram = {
+  id?: number;
+  code?: string;
+  name_en?: string;
+  name_ar?: string;
+  degree_level?: string;
+  department_id?: number;
+  faculty_id?: number;
+} | null;
+
+export type CurrentStandingStudentListForTheSameAuthorizedReportSelection200DataItem = {
+  student_id?: number;
+  university_id?: string;
+  /** @nullable */
+  name_en: string | null;
+  /** @nullable */
+  name_ar: string | null;
+  /** @nullable */
+  program: CurrentStandingStudentListForTheSameAuthorizedReportSelection200DataItemProgram;
+  lifecycle?: string;
+  /** @nullable */
+  cgpa: number | null;
+  standing?: string;
+  explanation?: string;
+  unavailable?: string[];
+};
+
+export type CurrentStandingStudentListForTheSameAuthorizedReportSelection200Meta = {
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+};
+
+export type CurrentStandingStudentListForTheSameAuthorizedReportSelection200 = {
+  data?: CurrentStandingStudentListForTheSameAuthorizedReportSelection200DataItem[];
+  meta?: CurrentStandingStudentListForTheSameAuthorizedReportSelection200Meta;
+};
+
+export type ExportEveryStudentInTheAuthorizedStandingReportSelectionParams = {
+/**
+ * CSV Faculty IDs.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV lifecycle; default Active.
+ */
+lifecycle?: string;
+/**
+ * CSV Standing values.
+ */
+standing?: string;
+/**
+ * Bilingual name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV field order.
+ */
+sort?: string;
+/**
+ * Accepted but does not truncate export.
+ */
+page?: number;
+/**
+ * Accepted but does not truncate export.
+ */
+per_page?: number;
+};
+
 export type MyTargetAwareCreditHourSummary200DataCategoriesItem = {
   category?: string;
   baseline_required_ch?: number;
@@ -13897,6 +14025,195 @@ export function useCurrentAcademicStandingCountsForTheAuthorizedFullSelection<TD
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Current Standing Student List for the same authorized Report selection.
+ */
+export const currentStandingStudentListForTheSameAuthorizedReportSelection = (
+    params?: CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CurrentStandingStudentListForTheSameAuthorizedReportSelection200>(
+      {url: `/api/v1/academic-standing/reports/standing/students`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getCurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryKey = (params?: CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/standing/students`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getCurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryOptions = <TData = Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError = unknown>(params?: CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>> = ({ signal }) => currentStandingStudentListForTheSameAuthorizedReportSelection(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryResult = NonNullable<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>>
+export type CurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryError = unknown
+
+
+export function useCurrentStandingStudentListForTheSameAuthorizedReportSelection<TData = Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError = unknown>(
+ params: undefined |  CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>,
+          TError,
+          Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCurrentStandingStudentListForTheSameAuthorizedReportSelection<TData = Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError = unknown>(
+ params?: CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>,
+          TError,
+          Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCurrentStandingStudentListForTheSameAuthorizedReportSelection<TData = Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError = unknown>(
+ params?: CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Current Standing Student List for the same authorized Report selection.
+ */
+
+export function useCurrentStandingStudentListForTheSameAuthorizedReportSelection<TData = Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError = unknown>(
+ params?: CurrentStandingStudentListForTheSameAuthorizedReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentStandingStudentListForTheSameAuthorizedReportSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * @summary Export every Student in the authorized Standing Report selection.
+ */
+export const exportEveryStudentInTheAuthorizedStandingReportSelection = (
+    params?: ExportEveryStudentInTheAuthorizedStandingReportSelectionParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<Blob>(
+      {url: `/api/v1/academic-standing/reports/standing/students/export`, method: 'GET',
+        params,
+        responseType: 'blob', signal
+    },
+      );
+    }
+
+
+
+
+export const getExportEveryStudentInTheAuthorizedStandingReportSelectionQueryKey = (params?: ExportEveryStudentInTheAuthorizedStandingReportSelectionParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/standing/students/export`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getExportEveryStudentInTheAuthorizedStandingReportSelectionQueryOptions = <TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError = unknown>(params?: ExportEveryStudentInTheAuthorizedStandingReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportEveryStudentInTheAuthorizedStandingReportSelectionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>> = ({ signal }) => exportEveryStudentInTheAuthorizedStandingReportSelection(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportEveryStudentInTheAuthorizedStandingReportSelectionQueryResult = NonNullable<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>>
+export type ExportEveryStudentInTheAuthorizedStandingReportSelectionQueryError = unknown
+
+
+export function useExportEveryStudentInTheAuthorizedStandingReportSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError = unknown>(
+ params: undefined |  ExportEveryStudentInTheAuthorizedStandingReportSelectionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>,
+          TError,
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportEveryStudentInTheAuthorizedStandingReportSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError = unknown>(
+ params?: ExportEveryStudentInTheAuthorizedStandingReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>,
+          TError,
+          Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportEveryStudentInTheAuthorizedStandingReportSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError = unknown>(
+ params?: ExportEveryStudentInTheAuthorizedStandingReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Export every Student in the authorized Standing Report selection.
+ */
+
+export function useExportEveryStudentInTheAuthorizedStandingReportSelection<TData = Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError = unknown>(
+ params?: ExportEveryStudentInTheAuthorizedStandingReportSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportEveryStudentInTheAuthorizedStandingReportSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getExportEveryStudentInTheAuthorizedStandingReportSelectionQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -7,6 +7,36 @@
 import * as zod from 'zod';
 
 /**
+ * @summary Current Academic Standing counts for the authorized full selection.
+ */
+export const CurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV Active or Terminated; default Active.'),
+  "standing": zod.string().optional().describe('CSV authoritative Standing values.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV stored or derived field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.')
+})
+
+export const CurrentAcademicStandingCountsForTheAuthorizedFullSelectionResponse = zod.object({
+  "data": zod.object({
+  "total": zod.number().optional(),
+  "counts": zod.object({
+  "TerminationPending": zod.number().optional(),
+  "NotYetAssessed": zod.number().optional(),
+  "AcademicProbation": zod.number().optional(),
+  "AcademicWarning": zod.number().optional(),
+  "GoodStanding": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
  * @summary My target-aware Credit-Hour Summary.
  */
 export const MyTargetAwareCreditHourSummaryResponse = zod.object({

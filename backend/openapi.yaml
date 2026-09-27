@@ -41,6 +41,156 @@ tags:
   - name: Waivers
     description: ''
 paths:
+  /api/v1/academic-standing/reports/standing:
+    get:
+      summary: 'Current Academic Standing counts for the authorized full selection.'
+      operationId: currentAcademicStandingCountsForTheAuthorizedFullSelection
+      description: ''
+      parameters:
+        -
+          in: query
+          name: faculty_id
+          description: 'CSV Faculty IDs narrowing permitted Students.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Faculty IDs narrowing permitted Students.'
+            example: '1'
+        -
+          in: query
+          name: department_id
+          description: 'CSV Department IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Department IDs.'
+            example: '1'
+        -
+          in: query
+          name: program_id
+          description: 'CSV Program IDs.'
+          example: '1'
+          required: false
+          schema:
+            type: string
+            description: 'CSV Program IDs.'
+            example: '1'
+        -
+          in: query
+          name: degree_level
+          description: 'CSV MSc or PhD.'
+          example: MSc
+          required: false
+          schema:
+            type: string
+            description: 'CSV MSc or PhD.'
+            example: MSc
+        -
+          in: query
+          name: lifecycle
+          description: 'CSV Active or Terminated; default Active.'
+          example: Active
+          required: false
+          schema:
+            type: string
+            description: 'CSV Active or Terminated; default Active.'
+            example: Active
+        -
+          in: query
+          name: standing
+          description: 'CSV authoritative Standing values.'
+          example: AcademicWarning
+          required: false
+          schema:
+            type: string
+            description: 'CSV authoritative Standing values.'
+            example: AcademicWarning
+        -
+          in: query
+          name: q
+          description: 'Bilingual name or University-ID search.'
+          example: Ahmed
+          required: false
+          schema:
+            type: string
+            description: 'Bilingual name or University-ID search.'
+            example: Ahmed
+        -
+          in: query
+          name: sort
+          description: 'CSV stored or derived field order.'
+          example: '-cgpa'
+          required: false
+          schema:
+            type: string
+            description: 'CSV stored or derived field order.'
+            example: '-cgpa'
+        -
+          in: query
+          name: page
+          description: 'Accepted but does not truncate summary.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Accepted but does not truncate summary.'
+            example: 1
+        -
+          in: query
+          name: per_page
+          description: 'Accepted but does not truncate summary.'
+          example: 25
+          required: false
+          schema:
+            type: integer
+            description: 'Accepted but does not truncate summary.'
+            example: 25
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    total: 3
+                    counts:
+                      TerminationPending: 0
+                      NotYetAssessed: 1
+                      AcademicProbation: 0
+                      AcademicWarning: 1
+                      GoodStanding: 1
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 3
+                      counts:
+                        type: object
+                        properties:
+                          TerminationPending:
+                            type: integer
+                            example: 0
+                          NotYetAssessed:
+                            type: integer
+                            example: 1
+                          AcademicProbation:
+                            type: integer
+                            example: 0
+                          AcademicWarning:
+                            type: integer
+                            example: 1
+                          GoodStanding:
+                            type: integer
+                            example: 1
+      tags:
+        - 'Academic Standing'
+      security: []
   /api/v1/academic-standing/me/credit-hours:
     get:
       summary: 'My target-aware Credit-Hour Summary.'

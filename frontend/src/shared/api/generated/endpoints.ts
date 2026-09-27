@@ -24,6 +24,66 @@ import type {
 } from '@tanstack/react-query';
 
 import { customInstance } from '../http';
+export type CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams = {
+/**
+ * CSV Faculty IDs narrowing permitted Students.
+ */
+faculty_id?: string;
+/**
+ * CSV Department IDs.
+ */
+department_id?: string;
+/**
+ * CSV Program IDs.
+ */
+program_id?: string;
+/**
+ * CSV MSc or PhD.
+ */
+degree_level?: string;
+/**
+ * CSV Active or Terminated; default Active.
+ */
+lifecycle?: string;
+/**
+ * CSV authoritative Standing values.
+ */
+standing?: string;
+/**
+ * Bilingual name or University-ID search.
+ */
+q?: string;
+/**
+ * CSV stored or derived field order.
+ */
+sort?: string;
+/**
+ * Accepted but does not truncate summary.
+ */
+page?: number;
+/**
+ * Accepted but does not truncate summary.
+ */
+per_page?: number;
+};
+
+export type CurrentAcademicStandingCountsForTheAuthorizedFullSelection200DataCounts = {
+  TerminationPending?: number;
+  NotYetAssessed?: number;
+  AcademicProbation?: number;
+  AcademicWarning?: number;
+  GoodStanding?: number;
+};
+
+export type CurrentAcademicStandingCountsForTheAuthorizedFullSelection200Data = {
+  total?: number;
+  counts?: CurrentAcademicStandingCountsForTheAuthorizedFullSelection200DataCounts;
+};
+
+export type CurrentAcademicStandingCountsForTheAuthorizedFullSelection200 = {
+  data?: CurrentAcademicStandingCountsForTheAuthorizedFullSelection200Data;
+};
+
 export type MyTargetAwareCreditHourSummary200DataCategoriesItem = {
   category?: string;
   baseline_required_ch?: number;
@@ -13754,6 +13814,100 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+/**
+ * @summary Current Academic Standing counts for the authorized full selection.
+ */
+export const currentAcademicStandingCountsForTheAuthorizedFullSelection = (
+    params?: CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams,
+ signal?: AbortSignal
+) => {
+
+
+      return customInstance<CurrentAcademicStandingCountsForTheAuthorizedFullSelection200>(
+      {url: `/api/v1/academic-standing/reports/standing`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getCurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryKey = (params?: CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams,) => {
+    return [
+    `/api/v1/academic-standing/reports/standing`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getCurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryOptions = <TData = Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError = unknown>(params?: CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>> = ({ signal }) => currentAcademicStandingCountsForTheAuthorizedFullSelection(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryResult = NonNullable<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>>
+export type CurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryError = unknown
+
+
+export function useCurrentAcademicStandingCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params: undefined |  CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>,
+          TError,
+          Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCurrentAcademicStandingCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params?: CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>,
+          TError,
+          Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCurrentAcademicStandingCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params?: CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Current Academic Standing counts for the authorized full selection.
+ */
+
+export function useCurrentAcademicStandingCountsForTheAuthorizedFullSelection<TData = Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError = unknown>(
+ params?: CurrentAcademicStandingCountsForTheAuthorizedFullSelectionParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof currentAcademicStandingCountsForTheAuthorizedFullSelection>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * @summary My target-aware Credit-Hour Summary.

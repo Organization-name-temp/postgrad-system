@@ -1017,3 +1017,25 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   3.00s**; Pint passed. Final PHPStan/deptrac results recorded below before commit.
 - PHPStan and deptrac passed (zero violations). Phase 7 Report HTTP tracer is next;
   no cohort endpoint or ticket completion is claimed by this prerequisite slice.
+
+### Academic Standing Report summary HTTP tracer
+
+- The Report HTTP tests first failed with 404. AcademicStanding now owns a current
+  Standing summary endpoint behind standing.monitor plus eligible cohort Role
+  authorization. A reusable owner cohort selection acquires Identity/Catalog DTOs
+  in 100-ID batches, applies live Advisor/Dean/Head union or global oversight,
+  then derives Standing only for authorized candidates. No foreign Internal SQL,
+  stored standing balance or Reporting module was added.
+- Active default and explicit Terminated history remain separate from the five
+  Standing bands. Faculty/Department/Program/degree/search only narrow scope.
+  Zero bands are retained; summary totals ignore page size. Tests cover all global
+  oversight Roles, Advisor/Dean union and reassignment, academic Head versus null
+  Preparatory scope, bilingual normalization, cross-scope empty results, denied
+  Student/Instructor Roles and unknown/invalid criteria.
+- Focused HTTP **8 tests / 41 assertions passed, 3.63s**; Pint, PHPStan and deptrac
+  passed. OpenAPI and Orval regenerated; generated diff contains only the new query
+  endpoint/types, with no inferred GET body. Frontend typecheck is pending before
+  commit. Pageable List, derived ordering, canonical audited export and owner UI
+  remain next; this summary slice does not complete #01.
+- Frontend generated-client typecheck passed. Student List HTTP tracer is written
+  separately; it will be implemented in the next vertical slice.

@@ -76,3 +76,13 @@ it('resolves every Head covering the same Department', function () {
     expect(departmentHeadAssignments()->headsForDepartment(7))
         ->toEqualCanonicalizing([$first->id, $second->id]);
 });
+
+it('returns live academic Departments for a Head without extending the Preparatory assignment', function () {
+    $head = assignedHead(7);
+    $second = DepartmentHeadAssignment::factory()->create(['user_id' => $head->id, 'department_id' => 9]);
+    DepartmentHeadAssignment::factory()->universityWide()->create(['user_id' => $head->id]);
+    assignedHead(11);
+    expect(departmentHeadAssignments()->departmentsForHead($head->id))->toBe([7, 9]);
+    $second->delete();
+    expect(departmentHeadAssignments()->departmentsForHead($head->id))->toBe([7]);
+});

@@ -13,6 +13,13 @@ use Modules\Identity\Public\Contracts\DepartmentHeadAssignments;
  */
 class EloquentDepartmentHeadAssignments implements DepartmentHeadAssignments
 {
+    public function departmentsForHead(int $userId): array
+    {
+        return DepartmentHeadAssignment::query()->where('user_id', $userId)
+            ->whereNotNull('department_id')->orderBy('department_id')
+            ->pluck('department_id')->map(static fn ($id): int => (int) $id)->all();
+    }
+
     /** @return list<int> */
     public function headsForDepartment(?int $departmentId): array
     {

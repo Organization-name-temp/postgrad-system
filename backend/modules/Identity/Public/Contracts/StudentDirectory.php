@@ -3,6 +3,7 @@
 namespace Modules\Identity\Public\Contracts;
 
 use Modules\Identity\Public\StudentSummary;
+use Support\Query\CollectionQuery;
 
 /**
  * The read facade over the `Student` anchors (ADR-0013). Other modules — and
@@ -65,4 +66,14 @@ interface StudentDirectory
      * @return list<int>
      */
     public function allStudentIds(): array;
+
+    /**
+     * Unscoped candidate IDs matching Identity-owned stored criteria and bilingual
+     * name/University-ID search. Active lifecycle is the default. No pagination is
+     * applied: the consumer must authorize its cohort and calculate derived filters
+     * before slicing. Foreign/derived criteria remain with their owning consumer.
+     *
+     * @return list<int>
+     */
+    public function studentIdsMatching(CollectionQuery $query): array;
 }

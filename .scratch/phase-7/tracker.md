@@ -1001,3 +1001,19 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   violations. No HTTP payload or generated API change in this slice.
 - #01 cohort selection/API, scoped derived pagination, canonical audited workbook
   and UI remain required. These owner batches do not mark the ticket complete.
+
+### Identity-owned cohort candidates and live Department Head scope
+
+- Public facade tests first failed on absent studentIdsMatching and
+  departmentsForHead methods. Identity now applies its stored Program/lifecycle
+  filters and normalized bilingual name/University-ID search in SQL, retaining
+  stable order without applying pagination before derived selection. Active is
+  the default; explicit Terminated criteria permit history. The candidate method
+  is unscoped by contract; AcademicStanding must authorize before any calculation
+  or serialization. Private identity snapshots are not Report payloads.
+- Live Head assignments return academic Department IDs; university-wide null
+  Preparatory scope remains disjoint and cannot widen cohort access. Assignment
+  removal is reflected on the next call. Focused **8 tests / 12 assertions passed,
+  3.00s**; Pint passed. Final PHPStan/deptrac results recorded below before commit.
+- PHPStan and deptrac passed (zero violations). Phase 7 Report HTTP tracer is next;
+  no cohort endpoint or ticket completion is claimed by this prerequisite slice.

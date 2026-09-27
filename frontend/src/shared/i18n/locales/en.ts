@@ -2256,6 +2256,8 @@ export const en = {
       lifecycles: { Active: 'Active', Terminated: 'Terminated' },
       noMatches: 'No matching choices',
       referenceLoading: 'Loading choices',
+      referenceLoadingValue: 'Loading reference #{{id}}',
+      referenceNameError: 'Reference name could not be loaded (#{{id}})',
       referenceUnavailable: 'Unavailable reference #{{id}}',
       clear: 'Clear selection',
       open: 'Open choices',

@@ -103,7 +103,7 @@ export function CourseEditPage() {
             {name}
           </Typography>
           {altName && altName !== name && (
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography variant="subtitle1" component="p" color="text.secondary">
               {altName}
             </Typography>
           )}

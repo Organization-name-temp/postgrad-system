@@ -289,7 +289,12 @@ function CategorySection({
       )}
 
       {canManage && (
-        <Stack direction="row" spacing={1} sx={{ mt: 1, alignItems: 'center' }}>
+        <Stack
+          direction="row"
+          useFlexGap
+          spacing={1}
+          sx={{ mt: 1, alignItems: 'center', flexWrap: 'wrap' }}
+        >
           <Autocomplete
             value={selected}
             inputValue={selected ? courseLabel(selected) : input}
@@ -312,7 +317,7 @@ function CategorySection({
             closeText={t('references.close')}
             getOptionLabel={courseLabel}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            sx={{ minWidth: 280 }}
+            sx={{ minWidth: 0, width: 280, maxWidth: '100%' }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -324,7 +329,7 @@ function CategorySection({
             )}
           />
           {category === 'Preparatory' && (
-            <FormControl size="small" sx={{ minWidth: 240 }}>
+            <FormControl size="small" sx={{ minWidth: 0, width: 240, maxWidth: '100%' }}>
               <InputLabel id="new-preparatory-role-label">
                 {t('curriculum.preparatoryRequirementRole')}
               </InputLabel>

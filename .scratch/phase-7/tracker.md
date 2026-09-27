@@ -1344,3 +1344,37 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   matrix passed **4 / 4, 2.4m**, at 390/1280px in all language/theme states. Proper
   loading semantics are covered separately rather than scanning Skeletons as
   completed content. Advisor/Head/Council/Records remain on the audit frontier.
+- Remaining Advisor/Head/Council and Student/staff Records read-only matrices
+  passed **20 / 20, 6.0m**, with all four language/theme states, narrow/wide fit,
+  loaded content, raw-key checks and no serious/critical axe findings. Together
+  with prior groups this covers the nine core matrix surface groups.
+- Academic bookmarked reference edge captured: 101 IDs lost their last named
+  criterion at the Catalogue 100-row page cap. Additional EN/AR pending/error/
+  absent-reference checks distinguish truthfully labelled states: **5 RED / 2
+  existing-state passes**. Exact lookup now batches generated owner queries at 100
+  IDs and preserves per-batch pending/error versus missing-reference labels.
+  Focused regressions and static checks are running; no result claimed yet.
+- Additional Catalog detail/curriculum/version/dialog, invalid-public verification
+  and cross-Report headline specs authored but unrun. Existing Records journey
+  now saves actual A4 PDFs alongside its existing four-state print checks for
+  paper inspection; no completed Records journey claim yet.
+- Named reference edge/states now pass **7 focused tests, 15.38s**; three existing
+  Report files also passed. The first green attempt used an accessible-region
+  query for print-only hidden criteria; corrected the test to inspect its labelled
+  criteria section, preserving production print visibility. Typecheck/lint/full
+  format passed for the batching/state labels.
+- Narrow Curriculum add row now wraps and control widths cap at available space;
+  focused Curriculum regressions passed **10 / 2 files, 11.95s**. Native detail
+  check progressed through Programme history/dialog to the Course's intentionally
+  empty seed history; the test incorrectly assumed non-empty history for both.
+  It now verifies the real populated Programme and empty Course states separately.
+  No seed/version history fabricated. Detail/dialog matrix still pending.
+- Course alternate-language name generated a level-six heading under the title.
+  Native heading regression captured RED; explicit paragraph preserves subtitle
+  styling and proper document hierarchy. Catalog detail/dialog EN/AR light and
+  dark EN cases pass so far; final dark AR result pending. Fresh typecheck, lint
+  and format checks passed for named criteria, responsive controls and semantics.
+- Final Catalog detail/curriculum/history/dialog matrix passed **4 / 4, 2.2m**,
+  covering EN/AR, light/dark, 390/1280px, keyboard dialog focus and loaded axe
+  checks. Named reference and Catalog fixes are committed with this evidence;
+  headline, invalid-public verifier and Records paper journey remain unrun.

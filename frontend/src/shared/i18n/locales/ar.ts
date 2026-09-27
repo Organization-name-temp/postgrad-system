@@ -2177,6 +2177,8 @@ export const ar = {
       lifecycles: { Active: 'نشط', Terminated: 'تم إنهاء القيد' },
       noMatches: 'لا توجد خيارات مطابقة',
       referenceLoading: 'جارٍ تحميل الخيارات',
+      referenceLoadingValue: 'جارٍ تحميل اسم المرجع رقم {{id}}',
+      referenceNameError: 'تعذّر تحميل اسم المرجع رقم {{id}}',
       referenceUnavailable: 'مرجع غير متاح رقم {{id}}',
       clear: 'مسح الاختيار',
       open: 'فتح الخيارات',

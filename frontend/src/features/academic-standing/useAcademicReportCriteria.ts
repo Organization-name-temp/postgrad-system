@@ -1,6 +1,10 @@
+import { useQueries } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+  getListDepartmentsQueryOptions,
+  getListFacultiesQueryOptions,
+  getListProgramsQueryOptions,
   useListDepartments,
   useListFaculties,
   useListPrograms,
@@ -17,6 +21,21 @@ export const ACADEMIC_STANDINGS = [
   'GoodStanding',
 ] as const
 
+/** Exact reference reads respect the owning collection's 100-row page cap. */
+function referenceBatches(ids: string | null): string[] {
+  const values = [
+    ...new Set(
+      (ids ?? '')
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean),
+    ),
+  ]
+  return Array.from({ length: Math.ceil(values.length / 100) }, (_, index) =>
+    values.slice(index * 100, (index + 1) * 100).join(','),
+  )
+}
+
 /** Shared only by the AcademicStanding owner's Report and ordinary Student List. */
 export function useAcademicReportCriteria(includeStanding = true, defaultLifecycle = 'Active') {
   const { t, i18n } = useTranslation('academicStanding')
@@ -30,18 +49,18 @@ export function useAcademicReportCriteria(includeStanding = true, defaultLifecyc
   const faculties = useListFaculties({ q: facultySearch ?? undefined, per_page: 100 })
   const departments = useListDepartments({ q: departmentSearch ?? undefined, per_page: 100 })
   const programs = useListPrograms({ q: programSearch ?? undefined, per_page: 100 })
-  const selectedFaculties = useListFaculties(
-    { id: faculty ?? undefined, per_page: 100 },
-    { query: { enabled: Boolean(faculty) } },
-  )
-  const selectedDepartments = useListDepartments(
-    { id: department ?? undefined, per_page: 100 },
-    { query: { enabled: Boolean(department) } },
-  )
-  const selectedPrograms = useListPrograms(
-    { id: program ?? undefined, per_page: 100 },
-    { query: { enabled: Boolean(program) } },
-  )
+  const facultyBatches = referenceBatches(faculty)
+  const departmentBatches = referenceBatches(department)
+  const programBatches = referenceBatches(program)
+  const selectedFaculties = useQueries({
+    queries: facultyBatches.map((id) => getListFacultiesQueryOptions({ id, per_page: 100 })),
+  })
+  const selectedDepartments = useQueries({
+    queries: departmentBatches.map((id) => getListDepartmentsQueryOptions({ id, per_page: 100 })),
+  })
+  const selectedPrograms = useQueries({
+    queries: programBatches.map((id) => getListProgramsQueryOptions({ id, per_page: 100 })),
+  })
   type ReferenceRow = { id?: number; name_en?: string; name_ar?: string }
   const option = (row: ReferenceRow): FilterOption => ({
     value: String(row.id),
@@ -49,7 +68,8 @@ export function useAcademicReportCriteria(includeStanding = true, defaultLifecyc
   })
   const selected = (
     ids: string | null,
-    rows: ReferenceRow[] | undefined,
+    results: readonly { data?: { data?: ReferenceRow[] }; isFetching: boolean; isError: boolean }[],
+    batches: readonly string[],
   ): FilterOption | undefined =>
     ids
       ? {
@@ -57,15 +77,23 @@ export function useAcademicReportCriteria(includeStanding = true, defaultLifecyc
           label: ids
             .split(',')
             .map((id) => {
-              const row = rows?.find((item) => String(item.id) === id.trim())
-              return row ? option(row).label : t('report.referenceUnavailable', { id: id.trim() })
+              const token = id.trim()
+              const result = results[batches.findIndex((batch) => batch.split(',').includes(token))]
+              const row = result?.data?.data?.find((item) => String(item.id) === token)
+              if (row) return option(row).label
+              const key = result?.isFetching
+                ? 'report.referenceLoadingValue'
+                : result?.isError
+                  ? 'report.referenceNameError'
+                  : 'report.referenceUnavailable'
+              return t(key, { id: token })
             })
             .join(', '),
         }
       : undefined
-  const facultyChoice = selected(faculty, selectedFaculties.data?.data)
-  const departmentChoice = selected(department, selectedDepartments.data?.data)
-  const programChoice = selected(program, selectedPrograms.data?.data)
+  const facultyChoice = selected(faculty, selectedFaculties, facultyBatches)
+  const departmentChoice = selected(department, selectedDepartments, departmentBatches)
+  const programChoice = selected(program, selectedPrograms, programBatches)
   const referenceCopy = {
     noOptionsText: t('report.noMatches'),
     loadingText: t('report.referenceLoading'),
@@ -84,7 +112,7 @@ export function useAcademicReportCriteria(includeStanding = true, defaultLifecyc
         selected: facultyChoice,
         query: facultySearch,
         onSearch: setFacultySearch,
-        loading: faculties.isFetching,
+        loading: faculties.isFetching || selectedFaculties.some((query) => query.isFetching),
       },
     },
     {
@@ -96,7 +124,7 @@ export function useAcademicReportCriteria(includeStanding = true, defaultLifecyc
         selected: departmentChoice,
         query: departmentSearch,
         onSearch: setDepartmentSearch,
-        loading: departments.isFetching,
+        loading: departments.isFetching || selectedDepartments.some((query) => query.isFetching),
       },
     },
     {
@@ -108,7 +136,7 @@ export function useAcademicReportCriteria(includeStanding = true, defaultLifecyc
         selected: programChoice,
         query: programSearch,
         onSearch: setProgramSearch,
-        loading: programs.isFetching,
+        loading: programs.isFetching || selectedPrograms.some((query) => query.isFetching),
       },
     },
     {

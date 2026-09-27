@@ -56,17 +56,21 @@ a foreign app. All seeded accounts below use password `password`.
   390/1280px page fit and populated form continuity.
 - Records service/invalid verifier acceptance slice: six tests passed in 5.0m.
   Actual current, official, valid-public and revoked A4 PDFs generated in all four
-  states. Current/public revoked use one page; full official snapshots use two.
+  states. In the latest expanded fixture, current EN uses one page and current
+  AR uses two; public revoked uses one and full issued snapshots use two.
   Native EN/AR paper inspection includes continuation headers, watermark, seal,
   QR placement and dark-theme black text.
 - Backend gate: passed completely (1,329 tests / 8,421 assertions plus static
   and generated OpenAPI checks).
 - Expanded owner presentation checks passed: Admissions 4.6m and seven remaining
   correction/Enrollment/headline/Records checks in 15.2m.
-- Frontend gate: 121 files / 676 unit tests passed; complete serial browser stage
-  was interrupted without a terminal result. Repeating from a fresh seed; complete
-  frontend-gate success remains pending.
-- Consolidated Standards/Spec code review: pending; none run per ticket.
+- Frontend gate: API/static stages and 121 files / 676 unit tests passed in the
+  isolated full attempt; 178 serial browser tests passed and one Records print
+  locale assertion failed. Its reload-preference wait is fixed; affected browser
+  verification and the complete final gate remain pending.
+- Consolidated Standards/Spec review: one native run, four actionable findings
+  fixed and confirmed resolved. [Review evidence](review.md) includes separate
+  axes, requirements, test-first fixes and verification.
 
 ## Human acceptance
 

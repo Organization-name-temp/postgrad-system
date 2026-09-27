@@ -7,6 +7,7 @@ implementation and fixes remain local. No per-ticket code reviews were run.
 - Initial reviewed tip: `48e5e99b0f9a5075b243dc4c38f5fa13e3d02782`.
 - Comparison: `git diff b3a3ae7b71538c36230985270de2b73bc2f92088...48e5e99b0f9a5075b243dc4c38f5fa13e3d02782`.
 - Commits: `git log b3a3ae7b71538c36230985270de2b73bc2f92088..48e5e99b0f9a5075b243dc4c38f5fa13e3d02782 --oneline`.
+- Fix commit: `c4be343` (reviewer confirmations cover the root-session fixes).
 - Scope: all seven Phase 7 tickets and executable Phase 4.6 prerequisites
   #01, #02, #03, #04, #05, #06, #08 and #15. Unrelated Phase 4.6 work stays deferred.
 - Sources: AGENTS, CONTEXT, requirements, accepted related ADRs, design system,
@@ -69,8 +70,10 @@ remain explicit dispositions rather than missing product behavior.
   and actor scope remain unchanged. Standards reviewer confirmed this scope
   choice and resolution.
 - Combined affected owner verification: **33 tests / 262 assertions (7.79s)**.
-  Frontend lint, full format and typecheck passed. Final package gates and the
-  Records reload-language recheck remain pending; no gate failure is hidden.
+  Frontend lint, full format and typecheck passed. The affected
+  Records reload-language recheck passed: **5 native tests (11.7m), exit 0**
+  including all four Readiness states and full Records (9.5m). Final package gates
+  remain pending; no gate failure is hidden.
 
 Initial counts: Standards **3**, worst **P2**; Spec **1**, worst **P1**. All four findings resolved and confirmed by their native reviewers; no remaining actionable findings. Human acceptance remains
 separate from native review; no merge, push or deployment is performed.

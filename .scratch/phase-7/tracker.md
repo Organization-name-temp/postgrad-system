@@ -26,19 +26,21 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 
 | Ticket | State | Evidence |
 | --- | --- | --- |
-| 01 Standing | Implemented; final acceptance pending | Owner summary/List/export, protected EN/AR UI and four native journeys verified below; final gates/review pending |
-| 02 Readiness | Implemented; final acceptance pending | Bounded owner parity, scoped summary/List/export, EN/AR UI and four native journeys verified below; final gates/review pending |
+| 01 Standing | Implemented; final acceptance pending | Owner summary/List/export, protected EN/AR UI and four native journeys verified below; final gates and human acceptance pending |
+| 02 Readiness | Implemented; final acceptance pending | Bounded owner parity, scoped summary/List/export, EN/AR UI and four native journeys verified below; final gates and human acceptance pending |
 | 03 Termination | Implemented; final acceptance pending | Scoped minimal Case summary/List/export, authorized review links, worked seed evidence, EN/AR UI and four native journeys verified below |
-| 04 Shell/Catalog/Admissions polish | Implemented; final verification pending | Concrete label, count, contrast and responsive defects fixed test-first; core/detail matrices and expanded Admissions journey passed; final gates/review pending |
-| 05 Enrollment/Grading/progress polish | Implemented; final verification pending | Paired Waiver/loading/identifier/count corrections verified; expanded owner journeys and final gate/review pending |
-| 06 Records polish | Implemented; final verification pending | Paired loading corrections, service journey, four-state read/print and invalid public verifier passed; expanded action-state checks and final gate/review pending |
-| 07 Acceptance | Implemented; final verification pending | Exact-population/export headline passed; reproducible demo and audit recorded; complete gates/consolidated review pending, human acceptance required |
+| 04 Shell/Catalog/Admissions polish | Implemented; final verification pending | Concrete label, count, contrast and responsive defects fixed test-first; core/detail matrices and expanded Admissions journey passed; final gates and human acceptance pending |
+| 05 Enrollment/Grading/progress polish | Implemented; final verification pending | Paired Waiver/loading/identifier/count corrections verified; expanded owner journeys and final gate and human acceptance pending |
+| 06 Records polish | Implemented; final verification pending | Paired loading corrections, service journey, four-state read/print and invalid public verifier passed; expanded action-state checks and final gate and human acceptance pending |
+| 07 Acceptance | Implemented; final verification pending | Exact-population/export headline passed; reproducible demo and audit recorded; complete gates pending; consolidated review resolved, human acceptance required |
 
 ## Commands and results
 
 Complete backend gate passed (1,329 tests / 8,421 assertions; details below).
-Complete frontend gate and consolidated review remain pending. Starting commit and
-initial clean worktree verified.
+The one consolidated Standards/Spec review is resolved (three Standards findings,
+one Spec finding; fixes committed at `c4be343`). Final backend gate rerun and
+complete frontend gate remain pending. Starting commit and initial clean worktree
+verified. Review evidence is in [review](review.md).
 
 ### Shared frontend prerequisites (#02/#03/#05 slices)
 
@@ -1681,3 +1683,19 @@ formal reviews were run.
   (15.43s)**. The Standards reviewer confirmed all S1–S3 resolved; Spec confirmed
   P1 resolved. The single consolidated review has **no remaining actionable
   findings**. Final gates and Records affected recheck remain pending.
+
+- Affected Records recheck generated all **20 A4 PDFs** without repeating the
+  watermark assertion failure. Native inspection of official dark AR pages 1/2
+  and dark AR revoked-public paper confirms readable black text, RTL tables,
+  watermark, seal/unmirrored QR and reference/status-only revoked disclosure.
+  Page counts measured from these actual PDFs: current EN 1, current AR 2,
+  official/valid-public/official-revoked 2, revoked-public 1 in each theme.
+  Earlier one-page current evidence described an earlier fixture; these are the
+  current observed counts. The service test is finishing remaining actions;
+  PDF generation alone is not its terminal pass or human acceptance.
+
+- Affected native recheck **5/5 passed (11.7m), terminal exit 0**: Readiness
+  four states plus the complete Records correction/certification/revocation/
+  refund/collection journey (**9.5m**). The reload-preference fix retained the
+  original watermark assertion and all 20 paper variants. No browser journey is
+  now competing with preparation of the final fresh development fixture.

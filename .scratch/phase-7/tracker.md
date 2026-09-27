@@ -957,3 +957,15 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   Pipeline; its required second Report verification will accompany the first
   Academic Standing Report. No planning merge is being counted as implementation.
   All seven Phase 7 acceptance, full gates and consolidated review remain pending.
+
+### Academic Standing scope union tracer
+
+- Phase 7 #01's first access tracer reproduced HTTP 403 for a Dean/Advisor's
+  Faculty Student outside their advisee set. The existing individual Standing scope
+  returned early on an unsuccessful Advisor match. It now continues to the other
+  eligible scopes, preserving the role union and existing self-read behavior.
+- HTTP checks cover both union branches, an outside Student, removed Dean assignment
+  and reassigned advisee. Focused Standing tests **3 passed / 22 assertions, 3.20s**;
+  Pint, PHPStan and deptrac passed. No API shape changed.
+- This is supporting access behavior, not completion of #01: cohort APIs, bounded
+  owner Standing batches, UI/export and second Report printing remain next.

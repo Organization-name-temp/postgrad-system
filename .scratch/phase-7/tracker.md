@@ -1585,3 +1585,9 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   serious/critical axe. It is running; fixture injection tests rendering only,
   not backend scope or decision authority (which the existing Pest owner tests
   cover).
+
+- B05-05 native **4/4 passed in 54.9s**: real Department Head GET authorized;
+  existing typed owner response fixture supplied one pending Card for layout;
+  EN/AR, light/dark, 390/1280px, required-reason feedback, keyboard Cancel and
+  no capacity-decision POST passed. This proves UI behavior with a supplied read
+  fixture; separate Pest tests prove real scope and workflow transitions.

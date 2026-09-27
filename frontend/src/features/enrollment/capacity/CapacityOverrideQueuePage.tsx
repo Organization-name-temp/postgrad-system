@@ -92,7 +92,7 @@ function CapacityCard({
       sx={(theme) => ({ p: { xs: 2, sm: 3 }, borderRadius: theme.shape.radiusLg })}
     >
       <Stack spacing={2}>
-        <Typography variant="h6">
+        <Typography variant="h6" component="h2">
           {t('capacityReview.courseLabel')} <bdi dir="ltr">#{row.course_id}</bdi>
         </Typography>
         {row.obligation_type && (

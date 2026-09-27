@@ -710,3 +710,40 @@ EN/AR Dean review and decisions bookmarks retain comma-separated Faculty criteri
 through reload and authenticated workbook downloads; serious/critical axe scans
 passed: **2 browser tests, 53.7s**. Final package gates and consolidated review have
 not run. Post-commit generated drift checks are next.
+
+Faculty criterion checkpoint `9514dda`: backend `composer api:check` and frontend
+`npm run api:check` passed after commit. Advisor type-ahead checkpoint `6107ff7`
+also remains committed. No final gate/review completion is claimed.
+
+### Catalog Faculty type-ahead
+
+- Department form EN/AR HTTP tests first failed on its non-searchable Faculty
+  select. The owner feature now supplies a reusable Faculty picker requesting
+  server-normalized search with a 100-row reference page and no client filtering.
+  Selection submits Faculty 207 after lookup beyond the first page.
+- Existing Faculty ownership hydrates through the already-authorized Faculty
+  detail route. Typecheck exposed that the collection has no `id` criterion; a
+  red existing-owner test preceded using its generated detail hook. No generated
+  contract was weakened or hand-edited to bypass the unsupported criterion.
+- Search/create plus existing-owner tests **3 passed, 10.62s**. Frontend
+  typecheck/lint/full format passed. Enhanced EN/AR tests additionally cover
+  invalidating the prior Faculty and disabling Save during a new search; rerun
+  pending. EN browser criteria/download/new-Department Faculty search/axe passed;
+  full EN/AR browser run pending.
+- This migrates only the Department form. Other Catalog parent and curriculum
+  references remain #06 work; Pipeline/print prerequisites and all Phase 7 ticket
+  acceptance/final gates/consolidated review are still required.
+
+Faculty picker follow-up: enhanced EN/AR tests reproduced MUI reset wiping a new
+typed query after a selection. Input state now changes on explicit input/clear;
+selected owner labels hydrate separately. Both languages retain the new query and
+disable Save until another explicit choice. Focused **3 tests passed, 13.80s**.
+Added paired visible/accessible loading, no-match, error, clear/open/close copy.
+The earlier browser run passed **2 tests, 1.1m** before this adjustment; affected
+static and serial browser reruns remain pending after the fix.
+
+Faculty picker final verification after the reset fix: frontend
+**typecheck/lint/full format passed**; EN/AR Catalog criteria/downloads and
+new-Department Faculty lookup/selection with serious/critical axe checks
+**2 browser tests passed, 1.1m**. API artifacts unchanged. Other Catalog pickers
+and the remaining prerequisite/ticket/final gate/review requirements remain pending.

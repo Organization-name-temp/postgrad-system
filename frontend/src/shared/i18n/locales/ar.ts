@@ -289,6 +289,14 @@ export const ar = {
     },
   },
   catalog: {
+    references: {
+      loading: 'جارٍ تحميل الخيارات',
+      error: 'تعذّر تحميل الخيارات.',
+      noMatch: 'لا توجد خيارات مطابقة.',
+      clear: 'مسح الاختيار',
+      open: 'عرض الخيارات',
+      close: 'إخفاء الخيارات',
+    },
     filters: {
       activeState: 'حالة التفعيل',
       code: 'الرمز',

@@ -33,6 +33,25 @@ for (const locale of ['en', 'ar'] as const) {
       expect(download.suggestedFilename()).toBe(`${resource}.xlsx`)
       expect(await download.failure()).toBeNull()
       await download.saveAs(testInfo.outputPath(`${resource}-${locale}.xlsx`))
+      if (resource === 'departments') {
+        await page
+          .getByRole('button', { name: locale === 'ar' ? 'قسم جديد' : 'New department' })
+          .click()
+        const form = page.getByRole('dialog', {
+          name: locale === 'ar' ? 'قسم جديد' : 'New department',
+        })
+        const faculty = form.getByRole('combobox', { name: locale === 'ar' ? 'الكلية' : 'Faculty' })
+        await faculty.fill('FoE')
+        await page
+          .getByRole('option', { name: locale === 'ar' ? /الهندسة/ : /Engineering/ })
+          .click()
+        await expect(faculty).toHaveValue(locale === 'ar' ? /الهندسة/ : /Engineering/)
+        const formScan = await new AxeBuilder({ page }).analyze()
+        expect(
+          formScan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+        ).toEqual([])
+        await form.getByRole('button', { name: locale === 'ar' ? 'إلغاء' : 'Cancel' }).click()
+      }
     }
     await page.getByRole('button', { name: 'English' }).click()
   })

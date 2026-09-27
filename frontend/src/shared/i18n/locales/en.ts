@@ -296,6 +296,14 @@ export const en = {
     },
   },
   catalog: {
+    references: {
+      loading: 'Loading choices',
+      error: 'Could not load choices.',
+      noMatch: 'No matching choices.',
+      clear: 'Clear selection',
+      open: 'Show choices',
+      close: 'Hide choices',
+    },
     filters: {
       activeState: 'Active state',
       code: 'Code',

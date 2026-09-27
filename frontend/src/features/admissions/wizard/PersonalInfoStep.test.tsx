@@ -280,3 +280,24 @@ it.each(['en', 'ar'] as const)(
     }
   },
 )
+
+it.each(['en', 'ar'] as const)(
+  'keeps English-test guidance readable when None disables the score in %s',
+  async (locale) => {
+    const { default: i18n } = await import('../../../shared/i18n/config')
+    await i18n.changeLanguage(locale)
+    try {
+      renderStep({ ...COMPLETE, english_test: 'None' })
+      expect(screen.getByText(i18n.t('admissions:personalInfo.scoreHelp'))).not.toHaveClass(
+        'Mui-disabled',
+      )
+      expect(
+        screen.getByLabelText(i18n.t('admissions:personalInfo.fields.english_score'), {
+          exact: false,
+        }),
+      ).toBeDisabled()
+    } finally {
+      await act(() => i18n.changeLanguage('en'))
+    }
+  },
+)

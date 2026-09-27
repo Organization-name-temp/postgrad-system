@@ -1477,3 +1477,11 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
 - Enum sort fix focused verification passed **28 tests / 291 assertions, 6.07s**
   (all insertion permutations plus shared actor-scope collection contracts); Pint
   passed. Repeating the required full backend gate after this concrete failure.
+- Expanded owner audit stopped on B04-12: choosing English test None left its
+  meaningful instructional helper at 2.57:1. Two EN/AR RED regressions captured
+  the populated state. Enabled helper state while retaining disabled score input
+  and existing submission/validation rules; focused/static checks and serial owner
+  journeys rerunning. Remaining owner checks were not run on that failed attempt.
+- B04-12 focused check passed **16 PersonalInfoStep tests, 34.42s**; frontend
+  typecheck, lint and full format checks passed. Native expanded owner journey
+  remains active; its completion is not claimed yet.

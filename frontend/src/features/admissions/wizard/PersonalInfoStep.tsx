@@ -690,6 +690,7 @@ export function PersonalInfoStep({ application, onSubmitted, onBack }: PersonalI
               disabled={scoreDisabled}
               error={Boolean(fieldState.error)}
               helperText={fieldState.error?.message ?? scoreHint}
+              slotProps={{ formHelperText: { disabled: false } }}
             />
           )}
         />

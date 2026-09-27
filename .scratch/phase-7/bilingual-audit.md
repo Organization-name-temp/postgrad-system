@@ -139,3 +139,7 @@ After B04-11/B05-04: repeated frontend source audit reports **2,104 keys per
 language, zero missing/extra keys and zero interpolation mismatches**. Counts remain
 provided by the owners; the fix affects their Arabic wording only. Focused affected
 Card verification passed **58 / 7 files**. Both final gates are running.
+
+| ID | Surface | Evidence | Disposition |
+| --- | --- | --- | --- |
+| B04-12 | Populated Applicant “None” English-score guidance | Extended real Admissions journey reproduced 2.57:1 on the disabled score helper; paired EN/AR focused regressions failed. | Keep score input disabled/omitted for None and enable its instructional helper, as with GPA scale guidance. Focused owner tests and serial populated-state journey rerunning. |

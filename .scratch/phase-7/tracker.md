@@ -129,3 +129,25 @@ Reserved until all tickets and prerequisite changes are implemented.
   named applicant so first-page assumptions do not hide pagination regressions.
 - Full package gates, API drift checks after commit and final consolidated review
   remain pending. No whole prerequisite or Phase 7 ticket is claimed complete yet.
+
+### Owner batch prerequisite (#04), roster/CGPA slice
+
+- Enrollment Public facade now bulk-resolves whole rosters as immutable DTOs in
+  bounded 100-Student reads, including empty rosters and non-counting statuses.
+- Grading Public facade now returns batch nullable CGPAs and exact rounded-value
+  frequencies with an explicit ungraded category. Shared owner tally uses bounded
+  roster, current-grade and Semester reads; single and batch reads invoke the same
+  existing supersession and integer-hundredths calculator. No storage/cache,
+  migration, cross-owner join or new deptrac edge.
+- Red tests confirmed missing batch methods. Corrected the new rounding fixture's
+  mistaken grade scale to ADR-0021's known 13 CH at 3.30 plus 8 CH at 2.50: raw
+  2.995238... rounds once to 3.00. Fall→Spring retake and null-versus-zero cases
+  pass, along with the separately named seeded parity gate over all 180 Students.
+- `php artisan test --filter='BatchCgpaSeededParityTest|GradingRecordsTest|EnrollmentRecordsTest|StandingObservationTest|GpaCalculatorTest'`:
+  **50 passed, 289 assertions, 23.42s**; seeded parity test **16.55s**. Pint,
+  PHPStan and deptrac passed. Existing Standing test double updated to the expanded
+  Public contract; its read-side-effect assertions remain green.
+- Screening commit `db00bbc`: `composer api:check` and `npm run api:check`
+  **passed** after committing generated artifacts. Frontend `npm run format` passed.
+- #04 remains incomplete: attendance/enrollment aggregates and Admissions pipeline
+  aggregate still required. Full package gates and final review remain pending.

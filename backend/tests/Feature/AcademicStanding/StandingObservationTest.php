@@ -28,6 +28,16 @@ final class MutableStandingGrading implements GradingRecords
         return $this->cgpa;
     }
 
+    public function cgpaForStudents(array $studentIds): array
+    {
+        return array_fill_keys($studentIds, $this->cgpa);
+    }
+
+    public function cgpaDistributionForStudents(array $studentIds): array
+    {
+        return $studentIds === [] ? [] : [($this->cgpa === null ? 'ungraded' : number_format($this->cgpa, 2, '.', '')) => count(array_unique($studentIds))];
+    }
+
     public function semesterGpaFor(int $studentId, int $semesterId): ?float
     {
         return null;

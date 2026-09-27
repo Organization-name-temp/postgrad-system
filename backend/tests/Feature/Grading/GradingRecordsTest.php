@@ -157,3 +157,33 @@ it('omits an id with no finalized grade', function () {
 it('returns an empty array for an empty id list', function () {
     expect(gradingRecords()->gradesFor([]))->toBe([]);
 });
+
+it('batch CGPA parity gate preserves half-up threshold rounding Fall to Spring supersession and null records', function () {
+    $boundary = grStudent();
+    // (3.30 × 13 + 2.50 × 8) / 21 = 2.995238..., rounded once to 3.00.
+    grGrade(grEnroll(grOffering(), $boundary, creditHours: 13), 87);
+    grGrade(grEnroll(grOffering(), $boundary, creditHours: 8), 77);
+    $retake = grStudent();
+    $course = Course::factory()->create();
+    $fall = Semester::factory()->create(['starts_at' => '2025-09-01']);
+    $spring = Semester::factory()->create(['starts_at' => '2026-02-01']);
+    grGrade(grEnroll(grOffering($fall, $course), $retake), 95);
+    grGrade(grEnroll(grOffering($spring, $course), $retake, CourseStatus::Retake), 62);
+    $empty = grStudent();
+    $ids = [$boundary->id, $retake->id, $empty->id];
+    $batch = gradingRecords()->cgpaForStudents($ids);
+    expect($batch)->toBe([$boundary->id => 3.0, $retake->id => 1.0, $empty->id => null]);
+    foreach ($ids as $id) {
+        expect($batch[$id])->toBe(gradingRecords()->cgpaFor($id));
+    }
+});
+
+it('distributes batch CGPA values without conflating an ungraded record with zero', function () {
+    $zero = grStudent();
+    grGrade(grEnroll(grOffering(), $zero), 40);
+    $good = grStudent();
+    grGrade(grEnroll(grOffering(), $good), 82);
+    $empty = grStudent();
+    expect(gradingRecords()->cgpaDistributionForStudents([$zero->id, $good->id, $empty->id]))
+        ->toBe(['0.00' => 1, '3.00' => 1, 'ungraded' => 1]);
+});

@@ -128,6 +128,18 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
             ->all();
     }
 
+    public function enrollmentsForStudents(array $studentIds): array
+    {
+        $rosters = array_fill_keys($studentIds, []);
+        foreach (array_chunk(array_values(array_unique($studentIds)), 100) as $batch) {
+            foreach (Enrollment::query()->with('offering')->whereIn('student_id', $batch)->orderBy('id')->get() as $enrollment) {
+                $rosters[(int) $enrollment->student_id][] = $this->toEnrollmentSummary($enrollment);
+            }
+        }
+
+        return $rosters;
+    }
+
     /**
      * @param  list<int>  $offeringIds
      * @return array<int, int>

@@ -3,9 +3,11 @@
 namespace Modules\Grading\Internal\Support;
 
 use Modules\Calendar\Public\AcademicCalendar;
+use Modules\Calendar\Public\SemesterSummary;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentSummary;
 use Modules\Grading\Internal\Http\Controllers\MyGradesController;
+use Modules\Grading\Internal\Models\Grade;
 
 /**
  * A Student's whole CGPA/GPA input, assembled from `Enrollment\Public`'s roster,
@@ -54,32 +56,54 @@ final readonly class StudentGpaTally
 
     public function recordFor(int $studentId): StudentGpaRecord
     {
-        $relevant = array_values(array_filter(
-            $this->enrollments->enrollmentsForStudent($studentId),
-            fn (EnrollmentSummary $enrollment): bool => $enrollment->countsTowardCgpa
-                || self::isUngradedVisible($enrollment->courseStatus),
-        ));
+        return $this->recordsFor([$studentId])[$studentId];
+    }
 
-        if ($relevant === []) {
-            return new StudentGpaRecord(enrollments: [], grades: [], semesters: [], attempts: []);
-        }
-
-        $grades = CurrentGradeLookup::forEnrollments(array_map(
-            fn (EnrollmentSummary $enrollment): int => $enrollment->id,
-            $relevant,
-        ));
-
-        // Every Semester among the relevant set, not only the graded subset — an Incomplete or
-        // Fail Withdrawal never carries a Grade but still needs its Semester resolved for My
-        // Grades' section grouping and (for an Incomplete) the deadline calculation.
-        $semesters = [];
-        foreach (array_unique(array_map(fn (EnrollmentSummary $e): int => $e->semesterId, $relevant)) as $semesterId) {
-            $semester = $this->calendar->find($semesterId);
-            if ($semester !== null) {
-                $semesters[$semesterId] = $semester;
+    /**
+     * @param  list<int>  $studentIds
+     * @return array<int, StudentGpaRecord>
+     */
+    public function recordsFor(array $studentIds): array
+    {
+        $records = [];
+        foreach (array_chunk(array_values(array_unique($studentIds)), 100) as $batch) {
+            $rosters = $this->enrollments->enrollmentsForStudents($batch);
+            $relevantByStudent = [];
+            $enrollmentIds = [];
+            $semesterIds = [];
+            foreach ($rosters as $studentId => $roster) {
+                $relevant = array_values(array_filter($roster, fn (EnrollmentSummary $e): bool => $e->countsTowardCgpa || self::isUngradedVisible($e->courseStatus)));
+                $relevantByStudent[$studentId] = $relevant;
+                foreach ($relevant as $enrollment) {
+                    $enrollmentIds[] = $enrollment->id;
+                    $semesterIds[] = $enrollment->semesterId;
+                }
+            }
+            $grades = [];
+            foreach (array_chunk($enrollmentIds, 500) as $gradeBatch) {
+                $grades += CurrentGradeLookup::forEnrollments($gradeBatch);
+            }
+            $semesters = [];
+            foreach (array_chunk(array_values(array_unique($semesterIds)), 100) as $semesterBatch) {
+                $semesters += $this->calendar->findMany($semesterBatch);
+            }
+            foreach ($relevantByStudent as $studentId => $relevant) {
+                $ownIds = array_fill_keys(array_map(fn (EnrollmentSummary $e): int => $e->id, $relevant), true);
+                $ownSemesters = array_fill_keys(array_map(fn (EnrollmentSummary $e): int => $e->semesterId, $relevant), true);
+                $records[$studentId] = $this->assemble($relevant, array_intersect_key($grades, $ownIds), array_intersect_key($semesters, $ownSemesters));
             }
         }
 
+        return $records;
+    }
+
+    /**
+     * @param  list<EnrollmentSummary>  $relevant
+     * @param  array<int, Grade>  $grades
+     * @param  array<int, SemesterSummary>  $semesters
+     */
+    private function assemble(array $relevant, array $grades, array $semesters): StudentGpaRecord
+    {
         // The arithmetic input stays exactly what it always was — CGPA-counting AND graded —
         // so an Incomplete/Fail-Withdrawal row (never graded) can never reach it even though it
         // now rides along in $relevant/$semesters for My Grades' display.

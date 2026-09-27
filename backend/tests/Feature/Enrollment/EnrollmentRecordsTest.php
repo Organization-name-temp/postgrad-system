@@ -330,3 +330,16 @@ it('writes the earned bit through recordOutcome, the sole writer of the column',
     enrollmentRecords()->recordOutcome($enrollment->id, null);
     expect($enrollment->fresh()->earned)->toBeNull();
 });
+
+it('bulk resolves bounded student rosters as owner DTOs including empty and non-counting rosters', function () {
+    $instructor = User::factory()->create();
+    $first = erEnroll(erOffering($instructor->id));
+    $second = erEnroll(erOffering($instructor->id), CourseStatus::Audit);
+    $empty = Student::factory()->create();
+    $ids = [$first->student_id, $second->student_id, $empty->id];
+    $batch = enrollmentRecords()->enrollmentsForStudents($ids);
+    expect(array_keys($batch))->toBe($ids)->and($batch[$empty->id])->toBe([])
+        ->and($batch[$first->student_id])->toEqual(enrollmentRecords()->enrollmentsForStudent($first->student_id))
+        ->and($batch[$second->student_id][0])->toBeInstanceOf(EnrollmentSummary::class)
+        ->and($batch[$second->student_id][0]->countsTowardCgpa)->toBeFalse();
+});

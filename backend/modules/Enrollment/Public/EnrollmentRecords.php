@@ -120,6 +120,15 @@ interface EnrollmentRecords
     public function enrollmentsForStudent(int $studentId): array;
 
     /**
+     * Whole rosters in bounded reads, including an empty list for each requested
+     * Student with no Enrollment. Callers supply authorized candidate ids.
+     *
+     * @param  list<int>  $studentIds
+     * @return array<int, list<EnrollmentSummary>> keyed by Student id
+     */
+    public function enrollmentsForStudents(array $studentIds): array;
+
+    /**
      * Write the single `earned` bit onto an Enrollment — "this Attempt reached C+ and earned
      * its credit hours" (ADR-0022). The **only** writer of this column: called by Grading from
      * inside the same transaction as a Sheet's finalize, never on its own. `$earned` is

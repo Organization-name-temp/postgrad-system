@@ -35,6 +35,23 @@ interface GradingRecords
     public function cgpaFor(int $studentId): ?float;
 
     /**
+     * Same owner calculation over bounded authorized candidate rosters. Every
+     * requested id has a value; no counting grade is represented by null.
+     *
+     * @param  list<int>  $studentIds
+     * @return array<int, float|null>
+     */
+    public function cgpaForStudents(array $studentIds): array;
+
+    /**
+     * Frequency of each rounded CGPA, with an explicit ungraded category.
+     *
+     * @param  list<int>  $studentIds
+     * @return array<string, int> sorted numeric values followed by ungraded
+     */
+    public function cgpaDistributionForStudents(array $studentIds): array;
+
+    /**
      * The same formula restricted to one Semester's Enrollments, from the same
      * non-superseded eligible set the CGPA is drawn from — a Retake that supersedes an
      * earlier Attempt is excluded from that earlier Attempt's own Semester GPA too, not only

@@ -40,6 +40,25 @@ for (const locale of ['en', 'ar'] as const) {
     })
     await page.reload()
     await expect(search).toHaveValue('CSE5')
+    await page.getByRole('button', { name: locale === 'ar' ? 'مقرر جديد' : 'New course' }).click()
+    const form = page.getByRole('dialog', { name: locale === 'ar' ? 'مقرر جديد' : 'New course' })
+    const department = form.getByRole('combobox', {
+      name: locale === 'ar' ? 'القسم' : 'Department',
+    })
+    await department.fill('CE')
+    await page
+      .getByRole('option', { name: locale === 'ar' ? /هندسة الحاسوب/ : /Computer Engineering/ })
+      .click()
+    await expect(department).toHaveValue(locale === 'ar' ? /هندسة الحاسوب/ : /Computer Engineering/)
+    await department.click()
+    const universityWide = locale === 'ar' ? 'على مستوى الجامعة' : 'University-wide'
+    await page.getByRole('option', { name: universityWide }).click()
+    await expect(department).toHaveValue(universityWide)
+    const formScan = await new AxeBuilder({ page }).analyze()
+    expect(
+      formScan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+    ).toEqual([])
+    await form.getByRole('button', { name: locale === 'ar' ? 'إلغاء' : 'Cancel' }).click()
     await page.getByRole('button', { name: 'English' }).click()
   })
 }

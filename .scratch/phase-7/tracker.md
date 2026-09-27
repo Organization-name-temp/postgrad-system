@@ -764,3 +764,28 @@ and the remaining prerequisite/ticket/final gate/review requirements remain pend
   serious/critical axe checks: **2 passed, 1.1m**. No API contract change.
 - Course creation/edit and curriculum references remain next #06 work; Pipeline,
   print and all Phase 7 ticket/final gate/consolidated review requirements remain.
+
+### Course Department type-ahead
+
+- EN/AR HTTP tests first reproduced the Course form's blank existing Department
+  beyond page one. It now uses the same owner detail/search seam as the Program
+  form. Search invalidates the prior choice and disables Save; no search text is
+  mistaken for a Department or auto-selects a result.
+- University-wide ownership remains explicit and distinct from an unresolved
+  search. A labelled local option represents the existing nullable owner value;
+  selecting it submits the existing payload with Department omitted. Its internal
+  option key never goes to the server. A callback lets the Course form keep Save
+  disabled while searching even though its Department is optional.
+- Focused Catalog form regression **3 files / 7 tests passed, 21.27s**. Expanded
+  Course EN/AR Department and University-wide submission checks **4 tests passed,
+  13.61s**. Frontend **typecheck/lint/full format passed**. No API changes.
+- Serial EN/AR Course and Catalog reference browser rerun pending after the optional
+  owner extension; curriculum references and remaining prerequisite/ticket/final
+  gate/consolidated review requirements remain outstanding.
+
+Course final browser verification after the optional-owner extension: serial
+EN/AR Course and Catalog reference tests **4 passed, 1.9m**. Course dialogs exercise
+Department server search and explicit University-wide selection with serious/
+critical axe checks; existing Faculty/Program choices, bookmarks and authenticated
+downloads remain executable. Curriculum reference migration is next. No API or
+final gate/review completion is claimed.

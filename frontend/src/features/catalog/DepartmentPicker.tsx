@@ -10,15 +10,20 @@ export function DepartmentPicker({
   onChange,
   label,
   enabled = true,
+  noneLabel,
+  onSearchChange,
 }: {
   value: string
   onChange: (id: string) => void
   label: string
   enabled?: boolean
+  noneLabel?: string
+  onSearchChange?: (searching: boolean) => void
 }) {
   const { t, i18n } = useTranslation('catalog')
   const [search, setSearch] = useState('')
   const [input, setInput] = useState('')
+  const [searching, setSearching] = useState(false)
   const results = useListDepartments(
     { q: search || undefined, per_page: 100 },
     { query: { enabled } },
@@ -26,13 +31,15 @@ export function DepartmentPicker({
   const resolved = useShowADepartment(Number(value), {
     query: { enabled: enabled && value !== '' },
   })
-  const options = results.data?.data ?? []
+  const none = noneLabel ? { id: 0, code: '', name_en: noneLabel, name_ar: noneLabel } : null
+  const options = none ? [none, ...(results.data?.data ?? [])] : (results.data?.data ?? [])
   const selected =
-    options.find((department) => String(department.id) === value) ??
+    (value === '' && none ? none : options.find((department) => String(department.id) === value)) ??
     (String(resolved.data?.data?.id) === value ? resolved.data?.data : null) ??
     null
-  const selectedLabel = selected
-    ? pickLocaleName(selected, i18n.language, selected.code ?? '')
+  const selectedValue = searching ? null : selected
+  const selectedLabel = selectedValue
+    ? pickLocaleName(selectedValue, i18n.language, selectedValue.code ?? '')
     : null
   useEffect(() => {
     if (selectedLabel !== null) setInput(selectedLabel)
@@ -41,13 +48,14 @@ export function DepartmentPicker({
     if (!enabled) {
       setSearch('')
       setInput('')
+      setSearching(false)
     }
   }, [enabled])
 
   return (
     <Autocomplete
       options={options}
-      value={selected}
+      value={selectedValue}
       inputValue={input}
       getOptionLabel={(department) =>
         pickLocaleName(department, i18n.language, department.code ?? '')
@@ -65,17 +73,21 @@ export function DepartmentPicker({
         if (reason === 'input' || reason === 'clear') {
           setInput(text)
           setSearch(text)
+          setSearching(true)
           onChange('')
+          onSearchChange?.(true)
         }
       }}
-      onChange={(_event, department) =>
-        onChange(department?.id !== undefined ? String(department.id) : '')
-      }
+      onChange={(_event, department) => {
+        setSearching(department === null)
+        onSearchChange?.(department === null)
+        onChange(department?.id !== undefined && department.id !== 0 ? String(department.id) : '')
+      }}
       renderInput={(params) => (
         <TextField
           {...params}
           label={label}
-          required
+          required={!noneLabel}
           fullWidth
           error={results.isError || resolved.isError}
           helperText={results.isError || resolved.isError ? t('references.error') : undefined}

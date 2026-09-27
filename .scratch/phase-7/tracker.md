@@ -537,3 +537,8 @@ admissions headline **1 passed, 1.5m**, retaining slot creation, open-only sched
 interviewer evaluation, completion and acceptance. Slot-pool EN/AR controls/export
 browser evidence will be gathered when that UI slice is implemented. Full Phase 7
 completion/gates/print audit/consolidated review remain pending.
+
+Commit `8a2e0bf`: sequential `composer api:check` and `npm run api:check`
+**passed**, with no generated drift. Next frontier remains slot-pool URL controls,
+slot-pickers type-ahead (including selections beyond the first 100), staff/Catalog
+pickers and direct Dean Faculty criteria; then Pipeline/print and Phase 7 Reports.

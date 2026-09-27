@@ -142,6 +142,8 @@ final class TerminationCaseController
     }
 
     /**
+     * @urlParam case_id integer required The ID of the case. Example: 1
+     *
      * @bodyParam assessment string required Example: Two distinct failing grades remain effective.
      * @bodyParam recommendation string required continue or dismiss. Example: continue
      *
@@ -170,6 +172,8 @@ final class TerminationCaseController
     }
 
     /**
+     * @urlParam case_id integer required The ID of the case. Example: 1
+     *
      * @bodyParam action string required recommend or dismiss. Example: recommend
      * @bodyParam reason string required Example: Evidence is actionable.
      *
@@ -205,6 +209,8 @@ final class TerminationCaseController
     }
 
     /**
+     * @urlParam case_id integer required The ID of the case. Example: 1
+     *
      * @bodyParam action string required terminate or dismiss. Example: terminate
      * @bodyParam reason string required Example: Council confirmed termination.
      *

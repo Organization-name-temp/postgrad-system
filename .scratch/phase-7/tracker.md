@@ -1485,3 +1485,13 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
 - B04-12 focused check passed **16 PersonalInfoStep tests, 34.42s**; frontend
   typecheck, lint and full format checks passed. Native expanded owner journey
   remains active; its completion is not claimed yet.
+- Backend gate attempt 3: Pint/PHPStan/deptrac and **1,329 Pest tests / 8,421
+  assertions passed, 725.83s**; final OpenAPI drift failed on three operational Case
+  path examples inferred from mutable development data (16 → 1). Adding explicit
+  controller-doc URL examples; no runtime operation changes. Regeneration/drift
+  verification and the complete backend gate remain pending.
+- Expanded owner audit also exposed two harness races after the wizard checks:
+  capturing queue inputs before detail navigation finished, then choosing English
+  before saved account locale applied. Await actual Applicant detail heading and
+  authenticated `/me` preferences, and await persisted language GET data when
+  switching. Product behavior unchanged. Revised eight-test serial run active.

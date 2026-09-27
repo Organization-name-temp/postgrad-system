@@ -2941,7 +2941,7 @@ paths:
         in: path
         name: case_id
         description: 'The ID of the case.'
-        example: 16
+        example: 1
         required: true
         schema:
           type: integer
@@ -3290,7 +3290,7 @@ paths:
         in: path
         name: case_id
         description: 'The ID of the case.'
-        example: 16
+        example: 1
         required: true
         schema:
           type: integer
@@ -3645,7 +3645,7 @@ paths:
         in: path
         name: case_id
         description: 'The ID of the case.'
-        example: 16
+        example: 1
         required: true
         schema:
           type: integer

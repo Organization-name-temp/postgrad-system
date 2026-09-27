@@ -39,9 +39,21 @@ final readonly class TerminationCaseReconciler implements TerminationCases
 
     public function currentForStudent(int $studentId): ?TerminationCaseSummary
     {
-        $case = TerminationCase::query()->where('student_id', $studentId)->whereIn('state', $this->openStates())->latest('id')->first();
+        return $this->currentForStudents([$studentId])[$studentId] ?? null;
+    }
 
-        return $case === null ? null : $this->summary($case);
+    public function currentForStudents(array $studentIds): array
+    {
+        $values = [];
+        foreach (array_chunk(array_values(array_unique($studentIds)), 100) as $batch) {
+            $cases = TerminationCase::query()->whereIn('student_id', $batch)
+                ->whereIn('state', $this->openStates())->orderByDesc('id')->get();
+            foreach ($cases as $case) {
+                $values[$case->student_id] ??= $this->summary($case);
+            }
+        }
+
+        return $values;
     }
 
     public function latestForStudent(int $studentId): ?TerminationCaseSummary

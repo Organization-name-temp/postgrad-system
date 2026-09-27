@@ -981,3 +981,23 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
   batch/single parity **1 test / 364 assertions, 18.57s**. Pint, PHPStan and deptrac
   passed. This is an internal Public contract addition, with no HTTP API change.
 - Current Standing batch implementation is next; #01 cohort delivery remains pending.
+
+### Current Standing owner batches
+
+- The batch Public tracer first failed on the absent currentForStudents method
+  after correcting its required Observation fingerprint fixture. StandingRecords
+  now acquires bounded owner CGPA/effective-Attempt DTOs and read-only open Cases,
+  then reuses the existing StandingCalculator and summary/explanation mapping.
+  Single-Student calls retain their existing owner contract calls, preserving
+  operational callers and enabling independent batch/single comparisons.
+- Worked grades exercise all five Standing bands, null versus zero, effective D
+  warning at CGPA 3.00 and open-Case precedence. Stale GoodStanding Observations
+  and dismissed Cases do not override current calculation. Seeded 180-Student
+  parity crosses batch boundaries without creating Observations or Cases.
+- Existing Council termination regression initially exposed changed mock call
+  expectations; preserving the single-read calls resolved it. Focused operational
+  tests **11 passed / 82 assertions, 3.99s**. Final owner batch tests **3 passed /
+  208 assertions, 18.41s**. Pint and PHPStan passed; deptrac passed with zero
+  violations. No HTTP payload or generated API change in this slice.
+- #01 cohort selection/API, scoped derived pagination, canonical audited workbook
+  and UI remain required. These owner batches do not mark the ticket complete.

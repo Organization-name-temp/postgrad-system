@@ -7,6 +7,7 @@ use Modules\AcademicStanding\Public\AcademicStanding;
 use Modules\AcademicStanding\Public\StandingRecords;
 use Modules\AcademicStanding\Public\StandingSummary;
 use Modules\AcademicStanding\Public\TerminationCases;
+use Modules\Grading\Public\EffectiveAttemptSummary;
 use Modules\Grading\Public\GradingRecords;
 
 final readonly class DerivedStandingRecords implements StandingRecords
@@ -15,12 +16,36 @@ final readonly class DerivedStandingRecords implements StandingRecords
 
     public function currentForStudent(int $studentId): StandingSummary
     {
-        $cgpa = $this->grading->cgpaFor($studentId);
-        $attempts = $this->grading->effectiveAttemptsForStudent($studentId);
+        return $this->summary(
+            $studentId,
+            $this->grading->cgpaFor($studentId),
+            $this->grading->effectiveAttemptsForStudent($studentId),
+            $this->terminationCases->currentForStudent($studentId) !== null,
+        );
+    }
+
+    public function currentForStudents(array $studentIds): array
+    {
+        $values = [];
+        foreach (array_chunk(array_values(array_unique($studentIds)), 100) as $batch) {
+            $cgpas = $this->grading->cgpaForStudents($batch);
+            $attempts = $this->grading->effectiveAttemptsForStudents($batch);
+            $cases = $this->terminationCases->currentForStudents($batch);
+            foreach ($batch as $studentId) {
+                $values[$studentId] = $this->summary($studentId, $cgpas[$studentId], $attempts[$studentId], isset($cases[$studentId]));
+            }
+        }
+
+        return $values;
+    }
+
+    /** @param list<EffectiveAttemptSummary> $attempts */
+    private function summary(int $studentId, ?float $cgpa, array $attempts, bool $terminationPending): StandingSummary
+    {
         $standing = StandingCalculator::calculate(
             $cgpa,
             array_map(fn ($attempt): bool => $attempt->earned, $attempts),
-            $this->terminationCases->currentForStudent($studentId) !== null,
+            $terminationPending,
         );
 
         return new StandingSummary(

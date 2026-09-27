@@ -29,7 +29,11 @@ it('shows frozen certification and QR in both languages and removes public conte
       verificationPath="/records/verify/unguessable"
     />,
   )
-  expect(screen.getByText('OFFICIAL TRANSCRIPT')).toHaveAttribute('aria-hidden', 'true')
+  const watermark = screen.getByTestId('official-watermark')
+  expect(watermark.tagName).toBe('IMG')
+  expect(watermark).toHaveAttribute('alt', '')
+  expect(watermark).toHaveAttribute('aria-hidden', 'true')
+  expect(decodeURIComponent(watermark.getAttribute('src') ?? '')).toContain('OFFICIAL TRANSCRIPT')
   expect(screen.getByText('AB123456')).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Verify this official copy' })).toHaveAttribute(
     'href',
@@ -38,7 +42,9 @@ it('shows frozen certification and QR in both languages and removes public conte
   expect(screen.getByTitle('QR verification link')).toBeInTheDocument()
   await act(() => i18n.changeLanguage('ar'))
   expect(screen.getByText('سارة')).toBeInTheDocument()
-  expect(screen.getByText('سجل أكاديمي رسمي')).toHaveAttribute('aria-hidden', 'true')
+  expect(
+    decodeURIComponent(screen.getByTestId('official-watermark').getAttribute('src') ?? ''),
+  ).toContain('سجل أكاديمي رسمي')
   rerender(
     <IssuedDocument
       issuance={{ reference: 'REF-ONE', status: 'Revoked' }}
@@ -48,7 +54,7 @@ it('shows frozen certification and QR in both languages and removes public conte
   )
   expect(screen.getByText('نسخة رسمية ملغاة الصلاحية')).toBeInTheDocument()
   expect(screen.getByText('REF-ONE')).toBeInTheDocument()
-  expect(screen.queryByText('سجل أكاديمي رسمي')).not.toBeInTheDocument()
+  expect(screen.queryByTestId('official-watermark')).not.toBeInTheDocument()
   expect(screen.queryByText('AB123456')).not.toBeInTheDocument()
   expect(screen.queryByText('سارة')).not.toBeInTheDocument()
   expect(screen.queryByText('Records Officer')).not.toBeInTheDocument()

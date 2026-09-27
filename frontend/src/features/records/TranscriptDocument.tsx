@@ -11,6 +11,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@mui/material/styles'
 import type {
   CurrentUnofficialTranscript200Data,
   ReviewCoherentOfficialTranscriptPreview200DataSnapshot,
@@ -46,7 +47,13 @@ export function TranscriptDocument({
   official?: boolean
 }) {
   const { t, i18n } = useTranslation('records', { lng: language })
+  const theme = useTheme()
   const arabic = (language ?? i18n.language) === 'ar'
+  // This duplicates the readable official heading as a decorative graphic.
+  // An empty image alternative keeps it out of the document's reading order.
+  const watermark = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80"><text x="300" y="40" text-anchor="middle" dominant-baseline="middle" fill="${theme.palette.common.black}" font-family="${theme.typography.fontFamily?.replaceAll('"', '&quot;')}" style="font-size:${theme.typography.h2.fontSize};font-weight:${theme.typography.fontWeightBold}">${t('service.watermark')}</text></svg>`,
+  )}`
   const name = (value: { name_en?: string; name_ar?: string } | undefined) =>
     arabic ? value?.name_ar : value?.name_en
   const program = record.program
@@ -72,24 +79,24 @@ export function TranscriptDocument({
     >
       {official && (
         <Box
-          component="span"
+          component="img"
+          src={watermark}
+          alt=""
+          data-testid="official-watermark"
           aria-hidden="true"
           sx={{
             position: 'absolute',
             insetInline: 0,
             top: '40%',
-            textAlign: 'center',
+            width: '100%',
             transform: 'rotate(-25deg)',
-            fontSize: (theme) => theme.typography.h2.fontSize,
-            fontWeight: 'bold',
-            color: 'text.primary',
             opacity: 0.08,
             pointerEvents: 'none',
             userSelect: 'none',
+            ...theme.applyStyles('dark', { filter: 'invert(1)' }),
+            '@media print': { filter: 'none !important' },
           }}
-        >
-          {t('service.watermark')}
-        </Box>
+        />
       )}
       <Box
         component="img"

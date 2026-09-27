@@ -83,3 +83,12 @@ Functional polling now permits 20 seconds; Dashboard setup waits for authenticat
 content and its locale save before context closure. All content/access/a11y assertions
 remain. The three originally failing tests passed together (4.4 minutes), including
 the full four-user enrollment loop. The complete gate rerun follows a fresh seed.
+
+The subsequent full frontend gate passed all 534 unit tests and 65 browser tests;
+the Transcript journey exposed a serious axe contrast finding on faint HTML watermark
+text. A decorative bilingual SVG image with an empty alternative retains the graphic
+alongside the readable official heading. The focused image-contract test failed before
+the fix and passed afterward; TypeScript and the complete Transcript journey passed
+(3.5 minutes), including axe, image loading, A4 print, public revocation, refund and
+collection. Arabic official/revoked A4 screenshot artifacts were inspected. No axe
+rule or content assertion was disabled. Complete gate re-verification follows.

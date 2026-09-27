@@ -122,12 +122,17 @@ async function checkReadAndPrintMatrix(
       await page.emulateMedia({ media: 'print' })
       if (!publicView) await expect(page.getByRole('banner')).toBeHidden()
       if (!revokedPublic) await expect(page.locator('article')).toBeVisible()
-      const watermark = page.getByText(
-        language === 'ar' ? 'سجل أكاديمي رسمي' : 'OFFICIAL TRANSCRIPT',
-        { exact: true },
-      )
+      const watermark = page.getByTestId('official-watermark')
       if (name === 'current' || revokedPublic) await expect(watermark).toHaveCount(0)
-      else await expect(watermark).toBeVisible()
+      else {
+        await expect(watermark).toBeVisible()
+        expect(decodeURIComponent((await watermark.getAttribute('src')) ?? '')).toContain(
+          language === 'ar' ? 'سجل أكاديمي رسمي' : 'OFFICIAL TRANSCRIPT',
+        )
+        expect(
+          await watermark.evaluate((image: HTMLImageElement) => image.naturalWidth),
+        ).toBeGreaterThan(0)
+      }
       const fits =
         revokedPublic ||
         (await page

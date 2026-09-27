@@ -1550,3 +1550,17 @@ implementation, not whole Phase 4.6 completion or passing an unrun final gate.
   started with **175 tests / one worker** against the fresh fixture. Durable log:
   `backend/storage/logs/phase7-verification/frontend-gate.log`. Its terminal result
   remains pending; the interrupted earlier run is not claimed complete.
+- Recovery frontend full-gate browser attempt stopped deliberately (exit 143) after
+  two concrete failures: grading headline and English Readiness setup selected
+  English before saved `/me` Arabic preferences applied. Failure artifacts show
+  correct authenticated accounts/permissions with Arabic shell labels; Arabic
+  Readiness subsequently passed. No academic calculation failure was observed.
+  All 121 unit files / 676 tests, static stages and preceding 109 browser checks
+  passed; remaining browser checks were not completed and no full-gate pass is
+  claimed. Durable failed-attempt log remains in workspace storage.
+- Reused the existing authenticated locale helper across seeded browser setups:
+  await actual `/me` preference, then English and saved-locale GET completion;
+  explicit language switches await persistence before navigation/reload. Product
+  code, owner workflows and assertions remain unchanged. Focused five-test serial
+  grading-headline/Readiness run is active against the retained failing preference
+  state; next full gate will receive a new fresh fixture after it ends.

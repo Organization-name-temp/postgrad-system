@@ -55,8 +55,13 @@ configured ports. All seeded accounts below use password `password`.
   states. Current/public revoked use one page; full official snapshots use two.
   Native EN/AR paper inspection includes continuation headers, watermark, seal,
   QR placement and dark-theme black text.
-- Backend gate: running; final result pending.
-- Frontend gate and newly expanded owner presentation checks: pending.
+- Backend gate: passed completely (1,329 tests / 8,421 assertions plus static
+  and generated OpenAPI checks).
+- Expanded owner presentation checks passed: Admissions 4.6m and seven remaining
+  correction/Enrollment/headline/Records checks in 15.2m.
+- Frontend gate: 121 files / 676 unit tests passed; complete serial browser stage
+  was interrupted without a terminal result. Repeating from a fresh seed; complete
+  frontend-gate success remains pending.
 - Consolidated Standards/Spec code review: pending; none run per ticket.
 
 ## Human acceptance

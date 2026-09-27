@@ -361,3 +361,10 @@ serious/critical axe checks. No live Cycle windows or named personas modified by
 the new collection checks. Workbook artifacts captured in the local Playwright
 report. The type-ahead's beyond-page and empty-search behavior is proven by focused
 RTL tests; the browser headline exercises the preserved single-open-Cycle path.
+
+Cycle commit `407ea30`: `composer api:check` and then `npm run api:check`
+**passed**, with no generated drift. Remaining #06 frontier is the interview
+worklists/slot pool and staff/applicant pickers, Catalog picker adoption and direct
+Dean Faculty criterion. Existing interview scheduling is university-wide for its
+privileged actors; migration must preserve that operational scope independently
+of the faculty-scoped Dean review/decision queues.

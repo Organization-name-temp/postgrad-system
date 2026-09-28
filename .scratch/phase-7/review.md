@@ -77,3 +77,16 @@ remain explicit dispositions rather than missing product behavior.
 
 Initial counts: Standards **3**, worst **P2**; Spec **1**, worst **P1**. All four findings resolved and confirmed by their native reviewers; no remaining actionable findings. Human acceptance remains
 separate from native review; no merge, push or deployment is performed.
+
+## CI follow-up within this consolidated review
+
+The additional GitHub verification request exposed two browser label-contrast
+failures in run `36360347596` (177/179 passed). Root reproduced the rendered
+intermediate colour on the actual MUI gallery, locked the finite-transition wait
+with a RED/GREEN native regression and committed the audit correction at
+`c1dbe1c`. No production colour, axe threshold, domain behaviour or permission
+changed. Both existing native reviewers inspected only this follow-up delta and
+reported **no actionable Standards or Spec issue**. This is resolution follow-up
+within the single consolidated review, not a second full or per-ticket review.
+Affected real Enrollment/Records rechecks and remote publication verification
+remain pending. See the tracker for exact diagnostic/regression evidence.

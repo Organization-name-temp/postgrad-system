@@ -1,4 +1,5 @@
 import { selectAuthenticatedLanguage } from './authenticatedLanguage'
+import { settledPresentation } from './settledPresentation'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, type Page } from '@playwright/test'
 
@@ -35,6 +36,7 @@ export async function auditPresentation(page: Page) {
           `${page.url()}: ${scheme}/${locale}/${width}`,
         ).toBe(true)
       }
+      await settledPresentation(page)
       const scan = await new AxeBuilder({ page }).analyze()
       expect(
         scan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
@@ -46,4 +48,6 @@ export async function auditPresentation(page: Page) {
     await page.getByRole('button', { name: 'Toggle light and dark theme', exact: true }).click()
   }
   if (viewport) await page.setViewportSize(viewport)
+  // Callers often run another scan immediately after this audit restores its theme.
+  await settledPresentation(page)
 }

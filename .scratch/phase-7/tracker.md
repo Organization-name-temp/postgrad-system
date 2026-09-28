@@ -1742,3 +1742,34 @@ no hypothetical workflow change or successful CI conclusion is inferred.
   Standing table retained. Native AR visual inspection confirms RTL ordering,
   legible monochrome chart/labels and matching table, with no app chrome. This is
   technical evidence, not the required human print acceptance.
+
+### GitHub browser failure and test-first timing correction
+
+Run `36360347596` completed **177 passed / 2 failed (32.9m)**, with backend and
+frontend jobs green. Records' earlier watermark locale issue is absent; the two
+failures are now real rendered label-colour measurements: Enrollment's outer axe
+scan after the four-state audit restores light mode (4.24:1, `#757b89` on white),
+and Records' presentation audit (4.35:1, `#6e7583` on the default light surface).
+
+An offline native browser probe of the actual MUI gallery observed the label's
+running **200ms colour transition**, ending at token `rgb(107, 114, 128)`. Pausing
+that actual transition at 100ms reproduced axe's serious contrast symptom
+(**3.73:1**) and resuming/awaiting `finished` gave **zero contrast violations**.
+The first probe accidentally intercepted source imports with an overly broad
+API route; it was corrected to stub only `/api/v1/me`, matching the existing
+public gallery seam. It never used or mutated a seeded account.
+
+- New deterministic native regression stretches the real label transition and
+  retains an infinite decorative animation. RED with a no-op wait: expected
+  token `rgb(107, 114, 128)`, received transitional `rgb(176, 183, 193)`.
+- GREEN with `settledPresentation`: **1 passed (7.3s)**. The helper waits on finite
+  `Animation.finished` promises and treats cancellation as settled; infinite
+  animation is excluded and remains active. No arbitrary timeout, production
+  colour change, axe exclusion or softened contrast assertion.
+- Presentation audit waits before each scan and after restoring its original
+  theme/viewport, so the caller's subsequent scan also sees the endpoint.
+- The existing full local 179-test gate continues; the offline regression uses
+  a separate artifact/config path and no mutable API fixture. This additional
+  test will be included in subsequent suite discovery (180 tests). Real affected
+  Enrollment and Records journeys must rerun after the active suite; no green
+  remote result for this new timing correction is claimed before publication.

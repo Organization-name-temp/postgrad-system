@@ -50,31 +50,42 @@ later list is a fill. It establishes, once and in one place:
 
 **Blocked by:** 01 — Seeded cohort + assertion audit.
 
-**Status:** ready-for-agent
+**Status:** implemented prerequisite — final verification pending
 
-- [ ] `Support\` autoloads, has its own deptrac layer with every `*_Internal → Support` edge granted
+- [x] `Support\` autoloads, has its own deptrac layer with every `*_Internal → Support` edge granted
       and **no outbound edge**; a deliberate violation fails `deptrac analyse`
-- [ ] The parser is a pure function of input + allowlist producing an immutable spec, unit-tested
+- [x] The parser is a pure function of input + allowlist producing an immutable spec, unit-tested
       with **no database**
-- [ ] Unit tests cover multi-value parsing, `_min`/`_max` ranges, comma-separated multi-column sort
+- [x] Unit tests cover multi-value parsing, `_min`/`_max` ranges, comma-separated multi-column sort
       with independent descending markers, effective allowlists, and rejection of
       unknown fields, `per_page` clamping, and every Arabic normalisation fold
-- [ ] Equal selected sort values fall back to the endpoint's stable unique key; adjacent-page tests
+- [x] Equal selected sort values fall back to the endpoint's stable unique key; adjacent-page tests
       prove ties cannot duplicate or omit rows
-- [ ] The screening queue filters on Application Status, Program, Admission Cycle and derived age
-- [ ] `q` searches the declared fields across `_en` and `_ar`; `احمد` finds `أحمد` and a partial
+- [x] The screening queue filters on Application Status, Program, Admission Cycle and derived age
+- [x] `q` searches the declared fields across `_en` and `_ar`; `احمد` finds `أحمد` and a partial
       National ID matches
-- [ ] The endpoint returns the paginated envelope with a correct total; `per_page=5000` is clamped
+- [x] The endpoint returns the paginated envelope with a correct total; `per_page=5000` is clamped
       to 100 rather than refused
-- [ ] A field outside the actor's effective allowlist is ignored, and a filter value outside the
+- [x] A field outside the actor's effective allowlist is ignored, and a filter value outside the
       actor's scope returns an empty page rather than 422
-- [ ] `<FilterBar>`, `<DataToolbar>` and pagination live in `shared/ui` and contain no domain names
-- [ ] Filter, sort and page state round-trip through the URL; reload and back-button preserve the
+- [x] `<FilterBar>`, `<DataToolbar>` and pagination live in `shared/ui` and contain no domain names
+- [x] Filter, sort and page state round-trip through the URL; reload and back-button preserve the
       view, and a pasted URL reproduces it
-- [ ] The cross-module contract test exists with the screening queue as its first dataset row
-- [ ] `openapi.yaml` and the Orval client are regenerated **and committed**; both `api:check` gates
+- [x] The cross-module contract test exists with the screening queue as its first dataset row
+- [x] `openapi.yaml` and the Orval client are regenerated **and committed**; both `api:check` gates
       pass
-- [ ] Every query parameter has an explicit Scribe `@queryParam`; every model-bound route retains
+- [x] Every query parameter has an explicit Scribe `@queryParam`; every model-bound route retains
       its `@urlParam ... Example:` annotation so generated examples stay deterministic
-- [ ] Vitest covers `<FilterBar>` states and the URL-state round trip
+- [x] Vitest covers `<FilterBar>` states and the URL-state round trip
 - [ ] `composer gate` and `npm run gate` green
+
+## Phase 7 prerequisite disposition
+
+This ticket is in the authorized executable closure for Phase 7; its implementation
+is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
+before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
+focused tests, runtime evidence and the fixed review baseline, and
+[the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
+findings. Final backend gate is green; the complete frontend browser gate remains
+active. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+outside this goal and are not marked complete by this disposition.

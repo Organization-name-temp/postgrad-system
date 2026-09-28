@@ -1730,3 +1730,15 @@ intermediate foreground `#757b89` on white). The shipped secondary-text token is
 The prior run's logs and artifacts are retained in ignored durable verification
 storage. Current remote browser outcome and any necessary fixes remain pending;
 no hypothetical workflow change or successful CI conclusion is inferred.
+
+- Downloaded completed GitHub job logs through the jobs API while the overall run
+  remains active. Remote backend confirms **1,334 passed / 8,458 assertions
+  (326.01s)**, including its static/boundary/OpenAPI checks; remote frontend confirms
+  **121 files / 684 passed (351.94s)** with API/lint/format/typecheck steps successful.
+  Durable logs: `github-final-backend.log` and `github-final-frontend.log` in ignored
+  verification storage. The GitHub browser conclusion is still pending.
+- Final local Standing paper inspected from the current full gate: r05 EN and AR
+  each one A4 page, active Program/degree/lifecycle criteria and 58-Student exact
+  Standing table retained. Native AR visual inspection confirms RTL ordering,
+  legible monochrome chart/labels and matching table, with no app chrome. This is
+  technical evidence, not the required human print acceptance.

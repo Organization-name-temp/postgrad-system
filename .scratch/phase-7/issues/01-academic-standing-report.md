@@ -4,7 +4,7 @@
 
 **Blocked by:** Phase 4.6 #08 — Analytics section + Application Pipeline Report + drill-through; Phase 4.6 #15 — Print stylesheet for Reports. Their own blocking edges remain in force. Verify executable delivery before starting: merged planning documents do not satisfy these prerequisites.
 
-**Status:** implemented — final verification pending
+**Status:** ready-for-human
 
 - [x] AcademicStanding owns the Report, summary, pageable List and export. Cross-module facts arrive through owner Public contracts and DTOs; no new Reporting module, stored standing balance or cross-owner SQL join is introduced.
 - [x] Backend access requires `standing.monitor` and an eligible oversight Role or administrator override. Student Affairs/Council see the university population, Advisors live advisees, Deans assigned Faculties, and Department Heads assigned Departments. Student-only and Instructor-only Users cannot access cohort APIs or navigation.
@@ -31,7 +31,12 @@ Implemented on `phase-7-academic-reports-bilingual` against fixed baseline
 `b3a3ae7b71538c36230985270de2b73bc2f92088`. Focused red/green evidence,
 owner/API/UI verification and prerequisite dispositions are recorded in
 [the Phase 7 tracker](../tracker.md). The single consolidated
-[Standards/Spec review](../review.md) has all four actionable findings resolved.
-The final backend gate passed (1,334 tests / 8,458 assertions); frontend static
-checks and 684 unit tests passed. The complete serial browser stage is still
-running. This disposition does not claim phase acceptance or human review.
+[Standards/Spec review](../review.md) has all five actionable findings resolved.
+Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend API/static checks, 121 files / 684 unit tests and all 179 serial browser
+checks. The new CI transition regression and complete affected Enrollment/Records
+journeys passed together (3/3, 12.4m, exit 0), providing evidence for all 180
+current distinct browser tests. Required human demo/Arabic/print acceptance is
+pending. Latest GitHub run is pre-fix and failed two browser contrast assertions;
+`c1dbe1c` fixes them locally, with remote verification awaiting publication under
+the user's no-push instruction. No phase acceptance, push or merge is claimed.

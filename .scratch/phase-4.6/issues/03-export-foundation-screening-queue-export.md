@@ -40,7 +40,7 @@ This establishes the export half of the platform, and every later export is a co
 
 **Blocked by:** 02 — Query contract foundation + the screening queue filtered end to end.
 
-**Status:** implemented prerequisite — final verification pending
+**Status:** ready-for-human
 
 - [x] `GET /applications/export` accepts the identical query string as the list and returns a
       streamed `.xlsx`
@@ -64,7 +64,7 @@ This establishes the export half of the platform, and every later export is a co
       downloads an in-memory blob, and is not rendered as a bare export link
 - [x] Scribe documents a single binary response; `openapi.yaml` and the Orval client are
       regenerated and committed
-- [ ] `composer gate` and `npm run gate` green
+- [x] `composer gate` and `npm run gate` green
 
 ## Phase 7 prerequisite disposition
 
@@ -73,6 +73,8 @@ is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
 before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
 focused tests, runtime evidence and the fixed review baseline, and
 [the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
-findings. Final backend gate is green; the complete frontend browser gate remains
-active. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
 outside this goal and are not marked complete by this disposition.

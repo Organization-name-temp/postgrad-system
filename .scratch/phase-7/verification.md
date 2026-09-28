@@ -70,16 +70,20 @@ a foreign app. All seeded accounts below use password `password`.
   attempt had 178 browser passes and one Records locale assertion failure; the
   reload-preference fix passed the complete affected Records journey (9.5m).
   Full gate artifacts are retained under ignored `final-gate-artifacts/`. The
-  additional CI timing regression was added after this run discovered its tests;
-  it passed offline, with the three-test affected recheck pending.
+  additional CI timing regression was added after this run discovered its tests.
+  It and the complete affected Enrollment/Records workflows passed together:
+  **3/3 (12.4m), exit 0** at `12c7c9a`, including fix `c1dbe1c`. All 180 current
+  distinct browser tests have evidence; no single 180-test gate run is claimed.
 - GitHub run [36360347596](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36360347596):
   backend and frontend jobs passed, matching the 1,334/684 test counts. Browser
   stage finished 177/179, with two label-colour assertions during theme transition.
   A real MUI probe and RED/GREEN native regression establish the correction at
   `c1dbe1c`: wait for finite presentation animations before scans and after audit
   restoration. Static format and 180-test discovery pass. Affected Enrollment/
-  Records rechecks and a remote run containing this correction remain pending.
-- Consolidated Standards/Spec review: one native run, four actionable findings
+  Records rechecks passed (3/3 with new regression, 12.4m, exit 0). A remote run
+  containing this correction remains pending publication; the no-push instruction
+  prevents agent publication, and the existing failed run is not reported green.
+- Consolidated Standards/Spec review: one native run with resolution follow-ups, five actionable findings
   fixed and confirmed resolved. [Review evidence](review.md) includes separate
   axes, requirements, test-first fixes and verification.
 
@@ -88,3 +92,18 @@ a foreign app. All seeded accounts below use password `password`.
 Native verification is not human acceptance. Phase 7 remains unaccepted until
 its headline demo, Arabic wording and browser paper presentation receive the
 required human review. No push, merge, deployment or external runner is authorized.
+
+## Fixture and publication dispositions
+
+GeneratedCohortSeeder preserves named rosters using isolated staff. The necessary
+Phase 7 worked layer reuses MSC-CE/two existing Courses, isolates its Instructor
+and adds three advisees/open Cases to r03 plus departmental work to r06. Original
+persona/Student records are retained; global work populations are expanded rather
+than claimed identical to the baseline. This permitted addition is reflected in
+[the resolved review](review.md).
+
+GitHub CI is **not yet confirmed green at the fix revision**. The latest remote
+run's backend/frontend passed and browser failed 2/179 on pre-fix source. Local
+RED/GREEN reproduction, unchanged contrast assertions and full affected workflows
+verify the correction, but remote confirmation requires publication. No push,
+merge or old-source retry was performed.

@@ -4,7 +4,7 @@
 
 **Blocked by:** Phase 7 #01 — Academic Standing Report, which establishes academic cohort scope and Analytics integration.
 
-**Status:** implemented — final verification pending
+**Status:** ready-for-human
 
 - [x] AcademicStanding owns the Case-based summary, pageable List and export. Apply #01's `standing.monitor` oversight gate, live assignment scope union and administrator override. Staff without operational review authority receive only the minimal oversight summary.
 - [x] Default results include non-terminal Cases and final Terminated decisions. An explicit history filter also includes Dismissed, Trigger Cleared and Evidence Changed outcomes, preserving replaced Case history.
@@ -29,7 +29,12 @@ Implemented on `phase-7-academic-reports-bilingual` against fixed baseline
 `b3a3ae7b71538c36230985270de2b73bc2f92088`. Focused red/green evidence,
 owner/API/UI verification and prerequisite dispositions are recorded in
 [the Phase 7 tracker](../tracker.md). The single consolidated
-[Standards/Spec review](../review.md) has all four actionable findings resolved.
-The final backend gate passed (1,334 tests / 8,458 assertions); frontend static
-checks and 684 unit tests passed. The complete serial browser stage is still
-running. This disposition does not claim phase acceptance or human review.
+[Standards/Spec review](../review.md) has all five actionable findings resolved.
+Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend API/static checks, 121 files / 684 unit tests and all 179 serial browser
+checks. The new CI transition regression and complete affected Enrollment/Records
+journeys passed together (3/3, 12.4m, exit 0), providing evidence for all 180
+current distinct browser tests. Required human demo/Arabic/print acceptance is
+pending. Latest GitHub run is pre-fix and failed two browser contrast assertions;
+`c1dbe1c` fixes them locally, with remote verification awaiting publication under
+the user's no-push instruction. No phase acceptance, push or merge is claimed.

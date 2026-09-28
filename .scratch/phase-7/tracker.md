@@ -26,21 +26,30 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 
 | Ticket | State | Evidence |
 | --- | --- | --- |
-| 01 Standing | Implemented; final acceptance pending | Owner summary/List/export, protected EN/AR UI and four native journeys verified below; final gates and human acceptance pending |
-| 02 Readiness | Implemented; final acceptance pending | Bounded owner parity, scoped summary/List/export, EN/AR UI and four native journeys verified below; final gates and human acceptance pending |
-| 03 Termination | Implemented; final acceptance pending | Scoped minimal Case summary/List/export, authorized review links, worked seed evidence, EN/AR UI and four native journeys verified below |
-| 04 Shell/Catalog/Admissions polish | Implemented; final verification pending | Concrete label, count, contrast and responsive defects fixed test-first; core/detail matrices and expanded Admissions journey passed; final gates and human acceptance pending |
-| 05 Enrollment/Grading/progress polish | Implemented; final verification pending | Paired Waiver/loading/identifier/count corrections verified; expanded owner journeys and final gate and human acceptance pending |
-| 06 Records polish | Implemented; final verification pending | Paired loading corrections, service journey, four-state read/print and invalid public verifier passed; expanded action-state checks and final gate and human acceptance pending |
-| 07 Acceptance | Implemented; final verification pending | Exact-population/export headline passed; reproducible demo and audit recorded; complete gates pending; consolidated review resolved, human acceptance required |
+| 01 Standing | Verified locally; ready for human | Scoped owner summary/List/export, parity/privacy/no-write tests, four native language/persona journeys and paper/a11y passed |
+| 02 Readiness | Verified locally; ready for human | Bound-curriculum parity, overlapping exact blocker intersection, scoped export, four native journeys and paper/a11y passed |
+| 03 Termination | Verified locally; ready for human | Minimal scoped Case/history/count/date semantics, stage-authorized links, four native journeys and paper/a11y passed |
+| 04 Shell/Catalog/Admissions polish | Verified locally; ready for human | Concrete fixes and complete core/detail matrices plus expanded Admissions journey passed |
+| 05 Enrollment/Grading/progress polish | Verified locally; ready for human | Paired language/token/control fixes, complete owner matrices/workflows and post-CI Enrollment recheck passed |
+| 06 Records polish | Verified locally; ready for human | Complete service workflow, 20 EN/AR paper variants, private invalid/revoked public states and post-CI recheck passed |
+| 07 Acceptance | Technical verification complete; human acceptance pending | Both package gates green, all 180 current distinct browser tests evidenced, one consolidated review/five findings resolved; GitHub fix publication remains pending |
 
 ## Commands and results
 
-Complete backend gate passed (1,329 tests / 8,421 assertions; details below).
-The one consolidated Standards/Spec review is resolved (three Standards findings,
-one Spec finding; fixes committed at `c4be343`). Final backend gate passed with **1,334 tests / 8,458 assertions**; the complete
-frontend gate passed completely (121 files / 684 unit tests and 179 serial browser checks, terminal exit 0). The subsequent CI timing correction has its three affected rechecks pending. Starting commit and initial clean worktree
-verified. Review evidence is in [review](review.md).
+Both final package gates are **GREEN**: backend **1,334 tests / 8,458 assertions**
+plus static/boundary/OpenAPI checks; frontend API/static checks, **121 files / 684
+unit tests** and **179 serial browser checks**, each terminal exit 0. The CI timing
+correction passed its three affected rechecks (12.4m, exit 0), including the new
+regression. This gives executable evidence for all 180 current distinct browser
+tests; no single 180-test gate run is claimed.
+
+The single consolidated Standards/Spec review is resolved: three Standards and
+two Spec findings, including the closeout fixture-description correction. Runtime
+review fixes are at `c4be343`; the CI test correction is at `c1dbe1c`. Starting
+commit and initial worktree are verified. [Review evidence](review.md) preserves
+separate axes and resolution follow-ups. Human acceptance and remote verification
+of the unpublished CI correction remain pending. Earlier results below are
+chronological evidence, superseded by these final outcomes where applicable.
 
 ### Shared frontend prerequisites (#02/#03/#05 slices)
 
@@ -1262,7 +1271,10 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 - New isolated Phase7AcademicReportSeeder uses existing academic seed helpers,
   two unused graduate Offerings and owner-derived D/F Grades. Public Termination
   reconciliation creates three real Cases; reseeding preserves their reviews and
-  evidence. Named operational rosters remain untouched. Test-first missing-seeder
+  evidence. This worked layer retains original persona/Student records but adds
+  three advisees/open Cases to r03 and departmental review work to r06; the
+  isolated Instructor avoids altering existing teaching rosters. It reuses
+  MSC-CE and two existing graduate Courses. Test-first missing-seeder
   RED became **1 passing test / 17 assertions, 18.75s**; Pint/PHPStan passed.
 - Seeded development fixtures successfully. Native EN/AR × oversight persona
   browser/print/accessibility verification is running; no result claimed yet.
@@ -1414,7 +1426,7 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 
 | Phase 4.6 ticket | Executable disposition | Evidence seam |
 | --- | --- | --- |
-| 01 | Implemented bounded fixture/assertion closure; backend gate passed, frontend gate pending | GeneratedCohortSeederTest, named-persona seeder tests, collection/journey counts audited throughout |
+| 01 | Verified bounded fixture/assertion closure; both package gates passed | GeneratedCohortSeederTest, named-persona seeder tests, collection/journey counts audited throughout |
 | 02 | Existing Support parser verified; shared URL/filter/page controls and scoped screening tracer implemented | CollectionQueryTest, CollectionContractTest, ScreeningQueuePage interactions and serial collections |
 | 03 | Existing OpenSpout writer verified; canonical full-selection audited exports wired | Screening/collection and Report export HTTP tests, workbook readback, scoped native exports |
 | 04 | Required owner aggregate/batch closure implemented; no foreign Internal calls | BatchCgpaSeededParityTest, aggregate parity tests, GraduationBatchSeededParityTest, owner Curriculum/Credit-Hour/Standing batches |
@@ -1424,7 +1436,7 @@ Catalog grids remain the next prerequisite follow-up; no final gate/review claim
 | 15 | Browser Report print implemented and native papers inspected across Pipeline, Standing, Readiness and Termination | ReportDocument/Chart print tests and real EN/AR A4 artifacts; human paper signoff still required |
 
 Other Phase 4.6 tickets remain outside this goal. This table records executable
-implementation, not whole Phase 4.6 completion or passing an unrun final gate.
+implementation verified by both final gates, not whole Phase 4.6 completion.
 
 ### Final package verification underway
 
@@ -1800,3 +1812,45 @@ two; official, valid-public and official-revoked two; revoked-public one, in eac
 theme. Readiness EN/AR each two pages; native inspection of its final AR
 continuation confirms overlapping-blocker warning, monochrome chart and exact
 count table. Human demo/Arabic wording/print acceptance remains pending.
+
+### CI correction affected recheck — GREEN
+
+At source revision `12c7c9a` (including runtime-neutral E2E correction `c1dbe1c`),
+a freshly migrated/seeded development fixture and isolated ports ran exactly:
+`npm run e2e -- e2e/enrollment.spec.ts e2e/records.spec.ts
+e2e/presentation-settle.spec.ts`. **3/3 passed (12.4m), terminal exit 0**:
+Enrollment full workflow 3.8m; finite-transition/infinite-animation regression
+4.6s; full Records correction/certification/QR/revocation/refund/collection 8.4m.
+The contrast checks remain unchanged. Durable `ci-affected-browser.log`/`.exit`
+and complete `ci-affected-artifacts/` retain evidence. All 180 distinct current
+browser tests have executable evidence: the complete 179-test gate plus this
+new regression, with the two affected long workflows rerun at the fix revision.
+No single 180-test full-gate run or green GitHub fix run is claimed.
+
+Fresh recheck seeding passed; generated cohort took **13.327s** and Phase 7
+worked Cases **2.330s**. No mutable browser competed with seeding or another
+journey. Both package gates, affected verification and consolidated review are
+resolved locally. Remaining acceptance is the human headline/Arabic/print review.
+
+### Closeout fixture-description correction (Spec P2)
+
+Within the same consolidated review, native Spec follow-up confirmed that the
+approved Phase 7 allowance for necessary deterministic academic Cases permits
+the additive worked demo. The generated 180-Student layer itself uses isolated
+staff and preserves named rosters. The later worked layer reuses **MSC-CE and
+two existing Courses**, has an isolated Instructor, adds **three advisees/open
+Cases to r03** and departmental review work to **r06**. Original persona and
+Student records remain preserved; their work populations expand. The earlier
+claim that all named operational rosters remain untouched was incorrect and is
+corrected above. Seeder tests comparing after DatabaseSeeder do not establish
+global roster parity against the review baseline. No new runtime blocker was
+identified; the disposition is documented rather than falsely claiming parity.
+
+### Remaining GitHub disposition
+
+Latest observed remote run remains `36360347596` at `5ad5ec1`: backend/frontend
+green, browser 177/179 with the two transient contrast failures now corrected
+and verified locally. No run containing `c1dbe1c` is available. Publication is
+excluded by the user's explicit no-push instruction, so remote verification is
+**pending publication of the reviewed branch**, not green. The agent has neither
+pushed, merged nor triggered a misleading rerun of the old source revision.

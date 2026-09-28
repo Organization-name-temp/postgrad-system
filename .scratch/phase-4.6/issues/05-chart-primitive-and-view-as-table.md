@@ -29,7 +29,7 @@ Phase 0.5, unused. This ticket answers the other half rather than waiving it.
 
 **Blocked by:** None — can start immediately in parallel with ticket 01; ticket 04 follows 01.
 
-**Status:** implemented prerequisite — final verification pending
+**Status:** ready-for-human
 
 - [x] `@mui/x-charts` added at a version aligned with the installed MUI X major, verified rather
       than assumed
@@ -44,7 +44,7 @@ Phase 0.5, unused. This ticket answers the other half rather than waiving it.
 - [x] Axis and legend text are always present, so colour is never the only signal
 - [x] The `/style` gallery renders bar, line and pie across light/dark × EN/AR as living reference
 - [x] `@axe-core/playwright` passes on `/style` in all four combinations
-- [ ] `npm run gate` green
+- [x] `npm run gate` green
 
 ## Phase 7 prerequisite disposition
 
@@ -53,6 +53,8 @@ is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
 before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
 focused tests, runtime evidence and the fixed review baseline, and
 [the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
-findings. Final backend gate is green; the complete frontend browser gate remains
-active. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
 outside this goal and are not marked complete by this disposition.

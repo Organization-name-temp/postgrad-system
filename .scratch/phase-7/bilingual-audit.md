@@ -28,8 +28,10 @@ The core matrix passed all 36 checks uninterrupted. Workflow-detail checks passe
 populated capacity denial dialog four.
 Expanded Admissions passed 4.6m; Enrollment passed 4.2m; Records passed 8.9m.
 The five grading-headline/Readiness checks passed 2.9m after the saved-locale
-setup race was fixed. The complete frontend gate is rerunning from a fresh seed;
-these focused/grouped results do not claim its terminal success.
+setup race was fixed. These were focused/grouped results. The final complete
+frontend gate subsequently passed all 179 serial checks and 684 unit tests,
+terminal exit 0. The later CI timing correction passed its full affected owner
+journeys and new regression together (3/3, 12.4m, exit 0).
 
 The seeded capacity queue is empty. Its core scan covers the empty queue. A
 separate four-state native audit checks a populated denial dialog using the
@@ -86,8 +88,20 @@ semantic h2 with the same visual typography.
 
 The final backend gate passed after review fixes (1,334 tests / 8,458 assertions
 plus static and OpenAPI checks, terminal exit 0). The complete final frontend gate
-remains pending. The single
-consolidated Standards/Spec review found four actionable issues, all fixed and
-confirmed by native reviewers; details are in [review](review.md). No per-ticket code review was run. Human review of the
+passed (684 unit tests, 179 serial browser checks, exit 0), followed by 3/3
+affected CI timing rechecks. The single consolidated Standards/Spec review has
+five actionable findings resolved, including the worked-fixture description; details are in [review](review.md). No per-ticket code review was run. Human review of the
 [headline demo](verification.md), Arabic wording and browser paper presentation
 remains required before Phase 7 is accepted. No push or merge is authorized.
+
+### T07-01 — rendered theme transition in accessibility audits
+
+GitHub's pre-fix run reported label contrast at 4.24:1 (Enrollment) and 4.35:1
+(Records) during theme changes. A real MUI gallery probe found a 200ms colour
+transition; paused midpoint reproduced serious axe contrast and endpoint had no
+violation. A deterministic native test went RED with an immediate wait and GREEN
+with finite-animation completion, retaining infinite decorative animation.
+Presentation audits now settle before each scan and after theme restoration.
+Contrast assertions and production tokens are unchanged; complete affected
+Enrollment/Records workflows plus the regression passed 3/3 (12.4m), exit 0.
+GitHub confirmation at this fix awaits publication under the no-push instruction.

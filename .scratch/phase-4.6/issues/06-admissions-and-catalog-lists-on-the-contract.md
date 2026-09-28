@@ -48,7 +48,7 @@ rather than the full filter bar, and a 100-row default.
 **Blocked by:** 02 — Query contract foundation; 03 — Export foundation; 04 — batched owner-facade
 derivation used by derived queue values.
 
-**Status:** implemented prerequisite — final verification pending
+**Status:** ready-for-human
 
 - [x] Every Admissions and Catalog collection named above returns the paginated envelope, including
       public and personal lookup collections
@@ -76,7 +76,7 @@ derivation used by derived queue values.
 - [x] `openapi.yaml` and the Orval client regenerated and committed; both `api:check` gates pass
 - [x] Every endpoint documents each `@queryParam`, preserves model-bound `@urlParam ... Example:`,
       and regenerates deterministic OpenAPI/Orval artifacts
-- [ ] `composer gate` and `npm run gate` green
+- [x] `composer gate` and `npm run gate` green
 
 ## Phase 7 prerequisite disposition
 
@@ -85,6 +85,8 @@ is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
 before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
 focused tests, runtime evidence and the fixed review baseline, and
 [the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
-findings. Final backend gate is green; the complete frontend browser gate remains
-active. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
 outside this goal and are not marked complete by this disposition.

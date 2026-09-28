@@ -26,7 +26,7 @@ Browsershot, and only optionally, so this is CSS and nothing else.
 
 **Blocked by:** 08 — Analytics section + Application Pipeline Report + drill-through.
 
-**Status:** implemented prerequisite — final verification pending
+**Status:** ready-for-human
 
 - [x] Printing a Report suppresses app bar, side nav, bell, theme toggle, filter controls and
       export button
@@ -38,7 +38,7 @@ Browsershot, and only optionally, so this is CSS and nothing else.
 - [x] No PDF library, headless browser or new endpoint is introduced
 - [ ] Verified by hand across at least two Reports, in both languages, and recorded in the ticket's
       close-out comment
-- [ ] `npm run gate` green
+- [x] `npm run gate` green
 
 ## Phase 7 prerequisite disposition
 
@@ -47,6 +47,8 @@ is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
 before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
 focused tests, runtime evidence and the fixed review baseline, and
 [the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
-findings. Final backend gate is green; the complete frontend browser gate remains
-active. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
 outside this goal and are not marked complete by this disposition.

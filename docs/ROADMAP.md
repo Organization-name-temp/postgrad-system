@@ -1045,11 +1045,13 @@ coherent owner-managed certification reads.
   manual refund, and official revocation → reference/status-only QR response, in EN/AR.
 
 ### Phase 7 — Reporting & polish (SRS §4.12)
-**Current status:** implementation and verification in progress on
-`phase-7-academic-reports-bilingual`. The three owner-backed Reports and demonstrated
-EN/AR presentation fixes are committed. The final backend gate passed and the single
-consolidated Standards/Spec review is resolved. Final frontend/GitHub browser checks
-and human demo acceptance remain pending; no phase acceptance,
+**Current status:** all seven tickets implemented and verified locally on
+`phase-7-academic-reports-bilingual`, with only prerequisite tickets 01, 02, 03, 04,
+05, 06, 08 and 15 from Phase 4.6 implemented. Both package gates passed and the
+single consolidated Standards/Spec review has five findings resolved. The CI
+timing correction passed its affected workflows/regression (3/3); the existing
+GitHub run is pre-fix and remote confirmation awaits publication. Human demo/
+Arabic/print acceptance remains pending; no phase acceptance,
 push or merge is claimed. Evidence: [tracker](../.scratch/phase-7/tracker.md),
 [audit](../.scratch/phase-7/bilingual-audit.md).
 

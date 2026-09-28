@@ -29,7 +29,7 @@ Prior art for the seam is direct: the existing `Public`-facade tests under `Feat
 
 **Blocked by:** 01 — Seeded cohort + assertion audit.
 
-**Status:** implemented prerequisite — final verification pending
+**Status:** ready-for-human
 
 - [x] The Grading records facade gains a batch CGPA method and distribution method using bounded
       candidate DTO batches, owner-local bulk reads, and the existing calculator
@@ -56,6 +56,8 @@ is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
 before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
 focused tests, runtime evidence and the fixed review baseline, and
 [the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
-findings. Final backend gate is green; the complete frontend browser gate remains
-active. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
 outside this goal and are not marked complete by this disposition.

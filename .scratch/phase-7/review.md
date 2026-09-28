@@ -45,9 +45,17 @@ finding warranted cosmetic refactoring. Tooling-enforced rules were excluded.
    matching filtered Student List.” High confidence. Preserve the original OR
    criterion and intersect the clicked blocker for List/export selection.
 
-No additional actionable Spec finding was identified across the seven tickets
-and bounded prerequisite closure. Human acceptance and pending verification
-remain explicit dispositions rather than missing product behavior.
+2. **P2 — P2, worked-fixture disposition.** Closeout wording incorrectly claimed
+   all named operational rosters were untouched. The generated layer is isolated,
+   but Phase7AcademicReportSeeder adds three advisees/open Cases to r03 and
+   departmental review work to r06, reusing MSC-CE and two existing Courses.
+   The later approved Phase 7 permission for necessary deterministic academic
+   Cases permits this additive fixture; original persona/Student records are not
+   rewritten. Evidence must distinguish this addition from global roster parity,
+   which the current after-DatabaseSeeder comparisons do not prove. High confidence.
+
+Human acceptance and remote publication verification remain explicit dispositions
+rather than missing product behavior.
 
 ## Resolutions and affected verification
 
@@ -73,9 +81,12 @@ remain explicit dispositions rather than missing product behavior.
   Frontend lint, full format and typecheck passed. The affected
   Records reload-language recheck passed: **5 native tests (11.7m), exit 0**
   including all four Readiness states and full Records (9.5m). Final backend gate passed (1,334 tests / 8,458 assertions, exit 0);
-  final frontend gate remains pending; no gate failure is hidden.
+  final frontend gate passed: 121 files / 684 unit tests and 179 serial browser
+  checks (1.1h), terminal exit 0. Its artifacts are retained; no gate failure is hidden.
 
-Initial counts: Standards **3**, worst **P2**; Spec **1**, worst **P1**. All four findings resolved and confirmed by their native reviewers; no remaining actionable findings. Human acceptance remains
+Initial counts: Standards **3**, worst **P2**; Spec **1**, worst **P1**. After the
+fixture-description follow-up, final counts are Standards **3**, worst **P2**;
+Spec **2**, worst **P1**. All five findings are resolved; no remaining actionable findings. Human acceptance remains
 separate from native review; no merge, push or deployment is performed.
 
 ## CI follow-up within this consolidated review
@@ -88,5 +99,18 @@ with a RED/GREEN native regression and committed the audit correction at
 changed. Both existing native reviewers inspected only this follow-up delta and
 reported **no actionable Standards or Spec issue**. This is resolution follow-up
 within the single consolidated review, not a second full or per-ticket review.
-Affected real Enrollment/Records rechecks and remote publication verification
-remain pending. See the tracker for exact diagnostic/regression evidence.
+Affected real Enrollment/Records and the new transition regression passed
+together **3/3 (12.4m), terminal exit 0** at `12c7c9a` including `c1dbe1c`.
+Remote publication verification remains pending under the no-push instruction. See the tracker for exact diagnostic/regression evidence.
+
+## Worked-fixture description resolution
+
+P2 documentation corrected: the tracker limits unchanged-roster wording to the
+generated cohort layer and explicitly records the permitted r03/r06 additions.
+Prerequisite #01's disposition and the human-demo verification document make
+that distinction too. Original persona/Student records remain preserved, with
+expanded work populations; no global baseline roster-parity claim is made.
+No runtime change or additional gate is required for this factual correction.
+
+Native Spec reviewer confirmed **P2 resolved** and both Spec findings resolved
+within this same consolidated review. Standards S1–S3 were already confirmed.

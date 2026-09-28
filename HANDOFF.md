@@ -2,7 +2,7 @@
 
 **Project:** Postgraduate Registration System (PRS) for E-JUST.
 **Workspace:** `postgrad-system` (git remote `MohamedYasser343/postgrad-system`).
-**Last refreshed:** Phase 7 implementation in progress on `phase-7-academic-reports-bilingual`; verification evidence lives in [.scratch/phase-7/tracker.md](.scratch/phase-7/tracker.md).
+**Last refreshed:** Phase 7 implemented and verified locally, ready for human acceptance on `phase-7-academic-reports-bilingual`; verification evidence lives in [.scratch/phase-7/tracker.md](.scratch/phase-7/tracker.md).
 
 This file is the *entry point for a fresh session*. It carries only what the repo does **not**
 already record; everything else is deliberately a pointer, so it cannot drift.
@@ -41,7 +41,7 @@ already record; everything else is deliberately a pointer, so it cannot drift.
 | **4.6 Query, Filter, Export & Reports** | **Partially executable** — earlier Done claim included planning merges. Phase 7 implements only prerequisite tickets 01, 02, 03, 04, 05, 06, 08 and 15; other work remains outside its goal |
 | **5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver** | **Complete** — all 17 tickets and final review corrections |
 | **6 Records & Transcript** | **Complete and verified on `phase-6/records-transcript`** — all 13 tickets, full gates, one consolidated review resolved; not merged or pushed |
-| **7 Reporting & polish** | **Implementation/verification in progress** — three academic Reports and demonstrated bilingual fixes committed; final frontend gate and human acceptance pending; backend gate green and consolidated review resolved |
+| **7 Reporting & polish** | **Implemented and verified locally** — all seven tickets and bounded prerequisites; both package gates green, one consolidated review/five findings resolved. Human acceptance and remote verification of the unpublished CI correction remain pending |
 
 **Phase 4.5 is a composition slice**, inserted between Phases 4 and 5 as Phase 0.5 was inserted
 between 0 and 1 — it added no module, migration, Permission, Role or domain rule. Phases 5, 6 and
@@ -128,11 +128,14 @@ Phase 6 implementation is complete on the existing branch. Its acceptance eviden
 reproducible headline demo are in [.scratch/phase-6/verification.md](.scratch/phase-6/verification.md);
 the one consolidated review and six resolved findings are in
 [.scratch/phase-6/review.md](.scratch/phase-6/review.md). No merge or push was performed.
-Phase 7 is active on its dedicated branch with fixed review baseline
+Phase 7 is implemented and verified locally on its dedicated branch with fixed review baseline
 `b3a3ae7b71538c36230985270de2b73bc2f92088`. Follow its
 [tracker](.scratch/phase-7/tracker.md) and
 [bilingual audit](.scratch/phase-7/bilingual-audit.md) for current evidence and pending
-verification. The single consolidated Standards/Spec review is resolved with all four
-actionable findings fixed. The final backend gate passed; final frontend and GitHub
-browser checks remain active. No per-ticket review, push or merge. Server PDF, cryptographic signing, payment gateways,
+human acceptance. The single consolidated Standards/Spec review is resolved with
+all five actionable findings fixed. Both package gates passed; the new CI timing
+regression and affected Enrollment/Records workflows passed 3/3. The latest GitHub
+run is pre-fix and failed two browser assertions; the reviewed correction awaits
+publication under the no-push instruction. No per-ticket review, push or merge.
+Server PDF, cryptographic signing, payment gateways,
 postal delivery and email/SMS remain deferred.

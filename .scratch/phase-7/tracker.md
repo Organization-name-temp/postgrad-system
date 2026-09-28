@@ -1708,3 +1708,25 @@ formal reviews were run.
   Generated artifacts remained synchronized; no mutable browser competed with
   the Pest database. Final frontend gate is active from the fresh development
   fixture, on isolated 5177/18001, with API/static stages passed.
+
+- Final frontend static/API checks passed and **121 Vitest files / 684 tests
+  passed (549.45s)**. The final **179-test, one-worker** browser stage is active.
+  Its detached local gate process records an explicit terminal exit; no complete
+  frontend-gate success is claimed yet.
+
+## GitHub CI verification (additional user instruction)
+
+Read-only `gh` inspection found an existing remote push run on runtime/document
+commit `5ad5ec1`: [CI run 36360347596](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36360347596).
+Backend and frontend jobs are successful; Playwright remains in progress.
+The agent has not pushed, merged or triggered another remote run.
+
+The preceding [run 36358201084](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36358201084)
+at `4e4375a` had 177 browser passes and two failures: the Records reload-language
+watermark assertion (fixed at `48e5e99`, confirmed by the full affected Records
+journey) and an Enrollment Review input-label contrast assertion (4.24:1,
+intermediate foreground `#757b89` on white). The shipped secondary-text token is
+`#6B7280`; a transient presentation state is plausible, but is not yet proven.
+The prior run's logs and artifacts are retained in ignored durable verification
+storage. Current remote browser outcome and any necessary fixes remain pending;
+no hypothetical workflow change or successful CI conclusion is inferred.

@@ -1047,8 +1047,9 @@ coherent owner-managed certification reads.
 ### Phase 7 — Reporting & polish (SRS §4.12)
 **Current status:** implementation and verification in progress on
 `phase-7-academic-reports-bilingual`. The three owner-backed Reports and demonstrated
-EN/AR presentation fixes are committed. Final package gates, one consolidated
-Standards/Spec review and human demo acceptance remain pending; no phase acceptance,
+EN/AR presentation fixes are committed. The final backend gate passed and the single
+consolidated Standards/Spec review is resolved. Final frontend/GitHub browser checks
+and human demo acceptance remain pending; no phase acceptance,
 push or merge is claimed. Evidence: [tracker](../.scratch/phase-7/tracker.md),
 [audit](../.scratch/phase-7/bilingual-audit.md).
 

@@ -41,7 +41,7 @@ already record; everything else is deliberately a pointer, so it cannot drift.
 | **4.6 Query, Filter, Export & Reports** | **Partially executable** — earlier Done claim included planning merges. Phase 7 implements only prerequisite tickets 01, 02, 03, 04, 05, 06, 08 and 15; other work remains outside its goal |
 | **5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver** | **Complete** — all 17 tickets and final review corrections |
 | **6 Records & Transcript** | **Complete and verified on `phase-6/records-transcript`** — all 13 tickets, full gates, one consolidated review resolved; not merged or pushed |
-| **7 Reporting & polish** | **Implementation/verification in progress** — three academic Reports and demonstrated bilingual fixes committed; final gates, consolidated review and human acceptance pending |
+| **7 Reporting & polish** | **Implementation/verification in progress** — three academic Reports and demonstrated bilingual fixes committed; final frontend gate and human acceptance pending; backend gate green and consolidated review resolved |
 
 **Phase 4.5 is a composition slice**, inserted between Phases 4 and 5 as Phase 0.5 was inserted
 between 0 and 1 — it added no module, migration, Permission, Role or domain rule. Phases 5, 6 and
@@ -132,6 +132,7 @@ Phase 7 is active on its dedicated branch with fixed review baseline
 `b3a3ae7b71538c36230985270de2b73bc2f92088`. Follow its
 [tracker](.scratch/phase-7/tracker.md) and
 [bilingual audit](.scratch/phase-7/bilingual-audit.md) for current evidence and pending
-verification. One final Standards/Spec review is required after implementation; no
-per-ticket review, push or merge. Server PDF, cryptographic signing, payment gateways,
+verification. The single consolidated Standards/Spec review is resolved with all four
+actionable findings fixed. The final backend gate passed; final frontend and GitHub
+browser checks remain active. No per-ticket review, push or merge. Server PDF, cryptographic signing, payment gateways,
 postal delivery and email/SMS remain deferred.

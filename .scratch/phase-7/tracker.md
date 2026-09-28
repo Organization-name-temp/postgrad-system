@@ -38,8 +38,8 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 
 Complete backend gate passed (1,329 tests / 8,421 assertions; details below).
 The one consolidated Standards/Spec review is resolved (three Standards findings,
-one Spec finding; fixes committed at `c4be343`). Final backend gate rerun and
-complete frontend gate remain pending. Starting commit and initial clean worktree
+one Spec finding; fixes committed at `c4be343`). Final backend gate passed with **1,334 tests / 8,458 assertions**; the complete
+frontend gate remains pending. Starting commit and initial clean worktree
 verified. Review evidence is in [review](review.md).
 
 ### Shared frontend prerequisites (#02/#03/#05 slices)
@@ -1699,3 +1699,12 @@ formal reviews were run.
   refund/collection journey (**9.5m**). The reload-preference fix retained the
   original watermark assertion and all 20 paper variants. No browser journey is
   now competing with preparation of the final fresh development fixture.
+
+- **Final backend gate GREEN, terminal exit 0** after consolidated fixes:
+  `COMPOSER_PROCESS_TIMEOUT=0 composer gate` passed Pint, PHPStan/Larastan,
+  deptrac, **1,334 Pest tests / 8,458 assertions (790.42s)** and committed
+  OpenAPI drift checking. Exact durable log/exit marker:
+  `backend/storage/logs/phase7-verification/backend-gate-final.log` and `.exit`.
+  Generated artifacts remained synchronized; no mutable browser competed with
+  the Pest database. Final frontend gate is active from the fresh development
+  fixture, on isolated 5177/18001, with API/static stages passed.

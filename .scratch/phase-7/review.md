@@ -72,8 +72,8 @@ remain explicit dispositions rather than missing product behavior.
 - Combined affected owner verification: **33 tests / 262 assertions (7.79s)**.
   Frontend lint, full format and typecheck passed. The affected
   Records reload-language recheck passed: **5 native tests (11.7m), exit 0**
-  including all four Readiness states and full Records (9.5m). Final package gates
-  remain pending; no gate failure is hidden.
+  including all four Readiness states and full Records (9.5m). Final backend gate passed (1,334 tests / 8,458 assertions, exit 0);
+  final frontend gate remains pending; no gate failure is hidden.
 
 Initial counts: Standards **3**, worst **P2**; Spec **1**, worst **P1**. All four findings resolved and confirmed by their native reviewers; no remaining actionable findings. Human acceptance remains
 separate from native review; no merge, push or deployment is performed.

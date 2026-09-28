@@ -84,8 +84,9 @@ semantic h2 with the same visual typography.
 
 ## Remaining verification and human acceptance
 
-The complete backend gate passed (1,329 tests / 8,421 assertions plus static and
-OpenAPI checks). Final package-gate verification remains pending after review fixes. The single
+The final backend gate passed after review fixes (1,334 tests / 8,458 assertions
+plus static and OpenAPI checks, terminal exit 0). The complete final frontend gate
+remains pending. The single
 consolidated Standards/Spec review found four actionable issues, all fixed and
 confirmed by native reviewers; details are in [review](review.md). No per-ticket code review was run. Human review of the
 [headline demo](verification.md), Arabic wording and browser paper presentation

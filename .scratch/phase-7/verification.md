@@ -61,7 +61,8 @@ a foreign app. All seeded accounts below use password `password`.
   Native EN/AR paper inspection includes continuation headers, watermark, seal,
   QR placement and dark-theme black text.
 - Backend gate: passed completely (1,329 tests / 8,421 assertions plus static
-  and generated OpenAPI checks).
+  and generated OpenAPI checks). The post-review final rerun passed completely:
+  **1,334 tests / 8,458 assertions (790.42s), terminal exit 0**.
 - Expanded owner presentation checks passed: Admissions 4.6m and seven remaining
   correction/Enrollment/headline/Records checks in 15.2m.
 - Frontend gate: API/static stages and 121 files / 676 unit tests passed in the

@@ -1,0 +1,9 @@
+
+> frontend@0.0.0 test
+> vitest run --passWithNoTests --maxWorkers=1
+
+
+ RUN  v4.1.11 /home/mohamed/Documents/postgrad-system/frontend
+
+ ❯ src/features/records/FeeForm.test.tsx (2 tests | 1 failed) 22094ms
+   × requires both instruction languages before saving and reports a successful configuration 20783ms

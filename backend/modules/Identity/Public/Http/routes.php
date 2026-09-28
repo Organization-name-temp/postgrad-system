@@ -18,7 +18,7 @@ use Modules\Identity\Public\Http\HealthController;
 Route::get('/health', HealthController::class);
 
 // Authentication (Sanctum SPA cookie session).
-Route::post('/login', LoginController::class);
+Route::post('/login', LoginController::class)->middleware('spa-session');
 Route::post('/logout', LogoutController::class)->middleware('auth:sanctum');
 Route::get('/me', MeController::class)->middleware('auth:sanctum');
 Route::patch('/me', UpdateCurrentUserController::class)->middleware('auth:sanctum');

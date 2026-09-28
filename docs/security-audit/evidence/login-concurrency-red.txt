@@ -1,0 +1,61 @@
+
+   FAIL  Tests\Feature\Identity\AuthTest
+  ⨯ it rejects a competing login before password checks while an overla… 2.10s
+  ⨯ it rejects a competing login before password checks while an overla… 0.27s
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Identity\AuthTest > it rejects a competing login be…
+  Expected response status code [429] but received 422.
+Failed asserting that 422 is identical to 429.
+
+The following errors occurred during the last request:
+
+{
+    "message": "These credentials do not match our records.",
+    "errors": {
+        "email": [
+            "These credentials do not match our records."
+        ]
+    }
+}
+
+  at tests/Feature/Identity/AuthTest.php:137
+    133▕     expect($lock->get())->toBeTrue();
+    134▕     Illuminate\Support\Facades\Event::fake([Illuminate\Auth\Events\Attempting::class]);
+    135▕     try {
+    136▕         $this->postJson('/api/v1/login', ['email' => strtoupper($email), 'password' => 'wrong'], ['Origin' => 'http://localhost'])
+  ➜ 137▕             ->assertStatus(429)->assertHeader('Retry-After', '1');
+    138▕         $this->assertDatabaseCount('audit_log', 0);
+    139▕         Illuminate\Support\Facades\Event::assertNotDispatched(Illuminate\Auth\Events\Attempting::class);
+    140▕     } finally {
+    141▕         $lock->release();
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Identity\AuthTest > it rejects a competing login be…
+  Expected response status code [429] but received 422.
+Failed asserting that 422 is identical to 429.
+
+The following errors occurred during the last request:
+
+{
+    "message": "These credentials do not match our records.",
+    "errors": {
+        "email": [
+            "These credentials do not match our records."
+        ]
+    }
+}
+
+  at tests/Feature/Identity/AuthTest.php:137
+    133▕     expect($lock->get())->toBeTrue();
+    134▕     Illuminate\Support\Facades\Event::fake([Illuminate\Auth\Events\Attempting::class]);
+    135▕     try {
+    136▕         $this->postJson('/api/v1/login', ['email' => strtoupper($email), 'password' => 'wrong'], ['Origin' => 'http://localhost'])
+  ➜ 137▕             ->assertStatus(429)->assertHeader('Retry-After', '1');
+    138▕         $this->assertDatabaseCount('audit_log', 0);
+    139▕         Illuminate\Support\Facades\Event::assertNotDispatched(Illuminate\Auth\Events\Attempting::class);
+    140▕     } finally {
+    141▕         $lock->release();
+
+
+  Tests:    2 failed (4 assertions)
+  Duration: 3.26s

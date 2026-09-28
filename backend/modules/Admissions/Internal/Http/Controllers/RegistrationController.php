@@ -31,7 +31,8 @@ class RegistrationController
      * Open only while an Admission Cycle's window is open: refused when none is
      * open, auto-filed into the one open Cycle, or (when several are open) filed
      * into the chosen one. Rate-limited per client. On success the applicant is
-     * authenticated and their Draft Application is returned.
+     * authenticated and their Draft Application is returned. Requests without a
+     * first-party SPA session are refused before any records are created.
      *
      * @unauthenticated
      *
@@ -42,6 +43,7 @@ class RegistrationController
      * @bodyParam admission_cycle_id integer The open Cycle to apply to. Required only when more than one Cycle is open; otherwise the single open Cycle is used. Example: 1
      *
      * @response 201 {"data": {"id": 1, "status": "draft", "admission_cycle_id": 1}}
+     * @response 400 {"message": "A first-party SPA session is required."}
      * @response 409 scenario="admissions closed" {"message": "Admissions are currently closed."}
      * @response 422 scenario="validation" {"message": "The email has already been taken.", "errors": {"email": ["The email has already been taken."]}}
      */

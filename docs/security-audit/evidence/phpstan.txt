@@ -1,0 +1,3 @@
+Note: Using configuration file /home/mohamed/Documents/postgrad-system/backend/phpstan.neon.
+
+ [OK] No errors

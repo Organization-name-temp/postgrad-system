@@ -1,0 +1,71 @@
+
+   FAIL  Tests\Feature\Admissions\ScreeningConcurrencyTest
+  ⨯ it serializes competing screening decisions with one history and no… 3.04s
+  ⨯ it serializes competing screening decisions with one history and no… 2.16s
+
+   FAIL  Tests\Feature\Admissions\ApplicationScreeningTest
+  ⨯ it refuses a stale screening handler without overwriting a terminal… 1.16s
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ScreeningConcurrencyTest > it serializes…
+  Failed asserting that two arrays are identical.
+   Array &0 [
+  -    'status' => 409,
+  +    'status' => 200,
+   ]
+
+
+  at tests/Feature/Admissions/ScreeningConcurrencyTest.php:70
+     66▕     } finally {
+     67▕         fclose($parent);
+     68▕         pcntl_waitpid($pid, $status);
+     69▕     }
+  ➜  70▕     expect($waiting)->toBeTrue()->and($result)->toBe(['status' => 409])->and(pcntl_wexitstatus($status))->toBe(0);
+     71▕     $this->assertDatabaseHas('applications', ['id' => $application->id, 'status' => $winner === 'reject' ? 'rejected' : 'under_dean_review']);
+     72▕     $this->assertDatabaseCount('application_status_transitions', $winner === 'reject' ? 1 : 2);
+     73▕     $this->assertDatabaseCount('notifications', $winner === 'reject' ? 1 : 0);
+     74▕ })->with(['reject', 'approve']);
+
+  1   tests/Feature/Admissions/ScreeningConcurrencyTest.php:70
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ScreeningConcurrencyTest > it serializes…
+  Failed asserting that two arrays are identical.
+   Array &0 [
+  -    'status' => 409,
+  +    'status' => 200,
+   ]
+
+
+  at tests/Feature/Admissions/ScreeningConcurrencyTest.php:70
+     66▕     } finally {
+     67▕         fclose($parent);
+     68▕         pcntl_waitpid($pid, $status);
+     69▕     }
+  ➜  70▕     expect($waiting)->toBeTrue()->and($result)->toBe(['status' => 409])->and(pcntl_wexitstatus($status))->toBe(0);
+     71▕     $this->assertDatabaseHas('applications', ['id' => $application->id, 'status' => $winner === 'reject' ? 'rejected' : 'under_dean_review']);
+     72▕     $this->assertDatabaseCount('application_status_transitions', $winner === 'reject' ? 1 : 2);
+     73▕     $this->assertDatabaseCount('notifications', $winner === 'reject' ? 1 : 0);
+     74▕ })->with(['reject', 'approve']);
+
+  1   tests/Feature/Admissions/ScreeningConcurrencyTest.php:70
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationScreeni…  AssertionFailedError
+  A stale decision must return a conflict.
+
+  at tests/Feature/Admissions/ApplicationScreeningTest.php:30
+     26▕     $request = Illuminate\Http\Request::create('/api/v1/applications/'.$application->id.'/screen', 'POST', ['action' => 'approve']);
+     27▕     $request->setUserResolver(fn () => $reviewer);
+     28▕     try {
+     29▕         app()->call([app(Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController::class), 'screen'], ['request' => $request, 'application' => $stale]);
+  ➜  30▕         $this->fail('A stale decision must return a conflict.');
+     31▕     } catch (Symfony\Component\HttpKernel\Exception\ConflictHttpException $error) {
+     32▕         expect($error->getStatusCode())->toBe(409);
+     33▕     }
+     34▕     expect($application->fresh()->status)->toBe(ApplicationStatus::Rejected);
+
+  1   tests/Feature/Admissions/ApplicationScreeningTest.php:30
+
+
+  Tests:    3 failed (8 assertions)
+  Duration: 6.55s

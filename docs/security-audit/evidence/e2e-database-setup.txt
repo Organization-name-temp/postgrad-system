@@ -1,0 +1,107 @@
+
+  Dropping all tables .......................................... 233.13ms DONE
+
+   INFO  Preparing database.
+
+  Creating migration table ...................................... 14.86ms DONE
+
+   INFO  Running migrations.
+
+  0001_01_01_000000_create_users_table .......................... 31.77ms DONE
+  0001_01_01_000001_create_cache_table .......................... 11.68ms DONE
+  0001_01_01_000002_create_jobs_table ........................... 25.94ms DONE
+  2026_07_10_000001_create_user_roles_table ..................... 23.88ms DONE
+  2026_07_10_000002_create_audit_log_table ....................... 8.61ms DONE
+  2026_07_10_000003_add_preferred_locale_to_users_table .......... 3.14ms DONE
+  2026_07_12_000001_create_faculties_table ....................... 7.43ms DONE
+  2026_07_12_000002_create_departments_table .................... 12.20ms DONE
+  2026_07_12_000003_create_programs_table ....................... 14.18ms DONE
+  2026_07_12_000004_create_courses_table ........................ 13.59ms DONE
+  2026_07_12_000005_create_curriculum_entries_table ............. 10.73ms DONE
+  2026_07_12_000006_create_catalog_versions_table ............... 11.83ms DONE
+  2026_07_14_000001_create_admission_cycles_table ............... 10.11ms DONE
+  2026_07_14_000002_create_notifications_table .................. 13.30ms DONE
+  2026_07_14_000003_create_applications_table .................... 9.80ms DONE
+  2026_07_14_000004_add_step_one_snapshot_to_applications_table . 23.30ms DONE
+  2026_07_14_000005_create_application_documents_table .......... 13.36ms DONE
+  2026_07_14_000006_add_program_selection_to_applications_table .. 4.50ms DONE
+  2026_07_14_000007_create_application_status_transitions_table . 12.11ms DONE
+  2026_07_15_000001_create_faculty_dean_assignments_table ........ 9.56ms DONE
+  2026_07_15_000002_create_interview_slots_table ................ 10.11ms DONE
+  2026_07_15_000003_create_interviews_table ..................... 14.52ms DONE
+  2026_07_15_000004_add_decision_extras_to_applications_table .... 3.68ms DONE
+  2026_07_15_000005_add_identification_type_to_applications_table  3.13ms DONE
+  2026_07_15_000010_create_students_table ....................... 13.99ms DONE
+  2026_07_15_000011_create_student_number_sequences_table ........ 8.17ms DONE
+  2026_07_23_000001_create_semesters_table ....................... 7.49ms DONE
+  2026_07_23_000002_add_research_type_to_courses_table ........... 2.54ms DONE
+  2026_07_23_000003_create_course_offerings_table ................ 7.15ms DONE
+  2026_07_23_000004_create_offering_meetings_table ............... 7.67ms DONE
+  2026_07_23_000005_create_registration_requests_table ........... 9.81ms DONE
+  2026_07_23_000006_create_registration_request_lines_table ...... 8.54ms DONE
+  2026_07_23_000007_create_enrollments_table .................... 11.16ms DONE
+  2026_07_23_000008_add_advisor_decision_to_registration_requests  7.97ms DONE
+  2026_07_24_000009_create_class_sessions_table ................. 12.34ms DONE
+  2026_07_24_000010_create_attendance_marks_table ............... 14.90ms DONE
+  2026_07_25_000001_create_grade_sheets_table ................... 11.00ms DONE
+  2026_07_25_000002_create_grades_table .......................... 9.40ms DONE
+  2026_07_26_000001_create_department_head_assignments_table ..... 8.22ms DONE
+  2026_07_27_000003_add_signing_to_grade_sheets_table ............ 5.89ms DONE
+  2026_07_27_000011_add_earned_to_enrollments_table .............. 2.73ms DONE
+  2026_07_29_000004_create_incompletes_table .................... 15.42ms DONE
+  2026_07_29_000012_add_pre_incomplete_status_to_enrollments_table  2.79ms DONE
+  2026_08_01_000005_create_grade_sheet_correction_lines_table .... 9.11ms DONE
+  2026_08_04_000002_add_grade_submission_deadline_to_semesters_table  7.68ms DONE
+  2026_09_04_000001_add_notification_deduplication_key ........... 5.18ms DONE
+  2026_09_04_000001_add_preparatory_requirement_role_to_curriculum_entries  12.33ms DONE
+  2026_09_04_000001_add_student_curriculum_version_binding ....... 3.86ms DONE
+  2026_09_04_000002_add_previous_ejust_program_to_applications ... 2.94ms DONE
+  2026_09_04_000002_backfill_student_curriculum_version_bindings  19.84ms DONE
+  2026_09_04_000003_require_student_curriculum_version_binding ... 5.93ms DONE
+  2026_09_04_000004_add_admission_evidence_to_students ........... 3.19ms DONE
+  2026_09_04_010000_create_automatic_exemption_evidence_table ... 10.26ms DONE
+  2026_09_04_010001_create_exemption_decisions_table ............ 11.32ms DONE
+  2026_09_04_020000_create_manual_exemption_requests_table ...... 31.02ms DONE
+  2026_09_04_020001_add_lifecycle_status_to_students ............. 3.24ms DONE
+  2026_09_04_030000_create_transfer_requests_table .............. 33.77ms DONE
+  2026_09_04_030000_create_waiver_requests_and_decisions_tables . 37.33ms DONE
+  2026_09_04_040000_create_credit_decision_revocations_table .... 24.37ms DONE
+  2026_09_05_010000_create_standing_observations_table ........... 7.99ms DONE
+  2026_09_05_020000_create_must_retake_obligations_table ........ 15.84ms DONE
+  2026_09_05_030000_create_capacity_override_requirements_table . 14.38ms DONE
+  2026_09_05_040000_create_remediation_obligations_table ........ 15.54ms DONE
+  2026_09_05_050000_create_termination_cases_table .............. 10.80ms DONE
+  2026_09_05_060000_create_registration_policy_projections_table . 4.59ms DONE
+  2026_09_05_070000_add_academic_request_closeout_history ....... 17.42ms DONE
+  2026_09_05_080000_add_underload_basis_to_registration_policy_projections  7.36ms DONE
+  2026_09_27_000001_add_identification_type_to_students .......... 3.94ms DONE
+  2026_09_27_000002_create_transcript_fee ........................ 7.90ms DONE
+  2026_09_27_000003_create_transcript_requests .................. 19.06ms DONE
+  2026_09_27_000004_create_transcript_payments .................. 18.95ms DONE
+  2026_09_27_000005_create_transcript_refunds ................... 10.08ms DONE
+  2026_09_27_000006_create_transcript_issuances ................. 18.99ms DONE
+  2026_09_27_000007_create_transcript_revocations ............... 10.11ms DONE
+
+
+   INFO  Seeding database.
+
+  Database\Seeders\CatalogSeeder ..................................... RUNNING
+  Database\Seeders\CatalogSeeder ................................. 413 ms DONE
+
+  Database\Seeders\AdmissionsSeeder .................................. RUNNING
+  Database\Seeders\AdmissionsSeeder ........................... 10,797 ms DONE
+
+  Database\Seeders\EnrollmentSeeder .................................. RUNNING
+  Database\Seeders\EnrollmentSeeder ............................ 3,139 ms DONE
+
+  Database\Seeders\GradingSeeder ..................................... RUNNING
+  Database\Seeders\GradingSeeder ............................... 6,332 ms DONE
+
+  Database\Seeders\RoleAccountSeeder ................................. RUNNING
+  Database\Seeders\RoleAccountSeeder ........................... 2,331 ms DONE
+
+  Database\Seeders\GeneratedCohortSeeder ............................. RUNNING
+  Database\Seeders\GeneratedCohortSeeder ...................... 13,589 ms DONE
+
+  Database\Seeders\Phase7AcademicReportSeeder ........................ RUNNING
+  Database\Seeders\Phase7AcademicReportSeeder .................. 2,349 ms DONE

@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\Sanctum;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Enums\DocumentType;
+use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Models\ApplicationDocument;
 use Modules\Admissions\Internal\Models\ApplicationStatusTransition;
@@ -13,8 +15,41 @@ use Modules\Catalog\Public\Enums\DegreeLevel;
 use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 uses(RefreshDatabase::class);
+
+it('refuses screening rejection after the Student Affairs stage without history or notifications', function (ApplicationStatus $status, string $locale) {
+    $application = Application::factory()->create(['status' => $status]);
+    actingAsRole(Role::StudentAffairs);
+    $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => 'reject', 'note' => 'Wrong review stage'], ['Accept-Language' => $locale])
+        ->assertConflict()->assertJsonPath('message', $locale === 'ar'
+            ? 'هذا الطلب ليس قيد مراجعة شؤون الطلاب.'
+            : 'This application is not under Student Affairs review.');
+    expect($application->refresh()->status)->toBe($status);
+    $this->assertDatabaseCount('application_status_transitions', 0);
+    $this->assertDatabaseCount('notifications', 0);
+})->with([ApplicationStatus::UnderDeanReview, ApplicationStatus::InterviewCompleted, ApplicationStatus::ConditionallyAccepted, ApplicationStatus::Waitlisted])->with(['en', 'ar']);
+
+it('refuses a stale screening handler without overwriting a terminal decision', function () {
+    $reviewer = User::factory()->create();
+    $reviewer->assignRole(Role::StudentAffairs);
+    $application = Application::factory()->underReview()->create();
+    $stale = Application::findOrFail($application->id);
+    Sanctum::actingAs($reviewer);
+    $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => 'reject', 'note' => 'Winning rejection'])->assertOk();
+    $request = Request::create('/api/v1/applications/'.$application->id.'/screen', 'POST', ['action' => 'approve']);
+    $request->setUserResolver(fn () => $reviewer);
+    try {
+        app()->call([app(ApplicationScreeningController::class), 'screen'], ['request' => $request, 'application' => $stale]);
+        $this->fail('A stale decision must return a conflict.');
+    } catch (ConflictHttpException $error) {
+        expect($error->getStatusCode())->toBe(409);
+    }
+    expect($application->fresh()->status)->toBe(ApplicationStatus::Rejected);
+    $this->assertDatabaseCount('application_status_transitions', 1);
+    $this->assertDatabaseCount('notifications', 1);
+});
 
 /*
 | Application status machine + Student Affairs screening + status timeline (ticket

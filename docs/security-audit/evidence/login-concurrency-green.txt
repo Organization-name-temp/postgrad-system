@@ -1,0 +1,16 @@
+
+   PASS  Tests\Feature\Identity\AuthTest
+  ✓ it logs in with valid credentials and records a login audit entry    2.53s
+  ✓ it rejects invalid credentials and records a failed-login audit ent… 0.36s
+  ✓ it returns the authenticated user and their roles from /me           0.22s
+  ✓ it rejects /me when unauthenticated                                  0.15s
+  ✓ it logs out an authenticated session and records a logout audit ent… 0.15s
+  ✓ it rejects stateless login before authentication and audit side eff… 0.16s
+  ✓ it blocks the sixth failed account attempt across email case and cl… 1.43s
+  ✓ it limits rotating account guesses from one IP and localizes the re… 0.67s
+  ✓ it successful login resets only its account failures and does not c… 1.05s
+  ✓ it rejects a competing login before password checks while an overla… 0.11s
+  ✓ it rejects a competing login before password checks while an overla… 0.10s
+
+  Tests:    11 passed (56 assertions)
+  Duration: 8.10s

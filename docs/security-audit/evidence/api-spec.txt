@@ -1,0 +1,279 @@
+  [GET] api/v1/academic-standing/reports/termination ........... 147.39ms DONE
+  [GET] api/v1/academic-standing/reports/termination/cases/export  5.79ms DONE
+  [GET] api/v1/academic-standing/reports/termination/cases ....... 6.75ms DONE
+  [GET] api/v1/academic-standing/reports/graduation-readiness/students/export  19.43ms DONE
+  [GET] api/v1/academic-standing/reports/graduation-readiness/students  4.28ms DONE
+  [GET] api/v1/academic-standing/reports/graduation-readiness .... 3.86ms DONE
+  [GET] api/v1/academic-standing/reports/standing ............... 13.51ms DONE
+  [GET] api/v1/academic-standing/reports/standing/students ....... 4.00ms DONE
+  [GET] api/v1/academic-standing/reports/standing/students/export  4.72ms DONE
+  [GET] api/v1/academic-standing/me/credit-hours ................ 40.45ms DONE
+  [GET] api/v1/academic-standing/cards/credit-hours .............. 3.47ms DONE
+  [GET] api/v1/academic-standing/students/{student_id}/credit-hours  43.43ms DONE
+  [GET] api/v1/academic-standing/me ............................. 23.86ms DONE
+  [GET] api/v1/academic-standing/cards/standing .................. 8.80ms DONE
+  [GET] api/v1/academic-standing/me/graduation-readiness ........ 11.40ms DONE
+  [GET] api/v1/academic-standing/students/{student_id}/graduation-readiness  5.97ms DONE
+  [GET] api/v1/academic-standing/students/{student_id} ........... 4.60ms DONE
+  [GET] api/v1/termination-cases/mine ........................... 50.04ms DONE
+  [GET] api/v1/termination-cases/advisor ......................... 3.43ms DONE
+  [GET] api/v1/termination-cases/advisor/export .................. 3.12ms DONE
+  [POST] api/v1/termination-cases/{case}/advisor-review ......... 71.88ms DONE
+  [GET] api/v1/termination-cases/department-head ................. 4.43ms DONE
+  [GET] api/v1/termination-cases/department-head/export .......... 3.42ms DONE
+  [POST] api/v1/termination-cases/{case}/department-review ...... 17.15ms DONE
+  [GET] api/v1/termination-cases/council ......................... 3.75ms DONE
+  [GET] api/v1/termination-cases/council/export .................. 3.42ms DONE
+  [POST] api/v1/termination-cases/{case}/council-decision ....... 18.25ms DONE
+  [GET] api/v1/admission-cycles/open ............................ 11.27ms DONE
+  [POST] api/v1/register ........................................ 17.50ms DONE
+  [GET] api/v1/applications/{application}/verify-email .......... 12.27ms DONE
+  [GET] api/v1/application ...................................... 31.80ms DONE
+  [PATCH] api/v1/application ..................................... 2.74ms DONE
+  [POST] api/v1/application/submit ............................... 3.44ms DONE
+  [POST] api/v1/application/resend-verification .................. 1.35ms DONE
+  [POST] api/v1/application/documents ........................... 29.03ms DONE
+  [DELETE] api/v1/application/documents/{document} ............... 8.79ms DONE
+  [PATCH] api/v1/application/programs ............................ 9.55ms DONE
+  [POST] api/v1/application/finalize ............................. 2.64ms DONE
+  [POST] api/v1/application/resubmit ............................. 2.77ms DONE
+  [GET] api/v1/application/interview/slots ....................... 9.50ms DONE
+  [GET] api/v1/application/interview ............................. 1.82ms DONE
+  [POST] api/v1/application/interview/confirm .................... 2.24ms DONE
+  [POST] api/v1/application/interview/reschedule ................. 2.86ms DONE
+  [GET] api/v1/admissions/cards/my-application .................. 11.54ms DONE
+  [GET] api/v1/interviews/assigned/export ....................... 10.14ms DONE
+  [GET] api/v1/interviews/assigned ............................... 4.63ms DONE
+  [POST] api/v1/interviews/{interview}/evaluation ................ 9.45ms DONE
+  [GET] api/v1/applications/awaiting-interview .................. 22.70ms DONE
+  [GET] api/v1/applications/awaiting-interview/export ............ 4.14ms DONE
+  [GET] api/v1/interview-slots/interviewers ..................... 11.44ms DONE
+  [GET] api/v1/interview-slots/export ............................ 3.74ms DONE
+  [GET] api/v1/interview-slots ................................... 3.54ms DONE
+  [POST] api/v1/interview-slots .................................. 3.25ms DONE
+  [PATCH] api/v1/interview-slots/{interview_slot} ................ 5.51ms DONE
+  [DELETE] api/v1/interview-slots/{interview_slot} ............... 3.09ms DONE
+  [GET] api/v1/interviews/export ................................. 3.53ms DONE
+  [GET] api/v1/interviews ........................................ 4.16ms DONE
+  [POST] api/v1/applications/{application}/interview ............. 5.53ms DONE
+  [POST] api/v1/interviews/{interview}/complete .................. 4.99ms DONE
+  [GET] api/v1/applications/{application}/timeline .............. 14.96ms DONE
+  [GET] api/v1/admissions/reports/application-pipeline .......... 13.17ms DONE
+  [GET] api/v1/applications ...................................... 3.59ms DONE
+  [GET] api/v1/applications/export ............................... 3.17ms DONE
+  [GET] api/v1/applications/{application} ........................ 4.76ms DONE
+  [POST] api/v1/applications/{application}/screen ............... 11.62ms DONE
+  [GET] api/v1/admissions/cards/screening-queue .................. 2.81ms DONE
+  [GET] api/v1/dean/applications ................................ 12.12ms DONE
+  [GET] api/v1/dean/applications/export .......................... 3.27ms DONE
+  [POST] api/v1/dean/applications/{application}/review ........... 7.06ms DONE
+  [GET] api/v1/dean/decisions ................................... 26.90ms DONE
+  [GET] api/v1/dean/decisions/export ............................. 2.98ms DONE
+  [GET] api/v1/dean/advisors ..................................... 7.06ms DONE
+  [POST] api/v1/dean/applications/{application}/decide .......... 10.80ms DONE
+  [GET] api/v1/admissions/cards/admission-decisions .............. 2.20ms DONE
+  [GET] api/v1/documents/{document} .............................. 3.67ms DONE
+  [GET] api/v1/admission-cycles .................................. 2.27ms DONE
+  [GET] api/v1/admission-cycles/export ........................... 3.67ms DONE
+  [POST] api/v1/admission-cycles ................................. 1.70ms DONE
+  [GET] api/v1/admission-cycles/{admission_cycle} ................ 3.90ms DONE
+  [PATCH] api/v1/admission-cycles/{admission_cycle} .............. 2.69ms DONE
+  [POST] api/v1/admission-cycles/{admission_cycle}/activate ...... 1.99ms DONE
+  [POST] api/v1/admission-cycles/{admission_cycle}/deactivate .... 2.77ms DONE
+  [GET] api/v1/semesters ......................................... 6.69ms DONE
+  [GET] api/v1/semesters/{semester} .............................. 6.49ms DONE
+  [POST] api/v1/semesters ........................................ 3.56ms DONE
+  [PATCH] api/v1/semesters/{semester} ............................ 5.69ms DONE
+  [GET] api/v1/calendar/cards/semester-windows ................... 8.19ms DONE
+  [GET] api/v1/catalog/tree ..................................... 10.40ms DONE
+  [GET] api/v1/catalog/cards/summary ............................. 3.54ms DONE
+  [GET] api/v1/faculties/export .................................. 8.56ms DONE
+  [GET] api/v1/faculties ......................................... 3.08ms DONE
+  [GET] api/v1/faculties/{faculty} ............................... 7.26ms DONE
+  [POST] api/v1/faculties ........................................ 2.44ms DONE
+  [PATCH] api/v1/faculties/{faculty} ............................. 4.20ms DONE
+  [POST] api/v1/faculties/{faculty}/activate ..................... 6.75ms DONE
+  [POST] api/v1/faculties/{faculty}/deactivate ................... 4.02ms DONE
+  [GET] api/v1/departments/export ............................... 16.61ms DONE
+  [GET] api/v1/departments ....................................... 2.67ms DONE
+  [GET] api/v1/departments/{department} .......................... 6.60ms DONE
+  [POST] api/v1/departments ...................................... 2.10ms DONE
+  [PATCH] api/v1/departments/{department} ....................... 21.39ms DONE
+  [POST] api/v1/departments/{department}/activate ................ 4.06ms DONE
+  [POST] api/v1/departments/{department}/deactivate .............. 3.87ms DONE
+  [GET] api/v1/programs/export ................................... 9.99ms DONE
+  [GET] api/v1/programs .......................................... 1.88ms DONE
+  [GET] api/v1/programs/{program} ................................ 5.11ms DONE
+  [POST] api/v1/programs ......................................... 2.08ms DONE
+  [PATCH] api/v1/programs/{program} .............................. 3.64ms DONE
+  [POST] api/v1/programs/{program}/activate ...................... 3.92ms DONE
+  [POST] api/v1/programs/{program}/deactivate .................... 3.53ms DONE
+  [GET] api/v1/programs/{program}/curriculum .................... 19.76ms DONE
+  [POST] api/v1/programs/{program}/curriculum ................... 13.06ms DONE
+  [PATCH] api/v1/programs/{program}/curriculum/{curriculum_entry}  13.11ms DONE
+  [DELETE] api/v1/programs/{program}/curriculum/{curriculum_entry}  5.73ms DONE
+  [GET] api/v1/programs/{program}/versions ....................... 5.37ms DONE
+  [GET] api/v1/courses/{course}/versions ......................... 5.88ms DONE
+  [GET] api/v1/courses/export ................................... 13.13ms DONE
+  [GET] api/v1/courses ........................................... 3.54ms DONE
+  [GET] api/v1/courses/{course} .................................. 4.23ms DONE
+  [POST] api/v1/courses .......................................... 3.28ms DONE
+  [PATCH] api/v1/courses/{course} ................................ 5.51ms DONE
+  [POST] api/v1/courses/{course}/activate ........................ 4.29ms DONE
+  [POST] api/v1/courses/{course}/deactivate ...................... 4.36ms DONE
+  [GET] api/v1/instructors ...................................... 26.84ms DONE
+  [GET] api/v1/semesters/{semester_id}/offerings ................. 3.42ms DONE
+  [POST] api/v1/semesters/{semester_id}/offerings ................ 5.49ms DONE
+  [GET] api/v1/offerings/{offering} .............................. 8.46ms DONE
+  [PATCH] api/v1/offerings/{offering} ............................ 7.55ms DONE
+  [DELETE] api/v1/offerings/{offering} ........................... 5.18ms DONE
+  [GET] api/v1/registration/eligible-courses .................... 73.10ms DONE
+  [POST] api/v1/registration/requests ............................ 7.14ms DONE
+  [GET] api/v1/registration/requests ............................. 4.60ms DONE
+  [GET] api/v1/registration/schedule ............................. 4.57ms DONE
+  [POST] api/v1/registration/enrollments ........................ 25.68ms DONE
+  [DELETE] api/v1/registration/enrollments/{enrollment} ......... 13.17ms DONE
+  [POST] api/v1/registration/enrollments/{enrollment}/withdrawal  12.21ms DONE
+  [GET] api/v1/enrollment/cards/my-registration ................. 10.45ms DONE
+  [GET] api/v1/credit-decisions/exemptions ....................... 5.83ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/targets ...... 50.42ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests ............... 7.50ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/export ........ 8.00ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests ............. 12.76ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/{exemption_request}  7.45ms DONE
+  [PATCH] api/v1/credit-decisions/exemption-requests/{exemption_request}  10.57ms DONE
+  [DELETE] api/v1/credit-decisions/exemption-requests/{exemption_request}  10.05ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests/{exemption_request}/submit  8.06ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/advisor-queue  54.41ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/advisor-queue/export  3.49ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests/{exemption_request}/advisor-decision  4.81ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/department-head-queue  4.17ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/department-head-queue/export  3.94ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests/{exemption_request}/department-head-decision  3.25ms DONE
+  [POST] api/v1/credit-decisions/exemptions/{decision}/revoke ... 12.02ms DONE
+  [GET] api/v1/registration/capacity-overrides .................. 11.58ms DONE
+  [POST] api/v1/registration/capacity-overrides/{requirement}/decision  9.82ms DONE
+  [GET] api/v1/registration/remediation-obligations .............. 5.44ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/evidence-documents  29.50ms DONE
+  [GET] api/v1/credit-decisions/transfers ........................ 2.86ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/evidence-documents  25.62ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/targets ........ 1.79ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests ................ 2.99ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/export ......... 3.34ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests ............... 5.27ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/{transfer_request}  6.10ms DONE
+  [PATCH] api/v1/credit-decisions/transfer-requests/{transfer_request}  10.84ms DONE
+  [DELETE] api/v1/credit-decisions/transfer-requests/{transfer_request}  6.02ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/submit  6.64ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/{waiver_request}/evidence-documents/{document}  7.76ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/{transfer_request}/evidence-documents/{document}  4.96ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/advisor-queue . 33.17ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/advisor-queue/export  2.75ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/advisor-decision  3.47ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/department-head-queue  3.02ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/department-head-queue/export  3.19ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/department-head-decision  3.83ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/council-queue .. 3.28ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/council-queue/export  3.42ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/council-decision  3.59ms DONE
+  [POST] api/v1/credit-decisions/transfers/{decision}/revoke ..... 6.18ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/targets .......... 2.83ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/prior-results .... 3.45ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests .................. 8.71ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/export ........... 9.63ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests ................ 23.24ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/{waiver_request} . 4.60ms DONE
+  [PATCH] api/v1/credit-decisions/waiver-requests/{waiver_request}  13.84ms DONE
+  [DELETE] api/v1/credit-decisions/waiver-requests/{waiver_request}  6.60ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/submit  5.24ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/advisor-queue ... 50.60ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/advisor-queue/export  4.80ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/advisor-decision  9.24ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/department-head-queue  3.29ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/department-head-queue/export  4.54ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/department-head-decision  6.60ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/council-queue .... 4.06ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/council-queue/export  4.39ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/council-decision  5.60ms DONE
+  [POST] api/v1/credit-decisions/waivers/{decision}/revoke ...... 16.02ms DONE
+  [GET] api/v1/registration/on-behalf/students ................... 5.06ms DONE
+  [GET] api/v1/registration/on-behalf/students/{student_id}/eligible-courses  6.35ms DONE
+  [POST] api/v1/registration/on-behalf/students/{student_id}/requests  7.25ms DONE
+  [GET] api/v1/registration/queue ............................... 45.51ms DONE
+  [GET] api/v1/registration/requests/{registration} .............. 9.33ms DONE
+  [POST] api/v1/registration/requests/{registration}/decision ... 12.64ms DONE
+  [GET] api/v1/registration/students/{student_id}/schedule ....... 5.79ms DONE
+  [GET] api/v1/enrollment/cards/advisee-requests ................. 3.16ms DONE
+  [GET] api/v1/offerings/mine ................................... 50.36ms DONE
+  [GET] api/v1/offerings/{offering}/register ..................... 5.61ms DONE
+  [PATCH] api/v1/class-sessions/{class_session} .................. 6.21ms DONE
+  [PUT] api/v1/class-sessions/{class_session}/attendance ......... 7.76ms DONE
+  [GET] api/v1/grading/offerings ................................ 45.40ms DONE
+  [GET] api/v1/grading/offerings/{offering_id}/sheet ............. 4.95ms DONE
+  [PUT] api/v1/grading/sheets/{grade_sheet}/lines/{enrollment_id}  8.88ms DONE
+  [POST] api/v1/grading/sheets/{grade_sheet}/correction .......... 8.37ms DONE
+  [GET] api/v1/grading/corrections/{grade_sheet} ................. 5.44ms DONE
+  [GET] api/v1/grading/incompletes .............................. 14.48ms DONE
+  [GET] api/v1/grading/incompletes/{incomplete}/resolution ...... 10.12ms DONE
+  [GET] api/v1/grading/cards/grade-sheets ........................ 9.78ms DONE
+  [GET] api/v1/grading/cards/incompletes ......................... 2.15ms DONE
+  [POST] api/v1/grading/sheets/{grade_sheet}/sign ................ 9.12ms DONE
+  [GET] api/v1/grading/department-head/sheets ................... 28.93ms DONE
+  [GET] api/v1/grading/department-head/sheets/{grade_sheet} ...... 3.77ms DONE
+  [POST] api/v1/grading/department-head/sheets/{grade_sheet}/finalize  5.56ms DONE
+  [POST] api/v1/grading/department-head/sheets/{grade_sheet}/return  5.86ms DONE
+  [GET] api/v1/grading/cards/sheets-awaiting-review .............. 2.45ms DONE
+  [GET] api/v1/grading/my-grades ................................. 6.04ms DONE
+  [GET] api/v1/grading/cards/academic-record ..................... 8.77ms DONE
+  [GET] api/v1/grading/students ................................. 30.88ms DONE
+  [GET] api/v1/grading/students/{student_id} ..................... 4.09ms DONE
+  [GET] api/v1/health ............................................ 3.11ms DONE
+  [POST] api/v1/login ............................................ 6.17ms DONE
+  [POST] api/v1/logout ........................................... 2.66ms DONE
+  [GET] api/v1/me ................................................ 2.61ms DONE
+  [PATCH] api/v1/me .............................................. 3.03ms DONE
+  [GET] api/v1/admin/deans ....................................... 6.28ms DONE
+  [GET] api/v1/admin/faculty-dean-assignments .................... 1.98ms DONE
+  [POST] api/v1/admin/faculty-dean-assignments ................... 3.72ms DONE
+  [DELETE] api/v1/admin/faculty-dean-assignments/{assignment} .... 6.08ms DONE
+  [GET] api/v1/admin/department-heads ........................... 17.42ms DONE
+  [GET] api/v1/admin/department-head-assignments ................. 1.96ms DONE
+  [POST] api/v1/admin/department-head-assignments ................ 3.19ms DONE
+  [DELETE] api/v1/admin/department-head-assignments/{assignment} . 4.88ms DONE
+  [GET] api/v1/admin/cards/administration ........................ 3.73ms DONE
+  [GET] api/v1/notifications ..................................... 5.20ms DONE
+  [GET] api/v1/notifications/unread-count ........................ 1.73ms DONE
+  [POST] api/v1/notifications/read-all ........................... 1.45ms DONE
+  [POST] api/v1/notifications/{notification}/read ................ 2.99ms DONE
+  [GET] api/v1/records/students .................................. 7.09ms DONE
+  [GET] api/v1/records/students/export ........................... 3.07ms DONE
+  [GET] api/v1/records/students/{student_id}/transcript .......... 4.92ms DONE
+  [GET] api/v1/records/service ................................... 9.88ms DONE
+  [GET] api/v1/records/fee ....................................... 2.15ms DONE
+  [PUT] api/v1/records/fee ....................................... 5.35ms DONE
+  [GET] api/v1/records/requests ................................. 20.89ms DONE
+  [GET] api/v1/records/requests/export ........................... 4.65ms DONE
+  [POST] api/v1/records/requests ................................. 4.51ms DONE
+  [POST] api/v1/records/requests/{request_id}/refund ............ 14.08ms DONE
+  [GET] api/v1/records/requests/{request_id}/refund/receipt ...... 3.94ms DONE
+  [POST] api/v1/records/requests/{request_id}/cancellation ...... 19.94ms DONE
+  [POST] api/v1/records/requests/{request_id}/cancellation-review  3.92ms DONE
+  [POST] api/v1/records/requests/{request_id}/payment ........... 15.34ms DONE
+  [POST] api/v1/records/requests/{request_id}/payment-review ..... 7.33ms DONE
+  [GET] api/v1/records/requests/{request_id}/payments/{submission_id}/receipt  5.32ms DONE
+  [GET] api/v1/records/requests/{request_id} ..................... 3.77ms DONE
+  [POST] api/v1/records/requests/{request_id}/review ............. 4.59ms DONE
+  [POST] api/v1/records/requests/{request_id}/preview ........... 23.16ms DONE
+  [POST] api/v1/records/requests/{request_id}/issue ............. 12.38ms DONE
+  [GET] api/v1/records/issuances ................................. 9.94ms DONE
+  [GET] api/v1/records/issuances/export .......................... 4.70ms DONE
+  [GET] api/v1/records/issuances/{issuance_id} .................. 10.64ms DONE
+  [GET] api/v1/records/verify/{token} ........................... 10.00ms DONE
+  [POST] api/v1/records/requests/{request_id}/collection ........ 13.99ms DONE
+  [POST] api/v1/records/issuances/{issuance_id}/revocation ....... 4.02ms DONE
+  Extracting intro and auth Markdown files to: .scribe .......... 37.05ms DONE
+  Writing Blade docs to resources/views/scribe/ and assets to public/vendor/scribe/  3s DONE
+  Generating Postman collection in storage/app/private/scribe/ . 122.78ms DONE
+  Generating OpenAPI specification in storage/app/private/scribe/  785.30ms DONE
+
+  All done ............................................. http://localhost/docs

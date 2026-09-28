@@ -4583,7 +4583,7 @@ paths:
     post:
       summary: 'Register and start an application.'
       operationId: registerAndStartAnApplication
-      description: "Open only while an Admission Cycle's window is open: refused when none is\nopen, auto-filed into the one open Cycle, or (when several are open) filed\ninto the chosen one. Rate-limited per client. On success the applicant is\nauthenticated and their Draft Application is returned."
+      description: "Open only while an Admission Cycle's window is open: refused when none is\nopen, auto-filed into the one open Cycle, or (when several are open) filed\ninto the chosen one. Rate-limited per client. On success the applicant is\nauthenticated and their Draft Application is returned. Requests without a\nfirst-party SPA session are refused before any records are created."
       parameters: []
       responses:
         201:
@@ -4610,6 +4610,18 @@ paths:
                       admission_cycle_id:
                         type: integer
                         example: 1
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A first-party SPA session is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A first-party SPA session is required.'
         409:
           description: 'admissions closed'
           content:
@@ -9532,7 +9544,7 @@ paths:
     get:
       summary: 'Status timeline.'
       operationId: statusTimeline
-      description: "An application's append-only status history (from/to/note/when), oldest-first —\nthe applicant's visible progress and the decision audit trail. Readable by the\nowning applicant or any reviewer (`application.screen`); anyone else → 403."
+      description: "An application's append-only status history (from/to/note/when), oldest-first —\nthe applicant's visible progress and the decision audit trail. Readable by the\nowning applicant or a scoped reviewer (`application.screen`); anyone else → 403."
       parameters: []
       responses:
         200:
@@ -10251,7 +10263,7 @@ paths:
     get:
       summary: 'Review an application.'
       operationId: reviewAnApplication
-      description: "The full application — the Step-1 snapshot, resolved Program(s), and the\nuploaded documents — for a reviewer to assess completeness and authenticity\nbefore acting. Gated on `application.screen`."
+      description: "The full application — the Step-1 snapshot, resolved Program(s), and the\nuploaded documents — for a reviewer to assess completeness and authenticity\nbefore acting. Gated on `application.screen` and the same Faculty scope as the queue."
       parameters: []
       responses:
         200:
@@ -10624,11 +10636,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'This application cannot move from draft to sa_approved.'
+                  message: 'This application is not under Student Affairs review.'
                 properties:
                   message:
                     type: string
-                    example: 'This application cannot move from draft to sa_approved.'
+                    example: 'This application is not under Student Affairs review.'
         422:
           description: 'missing note'
           content:
@@ -12154,7 +12166,7 @@ paths:
     get:
       summary: 'Stream a document.'
       operationId: streamADocument
-      description: "Serves the stored file inline to the owning applicant or to a reviewer holding\n`application.screen`; anyone else is refused with a 403. The ULID in the path\nis the only handle — the storage path and row id are never exposed."
+      description: "Serves the stored file inline to the owning applicant or a reviewer authorized\nfor this Application's Faculty scope; anyone else is refused with a 403. The ULID in the path\nis the only handle — the storage path and row id are never exposed."
       parameters: []
       responses:
         403:
@@ -17734,7 +17746,7 @@ paths:
     post:
       summary: 'Log in.'
       operationId: logIn
-      description: "Authenticates via Sanctum's SPA cookie session (Q10)."
+      description: "Authenticates via Sanctum's SPA cookie session (Q10). Requires a first-party\nsession and limits failed attempts by normalized email and client IP."
       parameters: []
       responses:
         200:
@@ -17817,6 +17829,18 @@ paths:
                           - calendar.manage
                         items:
                           type: string
+        400:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'A first-party SPA session is required.'
+                properties:
+                  message:
+                    type: string
+                    example: 'A first-party SPA session is required.'
         422:
           description: ''
           content:
@@ -17841,6 +17865,18 @@ paths:
                           - 'These credentials do not match our records.'
                         items:
                           type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Too many login attempts. Please try again in 60 seconds.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Too many login attempts. Please try again in 60 seconds.'
       tags:
         - Endpoints
       requestBody:

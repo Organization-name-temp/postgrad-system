@@ -1,0 +1,298 @@
+
+> frontend@0.0.0 e2e
+> playwright test
+
+[WebServer] (node:291322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 180 tests using 1 worker
+
+(node:291389) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r05 in en (21.3s)
+  ✓    2 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r05 in ar (26.7s)
+  ✓    3 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r07 in en (19.7s)
+  ✓    4 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r07 in ar (26.5s)
+  ✓    5 [chromium] › e2e/admissions.spec.ts:79:1 › headline: a stranger applies and is admitted as a Student across every role (5.2m)
+  ✓    6 [chromium] › e2e/application-pipeline.spec.ts:10:5 › Pipeline exact stage drill and export work for r05 in en (21.7s)
+  ✓    7 [chromium] › e2e/application-pipeline.spec.ts:10:5 › Pipeline exact stage drill and export work for r05 in ar (33.0s)
+  ✓    8 [chromium] › e2e/application-pipeline.spec.ts:10:5 › Pipeline exact stage drill and export work for r07 in en (19.7s)
+  ✓    9 [chromium] › e2e/application-pipeline.spec.ts:10:5 › Pipeline exact stage drill and export work for r07 in ar (27.2s)
+  ✓   10 [chromium] › e2e/auth-bilingual-audit.spec.ts:6:5 › public authentication preserves input in light en (8.3s)
+  ✓   11 [chromium] › e2e/auth-bilingual-audit.spec.ts:6:5 › public authentication preserves input in light ar (8.7s)
+  ✓   12 [chromium] › e2e/auth-bilingual-audit.spec.ts:6:5 › public authentication preserves input in dark en (8.1s)
+  ✓   13 [chromium] › e2e/auth-bilingual-audit.spec.ts:6:5 › public authentication preserves input in dark ar (8.2s)
+  ✓   14 [chromium] › e2e/awaiting-interview-collection.spec.ts:9:3 › Awaiting interview criteria and authenticated workbook work in en (12.7s)
+  ✓   15 [chromium] › e2e/awaiting-interview-collection.spec.ts:9:3 › Awaiting interview criteria and authenticated workbook work in ar (19.2s)
+  ✓   16 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Catalog management light en (34.0s)
+  ✓   17 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Catalog management light ar (47.9s)
+  ✓   18 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Catalog management dark en (35.9s)
+  ✓   19 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Catalog management dark ar (50.1s)
+  ✓   20 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions staff light en (32.5s)
+  ✓   21 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions staff light ar (42.8s)
+  ✓   22 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions staff dark en (30.2s)
+  ✓   23 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions staff dark ar (37.9s)
+  ✓   24 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions Dean light en (20.3s)
+  ✓   25 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions Dean light ar (35.1s)
+  ✓   26 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions Dean dark en (20.7s)
+  ✓   27 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Admissions Dean dark ar (24.1s)
+  ✓   28 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Student academic light en (48.5s)
+  ✓   29 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Student academic light ar (54.9s)
+  ✓   30 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Student academic dark en (1.1m)
+  ✓   31 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Student academic dark ar (1.5m)
+  ✓   32 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Advisor academic light en (46.4s)
+  ✓   33 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Advisor academic light ar (46.5s)
+  ✓   34 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Advisor academic dark en (36.9s)
+  ✓   35 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Advisor academic dark ar (43.6s)
+  ✓   36 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Head academic light en (39.1s)
+  ✓   37 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Head academic light ar (44.5s)
+  ✓   38 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Head academic dark en (32.2s)
+  ✓   39 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Head academic dark ar (48.6s)
+  ✓   40 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Council academic light en (18.0s)
+  ✓   41 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Council academic light ar (27.0s)
+  ✓   42 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Council academic dark en (18.9s)
+  ✓   43 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Council academic dark ar (28.6s)
+  ✓   44 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records Student light en (23.0s)
+  ✓   45 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records Student light ar (27.8s)
+  ✓   46 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records Student dark en (29.3s)
+  ✓   47 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records Student dark ar (32.0s)
+  ✓   48 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records staff light en (34.2s)
+  ✓   49 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records staff light ar (39.5s)
+  ✓   50 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records staff dark en (22.4s)
+  ✓   51 [chromium] › e2e/bilingual-audit.spec.ts:86:7 › audit Records staff dark ar (35.8s)
+  ✓   52 [chromium] › e2e/capacity-dialog-audit.spec.ts:20:5 › populated capacity validation and denial dialog in light en (19.9s)
+  ✓   53 [chromium] › e2e/capacity-dialog-audit.spec.ts:20:5 › populated capacity validation and denial dialog in light ar (28.9s)
+  ✓   54 [chromium] › e2e/capacity-dialog-audit.spec.ts:20:5 › populated capacity validation and denial dialog in dark en (21.4s)
+  ✓   55 [chromium] › e2e/capacity-dialog-audit.spec.ts:20:5 › populated capacity validation and denial dialog in dark ar (34.0s)
+  ✓   56 [chromium] › e2e/catalog-detail-audit.spec.ts:10:5 › Catalog details curriculum history and dialogs work in light en (41.6s)
+  ✘   57 [chromium] › e2e/catalog-detail-audit.spec.ts:10:5 › Catalog details curriculum history and dialogs work in light ar (2.0m)
+(node:377764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   58 [chromium] › e2e/catalog-detail-audit.spec.ts:10:5 › Catalog details curriculum history and dialogs work in dark en (1.1m)
+  ✓   59 [chromium] › e2e/catalog-detail-audit.spec.ts:10:5 › Catalog details curriculum history and dialogs work in dark ar (1.0m)
+  ✓   60 [chromium] › e2e/correction-dialog-audit.spec.ts:7:5 › Correction selection and validation remain usable in light en (23.6s)
+  ✓   61 [chromium] › e2e/correction-dialog-audit.spec.ts:7:5 › Correction selection and validation remain usable in light ar (34.5s)
+  ✓   62 [chromium] › e2e/correction-dialog-audit.spec.ts:7:5 › Correction selection and validation remain usable in dark en (22.6s)
+  ✓   63 [chromium] › e2e/correction-dialog-audit.spec.ts:7:5 › Correction selection and validation remain usable in dark ar (30.7s)
+  ✓   64 [chromium] › e2e/course-collections.spec.ts:9:3 › Course filters and authenticated export retain their URL in en (36.2s)
+  ✘   65 [chromium] › e2e/course-collections.spec.ts:9:3 › Course filters and authenticated export retain their URL in ar (1.0m)
+(node:390718) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   66 [chromium] › e2e/cycle-collections.spec.ts:9:3 › Cycle criteria and authenticated workbook work in en (24.3s)
+  ✘   67 [chromium] › e2e/cycle-collections.spec.ts:9:3 › Cycle criteria and authenticated workbook work in ar (1.0m)
+(node:393559) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   68 [chromium] › e2e/dashboard.spec.ts:196:3 › the Dashboard composes Cards from the acting user’s access (ADR-0024) › an Applicant sees their own Application Card and no queue (8.1s)
+  ✓   69 [chromium] › e2e/dashboard.spec.ts:202:3 › the Dashboard composes Cards from the acting user’s access (ADR-0024) › a Student sees the four persona Cards, with a real CGPA rather than a placeholder (9.9s)
+  ✓   70 [chromium] › e2e/dashboard.spec.ts:228:3 › the Dashboard composes Cards from the acting user’s access (ADR-0024) › an Advisor sees the advisee queue alone, with their own advisees in it (9.2s)
+  ✓   71 [chromium] › e2e/dashboard.spec.ts:241:3 › the Dashboard composes Cards from the acting user’s access (ADR-0024) › an Instructor sees their two grading Cards and nothing from admissions (9.7s)
+  ✓   72 [chromium] › e2e/dashboard.spec.ts:250:3 › the Dashboard composes Cards from the acting user’s access (ADR-0024) › a Dean sees the admissions and configuration Cards their Faculty scope gives them (9.6s)
+  ✓   73 [chromium] › e2e/dashboard.spec.ts:263:3 › the Dashboard composes Cards from the acting user’s access (ADR-0024) › multi@ sees the union of both its Roles on one page, with no role switcher (10.7s)
+  ✓   74 [chromium] › e2e/dashboard.spec.ts:292:3 › the Dashboard composes Cards from the acting user’s access (ADR-0024) › an administrator sees the administration set only, never the union they inherit (8.8s)
+  ✓   75 [chromium] › e2e/dashboard.spec.ts:309:5 › the Dashboard holds WCAG AA › the Dashboard passes axe in light / en (13.5s)
+  ✓   76 [chromium] › e2e/dashboard.spec.ts:309:5 › the Dashboard holds WCAG AA › the Dashboard passes axe in dark / en (13.4s)
+  ✓   77 [chromium] › e2e/dashboard.spec.ts:309:5 › the Dashboard holds WCAG AA › the Dashboard passes axe in light / ar (21.8s)
+  ✓   78 [chromium] › e2e/dashboard.spec.ts:309:5 › the Dashboard holds WCAG AA › the Dashboard passes axe in dark / ar (21.3s)
+  ✓   79 [chromium] › e2e/dean-collections.spec.ts:9:3 › Dean collections bookmark and authenticated download work in en (33.8s)
+  ✘   80 [chromium] › e2e/dean-collections.spec.ts:9:3 › Dean collections bookmark and authenticated download work in ar (25.9s)
+(node:400552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   81 [chromium] › e2e/department-heads.spec.ts:83:5 › department head assignments › the Department-Heads screen passes axe in light / en (27.8s)
+  ✓   82 [chromium] › e2e/department-heads.spec.ts:83:5 › department head assignments › the Department-Heads screen passes axe in dark / en (31.5s)
+  ✓   83 [chromium] › e2e/department-heads.spec.ts:83:5 › department head assignments › the Department-Heads screen passes axe in light / ar (26.4s)
+  ✓   84 [chromium] › e2e/department-heads.spec.ts:83:5 › department head assignments › the Department-Heads screen passes axe in dark / ar (48.5s)
+  ✓   85 [chromium] › e2e/enrollment.spec.ts:84:1 › headline: an admin, a student, their advisor and an instructor run the enrollment loop (7.3m)
+  ✓   86 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Student passes axe in light / en (9.6s)
+  ✓   87 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Student passes axe in dark / en (9.3s)
+  ✓   88 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Student passes axe in light / ar (14.5s)
+  ✓   89 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Student passes axe in dark / ar (15.4s)
+  ✓   90 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Advisor passes axe in light / en (7.8s)
+  ✓   91 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Advisor passes axe in dark / en (8.6s)
+  ✓   92 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Advisor passes axe in light / ar (13.8s)
+  ✓   93 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Advisor passes axe in dark / ar (13.3s)
+  ✓   94 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Department Head passes axe in light / en (8.8s)
+  ✓   95 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Department Head passes axe in dark / en (7.7s)
+  ✓   96 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Department Head passes axe in light / ar (16.7s)
+  ✓   97 [chromium] › e2e/exemptions.spec.ts:61:7 › manual Exemption surfaces hold the design-system matrix › Department Head passes axe in dark / ar (21.8s)
+  ✓   98 [chromium] › e2e/grading.spec.ts:140:5 › grading screens › the grade sheet list and editor pass axe in light / en (18.5s)
+  ✓   99 [chromium] › e2e/grading.spec.ts:140:5 › grading screens › the grade sheet list and editor pass axe in dark / en (17.7s)
+  ✓  100 [chromium] › e2e/grading.spec.ts:140:5 › grading screens › the grade sheet list and editor pass axe in light / ar (17.2s)
+  ✓  101 [chromium] › e2e/grading.spec.ts:140:5 › grading screens › the grade sheet list and editor pass axe in dark / ar (26.6s)
+  ✓  102 [chromium] › e2e/grading.spec.ts:203:5 › outstanding incompletes (ticket 05) › the outstanding-incompletes list passes axe in light / en (12.3s)
+  ✓  103 [chromium] › e2e/grading.spec.ts:203:5 › outstanding incompletes (ticket 05) › the outstanding-incompletes list passes axe in dark / en (12.5s)
+  ✓  104 [chromium] › e2e/grading.spec.ts:203:5 › outstanding incompletes (ticket 05) › the outstanding-incompletes list passes axe in light / ar (12.5s)
+  ✓  105 [chromium] › e2e/grading.spec.ts:203:5 › outstanding incompletes (ticket 05) › the outstanding-incompletes list passes axe in dark / ar (18.3s)
+  ✓  106 [chromium] › e2e/grading.spec.ts:241:5 › central grade entry (ticket 09) › the central entry picker and sheet editor pass axe in light / en (15.9s)
+  ✓  107 [chromium] › e2e/grading.spec.ts:241:5 › central grade entry (ticket 09) › the central entry picker and sheet editor pass axe in dark / en (14.8s)
+  ✓  108 [chromium] › e2e/grading.spec.ts:241:5 › central grade entry (ticket 09) › the central entry picker and sheet editor pass axe in light / ar (14.6s)
+  ✓  109 [chromium] › e2e/grading.spec.ts:241:5 › central grade entry (ticket 09) › the central entry picker and sheet editor pass axe in dark / ar (28.5s)
+  ✓  110 [chromium] › e2e/grading.spec.ts:277:5 › my grades screen (ticket 04) › My Grades passes axe in light / en (10.6s)
+  ✓  111 [chromium] › e2e/grading.spec.ts:277:5 › my grades screen (ticket 04) › My Grades passes axe in dark / en (14.7s)
+  ✓  112 [chromium] › e2e/grading.spec.ts:277:5 › my grades screen (ticket 04) › My Grades passes axe in light / ar (14.0s)
+  ✓  113 [chromium] › e2e/grading.spec.ts:277:5 › my grades screen (ticket 04) › My Grades passes axe in dark / ar (21.5s)
+  ✓  114 [chromium] › e2e/grading.spec.ts:313:1 › headline: an instructor grades and defers, the head finalizes, and the students see it (47.5s)
+  ✓  115 [chromium] › e2e/graduation-readiness-report.spec.ts:16:5 › Readiness Report scoped drill export and paper work for r05 in en (38.4s)
+  ✓  116 [chromium] › e2e/graduation-readiness-report.spec.ts:16:5 › Readiness Report scoped drill export and paper work for r05 in ar (34.9s)
+  ✓  117 [chromium] › e2e/graduation-readiness-report.spec.ts:16:5 › Readiness Report scoped drill export and paper work for r07 in en (29.4s)
+  ✓  118 [chromium] › e2e/graduation-readiness-report.spec.ts:16:5 › Readiness Report scoped drill export and paper work for r07 in ar (33.7s)
+  ✓  119 [chromium] › e2e/headline.spec.ts:24:1 › an unauthenticated visit to a guarded route redirects to login (4.2s)
+  ✓  120 [chromium] › e2e/headline.spec.ts:36:1 › headline: sign in, browse the catalog tree, open a course, flip to RTL, sign out (17.4s)
+  ✓  121 [chromium] › e2e/interview-collections.spec.ts:10:5 › booked Interview collection preserves criteria and downloads in en (11.6s)
+  ✓  122 [chromium] › e2e/interview-collections.spec.ts:10:5 › assigned Interview collection preserves criteria and downloads in en (13.5s)
+  ✓  123 [chromium] › e2e/interview-collections.spec.ts:10:5 › booked Interview collection preserves criteria and downloads in ar (18.2s)
+  ✓  124 [chromium] › e2e/interview-collections.spec.ts:10:5 › assigned Interview collection preserves criteria and downloads in ar (14.0s)
+  ✓  125 [chromium] › e2e/phase7-headline.spec.ts:20:1 › Phase 7 headline: scoped academic populations, canonical exports, language continuity and authorized investigation (54.5s)
+  ✓  126 [chromium] › e2e/presentation-settle.spec.ts:4:1 › a theme audit waits for rendered label colour and ignores infinite animation (4.5s)
+  ✓  127 [chromium] › e2e/records-invalid-audit.spec.ts:6:5 › invalid public verification is private and readable in light en (4.5s)
+  ✓  128 [chromium] › e2e/records-invalid-audit.spec.ts:6:5 › invalid public verification is private and readable in light ar (4.6s)
+  ✓  129 [chromium] › e2e/records-invalid-audit.spec.ts:6:5 › invalid public verification is private and readable in dark en (4.3s)
+  ✓  130 [chromium] › e2e/records-invalid-audit.spec.ts:6:5 › invalid public verification is private and readable in dark ar (4.6s)
+  ✓  131 [chromium] › e2e/records-print.spec.ts:7:1 › dark theme prints all Transcript text legibly on white paper (12.4s)
+  ✓  132 [chromium] › e2e/records.spec.ts:181:1 › Phase 6 serial journey: payment correction, bilingual certification/QR, revocation, full refund and collection (9.0m)
+  ✓  133 [chromium] › e2e/reference-collections.spec.ts:9:3 › Catalog reference criteria and downloads work in en (29.2s)
+  ✓  134 [chromium] › e2e/reference-collections.spec.ts:9:3 › Catalog reference criteria and downloads work in ar (38.4s)
+  ✓  135 [chromium] › e2e/slot-collection.spec.ts:9:3 › Slot pool bookmarks and authenticated export work in en (11.3s)
+  ✓  136 [chromium] › e2e/slot-collection.spec.ts:9:3 › Slot pool bookmarks and authenticated export work in ar (17.6s)
+  ✓  137 [chromium] › e2e/style.spec.ts:32:5 › design-system gallery (/style) › renders and passes axe in light / en (7.4s)
+  ✓  138 [chromium] › e2e/style.spec.ts:32:5 › design-system gallery (/style) › renders and passes axe in dark / en (7.3s)
+  ✓  139 [chromium] › e2e/style.spec.ts:32:5 › design-system gallery (/style) › renders and passes axe in light / ar (8.6s)
+  ✓  140 [chromium] › e2e/style.spec.ts:32:5 › design-system gallery (/style) › renders and passes axe in dark / ar (8.7s)
+  ✓  141 [chromium] › e2e/termination-report.spec.ts:10:5 › Termination scoped Cases export and paper for r05 in en (17.9s)
+  ✓  142 [chromium] › e2e/termination-report.spec.ts:10:5 › Termination scoped Cases export and paper for r05 in ar (25.0s)
+  ✓  143 [chromium] › e2e/termination-report.spec.ts:10:5 › Termination scoped Cases export and paper for r07 in en (16.5s)
+  ✓  144 [chromium] › e2e/termination-report.spec.ts:10:5 › Termination scoped Cases export and paper for r07 in ar (23.6s)
+  ✓  145 [chromium] › e2e/transfers.spec.ts:42:5 › Transfer workflow role surfaces › r02@ejust.test gets an accessible bilingual scoped surface (12.8s)
+  ✓  146 [chromium] › e2e/transfers.spec.ts:42:5 › Transfer workflow role surfaces › r03@ejust.test gets an accessible bilingual scoped surface (10.4s)
+  ✓  147 [chromium] › e2e/transfers.spec.ts:42:5 › Transfer workflow role surfaces › r06@ejust.test gets an accessible bilingual scoped surface (10.3s)
+  ✓  148 [chromium] › e2e/transfers.spec.ts:42:5 › Transfer workflow role surfaces › r08@ejust.test gets an accessible bilingual scoped surface (9.8s)
+  ✓  149 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Student Waiver surface in en (13.1s)
+  ✓  150 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Student Waiver surface in ar (11.3s)
+  ✓  151 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Advisor Waiver surface in en (11.7s)
+  ✓  152 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Advisor Waiver surface in ar (10.3s)
+  ✓  153 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Department Head Waiver surface in en (11.6s)
+  ✓  154 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Department Head Waiver surface in ar (10.1s)
+  ✓  155 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Council Waiver surface in en (11.3s)
+  ✓  156 [chromium] › e2e/waivers.spec.ts:44:7 › Waiver persona surfaces are bilingual, RTL-safe, and accessible › Council Waiver surface in ar (9.9s)
+  ✓  157 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Applicant form in light en (27.2s)
+  ✓  158 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Applicant form in light ar (24.4s)
+  ✓  159 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Applicant form in dark en (27.6s)
+  ✓  160 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Applicant form in dark ar (24.3s)
+  ✓  161 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Screening detail in light en (19.8s)
+  ✓  162 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Screening detail in light ar (25.8s)
+  ✓  163 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Screening detail in dark en (19.8s)
+  ✓  164 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Screening detail in dark ar (25.7s)
+  ✓  165 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Dean detail in light en (14.9s)
+  ✓  166 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Dean detail in light ar (20.3s)
+  ✓  167 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Dean detail in dark en (14.4s)
+  ✓  168 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Dean detail in dark ar (20.4s)
+  ✓  169 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Advisor detail in light en (16.4s)
+  ✓  170 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Advisor detail in light ar (17.2s)
+  ✓  171 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Advisor detail in dark en (12.5s)
+  ✓  172 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Advisor detail in dark ar (17.1s)
+  ✓  173 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Attendance register in light en (14.0s)
+  ✓  174 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Attendance register in light ar (19.4s)
+  ✓  175 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Attendance register in dark en (13.9s)
+  ✓  176 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Attendance register in dark ar (18.9s)
+  ✓  177 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Interviewer in light en (10.0s)
+  ✓  178 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Interviewer in light ar (14.8s)
+  ✓  179 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Interviewer in dark en (9.9s)
+  ✓  180 [chromium] › e2e/workflow-detail-audit.spec.ts:44:7 › existing Interviewer in dark ar (14.3s)
+
+
+  1) [chromium] › e2e/catalog-detail-audit.spec.ts:10:5 › Catalog details curriculum history and dialogs work in light ar
+
+    Test timeout of 120000ms exceeded.
+
+    Error: locator.click: Test timeout of 120000ms exceeded.
+    Call log:
+      - waiting for getByRole('row').filter({ has: getByRole('cell', { name: 'CSE511', exact: true }) }).getByRole('link', { name: 'تعديل', exact: true })
+
+
+      25 |         await row
+      26 |           .getByRole('link', { name: locale === 'ar' ? 'تعديل' : 'Edit', exact: true })
+    > 27 |           .click()
+         |            ^
+      28 |         await expect(page.getByTestId('version-history')).toBeVisible()
+      29 |         await expect(page.getByTestId('version-history').getByRole('progressbar')).toHaveCount(0)
+      30 |         if (collection === 'programs') {
+        at /home/mohamed/Documents/postgrad-system/frontend/e2e/catalog-detail-audit.spec.ts:27:12
+
+    Error Context: test-results/catalog-detail-audit-Catal-b5705-nd-dialogs-work-in-light-ar-chromium/error-context.md
+
+  2) [chromium] › e2e/course-collections.spec.ts:9:3 › Course filters and authenticated export retain their URL in ar
+
+    Test timeout of 60000ms exceeded.
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  locator('html')
+    Expected: "ltr"
+    Received: ""
+
+
+       at authenticatedLanguage.ts:20
+
+      18 |   }
+      19 |   await expect(page.locator('html')).toHaveAttribute('lang', locale)
+    > 20 |   await expect(page.locator('html')).toHaveAttribute('dir', locale === 'ar' ? 'rtl' : 'ltr')
+         |                                      ^
+      21 | }
+      22 |
+      23 | export async function loginInEnglish(page: Page, email: string) {
+        at selectAuthenticatedLanguage (/home/mohamed/Documents/postgrad-system/frontend/e2e/authenticatedLanguage.ts:20:38)
+        at /home/mohamed/Documents/postgrad-system/frontend/e2e/course-collections.spec.ts:74:5
+
+    Error Context: test-results/course-collections-Course--c747c-port-retain-their-URL-in-ar-chromium/error-context.md
+
+  3) [chromium] › e2e/cycle-collections.spec.ts:9:3 › Cycle criteria and authenticated workbook work in ar
+
+    Test timeout of 60000ms exceeded.
+
+    Error: locator.fill: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Email')
+
+
+       at authenticatedLanguage.ts:25
+
+      23 | export async function loginInEnglish(page: Page, email: string) {
+      24 |   await page.goto('/login')
+    > 25 |   await page.getByLabel('Email').fill(email)
+         |                                  ^
+      26 |   await page.getByLabel('Password').fill('password')
+      27 |   const currentUser = page.waitForResponse(
+      28 |     (response) =>
+        at loginInEnglish (/home/mohamed/Documents/postgrad-system/frontend/e2e/authenticatedLanguage.ts:25:34)
+        at /home/mohamed/Documents/postgrad-system/frontend/e2e/cycle-collections.spec.ts:12:5
+
+    Error Context: test-results/cycle-collections-Cycle-cr-351a4-ticated-workbook-work-in-ar-chromium/error-context.md
+
+  4) [chromium] › e2e/dean-collections.spec.ts:9:3 › Dean collections bookmark and authenticated download work in ar
+
+    Error: frame.evaluate: Execution context was destroyed, most likely because of a navigation.
+
+      36 |       expect(await download.failure()).toBeNull()
+      37 |       await download.saveAs(testInfo.outputPath(`${resource}-${locale}.xlsx`))
+    > 38 |       const scan = await new AxeBuilder({ page }).analyze()
+         |                    ^
+      39 |       expect(
+      40 |         scan.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical'),
+      41 |       ).toEqual([])
+        at AxeBuilder.runPartialRecursive (/home/mohamed/Documents/postgrad-system/frontend/node_modules/@axe-core/playwright/dist/index.mjs:283:34)
+        at AxeBuilder.analyze (/home/mohamed/Documents/postgrad-system/frontend/node_modules/@axe-core/playwright/dist/index.mjs:210:28)
+        at /home/mohamed/Documents/postgrad-system/frontend/e2e/dean-collections.spec.ts:38:20
+
+    Error Context: test-results/dean-collections-Dean-coll-a4e5c-ticated-download-work-in-ar-chromium/error-context.md
+
+  Slow test file: [chromium] › e2e/bilingual-audit.spec.ts (22.4m)
+  Slow test file: [chromium] › e2e/records.spec.ts (9.0m)
+  Slow test file: [chromium] › e2e/workflow-detail-audit.spec.ts (7.4m)
+  Slow test file: [chromium] › e2e/enrollment.spec.ts (7.3m)
+  Slow test file: [chromium] › e2e/grading.spec.ts (5.3m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  4 failed
+    [chromium] › e2e/catalog-detail-audit.spec.ts:10:5 › Catalog details curriculum history and dialogs work in light ar
+    [chromium] › e2e/course-collections.spec.ts:9:3 › Course filters and authenticated export retain their URL in ar
+    [chromium] › e2e/cycle-collections.spec.ts:9:3 › Cycle criteria and authenticated workbook work in ar
+    [chromium] › e2e/dean-collections.spec.ts:9:3 › Dean collections bookmark and authenticated download work in ar
+  176 passed (1.5h)

@@ -1,0 +1,16 @@
+
+   PASS  Tests\SecurityAudit\SecurityAuditPoCTest
+  ✓ it AUDIT-01 blocks outside-faculty PII timeline and private files    2.97s
+  ✓ it AUDIT-02 prevents outside-faculty rejection through screening     0.17s
+  ✓ it AUDIT-03 rejects guesses after the account failure budget is exh… 1.55s
+  ✓ it DEFERRED-01 registration accepts a weak password and ignores inj… 0.14s
+  ✓ it AUDIT-04 refuses stateless registration before committing record… 0.05s
+  ✓ it AUDIT-05 refuses a stale screening handler after a terminal reje… 0.14s
+  ✓ it DEFERRED-02 applicant verifies email using a link returned to th… 0.18s
+  ✓ it DEFERRED-03 PDF with an inert embedded script is stored and retu… 0.13s
+  ✓ it CONTROL unrelated applicants cannot read or delete someone elses… 0.23s
+  ✓ it CONTROL tampered verification signatures fail                     0.14s
+  ✓ it CONTROL SQL-looking sort fields and HTML masquerading as a PDF a… 0.19s
+
+  Tests:    11 passed (66 assertions)
+  Duration: 6.41s

@@ -30,6 +30,9 @@ infrastructure for unfinished work — it is deliberate scope.
   computed on-demand rather than Redis-cached.
 - **Auth hardening:** MFA/2FA, SSO/LDAP/SAML, account lockout, CAPTCHA, password policy,
   session listing/force-terminate, geolocation logging → minimal Sanctum session auth.
+  [ADR-0051](0051-security-audit-remediation.md) adds narrow failed-login rate limits and
+  an explicit first-party session precondition following the security audit; the other
+  listed production controls remain deferred.
 - **Notifications:** email + SMS → in-app notifications table with a polled bell only.
 - **Scheduler:** cron/Laravel scheduler → artisan console commands run manually.
 - **Resilience/scale:** synchronous Postgres replica, encrypted backups, and all

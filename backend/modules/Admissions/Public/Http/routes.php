@@ -35,7 +35,7 @@ Route::get('/admission-cycles/open', [AdmissionCycleController::class, 'open']);
 // Public: register and start an application. Unauthenticated and rate-limited
 // (the `register` limiter, defined in AdmissionsServiceProvider); it establishes
 // the applicant's session itself (ticket 03).
-Route::post('/register', RegistrationController::class)->middleware('throttle:register');
+Route::post('/register', RegistrationController::class)->middleware(['spa-session', 'throttle:register']);
 
 // Public (signed, not session-authed): the emailed-style verification link. The
 // signature is the credential — the link may be clicked from anywhere — so this

@@ -5,7 +5,6 @@ namespace Modules\Admissions\Internal\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -13,7 +12,7 @@ use Modules\Admissions\Internal\Enums\DocumentType;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesCurrentApplication;
 use Modules\Admissions\Internal\Http\Resources\ApplicationDocumentResource;
 use Modules\Admissions\Internal\Models\ApplicationDocument;
-use Modules\Identity\Public\Enums\Permission;
+use Modules\Admissions\Internal\Support\ApplicationAccess;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
@@ -24,8 +23,8 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
  * the certificates and files that complete their application, each validated
  * against its {@see DocumentType}'s own rules (format, size, cardinality). Files
  * land on the private `local` disk under an opaque ULID (never `public`, ADR-0005)
- * and are streamed back only to the owning applicant or a reviewer holding
- * `application.screen`. Uploads and removals are allowed only while the Application
+ * and are streamed back only to the owning applicant or a scoped reviewer.
+ * Uploads and removals are allowed only while the Application
  * is still in the applicant's hands (Draft / Submitted / EmailVerified /
  * ReturnedForRevision); once it enters review, the documents lock.
  */
@@ -131,8 +130,8 @@ class DocumentController
     /**
      * Stream a document.
      *
-     * Serves the stored file inline to the owning applicant or to a reviewer holding
-     * `application.screen`; anyone else is refused with a 403. The ULID in the path
+     * Serves the stored file inline to the owning applicant or a reviewer authorized
+     * for this Application's Faculty scope; anyone else is refused with a 403. The ULID in the path
      * is the only handle — the storage path and row id are never exposed.
      *
      * @urlParam document_ulid string required The ULID of the document to stream. Example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
@@ -141,15 +140,9 @@ class DocumentController
      *
      * @responseField file The raw document bytes, served with the stored content type.
      */
-    public function download(Request $request, ApplicationDocument $document): StreamedResponse
+    public function download(Request $request, ApplicationDocument $document, ApplicationAccess $access): StreamedResponse
     {
-        $user = $request->user();
-        $owns = $user !== null && (int) $document->application->user_id === (int) $user->getAuthIdentifier();
-
-        // The owner sees their own document; a reviewer sees any (application.screen).
-        if (! $owns && ! Gate::allows(Permission::ScreenApplications->value)) {
-            abort(403);
-        }
+        abort_unless($access->reads((int) $request->user()?->getAuthIdentifier(), $document->application), 403);
 
         return Storage::disk('local')->response(
             $document->stored_path,

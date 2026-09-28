@@ -1,0 +1,2 @@
+🎉 Inert audit fixture - Your OpenAPI spec has been converted into ready to use orval!
+{"package":"8.20.0","client":"react-query/axios","marker":"executed","triggered":true}

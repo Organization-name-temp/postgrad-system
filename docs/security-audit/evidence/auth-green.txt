@@ -1,0 +1,27 @@
+
+   PASS  Tests\Feature\Identity\AuthTest
+  ✓ it logs in with valid credentials and records a login audit entry    1.97s
+  ✓ it rejects invalid credentials and records a failed-login audit ent… 0.30s
+  ✓ it returns the authenticated user and their roles from /me           0.09s
+  ✓ it rejects /me when unauthenticated                                  0.06s
+  ✓ it logs out an authenticated session and records a logout audit ent… 0.09s
+  ✓ it rejects stateless login before authentication and audit side eff… 0.06s
+  ✓ it blocks the sixth failed account attempt across email case and cl… 1.31s
+  ✓ it limits rotating account guesses from one IP and localizes the re… 0.49s
+  ✓ it successful login resets only its account failures and does not c… 0.96s
+
+   PASS  Tests\Feature\Admissions\RegistrationTest
+  ✓ it rejects stateless registration before creating a user or applica… 0.08s
+  ✓ it registers an applicant into the single open cycle and logs them…  0.10s
+  ✓ it refuses registration with an admissions-closed message when no c… 0.07s
+  ✓ it auto-assigns the only open cycle, ignoring closed ones            0.09s
+  ✓ it requires choosing a cycle when more than one is open              0.08s
+  ✓ it files the application against the chosen cycle when several are…  0.10s
+  ✓ it rejects a chosen cycle that is not open                           0.08s
+  ✓ it rejects a duplicate email                                         0.08s
+  ✓ it requires a name, email, and a confirmed password                  0.06s
+  ✓ it rejects a password that fails confirmation                        0.07s
+  ✓ it rate-limits registration attempts from one client                 0.10s
+
+  Tests:    20 passed (97 assertions)
+  Duration: 6.41s

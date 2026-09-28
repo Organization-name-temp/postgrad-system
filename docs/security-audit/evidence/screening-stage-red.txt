@@ -1,0 +1,30 @@
+{
+    "expected_http": 409,
+    "rolled_back": true,
+    "results": [
+        {
+            "from": "under_dean_review",
+            "http": 200,
+            "after": "rejected",
+            "transitions": 1
+        },
+        {
+            "from": "interview_completed",
+            "http": 200,
+            "after": "rejected",
+            "transitions": 1
+        },
+        {
+            "from": "conditionally_accepted",
+            "http": 200,
+            "after": "rejected",
+            "transitions": 1
+        },
+        {
+            "from": "waitlisted",
+            "http": 200,
+            "after": "rejected",
+            "transitions": 1
+        }
+    ]
+}

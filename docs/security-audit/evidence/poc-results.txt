@@ -1,0 +1,16 @@
+
+   PASS  Tests\SecurityAudit\SecurityAuditPoCTest
+  ✓ it AUDIT-01 dean reads outside-faculty PII and files hidden from th… 1.75s
+  ✓ it AUDIT-02 dean rejects an outside-faculty application through scr… 0.11s
+  ✓ it AUDIT-03 login accepts 30 successive failed guesses without thro… 6.24s
+  ✓ it DEFERRED-01 registration accepts a weak password and ignores inj… 0.09s
+  ✓ it AUDIT-04 stateless registration returns 500 after committing the… 0.09s
+  ✓ it AUDIT-05 stale screening handler overwrites a terminal rejection  0.10s
+  ✓ it DEFERRED-02 applicant verifies email using a link returned to th… 0.09s
+  ✓ it DEFERRED-03 PDF with an inert embedded script is stored and retu… 0.11s
+  ✓ it CONTROL unrelated applicants cannot read or delete someone elses… 0.10s
+  ✓ it CONTROL tampered verification signatures fail                     0.07s
+  ✓ it CONTROL SQL-looking sort fields and HTML masquerading as a PDF a… 0.11s
+
+  Tests:    11 passed (68 assertions)
+  Duration: 9.03s

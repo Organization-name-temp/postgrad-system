@@ -1,0 +1,97 @@
+[
+  {
+    "path": "/api/v1/me",
+    "request_headers": {},
+    "status": 401,
+    "response_headers": {
+      "Host": "127.0.0.1:8000",
+      "Connection": "close",
+      "X-Powered-By": "PHP/8.4.25",
+      "Cache-Control": "no-cache, private",
+      "Date": "Mon, 28 Sep 2026 08:35:57 GMT",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    },
+    "body_preview": "{\"message\":\"Unauthenticated.\"}"
+  },
+  {
+    "path": "/api/v1/me",
+    "request_headers": {
+      "Origin": "http://evil.example.test"
+    },
+    "status": 401,
+    "response_headers": {
+      "Host": "127.0.0.1:8000",
+      "Connection": "close",
+      "X-Powered-By": "PHP/8.4.25",
+      "Cache-Control": "no-cache, private",
+      "Date": "Mon, 28 Sep 2026 08:35:57 GMT",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    },
+    "body_preview": "{\"message\":\"Unauthenticated.\"}"
+  },
+  {
+    "path": "/api/v1/records/verify/invalid-audit-token",
+    "request_headers": {},
+    "status": 404,
+    "response_headers": {
+      "Host": "127.0.0.1:8000",
+      "Connection": "close",
+      "X-Powered-By": "PHP/8.4.25",
+      "Cache-Control": "no-cache, private",
+      "Date": "Mon, 28 Sep 2026 08:35:57 GMT",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    },
+    "body_preview": "{\n    \"message\": \"\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\NotFoundHttpException\",\n    \"file\": \"/"
+  },
+  {
+    "path": "/api/v1/health",
+    "request_headers": {},
+    "status": 200,
+    "response_headers": {
+      "Host": "127.0.0.1:8000",
+      "Connection": "close",
+      "X-Powered-By": "PHP/8.4.25",
+      "Cache-Control": "no-cache, private",
+      "Date": "Mon, 28 Sep 2026 08:35:57 GMT",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    },
+    "body_preview": "{\"data\":{\"status\":\"ok\",\"app\":\"PRS\"}}"
+  },
+  {
+    "path": "/.env",
+    "request_headers": {},
+    "status": 404,
+    "response_headers": {
+      "Host": "127.0.0.1:8000",
+      "Connection": "close",
+      "X-Powered-By": "PHP/8.4.25",
+      "Cache-Control": "no-cache, private",
+      "date": "Mon, 28 Sep 2026 08:35:57 GMT",
+      "Content-Type": "text/html; charset=utf-8"
+    },
+    "body_preview": "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n        <meta name=\"viewport\" content=\"width="
+  },
+  {
+    "path": "/api/v1/login",
+    "request_headers": {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Origin": "http://localhost:5173"
+    },
+    "status": 419,
+    "response_headers": {
+      "Host": "127.0.0.1:8000",
+      "Connection": "close",
+      "X-Powered-By": "PHP/8.4.25",
+      "Cache-Control": "no-cache, private",
+      "Date": "Mon, 28 Sep 2026 08:35:57 GMT",
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    },
+    "body_preview": "{\n    \"message\": \"CSRF token mismatch.\",\n    \"exception\": \"Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\HttpException\",\n  "
+  }
+]

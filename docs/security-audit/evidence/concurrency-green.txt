@@ -1,0 +1,10 @@
+
+   PASS  Tests\Feature\Admissions\ScreeningConcurrencyTest
+  ✓ it serializes competing screening decisions with one history and no… 2.66s
+  ✓ it serializes competing screening decisions with one history and no… 1.89s
+
+   PASS  Tests\Feature\Admissions\ApplicationScreeningTest
+  ✓ it refuses a stale screening handler without overwriting a terminal… 1.20s
+
+  Tests:    3 passed (19 assertions)
+  Duration: 5.93s

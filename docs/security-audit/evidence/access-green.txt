@@ -1,0 +1,17 @@
+
+   PASS  Tests\Feature\Admissions\ApplicationAccessTest
+  ✓ it denies outside faculty detail timeline and document reads even w… 2.62s
+  ✓ it denies every outside faculty screening action without transition… 0.21s
+  ✓ it denies every outside faculty screening action without transition… 0.22s
+  ✓ it denies every outside faculty screening action without transition… 0.15s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.20s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.19s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.22s
+  ✓ it keeps in faculty dean access and screening                        0.32s
+  ✓ it retains university wide reads and screening for SA administrator… 0.25s
+  ✓ it retains university wide reads and screening for SA administrator… 0.25s
+  ✓ it retains university wide reads and screening for SA administrator… 0.22s
+  ✓ it keeps owner file and timeline access without giving the owner sc… 0.16s
+
+  Tests:    12 passed (58 assertions)
+  Duration: 6.18s

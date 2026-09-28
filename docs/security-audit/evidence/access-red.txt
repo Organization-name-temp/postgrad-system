@@ -1,0 +1,129 @@
+
+   FAIL  Tests\Feature\Admissions\ApplicationAccessTest
+  ⨯ it denies outside faculty detail timeline and document reads even w… 2.01s
+  ⨯ it denies every outside faculty screening action without transition… 0.20s
+  ⨯ it denies every outside faculty screening action without transition… 0.22s
+  ⨯ it denies every outside faculty screening action without transition… 0.23s
+  ⨯ it denies a dean with no assignment or an unresolved program with (… 0.16s
+  ⨯ it denies a dean with no assignment or an unresolved program with (… 0.12s
+  ⨯ it denies a dean with no assignment or an unresolved program with (… 0.18s
+  ✓ it keeps in faculty dean access and screening                        0.30s
+  ✓ it retains university wide reads and screening for SA administrator… 0.30s
+  ✓ it retains university wide reads and screening for SA administrator… 0.21s
+  ✓ it retains university wide reads and screening for SA administrator… 0.25s
+  ✓ it keeps owner file and timeline access without giving the owner sc… 0.20s
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationAccessTest > it denies outsid…
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests/Feature/Admissions/ApplicationAccessTest.php:36
+     32▕
+     33▕ it('denies outside faculty detail timeline and document reads even when the identifiers are known', function () {
+     34▕     [, $application, $document] = applicationAccessFixture();
+     35▕     $this->getJson('/api/v1/applications')->assertOk()->assertJsonPath('meta.total', 0);
+  ➜  36▕     $this->getJson('/api/v1/applications/'.$application->id)->assertForbidden();
+     37▕     $this->getJson('/api/v1/applications/'.$application->id.'/timeline')->assertForbidden();
+     38▕     $this->get('/api/v1/documents/'.$document->ulid)->assertForbidden();
+     39▕ });
+     40▕
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationAccessTest > it denies every…
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests/Feature/Admissions/ApplicationAccessTest.php:44
+     40▕
+     41▕ it('denies every outside faculty screening action without transitions or notifications', function (string $action) {
+     42▕     [, $application] = applicationAccessFixture();
+     43▕     $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => $action, 'note' => 'Review note'])
+  ➜  44▕         ->assertForbidden();
+     45▕     $this->assertDatabaseHas('applications', ['id' => $application->id, 'status' => 'under_sa_review']);
+     46▕     $this->assertDatabaseCount('application_status_transitions', 0);
+     47▕     $this->assertDatabaseCount('notifications', 0);
+     48▕ })->with(['approve', 'return', 'reject']);
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationAccessTest > it denies every…
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests/Feature/Admissions/ApplicationAccessTest.php:44
+     40▕
+     41▕ it('denies every outside faculty screening action without transitions or notifications', function (string $action) {
+     42▕     [, $application] = applicationAccessFixture();
+     43▕     $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => $action, 'note' => 'Review note'])
+  ➜  44▕         ->assertForbidden();
+     45▕     $this->assertDatabaseHas('applications', ['id' => $application->id, 'status' => 'under_sa_review']);
+     46▕     $this->assertDatabaseCount('application_status_transitions', 0);
+     47▕     $this->assertDatabaseCount('notifications', 0);
+     48▕ })->with(['approve', 'return', 'reject']);
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationAccessTest > it denies every…
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests/Feature/Admissions/ApplicationAccessTest.php:44
+     40▕
+     41▕ it('denies every outside faculty screening action without transitions or notifications', function (string $action) {
+     42▕     [, $application] = applicationAccessFixture();
+     43▕     $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => $action, 'note' => 'Review note'])
+  ➜  44▕         ->assertForbidden();
+     45▕     $this->assertDatabaseHas('applications', ['id' => $application->id, 'status' => 'under_sa_review']);
+     46▕     $this->assertDatabaseCount('application_status_transitions', 0);
+     47▕     $this->assertDatabaseCount('notifications', 0);
+     48▕ })->with(['approve', 'return', 'reject']);
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationAccessTest > it denies a dean…
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests/Feature/Admissions/ApplicationAccessTest.php:57
+     53▕         FacultyDeanAssignment::query()->where('user_id', $dean->id)->delete();
+     54▕     } else {
+     55▕         $application->update(['primary_program_id' => $missing === 'null' ? null : 999999]);
+     56▕     }
+  ➜  57▕     $this->getJson('/api/v1/applications/'.$application->id)->assertForbidden();
+     58▕     $this->get('/api/v1/documents/'.$document->ulid)->assertForbidden();
+     59▕     $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => 'reject', 'note' => 'Review note'])->assertForbidden();
+     60▕ })->with(['assignment', 'null', 'missing-program']);
+     61▕
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationAccessTest > it denies a dean…
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests/Feature/Admissions/ApplicationAccessTest.php:57
+     53▕         FacultyDeanAssignment::query()->where('user_id', $dean->id)->delete();
+     54▕     } else {
+     55▕         $application->update(['primary_program_id' => $missing === 'null' ? null : 999999]);
+     56▕     }
+  ➜  57▕     $this->getJson('/api/v1/applications/'.$application->id)->assertForbidden();
+     58▕     $this->get('/api/v1/documents/'.$document->ulid)->assertForbidden();
+     59▕     $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => 'reject', 'note' => 'Review note'])->assertForbidden();
+     60▕ })->with(['assignment', 'null', 'missing-program']);
+     61▕
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\ApplicationAccessTest > it denies a dean…
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests/Feature/Admissions/ApplicationAccessTest.php:57
+     53▕         FacultyDeanAssignment::query()->where('user_id', $dean->id)->delete();
+     54▕     } else {
+     55▕         $application->update(['primary_program_id' => $missing === 'null' ? null : 999999]);
+     56▕     }
+  ➜  57▕     $this->getJson('/api/v1/applications/'.$application->id)->assertForbidden();
+     58▕     $this->get('/api/v1/documents/'.$document->ulid)->assertForbidden();
+     59▕     $this->postJson('/api/v1/applications/'.$application->id.'/screen', ['action' => 'reject', 'note' => 'Review note'])->assertForbidden();
+     60▕ })->with(['assignment', 'null', 'missing-program']);
+     61▕
+
+
+  Tests:    7 failed, 5 passed (41 assertions)
+  Duration: 5.26s

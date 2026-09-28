@@ -1,0 +1,1971 @@
+{"tool":"pint","result":"passed"}Note: Using configuration file /home/mohamed/Documents/postgrad-system/backend/phpstan.neon.
+
+ [OK] No errors
+
+
+ -------------------- ------
+  Report
+ -------------------- ------
+  Violations           0
+  Skipped violations   0
+  Uncovered            1989
+  Allowed              1944
+  Warnings             0
+  Errors               0
+ -------------------- ------
+
+
+   PASS  Tests\Unit\AcademicStanding\CreditHourSummaryCalculatorTest
+  ✓ it preserves raw facts while allocating decisions before earned cre… 0.02s
+  ✓ it floors requirements and remaining at zero while leaving surplus raw credit visible
+
+   PASS  Tests\Unit\AcademicStanding\GraduationReadinessCalculatorTest
+  ✓ it is ready only with complete requirements an available qualifying… 0.05s
+  ✓ it returns every applicable typed blocker without treating warning as a blocker
+  ✓ it distinguishes unavailable cgpa and enforces the one-to-five hour approaching boundary with dataset "zero remaining"
+  ✓ it distinguishes unavailable cgpa and enforces the one-to-five hour approaching boundary with dataset "one complete"
+  ✓ it distinguishes unavailable cgpa and enforces the one-to-five hour approaching boundary with dataset "five complete"
+  ✓ it distinguishes unavailable cgpa and enforces the one-to-five hour approaching boundary with dataset "six complete"
+  ✓ it distinguishes unavailable cgpa and enforces the one-to-five hour approaching boundary with dataset "partial schedule"
+
+   PASS  Tests\Unit\AcademicStanding\StandingCalculatorTest
+  ✓ it classifies every standing state in precedence order with dataset… 0.02s
+  ✓ it classifies every standing state in precedence order with dataset "no finalized grade"
+  ✓ it classifies every standing state in precedence order with dataset "below 3.00"
+  ✓ it classifies every standing state in precedence order with dataset "exactly 3.00 with a failed effective grade"
+  ✓ it classifies every standing state in precedence order with dataset "different successful Course does not erase failure"
+  ✓ it classifies every standing state in precedence order with dataset "all effective attempts earned"
+
+   PASS  Tests\Unit\AcademicStanding\UnderloadRuleCalculatorTest
+  ✓ it allows only a one-to-five hour first-semester schedule containin… 0.03s
+  ✓ it allows an approaching-graduation schedule only when it completes exact targets and category slots
+
+   PASS  Tests\Unit\Admissions\ApplicationStatusTest
+  ✓ it allows the applicant-driven early moves                           0.03s
+  ✓ it allows Student Affairs screening to approve, return, or reject
+  ✓ it auto-forwards an SA-approved application to Dean review
+  ✓ it loops a returned application back into SA review on resubmit
+  ✓ it allows the later Dean, interview, and decision moves
+  ✓ it allows the extra conditional and waitlist exits to a real outcome
+  ✓ it refuses illegal jumps across the workflow
+  ✓ it treats Accepted and Rejected as terminal
+
+   PASS  Tests\Unit\Admissions\BusinessDaysTest
+  ✓ it counts zero elapsed business days on the same day                 0.08s
+  ✓ it counts one business day to the next weekday
+  ✓ it counts consecutive mid-week days without a weekend
+  ✓ it excludes the Egyptian Friday/Saturday weekend
+  ✓ it counts across a full weekend to the following week
+  ✓ it does not count the weekend itself as elapsed business days
+  ✓ it treats a moment before the start as zero elapsed days
+  ✓ it ignores the time of day, counting only whole elapsed days
+
+   PASS  Tests\Unit\Admissions\DegreeQualificationTest
+  ✓ it qualifies a BSc holder for an MSc but not a PhD                   0.03s
+  ✓ it qualifies an MSc holder for both an MSc and a PhD
+  ✓ it qualifies a PhD holder for a PhD but not a step down to an MSc
+
+   PASS  Tests\Unit\Admissions\DocumentTypeTest
+  ✓ it classifies the four core documents as always required             0.04s
+  ✓ it classifies the english certificate and MSc thesis as conditional
+  ✓ it classifies the CV, recommendation letters, and additional certificates as optional
+  ✓ it caps cardinality per type: 2 recommendation letters, 5 additional certificates, otherwise 1
+  ✓ it restricts the personal photo to image formats only                0.01s
+  ✓ it restricts the CV and thesis to PDF only
+  ✓ it accepts scanned PDFs or images for the certificate-style documents
+  ✓ it expresses the size ceiling in kilobytes for the file rule
+
+   PASS  Tests\Unit\Admissions\EnglishTestScoreTest
+  ✓ it maps each real test to its official score range                   0.11s
+  ✓ it carries no score range for None
+  ✓ it accepts a score only within the selected test’s range
+  ✓ it accepts no score for None
+
+   PASS  Tests\Unit\Admissions\GpaScaleTest
+  ✓ it reports each scale’s ceiling as its numeric value                 0.06s
+  ✓ it covers every scale (no case is left without a ceiling)            0.01s
+  ✓ it allows a GPA only when it is within 0 and the scale ceiling
+
+   PASS  Tests\Unit\Admissions\IdentificationTypeTest
+  ✓ it matches a National ID only when it is exactly 14 digits           0.08s
+  ✓ it matches a Passport only when it is 6–9 alphanumeric characters
+
+   PASS  Tests\Unit\Calendar\SemesterCalendarTest
+  ✓ it accepts a well-ordered calendar with no violations                0.06s
+  ✓ it rejects registration opening on or after the semester starts
+  ✓ it rejects registration opening on or after it closes
+  ✓ it rejects registration closing after the add/drop deadline
+  ✓ it rejects add/drop ending on or after late-add ends
+  ✓ it rejects late-add ending on or after the withdrawal deadline
+  ✓ it rejects a withdrawal deadline after the semester ends
+  ✓ it accepts a withdrawal deadline exactly on the semester end (inclusive bound)
+  ✓ it rejects a grade-submission deadline before the semester ends
+  ✓ it accepts a grade-submission deadline exactly on the semester end (inclusive bound)
+  ✓ it rejects a semester that ends on or before it starts
+  ✓ it derives registration-open only inside the registration window
+  ✓ it derives running between the semester start and end inclusive
+  ✓ it derives the free add/drop period from semester start to the add/drop deadline
+  ✓ it derives the late-add period strictly after add/drop up to the late-add deadline
+  ✓ it derives the withdrawal period strictly after late-add up to the withdrawal deadline
+  ✓ it reports having ended only strictly after the semester end
+  ✓ it reports the grade-submission deadline passed only strictly after it
+  ✓ it keeps the grade-submission deadline out of the period vocabulary
+  ✓ it names the current period, change windows taking precedence over the registration overlap
+  ✓ it gives the current period its own closing date, matching whichever window is live
+  ✓ it has no closing date for a period that is not an open window
+  ✓ it lists every open window when registration overlaps add-drop
+  ✓ it finds the nearest future deadline and names its source field
+  ✓ it has no next deadline after every semester date has passed
+
+   PASS  Tests\Unit\Catalog\CourseCategoryTest
+  ✓ it has exactly the three fixed course categories, in order           0.06s
+  ✓ it defaults each category requirement to the 6/6/9 bylaw split
+  ✓ it sums the default per-category requirements to a 21 credit-hour program
+
+   PASS  Tests\Unit\CreditHoursTest
+  ✓ it is balanced when lecture + tutorial + lab equals total            0.04s
+  ✓ it is unbalanced when the components do not sum to the total
+  ✓ it exposes the component sum independently of the declared total
+
+   PASS  Tests\Unit\Enrollment\AttemptDeriverTest
+  ✓ it mints a fresh Regular with no prior for-credit attempts           0.07s
+  ✓ it derives a Retake when one prior for-credit attempt exists
+  ✓ it derives a CGPA improvement when one prior for-credit attempt earned its credit
+  ✓ it blocks a third for-credit attempt regardless of whether the second was a Retake or a CGPA improvement
+  ✓ it always mints Audit for an audit request, regardless of priors
+  ✓ it treats zero-or-negative priors as a fresh Regular (defensive)
+
+   PASS  Tests\Unit\Enrollment\AttendanceCalculatorTest
+  ✓ it derives the percentage as present over recorded                   0.06s
+  ✓ it has no percentage when nothing is recorded (null, never division by zero)
+  ✓ it detects a downward crossing below the threshold
+  ✓ it treats going from no data straight to below-threshold as a crossing
+  ✓ it does not fire when already below the threshold before the save
+  ✓ it does not fire when the percentage stays at or above the threshold
+  ✓ it fires again on a fresh downward crossing after recovering above the threshold
+  ✓ it never fires when the after value is unknown
+
+   PASS  Tests\Unit\Enrollment\CartValidatorTest
+  ✓ it accepts a well-formed cart with no violations                     0.04s
+  ✓ it reports a below-floor cart
+  ✓ it does not report a below-floor cart in the first semester
+  ✓ it reports an above-ceiling cart
+  ✓ it rejects the same course twice, including Regular plus Audit of i… 0.02s
+  ✓ it caps external electives at one per cart
+  ✓ it allows a single external elective
+  ✓ it caps research courses at one per cart
+  ✓ it rejects a full offering but not an uncapped or seated one
+  ✓ it rejects two offerings that clash in the weekly schedule
+  ✓ it does not clash offerings that merely touch at an endpoint or sit on different days
+
+   PASS  Tests\Unit\Enrollment\CourseStatusTest
+  ✓ it ships all ten Appendix-D statuses                                 0.10s
+  ✓ it encodes the Appendix-D counting row for every status
+  ✓ it marks every status as appearing on the transcript
+  ✓ it counts every for-credit re-registration status toward the one combined allowance
+  ✓ it does not burn the retake allowance for withdrawal or audit
+  ✓ it counts only the three for-credit attempt kinds as gradable
+  ✓ it never treats an audit or a withdrawal as gradable
+
+   PASS  Tests\Unit\Enrollment\CreditHoursValidatorTest
+  ✓ it passes a load within the floor and ceiling                        0.02s
+  ✓ it passes a load sitting exactly on the floor and on the ceiling
+  ✓ it fails a load below the floor
+  ✓ it fails a load above the ceiling
+  ✓ it counts every regular and audit line toward the load
+  ✓ it waives the floor for a first-semester registration
+  ✓ it still enforces the ceiling even with the first-semester waiver
+  ✓ it exposes a first-semester exceptions context that waives the floor
+
+   PASS  Tests\Unit\Enrollment\EligibilityClassifierTest
+  ✓ it classifies an own-curriculum Preparatory course as Preparatory r… 0.04s
+  ✓ it classifies an own-curriculum Program Core course as Core
+  ✓ it classifies an own Research Elective at the MSc elective level (500) as Internal Elective
+  ✓ it classifies an own Research Elective at the PhD elective level (600) as Internal Elective
+  ✓ it does not classify an own Research Elective at the other degree's elective level
+  ✓ it classifies an own level-700 PBL Research Elective as the Research Course for an MSc
+  ✓ it classifies an own level-700 Seminar Research Elective as the Research Course for a PhD
+  ✓ it does not match a level-700 Research Course whose research type is for the other degree
+  ✓ it does not match a level-700 own Research Elective that carries no research type
+  ✓ it classifies a course outside the curriculum but in another active graduate program as External Elective (MSc, 500)
+  ✓ it classifies a PhD external elective at level 600
+  ✓ it does not classify an external candidate at the wrong level for the degree
+  ✓ it does not classify an external-level course that is in no other active graduate curriculum
+  ✓ it never treats a level-700 course outside the curriculum as an external elective
+  ✓ it prefers the own-curriculum classification even when the course also sits in another program
+
+   PASS  Tests\Unit\Enrollment\ManualExemptionContractTest
+  ✓ it publishes the complete nullable manual Exemption resource contra… 3.12s
+
+   PASS  Tests\Unit\Enrollment\MeetingTimeTest
+  ✓ it overlaps two slots on the same weekday whose times intersect      0.01s
+  ✓ it does not overlap slots on different weekdays even at the same time
+  ✓ it treats touching endpoints as non-overlapping (half-open intervals)
+  ✓ it overlaps when one slot fully contains another
+  ✓ it parses clock strings to minutes from midnight
+  ✓ it is well-formed only when it ends after it starts
+  ✓ it detects whether any two slots in a set clash
+
+   PASS  Tests\Unit\Enrollment\SessionScheduleTest
+  ✓ it emits one session per matching weekday across the term for a sin… 0.02s
+  ✓ it includes a meeting that falls exactly on the start or end date (inclusive range)
+  ✓ it interleaves multiple weekly meetings in date then start-time order
+  ✓ it orders two same-day meetings by their start time
+  ✓ it emits nothing when no meeting weekday occurs in the range
+  ✓ it emits nothing for no meetings or an inverted range
+
+   PASS  Tests\Unit\Grading\GpaCalculatorTest
+  ✓ it is credit-weighted, not a plain mean — a 1-CH attempt must not w… 0.02s
+  ✓ it counts every letter down to F at 0.00
+  ✓ it is null — never 0.00 — with no attempts, so a fresh record never looks catastrophic
+  ✓ it rounds the quotient half-up to two decimals exactly once, and a value can round across the 3.0 boundary
+  ✓ it has no floating-point drift across many attempts
+  ✓ it keeps only the chronologically latest attempt of a course, by semester starts_at, crossing a year boundary
+  ✓ it lets a worse Retake lower the CGPA — "latest" is unconditional, never "best attempt"
+  ✓ it never supersedes across two different Courses — both electives count (FR-REG-006.4)
+  ✓ it excludes a superseded attempt from its own original Semester GPA, not only the CGPA
+
+   PASS  Tests\Unit\Grading\IncompleteDeadlineTest
+  ✓ it adds exactly 63 days to the next semester's start — a Spring enr… 0.03s
+  ✓ it adds exactly 63 days to the next semester's start — a Fall enrol… 0.01s
+  ✓ it preserves the time of day, never just the date
+
+   PASS  Tests\Unit\Grading\LetterGradeTest
+  ✓ it ships exactly the nine letters of the scale, and no P/FL or minu… 0.05s
+  ✓ it carries the ADR-0021 GPA points for every letter
+  ✓ it carries the inclusive floor of every band
+  ✓ it maps a mark to its letter on both sides of every band boundary
+  ✓ it maps the two extremes of the range
+  ✓ it maps every mark in 0–100 to some letter, so the scale has no hol… 0.01s
+  ✓ it places the minimum pass at 75, not Appendix A's 77
+  ✓ it rejects a mark below zero                                         0.01s
+  ✓ it rejects a mark above one hundred
+
+   PASS  Tests\Unit\LeastLoadedAdvisorTest
+  ✓ it returns null when no advisor exists                               2.20s
+  ✓ it breaks a tie at zero advisees on the lowest id                    0.16s
+  ✓ it prefers the advisor with the fewest advisees                      0.14s
+  ✓ it ignores non-advisors even with no advisees                        0.13s
+
+   PASS  Tests\Unit\PermissionMatrixTest
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set w… 0.01s
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set with dataset "R02"
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set with dataset "R03"
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set with dataset "R04"
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set with dataset "R05"
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set with dataset "R06"
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set with dataset "R07"
+  ✓ it grants each non-admin role exactly its SRS §3.2 permission set with dataset "R08"
+  ✓ it grants System and Super Admin every permission with dataset "R09 System Admin"
+  ✓ it grants System and Super Admin every permission with dataset "R10 Super Admin"
+  ✓ it unions permissions across a multi-role user without duplication
+
+   PASS  Tests\Unit\RoleEnumTest
+  ✓ it defines exactly the ten SRS roles                                 0.02s
+  ✓ it maps role codes to their SRS §3.1 names
+
+   PASS  Tests\Unit\Support\CollectionQueryTest
+  ✓ it parses flat filters, total sorting, and capped pagination         0.01s
+  ✓ it ignores known unreadable filters and rejects unknown fields
+  ✓ it ignores known unreadable sorts while rejecting unknown sorts
+  ✓ it normalizes Arabic search text without changing Latin identifiers
+  ✓ it validates every value of declared positive-integer filters
+
+   PASS  Tests\Unit\Support\XlsxExporterTest
+  ✓ it writes a true RTL xlsx while retaining identifiers and formula-l… 0.07s
+
+   PASS  Tests\Unit\UniversityIdTest
+  ✓ it formats {year}-{programCode}-{NNNN} and increments per (year, pr… 0.14s
+  ✓ it runs an independent sequence for each program and year            0.16s
+
+   PASS  Tests\Feature\AcademicStanding\AcademicReportDemoSeederTest
+  ✓ it seeds isolated Report Cases from owner-derived two-course D/F e… 18.17s
+
+   PASS  Tests\Feature\AcademicStanding\CreditHourSummaryTest
+  ✓ it returns the owner-composed summary and card for the acting Stude… 0.30s
+  ✓ it allows only the current Advisor or authorized oversight to read…  0.27s
+  ✓ it reads credit summaries in bounded owner batches with single-Stud… 2.95s
+  ✓ it bulk derives advisory readiness without supplying a hypothetical… 0.21s
+
+   PASS  Tests\Feature\AcademicStanding\GraduationBatchSeededParityTest
+  ✓ it preserves credit and readiness owner parity across all 180 seed… 37.19s
+
+   PASS  Tests\Feature\AcademicStanding\GraduationReportExportTest
+  ✓ it exports the complete authorized selection with readable labels s… 0.27s
+  ✓ it exports the complete authorized selection with readable labels s… 0.25s
+
+   PASS  Tests\Feature\AcademicStanding\GraduationReportTest
+  ✓ it summarizes advisory readiness and overlapping blockers across th… 0.24s
+  ✓ it filters owner-derived readiness before stable pagination and cou… 0.55s
+  ✓ it keeps Warning readiness advisory and reflects pending dismissed…  1.02s
+  ✓ it reads corrected effective Grades and the Student bound Curriculu… 0.89s
+  ✓ it intersects blocker drill-through with the original OR selection…  0.43s
+
+   PASS  Tests\Feature\AcademicStanding\StandingObservationTest
+  ✓ it keeps reads side-effect free and records each real Standing tran… 0.25s
+  ✓ it applies the probation registration ceiling through the Public re… 0.15s
+
+   PASS  Tests\Feature\AcademicStanding\StandingRecordsTest
+  ✓ it batch current Standing ignores stale Observations and closed Cas… 0.17s
+  ✓ it matches single current Standing across the seeded 180 Student c… 30.67s
+  ✓ it derives all five Standing values from owner grades and keeps zer… 0.40s
+
+   PASS  Tests\Feature\AcademicStanding\StandingReportExportTest
+  ✓ it exports the complete authorized selection with readable labels s… 0.17s
+  ✓ it exports the complete authorized selection with readable labels s… 0.20s
+
+   PASS  Tests\Feature\AcademicStanding\StandingReportListTest
+  ✓ it filters and orders current derived Standing before pagination wi… 0.71s
+  ✓ it caps derived pages and uses stable Student IDs across the full c… 1.68s
+
+   PASS  Tests\Feature\AcademicStanding\StandingReportTest
+  ✓ it summarizes only the live union of permitted active Students and…  0.34s
+  ✓ it denies Student-only and Instructor-only cohort access even with…  0.12s
+  ✓ it denies Student-only and Instructor-only cohort access even with…  0.15s
+  ✓ it allows university oversight Roles while keeping lifecycle separa… 0.21s
+  ✓ it allows university oversight Roles while keeping lifecycle separa… 0.21s
+  ✓ it allows university oversight Roles while keeping lifecycle separa… 0.23s
+  ✓ it allows university oversight Roles while keeping lifecycle separa… 0.23s
+  ✓ it restricts Head counts to live academic Departments and rejects u… 0.30s
+
+   PASS  Tests\Feature\AcademicStanding\StandingScopeUnionTest
+  ✓ it combines live Advisor and Dean scope when reading current Standi… 0.46s
+
+   PASS  Tests\Feature\AcademicStanding\TerminationCaseTest
+  ✓ it opens one deterministic case for effective D or F grades in two…  0.19s
+  ✓ it opens ordinary Preparatory noncompletion only after the second m… 0.31s
+  ✓ it defers ordinary Preparatory noncompletion while the affected Enr… 0.23s
+  ✓ it lets Council atomically terminate the student and reject open re… 0.26s
+  ✓ it preserves the final attributed case outcome for the student       0.13s
+  ✓ it paginates preserved Council history and audits its live queue ex… 0.18s
+
+   PASS  Tests\Feature\AcademicStanding\TerminationReportExportTest
+  ✓ it exports every scoped Case beyond one page with localized stages…  0.70s
+  ✓ it exports every scoped Case beyond one page with localized stages…  0.52s
+
+   PASS  Tests\Feature\AcademicStanding\TerminationReportTest
+  ✓ it distinguishes default Case counts from Student counts and retain… 0.31s
+  ✓ it enforces the live Advisor Dean union and inclusive UTC Case-crea… 0.47s
+  ✓ it offers operational review links only for the actors actual stage… 0.23s
+  ✓ it denies cohort Case APIs and exports to a Student-only or Instruc… 0.16s
+  ✓ it denies cohort Case APIs and exports to a Student-only or Instruc… 0.20s
+  ✓ it restricts Head and Council workflow links to live academic assig… 0.55s
+  ✓ it caps pages across bounded cohorts and breaks equal stage timesta… 1.72s
+
+   PASS  Tests\Feature\Admissions\AdministrativeOverrideTest
+  ✓ it shows an administrator every faculty’s Dean review queue, unscop… 0.17s
+  ✓ it lets an administrator act on an application in any faculty where… 0.21s
+  ✓ it shows an administrator every faculty’s Dean decisions queue, uns… 0.19s
+  ✓ it lets an administrator record a decision on an out-of-faculty app… 0.26s
+  ✓ it lets an administrator record an evaluation for an interview not…  0.17s
+  ✓ it does not audit the assigned interviewer scoring their own interv… 0.15s
+  ✓ it lists every interview to an administrator so they can reach the…  0.22s
+  ✓ it keeps an ordinary interviewer scoped to their own assigned inter… 0.21s
+  ✓ it keeps a privileged reviewer who is not the assigned interviewer…  0.15s
+
+   PASS  Tests\Feature\Admissions\AdmissionCycleCollectionTest
+  ✓ it filters bilingual cycle names and window state before stable pag… 0.18s
+  ✓ it keeps public lookup criteria inside currently open cycles with t… 0.26s
+  ✓ it exports all matching cycle rows with bilingual window labels and… 0.19s
+
+   PASS  Tests\Feature\Admissions\AdmissionCycleManagementTest
+  ✓ it lets a calendar manager list cycles                               0.21s
+  ✓ it lets a manager read a single cycle with both language names and…  0.22s
+  ✓ it lets a manager create a cycle, active and open by default within… 0.16s
+  ✓ it requires both language names                                      0.16s
+  ✓ it requires intake term, year and a window                           0.11s
+  ✓ it rejects an intake term outside the Fall/Spring set                0.12s
+  ✓ it rejects a close date that is not after the open date              0.09s
+  ✓ it rejects a duplicate intake term and year                          0.09s
+  ✓ it allows the same year under a different term and the same term in… 0.12s
+  ✓ it lets a manager edit a cycle without tripping its own uniqueness   0.11s
+  ✓ it deactivating a cycle closes it even inside its window; reactivat… 0.11s
+  ✓ it forbids all management actions for a user without calendar.manag… 0.13s
+  ✓ it requires authentication to manage cycles                          0.10s
+  ✓ it does not allow hard-deleting a cycle                              0.09s
+  ✓ it exposes currently-open cycles publicly with no authentication     0.11s
+  ✓ it returns an empty open-cycle list when nothing is open             0.13s
+
+   PASS  Tests\Feature\Admissions\AdmissionDecisionsCardTest
+  ✓ it counts the applications awaiting the Dean’s decision              0.34s
+  ✓ it counts exactly what the decisions queue lists, never a second de… 0.26s
+  ✓ it excludes another Faculty’s applications from a Dean’s count       0.19s
+  ✓ it counts nothing for a Dean with no faculty assignment              0.15s
+  ✓ it returns zero rather than erroring when nothing is waiting         0.14s
+  ✓ it refuses a user without applicant.decide                           0.11s
+  ✓ it refuses an unauthenticated request                                0.09s
+
+   PASS  Tests\Feature\Admissions\AdmissionDocumentsTest
+  ✓ it publishes only the requested Applicants admission documents thro… 0.14s
+
+   PASS  Tests\Feature\Admissions\AdmissionsCardsTest
+  ✓ it returns the acting applicant’s current status as a typed value,…  0.15s
+  ✓ it returns the most recent application when an applicant has re-app… 0.13s
+  ✓ it returns a null payload for an applicant who has not started an a… 0.12s
+  ✓ it refuses an administrator who inherits the permission but is not…  0.10s
+  ✓ it refuses a user who does not hold application.view_status          0.10s
+  ✓ it never exposes another applicant’s application, since there is no… 0.12s
+  ✓ it refuses an unauthenticated request for the application card       0.11s
+  ✓ it counts the applications pending screening and distinguishes the…  0.22s
+  ✓ it ages in business days, skipping the Egyptian weekend, exactly as… 0.13s
+  ✓ it does not flag an application still inside the SLA                 0.14s
+  ✓ it lists the oldest few by name and age, and no more than three      0.19s
+  ✓ it orders the rows by the age it shows, not by when the application… 0.20s
+  ✓ it changes nothing about an overdue application — it is information… 0.17s
+  ✓ it returns zeros and an empty list for an empty queue rather than e… 0.14s
+  ✓ it refuses a user who does not hold application.screen               0.20s
+  ✓ it refuses an unauthenticated request for the screening card         0.12s
+
+   PASS  Tests\Feature\Admissions\ApplicantInterviewTest
+  ✓ it shows the applicant their booked interview                        0.32s
+  ✓ it 404s when the applicant has no interview                          0.13s
+  ✓ it confirms a pending interview                                      0.21s
+  ✓ it refuses to confirm an already-confirmed interview (409)           0.20s
+  ✓ it reschedules once into another open slot                           0.25s
+  ✓ it refuses a second reschedule (409)                                 0.20s
+  ✓ it refuses to reschedule into a taken slot                           0.22s
+  ✓ it lists the open slots the applicant could reschedule into          0.18s
+
+   PASS  Tests\Feature\Admissions\ApplicationAccessTest
+  ✓ it denies outside faculty detail timeline and document reads even w… 0.26s
+  ✓ it denies every outside faculty screening action without transition… 0.17s
+  ✓ it denies every outside faculty screening action without transition… 0.17s
+  ✓ it denies every outside faculty screening action without transition… 0.21s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.19s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.21s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.24s
+  ✓ it keeps in faculty dean access and screening                        0.34s
+  ✓ it retains university wide reads and screening for SA administrator… 0.29s
+  ✓ it retains university wide reads and screening for SA administrator… 0.29s
+  ✓ it retains university wide reads and screening for SA administrator… 0.28s
+  ✓ it keeps owner file and timeline access without giving the owner sc… 0.21s
+
+   PASS  Tests\Feature\Admissions\ApplicationExportTest
+  ✓ it exports the full filtered screening population as localized text… 0.26s
+  ✓ it exports the same derived filtered and ordered Dean scope as the…  0.29s
+
+   PASS  Tests\Feature\Admissions\ApplicationPipelineAggregateTest
+  ✓ it aggregates the scoped cycle statuses and measured transition con… 0.21s
+  ✓ it narrows live Dean scope and combines Student Affairs oversight i… 0.41s
+  ✓ it refuses the pipeline aggregate to a user without the screening g… 0.17s
+
+   PASS  Tests\Feature\Admissions\ApplicationPipelineReportTest
+  ✓ it serves the owner pipeline summary for a selected cycle and prese… 0.19s
+  ✓ it uses live Dean scope while Student Affairs filters only narrow t… 0.35s
+  ✓ it returns typed empty stages and null conversion rates without a c… 0.13s
+  ✓ it denies the pipeline report without its backend gate               0.14s
+  ✓ it validates report criteria instead of ignoring unsupported filter… 0.14s
+  ✓ it drills a pipeline stage into exactly its ordinary application po… 0.31s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.28s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.34s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.31s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.41s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.25s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.26s
+
+   PASS  Tests\Feature\Admissions\ApplicationScreeningTest
+  ✓ it refuses a stale screening handler without overwriting a terminal… 0.26s
+  ✓ it lists the Student Affairs screening queue with a derived age      0.17s
+  ✓ it refuses the queue to a user without application.screen            0.12s
+  ✓ it filters Arabic names and derived queue age before stable paginat… 0.25s
+  ✓ it applies stored queue criteria in SQL and returns truthful capped… 0.25s
+  ✓ it scopes Dean screening reads to live assignments while combining…  0.40s
+  ✓ it lets a reviewer open an application with its documents            0.17s
+  ✓ it approves an application, auto-forwarding it through sa_approved…  0.23s
+  ✓ it returns an application for revision with instructions and notifi… 0.24s
+  ✓ it rejects an application with a reason and notifies the applicant   0.23s
+  ✓ it requires a note to return or reject                               0.19s
+  ✓ it refuses to screen an application that is not under SA review (40… 0.17s
+  ✓ it refuses the screen action to a user without application.screen    0.18s
+  ✓ it loops a returned application back into review when the applicant… 0.22s
+  ✓ it refuses to resubmit an application that was not returned (409)    0.26s
+  ✓ it refuses to resubmit an incomplete application (422)               0.24s
+  ✓ it lets the owning applicant read their own timeline                 0.28s
+  ✓ it forbids a stranger from reading another applicant’s timeline      0.23s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.24s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.26s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.23s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.25s
+
+   PASS  Tests\Feature\Admissions\ApplicationWizardTest
+  ✓ it returns the current applicant’s draft application                 0.34s
+  ✓ it requires authentication to read an application                    0.11s
+  ✓ it saves a partial Step-1 snapshot and keeps the application a draf… 0.16s
+  ✓ it validates field formats on save, bilingually and inline           0.12s
+  ✓ it rejects a duplicate national id within the same cycle on save     0.14s
+  ✓ it allows the same national id in a different cycle                  0.17s
+  ✓ it keeps the snapshot editable through email verification, so back-… 0.18s
+  ✓ it blocks editing the snapshot once the application enters review    0.23s
+  ✓ it refuses to submit Step 1 until the snapshot is complete           0.14s
+  ✓ it captures a structured previous E-JUST MSc Program for exemption…  0.23s
+  ✓ it requires a valid MSc Program when an E-JUST MSc graduate submits  0.16s
+  ✓ it rejects a National ID that is not exactly 14 digits               0.20s
+  ✓ it validates a Passport identifier as 6–9 alphanumeric               0.22s
+  ✓ it rejects a phone that is not a canonical E.164 number              0.24s
+  ✓ it rejects a nationality outside the ISO 3166-1 alpha-2 list         0.13s
+  ✓ it rejects a GPA above the chosen scale’s ceiling                    0.22s
+  ✓ it rejects a CGPA above the chosen scale’s ceiling                   0.16s
+  ✓ it rejects an english score outside the selected test’s range        0.29s
+  ✓ it rejects an english score below the selected test’s floor          0.14s
+  ✓ it requires an english score unless the test is None                 0.13s
+  ✓ it rejects a score supplied for the None english test                0.13s
+  ✓ it accepts a None english test with no score                         0.19s
+  ✓ it submits Step 1, moving an unverified applicant to submitted and…  0.19s
+
+   PASS  Tests\Feature\Admissions\DeanDecisionQueueTest
+  ✓ it lists the applications awaiting the Dean’s decision for their fa… 0.55s
+  ✓ it excludes applications outside the Dean’s faculties                0.25s
+  ✓ it filters decision state before stable pages without widening a mu… 0.45s
+  ✓ it is empty for a Dean with no faculty assignment                    0.28s
+  ✓ it exports the filtered decision state for every in-scope row and a… 0.26s
+  ✓ it refuses the decisions queue to a user without applicant.decide (… 0.21s
+
+   PASS  Tests\Feature\Admissions\DeanReviewTest
+  ✓ it lists only the Dean’s own faculty applications                    0.38s
+  ✓ it filters and pages inside the Dean faculty scope even when the De… 0.35s
+  ✓ it shows an empty queue to a Dean with no assigned faculty           0.17s
+  ✓ it narrows the existing Dean scope by Faculty IDs without disclosin… 0.38s
+  ✓ it exports every matching Dean review row without disclosing anothe… 0.35s
+  ✓ it approves an application for interview and notifies the applicant  0.21s
+  ✓ it rejects an application with a reason and notifies the applicant   0.27s
+  ✓ it refuses a Dean acting on an application outside their faculty (4… 0.15s
+  ✓ it requires a reason to reject                                       0.17s
+  ✓ it refuses to act on an in-faculty application that is not under De… 0.15s
+  ✓ it refuses the Dean queue to a user without application.screen       0.08s
+
+   PASS  Tests\Feature\Admissions\DocumentUploadTest
+  ✓ it stores a valid document on the private disk under an opaque ULID  0.26s
+  ✓ it requires authentication to upload a document                      0.18s
+  ✓ it rejects an unknown document type                                  0.17s
+  ✓ it rejects a file whose format the type does not allow               0.16s
+  ✓ it rejects a file over the type’s size limit                         0.26s
+  ✓ it caps a single-slot type and allows a replacement once the old on… 0.16s
+  ✓ it allows up to two recommendation letters and refuses a third       0.16s
+  ✓ it lists the uploaded documents on the application resource          0.13s
+  ✓ it removes a document, deleting the file and freeing its slot        0.17s
+  ✓ it does not let an applicant remove another applicant’s document     0.18s
+  ✓ it blocks uploading once the application has left the applicant’s h… 0.15s
+  ✓ it blocks removing a document once the application is under review   0.12s
+  ✓ it streams a document back to its owner                              0.14s
+  ✓ it streams a document to a reviewer holding application.screen       0.18s
+  ✓ it refuses to stream a document to a non-owner without application.… 0.15s
+  ✓ it requires authentication to stream a document                      0.13s
+
+   PASS  Tests\Feature\Admissions\EmailVerificationTest
+  ✓ it verifies the email via the signed link, advancing submitted → em… 0.24s
+  ✓ it rejects an unsigned or tampered verification link with 403        0.17s
+  ✓ it treats a re-clicked verification link as idempotent               0.20s
+  ✓ it resends a fresh verification link and logs it                     0.17s
+  ✓ it throttles verification resends to five per day                    0.21s
+  ✓ it refuses to resend when the application is not awaiting verificat… 0.09s
+  ✓ it shortcuts a pre-verified applicant straight to email_verified wi… 0.11s
+
+   PASS  Tests\Feature\Admissions\FinalDecisionTest
+  ✓ it accepts an applicant and mints a Student                          0.37s
+  ✓ it applies qualifying automatic Exemptions after the acceptance tra… 0.42s
+  ✓ it keeps acceptance committed when post-commit exemption evaluation… 0.36s
+  ✓ it surfaces the University ID and Student role on /me after accepta… 0.44s
+  ✓ it binds the accepted Student to the Program Curriculum Version eff… 0.55s
+  ✓ it resolves the admission Curriculum Version inside the acceptance…  0.42s
+  ✓ it rejects acceptance atomically when the Program has no usable Cur… 0.24s
+  ✓ it publishes an immutable Public acceptance-evidence snapshot after… 0.30s
+  ✓ it mints per-(year, program) University IDs that increment and are…  0.92s
+  ✓ it conditionally accepts and holds the application with its conditi… 0.23s
+  ✓ it waitlists and holds the application with a position               0.22s
+  ✓ it rejects with a reason and notifies the applicant                  0.26s
+  ✓ it resolves a conditional offer to accepted, minting the Student     0.42s
+  ✓ it resolves a conditional offer to rejected                          0.20s
+  ✓ it resolves a waitlisted applicant to accepted, minting the Student  0.50s
+  ✓ it resolves a waitlisted applicant to rejected                       0.28s
+  ✓ it pre-fills the least-loaded advisor when none is provided          0.59s
+  ✓ it assigns an overridden advisor when one is provided                0.35s
+  ✓ it rejects an advisor that does not hold the advisor role (422)      0.24s
+  ✓ it refuses a decision on an application outside the Dean’s faculty…  0.16s
+  ✓ it refuses the decision surface to a user without applicant.decide…  0.18s
+  ✓ it refuses an action illegal from the current status (409)           0.19s
+  ✓ it lists advisors with the least-loaded one suggested                0.16s
+  ✓ it validates the detail each held/rejected decision requires         0.25s
+  ✓ it preserves the admission identification type and personal identit… 0.41s
+  ✓ it preserves the admission identification type and personal identit… 0.40s
+
+   PASS  Tests\Feature\Admissions\FinalizeTest
+  ✓ it finalizes a complete application, moving it to under_sa_review a… 0.23s
+  ✓ it requires authentication to finalize                               0.10s
+  ✓ it blocks finalize when no primary program is chosen                 0.16s
+  ✓ it blocks finalize when a required document is missing               0.15s
+  ✓ it blocks finalize when the conditionally-required English certific… 0.17s
+  ✓ it names the specific missing documents in the finalize error        0.20s
+  ✓ it does not require an English certificate when no test was reporte… 0.24s
+  ✓ it requires a PhD applicant to have uploaded their MSc thesis        0.30s
+  ✓ it refuses to finalize an application that is not awaiting finalize… 0.33s
+  ✓ it refuses to finalize an application already under review (409)     0.24s
+
+   PASS  Tests\Feature\Admissions\InterviewCollectionTest
+  ✓ it filters booked interviews by bilingual applicant and confirmatio… 0.33s
+  ✓ it keeps assigned interview criteria inside live interviewer scope…  0.32s
+  ✓ it exports the complete mirrored interview scope with text identifi… 0.24s
+  ✓ it exports the complete mirrored interview scope with text identifi… 0.22s
+  ✓ it denies booked interview reads and exports without scheduling per… 0.18s
+
+   PASS  Tests\Feature\Admissions\InterviewEvaluationTest
+  ✓ it lets the assigned interviewer record an evaluation                0.17s
+  ✓ it forbids anyone but the assigned interviewer from evaluating (403… 0.14s
+  ✓ it forbids a privileged reviewer who is not the assigned interviewe… 0.15s
+  ✓ it validates the score is within range                               0.15s
+  ✓ it refuses to evaluate a completed interview (409)                   0.18s
+  ✓ it lists only the interviews assigned to the signed-in interviewer   0.16s
+
+   PASS  Tests\Feature\Admissions\InterviewReminderCommandTest
+  ✓ it reminds both the applicant and the interviewer of an upcoming in… 0.24s
+  ✓ it does not remind about an interview beyond the reminder window     0.18s
+  ✓ it does not remind about an interview that has already passed        0.17s
+  ✓ it does not remind about an already-completed interview within the…  0.19s
+  ✓ it respects a configured reminder window                             0.16s
+
+   PASS  Tests\Feature\Admissions\InterviewSchedulingTest
+  ✓ it lists Dean-approved applicants awaiting scheduling, excluding al… 0.19s
+  ✓ it refuses the scheduling worklist to a user without interview.sche… 0.10s
+  ✓ it filters and pages the university scheduling worklist for a Dean…  0.21s
+  ✓ it exports all unbooked scheduling matches for a Dean and audits th… 0.24s
+  ✓ it lists booked interviews with applicant and slot for Student Affa… 0.16s
+  ✓ it schedules an approved applicant into an open slot and notifies t… 0.21s
+  ✓ it refuses to schedule an application that is not awaiting intervie… 0.20s
+  ✓ it refuses to schedule an application that already has an interview… 0.34s
+  ✓ it refuses to schedule into a slot that is already taken (409)       0.21s
+  ✓ it validates the slot exists                                         0.19s
+  ✓ it marks an interview complete, advancing the application to interv… 0.20s
+  ✓ it refuses to complete an interview twice (409)                      0.20s
+  ✓ it refuses the scheduling surface to a user without interview.sched… 0.19s
+
+   PASS  Tests\Feature\Admissions\InterviewSlotCollectionTest
+  ✓ it filters normalized bilingual slot locations and derived availabi… 0.28s
+  ✓ it keeps the personal slot picker inside currently open slots with…  0.25s
+  ✓ it exports all filtered manager-readable slots with localized label… 0.28s
+
+   PASS  Tests\Feature\Admissions\InterviewSlotTest
+  ✓ it lists the assignable faculty interviewers                         0.23s
+  ✓ it creates an interview slot assigned to a faculty interviewer       0.17s
+  ✓ it creates a virtual slot with a meeting link                        0.16s
+  ✓ it rejects a slot whose interviewer is not a faculty member          0.14s
+  ✓ it requires a location for an in-person slot and a link for a virtu… 0.21s
+  ✓ it lists the whole slot pool with open state                         0.18s
+  ✓ it updates an open slot                                              0.15s
+  ✓ it refuses to update a slot that has an interview booked (409)       0.15s
+  ✓ it deletes an open slot                                              0.15s
+  ✓ it refuses to delete a slot that has an interview booked (409)       0.29s
+  ✓ it refuses the slot surface to a user without interview.schedule     0.16s
+
+   PASS  Tests\Feature\Admissions\OverdueFlaggingCommandTest
+  ✓ it notifies Student Affairs when an application is overdue for scre… 0.19s
+  ✓ it does not flag an application still within the screening SLA       0.17s
+  ✓ it notifies the faculty Dean when an application is overdue for Dea… 0.23s
+  ✓ it does not notify a Dean about another faculty’s overdue applicati… 0.34s
+  ✓ it ignores applications that are not in a review stage               0.17s
+  ✓ it respects a configured screening SLA threshold                     0.17s
+  ✓ it appends no status-transition rows while flagging                  0.16s
+
+   PASS  Tests\Feature\Admissions\ProgramSelectionTest
+  ✓ it stores a qualifying primary program that matches the degree appl… 0.17s
+  ✓ it stores an optional alternative program alongside the primary      0.22s
+  ✓ it requires authentication to select a program                       0.22s
+  ✓ it requires a primary program                                        0.14s
+  ✓ it rejects a primary program id that does not exist                  0.16s
+  ✓ it rejects a primary program whose level does not match the degree…  0.17s
+  ✓ it rejects a program the applicant’s previous degree does not quali… 0.18s
+  ✓ it rejects an unqualified alternative program                        0.18s
+  ✓ it rejects an alternative that is the same as the primary            0.20s
+  ✓ it refuses program selection once the application has left the appl… 0.14s
+
+   PASS  Tests\Feature\Admissions\RegistrationTest
+  ✓ it rejects stateless registration before creating a user or applica… 0.18s
+  ✓ it registers an applicant into the single open cycle and logs them…  0.19s
+  ✓ it refuses registration with an admissions-closed message when no c… 0.17s
+  ✓ it auto-assigns the only open cycle, ignoring closed ones            0.32s
+  ✓ it requires choosing a cycle when more than one is open              0.32s
+  ✓ it files the application against the chosen cycle when several are…  0.22s
+  ✓ it rejects a chosen cycle that is not open                           0.13s
+  ✓ it rejects a duplicate email                                         0.19s
+  ✓ it requires a name, email, and a confirmed password                  0.14s
+  ✓ it rejects a password that fails confirmation                        0.17s
+  ✓ it rate-limits registration attempts from one client                 0.19s
+
+   PASS  Tests\Feature\Admissions\ScreeningConcurrencyTest
+  ✓ it serializes competing screening decisions with one history and no… 3.65s
+  ✓ it serializes competing screening decisions with one history and no… 2.95s
+
+   PASS  Tests\Feature\Admissions\StaffPickerCollectionTest
+  ✓ it pages normalized staff search inside the picker role and exclude… 2.23s
+  ✓ it pages normalized staff search inside the picker role and exclude… 0.22s
+
+   PASS  Tests\Feature\Calendar\SemesterManagementTest
+  ✓ it lets any authenticated user list semesters newest first           0.23s
+  ✓ it derives the bilingual name and the registration-open flag from t… 0.16s
+  ✓ it lets a calendar manager create a semester                         0.23s
+  ✓ it lets a Dean create a semester too (also holds calendar.manage)    0.26s
+  ✓ it reports registration open when the window contains the current m… 0.40s
+  ✓ it requires the term, year and every period date                     0.21s
+  ✓ it rejects a term outside the Fall/Spring set                        0.14s
+  ✓ it rejects registration that opens after the semester starts         0.12s
+  ✓ it rejects registration that closes after the add/drop deadline      0.12s
+  ✓ it rejects add/drop ending after the late-add deadline               0.13s
+  ✓ it rejects late-add ending after the withdrawal deadline             0.15s
+  ✓ it rejects a withdrawal deadline after the semester ends             0.14s
+  ✓ it rejects a grade-submission deadline before the semester ends      0.13s
+  ✓ it accepts a grade-submission deadline exactly on the semester end   0.12s
+  ✓ it localises an out-of-order date message into Arabic                0.14s
+  ✓ it rejects a semester that ends before it starts                     0.10s
+  ✓ it rejects a duplicate term and year                                 0.13s
+  ✓ it allows the same year under a different term and the same term in… 0.20s
+  ✓ it lets a manager edit a semester in place without tripping its own… 0.17s
+  ✓ it re-validates the ordering invariant on edit                       0.18s
+  ✓ it does not allow hard-deleting a semester                           0.11s
+  ✓ it forbids creating or editing a semester without calendar.manage    0.18s
+  ✓ it requires authentication to read or manage semesters               0.11s
+  ✓ it resolves the registration-open semester through the read facade   0.11s
+  ✓ it resolves the running semester and a semester by id through the r… 0.14s
+  ✓ it returns null from the facade when no semester is registration-op… 0.16s
+  ✓ it exposes the grade-submission deadline and its passed answer thro… 0.15s
+  ✓ it resolves several semesters at once through the read facade, skip… 0.11s
+  ✓ it resolves the latest started semester for academic work            0.13s
+
+   PASS  Tests\Feature\Calendar\SemesterWindowsCardTest
+  ✓ it names the running semester, the windows open on it, and the next… 0.23s
+  ✓ it lists every window open at once, not just the phase the semester… 0.13s
+  ✓ it falls back to the semester open for registration when no term is… 0.12s
+  ✓ it returns a null semester when no term is live at all, rather than… 0.12s
+  ✓ it returns a null semester for an empty calendar                     0.14s
+  ✓ it refuses a user who does not hold calendar.manage                  0.12s
+  ✓ it serves an administrator, who inherits calendar.manage             0.13s
+  ✓ it refuses an unauthenticated request                                0.10s
+
+   PASS  Tests\Feature\Catalog\CatalogSeederTest
+  ✓ it seeds all three faculties with bilingual names                    0.58s
+  ✓ it fully builds FoE → Computer Engineering → MSc & PhD from the FR-… 0.63s
+  ✓ it links the shared university-wide preparatory courses into every…  0.71s
+  ✓ it assigns every seeded Program exactly one of each Preparatory Req… 0.54s
+  ✓ it keeps every seeded course credit-hour balanced (L + T + Lab = To… 0.51s
+  ✓ it seeds idempotently                                                0.79s
+  ✓ it gives every seeded Program an idempotent full Curriculum Version  0.74s
+
+   PASS  Tests\Feature\Catalog\CatalogSummaryCardTest
+  ✓ it counts the active programs and courses, excluding the deactivate… 0.24s
+  ✓ it returns zeros for an empty catalog rather than erroring           0.10s
+  ✓ it refuses a user who holds only catalog.view, not catalog.manage    0.11s
+  ✓ it serves an administrator, who inherits catalog.manage              0.10s
+  ✓ it refuses an unauthenticated request                                0.10s
+
+   PASS  Tests\Feature\Catalog\CatalogTreeTest
+  ✓ it returns the whole nested tree in one payload, bilingual on every… 0.19s
+  ✓ it lists all three categories in bylaw order with their required cr… 0.17s
+  ✓ it places each course under its program category, with both names a… 0.16s
+  ✓ it carries a course active status so retired courses read accessibl… 0.13s
+  ✓ it groups a shared course under every program and category it is pl… 0.19s
+  ✓ it orders faculties, and courses within a category, deterministical… 0.12s
+  ✓ it requires an authenticated session                                 0.15s
+  ✓ it requires the catalog.view permission                              0.11s
+
+   PASS  Tests\Feature\Catalog\CourseCatalogTest
+  ✓ it returns a course summary with its code, names, level, total CH a… 0.18s
+  ✓ it exposes the research type as its plain string value, never the i… 0.12s
+  ✓ it reflects an inactive course                                       0.17s
+  ✓ it returns null for a course id that does not exist                  0.14s
+  ✓ it resolves several ids at once, keyed by id, omitting the missing…  0.16s
+  ✓ it returns an empty array when asked for no ids                      0.16s
+
+   PASS  Tests\Feature\Catalog\CourseCollectionTest
+  ✓ it filters the Course collection by code fragment bilingual names a… 0.23s
+  ✓ it exports the complete Course selection as a localized canonical i… 0.18s
+
+   PASS  Tests\Feature\Catalog\CourseManagementTest
+  ✓ it lets a viewer list courses, each carrying its full credit-hour b… 0.16s
+  ✓ it lets a viewer read a single course with both names, level and cr… 0.10s
+  ✓ it shows which programs and categories a course is placed in         0.16s
+  ✓ it shows an empty placements list for a course in no program         0.12s
+  ✓ it lets a manager create a department-owned course, active by defau… 0.14s
+  ✓ it lets a manager create a university-wide course with no departmen… 0.18s
+  ✓ it rejects a course whose lecture + tutorial + lab does not equal t… 0.23s
+  ✓ it requires both language names                                      0.28s
+  ✓ it requires the level and constrains it to the 400/500/600/700 enum  0.18s
+  ✓ it rejects a duplicate course code                                   0.14s
+  ✓ it rejects a non-existent department (when one is supplied)          0.20s
+  ✓ it rejects a negative or missing credit-hour component               0.20s
+  ✓ it lets a manager edit a course name and credit breakdown            0.16s
+  ✓ it lets a manager convert a department-owned course to university-w… 0.14s
+  ✓ it lets a manager deactivate then reactivate a course, leaving it r… 0.20s
+  ✓ it forbids mutations for a viewer without catalog.manage             0.16s
+  ✓ it does not allow hard-deleting a course                             0.13s
+  ✓ it lets a manager set a research type on create and round-trips it…  0.11s
+  ✓ it returns a null research type for a course that has none — the va… 0.14s
+  ✓ it lets a manager change and clear a research type on edit (full-re… 0.17s
+  ✓ it rejects a research type outside the PBL/Seminar enum              0.14s
+
+   PASS  Tests\Feature\Catalog\CurriculumBatchTest
+  ✓ it bulk reads immutable admission-bound requirements and entries in… 0.21s
+
+   PASS  Tests\Feature\Catalog\CurriculumCatalogTest
+  ✓ it exposes Preparatory Requirement Roles through immutable Public C… 0.20s
+  ✓ it resolves semantic entries from the bound historical Curriculum V… 0.19s
+
+   PASS  Tests\Feature\Catalog\CurriculumCompositionTest
+  ✓ it lets a viewer read a program curriculum with each entry carrying… 0.21s
+  ✓ it reports which semantic roles are missing before a Program Curric… 0.15s
+  ✓ it lets a manager add a course to a program under a category         0.30s
+  ✓ it requires and exposes a semantic role when adding a Preparatory C… 0.32s
+  ✓ it returns bilingual errors for missing and non-Preparatory role as… 0.21s
+  ✓ it rejects duplicate Preparatory Requirement Roles with bilingual v… 0.18s
+  ✓ it requires the Key Skills role to target a Course owned by the Pro… 0.25s
+  ✓ it lets a manager correct the role of an existing Preparatory Curri… 0.17s
+  ✓ it lets a manager remove a curriculum entry                          0.15s
+  ✓ it places the same course in two programs under different categorie… 0.34s
+  ✓ it places a shared preparatory course across multiple programs       0.26s
+  ✓ it rejects a duplicate entry for the same program, course and categ… 0.17s
+  ✓ it allows the same course in one program under two different catego… 0.25s
+  ✓ it requires a valid course and category                              0.35s
+  ✓ it forbids composing the curriculum without catalog.manage           0.29s
+  ✓ it does not remove an entry that belongs to a different program      0.21s
+
+   PASS  Tests\Feature\Catalog\DepartmentManagementTest
+  ✓ it lets a viewer list departments, each carrying its faculty id      0.24s
+  ✓ it lets a viewer read a single department with both language names   0.14s
+  ✓ it lets a manager create a department under a faculty, active by de… 0.11s
+  ✓ it requires a faculty                                                0.15s
+  ✓ it rejects a non-existent faculty                                    0.14s
+  ✓ it requires both language names                                      0.13s
+  ✓ it rejects a duplicate department code                               0.14s
+  ✓ it lets a manager rename a department                                0.14s
+  ✓ it lets a manager deactivate then reactivate a department            0.25s
+  ✓ it forbids mutations for a viewer without catalog.manage             0.14s
+  ✓ it does not allow hard-deleting a department                         0.13s
+
+   PASS  Tests\Feature\Catalog\FacultyManagementTest
+  ✓ it lets a viewer list faculties                                      0.15s
+  ✓ it lets a viewer read a single faculty with both language names      0.12s
+  ✓ it lets a manager create a faculty, active by default                0.11s
+  ✓ it requires both language names                                      0.13s
+  ✓ it rejects a duplicate faculty code                                  0.15s
+  ✓ it lets a manager rename a faculty                                   0.13s
+  ✓ it lets a manager deactivate then reactivate a faculty               0.18s
+  ✓ it forbids mutations for a viewer without catalog.manage             0.21s
+  ✓ it does not allow hard-deleting a faculty                            0.19s
+  ✓ it requires authentication to read the catalog                       0.10s
+
+   PASS  Tests\Feature\Catalog\ProgramCatalogTest
+  ✓ it returns a program summary with its department and faculty names   0.26s
+  ✓ it returns null for a program id that does not exist                 0.10s
+  ✓ it resolves several ids at once, keyed by id, omitting the missing…  0.24s
+  ✓ it returns an empty array when asked for no ids                      0.13s
+  ✓ it resolves the latest Program Curriculum Version effective at a ti… 0.13s
+
+   PASS  Tests\Feature\Catalog\ProgramManagementTest
+  ✓ it lets a viewer list programs, each carrying its per-category cred… 0.15s
+  ✓ it lets a viewer read a single program with both names and its cred… 0.12s
+  ✓ it lets a manager create a program with the default 6/6/9 split app… 0.16s
+  ✓ it lets a manager create a program with a custom credit split, tota… 0.14s
+  ✓ it requires a department                                             0.10s
+  ✓ it rejects a non-existent department                                 0.12s
+  ✓ it requires both language names                                      0.12s
+  ✓ it requires the degree level and constrains it to the MSc/PhD enum   0.14s
+  ✓ it rejects a duplicate program code                                  0.14s
+  ✓ it rejects a negative credit-hour requirement                        0.14s
+  ✓ it lets a manager edit a program name and credit split               0.19s
+  ✓ it lets a manager deactivate then reactivate a program, leaving it…  0.18s
+  ✓ it forbids mutations for a viewer without catalog.manage             0.17s
+  ✓ it does not allow hard-deleting a program                            0.26s
+
+   PASS  Tests\Feature\Catalog\ReferenceCollectionTest
+  ✓ it resolves exact reference IDs without depending on the first refe… 0.35s
+  ✓ it resolves exact reference IDs without depending on the first refe… 0.27s
+  ✓ it resolves exact reference IDs without depending on the first refe… 0.27s
+  ✓ it filters and pages a bilingual reference collection with stable t… 0.22s
+  ✓ it filters and pages a bilingual reference collection with stable t… 0.14s
+  ✓ it filters and pages a bilingual reference collection with stable t… 0.18s
+  ✓ it exports every matching reference entity with canonical localized… 0.16s
+  ✓ it exports every matching reference entity with canonical localized… 0.23s
+  ✓ it exports every matching reference entity with canonical localized… 0.21s
+
+   PASS  Tests\Feature\Catalog\VersionHistoryTest
+  ✓ it records version 1 when a program is created, in the catalog tabl… 0.25s
+  ✓ it increments the program version_no on each edit/activate/deactiva… 0.26s
+  ✓ it captures the full program aggregate — including its curriculum —… 0.19s
+  ✓ it marks a Program Curriculum Version complete only when all six Pr… 0.20s
+  ✓ it records a new program version when a curriculum entry is removed  0.20s
+  ✓ it records and increments course versions on each mutation, capturi… 0.18s
+  ✓ it captures setting and later changing the research type across cou… 0.20s
+  ✓ it lets any catalog.view holder read version history (a read like o… 0.24s
+  ✓ it does not allow editing or deleting version history through the A… 0.20s
+
+   PASS  Tests\Feature\CollectionContractTest
+  ✓ it preserves the shared collection contract inside the actor scope…  0.21s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.25s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.17s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.37s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.32s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.47s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.43s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.19s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.15s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.23s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.14s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.19s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.29s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.29s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.18s
+  ✓ it preserves the shared collection contract inside the actor scope…  0.27s
+
+   PASS  Tests\Feature\Enrollment\AdministrativeOverrideTest
+  ✓ it shows an administrator every advisor's pending requests, unscope… 0.32s
+  ✓ it lets an administrator decide a request for a student who is not…  0.36s
+  ✓ it does not audit the real advisor deciding their own advisee's req… 0.33s
+  ✓ it does not audit an administrator who is themselves the student's…  0.41s
+  ✓ it still forbids a non-admin advisor deciding a request for another… 0.22s
+  ✓ it lets an administrator compose for any student, routed Pending to… 0.33s
+  ✓ it lets an administrator read any student's schedule, unscoped and…  0.26s
+  ✓ it lets an advisor read their own advisee's schedule but forbids an… 0.19s
+  ✓ it lets an administrator read an offering's register they do not te… 0.21s
+  ✓ it shows an administrator every offering in My Offerings so they ca… 0.18s
+  ✓ it lets an administrator mark attendance on an offering they do not… 0.24s
+  ✓ it lets an administrator cancel a session on an offering they do no… 0.17s
+  ✓ it does not audit the assigned instructor marking their own offerin… 0.27s
+  ✓ it still forbids a non-admin instructor marking an offering they ar… 0.22s
+  ✓ it treats a Super Administrator the same as a System Administrator   0.23s
+
+   PASS  Tests\Feature\Enrollment\AttendanceTest
+  ✓ it generates class sessions from the meeting rows when the register… 0.26s
+  ✓ it generates sessions idempotently — reopening the register never d… 0.39s
+  ✓ it lists only the acting instructor's own offerings in My Offerings  0.22s
+  ✓ it forbids a non-assigned instructor from reading, cancelling, and…  0.23s
+  ✓ it cancels and reinstates a session                                  0.17s
+  ✓ it marks present/absent and corrects a mark by overwriting it        0.24s
+  ✓ it derives the percentage over non-cancelled recorded sessions       0.33s
+  ✓ it 409s marking a cancelled session                                  0.14s
+  ✓ it 422s marking an enrollment that is not on the active roster       0.21s
+  ✓ it excludes withdrawn enrollments from the roster but keeps their m… 0.22s
+  ✓ it raises the audit-at-risk notification once on the downward cross… 0.36s
+  ✓ it raises audit-at-risk when cancelling a session drops the percent… 0.28s
+  ✓ it does not raise audit-at-risk for a Regular enrollment below the…  0.24s
+  ✓ it shows the student their attendance percentage on My Schedule      0.24s
+
+   PASS  Tests\Feature\Enrollment\AutomaticExemptionTest
+  ✓ it does not apply an automatic Exemption to a target already recogn… 0.31s
+  ✓ it applies and exposes an automatic English Exemption from accepted… 0.40s
+  ✓ it deduplicates overlapping automatic rules, history, and notificat… 0.64s
+  ✓ it maps E-JUST BSc evidence to the three semantic Preparatory roles… 0.32s
+  ✓ it reconciles one Student from the captured immutable evidence and…  0.35s
+  ✓ it reconciles from the Student acceptance anchor when event handlin… 0.25s
+  ✓ it uses acceptance-time Program semantics when delayed reconciliati… 0.33s
+
+   PASS  Tests\Feature\Enrollment\CapacityOverrideTest
+  ✓ it moves an advisor-approved required full offering to capacity rev… 0.26s
+  ✓ it retires a pending capacity requirement and finalizes when a norm… 0.27s
+  ✓ it mints the entire unchanged batch only after scoped capacity appr… 0.32s
+  ✓ it rolls back capacity approval when final whole-batch revalidation… 0.49s
+  ✓ it refuses a stale capacity decision after the request is rejected…  0.45s
+  ✓ it refuses a stale capacity decision after the request is rejected…  0.28s
+
+   PASS  Tests\Feature\Enrollment\CreditDecisionRevocationTest
+  ✓ it lets Council append a reasoned Transfer revocation without rewri… 0.46s
+  ✓ it requires Council authority and a reason and never appends a seco… 0.54s
+  ✓ it freezes effective credit decisions after the student is terminat… 0.22s
+  ✓ it lets only the scoped Department Head revoke an Exemption decisio… 0.49s
+  ✓ it does not create remediation when an Exemption is revoked before…  0.37s
+  ✓ it lets Council revoke a Waiver decision while preserving its reque… 0.39s
+  ✓ it idempotently rejects an in-review Transfer when a failed Grade b… 0.30s
+  ✓ it rejects Grade finalization when a conflicting Transfer approval…  0.21s
+  ✓ it idempotently rejects an in-review Waiver and notifies its curren… 0.27s
+  ✓ it frees Transfer hours and requires a replacement to complete a ne… 0.44s
+  ✓ it rejects a new Transfer submission after any effective completed…  0.38s
+  ✓ it rejects a new Transfer submission after any effective completed…  0.48s
+
+   PASS  Tests\Feature\Enrollment\EligibleCoursesTest
+  ✓ it groups own-curriculum offered courses by their enrollment classi… 0.35s
+  ✓ it includes a course from another active graduate program as an ext… 0.24s
+  ✓ it does not treat a course from a deactivated program as an externa… 0.24s
+  ✓ it omits curriculum courses that have no offering this semester      0.22s
+  ✓ it shows only the degree-matched level-700 research option           0.22s
+  ✓ it excludes an offered course that is in neither the own nor anothe… 0.14s
+  ✓ it carries the offering instructor, meeting times, total CH and sea… 0.19s
+  ✓ it reports null seats remaining for an uncapped offering             0.26s
+  ✓ it marks failed preparatory and core courses as must-retake on the…  0.21s
+  ✓ it returns a null semester and an empty list when no registration w… 0.15s
+  ✓ it only lists offerings from the open semester, not another semeste… 0.19s
+  ✓ it classifies a PhD student's electives at level 600                 0.27s
+  ✓ it 403s when the acting user has no student record                   0.12s
+  ✓ it forbids a user without courses.register_self                      0.12s
+  ✓ it requires authentication                                           0.08s
+
+   PASS  Tests\Feature\Enrollment\EnrollmentCardsTest
+  ✓ it totals the current semester’s credit hours and states the 6–12 b… 0.22s
+  ✓ it excludes a withdrawn enrollment from the load, as the schedule d… 0.18s
+  ✓ it names the open period and the date it closes, read from the deri… 0.13s
+  ✓ it reports the registration window when the term has not started ye… 0.12s
+  ✓ it returns a null closing date when no window is open, because clos… 0.15s
+  ✓ it returns a null semester with the bounds intact when no term is l… 0.11s
+  ✓ it returns a zero load for a student with no enrollments this semes… 0.13s
+  ✓ it refuses a user who does not hold courses.register_self            0.08s
+  ✓ it refuses an administrator who inherits the permission but holds n… 0.10s
+  ✓ it refuses an unauthenticated request for the registration card      0.11s
+  ✓ it counts the pending requests waiting on the advisor, with the old… 0.21s
+  ✓ it counts only the acting advisor’s own advisees, never another adv… 0.24s
+  ✓ it follows advisor reassignment, because the advisee set is resolve… 0.21s
+  ✓ it shows a reviewer with an empty queue a zero count rather than er… 0.15s
+  ✓ it counts every advisor’s advisees for student affairs, who review…  0.28s
+  ✓ it counts only pending requests, not ones already decided            0.23s
+  ✓ it refuses a user who does not hold registration.approve             0.12s
+  ✓ it refuses an unauthenticated request for the advisee card           0.12s
+
+   PASS  Tests\Feature\Enrollment\EnrollmentRecordsTest
+  ✓ it returns an offering summary carrying its semester, course and in… 0.20s
+  ✓ it returns null for an offering id that does not exist               0.12s
+  ✓ it lists the offerings one instructor teaches, and no one else's     0.25s
+  ✓ it returns an empty list for a user who teaches nothing              0.17s
+  ✓ it lists every offering there is, whoever teaches it — the central…  0.25s
+  ✓ it returns an empty list from the central picker read when nothing…  0.19s
+  ✓ it orders both offering lists by the semester that starts latest, n… 0.17s
+  ✓ it keeps two offerings of one semester in creation order             0.17s
+  ✓ it returns the gradable enrollments of one offering as DTOs          0.15s
+  ✓ it exposes the classification and course status as plain strings, n… 0.15s
+  ✓ it omits Audit and Withdrawn enrollments — an instructor is never a… 0.17s
+  ✓ it includes every for-credit attempt kind — Regular, Retake and CGP… 0.20s
+  ✓ it returns an empty roster for an offering with no gradable enrollm… 0.15s
+  ✓ it returns an empty roster for an offering id that does not exist    0.14s
+  ✓ it never leaks another offering's roster                             0.19s
+  ✓ it finds an enrollment by id regardless of gradability               0.12s
+  ✓ it returns null for an enrollment id that does not exist             0.09s
+  ✓ it resolves several enrollments at once, keyed by id, dropping the…  0.15s
+  ✓ it resolves no enrollments for an empty id list                      0.09s
+  ✓ it returns every enrollment a student has, in every course status,…  0.12s
+  ✓ it reads countsTowardCgpa from the course status counting matrix, n… 0.14s
+  ✓ it carries the earned bit once recordOutcome has written it          0.14s
+  ✓ it returns an empty list for a student with no enrollments at all —… 0.12s
+  ✓ it returns an empty list for a student id that does not exist        0.12s
+  ✓ it never leaks another student's enrollments                         0.13s
+  ✓ it writes the earned bit through recordOutcome, the sole writer of…  0.13s
+  ✓ it bulk resolves bounded student rosters as owner DTOs including em… 0.18s
+  ✓ it batches owner attendance and enrollment counts excluding cancell… 0.18s
+
+   PASS  Tests\Feature\Enrollment\ManualExemptionWorkflowTest
+  ✓ it blocks a manual Exemption target already recognized by Waiver     0.29s
+  ✓ it applies the shared actor-aware collection and export contract wi… 0.29s
+  ✓ it applies the shared actor-aware collection and export contract wi… 0.28s
+  ✓ it applies the shared actor-aware collection and export contract wi… 0.30s
+  ✓ it streams a search-filtered reviewer export through bounded Identi… 3.61s
+  ✓ it hydrates only the latest transition when streaming Student and r… 0.38s
+  ✓ it hydrates only the latest transition when streaming Student and r… 0.43s
+  ✓ it takes corrected evidence from Draft through scoped review to an…  0.65s
+  ✓ it keeps request transitions append-only and requires abandonment i… 0.26s
+  ✓ it revalidates the Student lifecycle under the Identity guard befor… 0.48s
+  ✓ it blocks every request mutation after the Student is Terminated     0.38s
+  ✓ it gives an out-of-scope Department Head the same response for exis… 0.26s
+  ✓ it keeps target-unavailable as a domain error after Advisor authori… 0.21s
+  ✓ it enforces the selected English test score range on every evidence… 0.14s
+  ✓ it enforces the selected English test score range on every evidence… 0.12s
+  ✓ it returns a request for editable revision and invalidates the earl… 0.36s
+  ✓ it enforces live Advisor and Department Head scope and rejects stal… 0.35s
+  ✓ it revalidates live reviewer scope before returning an idempotent a… 0.55s
+  ✓ it approves corrected evidence after an Attempt without deleting st… 0.51s
+  ✓ it approves corrected evidence after an Attempt without deleting st… 0.45s
+  ✓ it restricts abandonment to the owner and keeps abandoned and Advis… 0.35s
+  ✓ it supports Department Head return and terminal rejection after fre… 0.51s
+
+   PASS  Tests\Feature\Enrollment\MustRetakeObligationTest
+  ✓ it creates one historical obligation for a failed preparatory or co… 0.20s
+  ✓ it gives an active Remediation Obligation the same offered-course p… 0.16s
+  ✓ it requires an offered feasible obligation before unrelated for-cre… 0.21s
+
+   PASS  Tests\Feature\Enrollment\MyScheduleTest
+  ✓ it returns the student's enrollments grouped by semester, newest fi… 0.17s
+  ✓ it renders each enrollment's status, classification, credit hours a… 0.16s
+  ✓ it marks failed preparatory and core enrollments as must-retake, bu… 0.21s
+  ✓ it returns an empty schedule when the student has no enrollments     0.17s
+  ✓ it 403s a schedule read for a user with no student record            0.11s
+  ✓ it forbids the schedule to a user without courses.register_self      0.10s
+  ✓ it requires authentication                                           0.10s
+
+   PASS  Tests\Feature\Enrollment\OfferingManagementTest
+  ✓ it lists a semesters offerings with resolved course, instructor and… 0.20s
+  ✓ it lets a calendar manager create an offering                        0.18s
+  ✓ it lets a Dean create an offering too (also holds calendar.manage)   0.22s
+  ✓ it creates an uncapped offering when capacity is omitted             0.17s
+  ✓ it rejects a second offering of the same course in the same semeste… 0.15s
+  ✓ it allows the same course to be offered in a different semester      0.25s
+  ✓ it rejects meetings that overlap each other                          0.19s
+  ✓ it allows two meetings on the same day that only touch at an endpoi… 0.23s
+  ✓ it rejects a meeting that ends before it starts                      0.17s
+  ✓ it rejects an instructor who is not a faculty member                 0.16s
+  ✓ it rejects a course that does not exist in the catalog               0.17s
+  ✓ it requires the course, instructor and at least one meeting          0.16s
+  ✓ it 404s when creating an offering for a semester that does not exis… 0.16s
+  ✓ it shows an offering with its resolved references                    0.17s
+  ✓ it updates an offering instructor, capacity and meetings, replacing… 0.24s
+  ✓ it deletes an unreferenced offering and cascades its meetings        0.19s
+  ✓ it refuses to delete an offering that is referenced by a session or… 0.16s
+  ✓ it lists assignable instructors for the picker                       0.17s
+  ✓ it forbids managing offerings without calendar.manage                0.21s
+  ✓ it requires authentication to manage offerings                       0.20s
+
+   PASS  Tests\Feature\Enrollment\RegistrationDecisionTest
+  ✓ it shows an advisor only their own advisees' pending requests        0.51s
+  ✓ it follows the student live when their advisor is reassigned         0.27s
+  ✓ it shows Student Affairs the queue unscoped                          0.26s
+  ✓ it approves every line, mints an Enrollment each, and marks the req… 0.58s
+  ✓ it trims a line — approves one, rejects one — minting only the appr… 0.47s
+  ✓ it rejects every line, minting nothing and marking the request Reje… 0.30s
+  ✓ it rejects an approved subset that falls below the credit-hour floo… 0.29s
+  ✓ it blocks approving a course the student is already enrolled in thi… 0.25s
+  ✓ it derives a Retake when a prior for-credit enrollment of the cours… 0.40s
+  ✓ it blocks a second retake of the same course                         0.28s
+  ✓ it does not burn the retake on a prior withdrawal — a fresh Regular  0.29s
+  ✓ it forbids an advisor deciding a request for a student who is not t… 0.26s
+  ✓ it 409s a decision on an already-decided request                     0.32s
+  ✓ it forbids the decision surface to a user without registration.appr… 0.18s
+  ✓ it notifies the student when their request is decided                0.46s
+  ✓ it notifies the advisor when a student submits a registration        0.30s
+
+   PASS  Tests\Feature\Enrollment\RegistrationOnBehalfTest
+  ✓ it lands SA-composed as a Pending request routed to the student’s a… 0.33s
+  ✓ it mints immediately when the advisor composes for their own advise… 0.25s
+  ✓ it forbids an advisor composing for a student who is not their advi… 0.17s
+  ✓ it applies the credit-hour floor to the target student               0.23s
+  ✓ it re-validates a born-Approved cart against the advisee’s record (… 0.21s
+  ✓ it 409s a compose when the student already has a pending request fo… 0.20s
+  ✓ it forbids the compose surface to a user without courses.register_f… 0.20s
+  ✓ it scopes the composable-students picker to advisees, and shows SA…  0.20s
+  ✓ it returns the target student’s eligible courses, and forbids readi… 0.20s
+
+   PASS  Tests\Feature\Enrollment\RegistrationPolicyTest
+  ✓ it fails closed when the canonical underload projection is unavaila… 0.15s
+  ✓ it uses the latest effective attempt when deriving an approaching-g… 0.46s
+
+   PASS  Tests\Feature\Enrollment\RegistrationSubmissionTest
+  ✓ it submits a valid cart as a Pending Initial request with its lines  0.33s
+  ✓ it records a line requested as Audit                                 0.31s
+  ✓ it rejects a cart below the credit-hour floor                        0.22s
+  ✓ it waives the first-semester floor only when the canonical basis sa… 0.32s
+  ✓ it rejects a cart above the credit-hour ceiling                      0.31s
+  ✓ it rejects a second external elective in one cart                    0.35s
+  ✓ it rejects a second research course in one cart                      0.37s
+  ✓ it rejects the same course twice, including Regular plus Audit of i… 0.22s
+  ✓ it rejects a cart whose two offerings clash in the weekly schedule   0.25s
+  ✓ it rejects a cart containing a full offering                         0.35s
+  ✓ it rejects a cart line for a course that is not eligible             0.25s
+  ✓ it rejects re-registering a course whose earlier attempt is still u… 0.27s
+  ✓ it lets a student register a different external elective after fail… 0.31s
+  ✓ it does not block registration just because a failed core course no… 0.30s
+  ✓ it rejects a submission when no registration window is open          0.15s
+  ✓ it blocks a second Pending request for the same semester with a 409  0.19s
+  ✓ it allows a fresh cart after a Rejected request while the window is… 0.25s
+  ✓ it shows the student their submitted request with per-line detail    0.35s
+  ✓ it returns a null semester and no requests when no window is open    0.11s
+  ✓ it forbids submission for a user without courses.register_self       0.09s
+  ✓ it 403s a submission when the acting user has no student record      0.10s
+  ✓ it requires authentication to submit or read requests                0.07s
+  ✓ it forbids reading requests for a user without courses.register_sel… 0.10s
+
+   PASS  Tests\Feature\Enrollment\RemediationCloseoutNotificationTest
+  ✓ it notifies the capacity reviewer when replacement exemption closes… 0.25s
+
+   PASS  Tests\Feature\Enrollment\RemediationObligationTest
+  ✓ it activates a remediation obligation at the earliest future offeri… 0.29s
+  ✓ it rereads course changes and reactivates an awaiting obligation id… 0.35s
+  ✓ it freezes a used remediation assignment when the course is later d… 0.21s
+  ✓ it does not freeze a remediation assignment because of an older enr… 0.26s
+  ✓ it does not mutate remediation obligations after termination         0.22s
+
+   PASS  Tests\Feature\Enrollment\ScheduleChangeTest
+  ✓ it free-adds an eligible course during the add/drop period and noti… 0.30s
+  ✓ it refuses a free add to a student with no approved initial request  0.19s
+  ✓ it refuses a free add outside the add/drop window                    0.16s
+  ✓ it refuses free-adding an external elective — it needs a request     0.20s
+  ✓ it free-drops a course during the add/drop period, hard-deleting it… 0.26s
+  ✓ it blocks a free drop that would take the load below the credit-hou… 0.24s
+  ✓ it fails closed on a below-floor free drop when the canonical under… 0.19s
+  ✓ it refuses a free drop outside the add/drop window                   0.16s
+  ✓ it refuses a free drop to a student with no approved initial reques… 0.21s
+  ✓ it 404s dropping another student's enrollment                        0.15s
+  ✓ it withdraws from a course during the withdrawal period — status W,… 0.33s
+  ✓ it refuses a withdrawal outside the withdrawal window                0.24s
+  ✓ it 409s a second withdrawal of an already-withdrawn course           0.19s
+  ✓ it submits a late-add request during the late-add window and notifi… 0.36s
+  ✓ it refuses a late-add-shaped submission outside the late-add window  0.20s
+  ✓ it offers a late-add list that excludes courses already on the sche… 0.28s
+  ✓ it locks out every student-initiated change after the withdrawal de… 0.25s
+
+   PASS  Tests\Feature\Enrollment\StudentLifecycleConcurrencyTest
+  ✓ it serializes Draft creation behind a committed lifecycle change     3.90s
+  ✓ it rolls back final approval when termination commits first          3.02s
+  ✓ it makes an Exemption-first finalizer observe the effective decisio… 3.11s
+  ✓ it serializes automatic reconciliation ahead of a competing manual…  3.30s
+
+   PASS  Tests\Feature\Enrollment\TransferCapConcurrencyTest
+  ✓ it serializes concurrent Council approvals so the target-aware life… 3.45s
+
+   PASS  Tests\Feature\Enrollment\TransferWorkflowTest
+  ✓ it blocks a Transfer target already recognized by Waiver             2.73s
+  ✓ it recognizes external study through Advisor Head and Council witho… 0.65s
+  ✓ it accepts only owned admission evidence and requires a transcript   0.28s
+  ✓ it lets only the live scoped reviewer open named supporting evidenc… 0.51s
+  ✓ it notifies the active reviewer without notifying an Advisor about…  0.43s
+  ✓ it enforces the fixed Role and live scope at every review transitio… 0.31s
+  ✓ it enforces the inclusive clamped one-calendar-month submission dea… 0.52s
+  ✓ it invalidates prior review evidence on return revise and resubmit   0.81s
+  ✓ it accepts only the four eligible normalized grades and protects st… 0.49s
+  ✓ it accepts only the four eligible normalized grades and protects st… 0.36s
+  ✓ it accepts only the four eligible normalized grades and protects st… 0.35s
+  ✓ it accepts only the four eligible normalized grades and protects st… 0.43s
+  ✓ it accepts only the four eligible normalized grades and protects st… 0.33s
+  ✓ it rechecks live Advisor and Head scope before honoring an idempote… 0.41s
+  ✓ it uses target Course hours for the lifetime cap and exposes decisi… 0.92s
+  ✓ it runs Identity StudentGuard before workflow state checks on every… 0.27s
+  ✓ it provides scoped pagination search and formula-safe audited XLSX…  0.54s
+  ✓ it applies the shared actor-aware collection contract to every Tran… 0.35s
+  ✓ it applies the shared actor-aware collection contract to every Tran… 0.32s
+  ✓ it applies the shared actor-aware collection contract to every Tran… 0.61s
+  ✓ it applies the shared actor-aware collection contract to every Tran… 0.33s
+
+   PASS  Tests\Feature\Enrollment\WaiverWorkflowTest
+  ✓ it takes a qualifying prior E-JUST result through Advisor Head and…  0.76s
+  ✓ it accepts only qualifying official legacy E-JUST results and direc… 0.59s
+  ✓ it blocks a Waiver target already recognized by Transfer             0.40s
+  ✓ it offers bound Curriculum targets and only qualifying PRS prior E-… 0.35s
+  ✓ it returns revised evidence to fresh Advisor and Head review while…  0.70s
+  ✓ it provides actor-scoped paginated queues and formula-safe audited…  0.69s
+  ✓ it blocks Waiver after an effective failed or earned target Attempt… 0.41s
+  ✓ it blocks Waiver after an effective failed or earned target Attempt… 0.41s
+  ✓ it revalidates target Attempt eligibility before Council approval    0.64s
+  ✓ it revalidates live role scope lifecycle revision and replay author… 0.87s
+
+   PASS  Tests\Feature\Grading\AcademicRecordCardTest
+  ✓ it returns the CGPA, the latest semester GPA and the earned credit…  0.41s
+  ✓ it reads the same supersession rule the record does, so a retake ne… 0.28s
+  ✓ it excludes credit hours a grade below the pass threshold never ear… 0.29s
+  ✓ it returns a null CGPA for a student with no CGPA-counting graded e… 0.31s
+  ✓ it ignores a mark still on a sheet the department head has not fina… 0.23s
+  ✓ it refuses a user who does not hold grades.view_own                  0.20s
+  ✓ it refuses an administrator who inherits the permission but holds n… 0.18s
+  ✓ it refuses an unauthenticated request                                0.11s
+
+   PASS  Tests\Feature\Grading\BatchCgpaSeededParityTest
+  ✓ it batch CGPA seeded cohort parity gate agrees for every generated… 30.87s
+
+   PASS  Tests\Feature\Grading\CentralGradeEntryTest
+  ✓ it lists every offering to a central-entry user, not only their own  0.60s
+  ✓ it names each offering's semester and assigned instructor on the pi… 0.32s
+  ✓ it still scopes an instructor's own picker to the offerings they te… 0.40s
+  ✓ it opens any offering's draft sheet for a central-entry user         0.31s
+  ✓ it lets a central-entry user enter and then correct a mark on someo… 0.50s
+  ✓ it lets a central-entry user declare an incomplete on someone else'… 0.37s
+  ✓ it lets a central-entry user key marks in but never sign — both hal… 0.38s
+  ✓ it keeps a department head out of mark entry entirely                0.43s
+  ✓ it still forbids an instructor reaching an offering they do not tea… 0.33s
+  ✓ it audits a central-entry mark on someone else's sheet, naming the…  0.32s
+  ✓ it audits a central-entry incomplete declaration too                 0.55s
+  ✓ it never audits an instructor entering a mark on their own sheet     0.33s
+  ✓ it never audits a refused write                                      0.33s
+  ✓ it audits the first open of someone else's sheet, since that open c… 0.31s
+  ✓ it never audits an instructor opening their own sheet for the first… 0.23s
+  ✓ it refuses a central-entry user a correction round against a finali… 0.27s
+  ✓ it still lets a central-entry user key marks into a correction roun… 0.41s
+
+   PASS  Tests\Feature\Grading\CorrectionRoundsTest
+  ✓ it opens a correction round for only the selected lines and leaves…  0.78s
+  ✓ it runs a correction through the same sign and finalize path, makin… 1.37s
+  ✓ it shows the earlier finalized grade as history on the department h… 0.94s
+  ✓ it audits a finalized correction with who corrected what             0.83s
+  ✓ it does not expose any student-initiated correction path             0.46s
+
+   PASS  Tests\Feature\Grading\GradeSheetTest
+  ✓ it lists the offerings the acting instructor teaches, with their co… 0.22s
+  ✓ it never lists another instructor's offerings                        0.15s
+  ✓ it refuses the grading surface to a user without grades.enter        0.15s
+  ✓ it refuses the grading surface to an unauthenticated caller          0.10s
+  ✓ it creates the sheet lazily on first open, in Draft                  0.17s
+  ✓ it returns the same round on every later open, never a second one    0.23s
+  ✓ it lets the database refuse a second Initial round, so two concurre… 0.25s
+  ✓ it still lets follow-up rounds of other kinds accumulate on the sam… 0.20s
+  ✓ it forbids an instructor opening a sheet for an offering they do no… 0.33s
+  ✓ it 404s an offering that does not exist                              0.19s
+  ✓ it returns one line per gradable enrollment with the student's univ… 0.24s
+  ✓ it omits audit and withdrawn enrollments from the sheet              0.32s
+  ✓ it returns an empty line list for an offering with no gradable rost… 0.20s
+  ✓ it carries the offering's resolved course on the sheet               0.16s
+  ✓ it saves one mark and derives its letter grade and gpa points        0.26s
+  ✓ it reads a saved mark back on the sheet                              0.51s
+  ✓ it saves each line on its own, so a partly-graded roster survives    0.30s
+  ✓ it corrects a mark by re-saving the line rather than adding a secon… 0.27s
+  ✓ it records the two extremes of the scale                             0.27s
+  ✓ it rejects a mark above 100 with a 422 naming the field              0.22s
+  ✓ it rejects a negative mark with a 422 naming the field               0.30s
+  ✓ it rejects a non-numeric mark                                        0.23s
+  ✓ it rejects a mark with more than two decimal places                  0.20s
+  ✓ it localises the out-of-range message into Arabic                    0.24s
+  ✓ it forbids marking a line on an offering the acting user does not t… 0.36s
+  ✓ it 404s a mark for an enrollment that is not a gradable line of thi… 0.28s
+  ✓ it 404s a mark for an enrollment on a different offering             0.24s
+  ✓ it 409s a mark on a sheet that is no longer open — the state guard…  0.16s
+
+   PASS  Tests\Feature\Grading\GradingCardsTest
+  ✓ it shows this term’s offerings, the count not yet finalized, and li… 0.25s
+  ✓ it reports an unstarted round as a null status rather than omitting… 0.17s
+  ✓ it shows the newest unfinalized follow-up round as the actionable s… 0.17s
+  ✓ it reads the current teaching term from the offerings, so a finishe… 0.19s
+  ✓ it flags an offering past the grade-submission deadline with no fin… 0.23s
+  ✓ it does not flag a finalized offering past the deadline, and blocks… 0.16s
+  ✓ it returns a null semester for an instructor who teaches nothing th… 0.28s
+  ✓ it gives a central-entry user every offering, as their grade sheets… 0.22s
+  ✓ it refuses a user who does not hold grades.enter                     0.13s
+  ✓ it refuses an unauthenticated request for the grade sheets card      0.10s
+  ✓ it counts the submitted sheets routed to the acting head, with the…  0.19s
+  ✓ it counts only the acting head’s own department, never another head… 0.24s
+  ✓ it includes the department-less preparatory sheets for a university… 0.23s
+  ✓ it excludes the preparatory sheets from a department-scoped head’s…  0.20s
+  ✓ it counts a department with no head assigned onto nobody’s card, wi… 0.20s
+  ✓ it counts only submitted rounds, not drafts or sheets already final… 0.17s
+  ✓ it refuses an instructor who shares the permission but is not a dep… 0.24s
+  ✓ it refuses a user who does not hold grades.finalize                  0.20s
+  ✓ it refuses an unauthenticated request for the review card            0.13s
+
+   PASS  Tests\Feature\Grading\GradingRecordsTest
+  ✓ it is null for a student with no CGPA-counting graded enrollment     0.16s
+  ✓ it computes the credit-weighted CGPA over finalized grades           0.25s
+  ✓ it excludes a grade still on a non-finalized sheet from the CGPA     0.19s
+  ✓ it lets a worse Retake lower the CGPA across the bound contract      0.19s
+  ✓ it computes one Semester's GPA restricted to that Semester           0.27s
+  ✓ it is null for a semester with no counted enrollment for this stude… 0.12s
+  ✓ it returns the current grade for each enrollment id, keyed by id     0.25s
+  ✓ it omits an id with no finalized grade                               0.29s
+  ✓ it returns an empty array for an empty id list                       0.12s
+  ✓ it batch CGPA parity gate preserves half-up threshold rounding Fall… 0.28s
+  ✓ it distributes batch CGPA values without conflating an ungraded rec… 0.43s
+  ✓ it batch effective Attempts retain the latest finalized Retake and…  0.46s
+
+   PASS  Tests\Feature\Grading\GradingSeederTest
+  ✓ it stands the three completed semesters up in the order the incomp… 28.07s
+  ✓ it seeds an overdue incomplete and an outstanding one that is not…  31.02s
+  ✓ it supersedes the earlier attempt of the seeded retake and leaves…  26.00s
+  ✓ it marks the below-C+ preparatory grade as one the student must re… 30.92s
+  ✓ it rests grade sheets in every state, including a finalized correc… 26.85s
+  ✓ it routes every department and leaves the uncovered ones visible    33.42s
+  ✓ it produces the varied student states the demo turns on            345.16s
+  ✓ it seeds idempotently                                               32.77s
+
+   PASS  Tests\Feature\Grading\IncompleteCommandsTest
+  ✓ it reminds at exactly 28, 14, 7 and 1 days remaining                 0.41s
+  ✓ it stays silent on a day that is not one of the configured offsets   0.14s
+  ✓ it re-notifies on a second same-day run — no sent-marker             0.16s
+  ✓ it changes no status when reminding                                  0.14s
+  ✓ it skips, without crashing or notifying, an incomplete with no next… 0.12s
+  ✓ it leaves an incomplete alone the day before its deadline            0.13s
+  ✓ it leaves an incomplete alone on the day of its deadline — the reso… 0.13s
+  ✓ it converts to Fail Withdrawal the day after the deadline, and noti… 0.24s
+  ✓ it publishes academic evidence change after converting an expired i… 0.13s
+  ✓ it skips and reports, never converting or crashing, an incomplete w… 0.21s
+  ✓ it never converts an already-resolved or already-converted incomple… 0.17s
+
+   PASS  Tests\Feature\Grading\IncompleteLifecycleTest
+  ✓ it declares an incomplete on a sheet line, persisting the completio… 0.23s
+  ✓ it is visible to the department head reviewing the sheet             0.30s
+  ✓ it refuses a completion percentage below the configured threshold,…  0.33s
+  ✓ it requires a reason when declaring an incomplete                    0.24s
+  ✓ it lets a mark supersede an earlier incomplete declaration on the s… 0.31s
+  ✓ it lets an incomplete declaration supersede an earlier mark on the…  0.35s
+  ✓ it counts a declared incomplete as a decided line, not blank, when…  0.36s
+  ✓ it leaves the course status untouched while the sheet is only signe… 0.23s
+  ✓ it becomes Incomplete via the Enrollment facade on finalize, rememb… 0.34s
+  ✓ it notifies the student that an incomplete was declared, with the r… 0.34s
+  ✓ it counts toward neither the CGPA nor earned credit while Incomplet… 0.55s
+  ✓ it shows the outstanding incomplete with its deadline, derived from… 0.42s
+  ✓ it has no deadline when the next semester does not exist yet — decl… 0.41s
+  ✓ it moves the outstanding deadline when the next semester's start da… 0.37s
+  ✓ it picks the next semester by starts_at ordering, never by (year, t… 0.34s
+  ✓ it excludes another instructor's outstanding incompletes             0.31s
+
+   PASS  Tests\Feature\Grading\IncompleteResolutionTest
+  ✓ it lazily opens an IncompleteResolution round containing only that…  0.71s
+  ✓ it returns the same round on a second open, rather than starting an… 0.89s
+  ✓ it forbids opening the resolution round for an incomplete outside t… 0.84s
+  ✓ it 409s opening a resolution round for an incomplete that was alrea… 1.28s
+  ✓ it resolves by entering the outstanding mark, signing and finalizin… 1.69s
+  ✓ it restores the pre-incomplete Course Status on resolution — a Reta… 1.32s
+  ✓ it writes earned=false through resolveIncomplete when the resolving… 1.26s
+  ✓ it attaches the resolving grade to the original Enrollment, changin… 1.62s
+  ✓ it resolves the earlier Incomplete's deadline off the record once t… 1.53s
+
+   PASS  Tests\Feature\Grading\LateSheetCommandTest
+  ✓ it notifies the instructor and the routed department head about an…  0.57s
+  ✓ it changes nothing at all — no sheet is created, opened or moved     0.43s
+  ✓ it flags an offering whose sheet is still only submitted — not fina… 0.34s
+  ✓ it reaches the university-wide head for a department-less preparato… 0.37s
+  ✓ it leaves an offering with a finalized sheet alone                   0.37s
+  ✓ it counts a finalized follow-up round as delivered, whatever kind i… 0.34s
+  ✓ it leaves an offering whose deadline has not passed alone, includin… 0.50s
+  ✓ it re-notifies on a second run — a hand-run flag carries no sent-ma… 0.65s
+  ✓ it reports how many offerings it flagged                             0.47s
+  ✓ it succeeds silently when nothing is late                            0.27s
+
+   PASS  Tests\Feature\Grading\MyGradesTest
+  ✓ it shows nothing for a mark still on a submitted, not-yet-finalized… 0.55s
+  ✓ it renders the CGPA as a dash-worthy null before any graded course…  0.37s
+  ✓ it shows a finalized grade with its credit hours, letter, and wheth… 0.48s
+  ✓ it marks a below-C+ grade as not earning its credit while it still…  0.47s
+  ✓ it groups courses by semester, newest semester first                 0.65s
+  ✓ it shows both grades for two different electives — neither supersed… 0.79s
+  ✓ it shows a superseded earlier attempt on the record, but excluded f… 0.97s
+  ✓ it is unreachable to a user without grades.view_own                  0.33s
+  ✓ it 403s a user who holds the permission but has no Student record    0.36s
+  ✓ it carries no id parameter — another Student's record is never reac… 0.70s
+
+   PASS  Tests\Feature\Grading\OutstandingIncompletesCardTest
+  ✓ it counts the outstanding Incompletes and gives the nearest derived… 0.74s
+  ✓ it reads the deadline fresh, so correcting a Semester’s start date…  0.62s
+  ✓ it shows an Incomplete whose following Semester does not exist yet,… 0.55s
+  ✓ it counts an Incomplete with no computable deadline beside ones tha… 0.60s
+  ✓ it counts only the acting Instructor’s own Incompletes               0.73s
+  ✓ it counts exactly what the resolution screen lists                   0.76s
+  ✓ it is empty rather than erroring for an Instructor with nothing out… 0.42s
+  ✓ it refuses a central-entry user who shares the permission but is no… 0.50s
+  ✓ it refuses a user without grades.enter                               0.42s
+  ✓ it refuses an unauthenticated request                                0.38s
+
+   PASS  Tests\Feature\Grading\SheetSigningReviewTest
+  ✓ it signs a fully-graded sheet, moving Draft to Submitted             0.69s
+  ✓ it refuses to sign a sheet with a blank line, naming how many remai… 0.76s
+  ✓ it 409s signing a sheet that is already submitted                    1.03s
+  ✓ it forbids signing an offering the acting user does not teach        0.74s
+  ✓ it the sheet is read-only to its own instructor once submitted       1.33s
+  ✓ it notifies every department head configured for the offering's dep… 1.32s
+  ✓ it shows a submitted sheet in its department head's queue            1.02s
+  ✓ it hides a submitted sheet from another department's head            0.86s
+  ✓ it routes a department-less preparatory sheet to the university-wid… 1.60s
+  ✓ it shows every mark and the grade distribution to the assigned depa… 1.63s
+  ✓ it a department head cannot write a mark                             1.42s
+  ✓ it finalizes a submitted sheet, permanently closing it               1.85s
+  ✓ it rolls back Grade finalization when stale credit-request invalida… 1.58s
+  ✓ it rolls back a failed Grade when a conflicting Transfer approval c… 1.51s
+  ✓ it 409s finalizing a sheet that was never submitted                  1.71s
+  ✓ it forbids finalizing or returning a sheet outside the head's depar… 1.82s
+  ✓ it writes earned=true for a grade at or above C+, through the enrol… 2.47s
+  ✓ it notifies each graded student on finalize, carrying the letter an… 2.15s
+  ✓ it returns a submitted sheet with a note, making it editable and re… 1.29s
+  ✓ it requires a note to return a sheet                                 1.14s
+  ✓ it shows the instructor's offerings list carrying the sheet's curre… 1.07s
+
+   PASS  Tests\Feature\Grading\StudentGradesOversightTest
+  ✓ it scopes an advisor to their own advisees and 403s another advisor  1.09s
+  ✓ it scopes a department head to students in their own department pro… 0.99s
+  ✓ it scopes a dean to students in their own faculty programs           0.85s
+  ✓ it scopes an instructor to students on their own teaching roster     1.74s
+  ✓ it lets Student Affairs and Council read any student                 0.69s
+  ✓ it forbids a student from reaching the oversight endpoint, even for… 0.54s
+  ✓ it lets an administrator read any student unscoped and without audi… 0.72s
+  ✓ it returns the same academic-record payload the student sees on My…  0.94s
+  ✓ it scopes the student picker to the reviewer role rather than retur… 0.81s
+
+   PASS  Tests\Feature\HealthTest
+  ✓ it reports service health in the data envelope                       0.32s
+  ✓ it returns an unknown api route as a 404 in the message envelope     0.22s
+
+   PASS  Tests\Feature\Identity\AdministrationCardTest
+  ✓ it counts the users and the role assignments they hold between them  0.42s
+  ✓ it shows the most recent audit entries, newest first, as action key… 0.81s
+  ✓ it bounds the activity to the few newest entries rather than the wh… 0.46s
+  ✓ it reports an entry with no actor rather than skipping it            0.26s
+  ✓ it returns an empty activity list for a log with nothing in it, rat… 0.34s
+  ✓ it serves a System Administrator and a Super Administrator with (Mo… 0.29s
+  ✓ it serves a System Administrator and a Super Administrator with (Mo… 0.42s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.68s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.56s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.53s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.41s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.26s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.63s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.29s
+  ✓ it refuses every non-administrator role with (Modules\Identity\Publ… 0.36s
+  ✓ it refuses an unauthenticated request                                0.52s
+
+   PASS  Tests\Feature\Identity\AuthTest
+  ✓ it logs in with valid credentials and records a login audit entry    0.52s
+  ✓ it rejects invalid credentials and records a failed-login audit ent… 0.55s
+  ✓ it returns the authenticated user and their roles from /me           0.46s
+  ✓ it rejects /me when unauthenticated                                  0.23s
+  ✓ it logs out an authenticated session and records a logout audit ent… 0.35s
+  ✓ it rejects stateless login before authentication and audit side eff… 0.40s
+  ✓ it blocks the sixth failed account attempt across email case and cl… 2.04s
+  ✓ it limits rotating account guesses from one IP and localizes the re… 0.83s
+  ✓ it successful login resets only its account failures and does not c… 1.71s
+  ✓ it rejects a competing login before password checks while an overla… 0.41s
+  ✓ it rejects a competing login before password checks while an overla… 0.39s
+
+   PASS  Tests\Feature\Identity\AuthorizationTest
+  ✓ it exposes the effective permissions for the signed-in user from /m… 0.44s
+  ✓ it returns 200 from a gated endpoint for a role that holds the perm… 0.30s
+  ✓ it returns 403 from a gated endpoint for a role that lacks the perm… 0.26s
+  ✓ it lets an administrator through the gate via the blanket permissio… 0.93s
+
+   PASS  Tests\Feature\Identity\CurriculumVersionBackfillTest
+  ✓ it backfills existing Students deterministically and audits the ear… 0.66s
+
+   PASS  Tests\Feature\Identity\DepartmentHeadAssignmentTest
+  ✓ it lets an administrator list Department-Head assignments            0.45s
+  ✓ it lets an administrator assign a Head to a department               0.29s
+  ✓ it lets an administrator assign a Head to the university-wide scope  0.36s
+  ✓ it requires the scope to be stated rather than omitted (422)         0.43s
+  ✓ it refuses to assign a user who is not a Department Head (422)       0.70s
+  ✓ it returns the not-a-Head refusal in Arabic when Arabic is requeste… 0.28s
+  ✓ it refuses a duplicate (Head, department) pair (422)                 0.31s
+  ✓ it refuses a second university-wide assignment for the same Head (4… 0.47s
+  ✓ it lets a Head who already covers a department also cover the unive… 0.35s
+  ✓ it lets two different Heads cover the same department                0.28s
+  ✓ it lets an administrator unassign a Head from a department           0.31s
+  ✓ it lists assignable Department Heads for the admin picker            0.46s
+  ✓ it audits an assignment                                              0.45s
+  ✓ it audits an unassignment                                            0.31s
+  ✓ it does not audit a refused assignment                               0.32s
+  ✓ it forbids a non-administrator from reading assignments (403)        0.27s
+  ✓ it forbids a Department Head from changing assignments (403)         0.27s
+  ✓ it forbids a Dean from changing assignments (403)                    0.42s
+  ✓ it forbids an unauthenticated visitor (401)                          0.28s
+
+   PASS  Tests\Feature\Identity\DepartmentHeadAssignmentsFacadeTest
+  ✓ it resolves the Head assigned to a Department                        0.30s
+  ✓ it resolves the Head assigned to the university-wide Preparatory sc… 0.20s
+  ✓ it returns no Head for a Department that has none                    0.24s
+  ✓ it does not answer a Department query with the university-wide Head  0.23s
+  ✓ it does not answer the university-wide query with a Department Head  0.26s
+  ✓ it resolves every Head covering the same Department                  0.26s
+  ✓ it returns live academic Departments for a Head without extending t… 0.60s
+
+   PASS  Tests\Feature\Identity\FacultyDeanAssignmentTest
+  ✓ it lets an administrator list Dean↔Faculty assignments               0.34s
+  ✓ it lets an administrator assign a Dean to a faculty                  0.36s
+  ✓ it refuses to assign a user who is not a Dean (422)                  0.38s
+  ✓ it refuses a duplicate (Dean, faculty) pair (422)                    0.29s
+  ✓ it lets the same Dean cover more than one faculty                    0.29s
+  ✓ it lets an administrator unassign a Dean from a faculty              0.59s
+  ✓ it lists assignable Deans for the admin picker                       0.32s
+  ✓ it forbids a non-administrator from reading assignments (403)        0.58s
+  ✓ it forbids a Dean from changing assignments (403)                    0.37s
+  ✓ it forbids an unauthenticated visitor (401/403)                      0.26s
+
+   PASS  Tests\Feature\Identity\GeneratedCohortSeederTest
+  ✓ it adds a deterministic multi-program academic cohort without cha… 149.09s
+  ✓ it adds an idempotent screening population beyond one standard pag… 99.41s
+
+   PASS  Tests\Feature\Identity\LocalizationTest
+  ✓ it persists the preferred locale and returns it on the next /me      0.32s
+  ✓ it rejects an unsupported preferred locale                           0.21s
+  ✓ it returns the login error in English by default                     0.53s
+  ✓ it negotiates the login error into Arabic from Accept-Language       0.46s
+
+   PASS  Tests\Feature\Identity\RoleAccountSeederTest
+  ✓ it gives r01@ a real Application for the Applicant Card             56.44s
+  ✓ it makes r02@ a real student whose CGPA and latest semester GPA ar… 60.85s
+  ✓ it gives r03@ advisees with a request genuinely pending their appr… 50.93s
+  ✓ it gives each operational role a non-empty primary Dashboard Card…  41.51s
+  ✓ it gives each operational role a non-empty primary Dashboard Card…  50.23s
+  ✓ it gives each operational role a non-empty primary Dashboard Card…  55.93s
+  ✓ it gives each operational role a non-empty primary Dashboard Card…  50.97s
+  ✓ it gives each operational role a non-empty primary Dashboard Card…  48.69s
+  ✓ it gives multi@ both halves of its two roles, so the composition r… 44.44s
+  ✓ it leaves the phase-3 and phase-4 worlds it builds on undisturbed   34.11s
+  ✓ it seeds the role accounts idempotently                             33.58s
+
+   PASS  Tests\Feature\Identity\StudentCohortSelectionTest
+  ✓ it selects Student IDs using owner stored criteria and normalized b… 0.13s
+
+   PASS  Tests\Feature\Identity\StudentIdentificationRecoveryTest
+  ✓ it recovers only matching accepted evidence and never overwrites a…  0.13s
+  ✓ it reports missing or mismatched accepted evidence as unresolved wi… 0.14s
+  ✓ it reports missing or mismatched accepted evidence as unresolved wi… 0.19s
+  ✓ it documents the unresolved owner identification type as nullable i… 2.86s
+
+   PASS  Tests\Feature\Identity\StudentLifecycleTest
+  ✓ it changes lifecycle only through the transaction-scoped public wri… 3.14s
+
+   PASS  Tests\Feature\Notifications\NotificationsTest
+  ✓ it creates a notification row when a module notifies a user          1.64s
+  ✓ it lists a user's notifications newest-first with the expected shap… 0.12s
+  ✓ it reports the unread count, ignoring read notifications             0.13s
+  ✓ it marks a single notification read, dropping the unread count       0.15s
+  ✓ it marks all of a user's notifications read at once                  0.13s
+  ✓ it never lists another user's notifications                          0.15s
+  ✓ it refuses to mark another user's notification read (404, and it st… 0.17s
+  ✓ it marking all read only touches the acting user's notifications     0.14s
+  ✓ it requires authentication for every notifications endpoint          0.12s
+
+   PASS  Tests\Feature\Records\CurrentTranscriptTest
+  ✓ it composes admission identity, all approved Enrollments and only f… 0.57s
+  ✓ it keeps transcript read scope live and preserves mixed-role unions  0.52s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.28s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.48s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.41s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.31s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.19s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.58s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.52s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.35s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.51s
+  ✓ it filters and paginates only readable scoped Student fields and au… 0.59s
+  ✓ it shows effective qualification-based decisions separately and nev… 0.78s
+  ✓ it exposes only approved Transfer and Waiver source details rather…  0.61s
+  ✓ it retains every Attempt and owner-derived supersession and retroac… 0.72s
+  ✓ it preserves owner target accounting when an exempted Course also e… 0.55s
+
+   PASS  Tests\Feature\Records\FeeConfigurationTest
+  ✓ it keeps requests unavailable until staff configure positive EGP an… 0.36s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.24s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.14s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.14s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.15s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.17s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.13s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.13s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.14s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.10s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.15s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.12s
+
+   PASS  Tests\Feature\Records\TranscriptCancellationTest
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.39s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.34s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.39s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.40s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.42s
+  ✓ it cancels unpaid requests without inventing a refund from an uploa… 0.39s
+  ✓ it creates one full verified-payment refund obligation and keeps th… 0.46s
+
+   PASS  Tests\Feature\Records\TranscriptCertificationConcurrencyTest
+  ✓ it waits for a real contributing owner writer and refuses certifica… 4.95s
+  ✓ it waits for a real contributing owner writer and refuses certifica… 4.27s
+  ✓ it waits for a real contributing owner writer and refuses certifica… 4.81s
+  ✓ it serializes two HTTP submissions under the owner guard and commit… 3.67s
+  ✓ it serializes duplicate certification and both issuance-cancellatio… 3.55s
+  ✓ it serializes duplicate certification and both issuance-cancellatio… 3.64s
+  ✓ it serializes duplicate certification and both issuance-cancellatio… 3.31s
+  ✓ it verification waiting behind cancellation cannot record payment o… 2.72s
+  ✓ it commits one full refund when two documented HTTP settlements com… 3.39s
+  ✓ it commits one collection handover when duplicate HTTP confirmation… 3.02s
+  ✓ it retains verification that commits before cancellation and create… 3.30s
+
+   PASS  Tests\Feature\Records\TranscriptExportTest
+  ✓ it exports scoped identifiers as spreadsheet strings and never expo… 2.02s
+  ✓ it renders every Records export in the requesters Arabic language w… 0.47s
+
+   PASS  Tests\Feature\Records\TranscriptIssuanceTest
+  ✓ it requires paid approval, staff authority and complete resolved id… 0.43s
+  ✓ it certifies only a current reviewed copy and publishes its immutab… 0.65s
+  ✓ it blocks reviewed issuance while cancellation is pending            0.41s
+  ✓ it records collection exactly once without changing certification o… 0.50s
+  ✓ it revokes validity once, preserves private history and discloses o… 0.49s
+  ✓ it scopes searchable issuance history and token-free exports to liv… 0.55s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.50s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.52s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.55s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.57s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.53s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.51s
+  ✓ it keeps Terminated Student services and older official copies vali… 0.72s
+  ✓ it records the actual certification instant even when the PostgreSQ… 0.52s
+
+   PASS  Tests\Feature\Records\TranscriptPaymentTest
+  ✓ it preserves corrected private payment submissions and accepts exac… 0.48s
+  ✓ it refuses missing or invalid receipts and submissions outside an a… 0.24s
+
+   PASS  Tests\Feature\Records\TranscriptRefundTest
+  ✓ it records one full manual refund with private evidence and release… 0.48s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.34s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.42s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.35s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.39s
+
+   PASS  Tests\Feature\Records\TranscriptRequestTest
+  ✓ it captures one open request and shows captured instructions only a… 0.30s
+  ✓ it rejection releases the request limit and Terminated Students ret… 0.25s
+  ✓ it keeps the service queue unavailable to Advisors and filters staf… 0.31s
+  ✓ it reports the owners open request independently of filtered staff…  0.27s
+
+   PASS  Tests\Feature\UnauthenticatedResponseTest
+  ✓ it answers an unauthenticated non-JSON API request with 401 JSON, n… 0.08s
+  ✓ it answers a bare document-link navigation with 401 JSON when unaut… 0.12s
+
+  Tests:    1356 passed (8581 assertions)
+  Duration: 1886.79s
+
+  [GET] api/v1/academic-standing/reports/termination ........... 133.63ms DONE
+  [GET] api/v1/academic-standing/reports/termination/cases/export  6.09ms DONE
+  [GET] api/v1/academic-standing/reports/termination/cases ....... 7.43ms DONE
+  [GET] api/v1/academic-standing/reports/graduation-readiness/students/export  19.40ms DONE
+  [GET] api/v1/academic-standing/reports/graduation-readiness/students  4.65ms DONE
+  [GET] api/v1/academic-standing/reports/graduation-readiness .... 4.09ms DONE
+  [GET] api/v1/academic-standing/reports/standing ............... 13.28ms DONE
+  [GET] api/v1/academic-standing/reports/standing/students ....... 3.84ms DONE
+  [GET] api/v1/academic-standing/reports/standing/students/export  4.65ms DONE
+  [GET] api/v1/academic-standing/me/credit-hours ................ 19.53ms DONE
+  [GET] api/v1/academic-standing/cards/credit-hours .............. 3.54ms DONE
+  [GET] api/v1/academic-standing/students/{student_id}/credit-hours  50.88ms DONE
+  [GET] api/v1/academic-standing/me ............................. 12.79ms DONE
+  [GET] api/v1/academic-standing/cards/standing .................. 2.79ms DONE
+  [GET] api/v1/academic-standing/me/graduation-readiness ......... 9.37ms DONE
+  [GET] api/v1/academic-standing/students/{student_id}/graduation-readiness  4.38ms DONE
+  [GET] api/v1/academic-standing/students/{student_id} ........... 3.67ms DONE
+  [GET] api/v1/termination-cases/mine ........................... 32.55ms DONE
+  [GET] api/v1/termination-cases/advisor ......................... 3.25ms DONE
+  [GET] api/v1/termination-cases/advisor/export .................. 2.85ms DONE
+  [POST] api/v1/termination-cases/{case}/advisor-review ........ 145.65ms DONE
+  [GET] api/v1/termination-cases/department-head ................ 24.23ms DONE
+  [GET] api/v1/termination-cases/department-head/export ......... 11.63ms DONE
+  [POST] api/v1/termination-cases/{case}/department-review ...... 25.99ms DONE
+  [GET] api/v1/termination-cases/council ......................... 6.82ms DONE
+  [GET] api/v1/termination-cases/council/export .................. 3.24ms DONE
+  [POST] api/v1/termination-cases/{case}/council-decision ....... 11.67ms DONE
+  [GET] api/v1/admission-cycles/open ............................ 10.57ms DONE
+  [POST] api/v1/register ........................................ 11.07ms DONE
+  [GET] api/v1/applications/{application}/verify-email .......... 11.16ms DONE
+  [GET] api/v1/application ...................................... 41.96ms DONE
+  [PATCH] api/v1/application ..................................... 5.06ms DONE
+  [POST] api/v1/application/submit ............................... 6.00ms DONE
+  [POST] api/v1/application/resend-verification .................. 2.92ms DONE
+  [POST] api/v1/application/documents ........................... 30.25ms DONE
+  [DELETE] api/v1/application/documents/{document} ............... 5.59ms DONE
+  [PATCH] api/v1/application/programs ............................ 7.33ms DONE
+  [POST] api/v1/application/finalize ............................. 1.71ms DONE
+  [POST] api/v1/application/resubmit ............................. 1.77ms DONE
+  [GET] api/v1/application/interview/slots ....................... 8.51ms DONE
+  [GET] api/v1/application/interview ............................. 1.26ms DONE
+  [POST] api/v1/application/interview/confirm .................... 2.10ms DONE
+  [POST] api/v1/application/interview/reschedule ................. 3.03ms DONE
+  [GET] api/v1/admissions/cards/my-application .................. 10.03ms DONE
+  [GET] api/v1/interviews/assigned/export ........................ 7.07ms DONE
+  [GET] api/v1/interviews/assigned ............................... 3.44ms DONE
+  [POST] api/v1/interviews/{interview}/evaluation ................ 8.50ms DONE
+  [GET] api/v1/applications/awaiting-interview .................. 18.88ms DONE
+  [GET] api/v1/applications/awaiting-interview/export ............ 3.86ms DONE
+  [GET] api/v1/interview-slots/interviewers ..................... 10.31ms DONE
+  [GET] api/v1/interview-slots/export ............................ 3.29ms DONE
+  [GET] api/v1/interview-slots ................................... 3.61ms DONE
+  [POST] api/v1/interview-slots .................................. 3.34ms DONE
+  [PATCH] api/v1/interview-slots/{interview_slot} ................ 4.56ms DONE
+  [DELETE] api/v1/interview-slots/{interview_slot} ............... 2.64ms DONE
+  [GET] api/v1/interviews/export ................................. 2.93ms DONE
+  [GET] api/v1/interviews ........................................ 3.63ms DONE
+  [POST] api/v1/applications/{application}/interview ............. 5.40ms DONE
+  [POST] api/v1/interviews/{interview}/complete .................. 6.04ms DONE
+  [GET] api/v1/applications/{application}/timeline .............. 15.26ms DONE
+  [GET] api/v1/admissions/reports/application-pipeline .......... 13.17ms DONE
+  [GET] api/v1/applications ...................................... 3.74ms DONE
+  [GET] api/v1/applications/export ............................... 3.19ms DONE
+  [GET] api/v1/applications/{application} ........................ 4.78ms DONE
+  [POST] api/v1/applications/{application}/screen ................ 7.16ms DONE
+  [GET] api/v1/admissions/cards/screening-queue .................. 1.81ms DONE
+  [GET] api/v1/dean/applications ................................. 8.44ms DONE
+  [GET] api/v1/dean/applications/export .......................... 3.38ms DONE
+  [POST] api/v1/dean/applications/{application}/review ........... 9.43ms DONE
+  [GET] api/v1/dean/decisions ................................... 25.88ms DONE
+  [GET] api/v1/dean/decisions/export ............................. 5.04ms DONE
+  [GET] api/v1/dean/advisors ..................................... 5.09ms DONE
+  [POST] api/v1/dean/applications/{application}/decide .......... 11.39ms DONE
+  [GET] api/v1/admissions/cards/admission-decisions .............. 2.47ms DONE
+  [GET] api/v1/documents/{document} .............................. 5.92ms DONE
+  [GET] api/v1/admission-cycles .................................. 3.00ms DONE
+  [GET] api/v1/admission-cycles/export ........................... 4.03ms DONE
+  [POST] api/v1/admission-cycles ................................. 2.70ms DONE
+  [GET] api/v1/admission-cycles/{admission_cycle} ................ 4.28ms DONE
+  [PATCH] api/v1/admission-cycles/{admission_cycle} .............. 3.50ms DONE
+  [POST] api/v1/admission-cycles/{admission_cycle}/activate ...... 2.89ms DONE
+  [POST] api/v1/admission-cycles/{admission_cycle}/deactivate .... 2.91ms DONE
+  [GET] api/v1/semesters ......................................... 9.14ms DONE
+  [GET] api/v1/semesters/{semester} .............................. 6.25ms DONE
+  [POST] api/v1/semesters ........................................ 3.31ms DONE
+  [PATCH] api/v1/semesters/{semester} ............................ 5.19ms DONE
+  [GET] api/v1/calendar/cards/semester-windows ................... 4.22ms DONE
+  [GET] api/v1/catalog/tree ..................................... 10.82ms DONE
+  [GET] api/v1/catalog/cards/summary ............................. 3.66ms DONE
+  [GET] api/v1/faculties/export .................................. 7.72ms DONE
+  [GET] api/v1/faculties ......................................... 3.30ms DONE
+  [GET] api/v1/faculties/{faculty} ............................... 5.28ms DONE
+  [POST] api/v1/faculties ........................................ 1.69ms DONE
+  [PATCH] api/v1/faculties/{faculty} ............................. 4.31ms DONE
+  [POST] api/v1/faculties/{faculty}/activate ..................... 4.68ms DONE
+  [POST] api/v1/faculties/{faculty}/deactivate ................... 4.18ms DONE
+  [GET] api/v1/departments/export ................................ 8.69ms DONE
+  [GET] api/v1/departments ....................................... 2.28ms DONE
+  [GET] api/v1/departments/{department} .......................... 5.89ms DONE
+  [POST] api/v1/departments ...................................... 2.03ms DONE
+  [PATCH] api/v1/departments/{department} ........................ 4.33ms DONE
+  [POST] api/v1/departments/{department}/activate ................ 4.11ms DONE
+  [POST] api/v1/departments/{department}/deactivate .............. 4.24ms DONE
+  [GET] api/v1/programs/export .................................. 19.81ms DONE
+  [GET] api/v1/programs .......................................... 3.09ms DONE
+  [GET] api/v1/programs/{program} ................................ 6.32ms DONE
+  [POST] api/v1/programs ......................................... 2.57ms DONE
+  [PATCH] api/v1/programs/{program} .............................. 4.78ms DONE
+  [POST] api/v1/programs/{program}/activate ...................... 4.60ms DONE
+  [POST] api/v1/programs/{program}/deactivate .................... 3.86ms DONE
+  [GET] api/v1/programs/{program}/curriculum .................... 12.80ms DONE
+  [POST] api/v1/programs/{program}/curriculum .................... 7.33ms DONE
+  [PATCH] api/v1/programs/{program}/curriculum/{curriculum_entry}  8.31ms DONE
+  [DELETE] api/v1/programs/{program}/curriculum/{curriculum_entry}  6.24ms DONE
+  [GET] api/v1/programs/{program}/versions ....................... 6.65ms DONE
+  [GET] api/v1/courses/{course}/versions ......................... 5.92ms DONE
+  [GET] api/v1/courses/export ................................... 15.12ms DONE
+  [GET] api/v1/courses ........................................... 4.26ms DONE
+  [GET] api/v1/courses/{course} .................................. 3.46ms DONE
+  [POST] api/v1/courses .......................................... 2.60ms DONE
+  [PATCH] api/v1/courses/{course} ................................ 5.90ms DONE
+  [POST] api/v1/courses/{course}/activate ........................ 6.63ms DONE
+  [POST] api/v1/courses/{course}/deactivate ...................... 4.34ms DONE
+  [GET] api/v1/instructors ...................................... 16.13ms DONE
+  [GET] api/v1/semesters/{semester_id}/offerings ................. 2.41ms DONE
+  [POST] api/v1/semesters/{semester_id}/offerings ................ 4.31ms DONE
+  [GET] api/v1/offerings/{offering} .............................. 6.05ms DONE
+  [PATCH] api/v1/offerings/{offering} ............................ 9.21ms DONE
+  [DELETE] api/v1/offerings/{offering} ........................... 5.00ms DONE
+  [GET] api/v1/registration/eligible-courses .................... 64.58ms DONE
+  [POST] api/v1/registration/requests ............................ 5.35ms DONE
+  [GET] api/v1/registration/requests ............................. 3.63ms DONE
+  [GET] api/v1/registration/schedule ............................. 4.13ms DONE
+  [POST] api/v1/registration/enrollments ........................ 20.85ms DONE
+  [DELETE] api/v1/registration/enrollments/{enrollment} .......... 8.37ms DONE
+  [POST] api/v1/registration/enrollments/{enrollment}/withdrawal . 6.55ms DONE
+  [GET] api/v1/enrollment/cards/my-registration ................. 11.43ms DONE
+  [GET] api/v1/credit-decisions/exemptions ....................... 5.75ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/targets ...... 30.68ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests ............... 4.80ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/export ........ 5.06ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests .............. 8.73ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/{exemption_request}  4.97ms DONE
+  [PATCH] api/v1/credit-decisions/exemption-requests/{exemption_request}  8.76ms DONE
+  [DELETE] api/v1/credit-decisions/exemption-requests/{exemption_request}  5.76ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests/{exemption_request}/submit  7.65ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/advisor-queue  43.17ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/advisor-queue/export  2.78ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests/{exemption_request}/advisor-decision  4.23ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/department-head-queue  3.52ms DONE
+  [GET] api/v1/credit-decisions/exemption-requests/department-head-queue/export  3.48ms DONE
+  [POST] api/v1/credit-decisions/exemption-requests/{exemption_request}/department-head-decision  4.29ms DONE
+  [POST] api/v1/credit-decisions/exemptions/{decision}/revoke ... 13.49ms DONE
+  [GET] api/v1/registration/capacity-overrides .................. 11.76ms DONE
+  [POST] api/v1/registration/capacity-overrides/{requirement}/decision  9.72ms DONE
+  [GET] api/v1/registration/remediation-obligations .............. 6.60ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/evidence-documents  42.25ms DONE
+  [GET] api/v1/credit-decisions/transfers ........................ 4.20ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/evidence-documents  30.85ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/targets ........ 2.95ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests ................ 3.62ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/export ......... 3.48ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests ............... 7.43ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/{transfer_request}  4.21ms DONE
+  [PATCH] api/v1/credit-decisions/transfer-requests/{transfer_request}  7.13ms DONE
+  [DELETE] api/v1/credit-decisions/transfer-requests/{transfer_request}  4.48ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/submit  4.54ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/{waiver_request}/evidence-documents/{document}  5.34ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/{transfer_request}/evidence-documents/{document}  3.32ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/advisor-queue . 27.84ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/advisor-queue/export  2.95ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/advisor-decision  3.79ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/department-head-queue  3.02ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/department-head-queue/export  3.23ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/department-head-decision  3.95ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/council-queue .. 2.61ms DONE
+  [GET] api/v1/credit-decisions/transfer-requests/council-queue/export  3.09ms DONE
+  [POST] api/v1/credit-decisions/transfer-requests/{transfer_request}/council-decision  4.05ms DONE
+  [POST] api/v1/credit-decisions/transfers/{decision}/revoke ..... 6.24ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/targets .......... 2.87ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/prior-results .... 2.76ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests .................. 4.32ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/export ........... 8.93ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests ................ 37.55ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/{waiver_request}  11.52ms DONE
+  [PATCH] api/v1/credit-decisions/waiver-requests/{waiver_request}  24.34ms DONE
+  [DELETE] api/v1/credit-decisions/waiver-requests/{waiver_request}  8.05ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/submit  7.84ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/advisor-queue ... 47.52ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/advisor-queue/export  3.99ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/advisor-decision  5.30ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/department-head-queue  3.83ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/department-head-queue/export  4.97ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/department-head-decision  7.16ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/council-queue .... 5.03ms DONE
+  [GET] api/v1/credit-decisions/waiver-requests/council-queue/export  4.72ms DONE
+  [POST] api/v1/credit-decisions/waiver-requests/{waiver_request}/council-decision  5.85ms DONE
+  [POST] api/v1/credit-decisions/waivers/{decision}/revoke ....... 5.45ms DONE
+  [GET] api/v1/registration/on-behalf/students ................... 4.95ms DONE
+  [GET] api/v1/registration/on-behalf/students/{student_id}/eligible-courses  4.93ms DONE
+  [POST] api/v1/registration/on-behalf/students/{student_id}/requests  5.77ms DONE
+  [GET] api/v1/registration/queue ............................... 36.49ms DONE
+  [GET] api/v1/registration/requests/{registration} .............. 7.00ms DONE
+  [POST] api/v1/registration/requests/{registration}/decision ... 12.75ms DONE
+  [GET] api/v1/registration/students/{student_id}/schedule ....... 5.04ms DONE
+  [GET] api/v1/enrollment/cards/advisee-requests ................. 2.92ms DONE
+  [GET] api/v1/offerings/mine ................................... 36.50ms DONE
+  [GET] api/v1/offerings/{offering}/register ..................... 4.77ms DONE
+  [PATCH] api/v1/class-sessions/{class_session} .................. 5.24ms DONE
+  [PUT] api/v1/class-sessions/{class_session}/attendance ......... 6.74ms DONE
+  [GET] api/v1/grading/offerings ................................ 28.92ms DONE
+  [GET] api/v1/grading/offerings/{offering_id}/sheet ............. 3.27ms DONE
+  [PUT] api/v1/grading/sheets/{grade_sheet}/lines/{enrollment_id}  6.15ms DONE
+  [POST] api/v1/grading/sheets/{grade_sheet}/correction .......... 4.73ms DONE
+  [GET] api/v1/grading/corrections/{grade_sheet} ................. 3.44ms DONE
+  [GET] api/v1/grading/incompletes ............................... 9.51ms DONE
+  [GET] api/v1/grading/incompletes/{incomplete}/resolution ....... 5.68ms DONE
+  [GET] api/v1/grading/cards/grade-sheets ........................ 8.43ms DONE
+  [GET] api/v1/grading/cards/incompletes ......................... 2.55ms DONE
+  [POST] api/v1/grading/sheets/{grade_sheet}/sign ................ 3.95ms DONE
+  [GET] api/v1/grading/department-head/sheets ................... 25.34ms DONE
+  [GET] api/v1/grading/department-head/sheets/{grade_sheet} ...... 2.92ms DONE
+  [POST] api/v1/grading/department-head/sheets/{grade_sheet}/finalize  4.84ms DONE
+  [POST] api/v1/grading/department-head/sheets/{grade_sheet}/return  5.30ms DONE
+  [GET] api/v1/grading/cards/sheets-awaiting-review .............. 1.99ms DONE
+  [GET] api/v1/grading/my-grades ................................. 4.39ms DONE
+  [GET] api/v1/grading/cards/academic-record ..................... 2.83ms DONE
+  [GET] api/v1/grading/students ................................. 14.04ms DONE
+  [GET] api/v1/grading/students/{student_id} ..................... 2.90ms DONE
+  [GET] api/v1/health ............................................ 2.01ms DONE
+  [POST] api/v1/login ............................................ 5.64ms DONE
+  [POST] api/v1/logout ........................................... 4.24ms DONE
+  [GET] api/v1/me ................................................ 4.12ms DONE
+  [PATCH] api/v1/me .............................................. 4.58ms DONE
+  [GET] api/v1/admin/deans ....................................... 6.31ms DONE
+  [GET] api/v1/admin/faculty-dean-assignments .................... 1.90ms DONE
+  [POST] api/v1/admin/faculty-dean-assignments ................... 4.52ms DONE
+  [DELETE] api/v1/admin/faculty-dean-assignments/{assignment} ... 12.02ms DONE
+  [GET] api/v1/admin/department-heads ........................... 23.67ms DONE
+  [GET] api/v1/admin/department-head-assignments ................. 1.53ms DONE
+  [POST] api/v1/admin/department-head-assignments ................ 3.51ms DONE
+  [DELETE] api/v1/admin/department-head-assignments/{assignment} . 6.53ms DONE
+  [GET] api/v1/admin/cards/administration ........................ 5.32ms DONE
+  [GET] api/v1/notifications ..................................... 4.42ms DONE
+  [GET] api/v1/notifications/unread-count ........................ 1.32ms DONE
+  [POST] api/v1/notifications/read-all ........................... 1.31ms DONE
+  [POST] api/v1/notifications/{notification}/read ................ 2.21ms DONE
+  [GET] api/v1/records/students .................................. 7.31ms DONE
+  [GET] api/v1/records/students/export ........................... 2.36ms DONE
+  [GET] api/v1/records/students/{student_id}/transcript .......... 4.56ms DONE
+  [GET] api/v1/records/service ................................... 6.47ms DONE
+  [GET] api/v1/records/fee ....................................... 1.55ms DONE
+  [PUT] api/v1/records/fee ....................................... 3.50ms DONE
+  [GET] api/v1/records/requests ................................. 20.70ms DONE
+  [GET] api/v1/records/requests/export ........................... 4.34ms DONE
+  [POST] api/v1/records/requests ................................. 4.48ms DONE
+  [POST] api/v1/records/requests/{request_id}/refund ............ 12.62ms DONE
+  [GET] api/v1/records/requests/{request_id}/refund/receipt ...... 3.72ms DONE
+  [POST] api/v1/records/requests/{request_id}/cancellation ...... 18.66ms DONE
+  [POST] api/v1/records/requests/{request_id}/cancellation-review  4.31ms DONE
+  [POST] api/v1/records/requests/{request_id}/payment ........... 13.84ms DONE
+  [POST] api/v1/records/requests/{request_id}/payment-review ..... 4.49ms DONE
+  [GET] api/v1/records/requests/{request_id}/payments/{submission_id}/receipt  4.36ms DONE
+  [GET] api/v1/records/requests/{request_id} ..................... 3.56ms DONE
+  [POST] api/v1/records/requests/{request_id}/review ............. 4.27ms DONE
+  [POST] api/v1/records/requests/{request_id}/preview ........... 16.03ms DONE
+  [POST] api/v1/records/requests/{request_id}/issue .............. 5.04ms DONE
+  [GET] api/v1/records/issuances ................................. 3.59ms DONE
+  [GET] api/v1/records/issuances/export .......................... 3.06ms DONE
+  [GET] api/v1/records/issuances/{issuance_id} ................... 4.33ms DONE
+  [GET] api/v1/records/verify/{token} ............................ 4.53ms DONE
+  [POST] api/v1/records/requests/{request_id}/collection ......... 9.32ms DONE
+  [POST] api/v1/records/issuances/{issuance_id}/revocation ....... 4.01ms DONE
+  Extracting intro and auth Markdown files to: .scribe .......... 23.58ms DONE
+  Writing Blade docs to resources/views/scribe/ and assets to public/vendor/scribe/  2s DONE
+  Generating Postman collection in storage/app/private/scribe/ .. 48.90ms DONE
+  Generating OpenAPI specification in storage/app/private/scribe/  657.77ms DONE
+
+  All done ............................................. http://localhost/docs

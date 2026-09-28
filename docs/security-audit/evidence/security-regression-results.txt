@@ -1,0 +1,178 @@
+
+   PASS  Tests\Feature\Identity\AuthTest
+  ✓ it logs in with valid credentials and records a login audit entry    2.30s
+  ✓ it rejects invalid credentials and records a failed-login audit ent… 0.28s
+  ✓ it returns the authenticated user and their roles from /me           0.09s
+  ✓ it rejects /me when unauthenticated                                  0.06s
+  ✓ it logs out an authenticated session and records a logout audit ent… 0.08s
+
+   PASS  Tests\Feature\Identity\AuthorizationTest
+  ✓ it exposes the effective permissions for the signed-in user from /m… 0.08s
+  ✓ it returns 200 from a gated endpoint for a role that holds the perm… 0.10s
+  ✓ it returns 403 from a gated endpoint for a role that lacks the perm… 0.09s
+  ✓ it lets an administrator through the gate via the blanket permissio… 0.08s
+
+   PASS  Tests\Feature\Admissions\DeanReviewTest
+  ✓ it lists only the Dean’s own faculty applications                    0.14s
+  ✓ it filters and pages inside the Dean faculty scope even when the De… 0.19s
+  ✓ it shows an empty queue to a Dean with no assigned faculty           0.10s
+  ✓ it narrows the existing Dean scope by Faculty IDs without disclosin… 0.26s
+  ✓ it exports every matching Dean review row without disclosing anothe… 0.15s
+  ✓ it approves an application for interview and notifies the applicant  0.15s
+  ✓ it rejects an application with a reason and notifies the applicant   0.23s
+  ✓ it refuses a Dean acting on an application outside their faculty (4… 0.17s
+  ✓ it requires a reason to reject                                       0.10s
+  ✓ it refuses to act on an in-faculty application that is not under De… 0.13s
+  ✓ it refuses the Dean queue to a user without application.screen       0.08s
+
+   PASS  Tests\Feature\Admissions\DocumentUploadTest
+  ✓ it stores a valid document on the private disk under an opaque ULID  0.12s
+  ✓ it requires authentication to upload a document                      0.07s
+  ✓ it rejects an unknown document type                                  0.08s
+  ✓ it rejects a file whose format the type does not allow               0.08s
+  ✓ it rejects a file over the type’s size limit                         0.07s
+  ✓ it caps a single-slot type and allows a replacement once the old on… 0.10s
+  ✓ it allows up to two recommendation letters and refuses a third       0.10s
+  ✓ it lists the uploaded documents on the application resource          0.08s
+  ✓ it removes a document, deleting the file and freeing its slot        0.09s
+  ✓ it does not let an applicant remove another applicant’s document     0.10s
+  ✓ it blocks uploading once the application has left the applicant’s h… 0.07s
+  ✓ it blocks removing a document once the application is under review   0.07s
+  ✓ it streams a document back to its owner                              0.10s
+  ✓ it streams a document to a reviewer holding application.screen       0.09s
+  ✓ it refuses to stream a document to a non-owner without application.… 0.10s
+  ✓ it requires authentication to stream a document                      0.07s
+
+   PASS  Tests\Feature\Grading\StudentGradesOversightTest
+  ✓ it scopes an advisor to their own advisees and 403s another advisor  0.16s
+  ✓ it scopes a department head to students in their own department pro… 0.16s
+  ✓ it scopes a dean to students in their own faculty programs           0.15s
+  ✓ it scopes an instructor to students on their own teaching roster     0.19s
+  ✓ it lets Student Affairs and Council read any student                 0.12s
+  ✓ it forbids a student from reaching the oversight endpoint, even for… 0.09s
+  ✓ it lets an administrator read any student unscoped and without audi… 0.11s
+  ✓ it returns the same academic-record payload the student sees on My…  0.18s
+  ✓ it scopes the student picker to the reviewer role rather than retur… 0.15s
+
+   PASS  Tests\Feature\Enrollment\RegistrationDecisionTest
+  ✓ it shows an advisor only their own advisees' pending requests        0.20s
+  ✓ it follows the student live when their advisor is reassigned         0.16s
+  ✓ it shows Student Affairs the queue unscoped                          0.17s
+  ✓ it approves every line, mints an Enrollment each, and marks the req… 0.24s
+  ✓ it trims a line — approves one, rejects one — minting only the appr… 0.32s
+  ✓ it rejects every line, minting nothing and marking the request Reje… 0.18s
+  ✓ it rejects an approved subset that falls below the credit-hour floo… 0.18s
+  ✓ it blocks approving a course the student is already enrolled in thi… 0.17s
+  ✓ it derives a Retake when a prior for-credit enrollment of the cours… 0.18s
+  ✓ it blocks a second retake of the same course                         0.17s
+  ✓ it does not burn the retake on a prior withdrawal — a fresh Regular  0.18s
+  ✓ it forbids an advisor deciding a request for a student who is not t… 0.13s
+  ✓ it 409s a decision on an already-decided request                     0.22s
+  ✓ it forbids the decision surface to a user without registration.appr… 0.12s
+  ✓ it notifies the student when their request is decided                0.22s
+  ✓ it notifies the advisor when a student submits a registration        0.16s
+
+   PASS  Tests\Feature\Notifications\NotificationsTest
+  ✓ it creates a notification row when a module notifies a user          0.09s
+  ✓ it lists a user's notifications newest-first with the expected shap… 0.07s
+  ✓ it reports the unread count, ignoring read notifications             0.07s
+  ✓ it marks a single notification read, dropping the unread count       0.09s
+  ✓ it marks all of a user's notifications read at once                  0.07s
+  ✓ it never lists another user's notifications                          0.08s
+  ✓ it refuses to mark another user's notification read (404, and it st… 0.08s
+  ✓ it marking all read only touches the acting user's notifications     0.07s
+  ✓ it requires authentication for every notifications endpoint          0.07s
+
+   PASS  Tests\Feature\Records\CurrentTranscriptTest
+  ✓ it composes admission identity, all approved Enrollments and only f… 0.28s
+  ✓ it keeps transcript read scope live and preserves mixed-role unions  0.23s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.10s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.10s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.10s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.09s
+  ✓ it refuses other Students and Roles including deferred PDF holders…  0.10s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.18s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.17s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.18s
+  ✓ it prints the owner Course Status outcomes without exposing marks o… 0.18s
+  ✓ it filters and paginates only readable scoped Student fields and au… 0.28s
+  ✓ it shows effective qualification-based decisions separately and nev… 0.35s
+  ✓ it exposes only approved Transfer and Waiver source details rather…  0.26s
+  ✓ it retains every Attempt and owner-derived supersession and retroac… 0.31s
+  ✓ it preserves owner target accounting when an exempted Course also e… 0.23s
+
+   PASS  Tests\Feature\Records\FeeConfigurationTest
+  ✓ it keeps requests unavailable until staff configure positive EGP an… 0.15s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.08s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.07s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.07s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.07s
+  ✓ it rejects nonpositive or fractional-piastre fees and missing bilin… 0.07s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.07s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.06s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.07s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.06s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.06s
+  ✓ it refuses setup mutation to every nonstaff Role with (Modules\Iden… 0.07s
+
+   PASS  Tests\Feature\Records\TranscriptCancellationTest
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.21s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.20s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.22s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.30s
+  ✓ it pauses every pre-issuance stage and restores the exact prior sta… 0.27s
+  ✓ it cancels unpaid requests without inventing a refund from an uploa… 0.23s
+  ✓ it creates one full verified-payment refund obligation and keeps th… 0.36s
+
+   PASS  Tests\Feature\Records\TranscriptCertificationConcurrencyTest
+  ✓ it waits for a real contributing owner writer and refuses certifica… 2.34s
+  ✓ it waits for a real contributing owner writer and refuses certifica… 2.38s
+  ✓ it waits for a real contributing owner writer and refuses certifica… 2.23s
+  ✓ it serializes two HTTP submissions under the owner guard and commit… 2.14s
+  ✓ it serializes duplicate certification and both issuance-cancellatio… 2.16s
+  ✓ it serializes duplicate certification and both issuance-cancellatio… 2.06s
+  ✓ it serializes duplicate certification and both issuance-cancellatio… 2.21s
+  ✓ it verification waiting behind cancellation cannot record payment o… 2.03s
+  ✓ it commits one full refund when two documented HTTP settlements com… 2.04s
+  ✓ it commits one collection handover when duplicate HTTP confirmation… 2.10s
+  ✓ it retains verification that commits before cancellation and create… 2.12s
+
+   PASS  Tests\Feature\Records\TranscriptExportTest
+  ✓ it exports scoped identifiers as spreadsheet strings and never expo… 1.35s
+  ✓ it renders every Records export in the requesters Arabic language w… 0.35s
+
+   PASS  Tests\Feature\Records\TranscriptIssuanceTest
+  ✓ it requires paid approval, staff authority and complete resolved id… 0.36s
+  ✓ it certifies only a current reviewed copy and publishes its immutab… 0.45s
+  ✓ it blocks reviewed issuance while cancellation is pending            0.28s
+  ✓ it records collection exactly once without changing certification o… 0.40s
+  ✓ it revokes validity once, preserves private history and discloses o… 0.35s
+  ✓ it scopes searchable issuance history and token-free exports to liv… 0.35s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.38s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.36s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.53s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.37s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.39s
+  ✓ it invalidates complete reviewed content after contributing academi… 0.37s
+  ✓ it keeps Terminated Student services and older official copies vali… 0.49s
+  ✓ it records the actual certification instant even when the PostgreSQ… 0.31s
+
+   PASS  Tests\Feature\Records\TranscriptPaymentTest
+  ✓ it preserves corrected private payment submissions and accepts exac… 0.30s
+  ✓ it refuses missing or invalid receipts and submissions outside an a… 0.18s
+
+   PASS  Tests\Feature\Records\TranscriptRefundTest
+  ✓ it records one full manual refund with private evidence and release… 0.35s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.28s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.26s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.25s
+  ✓ it refuses partial, excessive, or undocumented refunds without sett… 0.29s
+
+   PASS  Tests\Feature\Records\TranscriptRequestTest
+  ✓ it captures one open request and shows captured instructions only a… 0.23s
+  ✓ it rejection releases the request limit and Terminated Students ret… 0.17s
+  ✓ it keeps the service queue unavailable to Advisors and filters staf… 0.21s
+  ✓ it reports the owners open request independently of filtered staff…  0.17s
+
+  Tests:    143 passed (938 assertions)
+  Duration: 50.99s

@@ -1,0 +1,12 @@
+
+> frontend@0.0.0 test
+> vitest run --passWithNoTests --maxWorkers=1 --testTimeout=60000
+
+
+ RUN  v4.1.11 /home/mohamed/Documents/postgrad-system/frontend
+
+
+ Test Files  121 passed (121)
+      Tests  684 passed (684)
+   Start at  14:10:42
+   Duration  1259.07s (transform 16.85s, setup 20.33s, import 401.28s, tests 510.13s, environment 271.95s)

@@ -5,7 +5,6 @@ namespace Modules\Admissions\Internal\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Knuckles\Scribe\Attributes\ResponseField;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
@@ -14,12 +13,13 @@ use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationStatusTransitionResource;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Internal\Support\ApplicationAccess;
 use Modules\Admissions\Internal\Support\ApplicationCollection;
 use Modules\Admissions\Internal\Support\ApplicationExport;
 use Modules\Catalog\Public\ProgramCatalog;
-use Modules\Identity\Public\Enums\Permission;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
  * @group Admissions
@@ -116,7 +116,7 @@ class ApplicationScreeningController
      *
      * The full application — the Step-1 snapshot, resolved Program(s), and the
      * uploaded documents — for a reviewer to assess completeness and authenticity
-     * before acting. Gated on `application.screen`.
+     * before acting. Gated on `application.screen` and the same Faculty scope as the queue.
      *
      * @urlParam application_id integer required The application's id. Example: 1
      *
@@ -124,8 +124,9 @@ class ApplicationScreeningController
      * @response 403 {"message": "This action is unauthorized."}
      * @response 404 {"message": "No query results for model."}
      */
-    public function show(Application $application): ApplicationResource
+    public function show(Request $request, Application $application, ApplicationAccess $access): ApplicationResource
     {
+        abort_unless($access->reviews((int) $request->user()?->getAuthIdentifier(), $application), 403);
         $application->load('documents');
 
         return new ApplicationResource($application);
@@ -150,10 +151,10 @@ class ApplicationScreeningController
      * @response 200 scenario="approved" {"data": {"id": 1, "status": "under_dean_review"}}
      * @response 200 scenario="returned" {"data": {"id": 1, "status": "returned_for_revision"}}
      * @response 403 {"message": "This action is unauthorized."}
-     * @response 409 scenario="not under review" {"message": "This application cannot move from draft to sa_approved."}
+     * @response 409 scenario="not under review" {"message": "This application is not under Student Affairs review."}
      * @response 422 scenario="missing note" {"message": "The note field is required when action is return.", "errors": {"note": ["The note field is required when action is return."]}}
      */
-    public function screen(Request $request, Application $application, Notifier $notifier): ApplicationResource
+    public function screen(Request $request, Application $application, Notifier $notifier, ApplicationAccess $access): ApplicationResource
     {
         $validated = $request->validate([
             'action' => ['required', 'string', 'in:approve,return,reject'],
@@ -167,7 +168,15 @@ class ApplicationScreeningController
         // together — an approved/returned/rejected application never rests without
         // the move recorded, nor the applicant told, half-done. `action` is validated
         // to exactly these three values, so the final branch is `reject`.
-        DB::transaction(function () use ($application, $validated, $actorId, $note, $notifier): void {
+        DB::transaction(function () use ($application, $validated, $actorId, $note, $notifier, $access): void {
+            // Re-read scope and state while holding the row lock; route bindings may be stale.
+            $locked = Application::query()->whereKey($application->id)->lockForUpdate()->firstOrFail();
+            abort_unless($access->reviews($actorId, $locked), 403);
+            if ($locked->status !== ApplicationStatus::UnderSAReview) {
+                throw new ConflictHttpException(__('admissions.transition.not_under_sa_review'));
+            }
+            // Keep the request's bound status for the transition's stale-write check.
+            $application->primary_program_id = $locked->primary_program_id;
             if ($validated['action'] === 'approve') {
                 $application->approveForDeanReview($actorId, $note);
             } elseif ($validated['action'] === 'return') {
@@ -185,22 +194,16 @@ class ApplicationScreeningController
      *
      * An application's append-only status history (from/to/note/when), oldest-first —
      * the applicant's visible progress and the decision audit trail. Readable by the
-     * owning applicant or any reviewer (`application.screen`); anyone else → 403.
+     * owning applicant or a scoped reviewer (`application.screen`); anyone else → 403.
      *
      * @urlParam application_id integer required The application's id. Example: 1
      *
      * @response 200 {"data": [{"id": 1, "from_status": "email_verified", "to_status": "under_sa_review", "actor_user_id": 5, "note": null, "occurred_at": "2026-07-10T10:00:00+00:00"}, {"id": 2, "from_status": "under_sa_review", "to_status": "returned_for_revision", "actor_user_id": 2, "note": "Please re-upload a clearer transcript.", "occurred_at": "2026-07-11T09:00:00+00:00"}]}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function timeline(Request $request, Application $application): AnonymousResourceCollection
+    public function timeline(Request $request, Application $application, ApplicationAccess $access): AnonymousResourceCollection
     {
-        $user = $request->user();
-        $owns = $user !== null && (int) $application->user_id === (int) $user->getAuthIdentifier();
-
-        // The owner sees their own timeline; a reviewer sees any (application.screen).
-        if (! $owns && ! Gate::allows(Permission::ScreenApplications->value)) {
-            abort(403);
-        }
+        abort_unless($access->reads((int) $request->user()?->getAuthIdentifier(), $application), 403);
 
         return ApplicationStatusTransitionResource::collection($application->statusTransitions);
     }

@@ -36,6 +36,14 @@ function postRegister(array $payload): TestResponse
     return test()->postJson('/api/v1/register', $payload, ['Origin' => 'http://localhost']);
 }
 
+it('rejects stateless registration before creating a user or application', function () {
+    AdmissionCycle::factory()->open()->create();
+    $this->postJson('/api/v1/register', registerPayload())->assertStatus(400);
+    $this->assertDatabaseCount('users', 0);
+    $this->assertDatabaseCount('applications', 0);
+    $this->assertGuest();
+});
+
 it('registers an applicant into the single open cycle and logs them in', function () {
     $cycle = AdmissionCycle::factory()->open()->create();
 

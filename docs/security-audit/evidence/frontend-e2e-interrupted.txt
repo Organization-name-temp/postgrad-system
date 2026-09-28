@@ -1,0 +1,48 @@
+
+> frontend@0.0.0 e2e
+> playwright test
+
+[WebServer] (node:206039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 180 tests using 1 worker
+
+(node:206350) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r05 in en (22.1s)
+  ✓    2 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r05 in ar (34.8s)
+  ✓    3 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r07 in en (24.5s)
+  ✓    4 [chromium] › e2e/academic-standing-report.spec.ts:18:5 › Standing Report scoped drill export and paper work for r07 in ar (36.5s)
+  ✘    5 [chromium] › e2e/admissions.spec.ts:79:1 › headline: a stranger applies and is admitted as a Student across every role (3.4m)
+
+
+  1) [chromium] › e2e/admissions.spec.ts:79:1 › headline: a stranger applies and is admitted as a Student across every role
+
+    Test was interrupted.
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Review & submit' })
+    Expected: visible
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 20000ms
+      - waiting for getByRole('heading', { name: 'Review & submit' })
+
+
+      178 |
+      179 |   // ── 2e. Review & finalize ────────────────────────────────────────────────────────
+    > 180 |   await expect(page.getByRole('heading', { name: 'Review & submit' })).toBeVisible()
+          |                                                                        ^
+      181 |   await auditPresentation(page)
+      182 |   await page.getByRole('button', { name: 'Finalize application' }).click()
+      183 |
+        at /home/mohamed/Documents/postgrad-system/frontend/e2e/admissions.spec.ts:180:72
+
+    Error Context: test-results/admissions-headline-a-stra-6a03f-a-Student-across-every-role-chromium/error-context.md
+
+  1 interrupted
+    [chromium] › e2e/admissions.spec.ts:79:1 › headline: a stranger applies and is admitted as a Student across every role
+  175 did not run
+  4 passed (5.6m)

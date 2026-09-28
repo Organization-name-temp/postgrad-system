@@ -1,0 +1,292 @@
+
+   FAIL  Tests\Feature\Identity\AuthTest
+  ✓ it logs in with valid credentials and records a login audit entry    1.87s
+  ✓ it rejects invalid credentials and records a failed-login audit ent… 0.27s
+  ✓ it returns the authenticated user and their roles from /me           0.09s
+  ✓ it rejects /me when unauthenticated                                  0.06s
+  ✓ it logs out an authenticated session and records a logout audit ent… 0.09s
+  ⨯ it rejects stateless login before authentication and audit side eff… 0.09s
+  ⨯ it blocks the sixth failed account attempt across email case and cl… 1.30s
+  ⨯ it limits rotating account guesses from one IP and localizes the re… 0.68s
+  ⨯ it successful login resets only its account failures and does not c… 1.04s
+
+   FAIL  Tests\Feature\Admissions\RegistrationTest
+  ⨯ it rejects stateless registration before creating a user or applica… 0.11s
+  ✓ it registers an applicant into the single open cycle and logs them…  0.10s
+  ✓ it refuses registration with an admissions-closed message when no c… 0.07s
+  ✓ it auto-assigns the only open cycle, ignoring closed ones            0.09s
+  ✓ it requires choosing a cycle when more than one is open              0.08s
+  ✓ it files the application against the chosen cycle when several are…  0.10s
+  ✓ it rejects a chosen cycle that is not open                           0.07s
+  ✓ it rejects a duplicate email                                         0.07s
+  ✓ it requires a name, email, and a confirmed password                  0.06s
+  ✓ it rejects a password that fails confirmation                        0.07s
+  ✓ it rate-limits registration attempts from one client                 0.10s
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Identity\AuthTest > it rejects stateless login befo…
+  Expected response status code [400] but received 500.
+Failed asserting that 500 is identical to 400.
+
+The following exception occurred during the last request:
+
+RuntimeException: Session store not set on request. in /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Request.php:612
+Stack trace:
+#0 /home/mohamed/Documents/postgrad-system/backend/modules/Identity/Internal/Http/Controllers/LoginController.php(42): Illuminate\Http\Request->session()
+#1 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): Modules\Identity\Internal\Http\Controllers\LoginController->__invoke()
+#2 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#3 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#4 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#5 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#6 /home/mohamed/Documents/postgrad-system/backend/app/Http/Middleware/SetLocaleFromRequest.php(24): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#7 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\SetLocaleFromRequest->handle()
+#8 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#9 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#10 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#11 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful->{closure:Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::handle():25}()
+#12 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#13 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(25): Illuminate\Pipeline\Pipeline->then()
+#14 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful->handle()
+#15 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#16 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#17 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#18 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#19 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#20 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#21 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#22 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#23 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#24 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#25 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#26 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#27 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#28 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#29 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#30 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#31 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#32 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#33 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#34 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#35 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#36 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#37 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#38 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#39 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#40 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#41 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#42 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#43 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#44 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#45 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#46 /home/mohamed/Documents/postgrad-system/backend/tests/Feature/Identity/AuthTest.php(83): Illuminate\Foundation\Testing\TestCase->postJson()
+#47 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Factories/TestCaseMethodFactory.php(171): P\Tests\Feature\Identity\AuthTest->{closure:/home/mohamed/Documents/postgrad-system/backend/tests/Feature/Identity/AuthTest.php:81}()
+#48 [internal function]: P\Tests\Feature\Identity\AuthTest->{closure:Pest\Factories\TestCaseMethodFactory::getClosure():161}()
+#49 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Concerns/Testable.php(419): call_user_func_array()
+#50 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Support/ExceptionTrace.php(26): P\Tests\Feature\Identity\AuthTest->{closure:Pest\Concerns\Testable::__callClosure():419}()
+#51 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Concerns/Testable.php(419): Pest\Support\ExceptionTrace::ensure()
+#52 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Concerns/Testable.php(321): P\Tests\Feature\Identity\AuthTest->__callClosure()
+#53 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Factories/TestCaseFactory.php(173) : eval()'d code(62): P\Tests\Feature\Identity\AuthTest->__runTest()
+#54 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): P\Tests\Feature\Identity\AuthTest->__pest_evaluable_it_rejects_stateless_login_before_authentication_and_audit_side_effects()
+#55 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#56 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#57 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#58 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#59 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#60 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#61 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#62 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Kernel.php(103): PHPUnit\TextUI\Application->run()
+#63 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/bin/pest(184): Pest\Kernel->handle()
+#64 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/bin/pest(192): {closure:/home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/bin/pest:18}()
+#65 {main}
+
+----------------------------------------------------------------------------------
+
+Session store not set on request.
+
+  at tests/Feature/Identity/AuthTest.php:83
+     79▕ });
+     80▕
+     81▕ it('rejects stateless login before authentication and audit side effects', function () {
+     82▕     User::factory()->create(['email' => 'stateless@example.test', 'password' => 'password']);
+  ➜  83▕     $this->postJson('/api/v1/login', ['email' => 'stateless@example.test', 'password' => 'password'])->assertStatus(400);
+     84▕     $this->assertGuest();
+     85▕     $this->assertDatabaseCount('audit_log', 0);
+     86▕ });
+     87▕
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Identity\AuthTest > it blocks the sixth failed acco…
+  Expected response status code [429] but received 422.
+Failed asserting that 422 is identical to 429.
+
+The following errors occurred during the last request:
+
+{
+    "message": "These credentials do not match our records.",
+    "errors": {
+        "email": [
+            "These credentials do not match our records."
+        ]
+    }
+}
+
+  at tests/Feature/Identity/AuthTest.php:96
+     92▕             ->assertUnprocessable();
+     93▕     }
+     94▕     $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.9'])
+     95▕         ->postJson('/api/v1/login', ['email' => 'GUESS@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])
+  ➜  96▕         ->assertStatus(429)->assertHeader('Retry-After', '60');
+     97▕     expect(AuditLog::query()->where('action', 'login_failed')->count())->toBe(5);
+     98▕     $this->travel(61)->seconds();
+     99▕     $this->postJson('/api/v1/login', ['email' => 'guess@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertUnprocessable();
+    100▕ });
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Identity\AuthTest > it limits rotating account gues…
+  Expected response status code [429] but received 422.
+Failed asserting that 422 is identical to 429.
+
+The following errors occurred during the last request:
+
+{
+    "message": "بيانات الاعتماد هذه غير متطابقة مع سجلاتنا.",
+    "errors": {
+        "email": [
+            "بيانات الاعتماد هذه غير متطابقة مع سجلاتنا."
+        ]
+    }
+}
+
+  at tests/Feature/Identity/AuthTest.php:108
+    104▕     foreach (['first', 'second'] as $email) {
+    105▕         $this->postJson('/api/v1/login', ['email' => $email.'@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertUnprocessable();
+    106▕     }
+    107▕     $this->postJson('/api/v1/login', ['email' => 'third@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost', 'Accept-Language' => 'ar'])
+  ➜ 108▕         ->assertStatus(429)->assertJsonPath('message', 'عدد كبير جدًا من محاولات تسجيل الدخول. يرجى المحاولة مرة أخرى بعد 60 ثانية.');
+    109▕     expect(AuditLog::query()->where('action', 'login_failed')->count())->toBe(2);
+    110▕ });
+    111▕
+    112▕ it('successful login resets only its account failures and does not consume the failure budget', function () {
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Identity\AuthTest > it successful login resets only…
+  Expected response status code [429] but received 422.
+Failed asserting that 422 is identical to 429.
+
+The following errors occurred during the last request:
+
+{
+    "message": "These credentials do not match our records.",
+    "errors": {
+        "email": [
+            "These credentials do not match our records."
+        ]
+    }
+}
+
+  at tests/Feature/Identity/AuthTest.php:122
+    118▕         $this->postJson('/api/v1/login', ['email' => $user->email, 'password' => 'password'], ['Origin' => 'http://localhost'])->assertOk();
+    119▕     }
+    120▕     config(['auth.login_throttle.ip_max_attempts' => 5]);
+    121▕     $this->postJson('/api/v1/login', ['email' => $user->email, 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertUnprocessable();
+  ➜ 122▕     $this->postJson('/api/v1/login', ['email' => 'another@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertStatus(429);
+    123▕ });
+    124▕
+
+  ────────────────────────────────────────────────────────────────────────────
+   FAILED  Tests\Feature\Admissions\RegistrationTest > it rejects stateless…
+  Expected response status code [400] but received 500.
+Failed asserting that 500 is identical to 400.
+
+The following exception occurred during the last request:
+
+RuntimeException: Session store not set on request. in /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Request.php:612
+Stack trace:
+#0 /home/mohamed/Documents/postgrad-system/backend/modules/Admissions/Internal/Http/Controllers/RegistrationController.php(88): Illuminate\Http\Request->session()
+#1 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php(46): Modules\Admissions\Internal\Http\Controllers\RegistrationController->__invoke()
+#2 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\Routing\ControllerDispatcher->dispatch()
+#3 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Route.php(211): Illuminate\Routing\Route->runController()
+#4 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(822): Illuminate\Routing\Route->run()
+#5 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Routing\Router->{closure:Illuminate\Routing\Router::runRouteWithinStack():821}()
+#6 /home/mohamed/Documents/postgrad-system/backend/app/Http/Middleware/SetLocaleFromRequest.php(24): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#7 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): App\Http\Middleware\SetLocaleFromRequest->handle()
+#8 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php(50): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#9 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\SubstituteBindings->handle()
+#10 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(166): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#11 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(129): Illuminate\Routing\Middleware\ThrottleRequests->handleRequest()
+#12 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Middleware/ThrottleRequests.php(90): Illuminate\Routing\Middleware\ThrottleRequests->handleRequestUsingNamedLimiter()
+#13 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Routing\Middleware\ThrottleRequests->handle()
+#14 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#15 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful->{closure:Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::handle():25}()
+#16 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#17 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/sanctum/src/Http/Middleware/EnsureFrontendRequestsAreStateful.php(25): Illuminate\Pipeline\Pipeline->then()
+#18 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful->handle()
+#19 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#20 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\Pipeline\Pipeline->then()
+#21 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\Routing\Router->runRouteWithinStack()
+#22 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\Routing\Router->runRoute()
+#23 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\Routing\Router->dispatchToRoute()
+#24 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\Routing\Router->dispatch()
+#25 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\Foundation\Http\Kernel->{closure:Illuminate\Foundation\Http\Kernel::dispatchToRouter():197}()
+#26 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:Illuminate\Pipeline\Pipeline::prepareDestination():178}()
+#27 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#28 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull->handle()
+#29 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#30 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\Foundation\Http\Middleware\TransformsRequest->handle()
+#31 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\TrimStrings->handle()
+#32 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#33 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePostSize->handle()
+#34 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#35 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance->handle()
+#36 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(74): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#37 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\HandleCors->handle()
+#38 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#39 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\TrustProxies->handle()
+#40 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#41 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Foundation\Http\Middleware\InvokeDeferredCallbacks->handle()
+#42 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#43 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\Http\Middleware\ValidatePathEncoding->handle()
+#44 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\Pipeline\Pipeline->{closure:{closure:Illuminate\Pipeline\Pipeline::carry():194}:195}()
+#45 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\Pipeline\Pipeline->then()
+#46 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\Foundation\Http\Kernel->sendRequestThroughRouter()
+#47 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(607): Illuminate\Foundation\Http\Kernel->handle()
+#48 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(573): Illuminate\Foundation\Testing\TestCase->call()
+#49 /home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/MakesHttpRequests.php(411): Illuminate\Foundation\Testing\TestCase->json()
+#50 /home/mohamed/Documents/postgrad-system/backend/tests/Feature/Admissions/RegistrationTest.php(41): Illuminate\Foundation\Testing\TestCase->postJson()
+#51 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Factories/TestCaseMethodFactory.php(171): P\Tests\Feature\Admissions\RegistrationTest->{closure:/home/mohamed/Documents/postgrad-system/backend/tests/Feature/Admissions/RegistrationTest.php:39}()
+#52 [internal function]: P\Tests\Feature\Admissions\RegistrationTest->{closure:Pest\Factories\TestCaseMethodFactory::getClosure():161}()
+#53 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Concerns/Testable.php(419): call_user_func_array()
+#54 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Support/ExceptionTrace.php(26): P\Tests\Feature\Admissions\RegistrationTest->{closure:Pest\Concerns\Testable::__callClosure():419}()
+#55 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Concerns/Testable.php(419): Pest\Support\ExceptionTrace::ensure()
+#56 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Concerns/Testable.php(321): P\Tests\Feature\Admissions\RegistrationTest->__callClosure()
+#57 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Factories/TestCaseFactory.php(173) : eval()'d code(17): P\Tests\Feature\Admissions\RegistrationTest->__runTest()
+#58 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestCase.php(1667): P\Tests\Feature\Admissions\RegistrationTest->__pest_evaluable_it_rejects_stateless_registration_before_creating_a_user_or_application()
+#59 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestCase.php(519): PHPUnit\Framework\TestCase->runTest()
+#60 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestRunner/TestRunner.php(87): PHPUnit\Framework\TestCase->runBare()
+#61 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestCase.php(365): PHPUnit\Framework\TestRunner->run()
+#62 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestCase->run()
+#63 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/Framework/TestSuite.php(369): PHPUnit\Framework\TestSuite->run()
+#64 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/TextUI/TestRunner.php(64): PHPUnit\Framework\TestSuite->run()
+#65 /home/mohamed/Documents/postgrad-system/backend/vendor/phpunit/phpunit/src/TextUI/Application.php(211): PHPUnit\TextUI\TestRunner->run()
+#66 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/src/Kernel.php(103): PHPUnit\TextUI\Application->run()
+#67 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/bin/pest(184): Pest\Kernel->handle()
+#68 /home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/bin/pest(192): {closure:/home/mohamed/Documents/postgrad-system/backend/vendor/pestphp/pest/bin/pest:18}()
+#69 {main}
+
+----------------------------------------------------------------------------------
+
+Session store not set on request.
+
+  at tests/Feature/Admissions/RegistrationTest.php:41
+     37▕ }
+     38▕
+     39▕ it('rejects stateless registration before creating a user or application', function () {
+     40▕     AdmissionCycle::factory()->open()->create();
+  ➜  41▕     $this->postJson('/api/v1/register', registerPayload())->assertStatus(400);
+     42▕     $this->assertDatabaseCount('users', 0);
+     43▕     $this->assertDatabaseCount('applications', 0);
+     44▕     $this->assertGuest();
+     45▕ });
+
+
+  Tests:    5 failed, 15 passed (86 assertions)
+  Duration: 6.58s

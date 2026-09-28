@@ -340,8 +340,10 @@ class Application extends Model
      */
     public function approveForDeanReview(int $actorId, ?string $note = null): void
     {
-        $this->transitionTo(ApplicationStatus::SAApproved, actorId: $actorId, note: $note);
-        $this->transitionTo(ApplicationStatus::UnderDeanReview);
+        DB::transaction(function () use ($actorId, $note): void {
+            $this->transitionTo(ApplicationStatus::SAApproved, actorId: $actorId, note: $note);
+            $this->transitionTo(ApplicationStatus::UnderDeanReview);
+        });
     }
 
     /**
@@ -562,23 +564,27 @@ class Application extends Model
      */
     private function transitionTo(ApplicationStatus $to, ?int $actorId = null, ?string $note = null): void
     {
-        $from = $this->status;
+        DB::transaction(function () use ($to, $actorId, $note): void {
+            $from = $this->status;
+            $current = self::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+            if ($current->status !== $from) {
+                throw new ConflictHttpException(__('admissions.transition.stale'));
+            }
+            if (! $from->canTransitionTo($to)) {
+                throw new ConflictHttpException(
+                    __('admissions.transition.illegal', ['from' => $from->value, 'to' => $to->value]),
+                );
+            }
 
-        if (! $from->canTransitionTo($to)) {
-            throw new ConflictHttpException(
-                __('admissions.transition.illegal', ['from' => $from->value, 'to' => $to->value]),
-            );
-        }
-
-        $this->status = $to;
-        $this->save();
-
-        $this->statusTransitions()->create([
-            'from_status' => $from,
-            'to_status' => $to,
-            'actor_user_id' => $actorId,
-            'note' => $note,
-            'occurred_at' => now(),
-        ]);
+            $this->status = $to;
+            $this->save();
+            $this->statusTransitions()->create([
+                'from_status' => $from,
+                'to_status' => $to,
+                'actor_user_id' => $actorId,
+                'note' => $note,
+                'occurred_at' => now(),
+            ]);
+        });
     }
 }

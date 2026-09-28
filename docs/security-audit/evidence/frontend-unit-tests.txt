@@ -1,0 +1,50 @@
+
+> frontend@0.0.0 test
+> vitest run --passWithNoTests
+
+
+ RUN  v4.1.11 /home/mohamed/Documents/postgrad-system/frontend
+
+ ❯ src/app/theme/localeControls.test.tsx (2 tests | 2 failed) 77125ms
+   × localizes built-in selection controls in en 39877ms
+   × localizes built-in selection controls in ar 36213ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/app/theme/localeControls.test.tsx > localizes built-in selection controls in en
+ FAIL  src/app/theme/localeControls.test.tsx > localizes built-in selection controls in ar
+Error: Test timed out in 20000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/app/theme/localeControls.test.tsx:11:3
+      9|   ['en', 'Clear', 'Open', 'Close'],
+     10|   ['ar', 'مسح', 'فتح', 'إغلاق'],
+     11| ])('localizes built-in selection controls in %s', async (locale, clear…
+       |   ^
+     12|   const user = userEvent.setup()
+     13|   render(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: [vitest-pool]: Failed to start forks worker for test files /home/mohamed/Documents/postgrad-system/frontend/src/features/admissions/wizard/wizardSteps.test.ts.
+ ❯ node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:3532:94
+ ❯ Pool.schedule node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:3532:5
+
+Caused by: Error: [vitest-pool-runner]: Timeout waiting for worker to respond
+ ❯ Timeout.<anonymous> node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:3108:58
+ ❯ listOnTimeout node:internal/timers:585:17
+ ❯ processTimers node:internal/timers:521:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed | 119 passed (120)
+      Tests  2 failed | 677 passed (679)
+     Errors  1 error
+   Start at  13:40:21
+   Duration  1224.55s (transform 21.50s, setup 47.95s, import 1006.29s, tests 688.69s, environment 462.33s)

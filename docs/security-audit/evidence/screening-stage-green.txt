@@ -1,0 +1,30 @@
+{
+    "expected_http": 409,
+    "rolled_back": true,
+    "results": [
+        {
+            "from": "under_dean_review",
+            "http": 409,
+            "after": "under_dean_review",
+            "transitions": 0
+        },
+        {
+            "from": "interview_completed",
+            "http": 409,
+            "after": "interview_completed",
+            "transitions": 0
+        },
+        {
+            "from": "conditionally_accepted",
+            "http": 409,
+            "after": "conditionally_accepted",
+            "transitions": 0
+        },
+        {
+            "from": "waitlisted",
+            "http": 409,
+            "after": "waitlisted",
+            "transitions": 0
+        }
+    ]
+}

@@ -1,0 +1,4 @@
+docs/security-audit/REPORT.md 449ms (unchanged)
+docs/security-audit/REMEDIATION.md 99ms (unchanged)
+docs/adr/0051-security-audit-remediation.md 25ms (unchanged)
+docs/superpowers/plans/2026-09-28-security-remediation.md 49ms (unchanged)

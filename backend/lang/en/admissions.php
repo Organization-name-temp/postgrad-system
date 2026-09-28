@@ -114,6 +114,8 @@ return [
     // The hand-rolled status machine's 409 (ticket 07): the requested move is not a
     // legal transition from the application's current state.
     'transition' => [
+        'not_under_sa_review' => 'This application is not under Student Affairs review.',
+        'stale' => 'This application has changed. Refresh it before recording a decision.',
         'illegal' => 'This application cannot move from :from to :to.',
     ],
 ];

@@ -34,6 +34,7 @@ use Modules\Identity\Public\Contracts\StudentEnrollment;
 use Modules\Identity\Public\Contracts\StudentGuard;
 use Modules\Identity\Public\Contracts\StudentLifecycleWriter;
 use Modules\Identity\Public\Enums\Permission;
+use Modules\Identity\Public\Http\Middleware\RequireSpaSession;
 use Modules\Identity\Public\TranscriptReadGuard;
 
 class IdentityServiceProvider extends ServiceProvider
@@ -68,6 +69,7 @@ class IdentityServiceProvider extends ServiceProvider
         // extending the fixed permission matrix (ADR-0008).
         $router->aliasMiddleware('admin', EnsureAdministrator::class);
         $router->aliasMiddleware('role', EnsureRole::class);
+        $router->aliasMiddleware('spa-session', RequireSpaSession::class);
 
         // The module owns its /api/v1 routes (ADR-0002).
         Route::middleware('api')

@@ -1,0 +1,17 @@
+
+> frontend@0.0.0 e2e
+> playwright test e2e/catalog-detail-audit.spec.ts e2e/course-collections.spec.ts e2e/cycle-collections.spec.ts e2e/dean-collections.spec.ts --grep light ar|URL in ar|workbook work in ar|download work in ar --trace=on
+
+[WebServer] (node:496046) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:496096) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › e2e/catalog-detail-audit.spec.ts:10:5 › Catalog details curriculum history and dialogs work in light ar (54.7s)
+  ✓  2 [chromium] › e2e/course-collections.spec.ts:9:3 › Course filters and authenticated export retain their URL in ar (38.4s)
+  ✓  3 [chromium] › e2e/cycle-collections.spec.ts:9:3 › Cycle criteria and authenticated workbook work in ar (26.7s)
+  ✓  4 [chromium] › e2e/dean-collections.spec.ts:9:3 › Dean collections bookmark and authenticated download work in ar (38.5s)
+
+  4 passed (2.9m)

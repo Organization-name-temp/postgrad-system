@@ -20,7 +20,7 @@ final readonly class ApplicationCollection
     private const COLUMNS = ['id' => 'id', 'status' => 'status', 'program_id' => 'primary_program_id', 'admission_cycle_id' => 'admission_cycle_id',
         'degree_level' => 'applying_for_degree', 'name_en' => 'name_en', 'name_ar' => 'name_ar', 'national_id' => 'national_id', 'finalized_at' => 'finalized_at'];
 
-    public function __construct(private ProgramCatalog $catalog, private Directory $directory, private DeanAssignments $deans) {}
+    public function __construct(private ProgramCatalog $catalog, private Directory $directory, private DeanAssignments $deans, private ApplicationAccess $access) {}
 
     public function query(Request $request): CollectionQuery
     {
@@ -49,10 +49,12 @@ final readonly class ApplicationCollection
 
             return $builder->whereRaw('1 = 0');
         }
-        if ($this->directory->isAdministrator($actor) || ($scope === ApplicationCollectionScope::Screening && $this->directory->hasRole($actor, Role::StudentAffairs))) {
+        $faculties = $scope === ApplicationCollectionScope::Screening
+            ? $this->access->reviewerFacultyIds($actor)
+            : ($this->directory->isAdministrator($actor) ? null : ($this->directory->hasRole($actor, Role::Dean) ? $this->deans->facultiesForDean($actor) : []));
+        if ($faculties === null) {
             return $builder;
         }
-        $faculties = $this->directory->hasRole($actor, Role::Dean) ? $this->deans->facultiesForDean($actor) : [];
         $ids = $builder->clone()->whereNotNull('primary_program_id')->distinct()->pluck('primary_program_id')->all();
         $permitted = [];
         foreach (array_chunk($ids, 100) as $batch) {

@@ -1,0 +1,359 @@
+
+   PASS  Tests\Feature\Admissions\AdministrativeOverrideTest
+  ✓ it shows an administrator every faculty’s Dean review queue, unscop… 1.86s
+  ✓ it lets an administrator act on an application in any faculty where… 0.14s
+  ✓ it shows an administrator every faculty’s Dean decisions queue, uns… 0.11s
+  ✓ it lets an administrator record a decision on an out-of-faculty app… 0.13s
+  ✓ it lets an administrator record an evaluation for an interview not…  0.11s
+  ✓ it does not audit the assigned interviewer scoring their own interv… 0.09s
+  ✓ it lists every interview to an administrator so they can reach the…  0.11s
+  ✓ it keeps an ordinary interviewer scoped to their own assigned inter… 0.10s
+  ✓ it keeps a privileged reviewer who is not the assigned interviewer…  0.09s
+
+   PASS  Tests\Feature\Admissions\AdmissionCycleCollectionTest
+  ✓ it filters bilingual cycle names and window state before stable pag… 0.12s
+  ✓ it keeps public lookup criteria inside currently open cycles with t… 0.09s
+  ✓ it exports all matching cycle rows with bilingual window labels and… 0.12s
+
+   PASS  Tests\Feature\Admissions\AdmissionCycleManagementTest
+  ✓ it lets a calendar manager list cycles                               0.08s
+  ✓ it lets a manager read a single cycle with both language names and…  0.07s
+  ✓ it lets a manager create a cycle, active and open by default within… 0.08s
+  ✓ it requires both language names                                      0.08s
+  ✓ it requires intake term, year and a window                           0.08s
+  ✓ it rejects an intake term outside the Fall/Spring set                0.07s
+  ✓ it rejects a close date that is not after the open date              0.07s
+  ✓ it rejects a duplicate intake term and year                          0.10s
+  ✓ it allows the same year under a different term and the same term in… 0.13s
+  ✓ it lets a manager edit a cycle without tripping its own uniqueness   0.08s
+  ✓ it deactivating a cycle closes it even inside its window; reactivat… 0.12s
+  ✓ it forbids all management actions for a user without calendar.manag… 0.16s
+  ✓ it requires authentication to manage cycles                          0.10s
+  ✓ it does not allow hard-deleting a cycle                              0.11s
+  ✓ it exposes currently-open cycles publicly with no authentication     0.12s
+  ✓ it returns an empty open-cycle list when nothing is open             0.10s
+
+   PASS  Tests\Feature\Admissions\AdmissionDecisionsCardTest
+  ✓ it counts the applications awaiting the Dean’s decision              0.29s
+  ✓ it counts exactly what the decisions queue lists, never a second de… 0.23s
+  ✓ it excludes another Faculty’s applications from a Dean’s count       0.13s
+  ✓ it counts nothing for a Dean with no faculty assignment              0.09s
+  ✓ it returns zero rather than erroring when nothing is waiting         0.09s
+  ✓ it refuses a user without applicant.decide                           0.08s
+  ✓ it refuses an unauthenticated request                                0.06s
+
+   PASS  Tests\Feature\Admissions\AdmissionDocumentsTest
+  ✓ it publishes only the requested Applicants admission documents thro… 0.10s
+
+   PASS  Tests\Feature\Admissions\AdmissionsCardsTest
+  ✓ it returns the acting applicant’s current status as a typed value,…  0.08s
+  ✓ it returns the most recent application when an applicant has re-app… 0.09s
+  ✓ it returns a null payload for an applicant who has not started an a… 0.07s
+  ✓ it refuses an administrator who inherits the permission but is not…  0.07s
+  ✓ it refuses a user who does not hold application.view_status          0.07s
+  ✓ it never exposes another applicant’s application, since there is no… 0.09s
+  ✓ it refuses an unauthenticated request for the application card       0.06s
+  ✓ it counts the applications pending screening and distinguishes the…  0.15s
+  ✓ it ages in business days, skipping the Egyptian weekend, exactly as… 0.11s
+  ✓ it does not flag an application still inside the SLA                 0.11s
+  ✓ it lists the oldest few by name and age, and no more than three      0.16s
+  ✓ it orders the rows by the age it shows, not by when the application… 0.12s
+  ✓ it changes nothing about an overdue application — it is information… 0.12s
+  ✓ it returns zeros and an empty list for an empty queue rather than e… 0.12s
+  ✓ it refuses a user who does not hold application.screen               0.10s
+  ✓ it refuses an unauthenticated request for the screening card         0.07s
+
+   PASS  Tests\Feature\Admissions\ApplicantInterviewTest
+  ✓ it shows the applicant their booked interview                        0.11s
+  ✓ it 404s when the applicant has no interview                          0.08s
+  ✓ it confirms a pending interview                                      0.10s
+  ✓ it refuses to confirm an already-confirmed interview (409)           0.10s
+  ✓ it reschedules once into another open slot                           0.11s
+  ✓ it refuses a second reschedule (409)                                 0.13s
+  ✓ it refuses to reschedule into a taken slot                           0.12s
+  ✓ it lists the open slots the applicant could reschedule into          0.10s
+
+   PASS  Tests\Feature\Admissions\ApplicationAccessTest
+  ✓ it denies outside faculty detail timeline and document reads even w… 0.18s
+  ✓ it denies every outside faculty screening action without transition… 0.12s
+  ✓ it denies every outside faculty screening action without transition… 0.12s
+  ✓ it denies every outside faculty screening action without transition… 0.16s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.24s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.20s
+  ✓ it denies a dean with no assignment or an unresolved program with (… 0.17s
+  ✓ it keeps in faculty dean access and screening                        0.22s
+  ✓ it retains university wide reads and screening for SA administrator… 0.21s
+  ✓ it retains university wide reads and screening for SA administrator… 0.17s
+  ✓ it retains university wide reads and screening for SA administrator… 0.18s
+  ✓ it keeps owner file and timeline access without giving the owner sc… 0.12s
+
+   PASS  Tests\Feature\Admissions\ApplicationExportTest
+  ✓ it exports the full filtered screening population as localized text… 0.16s
+  ✓ it exports the same derived filtered and ordered Dean scope as the…  0.19s
+
+   PASS  Tests\Feature\Admissions\ApplicationPipelineAggregateTest
+  ✓ it aggregates the scoped cycle statuses and measured transition con… 0.13s
+  ✓ it narrows live Dean scope and combines Student Affairs oversight i… 0.19s
+  ✓ it refuses the pipeline aggregate to a user without the screening g… 0.09s
+
+   PASS  Tests\Feature\Admissions\ApplicationPipelineReportTest
+  ✓ it serves the owner pipeline summary for a selected cycle and prese… 0.12s
+  ✓ it uses live Dean scope while Student Affairs filters only narrow t… 0.32s
+  ✓ it returns typed empty stages and null conversion rates without a c… 0.09s
+  ✓ it denies the pipeline report without its backend gate               0.07s
+  ✓ it validates report criteria instead of ignoring unsupported filter… 0.09s
+  ✓ it drills a pipeline stage into exactly its ordinary application po… 0.17s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.17s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.15s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.16s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.15s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.16s
+  ✓ it orders mixed pipeline stages by their domain values before deriv… 0.15s
+
+   PASS  Tests\Feature\Admissions\ApplicationScreeningTest
+  ✓ it refuses a stale screening handler without overwriting a terminal… 0.14s
+  ✓ it lists the Student Affairs screening queue with a derived age      0.11s
+  ✓ it refuses the queue to a user without application.screen            0.07s
+  ✓ it filters Arabic names and derived queue age before stable paginat… 0.16s
+  ✓ it applies stored queue criteria in SQL and returns truthful capped… 0.15s
+  ✓ it scopes Dean screening reads to live assignments while combining…  0.18s
+  ✓ it lets a reviewer open an application with its documents            0.10s
+  ✓ it approves an application, auto-forwarding it through sa_approved…  0.13s
+  ✓ it returns an application for revision with instructions and notifi… 0.15s
+  ✓ it rejects an application with a reason and notifies the applicant   0.12s
+  ✓ it requires a note to return or reject                               0.09s
+  ✓ it refuses to screen an application that is not under SA review (40… 0.10s
+  ✓ it refuses the screen action to a user without application.screen    0.09s
+  ✓ it loops a returned application back into review when the applicant… 0.14s
+  ✓ it refuses to resubmit an application that was not returned (409)    0.08s
+  ✓ it refuses to resubmit an incomplete application (422)               0.09s
+  ✓ it lets the owning applicant read their own timeline                 0.08s
+  ✓ it forbids a stranger from reading another applicant’s timeline      0.10s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.15s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.14s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.14s
+  ✓ it preserves SQL nullable ordering when an age filter selects the s… 0.17s
+
+   PASS  Tests\Feature\Admissions\ApplicationWizardTest
+  ✓ it returns the current applicant’s draft application                 0.14s
+  ✓ it requires authentication to read an application                    0.07s
+  ✓ it saves a partial Step-1 snapshot and keeps the application a draf… 0.11s
+  ✓ it validates field formats on save, bilingually and inline           0.10s
+  ✓ it rejects a duplicate national id within the same cycle on save     0.11s
+  ✓ it allows the same national id in a different cycle                  0.11s
+  ✓ it keeps the snapshot editable through email verification, so back-… 0.14s
+  ✓ it blocks editing the snapshot once the application enters review    0.09s
+  ✓ it refuses to submit Step 1 until the snapshot is complete           0.09s
+  ✓ it captures a structured previous E-JUST MSc Program for exemption…  0.13s
+  ✓ it requires a valid MSc Program when an E-JUST MSc graduate submits  0.10s
+  ✓ it rejects a National ID that is not exactly 14 digits               0.11s
+  ✓ it validates a Passport identifier as 6–9 alphanumeric               0.12s
+  ✓ it rejects a phone that is not a canonical E.164 number              0.11s
+  ✓ it rejects a nationality outside the ISO 3166-1 alpha-2 list         0.09s
+  ✓ it rejects a GPA above the chosen scale’s ceiling                    0.12s
+  ✓ it rejects a CGPA above the chosen scale’s ceiling                   0.08s
+  ✓ it rejects an english score outside the selected test’s range        0.11s
+  ✓ it rejects an english score below the selected test’s floor          0.08s
+  ✓ it requires an english score unless the test is None                 0.09s
+  ✓ it rejects a score supplied for the None english test                0.08s
+  ✓ it accepts a None english test with no score                         0.10s
+  ✓ it submits Step 1, moving an unverified applicant to submitted and…  0.12s
+
+   PASS  Tests\Feature\Admissions\DeanDecisionQueueTest
+  ✓ it lists the applications awaiting the Dean’s decision for their fa… 0.20s
+  ✓ it excludes applications outside the Dean’s faculties                0.11s
+  ✓ it filters decision state before stable pages without widening a mu… 0.19s
+  ✓ it is empty for a Dean with no faculty assignment                    0.10s
+  ✓ it exports the filtered decision state for every in-scope row and a… 0.17s
+  ✓ it refuses the decisions queue to a user without applicant.decide (… 0.08s
+
+   PASS  Tests\Feature\Admissions\DeanReviewTest
+  ✓ it lists only the Dean’s own faculty applications                    0.13s
+  ✓ it filters and pages inside the Dean faculty scope even when the De… 0.19s
+  ✓ it shows an empty queue to a Dean with no assigned faculty           0.12s
+  ✓ it narrows the existing Dean scope by Faculty IDs without disclosin… 0.23s
+  ✓ it exports every matching Dean review row without disclosing anothe… 0.17s
+  ✓ it approves an application for interview and notifies the applicant  0.12s
+  ✓ it rejects an application with a reason and notifies the applicant   0.16s
+  ✓ it refuses a Dean acting on an application outside their faculty (4… 0.15s
+  ✓ it requires a reason to reject                                       0.18s
+  ✓ it refuses to act on an in-faculty application that is not under De… 0.20s
+  ✓ it refuses the Dean queue to a user without application.screen       0.13s
+
+   PASS  Tests\Feature\Admissions\DocumentUploadTest
+  ✓ it stores a valid document on the private disk under an opaque ULID  0.17s
+  ✓ it requires authentication to upload a document                      0.09s
+  ✓ it rejects an unknown document type                                  0.14s
+  ✓ it rejects a file whose format the type does not allow               0.11s
+  ✓ it rejects a file over the type’s size limit                         0.07s
+  ✓ it caps a single-slot type and allows a replacement once the old on… 0.11s
+  ✓ it allows up to two recommendation letters and refuses a third       0.10s
+  ✓ it lists the uploaded documents on the application resource          0.09s
+  ✓ it removes a document, deleting the file and freeing its slot        0.11s
+  ✓ it does not let an applicant remove another applicant’s document     0.10s
+  ✓ it blocks uploading once the application has left the applicant’s h… 0.09s
+  ✓ it blocks removing a document once the application is under review   0.08s
+  ✓ it streams a document back to its owner                              0.16s
+  ✓ it streams a document to a reviewer holding application.screen       0.13s
+  ✓ it refuses to stream a document to a non-owner without application.… 0.10s
+  ✓ it requires authentication to stream a document                      0.08s
+
+   PASS  Tests\Feature\Admissions\EmailVerificationTest
+  ✓ it verifies the email via the signed link, advancing submitted → em… 0.17s
+  ✓ it rejects an unsigned or tampered verification link with 403        0.13s
+  ✓ it treats a re-clicked verification link as idempotent               0.14s
+  ✓ it resends a fresh verification link and logs it                     0.12s
+  ✓ it throttles verification resends to five per day                    0.16s
+  ✓ it refuses to resend when the application is not awaiting verificat… 0.09s
+  ✓ it shortcuts a pre-verified applicant straight to email_verified wi… 0.10s
+
+   PASS  Tests\Feature\Admissions\FinalDecisionTest
+  ✓ it accepts an applicant and mints a Student                          0.27s
+  ✓ it applies qualifying automatic Exemptions after the acceptance tra… 0.26s
+  ✓ it keeps acceptance committed when post-commit exemption evaluation… 0.25s
+  ✓ it surfaces the University ID and Student role on /me after accepta… 0.23s
+  ✓ it binds the accepted Student to the Program Curriculum Version eff… 0.24s
+  ✓ it resolves the admission Curriculum Version inside the acceptance…  0.25s
+  ✓ it rejects acceptance atomically when the Program has no usable Cur… 0.15s
+  ✓ it publishes an immutable Public acceptance-evidence snapshot after… 0.16s
+  ✓ it mints per-(year, program) University IDs that increment and are…  0.36s
+  ✓ it conditionally accepts and holds the application with its conditi… 0.15s
+  ✓ it waitlists and holds the application with a position               0.13s
+  ✓ it rejects with a reason and notifies the applicant                  0.16s
+  ✓ it resolves a conditional offer to accepted, minting the Student     0.36s
+  ✓ it resolves a conditional offer to rejected                          0.15s
+  ✓ it resolves a waitlisted applicant to accepted, minting the Student  0.29s
+  ✓ it resolves a waitlisted applicant to rejected                       0.18s
+  ✓ it pre-fills the least-loaded advisor when none is provided          0.36s
+  ✓ it assigns an overridden advisor when one is provided                0.44s
+  ✓ it rejects an advisor that does not hold the advisor role (422)      0.27s
+  ✓ it refuses a decision on an application outside the Dean’s faculty…  0.24s
+  ✓ it refuses the decision surface to a user without applicant.decide…  0.15s
+  ✓ it refuses an action illegal from the current status (409)           0.13s
+  ✓ it lists advisors with the least-loaded one suggested                0.14s
+  ✓ it validates the detail each held/rejected decision requires         0.16s
+  ✓ it preserves the admission identification type and personal identit… 0.27s
+  ✓ it preserves the admission identification type and personal identit… 0.27s
+
+   PASS  Tests\Feature\Admissions\FinalizeTest
+  ✓ it finalizes a complete application, moving it to under_sa_review a… 0.16s
+  ✓ it requires authentication to finalize                               0.06s
+  ✓ it blocks finalize when no primary program is chosen                 0.10s
+  ✓ it blocks finalize when a required document is missing               0.10s
+  ✓ it blocks finalize when the conditionally-required English certific… 0.11s
+  ✓ it names the specific missing documents in the finalize error        0.20s
+  ✓ it does not require an English certificate when no test was reporte… 0.21s
+  ✓ it requires a PhD applicant to have uploaded their MSc thesis        0.26s
+  ✓ it refuses to finalize an application that is not awaiting finalize… 0.10s
+  ✓ it refuses to finalize an application already under review (409)     0.10s
+
+   PASS  Tests\Feature\Admissions\InterviewCollectionTest
+  ✓ it filters booked interviews by bilingual applicant and confirmatio… 0.20s
+  ✓ it keeps assigned interview criteria inside live interviewer scope…  0.20s
+  ✓ it exports the complete mirrored interview scope with text identifi… 0.20s
+  ✓ it exports the complete mirrored interview scope with text identifi… 0.17s
+  ✓ it denies booked interview reads and exports without scheduling per… 0.17s
+
+   PASS  Tests\Feature\Admissions\InterviewEvaluationTest
+  ✓ it lets the assigned interviewer record an evaluation                0.12s
+  ✓ it forbids anyone but the assigned interviewer from evaluating (403… 0.13s
+  ✓ it forbids a privileged reviewer who is not the assigned interviewe… 0.10s
+  ✓ it validates the score is within range                               0.10s
+  ✓ it refuses to evaluate a completed interview (409)                   0.10s
+  ✓ it lists only the interviews assigned to the signed-in interviewer   0.11s
+
+   PASS  Tests\Feature\Admissions\InterviewReminderCommandTest
+  ✓ it reminds both the applicant and the interviewer of an upcoming in… 0.12s
+  ✓ it does not remind about an interview beyond the reminder window     0.10s
+  ✓ it does not remind about an interview that has already passed        0.11s
+  ✓ it does not remind about an already-completed interview within the…  0.11s
+  ✓ it respects a configured reminder window                             0.10s
+
+   PASS  Tests\Feature\Admissions\InterviewSchedulingTest
+  ✓ it lists Dean-approved applicants awaiting scheduling, excluding al… 0.12s
+  ✓ it refuses the scheduling worklist to a user without interview.sche… 0.07s
+  ✓ it filters and pages the university scheduling worklist for a Dean…  0.16s
+  ✓ it exports all unbooked scheduling matches for a Dean and audits th… 0.16s
+  ✓ it lists booked interviews with applicant and slot for Student Affa… 0.10s
+  ✓ it schedules an approved applicant into an open slot and notifies t… 0.12s
+  ✓ it refuses to schedule an application that is not awaiting intervie… 0.12s
+  ✓ it refuses to schedule an application that already has an interview… 0.13s
+  ✓ it refuses to schedule into a slot that is already taken (409)       0.12s
+  ✓ it validates the slot exists                                         0.08s
+  ✓ it marks an interview complete, advancing the application to interv… 0.10s
+  ✓ it refuses to complete an interview twice (409)                      0.12s
+  ✓ it refuses the scheduling surface to a user without interview.sched… 0.08s
+
+   PASS  Tests\Feature\Admissions\InterviewSlotCollectionTest
+  ✓ it filters normalized bilingual slot locations and derived availabi… 0.13s
+  ✓ it keeps the personal slot picker inside currently open slots with…  0.12s
+  ✓ it exports all filtered manager-readable slots with localized label… 0.14s
+
+   PASS  Tests\Feature\Admissions\InterviewSlotTest
+  ✓ it lists the assignable faculty interviewers                         0.09s
+  ✓ it creates an interview slot assigned to a faculty interviewer       0.10s
+  ✓ it creates a virtual slot with a meeting link                        0.09s
+  ✓ it rejects a slot whose interviewer is not a faculty member          0.08s
+  ✓ it requires a location for an in-person slot and a link for a virtu… 0.15s
+  ✓ it lists the whole slot pool with open state                         0.11s
+  ✓ it updates an open slot                                              0.09s
+  ✓ it refuses to update a slot that has an interview booked (409)       0.10s
+  ✓ it deletes an open slot                                              0.08s
+  ✓ it refuses to delete a slot that has an interview booked (409)       0.10s
+  ✓ it refuses the slot surface to a user without interview.schedule     0.07s
+
+   PASS  Tests\Feature\Admissions\OverdueFlaggingCommandTest
+  ✓ it notifies Student Affairs when an application is overdue for scre… 0.11s
+  ✓ it does not flag an application still within the screening SLA       0.09s
+  ✓ it notifies the faculty Dean when an application is overdue for Dea… 0.13s
+  ✓ it does not notify a Dean about another faculty’s overdue applicati… 0.13s
+  ✓ it ignores applications that are not in a review stage               0.10s
+  ✓ it respects a configured screening SLA threshold                     0.10s
+  ✓ it appends no status-transition rows while flagging                  0.10s
+
+   PASS  Tests\Feature\Admissions\ProgramSelectionTest
+  ✓ it stores a qualifying primary program that matches the degree appl… 0.11s
+  ✓ it stores an optional alternative program alongside the primary      0.13s
+  ✓ it requires authentication to select a program                       0.07s
+  ✓ it requires a primary program                                        0.08s
+  ✓ it rejects a primary program id that does not exist                  0.09s
+  ✓ it rejects a primary program whose level does not match the degree…  0.11s
+  ✓ it rejects a program the applicant’s previous degree does not quali… 0.10s
+  ✓ it rejects an unqualified alternative program                        0.09s
+  ✓ it rejects an alternative that is the same as the primary            0.09s
+  ✓ it refuses program selection once the application has left the appl… 0.08s
+
+   PASS  Tests\Feature\Admissions\RegistrationTest
+  ✓ it rejects stateless registration before creating a user or applica… 0.09s
+  ✓ it registers an applicant into the single open cycle and logs them…  0.13s
+  ✓ it refuses registration with an admissions-closed message when no c… 0.09s
+  ✓ it auto-assigns the only open cycle, ignoring closed ones            0.11s
+  ✓ it requires choosing a cycle when more than one is open              0.11s
+  ✓ it files the application against the chosen cycle when several are…  0.10s
+  ✓ it rejects a chosen cycle that is not open                           0.07s
+  ✓ it rejects a duplicate email                                         0.09s
+  ✓ it requires a name, email, and a confirmed password                  0.06s
+  ✓ it rejects a password that fails confirmation                        0.07s
+  ✓ it rate-limits registration attempts from one client                 0.11s
+
+   PASS  Tests\Feature\Admissions\ScreeningConcurrencyTest
+  ✓ it serializes competing screening decisions with one history and no… 2.10s
+  ✓ it serializes competing screening decisions with one history and no… 2.23s
+
+   PASS  Tests\Feature\Admissions\StaffPickerCollectionTest
+  ✓ it pages normalized staff search inside the picker role and exclude… 1.38s
+  ✓ it pages normalized staff search inside the picker role and exclude… 0.27s
+
+   PASS  Tests\Feature\Identity\AuthTest
+  ✓ it logs in with valid credentials and records a login audit entry    0.16s
+  ✓ it rejects invalid credentials and records a failed-login audit ent… 0.33s
+  ✓ it returns the authenticated user and their roles from /me           0.13s
+  ✓ it rejects /me when unauthenticated                                  0.09s
+  ✓ it logs out an authenticated session and records a logout audit ent… 0.11s
+  ✓ it rejects stateless login before authentication and audit side eff… 0.07s
+  ✓ it blocks the sixth failed account attempt across email case and cl… 1.30s
+  ✓ it limits rotating account guesses from one IP and localizes the re… 0.49s
+  ✓ it successful login resets only its account failures and does not c… 1.00s
+
+  Tests:    294 passed (1386 assertions)
+  Duration: 48.63s

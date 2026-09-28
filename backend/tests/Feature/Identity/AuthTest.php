@@ -1,7 +1,11 @@
 <?php
 
+use Illuminate\Auth\Events\Attempting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
+use Modules\Identity\Internal\Models\AuditLog;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 
@@ -76,3 +80,67 @@ it('logs out an authenticated session and records a logout audit entry', functio
         'actor_user_id' => $user->id,
     ]);
 });
+
+it('rejects stateless login before authentication and audit side effects', function () {
+    User::factory()->create(['email' => 'stateless@example.test', 'password' => 'password']);
+    $this->postJson('/api/v1/login', ['email' => 'stateless@example.test', 'password' => 'password'])->assertStatus(400);
+    $this->assertGuest();
+    $this->assertDatabaseCount('audit_log', 0);
+});
+
+it('blocks the sixth failed account attempt across email case and client IPs and permits retry after expiry', function () {
+    $this->freezeTime();
+    for ($i = 0; $i < 5; $i++) {
+        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.'.($i + 1)])
+            ->postJson('/api/v1/login', ['email' => 'guess@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])
+            ->assertUnprocessable();
+    }
+    $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.9'])
+        ->postJson('/api/v1/login', ['email' => 'GUESS@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])
+        ->assertStatus(429)->assertHeader('Retry-After', '60');
+    expect(AuditLog::query()->where('action', 'login_failed')->count())->toBe(5);
+    $this->travel(61)->seconds();
+    $this->postJson('/api/v1/login', ['email' => 'guess@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertUnprocessable();
+});
+
+it('limits rotating account guesses from one IP and localizes the rejection', function () {
+    $this->freezeTime();
+    config(['auth.login_throttle.ip_max_attempts' => 2]);
+    foreach (['first', 'second'] as $email) {
+        $this->postJson('/api/v1/login', ['email' => $email.'@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertUnprocessable();
+    }
+    $this->postJson('/api/v1/login', ['email' => 'third@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost', 'Accept-Language' => 'ar'])
+        ->assertStatus(429)->assertJsonPath('message', 'عدد كبير جدًا من محاولات تسجيل الدخول. يرجى المحاولة مرة أخرى بعد 60 ثانية.');
+    expect(AuditLog::query()->where('action', 'login_failed')->count())->toBe(2);
+});
+
+it('successful login resets only its account failures and does not consume the failure budget', function () {
+    $user = User::factory()->create(['email' => 'recover@example.test', 'password' => 'password']);
+    for ($i = 0; $i < 4; $i++) {
+        $this->postJson('/api/v1/login', ['email' => $user->email, 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertUnprocessable();
+    }
+    for ($i = 0; $i < 6; $i++) {
+        $this->postJson('/api/v1/login', ['email' => $user->email, 'password' => 'password'], ['Origin' => 'http://localhost'])->assertOk();
+    }
+    config(['auth.login_throttle.ip_max_attempts' => 5]);
+    $this->postJson('/api/v1/login', ['email' => $user->email, 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertUnprocessable();
+    $this->postJson('/api/v1/login', ['email' => 'another@example.test', 'password' => 'wrong'], ['Origin' => 'http://localhost'])->assertStatus(429);
+});
+
+it('rejects a competing login before password checks while an overlapping budget is locked', function (string $budget) {
+    $email = 'competing@example.test';
+    $key = $budget === 'account'
+        ? 'login-account:'.hash('sha256', $email)
+        : 'login-ip:'.hash('sha256', '127.0.0.1');
+    $lock = Cache::lock($key.':verification', 30);
+    expect($lock->get())->toBeTrue();
+    Event::fake([Attempting::class]);
+    try {
+        $this->postJson('/api/v1/login', ['email' => strtoupper($email), 'password' => 'wrong'], ['Origin' => 'http://localhost'])
+            ->assertStatus(429)->assertHeader('Retry-After', '1');
+        $this->assertDatabaseCount('audit_log', 0);
+        Event::assertNotDispatched(Attempting::class);
+    } finally {
+        $lock->release();
+    }
+})->with(['account', 'ip']);

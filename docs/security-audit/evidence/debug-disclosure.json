@@ -1,0 +1,6 @@
+{
+  "status": 404,
+  "exception": "Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException",
+  "file": "/home/mohamed/Documents/postgrad-system/backend/vendor/laravel/framework/src/Illuminate/Foundation/Application.php",
+  "trace_frames": 48
+}

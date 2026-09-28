@@ -1,0 +1,13 @@
+
+   PASS  Tests\Feature\Admissions\ApplicationScreeningTest
+  ✓ it refuses screening rejection after the Student Affairs stage with… 2.58s
+  ✓ it refuses screening rejection after the Student Affairs stage with… 0.14s
+  ✓ it refuses screening rejection after the Student Affairs stage with… 0.13s
+  ✓ it refuses screening rejection after the Student Affairs stage with… 0.20s
+  ✓ it refuses screening rejection after the Student Affairs stage with… 0.23s
+  ✓ it refuses screening rejection after the Student Affairs stage with… 0.18s
+  ✓ it refuses screening rejection after the Student Affairs stage with… 0.14s
+  ✓ it refuses screening rejection after the Student Affairs stage with… 0.11s
+
+  Tests:    8 passed (40 assertions)
+  Duration: 6.28s

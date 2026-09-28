@@ -39,7 +39,7 @@ planning merges are not implementation evidence. Other Phase 4.6 tickets are out
 Complete backend gate passed (1,329 tests / 8,421 assertions; details below).
 The one consolidated Standards/Spec review is resolved (three Standards findings,
 one Spec finding; fixes committed at `c4be343`). Final backend gate passed with **1,334 tests / 8,458 assertions**; the complete
-frontend gate remains pending. Starting commit and initial clean worktree
+frontend gate passed completely (121 files / 684 unit tests and 179 serial browser checks, terminal exit 0). The subsequent CI timing correction has its three affected rechecks pending. Starting commit and initial clean worktree
 verified. Review evidence is in [review](review.md).
 
 ### Shared frontend prerequisites (#02/#03/#05 slices)
@@ -1773,3 +1773,30 @@ public gallery seam. It never used or mutated a seeded account.
   test will be included in subsequent suite discovery (180 tests). Real affected
   Enrollment and Records journeys must rerun after the active suite; no green
   remote result for this new timing correction is claimed before publication.
+
+### Final full frontend gate — GREEN
+
+The isolated `npm run gate` completed with **terminal exit 0**: generated API
+synchronization, ESLint, full Prettier check, TypeScript, **121 files / 684 Vitest
+tests (549.45s)** and **179 serial Playwright tests (1.1h)** all passed. This
+includes the Phase 7 headline (53.6s), Enrollment headline (3.7m), Records service
+journey (8.3m), all three Report/List/export/print matrices, light/dark EN/AR
+accessibility and the existing-surface/detail audit. Exact durable log/exit:
+`frontend-gate-final.log` / `.exit`; full browser report and test artifacts are
+retained in `final-gate-artifacts/` under ignored verification storage.
+
+The run discovered 179 tests before the new CI timing regression was added. Its
+additional test passed offline; **180-test discovery** and **full format** passed,
+and strict ad-hoc TypeScript for the three changed E2E files passed using
+`tsc --ignoreConfig --noEmit --target es2022 --module esnext --moduleResolution
+bundler --skipLibCheck --strict`. Both native reviewers confirmed no actionable
+follow-up issue. To verify the timing correction at one explicit source revision,
+the real Enrollment and Records journeys plus the new regression will run as one
+**three-test serial recheck** after fresh seeding. This is affected verification,
+not another full review or an inferred green remote run.
+
+Final full-run Records paper has all 20 variants: current EN one page/current AR
+two; official, valid-public and official-revoked two; revoked-public one, in each
+theme. Readiness EN/AR each two pages; native inspection of its final AR
+continuation confirms overlapping-blocker warning, monochrome chart and exact
+count table. Human demo/Arabic wording/print acceptance remains pending.

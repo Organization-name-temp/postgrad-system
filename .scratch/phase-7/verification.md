@@ -65,11 +65,13 @@ a foreign app. All seeded accounts below use password `password`.
   **1,334 tests / 8,458 assertions (790.42s), terminal exit 0**.
 - Expanded owner presentation checks passed: Admissions 4.6m and seven remaining
   correction/Enrollment/headline/Records checks in 15.2m.
-- Frontend gate: the final API/static stages and **121 files / 684 unit tests**
-  passed. Its 179-test serial browser stage is active. The previous complete
+- Frontend gate: **GREEN, terminal exit 0**. Final API/static stages, **121 files /
+  684 unit tests (549.45s)** and **179 serial browser tests (1.1h)** passed. The previous complete
   attempt had 178 browser passes and one Records locale assertion failure; the
   reload-preference fix passed the complete affected Records journey (9.5m).
-  No complete frontend-gate pass is claimed before its terminal result.
+  Full gate artifacts are retained under ignored `final-gate-artifacts/`. The
+  additional CI timing regression was added after this run discovered its tests;
+  it passed offline, with the three-test affected recheck pending.
 - GitHub run [36360347596](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36360347596):
   backend and frontend jobs passed, matching the 1,334/684 test counts. Browser
   stage finished 177/179, with two label-colour assertions during theme transition.

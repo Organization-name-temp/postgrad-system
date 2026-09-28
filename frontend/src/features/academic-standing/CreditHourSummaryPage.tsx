@@ -61,6 +61,7 @@ export function CreditHourSummaryPage() {
       </Typography>
       {standingQuery.isPending && (
         <Skeleton
+          role="status"
           variant="rounded"
           height={120}
           aria-label={t('standing.loading')}
@@ -102,6 +103,7 @@ export function CreditHourSummaryPage() {
       )}
       {readinessQuery.isPending && (
         <Skeleton
+          role="status"
           variant="rounded"
           height={160}
           aria-label={t('readiness.loading')}
@@ -148,6 +150,7 @@ export function CreditHourSummaryPage() {
       )}
       {terminationQuery.isPending && (
         <Skeleton
+          role="status"
           variant="rounded"
           height={110}
           aria-label={t('termination.loading')}
@@ -209,6 +212,7 @@ export function CreditHourSummaryPage() {
       )}
       {remediationQuery.isPending && (
         <Skeleton
+          role="status"
           variant="rounded"
           height={110}
           aria-label={t('remediation.loading')}
@@ -266,7 +270,7 @@ export function CreditHourSummaryPage() {
           </Paper>
         )}
       {isPending && (
-        <Stack spacing={1} aria-label={t('creditHours.loading')}>
+        <Stack role="status" spacing={1} aria-label={t('creditHours.loading')}>
           <Skeleton variant="rounded" height={48} />
           <Skeleton variant="rounded" height={44} />
           <Skeleton variant="rounded" height={44} />

@@ -28,6 +28,11 @@ class EloquentCurriculumCatalog implements CurriculumCatalog
             return null;
         }
 
+        return $this->requirements($version);
+    }
+
+    private function requirements(CatalogVersion $version): CurriculumRequirementsSummary
+    {
         return new CurriculumRequirementsSummary(
             curriculumVersionId: (int) $version->getKey(),
             programId: (int) $version->subject_id,
@@ -65,6 +70,12 @@ class EloquentCurriculumCatalog implements CurriculumCatalog
             return [];
         }
 
+        return $this->entries($version);
+    }
+
+    /** @return list<BoundCurriculumEntrySummary> */
+    private function entries(CatalogVersion $version): array
+    {
         $curriculum = $version->snapshot['curriculum'] ?? [];
         if (! is_array($curriculum)) {
             return [];
@@ -99,6 +110,30 @@ class EloquentCurriculumCatalog implements CurriculumCatalog
         }
 
         return $entries;
+    }
+
+    public function requirementsForVersions(array $curriculumVersionIds): array
+    {
+        $result = [];
+        foreach (array_chunk(array_values(array_unique($curriculumVersionIds)), 100) as $ids) {
+            foreach (CatalogVersion::query()->where('subject_type', VersionSubject::Program)->whereIn('id', $ids)->get() as $version) {
+                $result[(int) $version->getKey()] = $this->requirements($version);
+            }
+        }
+
+        return $result;
+    }
+
+    public function entriesForVersions(array $curriculumVersionIds): array
+    {
+        $result = [];
+        foreach (array_chunk(array_values(array_unique($curriculumVersionIds)), 100) as $ids) {
+            foreach (CatalogVersion::query()->where('subject_type', VersionSubject::Program)->whereIn('id', $ids)->get() as $version) {
+                $result[(int) $version->getKey()] = $this->entries($version);
+            }
+        }
+
+        return $result;
     }
 
     /**

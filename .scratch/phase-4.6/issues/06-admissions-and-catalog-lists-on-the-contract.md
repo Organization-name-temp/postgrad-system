@@ -48,32 +48,45 @@ rather than the full filter bar, and a 100-row default.
 **Blocked by:** 02 — Query contract foundation; 03 — Export foundation; 04 — batched owner-facade
 derivation used by derived queue values.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] Every Admissions and Catalog collection named above returns the paginated envelope, including
+- [x] Every Admissions and Catalog collection named above returns the paginated envelope, including
       public and personal lookup collections
-- [ ] The Catalog tree, Application timeline, Course/Program version histories, and Program
+- [x] The Catalog tree, Application timeline, Course/Program version histories, and Program
       curriculum retain their complete parent-aggregate response and have no `/export` route
-- [ ] Each declares a filter allowlist, a sort allowlist and its `q` field list, actor-aware
+- [x] Each declares a filter allowlist, a sort allowlist and its `q` field list, actor-aware
       wherever a field is permission-sensitive
-- [ ] Sort accepts comma-separated fields with independent descending markers; search normalizes
+- [x] Sort accepts comma-separated fields with independent descending markers; search normalizes
       Arabic on both sides
-- [ ] Every endpoint appends its stable unique key to the effective sort unless already selected;
+- [x] Every endpoint appends its stable unique key to the effective sort unless already selected;
       adjacent pages neither duplicate nor omit tied rows
-- [ ] Courses filter by Department, level, credit hours, Research Type and active state; `CSE5`
+- [x] Courses filter by Department, level, credit hours, Research Type and active state; `CSE5`
       matches `CSE511`
-- [ ] Programs, Departments and Faculties filter and search bilingually
-- [ ] Dean queues stay faculty-scoped with filters narrowing inside that scope only; an
+- [x] Programs, Departments and Faculties filter and search bilingually
+- [x] Dean queues stay faculty-scoped with filters narrowing inside that scope only; an
       out-of-faculty filter value returns an empty page
-- [ ] Work surfaces gain `<FilterBar>` with URL state; pickers gain a type-ahead and a 100-row
+- [x] Work surfaces gain `<FilterBar>` with URL state; pickers gain a type-ahead and a 100-row
       default
-- [ ] Every named export sibling above exists with a canonical column set, authenticated
+- [x] Every named export sibling above exists with a canonical column set, authenticated
       fetch-to-blob UI, and an Audit Log entry; all four excluded lookup/picker routes return 404
-- [ ] The Courses export column set is the shape ticket 16 will accept as an import template
-- [ ] Every migrated endpoint adds its row to the cross-module contract test dataset
-- [ ] Existing Admissions and Catalog Pest tests are updated to the new envelope and still assert
+- [x] The Courses export column set is the shape ticket 16 will accept as an import template
+- [x] Every migrated endpoint adds its row to the cross-module contract test dataset
+- [x] Existing Admissions and Catalog Pest tests are updated to the new envelope and still assert
       their original authorization behaviour
-- [ ] `openapi.yaml` and the Orval client regenerated and committed; both `api:check` gates pass
-- [ ] Every endpoint documents each `@queryParam`, preserves model-bound `@urlParam ... Example:`,
+- [x] `openapi.yaml` and the Orval client regenerated and committed; both `api:check` gates pass
+- [x] Every endpoint documents each `@queryParam`, preserves model-bound `@urlParam ... Example:`,
       and regenerates deterministic OpenAPI/Orval artifacts
-- [ ] `composer gate` and `npm run gate` green
+- [x] `composer gate` and `npm run gate` green
+
+## Phase 7 prerequisite disposition
+
+This ticket is in the authorized executable closure for Phase 7; its implementation
+is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
+before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
+focused tests, runtime evidence and the fixed review baseline, and
+[the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+outside this goal and are not marked complete by this disposition.

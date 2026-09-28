@@ -9,6 +9,7 @@ use Modules\Enrollment\EnrollmentServiceProvider;
 use Modules\Enrollment\Internal\Enums\CourseStatus;
 use Modules\Enrollment\Internal\Models\CourseOffering;
 use Modules\Enrollment\Internal\Models\Enrollment;
+use Modules\Enrollment\Public\AttendanceSummary;
 use Modules\Enrollment\Public\EnrollmentRecords;
 use Modules\Enrollment\Public\EnrollmentSummary;
 use Modules\Enrollment\Public\OfferingSummary;
@@ -126,6 +127,50 @@ class EloquentEnrollmentRecords implements EnrollmentRecords
         return $enrollments->map(fn (Enrollment $e): EnrollmentSummary => $this->toEnrollmentSummary($e))
             ->values()
             ->all();
+    }
+
+    public function enrollmentsForStudents(array $studentIds): array
+    {
+        $rosters = array_fill_keys($studentIds, []);
+        foreach (array_chunk(array_values(array_unique($studentIds)), 100) as $batch) {
+            foreach (Enrollment::query()->with('offering')->whereIn('student_id', $batch)->orderBy('id')->get() as $enrollment) {
+                $rosters[(int) $enrollment->student_id][] = $this->toEnrollmentSummary($enrollment);
+            }
+        }
+
+        return $rosters;
+    }
+
+    public function attendanceForEnrollments(array $enrollmentIds): array
+    {
+        $summaries = [];
+        foreach (array_chunk(array_values(array_unique($enrollmentIds)), 100) as $batch) {
+            $tallies = AttendanceTallies::forEnrollments($batch);
+            foreach (Enrollment::query()->whereIn('id', $batch)->get() as $enrollment) {
+                $tally = $tallies[(int) $enrollment->id] ?? ['present' => 0, 'recorded' => 0];
+                $block = AttendanceCalculator::block($tally['present'], $tally['recorded'], $enrollment->course_status === CourseStatus::Audit, (float) config('enrollment.attendance.audit_min_percent'));
+                $summaries[(int) $enrollment->id] = new AttendanceSummary((int) $enrollment->id, $tally['present'], $tally['recorded'],
+                    AttendanceCalculator::percentage($tally['present'], $tally['recorded']), $block['at_risk']);
+            }
+        }
+
+        return $summaries;
+    }
+
+    public function enrollmentCountsForStudents(array $studentIds, ?int $semesterId = null): array
+    {
+        $counts = array_fill_keys($studentIds, 0);
+        foreach (array_chunk(array_values(array_unique($studentIds)), 100) as $batch) {
+            $query = Enrollment::query()->whereIn('student_id', $batch);
+            if ($semesterId !== null) {
+                $query->whereHas('offering', fn ($offering) => $offering->where('semester_id', $semesterId));
+            }
+            foreach ($query->select('student_id')->selectRaw('count(*) as aggregate_count')->groupBy('student_id')->get() as $row) {
+                $counts[(int) $row->student_id] = (int) $row->getAttribute('aggregate_count');
+            }
+        }
+
+        return $counts;
     }
 
     /**

@@ -6,6 +6,34 @@
 // messages live in lang/{locale}/validation.php; this file holds only the custom
 // domain messages the Admissions controllers raise directly.
 return [
+    'slot_export' => ['columns' => ['id' => 'Slot ID', 'scheduled_at' => 'Scheduled at', 'duration_minutes' => 'Duration (minutes)', 'mode' => 'Mode', 'location' => 'Location', 'interviewer_id' => 'Interviewer ID', 'interviewer_name' => 'Interviewer', 'is_open' => 'Availability'], 'values' => ['open' => 'Open', 'booked' => 'Booked']],
+    'interview_export_columns' => ['id' => 'Interview ID', 'application_id' => 'Application reference', 'name_en' => 'English name', 'name_ar' => 'Arabic name', 'national_id' => 'National ID / passport', 'degree' => 'Degree', 'status' => 'Confirmation state', 'scheduled_at' => 'Scheduled at', 'duration_minutes' => 'Duration (minutes)', 'mode' => 'Mode', 'location' => 'Location', 'interviewer_id' => 'Interviewer ID', 'interviewer_name' => 'Interviewer', 'evaluation_score' => 'Evaluation score', 'evaluation_notes' => 'Evaluation notes', 'completed_at' => 'Completed at'],
+    'interview_states' => ['pending_confirmation' => 'Pending confirmation', 'confirmed' => 'Confirmed'],
+    'interview_modes' => ['in_person' => 'In person', 'virtual' => 'Virtual'],
+    'cycle_export' => [
+        'columns' => [
+            'id' => 'Admission Cycle ID',
+            'intake_term' => 'Intake term',
+            'year' => 'Year',
+            'name_en' => 'English name',
+            'name_ar' => 'Arabic name',
+            'opens_at' => 'Opens at',
+            'closes_at' => 'Closes at',
+            'is_active' => 'Active state',
+            'is_open' => 'Window state',
+        ],
+        'values' => [
+            'Fall' => 'Fall',
+            'Spring' => 'Spring',
+            'active' => 'Active',
+            'inactive' => 'Inactive',
+            'open' => 'Open',
+            'closed' => 'Closed',
+        ],
+    ],
+
+    'export_columns' => ['id' => 'Application reference', 'name_en' => 'English name', 'name_ar' => 'Arabic name', 'national_id' => 'National ID / passport', 'degree' => 'Degree', 'program' => 'Program', 'status' => 'Status', 'age_days' => 'Days in review', 'date_of_birth' => 'Date of birth', 'nationality' => 'Nationality', 'phone' => 'Phone', 'address' => 'Address', 'finalized_at' => 'Finalized at'],
+    'statuses' => ['draft' => 'Draft', 'submitted' => 'Submitted', 'email_verified' => 'Email verified', 'under_sa_review' => 'Under Student Affairs review', 'sa_approved' => 'Student Affairs approved', 'returned_for_revision' => 'Returned for revision', 'under_dean_review' => 'Under Dean review', 'interview_scheduled' => 'Interview scheduled', 'interview_completed' => 'Interview completed', 'accepted' => 'Accepted', 'conditionally_accepted' => 'Conditionally accepted', 'waitlisted' => 'Waitlisted', 'rejected' => 'Rejected'],
     // Locale-aware separator for lists built in a message (e.g. the missing-documents
     // enumeration) — Arabic uses its own comma, so it must not be hardcoded.
     'list_separator' => ', ',

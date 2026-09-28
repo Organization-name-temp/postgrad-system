@@ -6,7 +6,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  MenuItem,
   Stack,
   TextField,
 } from '@mui/material'
@@ -15,11 +14,10 @@ import { useTranslation } from 'react-i18next'
 import {
   getListDepartmentsQueryKey,
   useCreateADepartment,
-  useListFaculties,
   useUpdateADepartment,
 } from '../../../shared/api/generated/endpoints'
 import type { ListDepartments200DataItem } from '../../../shared/api/generated/endpoints'
-import { pickLocaleName } from '../localeName'
+import { FacultyPicker } from '../FacultyPicker'
 
 interface DepartmentFormDialogProps {
   open: boolean
@@ -34,12 +32,9 @@ interface DepartmentFormDialogProps {
  * departments list and closes; a server validation failure surfaces inline.
  */
 export function DepartmentFormDialog({ open, onClose, department }: DepartmentFormDialogProps) {
-  const { t, i18n } = useTranslation('catalog')
+  const { t } = useTranslation('catalog')
   const queryClient = useQueryClient()
   const isEdit = department !== undefined
-
-  const { data: facultiesData } = useListFaculties()
-  const faculties = facultiesData?.data ?? []
 
   const [facultyId, setFacultyId] = useState('')
   const [code, setCode] = useState('')
@@ -83,20 +78,12 @@ export function DepartmentFormDialog({ open, onClose, department }: DepartmentFo
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {isError && <Alert severity="error">{t('departments.saveError')}</Alert>}
-          <TextField
-            select
+          <FacultyPicker
             label={t('departments.faculty')}
             value={facultyId}
-            onChange={(event) => setFacultyId(event.target.value)}
-            required
-            fullWidth
-          >
-            {faculties.map((faculty) => (
-              <MenuItem key={faculty.id} value={String(faculty.id)}>
-                {pickLocaleName(faculty, i18n.language, faculty.code ?? '')}
-              </MenuItem>
-            ))}
-          </TextField>
+            onChange={setFacultyId}
+            enabled={open}
+          />
           <TextField
             label={t('departments.code')}
             value={code}

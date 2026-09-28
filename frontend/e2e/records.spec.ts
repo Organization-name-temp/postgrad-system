@@ -1,14 +1,8 @@
+import { loginInEnglish as login, selectAuthenticatedLanguage } from './authenticatedLanguage'
+import { auditPresentation } from './presentationAudit'
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Page, type TestInfo } from '@playwright/test'
 
-async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  await page.getByRole('button', { name: 'English', exact: true }).click()
-}
 async function accessible(page: Page) {
   const { violations } = await new AxeBuilder({ page }).analyze()
   expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual([])
@@ -37,6 +31,7 @@ async function open(page: Page, id: number) {
 }
 async function reasonAction(page: Page, button: string, reason: string) {
   await page.getByLabel('Reason', { exact: true }).fill(reason)
+  await auditPresentation(page)
   await page.getByRole('button', { name: button, exact: true }).click()
 }
 async function evidence(page: Page, button: string, reference: string) {
@@ -48,6 +43,7 @@ async function evidence(page: Page, button: string, reference: string) {
       '%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF',
     ),
   })
+  await auditPresentation(page)
   await page.getByRole('button', { name: button, exact: true }).click()
 }
 async function approveAndPay(student: Page, staff: Page, id: number) {
@@ -71,6 +67,7 @@ async function issue(staff: Page, id: number) {
   await expect(staff.locator('article[dir="ltr"]')).toBeVisible()
   await expect(staff.locator('article[dir="rtl"]')).toBeVisible()
   await accessible(staff)
+  await auditPresentation(staff)
   await staff.getByRole('checkbox').check()
   await staff.getByRole('button', { name: 'Certify this reviewed copy' }).click()
   await staff.getByRole('link', { name: 'Official Transcript', exact: true }).click()
@@ -87,7 +84,19 @@ async function checkReadAndPrintMatrix(
   for (const scheme of ['light', 'dark'] as const) {
     for (const language of ['en', 'ar'] as const) {
       await page.evaluate((mode) => localStorage.setItem('mui-mode', mode), scheme)
+      const currentUser = publicView
+        ? undefined
+        : page.waitForResponse(
+            (response) =>
+              new URL(response.url()).pathname === '/api/v1/me' &&
+              response.request().method() === 'GET' &&
+              response.status() === 200,
+          )
       await page.reload()
+      if (currentUser) {
+        const user = (await (await currentUser).json()).data
+        await expect(page.locator('html')).toHaveAttribute('lang', user.preferred_locale)
+      }
       if (publicView) {
         if ((await page.locator('html').getAttribute('lang')) !== language) {
           await page
@@ -95,9 +104,7 @@ async function checkReadAndPrintMatrix(
             .click()
         }
       } else {
-        await page
-          .getByRole('button', { name: language === 'ar' ? 'العربية' : 'English', exact: true })
-          .click()
+        await selectAuthenticatedLanguage(page, language)
       }
       await expect(page.locator('html')).toHaveAttribute('dir', language === 'ar' ? 'rtl' : 'ltr')
       await expect(page.locator('html')).toHaveAttribute('data-mui-color-scheme', scheme)
@@ -155,6 +162,12 @@ async function checkReadAndPrintMatrix(
         colors.every((color) => color === 'rgb(0, 0, 0)'),
         'Dark theme must not print faint or white Transcript text',
       ).toBe(true)
+      await page.pdf({
+        path: testInfo.outputPath(`${name}-print-${scheme}-${language}.pdf`),
+        format: 'A4',
+        printBackground: true,
+        preferCSSPageSize: true,
+      })
       await testInfo.attach(`${name}-print-${scheme}-${language}`, {
         body: await page.screenshot({ fullPage: true }),
         contentType: 'image/png',
@@ -168,7 +181,7 @@ async function checkReadAndPrintMatrix(
 test('Phase 6 serial journey: payment correction, bilingual certification/QR, revocation, full refund and collection', async ({
   browser,
 }, testInfo) => {
-  test.setTimeout(480_000)
+  test.setTimeout(900_000)
   const studentContext = await browser.newContext()
   const staffContext = await browser.newContext()
   const recipientContext = await browser.newContext()
@@ -222,9 +235,9 @@ test('Phase 6 serial journey: payment correction, bilingual certification/QR, re
     await recipient.getByRole('button', { name: 'English', exact: true }).click()
     await student.goto('/records')
     await checkReadAndPrintMatrix(student, 'current', false, testInfo)
-    await student.getByRole('button', { name: 'English', exact: true }).click()
+    await selectAuthenticatedLanguage(student, 'en')
     await checkReadAndPrintMatrix(staff, 'official', false, testInfo)
-    await staff.getByRole('button', { name: 'English', exact: true }).click()
+    await selectAuthenticatedLanguage(staff, 'en')
     await staff.getByLabel('Revocation reason').fill('Fictional learning revocation')
     await staff.getByRole('button', { name: 'Revoke validity' }).click()
     await expect(staff.getByText('Revoked official copy')).toBeVisible()
@@ -237,7 +250,7 @@ test('Phase 6 serial journey: payment correction, bilingual certification/QR, re
     await accessible(recipient)
     await checkReadAndPrintMatrix(recipient, 'public-revoked', true, testInfo, true)
     await checkReadAndPrintMatrix(staff, 'official-revoked', false, testInfo)
-    await staff.getByRole('button', { name: 'English', exact: true }).click()
+    await selectAuthenticatedLanguage(staff, 'en')
 
     const refund = await submitRequest(student, 'digital')
     await approveAndPay(student, staff, refund)

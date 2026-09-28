@@ -1,11 +1,17 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import type { AxiosRequestConfig } from 'axios'
-import '../../../shared/i18n/config' // initialise i18next so useTranslation works
+import i18n from '../../../shared/i18n/config'
 import { ApplicationReviewPage } from './ApplicationReviewPage'
+
+const fixture = vi.hoisted(() => ({ status: 'under_sa_review' }))
+beforeEach(async () => {
+  fixture.status = 'under_sa_review'
+  await i18n.changeLanguage('en')
+})
 
 // A tiny in-memory server behind the shared mutator, so the screen drives the REAL
 // generated hooks (the detail + timeline reads) — proving the page renders the full
@@ -21,7 +27,7 @@ vi.mock('../../../shared/api/http', () => ({
     return Promise.resolve({
       data: {
         id: 1,
-        status: 'under_sa_review',
+        status: fixture.status,
         name_en: 'Sara Applicant',
         national_id: '29001010101010',
         id_type: 'national_id',
@@ -77,3 +83,17 @@ describe('ApplicationReviewPage', () => {
     expect(screen.getByText('3.45')).toBeInTheDocument() // graduation_cgpa
   })
 })
+
+it.each(['accepted', 'under_dean_review'])(
+  'keeps %s records readable without illegal screening actions',
+  async (status) => {
+    fixture.status = status
+    renderPage()
+    expect(await screen.findByRole('heading', { name: 'Sara Applicant' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Approve for Dean review' }),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Return for revision' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Reject' })).not.toBeInTheDocument()
+  },
+)

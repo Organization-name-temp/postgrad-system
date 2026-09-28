@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react'
+import { PublicAuthLayout } from './PublicAuthLayout'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { RequestsPage } from '../features/records/RequestsPage'
@@ -11,6 +12,13 @@ import { FeePage } from '../features/records/FeePage'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RegisterPage } from '../features/admissions/RegisterPage'
 import { RequireAuth } from '../features/auth/RequireAuth'
+import { GraduationReportPage } from '../features/academic-standing/GraduationReportPage'
+import { GraduationStudentListPage } from '../features/academic-standing/GraduationStudentListPage'
+import { TerminationReportPage } from '../features/academic-standing/TerminationReportPage'
+import { TerminationCaseListPage } from '../features/academic-standing/TerminationCaseListPage'
+import { StandingReportPage } from '../features/academic-standing/StandingReportPage'
+import { StandingStudentListPage } from '../features/academic-standing/StandingStudentListPage'
+import { ACADEMIC_REPORT_ROLES } from '../features/academic-standing/academicReportAccess'
 import { FacultiesPage } from '../features/catalog/faculties/FacultiesPage'
 import { DepartmentsPage } from '../features/catalog/departments/DepartmentsPage'
 import { ProgramsPage } from '../features/catalog/programs/ProgramsPage'
@@ -20,6 +28,7 @@ import { CourseEditPage } from '../features/catalog/courses/CourseEditPage'
 import { CatalogTreePage } from '../features/catalog/tree/CatalogTreePage'
 import { ApplyPage } from '../features/admissions/wizard/ApplyPage'
 import { ScreeningQueuePage } from '../features/admissions/screening/ScreeningQueuePage'
+import { ApplicationPipelineReportPage } from '../features/admissions/reports/ApplicationPipelineReportPage'
 import { ApplicationReviewPage } from '../features/admissions/screening/ApplicationReviewPage'
 import { DeanQueuePage } from '../features/admissions/dean/DeanQueuePage'
 import { DeanReviewPage } from '../features/admissions/dean/DeanReviewPage'
@@ -84,8 +93,10 @@ export function App() {
       <AppThemeProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+            <Route element={<PublicAuthLayout />}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+            </Route>
             <Route path="/records/verify/:token" element={<PublicVerificationPage />} />
             {StyleGallery && (
               <Route
@@ -275,6 +286,39 @@ export function App() {
                     behalf. Gated on courses.register_for_student (nav + API); an Advisor's
                     picker is scoped to their advisees, Student Affairs sees all. */}
                 <Route path="/registration/on-behalf" element={<ComposeForStudentPage />} />
+                <Route element={<RequireAuth permission={PERMISSION.screenApplications} />}>
+                  <Route
+                    path="/analytics/application-pipeline"
+                    element={<ApplicationPipelineReportPage />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <RequireAuth
+                      permission={PERMISSION.monitorAcademicStanding}
+                      roles={ACADEMIC_REPORT_ROLES}
+                    />
+                  }
+                >
+                  <Route path="/analytics/termination" element={<TerminationReportPage />} />
+                  <Route
+                    path="/analytics/termination/cases"
+                    element={<TerminationCaseListPage />}
+                  />
+                  <Route
+                    path="/analytics/graduation-readiness"
+                    element={<GraduationReportPage />}
+                  />
+                  <Route
+                    path="/analytics/graduation-readiness/students"
+                    element={<GraduationStudentListPage />}
+                  />
+                  <Route path="/analytics/academic-standing" element={<StandingReportPage />} />
+                  <Route
+                    path="/analytics/academic-standing/students"
+                    element={<StandingStudentListPage />}
+                  />
+                </Route>
                 <Route path="/screening" element={<ScreeningQueuePage />} />
                 <Route path="/screening/:applicationId" element={<ApplicationReviewPage />} />
                 <Route path="/dean" element={<DeanQueuePage />} />

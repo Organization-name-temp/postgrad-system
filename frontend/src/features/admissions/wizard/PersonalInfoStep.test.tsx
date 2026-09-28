@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
@@ -259,3 +259,45 @@ describe('PersonalInfoStep academic scores (ticket 07)', () => {
     expect(calls.list.some((url) => url.includes('/application/submit'))).toBe(false)
   }, 15000)
 })
+
+it.each(['en', 'ar'] as const)(
+  'keeps scale guidance readable while GPA inputs are disabled in %s',
+  async (locale) => {
+    const { default: i18n } = await import('../../../shared/i18n/config')
+    await i18n.changeLanguage(locale)
+    try {
+      renderStep()
+      const guidance = screen.getAllByText(i18n.t('admissions:personalInfo.gpaScaleFirst'))
+      expect(guidance).toHaveLength(2)
+      for (const hint of guidance) expect(hint).not.toHaveClass('Mui-disabled')
+      expect(
+        screen.getByLabelText(i18n.t('admissions:personalInfo.fields.graduation_gpa'), {
+          exact: false,
+        }),
+      ).toBeDisabled()
+    } finally {
+      await act(() => i18n.changeLanguage('en'))
+    }
+  },
+)
+
+it.each(['en', 'ar'] as const)(
+  'keeps English-test guidance readable when None disables the score in %s',
+  async (locale) => {
+    const { default: i18n } = await import('../../../shared/i18n/config')
+    await i18n.changeLanguage(locale)
+    try {
+      renderStep({ ...COMPLETE, english_test: 'None' })
+      expect(screen.getByText(i18n.t('admissions:personalInfo.scoreHelp'))).not.toHaveClass(
+        'Mui-disabled',
+      )
+      expect(
+        screen.getByLabelText(i18n.t('admissions:personalInfo.fields.english_score'), {
+          exact: false,
+        }),
+      ).toBeDisabled()
+    } finally {
+      await act(() => i18n.changeLanguage('en'))
+    }
+  },
+)

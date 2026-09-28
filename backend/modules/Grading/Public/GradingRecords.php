@@ -27,12 +27,38 @@ interface GradingRecords
     public function effectiveAttemptsForStudent(int $studentId): array;
 
     /**
+     * Same authoritative Attempt selection, acquired in bounded owner batches.
+     * Every requested Student has a list, including Students with no finalized grade.
+     *
+     * @param  list<int>  $studentIds
+     * @return array<int, list<EffectiveAttemptSummary>>
+     */
+    public function effectiveAttemptsForStudents(array $studentIds): array;
+
+    /**
      * The Student's CGPA: `Σ(GPA points × credit hours) ÷ Σ(credit hours)` over their
      * CGPA-counting, non-superseded, graded Enrollments (spec §GPA and CGPA). `null` — never
      * `0.00` — when the Student has no CGPA-counting graded Enrollment yet, so a new record
      * never reads as a catastrophic one.
      */
     public function cgpaFor(int $studentId): ?float;
+
+    /**
+     * Same owner calculation over bounded authorized candidate rosters. Every
+     * requested id has a value; no counting grade is represented by null.
+     *
+     * @param  list<int>  $studentIds
+     * @return array<int, float|null>
+     */
+    public function cgpaForStudents(array $studentIds): array;
+
+    /**
+     * Frequency of each rounded CGPA, with an explicit ungraded category.
+     *
+     * @param  list<int>  $studentIds
+     * @return array<string, int> sorted numeric values followed by ungraded
+     */
+    public function cgpaDistributionForStudents(array $studentIds): array;
 
     /**
      * The same formula restricted to one Semester's Enrollments, from the same

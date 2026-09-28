@@ -180,29 +180,36 @@ it('shows locked evidence, immutable verification history, and the Council outco
   expect(screen.getByRole('button', { name: 'legacy-transcript.pdf' })).toBeInTheDocument()
 })
 
-it('reports a transcript download failure without leaving an unhandled rejection', async () => {
-  api.downloadError = true
-  api.requests = [
-    {
-      id: 7,
-      target_course_code: 'CSE-511',
-      prior_course_code: 'CSE-411',
-      prior_course_level: 400,
-      prior_result_source: 'legacy_transcript',
-      prior_letter_grade: 'B',
-      evidence: {
-        source: 'legacy_transcript',
-        official_transcript_document_ids: ['01ARZ3NDEKTSV4RRFFQ69G5FAW'],
+it.each([
+  ['en', 'The transcript could not be downloaded. Refresh and try again.'],
+  ['ar', 'تعذّر تنزيل كشف الدرجات. حدّث الصفحة وحاول مرة أخرى.'],
+] as const)(
+  'reports a transcript download failure in %s without an unhandled rejection',
+  async (locale, message) => {
+    await i18n.changeLanguage(locale)
+    api.downloadError = true
+    api.requests = [
+      {
+        id: 7,
+        target_course_code: 'CSE-511',
+        prior_course_code: 'CSE-411',
+        prior_course_level: 400,
+        prior_result_source: 'legacy_transcript',
+        prior_letter_grade: 'B',
+        evidence: {
+          source: 'legacy_transcript',
+          official_transcript_document_ids: ['01ARZ3NDEKTSV4RRFFQ69G5FAW'],
+        },
+        status: 'Approved',
+        revision: 1,
+        editable: false,
+        transitions: [],
       },
-      status: 'Approved',
-      revision: 1,
-      editable: false,
-      transitions: [],
-    },
-  ]
-  renderPage()
+    ]
+    renderPage(locale)
 
-  fireEvent.click(await screen.findByRole('button', { name: 'legacy-transcript.pdf' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'legacy-transcript.pdf' }))
 
-  expect(await screen.findByRole('alert')).toHaveTextContent(/could not be downloaded/i)
-})
+    expect(await screen.findByRole('alert')).toHaveTextContent(message)
+  },
+)

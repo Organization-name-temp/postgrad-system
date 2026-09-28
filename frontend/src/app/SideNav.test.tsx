@@ -119,6 +119,65 @@ function renderRealNav() {
   )
 }
 
+it('reveals Analytics only when an owner Report gate is held', () => {
+  mockedUseAuth.mockReturnValue(
+    authState({ hasPermission: (permission) => permission === 'application.screen' }),
+  )
+  const shown = renderRealNav()
+  expect(screen.getByText('Analytics')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: 'Application Pipeline' })).toHaveAttribute(
+    'href',
+    '/analytics/application-pipeline',
+  )
+  shown.unmount()
+  mockedUseAuth.mockReturnValue(authState({ hasPermission: () => false }))
+  renderRealNav()
+  expect(screen.queryByText('Analytics')).not.toBeInTheDocument()
+})
+
+it.each(['R03', 'R05', 'R06', 'R07', 'R08', 'R09', 'R10'])(
+  'shows current Standing Analytics to an eligible %s permission holder',
+  (role) => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        hasPermission: (permission) => permission === 'standing.monitor',
+        hasRole: (candidate) => candidate === role,
+      }),
+    )
+    renderRealNav()
+    expect(screen.getByRole('link', { name: 'Academic Standing Report' })).toHaveAttribute(
+      'href',
+      '/analytics/academic-standing',
+    )
+    expect(screen.getByRole('link', { name: 'Termination Report' })).toHaveAttribute(
+      'href',
+      '/analytics/termination',
+    )
+    expect(screen.getByRole('link', { name: 'Graduation Readiness Report' })).toHaveAttribute(
+      'href',
+      '/analytics/graduation-readiness',
+    )
+  },
+)
+
+it.each(['R02', 'R04'])(
+  'hides cohort Standing Analytics from a %s-only permission holder',
+  (role) => {
+    mockedUseAuth.mockReturnValue(
+      authState({
+        hasPermission: (permission) => permission === 'standing.monitor',
+        hasRole: (candidate) => candidate === role,
+      }),
+    )
+    renderRealNav()
+    expect(screen.queryByRole('link', { name: 'Academic Standing Report' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Termination Report' })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('link', { name: 'Graduation Readiness Report' }),
+    ).not.toBeInTheDocument()
+  },
+)
+
 describe('SideNav — persona gating (ticket 11)', () => {
   beforeEach(() => vi.clearAllMocks())
 

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import i18n from '../../shared/i18n/config'
 import { RequireAuth } from './RequireAuth'
 import { useAuth } from './useAuth'
 import type { UseAuth } from './useAuth'
@@ -60,7 +61,8 @@ function renderRoleGuard(roles: readonly string[]) {
 }
 
 describe('RequireAuth', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('en')
     vi.clearAllMocks()
   })
 
@@ -90,6 +92,13 @@ describe('RequireAuth', () => {
     expect(screen.getByLabelText('Checking your session')).toBeInTheDocument()
     expect(screen.queryByText('Secret dashboard')).not.toBeInTheDocument()
     expect(screen.queryByText('Login screen')).not.toBeInTheDocument()
+  })
+
+  it('labels session loading in Arabic', async () => {
+    await i18n.changeLanguage('ar')
+    mockedUseAuth.mockReturnValue(authState({ isPending: true }))
+    renderGuard()
+    expect(screen.getByRole('progressbar', { name: 'جارٍ التحقق من جلستك' })).toBeInTheDocument()
   })
 
   it('renders the route when the required permission is held', () => {

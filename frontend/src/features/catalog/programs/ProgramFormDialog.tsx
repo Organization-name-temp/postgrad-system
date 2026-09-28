@@ -18,11 +18,10 @@ import {
   getListProgramsQueryKey,
   getShowAProgramQueryKey,
   useCreateAProgram,
-  useListDepartments,
   useUpdateAProgram,
 } from '../../../shared/api/generated/endpoints'
 import type { ListPrograms200DataItem } from '../../../shared/api/generated/endpoints'
-import { pickLocaleName } from '../localeName'
+import { DepartmentPicker } from '../DepartmentPicker'
 import { DEGREE_LEVELS } from './degreeLevels'
 
 interface ProgramFormDialogProps {
@@ -44,12 +43,9 @@ const DEFAULT_CH = { prep: '6', core: '6', elective: '9' } as const
  * failure surfaces inline.
  */
 export function ProgramFormDialog({ open, onClose, program }: ProgramFormDialogProps) {
-  const { t, i18n } = useTranslation('catalog')
+  const { t } = useTranslation('catalog')
   const queryClient = useQueryClient()
   const isEdit = program !== undefined
-
-  const { data: departmentsData } = useListDepartments()
-  const departments = departmentsData?.data ?? []
 
   const [departmentId, setDepartmentId] = useState('')
   const [code, setCode] = useState('')
@@ -137,20 +133,12 @@ export function ProgramFormDialog({ open, onClose, program }: ProgramFormDialogP
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {isError && <Alert severity="error">{t('programs.saveError')}</Alert>}
-          <TextField
-            select
+          <DepartmentPicker
             label={t('programs.department')}
             value={departmentId}
-            onChange={(event) => setDepartmentId(event.target.value)}
-            required
-            fullWidth
-          >
-            {departments.map((department) => (
-              <MenuItem key={department.id} value={String(department.id)}>
-                {pickLocaleName(department, i18n.language, department.code ?? '')}
-              </MenuItem>
-            ))}
-          </TextField>
+            onChange={setDepartmentId}
+            enabled={open}
+          />
           <TextField
             label={t('programs.code')}
             value={code}

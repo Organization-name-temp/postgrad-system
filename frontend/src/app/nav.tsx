@@ -34,6 +34,7 @@ import GroupsIcon from '@mui/icons-material/Groups'
 import type { NavItem } from './SideNav'
 import { PERMISSION } from '../shared/access/permissions'
 import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
+import { ACADEMIC_REPORT_ROLES } from '../features/academic-standing/academicReportAccess'
 
 /**
  * The app's navigation destinations, classified two ways (ADR-0015, ticket 11):
@@ -50,6 +51,37 @@ import { ROLE, ADMIN_ROLES } from '../shared/access/roles'
  * `/style` gallery link is added by the ticket that builds that route.
  */
 export const navItems: NavItem[] = [
+  {
+    key: 'terminationReport',
+    to: '/analytics/termination',
+    icon: <DonutLargeIcon />,
+    permission: PERMISSION.monitorAcademicStanding,
+    roles: ACADEMIC_REPORT_ROLES,
+    section: 'analytics',
+  },
+  {
+    key: 'graduationReadinessReport',
+    to: '/analytics/graduation-readiness',
+    icon: <DonutLargeIcon />,
+    permission: PERMISSION.monitorAcademicStanding,
+    roles: ACADEMIC_REPORT_ROLES,
+    section: 'analytics',
+  },
+  {
+    key: 'standingReport',
+    to: '/analytics/academic-standing',
+    icon: <DonutLargeIcon />,
+    permission: PERMISSION.monitorAcademicStanding,
+    roles: ACADEMIC_REPORT_ROLES,
+    section: 'analytics',
+  },
+  {
+    key: 'applicationPipeline',
+    to: '/analytics/application-pipeline',
+    icon: <DonutLargeIcon />,
+    permission: PERMISSION.screenApplications,
+    section: 'analytics',
+  },
   {
     key: 'transcript',
     to: '/records',

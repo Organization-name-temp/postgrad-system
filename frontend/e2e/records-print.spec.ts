@@ -1,13 +1,13 @@
+import {
+  loginInEnglish as loginWithSavedPreference,
+  selectAuthenticatedLanguage,
+} from './authenticatedLanguage'
 import { expect, test } from '@playwright/test'
 
 test('dark theme prints all Transcript text legibly on white paper', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('mui-mode', 'dark'))
-  await page.goto('/login')
-  await page.getByLabel('Email').fill('student.smoke@seed.ejust.test')
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  await page.getByRole('button', { name: 'English', exact: true }).click()
+  await loginWithSavedPreference(page, 'student.smoke@seed.ejust.test')
+  await selectAuthenticatedLanguage(page, 'en')
   await page.goto('/records')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15_000 })
   await expect(page.getByText('31000000000004')).toBeVisible()

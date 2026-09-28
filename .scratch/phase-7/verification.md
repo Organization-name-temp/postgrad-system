@@ -1,0 +1,109 @@
+# Phase 7 verification and human demo
+
+Branch: `phase-7-academic-reports-bilingual`.
+Fixed consolidated-review baseline: `b3a3ae7b71538c36230985270de2b73bc2f92088`.
+Detailed chronological evidence and prerequisite dispositions:
+[tracker](tracker.md). Presentation coverage/defects: [audit](bilingual-audit.md).
+
+## Reproduction
+
+Start PostgreSQL with `docker compose up -d`. From `backend/`, prepare the fictional
+fixture with `php artisan migrate:fresh --seed --force`; do not reseed during a
+browser suite. Serve Laravel and Vite normally, or let Playwright manage their
+configured ports. If another app owns 5173, run the frontend gate with
+`PLAYWRIGHT_WEB_PORT=5177 PLAYWRIGHT_API_PORT=18001` and a
+`SANCTUM_STATEFUL_DOMAINS` value containing `localhost:5177`. The test config
+requires the selected servers to start on those exact ports, so it cannot reuse
+a foreign app. All seeded accounts below use password `password`.
+
+1. Sign in as Advisor `r03@ejust.test`. Open Analytics → Academic Standing.
+   Search `Phase 7 report`; the isolated owner-derived cohort contains three
+   Students. Switch to Arabic and back; the URL and populated criteria persist.
+2. Show the exact chart table and use keyboard Enter on **Termination Pending**.
+   The Student List contains the same three Students. Download the full filtered
+   workbook; verify its rows and string Student identifiers. Follow a Student's
+   authorized Grades link, then return to the bookmarked Report.
+3. Open Graduation Readiness with the same search. Use **Not academically ready**
+   to drill into the same cohort. Verify typed owner blockers, null versus numeric
+   CGPA and the export. This is advisory readiness, not formal graduation.
+4. Open Termination with the same search. Observe **three Cases / three Students**.
+   Drill through **Flagged: awaiting Advisor assessment**, export the selection,
+   and follow **Open authorized review workflow**. The oversight List contains no
+   private narrative or evidence. The operational queue remains independently
+   authorized and scoped; no Report read makes a workflow transition.
+5. Compare Student `r02@ejust.test` (no Analytics Report gate), Dean
+   `r07@ejust.test` (faculty scope) and Student Affairs `r05@ejust.test` (authorized
+   oversight). Report filters only narrow the server-derived population.
+6. For each Report, review EN and AR in both themes at narrow/wide widths. Print
+   A4 portrait: title, effective named criteria, chart and exact data table remain
+   readable; navigation/actions disappear. Compare monochrome presentation too.
+7. Inspect the documented existing-surface audit, especially Applicant populated
+   forms, Catalog curriculum/history dialogs, academic review queues and Records
+   payment/evidence actions. Check Arabic copy naturally with a human reader.
+8. Retain the Records service demo: review both official preview languages before
+   certification, inspect watermark/seal and unmirrored bearer QR, then revoke.
+   Public valid access shows the issued snapshot; revoked access shows reference
+   and status only; an invalid token shows no private snapshot.
+
+## Native verification
+
+- All three academic Reports: independent four-state serial Report/List/export/
+  keyboard/axe/print journeys passed during implementation.
+- Headline: `e2e/phase7-headline.spec.ts` passed, with workbook readback and exact
+  membership agreement, EN/AR continuity and authorized detail/review.
+- Existing-surface core matrix: all nine groups passed their four states.
+- Public auth 4, Catalog details 4 and workflow details 24 passed, including
+  390/1280px page fit and populated form continuity.
+- Records service/invalid verifier acceptance slice: six tests passed in 5.0m.
+  Actual current, official, valid-public and revoked A4 PDFs generated in all four
+  states. In the latest expanded fixture, current EN uses one page and current
+  AR uses two; public revoked uses one and full issued snapshots use two.
+  Native EN/AR paper inspection includes continuation headers, watermark, seal,
+  QR placement and dark-theme black text.
+- Backend gate: passed completely (1,329 tests / 8,421 assertions plus static
+  and generated OpenAPI checks). The post-review final rerun passed completely:
+  **1,334 tests / 8,458 assertions (790.42s), terminal exit 0**.
+- Expanded owner presentation checks passed: Admissions 4.6m and seven remaining
+  correction/Enrollment/headline/Records checks in 15.2m.
+- Frontend gate: **GREEN, terminal exit 0**. Final API/static stages, **121 files /
+  684 unit tests (549.45s)** and **179 serial browser tests (1.1h)** passed. The previous complete
+  attempt had 178 browser passes and one Records locale assertion failure; the
+  reload-preference fix passed the complete affected Records journey (9.5m).
+  Full gate artifacts are retained under ignored `final-gate-artifacts/`. The
+  additional CI timing regression was added after this run discovered its tests.
+  It and the complete affected Enrollment/Records workflows passed together:
+  **3/3 (12.4m), exit 0** at `12c7c9a`, including fix `c1dbe1c`. All 180 current
+  distinct browser tests have evidence; no single 180-test gate run is claimed.
+- GitHub run [36360347596](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36360347596):
+  backend and frontend jobs passed, matching the 1,334/684 test counts. Browser
+  stage finished 177/179, with two label-colour assertions during theme transition.
+  A real MUI probe and RED/GREEN native regression establish the correction at
+  `c1dbe1c`: wait for finite presentation animations before scans and after audit
+  restoration. Static format and 180-test discovery pass. Affected Enrollment/
+  Records rechecks passed (3/3 with new regression, 12.4m, exit 0). A remote run
+  containing this correction remains pending publication; the no-push instruction
+  prevents agent publication, and the existing failed run is not reported green.
+- Consolidated Standards/Spec review: one native run with resolution follow-ups, five actionable findings
+  fixed and confirmed resolved. [Review evidence](review.md) includes separate
+  axes, requirements, test-first fixes and verification.
+
+## Human acceptance
+
+Native verification is not human acceptance. Phase 7 remains unaccepted until
+its headline demo, Arabic wording and browser paper presentation receive the
+required human review. No push, merge, deployment or external runner is authorized.
+
+## Fixture and publication dispositions
+
+GeneratedCohortSeeder preserves named rosters using isolated staff. The necessary
+Phase 7 worked layer reuses MSC-CE/two existing Courses, isolates its Instructor
+and adds three advisees/open Cases to r03 plus departmental work to r06. Original
+persona/Student records are retained; global work populations are expanded rather
+than claimed identical to the baseline. This permitted addition is reflected in
+[the resolved review](review.md).
+
+GitHub CI is **not yet confirmed green at the fix revision**. The latest remote
+run's backend/frontend passed and browser failed 2/179 on pre-fix source. Local
+RED/GREEN reproduction, unchanged contrast assertions and full affected workflows
+verify the correction, but remote confirmation requires publication. No push,
+merge or old-source retry was performed.

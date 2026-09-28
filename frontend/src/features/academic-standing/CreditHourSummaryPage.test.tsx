@@ -154,3 +154,39 @@ it('renders the same accounting labels in Arabic RTL', async () => {
   expect(screen.getByRole('heading', { name: 'ملخص الساعات المعتمدة' })).toBeInTheDocument()
   expect(screen.getByRole('columnheader', { name: 'مستوفى' })).toBeInTheDocument()
 })
+
+it.each(['en', 'ar'])('exposes named loading statuses accessibly in %s', async (locale) => {
+  await i18n.changeLanguage(locale)
+  mockedQuery.mockReturnValue({ isPending: true, isError: false } as ReturnType<
+    typeof useMyTargetAwareCreditHourSummary
+  >)
+  mockedStanding.mockReturnValue({ isPending: true, isError: false } as ReturnType<
+    typeof useMyCurrentAcademicStandingAndObservationHistory
+  >)
+  mockedReadiness.mockReturnValue({ isPending: true, isError: false } as ReturnType<
+    typeof useMyDerivedGraduationReadiness
+  >)
+  mockedTermination.mockReturnValue({ isPending: true, isError: false } as ReturnType<
+    typeof useGetApiV1TerminationCasesMine
+  >)
+  mockedRemediation.mockReturnValue({ isPending: true, isError: false } as ReturnType<
+    typeof useGetApiV1RegistrationRemediationObligations
+  >)
+
+  render(
+    <ThemeProvider theme={theme}>
+      <CreditHourSummaryPage />
+    </ThemeProvider>,
+  )
+  for (const key of [
+    'standing.loading',
+    'readiness.loading',
+    'termination.loading',
+    'remediation.loading',
+    'creditHours.loading',
+  ]) {
+    expect(
+      screen.getByRole('status', { name: i18n.t(key, { ns: 'academicStanding' }) }),
+    ).toBeInTheDocument()
+  }
+})

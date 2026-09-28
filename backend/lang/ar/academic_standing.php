@@ -8,6 +8,41 @@ return [
     'student_required' => 'لا يوجد لك سجل طالب.',
     'student_missing' => 'الطالب غير موجود.',
     'curriculum_unavailable' => 'نسخة الخطة الدراسية المرتبطة غير متاحة.',
+    'report' => [
+        'headers' => [
+            'student_id' => 'معرّف الطالب', 'university_id' => 'الرقم الجامعي',
+            'name_en' => 'اسم الطالب بالإنجليزية', 'name_ar' => 'اسم الطالب بالعربية',
+            'program_code' => 'رمز البرنامج', 'program' => 'البرنامج', 'degree_level' => 'الدرجة العلمية',
+            'lifecycle' => 'حالة القيد', 'cgpa' => 'المعدل التراكمي', 'standing' => 'الوضع الأكاديمي',
+            'explanation' => 'التفسير', 'unavailable' => 'البيانات غير المتاحة',
+        ],
+        'standings' => [
+            'TerminationPending' => 'إنهاء القيد قيد النظر', 'NotYetAssessed' => 'لم يُقيّم بعد',
+            'AcademicProbation' => 'المراقبة الأكاديمية', 'AcademicWarning' => 'تحذير أكاديمي',
+            'GoodStanding' => 'وضع أكاديمي جيد',
+        ],
+        'explanations' => [
+            'termination_pending' => 'توجد حالة إنهاء قيد مفتوحة تستدعي الإجراء.',
+            'no_finalized_cgpa_grade' => 'لا توجد درجة نهائية محتسبة في المعدل التراكمي بعد.',
+            'cgpa_below_minimum' => 'المعدل التراكمي أقل من الحد الأدنى.',
+            'effective_grade_below_c_plus' => 'توجد درجة سارية أقل من C+.',
+            'requirements_met' => 'متطلبات الوضع الأكاديمي الحالي مستوفاة.',
+        ],
+        'lifecycle' => ['Active' => 'نشط', 'Terminated' => 'تم إنهاء القيد'],
+        'degrees' => ['MSc' => 'ماجستير', 'PhD' => 'دكتوراه'],
+        'unavailable' => ['program' => 'البرنامج غير متاح', 'student_name' => 'اسم الطالب غير متاح'],
+    ],
+    'graduation_report' => [
+        'headers' => ['readiness' => 'جاهزية أكاديمية استرشادية', 'remaining_ch' => 'الساعات المعتمدة المتبقية', 'cgpa' => 'المعدل التراكمي', 'approaching' => 'الاقتراب من التخرج (دون جدول مقترح)', 'blockers' => 'العوائق (متداخلة)', 'advisory' => 'الحالة الاسترشادية', 'unavailable' => 'البيانات غير المتاحة'],
+        'groups' => ['ready' => 'جاهز أكاديميًا (استرشادي)', 'not_ready' => 'غير جاهز أكاديميًا', 'unavailable' => 'جاهزية التخرج غير متاحة'],
+        'boolean' => ['yes' => 'نعم', 'no' => 'لا'],
+        'blockers' => ['RemainingRequirements' => 'متطلبات خطة دراسية متبقية', 'CgpaUnavailable' => 'المعدل التراكمي غير متاح', 'CgpaBelowMinimum' => 'المعدل التراكمي أقل من الحد الأدنى', 'TerminationPending' => 'حالة إنهاء قيد تستدعي الإجراء قيد النظر'],
+        'advisory' => ['Active' => 'معلومات أكاديمية استرشادية؛ ليست موافقة رسمية على التخرج', 'Terminated' => 'معلومات تاريخية استرشادية؛ الطالب غير مؤهل حاليًا للتخرج'],
+    ],
+    'termination_report' => [
+        'headers' => ['state' => 'مرحلة المراجعة / النتيجة', 'created_at' => 'إنشاء الحالة (UTC)', 'advisor_reviewed_at' => 'تقييم المرشد (UTC)', 'department_head_reviewed_at' => 'مراجعة رئيس القسم (UTC)', 'council_decided_at' => 'قرار المجلس (UTC)', 'closed_at' => 'إغلاق الحالة (UTC)', 'unavailable' => 'البيانات غير المتاحة'],
+        'states' => ['AwaitingAdvisor' => 'رصد حالة بانتظار تقييم المرشد', 'AwaitingDepartmentHead' => 'تقييم المرشد بانتظار مراجعة رئيس القسم', 'AwaitingCouncil' => 'توصية بانتظار قرار المجلس', 'Dismissed' => 'مرفوضة', 'Terminated' => 'تم إنهاء القيد', 'TriggerCleared' => 'زوال سبب الإجراء', 'EvidenceChanged' => 'تغيّرت الأدلة / حالة مستبدلة'],
+    ],
     'exports' => [
         'headers' => [
             'case_id' => 'رقم الحالة',

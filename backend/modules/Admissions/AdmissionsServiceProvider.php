@@ -13,8 +13,10 @@ use Modules\Admissions\Internal\Console\Commands\SendInterviewReminders;
 use Modules\Admissions\Internal\Enrollment\EloquentAcceptedStudentIdentifications;
 use Modules\Admissions\Internal\Enrollment\EloquentAdmissionDocuments;
 use Modules\Admissions\Internal\Listeners\SendAcceptanceNotification;
+use Modules\Admissions\Internal\Support\ScopedApplicationPipelines;
 use Modules\Admissions\Public\AcceptedStudentIdentifications;
 use Modules\Admissions\Public\AdmissionDocuments;
+use Modules\Admissions\Public\ApplicationPipelines;
 use Modules\Admissions\Public\Events\AdmissionAccepted;
 
 class AdmissionsServiceProvider extends ServiceProvider
@@ -23,6 +25,7 @@ class AdmissionsServiceProvider extends ServiceProvider
     {
         $this->app->bind(AcceptedStudentIdentifications::class, EloquentAcceptedStudentIdentifications::class);
         $this->app->bind(AdmissionDocuments::class, EloquentAdmissionDocuments::class);
+        $this->app->bind(ApplicationPipelines::class, ScopedApplicationPipelines::class);
     }
 
     public function boot(): void

@@ -19,7 +19,7 @@ import BlockIcon from '@mui/icons-material/Block'
 import DownloadIcon from '@mui/icons-material/Download'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { z } from 'zod'
 import {
   useGetApiV1TerminationCasesAdvisor,
@@ -102,7 +102,7 @@ export function TerminationReviewQueuePage({ stage }: { stage: Stage }) {
         </Alert>
       )}
       {query.isPending && (
-        <Stack spacing={2} aria-label={t('termination.review.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('termination.review.loading')}>
           <Skeleton variant="rounded" height={260} />
           <Skeleton variant="rounded" height={260} />
         </Stack>
@@ -183,13 +183,23 @@ function TerminationCaseCard({
     >
       <Stack spacing={2}>
         <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 1 }}>
-          <Typography variant="h6" dir="ltr">
-            {t('termination.review.student', { id: row.student_id })}
+          <Typography variant="h6">
+            <Trans
+              ns="academicStanding"
+              i18nKey="termination.review.student"
+              values={{ id: row.student_id }}
+              components={{ id: <bdi dir="ltr" /> }}
+            />
           </Typography>
           <Chip label={t(`termination.states.${row.state}`)} />
         </Stack>
-        <Typography variant="body2" dir="ltr" sx={{ overflowWrap: 'anywhere' }}>
-          {t('termination.review.fingerprint', { value: row.fingerprint })}
+        <Typography variant="body2" sx={{ overflowWrap: 'anywhere' }}>
+          <Trans
+            ns="academicStanding"
+            i18nKey="termination.review.fingerprint"
+            values={{ value: row.fingerprint }}
+            components={{ value: <bdi dir="ltr" /> }}
+          />
         </Typography>
         <Stack spacing={0.5}>
           <Typography variant="subtitle2">{t('termination.review.evidenceTitle')}</Typography>

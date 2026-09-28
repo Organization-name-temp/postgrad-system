@@ -183,7 +183,7 @@ export function TransfersPage() {
       </Stack>
 
       {state === 'loading' && (
-        <Stack spacing={2} aria-label={t('transfers.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('transfers.loading')}>
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(27.5) })} />
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(27.5) })} />
         </Stack>

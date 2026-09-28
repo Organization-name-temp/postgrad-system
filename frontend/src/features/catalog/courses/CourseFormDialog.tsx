@@ -18,14 +18,13 @@ import {
   getListCoursesQueryKey,
   getShowACourseQueryKey,
   useCreateACourse,
-  useListDepartments,
   useUpdateACourse,
 } from '../../../shared/api/generated/endpoints'
 import type {
   CreateACourseBody,
   ListCourses200DataItem,
 } from '../../../shared/api/generated/endpoints'
-import { pickLocaleName } from '../localeName'
+import { DepartmentPicker } from '../DepartmentPicker'
 import { COURSE_LEVELS } from './courseLevels'
 import { RESEARCH_TYPES } from './researchTypes'
 
@@ -57,14 +56,12 @@ const NO_RESEARCH_TYPE = ''
  * inline.
  */
 export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProps) {
-  const { t, i18n } = useTranslation('catalog')
+  const { t } = useTranslation('catalog')
   const queryClient = useQueryClient()
   const isEdit = course !== undefined
 
-  const { data: departmentsData } = useListDepartments()
-  const departments = departmentsData?.data ?? []
-
   const [departmentId, setDepartmentId] = useState<string>(UNIVERSITY_WIDE)
+  const [departmentSearching, setDepartmentSearching] = useState(false)
   const [code, setCode] = useState('')
   const [nameEn, setNameEn] = useState('')
   const [nameAr, setNameAr] = useState('')
@@ -77,6 +74,7 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
 
   useEffect(() => {
     if (open) {
+      setDepartmentSearching(false)
       setDepartmentId(
         course?.department_id != null ? String(course.department_id) : UNIVERSITY_WIDE,
       )
@@ -142,6 +140,7 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
 
   const chFilled = (value: string) => value.trim() !== '' && Number(value) >= 0
   const isComplete =
+    !departmentSearching &&
     code.trim() !== '' &&
     nameEn.trim() !== '' &&
     nameAr.trim() !== '' &&
@@ -164,20 +163,14 @@ export function CourseFormDialog({ open, onClose, course }: CourseFormDialogProp
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {isError && <Alert severity="error">{t('courses.saveError')}</Alert>}
-          <TextField
-            select
+          <DepartmentPicker
             label={t('courses.department')}
             value={departmentId}
-            onChange={(event) => setDepartmentId(event.target.value)}
-            fullWidth
-          >
-            <MenuItem value={UNIVERSITY_WIDE}>{t('courses.universityWide')}</MenuItem>
-            {departments.map((department) => (
-              <MenuItem key={department.id} value={String(department.id)}>
-                {pickLocaleName(department, i18n.language, department.code ?? '')}
-              </MenuItem>
-            ))}
-          </TextField>
+            onChange={setDepartmentId}
+            noneLabel={t('courses.universityWide')}
+            onSearchChange={setDepartmentSearching}
+            enabled={open}
+          />
           <TextField
             label={t('courses.code')}
             value={code}

@@ -161,3 +161,17 @@ export const motion = {
   duration: { fast: 100, base: 200, slow: 300 },
   easing: 'cubic-bezier(0.2, 0, 0, 1)',
 } as const
+
+// Design-system §14: categorical data colours are independent of status tones.
+export const chart = {
+  categorical: [
+    '#3B6098',
+    '#2A9D8F',
+    '#7B5EA7',
+    '#E8912B',
+    '#3AA0C9',
+    '#C65B7C',
+    '#8A9A3B',
+    '#6B7280',
+  ],
+} as const

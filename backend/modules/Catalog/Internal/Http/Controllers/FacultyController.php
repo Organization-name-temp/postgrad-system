@@ -8,6 +8,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\Rule;
 use Modules\Catalog\Internal\Http\Resources\FacultyResource;
 use Modules\Catalog\Internal\Models\Faculty;
+use Modules\Catalog\Internal\Support\ReferenceCollection;
+use Modules\Catalog\Internal\Support\ReferenceExport;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * @group Catalog
@@ -22,11 +25,42 @@ class FacultyController
     /**
      * List Faculties.
      *
-     * @response 200 {"data": [{"id": 1, "code": "FoE", "name_en": "Faculty of Engineering", "name_ar": "كلية الهندسة", "is_active": true}]}
+     * @queryParam q string Bilingual name or code fragment. Example: A
+     * @queryParam id string Comma-separated reference ids. Example: 1,2
+     * @queryParam code string Exact codes. Example: A001
+     * @queryParam is_active string Active states. Example: true
+     * @queryParam sort string Comma-separated readable fields; minus descends. Example: code,-name_en
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Page size capped at 100. Example: 100
+     *
+     * @response 200 {"data": [{"id": 1, "code": "FoE", "name_en": "Faculty of Engineering", "name_ar": "كلية الهندسة", "is_active": true}], "links": {"first": "http://localhost/api/v1/faculties?page=1", "last": "http://localhost/api/v1/faculties?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 100, "total": 1, "last_page": 1}}
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request, ReferenceCollection $collection): AnonymousResourceCollection
     {
-        return FacultyResource::collection(Faculty::query()->orderBy('code')->get());
+        $query = $collection->query($request, 'faculties');
+
+        return FacultyResource::collection($collection->selection(Faculty::query(), $query, 'faculties')->paginate($query->perPage, ['*'], 'page', $query->page)->withQueryString());
+    }
+
+    /**
+     * Export Faculties.
+     *
+     * All matching authorized rows with canonical localized columns; paging is ignored.
+     *
+     * @queryParam q string Bilingual name or code fragment. Example: A
+     * @queryParam id string Comma-separated reference ids. Example: 1,2
+     * @queryParam code string Exact codes. Example: A001
+     * @queryParam is_active string Active states. Example: true
+     * @queryParam sort string Comma-separated readable fields; minus descends. Example: code,-name_en
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Page size capped at 100. Example: 100
+     *
+     * @response 200 <<binary>>
+     * @response 403 {"message":"This action is unauthorized."}
+     */
+    public function export(Request $request, ReferenceExport $export): BinaryFileResponse
+    {
+        return $export->download($request, 'faculties', Faculty::class);
     }
 
     /**

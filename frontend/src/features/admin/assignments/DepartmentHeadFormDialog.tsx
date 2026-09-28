@@ -57,7 +57,7 @@ export function DepartmentHeadFormDialog({ open, onClose }: DepartmentHeadFormDi
   }, [open])
 
   const heads = useListAssignableDepartmentHeads({ query: { enabled: open } }).data?.data ?? []
-  const departments = useListDepartments({ query: { enabled: open } }).data?.data ?? []
+  const departments = useListDepartments(undefined, { query: { enabled: open } }).data?.data ?? []
 
   const assign = useAssignADepartmentHeadToAScope()
 

@@ -100,7 +100,7 @@ export function WaiverReviewQueuePage({ stage }: { stage: WaiverReviewStage }) {
         </Button>
       </Stack>
       {query.isPending && (
-        <Stack spacing={2} aria-label={t('waivers.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('waivers.loading')}>
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(29) })} />
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(29) })} />
         </Stack>

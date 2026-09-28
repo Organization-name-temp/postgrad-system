@@ -1,3 +1,4 @@
+import { loginInEnglish as loginWithSavedPreference } from './authenticatedLanguage'
 import { test, expect } from '@playwright/test'
 import type { Page, TestInfo } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
@@ -76,11 +77,7 @@ const COMBOS = [
  * the cold start is widened.
  */
 async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/, { timeout: 20_000 })
+  await loginWithSavedPreference(page, email)
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 }
 

@@ -99,7 +99,7 @@ export function ExemptionReviewQueuePage({ stage }: { stage: 'advisor' | 'depart
         </Button>
       </Stack>
       {queueViewState === 'loading' && (
-        <Stack spacing={2} aria-label={t('manualExemptions.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('manualExemptions.loading')}>
           <Skeleton variant="rounded" height={220} />
           <Skeleton variant="rounded" height={220} />
         </Stack>

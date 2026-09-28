@@ -49,6 +49,27 @@ final readonly class DerivedGraduationProgress implements GraduationProgress
         );
     }
 
+    public function readinessForStudents(array $studentIds): array
+    {
+        $result = [];
+        foreach (array_chunk(array_values(array_unique($studentIds)), 100) as $ids) {
+            $summaries = $this->creditHours->forStudents($ids);
+            $cgpas = $this->grading->cgpaForStudents($ids);
+            $standings = $this->standing->currentForStudents($ids);
+            foreach ($summaries as $studentId => $summary) {
+                $result[$studentId] = GraduationReadinessCalculator::calculate(
+                    remainingCreditHours: $summary->rows[CreditHourCategory::Total->value]->remainingCh,
+                    cgpa: $cgpas[$studentId] ?? null,
+                    terminationPending: $standings[$studentId]->standing === AcademicStanding::TerminationPending,
+                    proposedScheduleCompletesRequirements: false,
+                    minimumCgpa: (float) config('academic_standing.minimum_cgpa', 3.0),
+                );
+            }
+        }
+
+        return $result;
+    }
+
     public function underloadEligibility(int $studentId, bool $isEnrollmentSemester, array $proposedCourses): UnderloadEligibility
     {
         $basis = $this->underloadBasis($studentId);
@@ -88,6 +109,9 @@ final readonly class DerivedGraduationProgress implements GraduationProgress
     private function scheduleCompletes(int $studentId, array $proposedCourses): bool
     {
         $forCredit = array_values(array_filter($proposedCourses, fn (ProposedCourse $course): bool => $course->forCredit));
+        if ($forCredit === []) {
+            return false;
+        }
         if (! $this->containsEveryTarget($forCredit, $this->remainingExactTargets($studentId))) {
             return false;
         }

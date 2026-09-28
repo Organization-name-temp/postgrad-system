@@ -19,6 +19,11 @@ use Illuminate\Support\Carbon;
  * @property int|null $council_user_id
  * @property string|null $council_reason
  * @property string|null $closed_reason
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $advisor_reviewed_at
+ * @property Carbon|null $department_head_reviewed_at
+ * @property Carbon|null $council_decided_at
  * @property Carbon|null $closed_at
  */
 final class TerminationCase extends Model

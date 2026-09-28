@@ -31,25 +31,38 @@ This ticket establishes everything the five later Reports fill in.
 **Blocked by:** 02 — Query contract foundation; 04 — Batched owner-facade derivation; 05 — Chart primitive;
 06 — Admissions and Catalog lists on the contract.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] An Analytics nav section exists, permission-filtered like the existing sections, and is
+- [x] An Analytics nav section exists, permission-filtered like the existing sections, and is
       absent for users holding no Report gate
-- [ ] The Application Pipeline Report renders counts per Application Status and conversion rates
+- [x] The Application Pipeline Report renders counts per Application Status and conversion rates
       between stages, from the ticket-04 aggregate
-- [ ] Its parameters (Admission Cycle, Program, degree level) use the shared `<FilterBar>` and live
+- [x] Its parameters (Admission Cycle, Program, degree level) use the shared `<FilterBar>` and live
       in the URL
-- [ ] The chart uses the `shared/ui` primitive and carries its "View as table" disclosure
-- [ ] Clicking a segment navigates to the Applications list pre-filtered to exactly that segment,
+- [x] The chart uses the `shared/ui` primitive and carries its "View as table" disclosure
+- [x] Clicking a segment navigates to the Applications list pre-filtered to exactly that segment,
       and the row count matches the segment's figure
-- [ ] The matching "View as table" row offers the same drill-through as a keyboard-operable link
+- [x] The matching "View as table" row offers the same drill-through as a keyboard-operable link
       and lands on the identical filtered URL
-- [ ] The list drilled into is exportable with the segment's filters applied
-- [ ] The endpoint is gated on `application.screen` and returns 403 without it
-- [ ] A Dean's Report is faculty-scoped by the same derivation as their queue
-- [ ] Student Affairs sees the complete unscoped cohort; Dean tests include in-scope and
+- [x] The list drilled into is exportable with the segment's filters applied
+- [x] The endpoint is gated on `application.screen` and returns 403 without it
+- [x] A Dean's Report is faculty-scoped by the same derivation as their queue
+- [x] Student Affairs sees the complete unscoped cohort; Dean tests include in-scope and
       out-of-scope rows, and both roles prove filters only narrow their base scope
-- [ ] Payload carries typed domain values only — no pre-rendered display strings
-- [ ] Pest covers the authorized payload, the 403, the scoping and the empty case
-- [ ] `openapi.yaml` and the Orval client regenerated and committed
-- [ ] `composer gate` and `npm run gate` green
+- [x] Payload carries typed domain values only — no pre-rendered display strings
+- [x] Pest covers the authorized payload, the 403, the scoping and the empty case
+- [x] `openapi.yaml` and the Orval client regenerated and committed
+- [x] `composer gate` and `npm run gate` green
+
+## Phase 7 prerequisite disposition
+
+This ticket is in the authorized executable closure for Phase 7; its implementation
+is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
+before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
+focused tests, runtime evidence and the fixed review baseline, and
+[the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+outside this goal and are not marked complete by this disposition.

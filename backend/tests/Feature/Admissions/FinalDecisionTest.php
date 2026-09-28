@@ -222,6 +222,16 @@ it('keeps acceptance committed when post-commit exemption evaluation fails and r
             return $this->real->requirementsForVersion($curriculumVersionId);
         }
 
+        public function requirementsForVersions(array $curriculumVersionIds): array
+        {
+            return $this->real->requirementsForVersions($curriculumVersionIds);
+        }
+
+        public function entriesForVersions(array $curriculumVersionIds): array
+        {
+            return $this->real->entriesForVersions($curriculumVersionIds);
+        }
+
         /** @return array<int, CurriculumEntrySummary> */
         public function entriesForProgram(int $programId): array
         {
@@ -704,6 +714,8 @@ it('lists advisors with the least-loaded one suggested', function () {
     $this->getJson('/api/v1/dean/advisors')
         ->assertOk()
         ->assertJsonCount(2, 'data')
+        ->assertJsonPath('meta.suggested_advisor_id', (int) $free->id);
+    $this->getJson('/api/v1/dean/advisors?q=NoMatchingStaff')->assertOk()->assertJsonPath('meta.total', 0)
         ->assertJsonPath('meta.suggested_advisor_id', (int) $free->id);
 });
 

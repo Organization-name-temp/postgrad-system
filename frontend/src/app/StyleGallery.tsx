@@ -16,6 +16,7 @@ import { StatusChip } from '../shared/ui/StatusChip'
 import type { StatusChipVariant, StatusTone } from '../shared/ui/StatusChip'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeModeToggle } from './ThemeModeToggle'
+import { Chart } from '../shared/ui/Chart'
 
 // Dev-only living reference for the design system. Content is intentionally in
 // English (a developer tool); flipping language proves the theme flips direction
@@ -158,6 +159,23 @@ export default function StyleGallery() {
             </Box>
           ))}
         </Stack>
+      </Section>
+
+      <Section title="Charts (design-system.md §14)">
+        {(['bar', 'line', 'pie'] as const).map((kind) => (
+          <Chart
+            key={kind}
+            kind={kind}
+            label={`${kind} chart`}
+            categoryLabel="Category"
+            valueLabel="Count"
+            data={[
+              { label: 'A', value: 12 },
+              { label: 'B', value: 8 },
+              { label: 'C', value: 5 },
+            ]}
+          />
+        ))}
       </Section>
 
       <Section title="Typography">

@@ -103,6 +103,7 @@ deptrac:
     # A module's own Public facade may use its own Internal, and vice versa.
     Identity_Public:
       - Identity_Internal
+      - Support
     Identity_Internal:
       - Admissions_Public
       - Identity_Public

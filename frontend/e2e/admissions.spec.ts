@@ -1,3 +1,5 @@
+import { loginInEnglish as login } from './authenticatedLanguage'
+import { auditPresentation } from './presentationAudit'
 import { test, expect } from '@playwright/test'
 import type { Page, TestInfo } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
@@ -25,19 +27,6 @@ const PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
   'base64',
 )
-
-async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  // Pin English. The locale is persisted per user (`preferred_locale` on /me), and the bilingual
-  // axe specs sign in as these same seeded accounts and leave Arabic behind — so a flow that
-  // asserts English copy must state that rather than inherit whatever ran before it.
-  await page.getByRole('button', { name: 'English' }).click()
-  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
-}
 
 async function logout(page: Page) {
   await page.getByRole('button', { name: 'Account menu' }).click()
@@ -76,9 +65,15 @@ async function capture(page: Page, testInfo: TestInfo, name: string) {
 
 // Open the queue row for our applicant (queues also hold seeded rows) and follow it.
 async function openApplicantRow(page: Page) {
+  if (['/screening', '/dean', '/dean/decisions'].includes(new URL(page.url()).pathname)) {
+    await page.getByLabel('Search applicants').fill(APPLICANT.name)
+  }
   const row = page.getByRole('row', { name: new RegExp(APPLICANT.name) })
   await expect(row).toBeVisible()
   await row.getByRole('link', { name: 'Open' }).click()
+  await expect(
+    page.getByRole('heading', { level: 1, name: APPLICANT.name, exact: true }),
+  ).toBeVisible()
 }
 
 test('headline: a stranger applies and is admitted as a Student across every role', async ({
@@ -86,7 +81,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
 }, testInfo) => {
   // The flow spans ~nine sign-ins and the whole pipeline; give it room — but cap each
   // individual action so a wrong locator fails fast rather than eating the whole budget.
-  test.setTimeout(300_000)
+  test.setTimeout(900_000)
   page.setDefaultTimeout(20_000)
 
   // ── 1. Register into the open cycle ─────────────────────────────────────────────
@@ -135,6 +130,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await selectOption(page, 'Applying for', 'MSc')
   // "None" avoids the conditional English-certificate requirement at finalize.
   await selectOption(page, 'English proficiency test', 'None')
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Save & continue' }).click()
 
   // ── 2b. Email verification (link shown on screen, no mail sent) ──────────────────
@@ -143,6 +139,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   // "Verify email" button, whose fetch is cross-origin under the split dev servers
   // (SPA :5173, API :8000) — the link itself is the intended verification path.
   await expect(page.getByRole('heading', { name: 'Verify your email' })).toBeVisible()
+  await auditPresentation(page)
   const verifyHref = await page.getByRole('link', { name: /verify-email/ }).getAttribute('href')
   expect(verifyHref).toBeTruthy()
   await page.goto(verifyHref as string)
@@ -168,6 +165,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await expect(page.getByText('transcript.pdf')).toBeVisible()
   await expect(page.getByText('national-id.pdf')).toBeVisible()
   await expect(page.getByText('photo.png')).toBeVisible()
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Continue to program selection' }).click()
 
   // ── 2d. Program selection (a qualifying MSc program) ─────────────────────────────
@@ -175,10 +173,12 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   const programNode = page.getByRole('treeitem', { name: /MSc in Computer Engineering/ })
   await expect(programNode).toBeVisible()
   await programNode.getByText('Primary', { exact: true }).click()
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Save & continue' }).click()
 
   // ── 2e. Review & finalize ────────────────────────────────────────────────────────
   await expect(page.getByRole('heading', { name: 'Review & submit' })).toBeVisible()
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Finalize application' }).click()
 
   // The wizard flips to the read-only status view: the application is in review.
@@ -191,6 +191,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await page.getByRole('link', { name: 'Screening queue' }).first().click()
   await expect(page).toHaveURL(/\/screening$/)
   await openApplicantRow(page)
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Approve for Dean review' }).click()
   await expect(page).toHaveURL(/\/screening$/)
   await capture(page, testInfo, '2-sa-approved')
@@ -201,6 +202,7 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   await page.getByRole('link', { name: 'Dean review' }).first().click()
   await expect(page).toHaveURL(/\/dean$/)
   await openApplicantRow(page)
+  await auditPresentation(page)
   await page.getByRole('button', { name: 'Approve for interview' }).click()
   await expect(page).toHaveURL(/\/dean$/)
   await capture(page, testInfo, '3-dean-approved-for-interview')
@@ -208,23 +210,68 @@ test('headline: a stranger applies and is admitted as a Student across every rol
 
   // ── 5. Student Affairs schedules an interview slot ───────────────────────────────
   await login(page, 'r05@ejust.test')
+  // Each run creates its own capacity-one slot; repeated runs must not exhaust
+  // the named demo slots or depend on which of them was booked previously.
+  await page.getByRole('link', { name: 'Interview slots', exact: true }).click()
+  await page.getByRole('button', { name: 'New slot' }).click()
+  const slotForm = page.getByRole('dialog', { name: 'New slot' })
+  await slotForm
+    .getByLabel('Date & time')
+    .fill(new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 16))
+  await slotForm.getByRole('combobox', { name: 'Interviewer' }).fill('Hoda')
+  await page.getByRole('option', { name: 'Dr. Hoda Mansour', exact: true }).click()
+  const slotLocation = `Smoke room ${UNIQUE}`
+  await slotForm.getByLabel('Location').fill(slotLocation)
+  await slotForm.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(slotForm).not.toBeVisible()
+  const replacementLocation = `Smoke replacement ${UNIQUE}`
+  await page.getByRole('button', { name: 'New slot' }).click()
+  await slotForm
+    .getByLabel('Date & time')
+    .fill(new Date(Date.now() + 4 * 86400000).toISOString().slice(0, 16))
+  await slotForm.getByRole('combobox', { name: 'Interviewer' }).fill('Hoda')
+  await page.getByRole('option', { name: 'Dr. Hoda Mansour', exact: true }).click()
+  await slotForm.getByLabel('Location').fill(replacementLocation)
+  await slotForm.getByRole('button', { name: 'Save', exact: true }).click()
+  await expect(slotForm).not.toBeVisible()
   await page.getByRole('link', { name: 'Interview scheduling' }).first().click()
   await expect(page).toHaveURL(/\/interviews\/scheduling$/)
+  await page
+    .getByRole('region', { name: 'Awaiting scheduling' })
+    .getByLabel('Search applicants')
+    .fill(APPLICANT.name)
   await page
     .getByRole('row', { name: new RegExp(APPLICANT.name) })
     .getByRole('button', { name: 'Schedule' })
     .click()
-  // Pick the first open slot and book it.
-  await page.getByRole('combobox', { name: 'Interview slot' }).click()
-  await page.getByRole('option').first().click()
+  // Book the slot created for this run, assigned to the named interviewer below.
+  await page.getByRole('combobox', { name: 'Interview slot' }).fill(slotLocation)
+  await page.getByRole('option', { name: new RegExp(slotLocation) }).click()
   await page.getByRole('button', { name: 'Schedule interview' }).click()
   await capture(page, testInfo, '4-sa-scheduled')
+  await logout(page)
+
+  // The applicant searches their permitted open-slot lookup, uses the one
+  // reschedule, then confirms attendance. Each run owns both slots and applicant.
+  await login(page, APPLICANT.email)
+  await page.goto('/apply')
+  await page.getByRole('button', { name: 'Reschedule', exact: true }).click()
+  await page.getByRole('combobox', { name: 'New slot' }).fill(replacementLocation)
+  await page.getByRole('option', { name: new RegExp(replacementLocation) }).click()
+  await page.getByRole('button', { name: 'Move to this slot' }).click()
+  await expect(page.getByRole('button', { name: 'Reschedule', exact: true })).not.toBeVisible()
+  await auditPresentation(page)
+  await page.getByRole('button', { name: 'Confirm attendance' }).click()
+  await expect(page.getByText('Confirmed', { exact: true })).toBeVisible()
+  await expectNoSeriousA11y(page)
+  await capture(page, testInfo, '4b-applicant-rescheduled')
   await logout(page)
 
   // ── 6. The assigned interviewer records an evaluation ────────────────────────────
   await login(page, 'interviewer.hoda@ejust.test')
   await page.getByRole('link', { name: 'My interviews' }).first().click()
   await expect(page).toHaveURL(/\/interviews\/mine$/)
+  await page.getByLabel('Search applicants').fill(APPLICANT.name)
   await page
     .getByRole('row', { name: new RegExp(APPLICANT.name) })
     .getByRole('button', { name: 'Record evaluation' })
@@ -238,6 +285,10 @@ test('headline: a stranger applies and is admitted as a Student across every rol
   // ── 7. Student Affairs marks the interview complete ──────────────────────────────
   await login(page, 'r05@ejust.test')
   await page.getByRole('link', { name: 'Interview scheduling' }).first().click()
+  await page
+    .getByRole('region', { name: 'Scheduled interviews' })
+    .getByLabel('Search applicants')
+    .fill(APPLICANT.name)
   await page
     .getByRole('row', { name: new RegExp(APPLICANT.name) })
     .getByRole('button', { name: 'Mark complete' })

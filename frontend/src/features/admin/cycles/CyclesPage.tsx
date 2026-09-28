@@ -14,12 +14,19 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { useTranslation } from 'react-i18next'
-import { useListAdmissionCycles } from '../../../shared/api/generated/endpoints'
+import {
+  exportAdmissionCycles,
+  useListAdmissionCycles,
+} from '../../../shared/api/generated/endpoints'
 import type { ListAdmissionCycles200DataItem } from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
 import { PERMISSION } from '../../../shared/access/permissions'
 import { CycleRow } from './CycleRow'
 import { CycleFormDialog } from './CycleFormDialog'
+import { FilterBar } from '../../../shared/ui/FilterBar'
+import { DataToolbar } from '../../../shared/ui/DataToolbar'
+import { useCollectionQuery } from '../../../shared/ui/useCollectionQuery'
+import { downloadBlob } from '../../../shared/downloadBlob'
 
 /**
  * The Admission Cycles admin screen (features/admin). The whole surface is gated
@@ -33,7 +40,17 @@ export function CyclesPage() {
   const { hasPermission } = usePermissions()
   const canManage = hasPermission(PERMISSION.manageCalendar)
 
-  const { data, isPending, isError } = useListAdmissionCycles()
+  const collection = useCollectionQuery()
+  const params = {
+    ...collection.params,
+    year_min: collection.searchParams.has('year_min')
+      ? Number(collection.searchParams.get('year_min'))
+      : undefined,
+    year_max: collection.searchParams.has('year_max')
+      ? Number(collection.searchParams.get('year_max'))
+      : undefined,
+  }
+  const { data, isPending, isError } = useListAdmissionCycles(params)
   const cycles = data?.data ?? []
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -63,6 +80,66 @@ export function CyclesPage() {
           </Button>
         )}
       </Stack>
+
+      <FilterBar
+        values={collection.params}
+        onChange={collection.setCriteria}
+        fields={[
+          { key: 'q', label: t('cycles.filters.search') },
+          { key: 'year', label: t('cycles.year') },
+          { key: 'year_min', label: t('cycles.filters.minYear'), type: 'number' },
+          { key: 'year_max', label: t('cycles.filters.maxYear'), type: 'number' },
+          {
+            key: 'intake_term',
+            label: t('cycles.intakeTerm'),
+            options: [
+              { value: '', label: t('cycles.filters.all') },
+              { value: 'Fall', label: t('cycles.terms.Fall') },
+              { value: 'Spring', label: t('cycles.terms.Spring') },
+            ],
+          },
+          {
+            key: 'is_active',
+            label: t('cycles.filters.activeState'),
+            options: [
+              { value: '', label: t('cycles.filters.all') },
+              { value: 'true', label: t('cycles.filters.active') },
+              { value: 'false', label: t('cycles.status.inactive') },
+            ],
+          },
+          {
+            key: 'is_open',
+            label: t('cycles.filters.windowState'),
+            options: [
+              { value: '', label: t('cycles.filters.all') },
+              { value: 'true', label: t('cycles.status.open') },
+              { value: 'false', label: t('cycles.filters.notOpen') },
+            ],
+          },
+          {
+            key: 'sort',
+            label: t('cycles.filters.sort'),
+            options: [
+              { value: '', label: t('cycles.filters.newest') },
+              { value: '-year', label: t('cycles.filters.newest') },
+              { value: 'year', label: t('cycles.filters.oldest') },
+              { value: 'name_en', label: t('cycles.filters.nameEnglish') },
+              { value: 'name_ar', label: t('cycles.filters.nameArabic') },
+            ],
+          },
+        ]}
+      />
+      {data?.meta && !isError && (
+        <DataToolbar
+          total={data.meta.total ?? 0}
+          page={data.meta.current_page ?? params.page}
+          lastPage={data.meta.last_page ?? 1}
+          onPageChange={collection.setPage}
+          onExport={async () =>
+            downloadBlob(await exportAdmissionCycles(params), 'admission-cycles.xlsx')
+          }
+        />
+      )}
 
       {isPending && <CircularProgress aria-label={t('cycles.loading')} />}
       {isError && <Alert severity="error">{t('cycles.loadError')}</Alert>}

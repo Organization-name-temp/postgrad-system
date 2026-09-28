@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { MemoryRouter } from 'react-router-dom'
 import '../../../shared/i18n/config' // initialise i18next so useTranslation works
@@ -135,3 +135,21 @@ describe('MyGradeSheetsCard', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Could not load your grade sheets.')
   })
 })
+
+it.each([0, 1, 2, 3, 11, 100])(
+  'shows the actual Arabic sheet count %i across plural categories',
+  async (count) => {
+    const { default: i18n } = await import('../../../shared/i18n/config')
+    await i18n.changeLanguage('ar')
+    try {
+      mockedQuery.mockReturnValue(
+        queryResult(payload({ unfinalized_count: count, offering_count: count })),
+      )
+      renderCard()
+      expect(screen.getByText(`عدد الكشوف غير المعتمدة: ${count}`)).toBeInTheDocument()
+      expect(screen.getByText(`خريف 2026 · عدد الشعب: ${count}`)).toBeInTheDocument()
+    } finally {
+      await act(() => i18n.changeLanguage('en'))
+    }
+  },
+)

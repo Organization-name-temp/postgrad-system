@@ -29,22 +29,35 @@ Prior art for the seam is direct: the existing `Public`-facade tests under `Feat
 
 **Blocked by:** 01 — Seeded cohort + assertion audit.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] The Grading records facade gains a batch CGPA method and distribution method using bounded
+- [x] The Grading records facade gains a batch CGPA method and distribution method using bounded
       candidate DTO batches, owner-local bulk reads, and the existing calculator
-- [ ] The Enrollment records facade gains the attendance and enrollment aggregates the Reports and
+- [x] The Enrollment records facade gains the attendance and enrollment aggregates the Reports and
       the derived filters need
-- [ ] Admissions gains pipeline aggregation by status over an Admission Cycle
-- [ ] No migration is added and no derived value is stored or cached anywhere
-- [ ] No query joins tables owned by another module and no academic arithmetic is duplicated in SQL
-- [ ] The parity test asserts batch and single-Student CGPA agree across the whole seeded cohort
-- [ ] Parity is asserted specifically for a value that rounds **across** the 3.0 threshold
-- [ ] Parity is asserted for a Course with a superseding Attempt spanning a Fall→Spring boundary
-- [ ] Parity is asserted for a Student with no CGPA-counting graded Enrollment, where both return
+- [x] Admissions gains pipeline aggregation by status over an Admission Cycle
+- [x] No migration is added and no derived value is stored or cached anywhere
+- [x] No query joins tables owned by another module and no academic arithmetic is duplicated in SQL
+- [x] The parity test asserts batch and single-Student CGPA agree across the whole seeded cohort
+- [x] Parity is asserted specifically for a value that rounds **across** the 3.0 threshold
+- [x] Parity is asserted for a Course with a superseding Attempt spanning a Fall→Spring boundary
+- [x] Parity is asserted for a Student with no CGPA-counting graded Enrollment, where both return
       `null` and neither returns `0.00`
-- [ ] The parity test is named and located so that deleting it is conspicuous in review
-- [ ] Derived filtering and sorting happen before in-memory slicing; tests assert truthful total,
+- [x] The parity test is named and located so that deleting it is conspicuous in review
+- [x] Derived filtering and sorting happen before in-memory slicing; tests assert truthful total,
       order, and page boundaries, while stored fields continue to paginate in SQL
-- [ ] deptrac stays green — no new edge is needed or added
-- [ ] `composer gate` green
+- [x] deptrac stays green — no new edge is needed or added
+- [x] `composer gate` green
+
+## Phase 7 prerequisite disposition
+
+This ticket is in the authorized executable closure for Phase 7; its implementation
+is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
+before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
+focused tests, runtime evidence and the fixed review baseline, and
+[the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+outside this goal and are not marked complete by this disposition.

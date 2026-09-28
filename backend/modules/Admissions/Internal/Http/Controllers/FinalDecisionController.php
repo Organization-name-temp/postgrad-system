@@ -3,22 +3,28 @@
 namespace Modules\Admissions\Internal\Http\Controllers;
 
 use Carbon\CarbonImmutable;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Knuckles\Scribe\Attributes\ResponseField;
+use Modules\Admissions\Internal\Enums\ApplicationCollectionScope;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Http\Concerns\NotifiesApplicant;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Concerns\ScopesToDeanFaculty;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
 use Modules\Admissions\Internal\Http\Resources\ApplicationResource;
+use Modules\Admissions\Internal\Http\Resources\DirectoryUserResource;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Support\AdmissionAcceptanceEvidenceFactory;
+use Modules\Admissions\Internal\Support\ApplicationCollection;
+use Modules\Admissions\Internal\Support\ApplicationExport;
+use Modules\Admissions\Internal\Support\StaffPickerQuery;
 use Modules\Admissions\Public\Events\AdmissionAccepted;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\AdmitStudent;
@@ -28,6 +34,7 @@ use Modules\Identity\Public\Contracts\StudentEnrollment;
 use Modules\Identity\Public\Enums\Role;
 use Modules\Identity\Public\UserSummary;
 use Modules\Notifications\Public\Contracts\Notifier;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * @group Admissions
@@ -67,19 +74,58 @@ class FinalDecisionController
      * review queue (ADR-0012); a Dean with no assigned Faculty sees an empty queue.
      * Gated on `applicant.decide` (Dean only).
      *
-     * @response 200 {"data": [{"id": 1, "status": "interview_completed", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-12T10:00:00+00:00", "age_days": 3}]}
+     * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
+     * @queryParam status string Comma-separated statuses within the queue. Example: interview_completed,waitlisted
+     * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam faculty_id string Faculty ids, narrowing the actor scope. Example: 1,2
+     * @queryParam admission_cycle_id string Cycle ids. Example: 1
+     * @queryParam degree_level string Degree levels. Example: MSc
+     * @queryParam age_days_min integer Minimum whole days in current review. Example: 7
+     * @queryParam age_days_max integer Maximum whole days in current review. Example: 30
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: -age_days,name_en
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Page size, capped at 100. Example: 25
+     *
+     * @response 200 {"data": [{"id": 1, "status": "interview_completed", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": {"id": 1, "code": "MSC-CE", "name_en": "MSc in Computer Engineering", "name_ar": "ماجستير هندسة الحاسوب", "degree_level": "MSc", "department_name_en": "Computer Engineering", "department_name_ar": "هندسة الحاسوب", "faculty_name_en": "Faculty of Engineering", "faculty_name_ar": "كلية الهندسة"}, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-12T10:00:00+00:00", "age_days": 3}], "links": {"first": "http://localhost/api/v1/dean/decisions?page=1", "last": "http://localhost/api/v1/dean/decisions?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 25, "total": 1, "last_page": 1}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function index(Request $request, DeanAssignments $assignments, ProgramCatalog $catalog, Directory $directory): AnonymousResourceCollection
+    #[ResponseField('data.age_days', 'integer', nullable: true)]
+    public function index(Request $request, ProgramCatalog $catalog, ApplicationCollection $collection): AnonymousResourceCollection
     {
         // Post-interview applications awaiting a first decision, plus the held offers
         // awaiting resolution. An administrator sees them unscoped across every Faculty
         // (ADR-0015); a Dean sees only their own, faculty-scoped exactly like the Dean
         // review queue. The set is named once, in the trait, and shared with the
         // Admission Decisions Dashboard Card that counts it (phase 4.5, ticket 08).
-        $queue = $this->awaitingDecisionQueue($request, $assignments, $catalog, $directory);
+        $queue = $collection->page($request, $collection->query($request), $this->awaitingDecisionStatuses(), ApplicationCollectionScope::DeanFaculty);
+        $this->attachPrimaryPrograms($queue->getCollection(), $catalog);
 
         return ApplicationQueueResource::collection($queue);
+    }
+
+    /**
+     * Export Dean decision worklist.
+     *
+     * Canonical readable columns for every matching row inside the Dean faculty scope.
+     *
+     * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
+     * @queryParam status string Comma-separated statuses within the queue. Example: interview_completed,waitlisted
+     * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam faculty_id string Faculty ids, narrowing the actor scope. Example: 1,2
+     * @queryParam admission_cycle_id string Cycle ids. Example: 1
+     * @queryParam degree_level string Degree levels. Example: MSc
+     * @queryParam age_days_min integer Minimum whole days in current review. Example: 7
+     * @queryParam age_days_max integer Maximum whole days in current review. Example: 30
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: -age_days,name_en
+     * @queryParam page integer Ignored by export. Example: 1
+     * @queryParam per_page integer Ignored by export. Example: 25
+     *
+     * @response 200 scenario="XLSX" <<binary>>
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function export(Request $request, ApplicationExport $export): BinaryFileResponse
+    {
+        return $export->download($request, $this->awaitingDecisionStatuses(), ApplicationCollectionScope::DeanFaculty, 'dean/decisions');
     }
 
     /**
@@ -89,21 +135,23 @@ class FinalDecisionController
      * pre-selected in `meta.suggested_advisor_id` (null when no advisor exists). Gated
      * on `applicant.decide`.
      *
-     * @response 200 {"data": [{"id": 3, "name": "Dr. Advisor", "email": "advisor@ejust.test"}], "meta": {"suggested_advisor_id": 3}}
+     * @queryParam q string Normalized staff name or email search. Example: Advisor
+     * @queryParam id string Comma-separated eligible staff ids. Example: 3,4
+     * @queryParam sort string Comma-separated id, name or email; '-' descends. Example: name,-id
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Reference size, capped at 100. Example: 100
+     *
+     * @response 200 {"data": [{"id": 3, "name": "Dr. Advisor", "email": "advisor@ejust.test"}], "links": {"first": "http://localhost/api/v1/dean/advisors?page=1", "last": "http://localhost/api/v1/dean/advisors?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 100, "total": 1, "last_page": 1, "suggested_advisor_id": 3}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function advisors(Directory $directory, StudentEnrollment $enrollment): JsonResponse
+    #[ResponseField('meta.suggested_advisor_id', 'integer', nullable: true)]
+    public function advisors(Request $request, Directory $directory, StudentEnrollment $enrollment): AnonymousResourceCollection
     {
-        $advisors = $directory->usersByRole(Role::Advisor);
-        $suggested = $enrollment->suggestAdvisor();
+        $page = $directory->pageByRole(Role::Advisor, StaffPickerQuery::from($request));
+        $paginator = new LengthAwarePaginator($page->items, $page->total, $page->perPage, $page->page,
+            ['path' => $request->url(), 'query' => $request->query()]);
 
-        return response()->json([
-            'data' => array_map(
-                static fn (UserSummary $advisor): array => $advisor->toArray(),
-                $advisors,
-            ),
-            'meta' => ['suggested_advisor_id' => $suggested?->id],
-        ]);
+        return DirectoryUserResource::collection($paginator)->additional(['meta' => ['suggested_advisor_id' => $enrollment->suggestAdvisor()?->id]]);
     }
 
     /**

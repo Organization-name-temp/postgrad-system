@@ -31,24 +31,27 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('can:catalog.manage');
 
     // Faculties
+    Route::get('/faculties/export', [FacultyController::class, 'export'])->middleware('can:catalog.view');
     Route::get('/faculties', [FacultyController::class, 'index'])->middleware('can:catalog.view');
-    Route::get('/faculties/{faculty}', [FacultyController::class, 'show'])->middleware('can:catalog.view');
+    Route::get('/faculties/{faculty}', [FacultyController::class, 'show'])->whereNumber('faculty')->middleware('can:catalog.view');
     Route::post('/faculties', [FacultyController::class, 'store'])->middleware('can:catalog.manage');
     Route::patch('/faculties/{faculty}', [FacultyController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/faculties/{faculty}/activate', [FacultyController::class, 'activate'])->middleware('can:catalog.manage');
     Route::post('/faculties/{faculty}/deactivate', [FacultyController::class, 'deactivate'])->middleware('can:catalog.manage');
 
     // Departments
+    Route::get('/departments/export', [DepartmentController::class, 'export'])->middleware('can:catalog.view');
     Route::get('/departments', [DepartmentController::class, 'index'])->middleware('can:catalog.view');
-    Route::get('/departments/{department}', [DepartmentController::class, 'show'])->middleware('can:catalog.view');
+    Route::get('/departments/{department}', [DepartmentController::class, 'show'])->whereNumber('department')->middleware('can:catalog.view');
     Route::post('/departments', [DepartmentController::class, 'store'])->middleware('can:catalog.manage');
     Route::patch('/departments/{department}', [DepartmentController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/departments/{department}/activate', [DepartmentController::class, 'activate'])->middleware('can:catalog.manage');
     Route::post('/departments/{department}/deactivate', [DepartmentController::class, 'deactivate'])->middleware('can:catalog.manage');
 
     // Programs
+    Route::get('/programs/export', [ProgramController::class, 'export'])->middleware('can:catalog.view');
     Route::get('/programs', [ProgramController::class, 'index'])->middleware('can:catalog.view');
-    Route::get('/programs/{program}', [ProgramController::class, 'show'])->middleware('can:catalog.view');
+    Route::get('/programs/{program}', [ProgramController::class, 'show'])->whereNumber('program')->middleware('can:catalog.view');
     Route::post('/programs', [ProgramController::class, 'store'])->middleware('can:catalog.manage');
     Route::patch('/programs/{program}', [ProgramController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/programs/{program}/activate', [ProgramController::class, 'activate'])->middleware('can:catalog.manage');
@@ -67,8 +70,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses/{course}/versions', [CatalogVersionController::class, 'forCourse'])->middleware('can:catalog.view');
 
     // Courses
+    Route::get('/courses/export', [CourseController::class, 'export'])->middleware('can:catalog.view');
     Route::get('/courses', [CourseController::class, 'index'])->middleware('can:catalog.view');
-    Route::get('/courses/{course}', [CourseController::class, 'show'])->middleware('can:catalog.view');
+    Route::get('/courses/{course}', [CourseController::class, 'show'])->whereNumber('course')->middleware('can:catalog.view');
     Route::post('/courses', [CourseController::class, 'store'])->middleware('can:catalog.manage');
     Route::patch('/courses/{course}', [CourseController::class, 'update'])->middleware('can:catalog.manage');
     Route::post('/courses/{course}/activate', [CourseController::class, 'activate'])->middleware('can:catalog.manage');

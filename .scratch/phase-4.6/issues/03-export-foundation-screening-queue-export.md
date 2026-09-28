@@ -40,28 +40,41 @@ This establishes the export half of the platform, and every later export is a co
 
 **Blocked by:** 02 — Query contract foundation + the screening queue filtered end to end.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] `GET /applications/export` accepts the identical query string as the list and returns a
+- [x] `GET /applications/export` accepts the identical query string as the list and returns a
       streamed `.xlsx`
-- [ ] The export contains every matching row, not one page, and ignores `per_page` entirely
-- [ ] A 14-digit National ID and a University ID (`2026-CSE-0001`) survive as text cells and are
+- [x] The export contains every matching row, not one page, and ignores `per_page` entirely
+- [x] A 14-digit National ID and a University ID (`2026-CSE-0001`) survive as text cells and are
       not coerced to numbers or dates
-- [ ] Headers and enum values render in the requester's locale; an Arabic request produces an RTL
+- [x] Headers and enum values render in the requester's locale; an Arabic request produces an RTL
       sheet
-- [ ] The column set is defined server-side per resource and is unaffected by anything the client
+- [x] The column set is defined server-side per resource and is unaffected by anything the client
       sends
-- [ ] Each module supplies a separate actor-aware export-column projection, not the filter/sort
+- [x] Each module supplies a separate actor-aware export-column projection, not the filter/sort
       allowlist; it may retain readable-but-unfilterable fields, while a user who may list rows
       cannot export a hidden National ID, CGPA, Mark, or equivalent field
-- [ ] The route is refused with 403 to a user who cannot open the list it mirrors, and its rows are
+- [x] The route is refused with 403 to a user who cannot open the list it mirrors, and its rows are
       scoped identically
-- [ ] Every successful export writes one Audit Log entry with actor, resource, filter criteria and
+- [x] Every successful export writes one Audit Log entry with actor, resource, filter criteria and
       row count
-- [ ] One export is verified **end to end** by reading the produced file back with openspout's
+- [x] One export is verified **end to end** by reading the produced file back with openspout's
       reader — headers, a typed National-ID cell, and RTL on the Arabic sheet
-- [ ] The export control derives its request from the current query string, uses authenticated Axios,
+- [x] The export control derives its request from the current query string, uses authenticated Axios,
       downloads an in-memory blob, and is not rendered as a bare export link
-- [ ] Scribe documents a single binary response; `openapi.yaml` and the Orval client are
+- [x] Scribe documents a single binary response; `openapi.yaml` and the Orval client are
       regenerated and committed
-- [ ] `composer gate` and `npm run gate` green
+- [x] `composer gate` and `npm run gate` green
+
+## Phase 7 prerequisite disposition
+
+This ticket is in the authorized executable closure for Phase 7; its implementation
+is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
+before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
+focused tests, runtime evidence and the fixed review baseline, and
+[the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+outside this goal and are not marked complete by this disposition.

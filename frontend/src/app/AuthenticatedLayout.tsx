@@ -161,6 +161,7 @@ export function AuthenticatedLayout() {
         tabIndex={-1}
         sx={{
           flexGrow: 1,
+          minWidth: 0,
           width: { lg: `calc(100% - ${DRAWER_WIDTH}px)` },
           outline: 'none',
           '@media print': { width: '100%' },

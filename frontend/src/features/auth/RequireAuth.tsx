@@ -1,5 +1,6 @@
 import { Box, CircularProgress } from '@mui/material'
 import { Navigate, Outlet } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from './useAuth'
 
 interface RequireAuthProps {
@@ -21,12 +22,13 @@ interface RequireAuthProps {
  * regardless (ADR-0008).
  */
 export function RequireAuth({ permission, roles }: RequireAuthProps = {}) {
+  const { t } = useTranslation('auth')
   const { isPending, isAuthenticated, hasPermission, hasRole } = useAuth()
 
   if (isPending) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-        <CircularProgress aria-label="Checking your session" />
+        <CircularProgress aria-label={t('checkingSession')} />
       </Box>
     )
   }

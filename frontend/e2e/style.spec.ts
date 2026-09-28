@@ -62,6 +62,22 @@ test.describe('design-system gallery (/style)', () => {
         expect(await page.locator(`[data-variant="${v}"]`).count(), v).toBeGreaterThan(0)
       }
 
+      // Shared chart graphics and their exact table series across every theme/direction.
+      for (const kind of ['bar', 'line', 'pie']) {
+        await expect(page.getByRole('img', { name: `${kind} chart`, exact: true })).toBeVisible()
+      }
+      for (const kind of ['bar', 'line', 'pie']) {
+        await page
+          .getByRole('region', { name: `${kind} chart`, exact: true })
+          .getByRole('button', { name: lang === 'ar' ? 'عرض كجدول' : 'View as table', exact: true })
+          .click()
+        const table = page.getByRole('table', { name: `${kind} chart`, exact: true })
+        await expect(table.getByRole('row')).toHaveCount(4)
+        await expect(table.getByRole('cell', { name: '12', exact: true })).toBeVisible()
+        await expect(table.getByRole('cell', { name: '8', exact: true })).toBeVisible()
+        await expect(table.getByRole('cell', { name: '5', exact: true })).toBeVisible()
+      }
+
       // Accessibility: no serious/critical violations in this combo (this is where
       // StatusChip filled-soft contrast is exercised in dark mode).
       const results = await new AxeBuilder({ page }).analyze()

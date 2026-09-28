@@ -34,4 +34,12 @@ interface DepartmentHeadAssignments
      * @return list<int>
      */
     public function headsForDepartment(?int $departmentId): array;
+
+    /**
+     * Live academic Department assignments, ordered by opaque id. The disjoint
+     * university-wide Preparatory assignment does not grant academic cohort access.
+     *
+     * @return list<int>
+     */
+    public function departmentsForHead(int $userId): array;
 }

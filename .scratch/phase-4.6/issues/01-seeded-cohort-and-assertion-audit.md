@@ -28,22 +28,41 @@ generated layer grows or shrinks later.
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] A new deterministic seeder layer adds ~150–250 Students from a fixed seed, spread across
+- [x] A new deterministic seeder layer adds ~150–250 Students from a fixed seed, spread across
       Programs, degree levels, enrollment terms and the five existing Semesters
-- [ ] Generated Students carry a realistic spread of Enrollments, Course Statuses, finalized
+- [x] Generated Students carry a realistic spread of Enrollments, Course Statuses, finalized
       Grades and attendance marks — enough that a GPA distribution has a visible shape and some
       Students fall below 3.0
-- [ ] Every existing named persona is byte-for-byte unchanged; `r02@`, `r03@` and `multi@` keep
+- [x] Every existing named persona is byte-for-byte unchanged; `r02@`, `r03@` and `multi@` keep
       the exact footprints Phase 4.5 gave them
-- [ ] Seeding stays **idempotent** and every window stays a **relative offset from seed time**
-- [ ] Generated accounts live inside the reserved namespace and cannot collide with Playwright's
+- [x] Seeding stays **idempotent** and every window stays a **relative offset from seed time**
+- [x] Generated accounts live inside the reserved namespace and cannot collide with Playwright's
       own data
-- [ ] Every Pest assertion depending on an absolute count, a sole record or an exhaustive list is
+- [x] Every Pest assertion depending on an absolute count, a sole record or an exhaustive list is
       re-expressed against a named persona or a relative fact
-- [ ] Every Playwright assertion of the same kind is re-expressed the same way; `dashboard.spec.ts`
+- [x] Every Playwright assertion of the same kind is re-expressed the same way; `dashboard.spec.ts`
       still asserts Card presence *and* absence for all seven accounts
-- [ ] `composer gate` and `npm run gate` are green on a fresh seed
-- [ ] The seed's wall-clock cost is measured and recorded in the ticket's close-out comment, since
+- [x] `composer gate` and `npm run gate` are green on a fresh seed
+- [x] The seed's wall-clock cost is measured and recorded in the ticket's close-out comment, since
       every gate run and Playwright run now pays it
+
+## Phase 7 prerequisite disposition
+
+This ticket is in the authorized executable closure for Phase 7; its implementation
+is on `phase-7-academic-reports-bilingual`. Existing capabilities were verified
+before extending them. See [the Phase 7 tracker](../../phase-7/tracker.md) for
+focused tests, runtime evidence and the fixed review baseline, and
+[the consolidated review](../../phase-7/review.md) for resolved Standards/Spec
+findings. Both complete package gates passed: backend 1,334 tests / 8,458 assertions;
+frontend 684 unit tests and 179 serial browser checks. The additional CI timing
+regression and two affected workflows passed (3/3, 12.4m); see tracker for the
+180-test discovery versus 179-test full-gate distinction. Any by-hand acceptance remains pending. Other Phase 4.6 tickets are
+outside this goal and are not marked complete by this disposition.
+
+The named-persona preservation criterion applies to this generated cohort layer.
+The later approved Phase 7 worked-case allowance adds three advisees/open Cases
+to r03 and departmental review work to r06 while retaining original persona and
+Student records. It reuses MSC-CE/two existing Courses and isolates its Instructor.
+No global unchanged-work-population parity against the starting baseline is claimed.

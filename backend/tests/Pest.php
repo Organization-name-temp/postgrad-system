@@ -1,8 +1,16 @@
 <?php
 
 use Laravel\Sanctum\Sanctum;
+use Modules\Admissions\Internal\Enums\ApplicationStatus;
 use Modules\Admissions\Internal\Models\AdmissionCycle;
 use Modules\Admissions\Internal\Models\Application;
+use Modules\Admissions\Internal\Models\Interview;
+use Modules\Admissions\Internal\Models\InterviewSlot;
+use Modules\Catalog\Internal\Models\Course;
+use Modules\Catalog\Internal\Models\Department;
+use Modules\Catalog\Internal\Models\Faculty;
+use Modules\Catalog\Internal\Models\Program;
+use Modules\Identity\Internal\Models\FacultyDeanAssignment;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Enums\Role;
 use Tests\TestCase;
@@ -112,3 +120,174 @@ function facultyInterviewer(): User
 
     return $user;
 }
+
+/**
+ * Owner fixture closures return primitive scope expectations for the shared HTTP
+ * collection contract. Keep this registry distinct from owner workflow datasets.
+ */
+$catalogReferenceContracts = [];
+foreach (['programs' => Program::class, 'departments' => Department::class, 'faculties' => Faculty::class] as $resource => $model) {
+    $catalogReferenceContracts[$resource.' for a Catalog viewer'] = ['/api/v1/'.$resource, function () use ($model): array {
+        $first = $model::factory()->create(['code' => 'A001']);
+        $model::factory()->create(['code' => 'A002']);
+        $viewer = User::factory()->create();
+        $viewer->assignRole(Role::Student);
+
+        return ['actor' => $viewer->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'code=NOT-IN-CATALOG', 'private_probe' => 'q=1088888888'];
+    }];
+}
+
+dataset('collection contracts', [
+    'Interviewer picker' => ['/api/v1/interview-slots/interviewers', function (): array {
+        $first = User::factory()->create(['name' => 'Same staff', 'remember_token' => 'private-picker-probe']);
+        $first->assignRole(Role::Instructor);
+        User::factory()->create(['name' => 'Same staff'])->assignRole(Role::Instructor);
+        $outside = User::factory()->create();
+        $outside->assignRole(Role::Applicant);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$outside->id, 'private_probe' => 'q=private-picker-probe'];
+    }],
+    'Advisor picker' => ['/api/v1/dean/advisors', function (): array {
+        $first = User::factory()->create(['name' => 'Same staff', 'remember_token' => 'private-picker-probe']);
+        $first->assignRole(Role::Advisor);
+        User::factory()->create(['name' => 'Same staff'])->assignRole(Role::Advisor);
+        $outside = User::factory()->create();
+        $outside->assignRole(Role::Applicant);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Dean);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$outside->id, 'private_probe' => 'q=private-picker-probe'];
+    }],
+    'Interview slot pool' => ['/api/v1/interview-slots', function (): array {
+        $first = InterviewSlot::factory()->create(['scheduled_at' => now()->addDay()->startOfDay(), 'meeting_link' => 'https://meet.test/private-slot-probe']);
+        InterviewSlot::factory()->create(['scheduled_at' => $first->scheduled_at]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id=999999', 'private_probe' => 'q=private-slot-probe'];
+    }],
+    'Applicant open slot picker' => ['/api/v1/application/interview/slots', function (): array {
+        $first = InterviewSlot::factory()->create(['scheduled_at' => now()->addDay()->startOfDay(), 'meeting_link' => 'https://meet.test/private-slot-probe']);
+        InterviewSlot::factory()->create(['scheduled_at' => $first->scheduled_at]);
+        $booked = InterviewSlot::factory()->create();
+        Interview::factory()->create(['interview_slot_id' => $booked->id]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Applicant);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$booked->id, 'private_probe' => 'q=private-slot-probe'];
+    }],
+    'Booked interviews' => ['/api/v1/interviews', function (): array {
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+        Interview::factory()->confirmed()->create(['application_id' => Application::factory()->interviewScheduled()->create(['phone' => '+201088888888'])->id]);
+        $latest = Interview::factory()->confirmed()->create(['application_id' => Application::factory()->interviewScheduled()->create(['phone' => '+201088888888'])->id]);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $latest->id,
+            'outside_filter' => 'application_id=999999', 'private_probe' => 'q=1088888888'];
+    }],
+    'Assigned interviews' => ['/api/v1/interviews/assigned', function (): array {
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Instructor);
+        $first = null;
+        foreach (range(1, 2) as $index) {
+            $interview = Interview::factory()->confirmed()->create([
+                'application_id' => Application::factory()->interviewScheduled()->create(['phone' => '+201088888888'])->id,
+                'interview_slot_id' => InterviewSlot::factory()->create(['interviewer_id' => $actor->id, 'scheduled_at' => now()->addDay()->startOfDay()])->id,
+            ]);
+            $first ??= $interview->id;
+        }
+        $outside = InterviewSlot::factory()->create();
+        Interview::factory()->confirmed()->create(['interview_slot_id' => $outside->id]);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first,
+            'outside_filter' => 'interviewer_id='.$outside->interviewer_id, 'private_probe' => 'q=1088888888'];
+    }],
+    ...$catalogReferenceContracts,
+    'Awaiting interview scheduling' => ['/api/v1/applications/awaiting-interview', function (): array {
+        $first = Application::factory()->interviewScheduled()->create(['phone' => '+201088888888', 'finalized_at' => now()->subDays(2)]);
+        Application::factory()->interviewScheduled()->create(['phone' => '+201088888888', 'finalized_at' => $first->finalized_at]);
+        $booked = Application::factory()->interviewScheduled()->create();
+        Interview::factory()->create(['application_id' => $booked->id]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::Dean);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'status=under_sa_review', 'private_probe' => 'q=1088888888'];
+    }],
+    'Admission Cycle management' => ['/api/v1/admission-cycles', function (): array {
+        $first = AdmissionCycle::factory()->open()->create(['year' => 2026]);
+        AdmissionCycle::factory()->closed()->create(['year' => 2025]);
+        $actor = User::factory()->create();
+        $actor->assignRole(Role::StudentAffairs);
+
+        return ['actor' => $actor->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id=999999', 'private_probe' => 'q=1088888888'];
+    }],
+    'Public open Admission Cycles' => ['/api/v1/admission-cycles/open', function (): array {
+        $first = AdmissionCycle::factory()->open()->create(['year' => 2026]);
+        AdmissionCycle::factory()->open()->create(['year' => 2025]);
+        $closed = AdmissionCycle::factory()->closed()->create(['year' => 2027]);
+
+        return ['actor' => null, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'id='.$closed->id, 'private_probe' => 'q=1088888888'];
+    }],
+    'Dean decision worklist' => ['/api/v1/dean/decisions', function (): array {
+        $program = Program::factory()->create();
+        $outside = Program::factory()->create();
+        $first = Application::factory()->interviewScheduled()->create(['status' => ApplicationStatus::Waitlisted,
+            'primary_program_id' => $program->id, 'phone' => '+201088888888']);
+        Application::factory()->interviewScheduled()->create(['status' => ApplicationStatus::InterviewCompleted,
+            'primary_program_id' => $program->id, 'phone' => '+201088888888']);
+        Application::factory()->interviewScheduled()->create(['status' => ApplicationStatus::Waitlisted, 'primary_program_id' => $outside->id]);
+        $dean = User::factory()->create();
+        $dean->assignRole(Role::Dean);
+        FacultyDeanAssignment::create(['user_id' => $dean->id, 'faculty_id' => $program->department->faculty_id]);
+
+        return ['actor' => $dean->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'program_id='.$outside->id, 'private_probe' => 'q=1088888888'];
+    }],
+    'Dean review queue' => ['/api/v1/dean/applications', function (): array {
+        $program = Program::factory()->create();
+        $outside = Program::factory()->create();
+        $first = Application::factory()->underReview()->create(['status' => ApplicationStatus::UnderDeanReview,
+            'primary_program_id' => $program->id, 'phone' => '+201088888888']);
+        Application::factory()->underReview()->create(['status' => ApplicationStatus::UnderDeanReview,
+            'primary_program_id' => $program->id, 'phone' => '+201088888888']);
+        Application::factory()->underReview()->create(['status' => ApplicationStatus::UnderDeanReview, 'primary_program_id' => $outside->id]);
+        $dean = User::factory()->create();
+        $dean->assignRole(Role::Dean);
+        FacultyDeanAssignment::create(['user_id' => $dean->id, 'faculty_id' => $program->department->faculty_id]);
+
+        return ['actor' => $dean->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'program_id='.$outside->id, 'private_probe' => 'q=1088888888'];
+    }],
+    'Courses for a catalog viewer' => ['/api/v1/courses', function (): array {
+        $first = Course::factory()->create(['code' => 'CSE511']);
+        Course::factory()->create(['code' => 'CSE512']);
+        $viewer = User::factory()->create();
+        $viewer->assignRole(Role::Student);
+
+        return ['actor' => $viewer->id, 'total' => 2, 'first' => $first->id,
+            'outside_filter' => 'department_id=999999', 'private_probe' => 'q=1088888888'];
+    }],
+    'Dean screening queue' => ['/api/v1/applications', function (): array {
+        $insideProgram = Program::factory()->create();
+        $outsideProgram = Program::factory()->create();
+        $inside = Application::factory()->underReview()->create(['primary_program_id' => $insideProgram->id, 'phone' => '+201088888888']);
+        Application::factory()->underReview()->create(['primary_program_id' => $insideProgram->id, 'phone' => '+201088888888']);
+        Application::factory()->underReview()->create(['primary_program_id' => $outsideProgram->id]);
+        $dean = User::factory()->create();
+        $dean->assignRole(Role::Dean);
+        FacultyDeanAssignment::create(['user_id' => $dean->id, 'faculty_id' => $insideProgram->department->faculty_id]);
+
+        return ['actor' => $dean->id, 'total' => 2, 'first' => $inside->id,
+            'outside_filter' => 'program_id='.$outsideProgram->id, 'private_probe' => 'q=1088888888'];
+    }],
+]);

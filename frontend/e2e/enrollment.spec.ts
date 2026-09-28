@@ -1,3 +1,5 @@
+import { loginInEnglish as login } from './authenticatedLanguage'
+import { auditPresentation } from './presentationAudit'
 import { test, expect } from '@playwright/test'
 import type { Locator, Page, TestInfo } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
@@ -18,19 +20,6 @@ const ADMIN = 'r05@ejust.test' // Student Affairs — holds calendar.manage
 const STUDENT = 'student.smoke@seed.ejust.test' // R02, advised by Dr. Amina, no Fall request yet
 const ADVISOR = 'advisor.amina@ejust.test' // R03 — the Student's advisor
 const INSTRUCTOR = 'r04@ejust.test' // R04 — teaches the Student's audited Spring offering
-
-async function login(page: Page, email: string) {
-  await page.goto('/login')
-  await page.getByLabel('Email').fill(email)
-  await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await expect(page).toHaveURL(/\/$/)
-  // Pin English. The locale is persisted per user (`preferred_locale` on /me), and the bilingual
-  // axe specs sign in as these same seeded accounts and leave Arabic behind — so a flow that
-  // asserts English copy must state that rather than inherit whatever ran before it.
-  await page.getByRole('button', { name: 'English' }).click()
-  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr')
-}
 
 async function logout(page: Page) {
   await page.getByRole('button', { name: 'Account menu' }).click()
@@ -65,6 +54,7 @@ async function settled(surface: Locator) {
 
 // WCAG AA gate (design-system.md §12): axe on the real screens, no serious/critical.
 async function expectNoSeriousA11y(page: Page) {
+  if ((await page.getByRole('dialog').count()) === 0) await auditPresentation(page)
   const { violations } = await new AxeBuilder({ page }).analyze()
   const blocking = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
   expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([])
@@ -96,7 +86,7 @@ test('headline: an admin, a student, their advisor and an instructor run the enr
 }, testInfo) => {
   // The flow spans four sign-ins and five axe scans across the real stack; give it room,
   // but cap each action so a wrong locator fails fast rather than eating the whole budget.
-  test.setTimeout(300_000)
+  test.setTimeout(900_000)
   page.setDefaultTimeout(20_000)
 
   // ── 1. Student Affairs opens the Fall semester and creates a new Offering ─────────

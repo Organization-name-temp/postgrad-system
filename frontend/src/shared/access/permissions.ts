@@ -7,6 +7,7 @@
  * keys the UI actually gates on live here.
  */
 export const PERMISSION = {
+  monitorAcademicStanding: 'standing.monitor',
   screenApplications: 'application.screen',
   scheduleInterview: 'interview.schedule',
   decideApplicants: 'applicant.decide',

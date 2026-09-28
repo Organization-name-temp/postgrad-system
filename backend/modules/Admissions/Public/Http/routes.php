@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Admissions\Internal\Http\Controllers\AdmissionCycleController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicantInterviewController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationController;
+use Modules\Admissions\Internal\Http\Controllers\ApplicationPipelineReportController;
 use Modules\Admissions\Internal\Http\Controllers\ApplicationScreeningController;
 use Modules\Admissions\Internal\Http\Controllers\DashboardCardController;
 use Modules\Admissions\Internal\Http\Controllers\DeanReviewController;
@@ -102,6 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
 // controller allows an action only for the interviewer the slot is assigned to
 // (anyone else → 403). `assigned` is declared before the id-bound evaluation route.
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/interviews/assigned/export', [InterviewEvaluationController::class, 'export']);
     Route::get('/interviews/assigned', [InterviewEvaluationController::class, 'index']);
     Route::post('/interviews/{interview}/evaluation', [InterviewEvaluationController::class, 'store'])
         ->whereNumber('interview');
@@ -117,13 +119,16 @@ Route::middleware(['auth:sanctum', 'can:interview.schedule'])->group(function ()
     // Declared before the model-bound `/applications/{application}` reviewer routes;
     // the literal segment cannot be read as an integer id (they are whereNumber-bound).
     Route::get('/applications/awaiting-interview', [InterviewSchedulingController::class, 'index']);
+    Route::get('/applications/awaiting-interview/export', [InterviewSchedulingController::class, 'exportAwaiting']);
 
     Route::get('/interview-slots/interviewers', [InterviewSlotController::class, 'interviewers']);
+    Route::get('/interview-slots/export', [InterviewSlotController::class, 'export']);
     Route::get('/interview-slots', [InterviewSlotController::class, 'index']);
     Route::post('/interview-slots', [InterviewSlotController::class, 'store']);
     Route::patch('/interview-slots/{interview_slot}', [InterviewSlotController::class, 'update'])->whereNumber('interview_slot');
     Route::delete('/interview-slots/{interview_slot}', [InterviewSlotController::class, 'destroy'])->whereNumber('interview_slot');
 
+    Route::get('/interviews/export', [InterviewSchedulingController::class, 'exportBooked']);
     Route::get('/interviews', [InterviewSchedulingController::class, 'booked']);
     Route::post('/applications/{application}/interview', [InterviewSchedulingController::class, 'store'])->whereNumber('application');
     Route::post('/interviews/{interview}/complete', [InterviewSchedulingController::class, 'complete'])->whereNumber('interview');
@@ -140,7 +145,9 @@ Route::middleware('auth:sanctum')
 // Reviewer screening (ticket 07). The Student Affairs queue, application detail, and
 // the screen action, all gated on `application.screen` (SA / Dean).
 Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
+    Route::get('/admissions/reports/application-pipeline', ApplicationPipelineReportController::class);
     Route::get('/applications', [ApplicationScreeningController::class, 'index']);
+    Route::get('/applications/export', [ApplicationScreeningController::class, 'export']);
     Route::get('/applications/{application}', [ApplicationScreeningController::class, 'show'])->whereNumber('application');
     Route::post('/applications/{application}/screen', [ApplicationScreeningController::class, 'screen'])->whereNumber('application');
 
@@ -156,6 +163,7 @@ Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function ()
 // enforced inside the controller via the Dean↔Faculty assignment mapping.
 Route::middleware(['auth:sanctum', 'can:application.screen'])->group(function () {
     Route::get('/dean/applications', [DeanReviewController::class, 'index']);
+    Route::get('/dean/applications/export', [DeanReviewController::class, 'export']);
     Route::post('/dean/applications/{application}/review', [DeanReviewController::class, 'review'])->whereNumber('application');
 });
 
@@ -170,6 +178,7 @@ Route::middleware(['auth:sanctum', 'can:applicant.decide'])->group(function () {
     // conditional/waitlist offer. Literal segment, declared before the id-bound decide
     // route in the same permission group.
     Route::get('/dean/decisions', [FinalDecisionController::class, 'index']);
+    Route::get('/dean/decisions/export', [FinalDecisionController::class, 'export']);
     Route::get('/dean/advisors', [FinalDecisionController::class, 'advisors']);
     Route::post('/dean/applications/{application}/decide', [FinalDecisionController::class, 'decide'])->whereNumber('application');
 
@@ -190,6 +199,7 @@ Route::middleware('auth:sanctum')
 
 Route::middleware(['auth:sanctum', 'can:calendar.manage'])->group(function () {
     Route::get('/admission-cycles', [AdmissionCycleController::class, 'index']);
+    Route::get('/admission-cycles/export', [AdmissionCycleController::class, 'export']);
     Route::post('/admission-cycles', [AdmissionCycleController::class, 'store']);
     Route::get('/admission-cycles/{admission_cycle}', [AdmissionCycleController::class, 'show'])->whereNumber('admission_cycle');
     Route::patch('/admission-cycles/{admission_cycle}', [AdmissionCycleController::class, 'update'])->whereNumber('admission_cycle');

@@ -3,7 +3,9 @@
 namespace Modules\Identity\Public\Contracts;
 
 use Modules\Identity\Public\Enums\Role;
+use Modules\Identity\Public\UserPage;
 use Modules\Identity\Public\UserSummary;
+use Support\Query\CollectionQuery;
 
 /**
  * The read facade over Identity's user directory (ticket 09). Other modules resolve
@@ -27,6 +29,9 @@ interface Directory
      * @return list<UserSummary>
      */
     public function usersByRole(Role $role): array;
+
+    /** Role membership remains a base constraint before search, ordering and paging. */
+    public function pageByRole(Role $role, CollectionQuery $query): UserPage;
 
     /**
      * The summaries for the given user ids, keyed by id; ids with no matching User are

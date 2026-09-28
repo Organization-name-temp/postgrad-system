@@ -7,7 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Knuckles\Scribe\Attributes\ResponseField;
+use Modules\Admissions\Internal\Enums\ApplicationCollectionScope;
 use Modules\Admissions\Internal\Enums\ApplicationStatus;
+use Modules\Admissions\Internal\Enums\InterviewCollectionScope;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesInterviewers;
 use Modules\Admissions\Internal\Http\Concerns\ResolvesQueuePrograms;
 use Modules\Admissions\Internal\Http\Resources\ApplicationQueueResource;
@@ -15,10 +18,15 @@ use Modules\Admissions\Internal\Http\Resources\InterviewResource;
 use Modules\Admissions\Internal\Models\Application;
 use Modules\Admissions\Internal\Models\Interview;
 use Modules\Admissions\Internal\Models\InterviewSlot;
+use Modules\Admissions\Internal\Support\ApplicationCollection;
+use Modules\Admissions\Internal\Support\ApplicationExport;
+use Modules\Admissions\Internal\Support\InterviewCollection;
+use Modules\Admissions\Internal\Support\InterviewExport;
 use Modules\Catalog\Public\ProgramCatalog;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Notifications\Public\Contracts\Notifier;
 use Modules\Notifications\Public\Enums\NotificationType;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 /**
@@ -50,19 +58,67 @@ class InterviewSchedulingController
      * evaluation — Student Affairs' view for tracking interviews and marking them
      * complete. Gated on `interview.schedule`.
      *
-     * @response 200 {"data": [{"id": 1, "application_id": 1, "status": "confirmed", "reschedule_count": 0, "can_reschedule": true, "evaluation_score": 8, "evaluation_notes": "Strong candidate.", "completed_at": null, "slot": {"id": 1, "scheduled_at": "2026-07-20T10:00:00+00:00", "duration_minutes": 30, "mode": "in_person", "location": "Building C, Room 204", "meeting_link": null, "interviewer_id": 4, "interviewer": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "is_open": false}, "applicant": {"name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "status": "interview_scheduled"}}]}
+     * @queryParam q string Normalized bilingual applicant name or National ID search. Example: Sara
+     * @queryParam id string Comma-separated Interview ids. Example: 1,2
+     * @queryParam application_id string Comma-separated Application ids. Example: 1
+     * @queryParam status string Comma-separated confirmation states. Example: confirmed
+     * @queryParam interviewer_id string Comma-separated interviewer ids, within actor scope. Example: 4
+     * @queryParam program_id string Comma-separated primary Program ids. Example: 1
+     * @queryParam admission_cycle_id string Comma-separated Cycle ids. Example: 1
+     * @queryParam degree_level string Comma-separated applying degrees. Example: MSc
+     * @queryParam mode string Comma-separated interview modes. Example: in_person
+     * @queryParam evaluation_score_min integer Minimum recorded score, 1–10. Example: 1
+     * @queryParam evaluation_score_max integer Maximum recorded score, 1–10. Example: 10
+     * @queryParam scheduled_at_min string Earliest scheduled timestamp. Example: 2026-01-01
+     * @queryParam scheduled_at_max string Latest scheduled timestamp. Example: 2027-01-01
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: scheduled_at,-id
+     * @queryParam page integer Page number; ignored by export. Example: 1
+     * @queryParam per_page integer Page size, capped at 100; ignored by export. Example: 25
+     *
+     * @response 200 {"data": [{"id": 1, "application_id": 1, "status": "confirmed", "reschedule_count": 0, "can_reschedule": true, "evaluation_score": 8, "evaluation_notes": "Strong candidate.", "completed_at": null, "slot": {"id": 1, "scheduled_at": "2026-07-20T10:00:00+00:00", "duration_minutes": 30, "mode": "in_person", "location": "Building C, Room 204", "meeting_link": null, "interviewer_id": 4, "interviewer": {"id": 4, "name": "Dr. Instructor", "email": "instructor@ejust.test"}, "is_open": false}, "applicant": {"name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "status": "interview_scheduled"}}], "links": {"first": "http://localhost/api/v1/interviews?page=1", "last": "http://localhost/api/v1/interviews?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 25, "total": 1, "last_page": 1}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function booked(Directory $directory): AnonymousResourceCollection
+    #[ResponseField('data.evaluation_score', 'integer', nullable: true)]
+    #[ResponseField('data.evaluation_notes', 'string', nullable: true)]
+    #[ResponseField('data.slot.location', 'string', nullable: true)]
+    #[ResponseField('data.slot.meeting_link', 'string', nullable: true)]
+    public function booked(Request $request, Directory $directory, InterviewCollection $collection): AnonymousResourceCollection
     {
-        $interviews = Interview::query()
-            ->with(['slot', 'application'])
-            ->orderByDesc('id')
-            ->get();
+        $query = $collection->query($request, InterviewCollectionScope::Booked);
+        $interviews = $collection->selection($request, $query, InterviewCollectionScope::Booked)->paginate($query->perPage, ['interviews.*'], 'page', $query->page)->withQueryString();
 
-        $this->attachInterviewers($interviews->pluck('slot')->filter()->values(), $directory);
+        $this->attachInterviewers($interviews->getCollection()->pluck('slot')->filter()->values(), $directory);
 
         return InterviewResource::collection($interviews);
+    }
+
+    /**
+     * Export booked interviews.
+     *
+     * Downloads every matching authorized row with the list's live scope.
+     *
+     * @queryParam q string Normalized bilingual applicant name or National ID search. Example: Sara
+     * @queryParam id string Comma-separated Interview ids. Example: 1,2
+     * @queryParam application_id string Comma-separated Application ids. Example: 1
+     * @queryParam status string Comma-separated confirmation states. Example: confirmed
+     * @queryParam interviewer_id string Comma-separated interviewer ids, within actor scope. Example: 4
+     * @queryParam program_id string Comma-separated primary Program ids. Example: 1
+     * @queryParam admission_cycle_id string Comma-separated Cycle ids. Example: 1
+     * @queryParam degree_level string Comma-separated applying degrees. Example: MSc
+     * @queryParam mode string Comma-separated interview modes. Example: in_person
+     * @queryParam evaluation_score_min integer Minimum recorded score, 1–10. Example: 1
+     * @queryParam evaluation_score_max integer Maximum recorded score, 1–10. Example: 10
+     * @queryParam scheduled_at_min string Earliest scheduled timestamp. Example: 2026-01-01
+     * @queryParam scheduled_at_max string Latest scheduled timestamp. Example: 2027-01-01
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: scheduled_at,-id
+     * @queryParam page integer Page number; ignored by export. Example: 1
+     * @queryParam per_page integer Page size, capped at 100; ignored by export. Example: 25
+     *
+     * @response 200 scenario="XLSX" <<binary>>
+     */
+    public function exportBooked(Request $request, InterviewExport $export): BinaryFileResponse
+    {
+        return $export->download($request, InterviewCollectionScope::Booked);
     }
 
     /**
@@ -73,22 +129,52 @@ class InterviewSchedulingController
      * the applicant's identity, resolved primary Program, and days waited since Dean
      * approval. Gated on `interview.schedule`.
      *
-     * @response 200 {"data": [{"id": 1, "status": "interview_scheduled", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": null, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-12T10:00:00+00:00", "age_days": 3}]}
+     * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
+     * @queryParam status string Comma-separated statuses within the queue. Example: interview_scheduled
+     * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam admission_cycle_id string Cycle ids. Example: 1
+     * @queryParam degree_level string Degree levels. Example: MSc
+     * @queryParam age_days_min integer Minimum whole days in current review. Example: 7
+     * @queryParam age_days_max integer Maximum whole days in current review. Example: 30
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: -age_days,name_en
+     * @queryParam page integer Page number. Example: 1
+     * @queryParam per_page integer Page size, capped at 100. Example: 25
+     *
+     * @response 200 {"data": [{"id": 1, "status": "interview_scheduled", "name_en": "Sara Applicant", "name_ar": "سارة المتقدمة", "national_id": "29001010101010", "applying_for_degree": "MSc", "primary_program": null, "finalized_at": "2026-07-10T10:00:00+00:00", "review_entered_at": "2026-07-12T10:00:00+00:00", "age_days": 3}], "links": {"first": "http://localhost/api/v1/applications/awaiting-interview?page=1", "last": "http://localhost/api/v1/applications/awaiting-interview?page=1", "prev": null, "next": null}, "meta": {"current_page": 1, "per_page": 25, "total": 1, "last_page": 1}}
      * @response 403 {"message": "This action is unauthorized."}
      */
-    public function index(ProgramCatalog $catalog): AnonymousResourceCollection
+    #[ResponseField('data.age_days', 'integer', nullable: true)]
+    public function index(Request $request, ProgramCatalog $catalog, ApplicationCollection $collection): AnonymousResourceCollection
     {
-        $applications = Application::query()
-            ->with('statusTransitions')
-            ->where('status', ApplicationStatus::InterviewScheduled)
-            ->whereDoesntHave('interview')
-            ->orderBy('finalized_at')
-            ->orderBy('id')
-            ->get();
+        $applications = $collection->page($request, $collection->query($request), [ApplicationStatus::InterviewScheduled], ApplicationCollectionScope::AwaitingInterview);
 
-        $this->attachPrimaryPrograms($applications, $catalog);
+        $this->attachPrimaryPrograms($applications->getCollection(), $catalog);
 
         return ApplicationQueueResource::collection($applications);
+    }
+
+    /**
+     * Export applications awaiting interview scheduling.
+     *
+     * Every matching unbooked applicant for the privileged scheduling actor.
+     *
+     * @queryParam q string Normalized bilingual name or identifier search. Example: Ahmed
+     * @queryParam status string Comma-separated statuses within the queue. Example: interview_scheduled
+     * @queryParam program_id string Program ids. Example: 1,2
+     * @queryParam admission_cycle_id string Cycle ids. Example: 1
+     * @queryParam degree_level string Degree levels. Example: MSc
+     * @queryParam age_days_min integer Minimum whole days in current review. Example: 7
+     * @queryParam age_days_max integer Maximum whole days in current review. Example: 30
+     * @queryParam sort string Comma-separated readable fields; '-' descends. Example: -age_days,name_en
+     * @queryParam page integer Ignored by export. Example: 1
+     * @queryParam per_page integer Ignored by export. Example: 25
+     *
+     * @response 200 scenario="XLSX" <<binary>>
+     * @response 403 {"message": "This action is unauthorized."}
+     */
+    public function exportAwaiting(Request $request, ApplicationExport $export): BinaryFileResponse
+    {
+        return $export->download($request, [ApplicationStatus::InterviewScheduled], ApplicationCollectionScope::AwaitingInterview, 'applications/awaiting-interview');
     }
 
     /**

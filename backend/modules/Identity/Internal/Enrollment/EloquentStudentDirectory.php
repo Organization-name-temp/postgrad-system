@@ -4,7 +4,10 @@ namespace Modules\Identity\Internal\Enrollment;
 
 use Modules\Identity\Internal\Models\Student;
 use Modules\Identity\Public\Contracts\StudentDirectory;
+use Modules\Identity\Public\Enums\StudentLifecycleStatus;
 use Modules\Identity\Public\StudentSummary;
+use Support\Query\CollectionQuery;
+use Support\Query\SqlCollectionQuery;
 
 /**
  * The Eloquent-backed {@see StudentDirectory}. Reads the `students` table and maps each
@@ -68,6 +71,21 @@ class EloquentStudentDirectory implements StudentDirectory
             ->pluck('id')
             ->map(static fn ($id): int => (int) $id)
             ->all();
+    }
+
+    public function studentIdsMatching(CollectionQuery $query): array
+    {
+        $selection = Student::query();
+        if (($query->filters['lifecycle'] ?? []) === []) {
+            $selection->where('lifecycle_status', StudentLifecycleStatus::Active);
+        }
+
+        return SqlCollectionQuery::apply($selection, $query, [
+            'student_id' => 'id', 'program_id' => 'program_id',
+            'lifecycle' => 'lifecycle_status', 'name_en' => 'name_en',
+            'name_ar' => 'name_ar', 'university_id' => 'university_id',
+        ], ['name_en', 'name_ar', 'university_id'])
+            ->orderBy('id')->pluck('id')->map(static fn ($id): int => (int) $id)->all();
     }
 
     private function toSummary(?Student $student): ?StudentSummary

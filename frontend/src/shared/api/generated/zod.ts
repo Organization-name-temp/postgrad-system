@@ -7,6 +7,350 @@
 import * as zod from 'zod';
 
 /**
+ * AwaitingCouncil means a Department Head recommendation, distinct from initial
+ * flagging and Advisor assessment. GET never reconciles or replaces Cases.
+ * @summary Scoped Termination Case counts and distinct Students.
+ */
+export const ScopedTerminationCaseCountsAndDistinctStudentsQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active and Terminated.'),
+  "state": zod.string().optional().describe('CSV existing Case states.'),
+  "history": zod.string().optional().describe('default includes open Cases and Terminated; include adds all closed outcomes.'),
+  "created_from": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "created_to": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "q": zod.string().optional().describe('Bilingual Student name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV order; stable Case ID breaks ties and unknown timestamps sort last.'),
+  "page": zod.number().optional().describe('Page number; summary\/export retain the full selection.'),
+  "per_page": zod.number().optional().describe('List size capped at 100; summary\/export retain the full selection.')
+})
+
+export const ScopedTerminationCaseCountsAndDistinctStudentsResponse = zod.object({
+  "data": zod.object({
+  "case_count": zod.number().optional(),
+  "student_count": zod.number().optional(),
+  "states": zod.object({
+  "AwaitingAdvisor": zod.number().optional(),
+  "AwaitingDepartmentHead": zod.number().optional(),
+  "AwaitingCouncil": zod.number().optional(),
+  "Dismissed": zod.number().optional(),
+  "Terminated": zod.number().optional(),
+  "TriggerCleared": zod.number().optional(),
+  "EvidenceChanged": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * Localized stages preserve recommendation meaning. Identifiers are strings;
+ * the workbook contains minimal oversight facts and no private evidence.
+ * @summary Export the complete scoped Termination Case selection.
+ */
+export const ExportTheCompleteScopedTerminationCaseSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active and Terminated.'),
+  "state": zod.string().optional().describe('CSV existing Case states.'),
+  "history": zod.string().optional().describe('default includes open Cases and Terminated; include adds all closed outcomes.'),
+  "created_from": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "created_to": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "q": zod.string().optional().describe('Bilingual Student name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV order; stable Case ID breaks ties and unknown timestamps sort last.'),
+  "page": zod.number().optional().describe('Page number; summary\/export retain the full selection.'),
+  "per_page": zod.number().optional().describe('List size capped at 100; summary\/export retain the full selection.')
+})
+
+export const ExportTheCompleteScopedTerminationCaseSelectionResponse = zod.unknown()
+
+
+/**
+ * Review URLs require operational permission, persona, stage and live access.
+ * No evidence, fingerprints, private identity or review narratives are exposed.
+ * All available workflow timestamps are UTC; date filters describe Case creation.
+ * @summary Scoped minimal Termination Case List.
+ */
+export const ScopedMinimalTerminationCaseListQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active and Terminated.'),
+  "state": zod.string().optional().describe('CSV existing Case states.'),
+  "history": zod.string().optional().describe('default includes open Cases and Terminated; include adds all closed outcomes.'),
+  "created_from": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "created_to": zod.string().optional().describe('Inclusive Case-created UTC date, YYYY-MM-DD.'),
+  "q": zod.string().optional().describe('Bilingual Student name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV order; stable Case ID breaks ties and unknown timestamps sort last.'),
+  "page": zod.number().optional().describe('Page number; summary\/export retain the full selection.'),
+  "per_page": zod.number().optional().describe('List size capped at 100; summary\/export retain the full selection.')
+})
+
+export const ScopedMinimalTerminationCaseListResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name_en": zod.string().nullable(),
+  "name_ar": zod.string().nullable(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_id": zod.number().optional(),
+  "faculty_id": zod.number().optional()
+}).nullable(),
+  "lifecycle": zod.string().optional(),
+  "case_id": zod.number().optional(),
+  "state": zod.string().optional(),
+  "created_at": zod.string().nullable(),
+  "advisor_reviewed_at": zod.string().nullable(),
+  "department_head_reviewed_at": zod.string().nullable(),
+  "council_decided_at": zod.string().nullable(),
+  "closed_at": zod.string().nullable(),
+  "unavailable": zod.array(zod.string()).optional(),
+  "review_url": zod.string().nullable()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export every Student in the authorized advisory readiness selection.
+ */
+export const ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "readiness": zod.string().optional().describe('CSV ready, not_ready or unavailable groups.'),
+  "blocker": zod.string().optional().describe('CSV overlapping typed blockers; any selected blocker matches.'),
+  "blocker_all": zod.string().optional().describe('Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'),
+  "remaining_ch_min": zod.number().optional().describe('Inclusive remaining-CH lower bound.'),
+  "remaining_ch_max": zod.number().optional().describe('Inclusive remaining-CH upper bound.'),
+  "cgpa_min": zod.number().optional().describe('Inclusive CGPA lower bound; unknown values excluded.'),
+  "cgpa_max": zod.number().optional().describe('Inclusive CGPA upper bound.'),
+  "cgpa_availability": zod.string().optional().describe('CSV available or unavailable CGPA.'),
+  "proximity": zod.string().optional().describe('Remaining 1–5 CH only; not Approaching Graduation.')
+})
+
+export const ExportEveryStudentInTheAuthorizedAdvisoryReadinessSelectionResponse = zod.unknown()
+
+
+/**
+ * @summary Advisory readiness Student List for the authorized Report selection.
+ */
+export const AdvisoryReadinessStudentListForTheAuthorizedReportSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "readiness": zod.string().optional().describe('CSV ready, not_ready or unavailable groups.'),
+  "blocker": zod.string().optional().describe('CSV overlapping typed blockers; any selected blocker matches.'),
+  "blocker_all": zod.string().optional().describe('Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'),
+  "remaining_ch_min": zod.number().optional().describe('Inclusive remaining-CH lower bound.'),
+  "remaining_ch_max": zod.number().optional().describe('Inclusive remaining-CH upper bound.'),
+  "cgpa_min": zod.number().optional().describe('Inclusive CGPA lower bound; unknown values excluded.'),
+  "cgpa_max": zod.number().optional().describe('Inclusive CGPA upper bound.'),
+  "cgpa_availability": zod.string().optional().describe('CSV available or unavailable CGPA.'),
+  "proximity": zod.string().optional().describe('Remaining 1–5 CH only; not Approaching Graduation.')
+})
+
+export const AdvisoryReadinessStudentListForTheAuthorizedReportSelectionResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name_en": zod.string().nullable(),
+  "name_ar": zod.string().nullable(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_id": zod.number().optional(),
+  "faculty_id": zod.number().optional()
+}).nullable(),
+  "lifecycle": zod.string().optional(),
+  "readiness": zod.object({
+  "ready": zod.boolean().optional(),
+  "remaining_credit_hours": zod.number().optional(),
+  "cgpa": zod.number().nullable(),
+  "approaching_graduation": zod.boolean().optional(),
+  "blockers": zod.array(zod.string()).optional()
+}).nullable(),
+  "readiness_group": zod.string().optional(),
+  "unavailable": zod.array(zod.string()).optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * Blocker counts overlap; groups partition the selected Student population.
+ * No proposed schedule or formal graduation approval is supplied.
+ * @summary Advisory Graduation Readiness counts for the authorized full selection.
+ */
+export const AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "readiness": zod.string().optional().describe('CSV ready, not_ready or unavailable groups.'),
+  "blocker": zod.string().optional().describe('CSV overlapping typed blockers; any selected blocker matches.'),
+  "blocker_all": zod.string().optional().describe('Comma-separated blockers all required, intersecting the original blocker OR selection for exact drill-through.'),
+  "remaining_ch_min": zod.number().optional().describe('Inclusive remaining-CH lower bound.'),
+  "remaining_ch_max": zod.number().optional().describe('Inclusive remaining-CH upper bound.'),
+  "cgpa_min": zod.number().optional().describe('Inclusive CGPA lower bound; unknown values excluded.'),
+  "cgpa_max": zod.number().optional().describe('Inclusive CGPA upper bound.'),
+  "cgpa_availability": zod.string().optional().describe('CSV available or unavailable CGPA.'),
+  "proximity": zod.string().optional().describe('Remaining 1–5 CH only; not Approaching Graduation.')
+})
+
+export const AdvisoryGraduationReadinessCountsForTheAuthorizedFullSelectionResponse = zod.object({
+  "data": zod.object({
+  "total": zod.number().optional(),
+  "groups": zod.object({
+  "ready": zod.number().optional(),
+  "not_ready": zod.number().optional(),
+  "unavailable": zod.number().optional()
+}).optional(),
+  "blockers": zod.object({
+  "RemainingRequirements": zod.number().optional(),
+  "CgpaUnavailable": zod.number().optional(),
+  "CgpaBelowMinimum": zod.number().optional(),
+  "TerminationPending": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Current Academic Standing counts for the authorized full selection.
+ */
+export const CurrentAcademicStandingCountsForTheAuthorizedFullSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs narrowing permitted Students.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV Active or Terminated; default Active.'),
+  "standing": zod.string().optional().describe('CSV authoritative Standing values.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV stored or derived field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate summary.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate summary.')
+})
+
+export const CurrentAcademicStandingCountsForTheAuthorizedFullSelectionResponse = zod.object({
+  "data": zod.object({
+  "total": zod.number().optional(),
+  "counts": zod.object({
+  "TerminationPending": zod.number().optional(),
+  "NotYetAssessed": zod.number().optional(),
+  "AcademicProbation": zod.number().optional(),
+  "AcademicWarning": zod.number().optional(),
+  "GoodStanding": zod.number().optional()
+}).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Current Standing Student List for the same authorized Report selection.
+ */
+export const CurrentStandingStudentListForTheSameAuthorizedReportSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "standing": zod.string().optional().describe('CSV Standing values.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order; nullable values sort last.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const CurrentStandingStudentListForTheSameAuthorizedReportSelectionResponse = zod.object({
+  "data": zod.array(zod.object({
+  "student_id": zod.number().optional(),
+  "university_id": zod.string().optional(),
+  "name_en": zod.string().nullable(),
+  "name_ar": zod.string().nullable(),
+  "program": zod.object({
+  "id": zod.number().optional(),
+  "code": zod.string().optional(),
+  "name_en": zod.string().optional(),
+  "name_ar": zod.string().optional(),
+  "degree_level": zod.string().optional(),
+  "department_id": zod.number().optional(),
+  "faculty_id": zod.number().optional()
+}).nullable(),
+  "lifecycle": zod.string().optional(),
+  "cgpa": zod.number().nullable(),
+  "standing": zod.string().optional(),
+  "explanation": zod.string().optional(),
+  "unavailable": zod.array(zod.string()).optional()
+})).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional()
+}).optional()
+})
+
+
+/**
+ * @summary Export every Student in the authorized Standing Report selection.
+ */
+export const ExportEveryStudentInTheAuthorizedStandingReportSelectionQueryParams = zod.object({
+  "faculty_id": zod.string().optional().describe('CSV Faculty IDs.'),
+  "department_id": zod.string().optional().describe('CSV Department IDs.'),
+  "program_id": zod.string().optional().describe('CSV Program IDs.'),
+  "degree_level": zod.string().optional().describe('CSV MSc or PhD.'),
+  "lifecycle": zod.string().optional().describe('CSV lifecycle; default Active.'),
+  "standing": zod.string().optional().describe('CSV Standing values.'),
+  "q": zod.string().optional().describe('Bilingual name or University-ID search.'),
+  "sort": zod.string().optional().describe('CSV field order.'),
+  "page": zod.number().optional().describe('Accepted but does not truncate export.'),
+  "per_page": zod.number().optional().describe('Accepted but does not truncate export.')
+})
+
+export const ExportEveryStudentInTheAuthorizedStandingReportSelectionResponse = zod.unknown()
+
+
+/**
  * @summary My target-aware Credit-Hour Summary.
  */
 export const MyTargetAwareCreditHourSummaryResponse = zod.object({
@@ -607,6 +951,20 @@ export const AdministrationCardResponse = zod.object({
  * Cycles that are active and whose window contains the current moment.
  * @summary List currently-open Admission Cycles.
  */
+export const ListCurrentlyOpenAdmissionCyclesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual Cycle name search.'),
+  "id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "intake_term": zod.string().optional().describe('Comma-separated intake terms.'),
+  "year": zod.string().optional().describe('Comma-separated intake years.'),
+  "year_min": zod.number().optional().describe('Minimum intake year.'),
+  "year_max": zod.number().optional().describe('Maximum intake year.'),
+  "is_active": zod.string().optional().describe('Active states, true or false.'),
+  "is_open": zod.string().optional().describe('Derived window states, true or false.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ListCurrentlyOpenAdmissionCyclesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -618,7 +976,19 @@ export const ListCurrentlyOpenAdmissionCyclesResponse = zod.object({
   "closes_at": zod.string().optional(),
   "is_active": zod.boolean().optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -979,6 +1349,21 @@ export const ResubmitAfterRevisionResponse = zod.object({
  * one reschedule. Same shape as the Student Affairs slot list.
  * @summary Open slots to reschedule into.
  */
+export const OpenSlotsToRescheduleIntoQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual location search.'),
+  "id": zod.string().optional().describe('Comma-separated slot ids.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids.'),
+  "mode": zod.string().optional().describe('Comma-separated modes.'),
+  "is_open": zod.string().optional().describe('Derived availability, true or false.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "duration_minutes_min": zod.number().optional().describe('Minimum duration in minutes.'),
+  "duration_minutes_max": zod.number().optional().describe('Maximum duration in minutes.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
 export const OpenSlotsToRescheduleIntoResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -994,7 +1379,19 @@ export const OpenSlotsToRescheduleIntoResponse = zod.object({
   "email": zod.string().optional()
 }).optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -1140,6 +1537,32 @@ export const MyApplicationCardResponse = zod.object({
 
 
 /**
+ * Downloads every matching authorized row with the list's live scope.
+ * @summary Export assigned interviews.
+ */
+export const ExportAssignedInterviewsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual applicant name or National ID search.'),
+  "id": zod.string().optional().describe('Comma-separated Interview ids.'),
+  "application_id": zod.string().optional().describe('Comma-separated Application ids.'),
+  "status": zod.string().optional().describe('Comma-separated confirmation states.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids, within actor scope.'),
+  "program_id": zod.string().optional().describe('Comma-separated primary Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Comma-separated applying degrees.'),
+  "mode": zod.string().optional().describe('Comma-separated interview modes.'),
+  "evaluation_score_min": zod.number().optional().describe('Minimum recorded score, 1–10.'),
+  "evaluation_score_max": zod.number().optional().describe('Maximum recorded score, 1–10.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
+export const ExportAssignedInterviewsResponse = zod.unknown()
+
+
+/**
  * The interviews booked into the signed-in user's own slots, soonest-first, each
  * with the applicant's identity and the slot details — the interviewer's queue.
  * Empty for a user who is not the assigned interviewer on any slot. An administrator
@@ -1147,6 +1570,25 @@ export const MyApplicationCardResponse = zod.object({
  * write-path through this same screen.
  * @summary Interviews assigned to me.
  */
+export const InterviewsAssignedToMeQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual applicant name or National ID search.'),
+  "id": zod.string().optional().describe('Comma-separated Interview ids.'),
+  "application_id": zod.string().optional().describe('Comma-separated Application ids.'),
+  "status": zod.string().optional().describe('Comma-separated confirmation states.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids, within actor scope.'),
+  "program_id": zod.string().optional().describe('Comma-separated primary Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Comma-separated applying degrees.'),
+  "mode": zod.string().optional().describe('Comma-separated interview modes.'),
+  "evaluation_score_min": zod.number().optional().describe('Minimum recorded score, 1–10.'),
+  "evaluation_score_max": zod.number().optional().describe('Maximum recorded score, 1–10.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
 export const InterviewsAssignedToMeResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1154,16 +1596,16 @@ export const InterviewsAssignedToMeResponse = zod.object({
   "status": zod.string().optional(),
   "reschedule_count": zod.number().optional(),
   "can_reschedule": zod.boolean().optional(),
-  "evaluation_score": zod.string().nullish(),
-  "evaluation_notes": zod.string().nullish(),
+  "evaluation_score": zod.number().nullable(),
+  "evaluation_notes": zod.string().nullable(),
   "completed_at": zod.string().nullish(),
   "slot": zod.object({
   "id": zod.number().optional(),
   "scheduled_at": zod.string().optional(),
   "duration_minutes": zod.number().optional(),
   "mode": zod.string().optional(),
-  "location": zod.string().optional(),
-  "meeting_link": zod.string().nullish(),
+  "location": zod.string().nullable(),
+  "meeting_link": zod.string().nullable(),
   "interviewer_id": zod.number().optional(),
   "interviewer": zod.object({
   "id": zod.number().optional(),
@@ -1179,7 +1621,19 @@ export const InterviewsAssignedToMeResponse = zod.object({
   "applying_for_degree": zod.string().optional(),
   "status": zod.string().optional()
 }).optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -1233,6 +1687,19 @@ export const RecordMyEvaluationResponse = zod.object({
  * approval. Gated on `interview.schedule`.
  * @summary Applications awaiting interview scheduling.
  */
+export const ApplicationsAwaitingInterviewSchedulingQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ApplicationsAwaitingInterviewSchedulingResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1244,9 +1711,41 @@ export const ApplicationsAwaitingInterviewSchedulingResponse = zod.object({
   "primary_program": zod.string().nullish(),
   "finalized_at": zod.string().optional(),
   "review_entered_at": zod.string().optional(),
-  "age_days": zod.number().optional()
-})).optional()
+  "age_days": zod.number().nullable()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
+
+
+/**
+ * Every matching unbooked applicant for the privileged scheduling actor.
+ * @summary Export applications awaiting interview scheduling.
+ */
+export const ExportApplicationsAwaitingInterviewSchedulingQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Ignored by export.'),
+  "per_page": zod.number().optional().describe('Ignored by export.')
+})
+
+export const ExportApplicationsAwaitingInterviewSchedulingResponse = zod.unknown()
 
 
 /**
@@ -1254,20 +1753,77 @@ export const ApplicationsAwaitingInterviewSchedulingResponse = zod.object({
  * source for the slot form's interviewer picker. Gated on `interview.schedule`.
  * @summary List assignable interviewers.
  */
+export const ListAssignableInterviewersQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized staff name or email search.'),
+  "id": zod.string().optional().describe('Comma-separated eligible staff ids.'),
+  "sort": zod.string().optional().describe('Comma-separated id, name or email; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Reference size, capped at 100.')
+})
+
 export const ListAssignableInterviewersResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
   "name": zod.string().optional(),
   "email": zod.string().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
 /**
- * The whole slot pool, soonest-first, each with its resolved interviewer and
+ * Every matching manager-readable slot, independent of pagination.
+ * @summary Export interview slots.
+ */
+export const ExportInterviewSlotsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual location search.'),
+  "id": zod.string().optional().describe('Comma-separated slot ids.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids.'),
+  "mode": zod.string().optional().describe('Comma-separated modes.'),
+  "is_open": zod.string().optional().describe('Derived availability, true or false.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "duration_minutes_min": zod.number().optional().describe('Minimum duration in minutes.'),
+  "duration_minutes_max": zod.number().optional().describe('Maximum duration in minutes.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
+export const ExportInterviewSlotsResponse = zod.unknown()
+
+
+/**
+ * The paginated slot pool, soonest-first, each with its resolved interviewer and
  * whether it is still open. Gated on `interview.schedule`.
  * @summary List interview slots.
  */
+export const ListInterviewSlotsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual location search.'),
+  "id": zod.string().optional().describe('Comma-separated slot ids.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids.'),
+  "mode": zod.string().optional().describe('Comma-separated modes.'),
+  "is_open": zod.string().optional().describe('Derived availability, true or false.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "duration_minutes_min": zod.number().optional().describe('Minimum duration in minutes.'),
+  "duration_minutes_max": zod.number().optional().describe('Maximum duration in minutes.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
 export const ListInterviewSlotsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1283,7 +1839,19 @@ export const ListInterviewSlotsResponse = zod.object({
   "email": zod.string().optional()
 }).optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -1374,12 +1942,57 @@ export const DeleteAnInterviewSlotResponse = zod.looseObject({
 
 
 /**
+ * Downloads every matching authorized row with the list's live scope.
+ * @summary Export booked interviews.
+ */
+export const ExportBookedInterviewsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual applicant name or National ID search.'),
+  "id": zod.string().optional().describe('Comma-separated Interview ids.'),
+  "application_id": zod.string().optional().describe('Comma-separated Application ids.'),
+  "status": zod.string().optional().describe('Comma-separated confirmation states.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids, within actor scope.'),
+  "program_id": zod.string().optional().describe('Comma-separated primary Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Comma-separated applying degrees.'),
+  "mode": zod.string().optional().describe('Comma-separated interview modes.'),
+  "evaluation_score_min": zod.number().optional().describe('Minimum recorded score, 1–10.'),
+  "evaluation_score_max": zod.number().optional().describe('Maximum recorded score, 1–10.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
+export const ExportBookedInterviewsResponse = zod.unknown()
+
+
+/**
  * Every interview that has been booked, most-recent-first, each with the applicant
  * being interviewed, the slot details, its confirmation status, and any recorded
  * evaluation — Student Affairs' view for tracking interviews and marking them
  * complete. Gated on `interview.schedule`.
  * @summary Booked interviews.
  */
+export const BookedInterviewsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual applicant name or National ID search.'),
+  "id": zod.string().optional().describe('Comma-separated Interview ids.'),
+  "application_id": zod.string().optional().describe('Comma-separated Application ids.'),
+  "status": zod.string().optional().describe('Comma-separated confirmation states.'),
+  "interviewer_id": zod.string().optional().describe('Comma-separated interviewer ids, within actor scope.'),
+  "program_id": zod.string().optional().describe('Comma-separated primary Program ids.'),
+  "admission_cycle_id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Comma-separated applying degrees.'),
+  "mode": zod.string().optional().describe('Comma-separated interview modes.'),
+  "evaluation_score_min": zod.number().optional().describe('Minimum recorded score, 1–10.'),
+  "evaluation_score_max": zod.number().optional().describe('Maximum recorded score, 1–10.'),
+  "scheduled_at_min": zod.string().optional().describe('Earliest scheduled timestamp.'),
+  "scheduled_at_max": zod.string().optional().describe('Latest scheduled timestamp.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number; ignored by export.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100; ignored by export.')
+})
+
 export const BookedInterviewsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1387,16 +2000,16 @@ export const BookedInterviewsResponse = zod.object({
   "status": zod.string().optional(),
   "reschedule_count": zod.number().optional(),
   "can_reschedule": zod.boolean().optional(),
-  "evaluation_score": zod.number().optional(),
-  "evaluation_notes": zod.string().optional(),
+  "evaluation_score": zod.number().nullable(),
+  "evaluation_notes": zod.string().nullable(),
   "completed_at": zod.string().nullish(),
   "slot": zod.object({
   "id": zod.number().optional(),
   "scheduled_at": zod.string().optional(),
   "duration_minutes": zod.number().optional(),
   "mode": zod.string().optional(),
-  "location": zod.string().optional(),
-  "meeting_link": zod.string().nullish(),
+  "location": zod.string().nullable(),
+  "meeting_link": zod.string().nullable(),
   "interviewer_id": zod.number().optional(),
   "interviewer": zod.object({
   "id": zod.number().optional(),
@@ -1412,7 +2025,19 @@ export const BookedInterviewsResponse = zod.object({
   "applying_for_degree": zod.string().optional(),
   "status": zod.string().optional()
 }).optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -1507,12 +2132,76 @@ export const StatusTimelineResponse = zod.object({
 
 
 /**
- * The applications awaiting Student Affairs screening (`under_sa_review`),
- * oldest-first, each with the applicant's identity, chosen primary Program, and a
+ * Live actor-scoped counts and measured conversions from Admissions' owner
+ * aggregate. Reads never reconcile or mutate Applications. Counts include
+ * zero stages; a conversion with no eligible Applications has a null rate.
+ * Requires application.screen. Paging never limits a Report summary.
+ * @summary Application Pipeline Report.
+ */
+export const ApplicationPipelineReportQueryParams = zod.object({
+  "admission_cycle_id": zod.number().describe('Selected Admission Cycle.'),
+  "program_id": zod.number().nullish().describe('Optional primary Program.'),
+  "degree_level": zod.string().nullish().describe('Optional MSc or PhD degree.'),
+  "page": zod.number().optional().describe('Ignored by the summary.'),
+  "per_page": zod.number().optional().describe('Ignored by the summary.')
+})
+
+export const ApplicationPipelineReportResponse = zod.object({
+  "data": zod.object({
+  "total": zod.number().optional(),
+  "statuses": zod.object({
+  "draft": zod.number().optional(),
+  "submitted": zod.number().optional(),
+  "email_verified": zod.number().optional(),
+  "under_sa_review": zod.number().optional(),
+  "sa_approved": zod.number().optional(),
+  "returned_for_revision": zod.number().optional(),
+  "under_dean_review": zod.number().optional(),
+  "interview_scheduled": zod.number().optional(),
+  "interview_completed": zod.number().optional(),
+  "accepted": zod.number().optional(),
+  "conditionally_accepted": zod.number().optional(),
+  "waitlisted": zod.number().optional(),
+  "rejected": zod.number().optional()
+}).optional(),
+  "conversions": zod.array(zod.object({
+  "from_status": zod.string().optional(),
+  "to_status": zod.string().optional(),
+  "eligible": zod.number().optional(),
+  "converted": zod.number().optional(),
+  "rate": zod.number().optional()
+})).optional()
+}).optional(),
+  "meta": zod.object({
+  "admission_cycle_id": zod.number().optional(),
+  "program_id": zod.number().nullable(),
+  "degree_level": zod.string().nullable()
+}).optional()
+})
+
+
+/**
+ * Defaults to Applications awaiting Student Affairs screening (`under_sa_review`).
+ * An explicit status selection supports Pipeline drill-through across stages,
+ * within the same actor scope. Oldest-first, each with identity, primary Program, and a
  * **derived age** — whole days waited since entering review, computed from the
  * timeline, never stored. Gated on `application.screen`.
  * @summary Screening queue.
  */
+export const ScreeningQueueQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated Application statuses; defaults to under_sa_review.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids, narrowing the actor scope.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ScreeningQueueResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1534,9 +2223,43 @@ export const ScreeningQueueResponse = zod.object({
 }).optional(),
   "finalized_at": zod.string().optional(),
   "review_entered_at": zod.string().optional(),
-  "age_days": zod.number().optional()
-})).optional()
+  "age_days": zod.number().nullable()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
+
+
+/**
+ * Canonical authorized columns, localized to the request language. Includes
+ * all scoped matches; page and per_page never limit the file. No evidence files.
+ * @summary Export screening queue.
+ */
+export const ExportScreeningQueueQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids, narrowing the actor scope.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Ignored by export.'),
+  "per_page": zod.number().optional().describe('Ignored by export.')
+})
+
+export const ExportScreeningQueueResponse = zod.unknown()
 
 
 /**
@@ -1704,6 +2427,20 @@ export const ScreeningQueueCardResponse = zod.object({
  * A Dean with no assigned Faculty (or a non-Dean reviewer) sees an empty queue.
  * @summary Dean review queue.
  */
+export const DeanReviewQueueQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids, narrowing the actor scope.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const DeanReviewQueueResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1725,9 +2462,42 @@ export const DeanReviewQueueResponse = zod.object({
 }).optional(),
   "finalized_at": zod.string().optional(),
   "review_entered_at": zod.string().optional(),
-  "age_days": zod.number().optional()
-})).optional()
+  "age_days": zod.number().nullable()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
+
+
+/**
+ * Canonical readable columns for every filtered row inside the Dean faculty scope.
+ * @summary Export Dean review queue.
+ */
+export const ExportDeanReviewQueueQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids, narrowing the actor scope.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Ignored by export.'),
+  "per_page": zod.number().optional().describe('Ignored by export.')
+})
+
+export const ExportDeanReviewQueueResponse = zod.unknown()
 
 
 /**
@@ -1772,6 +2542,20 @@ export const DeanDecisionOnAnApplicationResponse = zod.union([zod.object({
  * Gated on `applicant.decide` (Dean only).
  * @summary Dean decisions queue.
  */
+export const DeanDecisionsQueueQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids, narrowing the actor scope.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const DeanDecisionsQueueResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1793,9 +2577,42 @@ export const DeanDecisionsQueueResponse = zod.object({
 }).optional(),
   "finalized_at": zod.string().optional(),
   "review_entered_at": zod.string().optional(),
-  "age_days": zod.number().optional()
-})).optional()
+  "age_days": zod.number().nullable()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
+
+
+/**
+ * Canonical readable columns for every matching row inside the Dean faculty scope.
+ * @summary Export Dean decision worklist.
+ */
+export const ExportDeanDecisionWorklistQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual name or identifier search.'),
+  "status": zod.string().optional().describe('Comma-separated statuses within the queue.'),
+  "program_id": zod.string().optional().describe('Program ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids, narrowing the actor scope.'),
+  "admission_cycle_id": zod.string().optional().describe('Cycle ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "age_days_min": zod.number().optional().describe('Minimum whole days in current review.'),
+  "age_days_max": zod.number().optional().describe('Maximum whole days in current review.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Ignored by export.'),
+  "per_page": zod.number().optional().describe('Ignored by export.')
+})
+
+export const ExportDeanDecisionWorklistResponse = zod.unknown()
 
 
 /**
@@ -1804,14 +2621,32 @@ export const DeanDecisionsQueueResponse = zod.object({
  * on `applicant.decide`.
  * @summary Advisors for the decision form.
  */
+export const AdvisorsForTheDecisionFormQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized staff name or email search.'),
+  "id": zod.string().optional().describe('Comma-separated eligible staff ids.'),
+  "sort": zod.string().optional().describe('Comma-separated id, name or email; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Reference size, capped at 100.')
+})
+
 export const AdvisorsForTheDecisionFormResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
   "name": zod.string().optional(),
   "email": zod.string().optional()
 })).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
   "meta": zod.object({
-  "suggested_advisor_id": zod.number().optional()
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional(),
+  "suggested_advisor_id": zod.number().nullable()
 }).optional()
 })
 
@@ -1918,6 +2753,20 @@ export const StreamADocumentResponse = zod.void()
  * list; the public registration screen uses the open-cycle lookup instead.
  * @summary List Admission Cycles.
  */
+export const ListAdmissionCyclesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual Cycle name search.'),
+  "id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "intake_term": zod.string().optional().describe('Comma-separated intake terms.'),
+  "year": zod.string().optional().describe('Comma-separated intake years.'),
+  "year_min": zod.number().optional().describe('Minimum intake year.'),
+  "year_max": zod.number().optional().describe('Maximum intake year.'),
+  "is_active": zod.string().optional().describe('Active states, true or false.'),
+  "is_open": zod.string().optional().describe('Derived window states, true or false.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ListAdmissionCyclesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -1929,7 +2778,19 @@ export const ListAdmissionCyclesResponse = zod.object({
   "closes_at": zod.string().optional(),
   "is_active": zod.boolean().optional(),
   "is_open": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -1958,6 +2819,27 @@ export const CreateAnAdmissionCycleResponse = zod.object({
   "is_open": zod.boolean().optional()
 }).optional()
 })
+
+
+/**
+ * All matching manager-readable rows, with bilingual names and localized state.
+ * @summary Export Admission Cycles.
+ */
+export const ExportAdmissionCyclesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Normalized bilingual Cycle name search.'),
+  "id": zod.string().optional().describe('Comma-separated Cycle ids.'),
+  "intake_term": zod.string().optional().describe('Comma-separated intake terms.'),
+  "year": zod.string().optional().describe('Comma-separated intake years.'),
+  "year_min": zod.number().optional().describe('Minimum intake year.'),
+  "year_max": zod.number().optional().describe('Maximum intake year.'),
+  "is_active": zod.string().optional().describe('Active states, true or false.'),
+  "is_open": zod.string().optional().describe('Derived window states, true or false.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Ignored by export.'),
+  "per_page": zod.number().optional().describe('Ignored by export.')
+})
+
+export const ExportAdmissionCyclesResponse = zod.unknown()
 
 
 /**
@@ -2296,8 +3178,35 @@ export const CatalogSummaryCardResponse = zod.object({
 
 
 /**
+ * All matching authorized rows with canonical localized columns; paging is ignored.
+ * @summary Export Faculties.
+ */
+export const ExportFacultiesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const ExportFacultiesResponse = zod.unknown()
+
+
+/**
  * @summary List Faculties.
  */
+export const ListFacultiesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
 export const ListFacultiesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2305,7 +3214,19 @@ export const ListFacultiesResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2410,8 +3331,37 @@ export const DeactivateAFacultyResponse = zod.object({
 
 
 /**
+ * All matching authorized rows with canonical localized columns; paging is ignored.
+ * @summary Export Departments.
+ */
+export const ExportDepartmentsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const ExportDepartmentsResponse = zod.unknown()
+
+
+/**
  * @summary List Departments.
  */
+export const ListDepartmentsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
 export const ListDepartmentsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2420,7 +3370,19 @@ export const ListDepartmentsResponse = zod.object({
   "name_en": zod.string().optional(),
   "name_ar": zod.string().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2532,8 +3494,41 @@ export const DeactivateADepartmentResponse = zod.object({
 
 
 /**
+ * All matching authorized rows with canonical localized columns; paging is ignored.
+ * @summary Export Programs.
+ */
+export const ExportProgramsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "department_id": zod.string().optional().describe('Department ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
+export const ExportProgramsResponse = zod.unknown()
+
+
+/**
  * @summary List Programs.
  */
+export const ListProgramsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual name or code fragment.'),
+  "id": zod.string().optional().describe('Comma-separated reference ids.'),
+  "code": zod.string().optional().describe('Exact codes.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "department_id": zod.string().optional().describe('Department ids.'),
+  "faculty_id": zod.string().optional().describe('Faculty ids.'),
+  "degree_level": zod.string().optional().describe('Degree levels.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; minus descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size capped at 100.')
+})
+
 export const ListProgramsResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2547,7 +3542,19 @@ export const ListProgramsResponse = zod.object({
   "elective_required_ch": zod.number().optional(),
   "total_required_ch": zod.number().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 
@@ -2886,8 +3893,43 @@ export const ListACoursesVersionHistoryResponse = zod.object({
 
 
 /**
+ * Canonical localized import template for every scoped match, ignoring paging.
+ * @summary Export Courses.
+ */
+export const ExportCoursesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual names or Course code fragment.'),
+  "department_id": zod.string().optional().describe('Owning Department ids.'),
+  "level": zod.string().optional().describe('Course levels.'),
+  "total_ch": zod.string().optional().describe('Credit-hour totals.'),
+  "total_ch_min": zod.number().optional().describe('Minimum total credit hours.'),
+  "total_ch_max": zod.number().optional().describe('Maximum total credit hours.'),
+  "research_type": zod.string().optional().describe('Research Types.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
+export const ExportCoursesResponse = zod.unknown()
+
+
+/**
  * @summary List Courses.
  */
+export const ListCoursesQueryParams = zod.object({
+  "q": zod.string().optional().describe('Bilingual names or Course code fragment.'),
+  "department_id": zod.string().optional().describe('Owning Department ids.'),
+  "level": zod.string().optional().describe('Course levels.'),
+  "total_ch": zod.string().optional().describe('Credit-hour totals.'),
+  "total_ch_min": zod.number().optional().describe('Minimum total credit hours.'),
+  "total_ch_max": zod.number().optional().describe('Maximum total credit hours.'),
+  "research_type": zod.string().optional().describe('Research Types.'),
+  "is_active": zod.string().optional().describe('Active states.'),
+  "sort": zod.string().optional().describe('Comma-separated readable fields; \'-\' descends.'),
+  "page": zod.number().optional().describe('Page number.'),
+  "per_page": zod.number().optional().describe('Page size, capped at 100.')
+})
+
 export const ListCoursesResponse = zod.object({
   "data": zod.array(zod.object({
   "id": zod.number().optional(),
@@ -2902,7 +3944,19 @@ export const ListCoursesResponse = zod.object({
   "lab_ch": zod.number().optional(),
   "total_ch": zod.number().optional(),
   "is_active": zod.boolean().optional()
-})).optional()
+})).optional(),
+  "links": zod.object({
+  "first": zod.string().optional(),
+  "last": zod.string().optional(),
+  "prev": zod.string().nullish(),
+  "next": zod.string().nullish()
+}).optional(),
+  "meta": zod.object({
+  "current_page": zod.number().optional(),
+  "per_page": zod.number().optional(),
+  "total": zod.number().optional(),
+  "last_page": zod.number().optional()
+}).optional()
 })
 
 

@@ -114,7 +114,7 @@ export function TransferReviewQueuePage({ stage }: { stage: TransferReviewStage 
         </Button>
       </Stack>
       {state === 'loading' && (
-        <Stack spacing={2} aria-label={t('transfers.loading')}>
+        <Stack role="status" spacing={2} aria-label={t('transfers.loading')}>
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(32.5) })} />
           <Skeleton variant="rounded" sx={(theme) => ({ height: theme.spacing(32.5) })} />
         </Stack>

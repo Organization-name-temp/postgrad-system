@@ -1,0 +1,207 @@
+import { useQueries } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+  getListDepartmentsQueryOptions,
+  getListFacultiesQueryOptions,
+  getListProgramsQueryOptions,
+  useListDepartments,
+  useListFaculties,
+  useListPrograms,
+} from '../../shared/api/generated/endpoints'
+import { pickLocaleName } from '../../shared/i18n/localeName'
+import type { FilterField, FilterOption } from '../../shared/ui/FilterBar'
+import { useCollectionQuery } from '../../shared/ui/useCollectionQuery'
+
+export const ACADEMIC_STANDINGS = [
+  'TerminationPending',
+  'NotYetAssessed',
+  'AcademicProbation',
+  'AcademicWarning',
+  'GoodStanding',
+] as const
+
+/** Exact reference reads respect the owning collection's 100-row page cap. */
+function referenceBatches(ids: string | null): string[] {
+  const values = [
+    ...new Set(
+      (ids ?? '')
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean),
+    ),
+  ]
+  return Array.from({ length: Math.ceil(values.length / 100) }, (_, index) =>
+    values.slice(index * 100, (index + 1) * 100).join(','),
+  )
+}
+
+/** Shared only by the AcademicStanding owner's Report and ordinary Student List. */
+export function useAcademicReportCriteria(includeStanding = true, defaultLifecycle = 'Active') {
+  const { t, i18n } = useTranslation('academicStanding')
+  const collection = useCollectionQuery()
+  const [facultySearch, setFacultySearch] = useState<string | null>(null)
+  const [departmentSearch, setDepartmentSearch] = useState<string | null>(null)
+  const [programSearch, setProgramSearch] = useState<string | null>(null)
+  const faculty = collection.searchParams.get('faculty_id')
+  const department = collection.searchParams.get('department_id')
+  const program = collection.searchParams.get('program_id')
+  const faculties = useListFaculties({ q: facultySearch ?? undefined, per_page: 100 })
+  const departments = useListDepartments({ q: departmentSearch ?? undefined, per_page: 100 })
+  const programs = useListPrograms({ q: programSearch ?? undefined, per_page: 100 })
+  const facultyBatches = referenceBatches(faculty)
+  const departmentBatches = referenceBatches(department)
+  const programBatches = referenceBatches(program)
+  const selectedFaculties = useQueries({
+    queries: facultyBatches.map((id) => getListFacultiesQueryOptions({ id, per_page: 100 })),
+  })
+  const selectedDepartments = useQueries({
+    queries: departmentBatches.map((id) => getListDepartmentsQueryOptions({ id, per_page: 100 })),
+  })
+  const selectedPrograms = useQueries({
+    queries: programBatches.map((id) => getListProgramsQueryOptions({ id, per_page: 100 })),
+  })
+  type ReferenceRow = { id?: number; name_en?: string; name_ar?: string }
+  const option = (row: ReferenceRow): FilterOption => ({
+    value: String(row.id),
+    label: pickLocaleName(row, i18n.language, String(row.id)),
+  })
+  const selected = (
+    ids: string | null,
+    results: readonly { data?: { data?: ReferenceRow[] }; isFetching: boolean; isError: boolean }[],
+    batches: readonly string[],
+  ): FilterOption | undefined =>
+    ids
+      ? {
+          value: ids,
+          label: ids
+            .split(',')
+            .map((id) => {
+              const token = id.trim()
+              const result = results[batches.findIndex((batch) => batch.split(',').includes(token))]
+              const row = result?.data?.data?.find((item) => String(item.id) === token)
+              if (row) return option(row).label
+              const key = result?.isFetching
+                ? 'report.referenceLoadingValue'
+                : result?.isError
+                  ? 'report.referenceNameError'
+                  : 'report.referenceUnavailable'
+              return t(key, { id: token })
+            })
+            .join(', '),
+        }
+      : undefined
+  const facultyChoice = selected(faculty, selectedFaculties, facultyBatches)
+  const departmentChoice = selected(department, selectedDepartments, departmentBatches)
+  const programChoice = selected(program, selectedPrograms, programBatches)
+  const referenceCopy = {
+    noOptionsText: t('report.noMatches'),
+    loadingText: t('report.referenceLoading'),
+    clearText: t('report.clear'),
+    openText: t('report.open'),
+    closeText: t('report.close'),
+  }
+  const fields: FilterField[] = [
+    { key: 'q', label: t('report.search') },
+    {
+      key: 'faculty_id',
+      label: t('report.faculty'),
+      reference: {
+        ...referenceCopy,
+        options: (faculties.data?.data ?? []).map(option),
+        selected: facultyChoice,
+        query: facultySearch,
+        onSearch: setFacultySearch,
+        loading: faculties.isFetching || selectedFaculties.some((query) => query.isFetching),
+      },
+    },
+    {
+      key: 'department_id',
+      label: t('report.department'),
+      reference: {
+        ...referenceCopy,
+        options: (departments.data?.data ?? []).map(option),
+        selected: departmentChoice,
+        query: departmentSearch,
+        onSearch: setDepartmentSearch,
+        loading: departments.isFetching || selectedDepartments.some((query) => query.isFetching),
+      },
+    },
+    {
+      key: 'program_id',
+      label: t('report.program'),
+      reference: {
+        ...referenceCopy,
+        options: (programs.data?.data ?? []).map(option),
+        selected: programChoice,
+        query: programSearch,
+        onSearch: setProgramSearch,
+        loading: programs.isFetching || selectedPrograms.some((query) => query.isFetching),
+      },
+    },
+    {
+      key: 'degree_level',
+      label: t('report.degree'),
+      options: [
+        { value: '', label: t('report.all') },
+        { value: 'MSc', label: t('report.msc') },
+        { value: 'PhD', label: t('report.phd') },
+      ],
+    },
+    {
+      key: 'lifecycle',
+      label: t('report.lifecycle'),
+      options: [
+        { value: 'Active', label: t('report.lifecycles.Active') },
+        { value: 'Terminated', label: t('report.lifecycles.Terminated') },
+        { value: 'Active,Terminated', label: t('report.all') },
+      ],
+    },
+    {
+      key: 'standing',
+      label: t('report.standing'),
+      options: [
+        { value: '', label: t('report.all') },
+        ...ACADEMIC_STANDINGS.map((value) => ({ value, label: t(`standing.values.${value}`) })),
+      ],
+    },
+  ]
+  const labelFor = (key: string, value: string | null): string => {
+    const options = fields.find((field) => field.key === key)?.options
+    return value
+      ? value
+          .split(',')
+          .map(
+            (token) => options?.find((item) => item.value === token.trim())?.label ?? token.trim(),
+          )
+          .join(', ')
+      : t('report.all')
+  }
+  const criteria = [
+    { label: t('report.search'), value: collection.searchParams.get('q') ?? t('report.all') },
+    { label: t('report.faculty'), value: facultyChoice?.label ?? t('report.all') },
+    { label: t('report.department'), value: departmentChoice?.label ?? t('report.all') },
+    { label: t('report.program'), value: programChoice?.label ?? t('report.all') },
+    {
+      label: t('report.degree'),
+      value: labelFor('degree_level', collection.searchParams.get('degree_level')),
+    },
+    {
+      label: t('report.lifecycle'),
+      value: labelFor('lifecycle', collection.searchParams.get('lifecycle') ?? defaultLifecycle),
+    },
+    {
+      label: t('report.standing'),
+      value: labelFor('standing', collection.searchParams.get('standing')),
+    },
+  ]
+  return {
+    ...collection,
+    fields: includeStanding ? fields : fields.filter((field) => field.key !== 'standing'),
+    criteria: includeStanding ? criteria : criteria.slice(0, -1),
+    values: {
+      ...collection.params,
+      lifecycle: collection.searchParams.get('lifecycle') ?? defaultLifecycle,
+    },
+  }
+}

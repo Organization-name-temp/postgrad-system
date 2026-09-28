@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import { MemoryRouter } from 'react-router-dom'
 import '../../../shared/i18n/config' // initialise i18next so useTranslation works
@@ -135,3 +135,18 @@ describe('MyRegistrationCard', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Could not load your registration.')
   })
 })
+
+it.each([1, 2, 3, 11, 100])(
+  'shows the actual Arabic credit-hour count %i rather than a singular fallback',
+  async (count) => {
+    const { default: i18n } = await import('../../../shared/i18n/config')
+    await i18n.changeLanguage('ar')
+    try {
+      mockedQuery.mockReturnValue(queryResult(payload({ credit_hours: count })))
+      renderCard()
+      expect(screen.getByText(`الساعات المعتمدة: ${count}`)).toBeInTheDocument()
+    } finally {
+      await act(() => i18n.changeLanguage('en'))
+    }
+  },
+)

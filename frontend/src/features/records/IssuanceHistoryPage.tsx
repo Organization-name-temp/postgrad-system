@@ -83,7 +83,9 @@ export function IssuanceHistoryPage() {
         page={page}
         onChange={(_, value) => setPage(value)}
       />
-      {query.isPending && <Skeleton variant="rectangular" height={96} aria-label={t('loading')} />}
+      {query.isPending && (
+        <Skeleton role="status" variant="rectangular" height={96} aria-label={t('loading')} />
+      )}
       {!query.isPending && !query.isError && query.data?.data?.length === 0 && (
         <Alert severity="info" icon={<InboxOutlined />}>
           {t('service.noCopies')}

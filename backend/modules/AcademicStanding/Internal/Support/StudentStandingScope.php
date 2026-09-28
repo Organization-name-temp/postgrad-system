@@ -27,8 +27,9 @@ final readonly class StudentStandingScope
             || $this->directory->hasRole($userId, Role::Council)) {
             return true;
         }
-        if ($this->directory->hasRole($userId, Role::Advisor)) {
-            return in_array($student->studentId, $this->students->studentIdsAdvisedBy($userId), true);
+        if ($this->directory->hasRole($userId, Role::Advisor)
+            && in_array($student->studentId, $this->students->studentIdsAdvisedBy($userId), true)) {
+            return true;
         }
         $program = $this->programs->find($student->programId);
         if ($program === null) {

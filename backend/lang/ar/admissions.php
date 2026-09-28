@@ -2,6 +2,34 @@
 
 // Arabic Admissions domain lines, selected when the request negotiates `ar`.
 return [
+    'slot_export' => ['columns' => ['id' => 'معرّف الموعد', 'scheduled_at' => 'موعد المقابلة', 'duration_minutes' => 'المدة بالدقائق', 'mode' => 'النمط', 'location' => 'المكان', 'interviewer_id' => 'معرّف المحاور', 'interviewer_name' => 'المحاور', 'is_open' => 'التوفر'], 'values' => ['open' => 'متاح', 'booked' => 'محجوز']],
+    'interview_export_columns' => ['id' => 'معرّف المقابلة', 'application_id' => 'مرجع الطلب', 'name_en' => 'الاسم بالإنجليزية', 'name_ar' => 'الاسم بالعربية', 'national_id' => 'الرقم القومي / جواز السفر', 'degree' => 'الدرجة', 'status' => 'حالة التأكيد', 'scheduled_at' => 'موعد المقابلة', 'duration_minutes' => 'المدة بالدقائق', 'mode' => 'النمط', 'location' => 'المكان', 'interviewer_id' => 'معرّف المحاور', 'interviewer_name' => 'المحاور', 'evaluation_score' => 'درجة التقييم', 'evaluation_notes' => 'ملاحظات التقييم', 'completed_at' => 'وقت الإتمام'],
+    'interview_states' => ['pending_confirmation' => 'بانتظار التأكيد', 'confirmed' => 'مؤكد'],
+    'interview_modes' => ['in_person' => 'حضوري', 'virtual' => 'عن بُعد'],
+    'cycle_export' => [
+        'columns' => [
+            'id' => 'معرّف دورة القبول',
+            'intake_term' => 'فصل القبول',
+            'year' => 'السنة',
+            'name_en' => 'الاسم بالإنجليزية',
+            'name_ar' => 'الاسم بالعربية',
+            'opens_at' => 'بداية التقديم',
+            'closes_at' => 'نهاية التقديم',
+            'is_active' => 'حالة التفعيل',
+            'is_open' => 'حالة نافذة التقديم',
+        ],
+        'values' => [
+            'Fall' => 'الخريف',
+            'Spring' => 'الربيع',
+            'active' => 'مفعّلة',
+            'inactive' => 'غير مفعّلة',
+            'open' => 'مفتوحة',
+            'closed' => 'مغلقة',
+        ],
+    ],
+
+    'export_columns' => ['id' => 'مرجع الطلب', 'name_en' => 'الاسم بالإنجليزية', 'name_ar' => 'الاسم بالعربية', 'national_id' => 'الرقم القومي / جواز السفر', 'degree' => 'الدرجة', 'program' => 'البرنامج', 'status' => 'الحالة', 'age_days' => 'أيام المراجعة', 'date_of_birth' => 'تاريخ الميلاد', 'nationality' => 'الجنسية', 'phone' => 'الهاتف', 'address' => 'العنوان', 'finalized_at' => 'وقت الإرسال النهائي'],
+    'statuses' => ['draft' => 'مسودة', 'submitted' => 'تم الإرسال', 'email_verified' => 'تم التحقق من البريد', 'under_sa_review' => 'قيد مراجعة شؤون الطلاب', 'sa_approved' => 'وافقت شؤون الطلاب', 'returned_for_revision' => 'أُعيد للتعديل', 'under_dean_review' => 'قيد مراجعة العميد', 'interview_scheduled' => 'تم تحديد المقابلة', 'interview_completed' => 'اكتملت المقابلة', 'accepted' => 'مقبول', 'conditionally_accepted' => 'مقبول بشروط', 'waitlisted' => 'قائمة الانتظار', 'rejected' => 'مرفوض'],
     // فاصل القوائم المبنية داخل رسالة (مثل تعداد المستندات الناقصة) — بالفاصلة العربية.
     'list_separator' => '، ',
     'registration' => [

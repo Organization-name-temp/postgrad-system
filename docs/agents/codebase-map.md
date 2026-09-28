@@ -46,12 +46,13 @@ modules/<Module>/
 |---|---|---|
 | `Identity` | users, fixed roles and permissions, student anchors and lifecycle projection, audit log, dean/head assignments, authentication | `Public/Contracts`, `StudentIdentity`, `AdmitStudent`, transaction-scoped `StudentGuard` / `StudentLifecycleWriter`, user/student DTOs |
 | `Catalog` | faculties, departments, programs, courses, curricula, catalog version snapshots | course/program/curriculum catalog facades and summary DTOs |
-| `Admissions` | admission cycles, applications, documents, review workflow, interviews, decisions | HTTP routes; acceptance hands student creation to Identity through its public contract |
+| `Admissions` | admission cycles, applications, documents, review workflow, interviews, decisions, Application Pipeline Report | HTTP routes and `ApplicationPipelines`; acceptance hands student creation to Identity through its public contract |
 | `Notifications` | persisted in-app notifications and the polled notification API | `Notifier` contract and `NotificationType` |
 | `Calendar` | semesters and registration/add-drop/withdrawal/grading windows | `AcademicCalendar` and `SemesterSummary` |
 | `Enrollment` | offerings, meetings, registration requests, enrollments, class sessions, attendance, earned-credit state, and automatic/manual Exemption decisions | `EnrollmentRecords`, `ExemptionDecisions`, and enrollment/offering/decision DTOs |
 | `Records` | current Transcripts, official requests/issuances, fee/payment/refund evidence, cancellation, collection, revocation, and bearer verification | owner Public contracts and transactional `TranscriptReadGuard` seams consumed by `Internal/Support`; HTTP routes |
 | `Grading` | grade sheets, grades, correction rounds, Incompletes, GPA/CGPA read model | `GradingRecords` and `GradeSummary` |
+| `AcademicStanding` | current Academic Standing and scoped Standing Report/List/export, Credit-Hour Summary, advisory Graduation Readiness and scoped readiness Report/List/export, minimal scoped Termination Report/List/export and operational Cases | `StandingRecords`, `CreditHourSummaries`, `GraduationProgress`, `TerminationCases` |
 
 When changing a module, begin at its `Public/Http/routes.php`, follow the route into `Internal/Http/Controllers`, then trace models/support classes and the matching tests. When another module needs data, begin at the owner's existing `Public` facade before considering a new method.
 
@@ -87,12 +88,17 @@ When changing a module, begin at its `Public/Http/routes.php`, follow the route 
 Feature ownership mirrors user-facing workflows:
 
 - `features/admin`: assignments, admission cycles, offerings, and semesters.
-- `features/admissions`: applicant wizard, screening, dean decisions, interviews, and application status.
+- `features/admissions`: applicant wizard, screening, dean decisions, interviews, application status, and the Application Pipeline Report.
 - `features/auth`: login, auth state, route guard, and dashboard.
 - `features/catalog`: faculty/department/program/course management, curricula, tree, and version history.
 - `features/enrollment`: registration, advising, on-behalf registration, schedules, attendance, and instructor registers.
 - `features/records`: bilingual current/official Transcript documents, service queues/actions/evidence, issuance history, staff fee setup, and public verification outside the authenticated shell.
 - `features/grading`: instructor sheets/corrections/Incompletes, department-head review, oversight, and student grades.
+- `features/academic-standing`: Student credit/standing summaries, scoped Academic Standing Report and pageable Student List, advisory readiness Report/List and Termination review surfaces. The app composes protected `/analytics/academic-standing` and `/analytics/academic-standing/students` routes; The same staff gate composes `/analytics/graduation-readiness` and its `/students` List. The same gate composes `/analytics/termination` and its `/cases` List; operational review links additionally require their stage and operational authority. Report downloads use the owner API.
+
+The shell composes owner Reports beneath permission-filtered Analytics navigation.
+Shared `FilterBar`, `Chart`/`ChartDataTable`, and `ReportDocument` supply parameter,
+accessible-series, and browser-print presentation; owners supply criteria and values.
 
 Vitest tests are colocated as `*.test.ts` or `*.test.tsx`. Full-stack journeys live in `frontend/e2e/*.spec.ts`; `playwright.config.ts` starts Laravel and Vite, but it expects PostgreSQL to be running and seeded.
 

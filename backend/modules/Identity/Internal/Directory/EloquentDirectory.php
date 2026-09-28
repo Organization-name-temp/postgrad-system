@@ -5,7 +5,10 @@ namespace Modules\Identity\Internal\Directory;
 use Modules\Identity\Internal\Models\User;
 use Modules\Identity\Public\Contracts\Directory;
 use Modules\Identity\Public\Enums\Role;
+use Modules\Identity\Public\UserPage;
 use Modules\Identity\Public\UserSummary;
+use Support\Query\CollectionQuery;
+use Support\Query\SqlCollectionQuery;
 
 /**
  * The Eloquent-backed {@see Directory}. Reads the `users` (and `user_roles`) tables
@@ -23,6 +26,15 @@ class EloquentDirectory implements Directory
             ->get(['id', 'name', 'email'])
             ->map(fn (User $user): UserSummary => $this->toSummary($user))
             ->all();
+    }
+
+    public function pageByRole(Role $role, CollectionQuery $query): UserPage
+    {
+        $selection = User::query()->whereHas('userRoles', fn ($membership) => $membership->where('role', $role->value));
+        $page = SqlCollectionQuery::apply($selection, $query, ['id' => 'id', 'name' => 'name', 'email' => 'email'], ['name', 'email'])
+            ->paginate($query->perPage, ['id', 'name', 'email'], 'page', $query->page);
+
+        return new UserPage($page->getCollection()->map(fn (User $user): UserSummary => $this->toSummary($user))->all(), $page->total(), $page->currentPage(), $page->perPage());
     }
 
     /**

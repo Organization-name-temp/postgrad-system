@@ -18,7 +18,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
 import {
   useListACoursesVersionHistory,
-  useListDepartments,
+  useShowADepartment,
   useShowACourse,
 } from '../../../shared/api/generated/endpoints'
 import { usePermissions } from '../../../shared/access/usePermissions'
@@ -51,8 +51,9 @@ export function CourseEditPage() {
   const versions = useListACoursesVersionHistory(courseId)
   // Departments resolve the owning Department's name for the header (a Course
   // carries only its department_id); a university-wide Course has none.
-  const { data: departmentsData } = useListDepartments()
-  const departments = departmentsData?.data ?? []
+  const ownerDepartment = useShowADepartment(Number(course?.department_id), {
+    query: { enabled: course?.department_id != null },
+  })
 
   const [detailsOpen, setDetailsOpen] = useState(false)
 
@@ -67,7 +68,7 @@ export function CourseEditPage() {
   // the other language beneath it.
   const name = pickLocaleName(course, i18n.language, course.code ?? '')
   const altName = i18n.language === 'ar' ? course.name_en : course.name_ar
-  const department = departments.find((item) => item.id === course.department_id)
+  const department = ownerDepartment.data?.data
   const owner =
     course.department_id != null
       ? department && pickLocaleName(department, i18n.language, department.code ?? '')
@@ -102,7 +103,7 @@ export function CourseEditPage() {
             {name}
           </Typography>
           {altName && altName !== name && (
-            <Typography variant="subtitle1" color="text.secondary">
+            <Typography variant="subtitle1" component="p" color="text.secondary">
               {altName}
             </Typography>
           )}

@@ -65,10 +65,18 @@ a foreign app. All seeded accounts below use password `password`.
   **1,334 tests / 8,458 assertions (790.42s), terminal exit 0**.
 - Expanded owner presentation checks passed: Admissions 4.6m and seven remaining
   correction/Enrollment/headline/Records checks in 15.2m.
-- Frontend gate: API/static stages and 121 files / 676 unit tests passed in the
-  isolated full attempt; 178 serial browser tests passed and one Records print
-  locale assertion failed. Its reload-preference wait is fixed; affected browser
-  verification and the complete final gate remain pending.
+- Frontend gate: the final API/static stages and **121 files / 684 unit tests**
+  passed. Its 179-test serial browser stage is active. The previous complete
+  attempt had 178 browser passes and one Records locale assertion failure; the
+  reload-preference fix passed the complete affected Records journey (9.5m).
+  No complete frontend-gate pass is claimed before its terminal result.
+- GitHub run [36360347596](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36360347596):
+  backend and frontend jobs passed, matching the 1,334/684 test counts. Browser
+  stage finished 177/179, with two label-colour assertions during theme transition.
+  A real MUI probe and RED/GREEN native regression establish the correction at
+  `c1dbe1c`: wait for finite presentation animations before scans and after audit
+  restoration. Static format and 180-test discovery pass. Affected Enrollment/
+  Records rechecks and a remote run containing this correction remain pending.
 - Consolidated Standards/Spec review: one native run, four actionable findings
   fixed and confirmed resolved. [Review evidence](review.md) includes separate
   axes, requirements, test-first fixes and verification.

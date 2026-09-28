@@ -892,7 +892,7 @@ a Card may now carry, and [CONTEXT.md](../CONTEXT.md) gains **Report** and **Exp
 
 ### Phase 6 — Records & Transcript (SRS §4.9)
 
-**Status: complete and verified on `phase-6/records-transcript`.** All 13 tickets in
+**Status: complete, verified and merged to `main` via PR #10 (`b3a3ae7`).** All 13 tickets in
 [the Phase 6 specification](../.scratch/phase-6/spec.md) are complete. Admission identity
 recovery, current and immutable bilingual Transcripts, private requests/fees/payments,
 cancellation/full refunds, digital delivery/collection, public QR verification/revocation,
@@ -900,7 +900,8 @@ scoped history/exports, audit and notifications are implemented. Backend and fro
 gates, generated-contract drift, real PostgreSQL concurrency, serial Playwright, EN/AR,
 RTL/LTR, accessibility and A4 browser printing passed. The single consolidated review's
 six findings are resolved; [verification evidence](../.scratch/phase-6/verification.md)
-records commands, results and failure resolutions. No merge or push was performed.
+records commands, results and failure resolutions. Its historical no-push/no-merge
+note is superseded by the observed merge history in the [release audit](release-readiness.md).
 [ADR-0050](./adr/0050-transcript-consistent-certification.md) documents
 coherent owner-managed certification reads.
 
@@ -1045,15 +1046,15 @@ coherent owner-managed certification reads.
   manual refund, and official revocation → reference/status-only QR response, in EN/AR.
 
 ### Phase 7 — Reporting & polish (SRS §4.12)
-**Current status:** all seven tickets implemented and verified locally on
-`phase-7-academic-reports-bilingual`, with only prerequisite tickets 01, 02, 03, 04,
-05, 06, 08 and 15 from Phase 4.6 implemented. Both package gates passed and the
-single consolidated Standards/Spec review has five findings resolved. The CI
-timing correction passed its affected workflows/regression (3/3); the existing
-GitHub run is pre-fix and remote confirmation awaits publication. Human demo/
-Arabic/print acceptance remains pending; no phase acceptance,
-push or merge is claimed. Evidence: [tracker](../.scratch/phase-7/tracker.md),
-[audit](../.scratch/phase-7/bilingual-audit.md).
+**Current status:** implemented and merged to `main` via PR #11 (`44807f6`), with
+only prerequisite tickets 01, 02, 03, 04, 05, 06, 08 and 15 from Phase 4.6 implemented.
+Both local package gates passed and the consolidated Standards/Spec review's five
+findings were resolved. Published head `a1d01f9` passed all three GitHub CI jobs,
+including full-stack Playwright. The merge-commit CI had successful backend/frontend
+jobs and Playwright still running when checked on 2026-09-28. Required human demo/
+Arabic/print acceptance remains unrecorded; merge does not assert that acceptance.
+See [release readiness](release-readiness.md), [tracker](../.scratch/phase-7/tracker.md)
+and [audit](../.scratch/phase-7/bilingual-audit.md).
 
 **Keeps its position after Phases 5 and 6, and is now much smaller than it was.** The original
 reasoning held that Phase 7 could not be pulled forward because three of its eight reports —
@@ -1140,3 +1141,16 @@ asked and what was decided:
       /tdd        → build red-green-refactor
       manual review gate → next phase
 ```
+
+## 7. After Phase 7 — localhost release readiness
+
+Phases 5–7 are merged; Phase 4.6 remains partially implemented. The user approved
+an audit of remaining requirements and release readiness on 2026-09-28. Its
+[requirement dispositions](release-requirements-audit.md),
+[CI/acceptance checklist and canonical backlog](release-readiness.md), and
+[new local tickets](../.scratch/release-readiness/spec.md) distinguish missing
+localhost capabilities from accepted production deferrals and unresolved requirements.
+
+The next milestone is completion/disposition of retained gaps, reproducible setup
+and human lifecycle/Arabic/print acceptance on a selected revision. Production
+promotion requires a separate scope decision; ADR-0005 remains in force.

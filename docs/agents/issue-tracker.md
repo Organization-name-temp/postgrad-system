@@ -2,9 +2,10 @@
 
 Issues and specs (a spec is what you may know as a PRD) for this repo live as markdown
 files under `.scratch/`. This repo has a GitHub remote
-(`MohamedYasser343/postgrad-system`), but the `gh` CLI is not installed and this is a
-solo localhost learning build, so work is tracked locally rather than in GitHub Issues.
-Switch to GitHub later by installing + authenticating `gh` and updating this file.
+(`MohamedYasser343/postgrad-system`), and work remains tracked locally rather than in
+GitHub Issues for this solo localhost learning build. The `gh` CLI is available and was used for read-only PR/CI verification
+on 2026-09-28; its availability does not change the configured tracker. A future
+tracker switch must explicitly update this convention.
 
 ## Conventions
 

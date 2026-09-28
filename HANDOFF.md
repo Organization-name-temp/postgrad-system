@@ -2,7 +2,7 @@
 
 **Project:** Postgraduate Registration System (PRS) for E-JUST.
 **Workspace:** `postgrad-system` (git remote `MohamedYasser343/postgrad-system`).
-**Last refreshed:** Phase 7 implemented and verified locally, ready for human acceptance on `phase-7-academic-reports-bilingual`; verification evidence lives in [.scratch/phase-7/tracker.md](.scratch/phase-7/tracker.md).
+**Last refreshed:** 2026-09-28 release-readiness audit of `main` at `44807f6`. Phases 5–7 are merged. Published Phase 7 head CI is green; merge-commit Playwright was still running when checked. Remaining scope and acceptance live in [docs/release-readiness.md](docs/release-readiness.md).
 
 This file is the *entry point for a fresh session*. It carries only what the repo does **not**
 already record; everything else is deliberately a pointer, so it cannot drift.
@@ -40,8 +40,8 @@ already record; everything else is deliberately a pointer, so it cannot drift.
 | **4.5 Dashboards** | **Merged** — all nine tickets plus final two-axis review corrections |
 | **4.6 Query, Filter, Export & Reports** | **Partially executable** — earlier Done claim included planning merges. Phase 7 implements only prerequisite tickets 01, 02, 03, 04, 05, 06, 08 and 15; other work remains outside its goal |
 | **5 Standing + Credit-Hour Summary + Exemption/Transfer/Waiver** | **Complete** — all 17 tickets and final review corrections |
-| **6 Records & Transcript** | **Complete and verified on `phase-6/records-transcript`** — all 13 tickets, full gates, one consolidated review resolved; not merged or pushed |
-| **7 Reporting & polish** | **Implemented and verified locally** — all seven tickets and bounded prerequisites; both package gates green, one consolidated review/five findings resolved. Human acceptance and remote verification of the unpublished CI correction remain pending |
+| **6 Records & Transcript** | **Merged to main via PR #10** — all 13 tickets, full gates and consolidated review corrections; publication supersedes the older local-only verification note |
+| **7 Reporting & polish** | **Merged to main via PR #11** — implemented tickets and bounded prerequisites; published head CI passed all three jobs. Required human acceptance remains unrecorded; merge-commit CI is tracked in release readiness |
 
 **Phase 4.5 is a composition slice**, inserted between Phases 4 and 5 as Phase 0.5 was inserted
 between 0 and 1 — it added no module, migration, Permission, Role or domain rule. Phases 5, 6 and
@@ -124,18 +124,25 @@ password for every account: `password`.
 
 ## Immediate next steps
 
-Phase 6 implementation is complete on the existing branch. Its acceptance evidence and
-reproducible headline demo are in [.scratch/phase-6/verification.md](.scratch/phase-6/verification.md);
-the one consolidated review and six resolved findings are in
-[.scratch/phase-6/review.md](.scratch/phase-6/review.md). No merge or push was performed.
-Phase 7 is implemented and verified locally on its dedicated branch with fixed review baseline
-`b3a3ae7b71538c36230985270de2b73bc2f92088`. Follow its
-[tracker](.scratch/phase-7/tracker.md) and
-[bilingual audit](.scratch/phase-7/bilingual-audit.md) for current evidence and pending
-human acceptance. The single consolidated Standards/Spec review is resolved with
-all five actionable findings fixed. Both package gates passed; the new CI timing
-regression and affected Enrollment/Records workflows passed 3/3. The latest GitHub
-run is pre-fix and failed two browser assertions; the reviewed correction awaits
-publication under the no-push instruction. No per-ticket review, push or merge.
-Server PDF, cryptographic signing, payment gateways,
-postal delivery and email/SMS remain deferred.
+The user approved a release-readiness and remaining-requirements audit after Phase 7.
+Its results are in [the requirements audit](docs/release-requirements-audit.md) and
+[the release checklist](docs/release-readiness.md); additional local issues are under
+[.scratch/release-readiness/](.scratch/release-readiness/spec.md). Existing Phase 4.6
+issues remain canonical and are linked with current blocking edges rather than duplicated.
+
+Start independent retained implementation work with Phase 4.6 Audit Log reporting,
+bulk Course import, or an owner-sized slice of the remaining collection-contract migration.
+Resolve the new Role-assignment and requirements-reconciliation issues before inventing
+policy. The localhost runbook and current-baseline human acceptance can proceed separately.
+CI/merge proves publication and technical checks, not manual Arabic/print acceptance.
+
+Phase 6 merged as `b3a3ae7`; Phase 7 merged as `44807f6`. Published Phase 7 head
+`a1d01f9` passed [all three CI jobs](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36382219491).
+The [merge-commit run](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36394320641)
+had green backend/frontend jobs and in-progress Playwright at the audit check; recheck
+its terminal result before selecting a release. Older phase trackers retain chronological
+local-only/no-push notes; those are superseded for publication by this record.
+
+Server PDF, cryptographic signing, payment gateways, postal delivery, email/SMS and
+production infrastructure/authentication hardening remain explicitly deferred. No
+release tag or production deployment has been performed by this audit.

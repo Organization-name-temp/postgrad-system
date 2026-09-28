@@ -4,6 +4,16 @@ Fixed review baseline: `b3a3ae7b71538c36230985270de2b73bc2f92088`.
 Branch: `phase-7-academic-reports-bilingual`. Initial worktree contained only the
 approved Phase 7 planning directory, committed at the user's request as `c113933`.
 
+## Publication update — 2026-09-28
+
+Phase 7 is now merged via [PR #11](https://github.com/MohamedYasser343/postgrad-system/pull/11)
+as `44807f6`. Published head `a1d01f9` passed [all three CI jobs](https://github.com/MohamedYasser343/postgrad-system/actions/runs/36382219491),
+including the corrected full-stack browser suite. The merge-commit CI observation and
+remaining human acceptance are in [release readiness](../../docs/release-readiness.md).
+This update supersedes publication/remote-verification claims below; the earlier
+no-push contract and results remain chronological implementation evidence. No human
+acceptance is inferred from the merge or CI result.
+
 ## Verification contract
 
 Use PostgreSQL Pest HTTP tests, focused Vitest/RTL interactions and serial
